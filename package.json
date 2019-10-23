@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "build-run": "webpack --env=none && cordova run android",
+    "build-run": "webpack && cordova run android",
     "run-android": "cordova run android",
     "run-browser": "cordova run browser",
     "rm-android": "cordova platform remove android",
