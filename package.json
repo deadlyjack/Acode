@@ -23,7 +23,6 @@
   "dependencies": {
     "@babel/runtime": "^7.5.5",
     "autosize": "^4.0.2",
-    "cordova-android": "^8.0.0",
     "cordova-clipboard": "^1.3.0",
     "cordova-custom-config": "^5.1.0",
     "cordova-plugin-android-permissions": "^1.0.0",
@@ -80,9 +79,7 @@
       },
       "cordova-clipboard": {}
     },
-    "platforms": [
-      "android"
-    ]
+    "platforms": []
   },
   "repository": {
     "type": "git",
