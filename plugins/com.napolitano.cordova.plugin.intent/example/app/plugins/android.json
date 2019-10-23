@@ -1,0 +1,18 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.napolitano.cordova.example.intent"
+        },
+        "com.napolitano.cordova.plugin.intent": {
+            "PACKAGE_NAME": "com.napolitano.cordova.example.intent"
+        }
+    },
+    "dependent_plugins": {}
+}

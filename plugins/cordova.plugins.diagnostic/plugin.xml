@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="cordova.plugins.diagnostic"
+    version="5.0.0">
+
+    <name>Diagnostic</name>
+    <description>Cordova/Phonegap plugin to check the state of Location/WiFi/Camera/Bluetooth device settings.</description>
+    <author>Dave Alden</author>
+    <license>MIT</license>
+    <keywords>ecosystem:cordova,cordova,phonegap,android,ios,windows,diagnostic,wifi,location,gps,camera,bluetooth,settings</keywords>
+    <engines>
+        <engine name="cordova" version=">=7.1.0"/>
+        <engine name="cordova-android" version=">=6.3.0"/>
+        <engine name="cordova-ios" version=">=4.3.0"/>
+    </engines>
+    <repo>https://github.com/dpa99c/cordova-diagnostic-plugin.git</repo>
+    <issue>https://github.com/dpa99c/cordova-diagnostic-plugin/issues</issue>
+
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic">
+                <param name="ios-package" value="Diagnostic" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module src="www/ios/diagnostic.js" name="Diagnostic">
+            <merges target="cordova.plugins.diagnostic" />
+        </js-module>
+
+        <header-file src="src/ios/Diagnostic.h" />
+        <source-file src="src/ios/Diagnostic.m" />
+
+        <!--BEGIN_MODULE LOCATION--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Location">
+                <param name="ios-package" value="Diagnostic_Location" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module src="www/ios/diagnostic.location.js" name="Diagnostic_Location">
+            <merges target="cordova.plugins.diagnostic.location" />
+        </js-module>
+
+        <header-file src="src/ios/Diagnostic_Location.h" />
+        <source-file src="src/ios/Diagnostic_Location.m" />
+
+        <framework src="CoreLocation.framework" />
+
+        <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription" comment="Default usage descriptions: override as necessary in .plist">
+            <string>This app requires access to your location when the screen is on and the app is displayed.</string>
+        </config-file>
+
+        <config-file target="*-Info.plist" parent="NSLocationAlwaysAndWhenInUseUsageDescription" comment="iOS 11 or greater">
+            <string>This app requires constant access to your location in order to track your position, even when the screen is off or the app is in the background.</string>
+        </config-file>
+
+        <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription" comment="iOS 10 or below">
+            <string>This app requires constant access to your location in order to track your position, even when the screen is off or the app is in the background.</string>
+        </config-file>
+        --><!--END_MODULE LOCATION-->
+
+        <!--BEGIN_MODULE BLUETOOTH--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Bluetooth">
+                <param name="ios-package" value="Diagnostic_Bluetooth" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module src="www/ios/diagnostic.bluetooth.js" name="Diagnostic_Bluetooth">
+            <merges target="cordova.plugins.diagnostic.bluetooth" />
+        </js-module>
+
+        <header-file src="src/ios/Diagnostic_Bluetooth.h" />
+        <source-file src="src/ios/Diagnostic_Bluetooth.m" />
+
+        <framework src="CoreBluetooth.framework" />
+
+        <config-file target="*-Info.plist" parent="NSBluetoothPeripheralUsageDescription">
+            <string>This app requires bluetooth access to function properly.</string>
+        </config-file>
+        --><!--END_MODULE BLUETOOTH-->
+
+        <!--BEGIN_MODULE WIFI--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Wifi">
+                <param name="ios-package" value="Diagnostic_Wifi" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module src="www/ios/diagnostic.wifi.js" name="Diagnostic_Wifi">
+            <merges target="cordova.plugins.diagnostic.wifi" />
+        </js-module>
+
+        <header-file src="src/ios/Diagnostic_Wifi.h" />
+        <source-file src="src/ios/Diagnostic_Wifi.m" />
+        --><!--END_MODULE WIFI-->
+
+        <!--BEGIN_MODULE CAMERA--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Camera">
+                <param name="ios-package" value="Diagnostic_Camera" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module src="www/ios/diagnostic.camera.js" name="Diagnostic_Camera">
+            <merges target="cordova.plugins.diagnostic.camera" />
+        </js-module>
+
+        <framework src="Photos.framework" />
+        <framework src="AVFoundation.framework" />
+
+        <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
+            <string>This app requires camera access to function properly.</string>
+        </config-file>
+
+        <config-file target="*-Info.plist" parent="NSPhotoLibraryUsageDescription">
+            <string>This app requires photo library access to function properly.</string>
+        </config-file>
+
+        <header-file src="src/ios/Diagnostic_Camera.h" />
+        <source-file src="src/ios/Diagnostic_Camera.m" />
+        --><!--END_MODULE CAMERA-->
+
+        <!--BEGIN_MODULE NOTIFICATIONS--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Notifications">
+                <param name="ios-package" value="Diagnostic_Notifications" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <framework src="UserNotifications.framework" />
+
+        <js-module src="www/ios/diagnostic.notifications.js" name="Diagnostic_Notifications">
+            <merges target="cordova.plugins.diagnostic.notifications" />
+        </js-module>
+
+        <header-file src="src/ios/Diagnostic_Notifications.h" />
+        <source-file src="src/ios/Diagnostic_Notifications.m" />
+        --><!--END_MODULE NOTIFICATIONS-->
+
+        <!--BEGIN_MODULE MICROPHONE--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Microphone">
+                <param name="ios-package" value="Diagnostic_Microphone" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module src="www/ios/diagnostic.microphone.js" name="Diagnostic_Microphone">
+            <merges target="cordova.plugins.diagnostic.microphone" />
+        </js-module>
+
+        <framework src="AVFoundation.framework" />
+
+        <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">
+            <string>This app requires microphone access to function properly.</string>
+        </config-file>
+
+        <header-file src="src/ios/Diagnostic_Microphone.h" />
+        <source-file src="src/ios/Diagnostic_Microphone.m" />
+        --><!--END_MODULE MICROPHONE-->
+
+        <!--BEGIN_MODULE CONTACTS--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Contacts">
+                <param name="ios-package" value="Diagnostic_Contacts" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module src="www/ios/diagnostic.contacts.js" name="Diagnostic_Contacts">
+            <merges target="cordova.plugins.diagnostic.contacts" />
+        </js-module>
+
+        <framework src="Contacts.framework" />
+        <framework src="AddressBook.framework" />
+
+        <config-file target="*-Info.plist" parent="NSContactsUsageDescription">
+            <string>This app requires contacts access to function properly.</string>
+        </config-file>
+
+        <header-file src="src/ios/Diagnostic_Contacts.h" />
+        <source-file src="src/ios/Diagnostic_Contacts.m" />
+        --><!--END_MODULE CONTACTS-->
+
+        <!--BEGIN_MODULE CALENDAR--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Calendar">
+                <param name="ios-package" value="Diagnostic_Calendar" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module src="www/ios/diagnostic.calendar.js" name="Diagnostic_Calendar">
+            <merges target="cordova.plugins.diagnostic.calendar" />
+        </js-module>
+
+        <framework src="EventKit.framework" />
+
+        <config-file target="*-Info.plist" parent="NSCalendarsUsageDescription">
+            <string>This app requires calendar access to function properly.</string>
+        </config-file>
+
+        <header-file src="src/ios/Diagnostic_Calendar.h" />
+        <source-file src="src/ios/Diagnostic_Calendar.m" />
+        --><!--END_MODULE CALENDAR-->
+
+        <!--BEGIN_MODULE REMINDERS--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Reminders">
+                <param name="ios-package" value="Diagnostic_Reminders" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module src="www/ios/diagnostic.reminders.js" name="Diagnostic_Reminders">
+            <merges target="cordova.plugins.diagnostic.reminders" />
+        </js-module>
+
+        <framework src="EventKit.framework" />
+
+        <config-file target="*-Info.plist" parent="NSRemindersUsageDescription">
+            <string>This app requires reminders access to function properly.</string>
+        </config-file>
+        
+        <header-file src="src/ios/Diagnostic_Reminders.h" />
+        <source-file src="src/ios/Diagnostic_Reminders.m" />
+        --><!--END_MODULE REMINDERS-->
+
+        <!--BEGIN_MODULE MOTION--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Motion">
+                <param name="ios-package" value="Diagnostic_Motion" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module src="www/ios/diagnostic.motion.js" name="Diagnostic_Motion">
+            <merges target="cordova.plugins.diagnostic.motion" />
+        </js-module>
+
+        <framework src="CoreMotion.framework" />
+
+        <config-file target="*-Info.plist" parent="NSMotionUsageDescription">
+            <string>This app requires motion detection access to function properly.</string>
+        </config-file>
+
+        <header-file src="src/ios/Diagnostic_Motion.h" />
+        <source-file src="src/ios/Diagnostic_Motion.m" />
+        --><!--END_MODULE MOTION-->
+    </platform>
+
+    <platform name="android">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic" >
+                <param name="android-package" value="cordova.plugins.Diagnostic"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module name="Diagnostic" src="www/android/diagnostic.js">
+            <merges target="cordova.plugins.diagnostic" />
+        </js-module>
+
+        <source-file src="src/android/Diagnostic.java" target-dir="src/cordova/plugins" />
+
+        <preference name="ANDROID_SUPPORT_VERSION" default="28.+" />
+        <framework src="com.android.support:support-v4:$ANDROID_SUPPORT_VERSION" />
+        <framework src="com.android.support:appcompat-v7:$ANDROID_SUPPORT_VERSION" />
+
+        <!--BEGIN_MODULE LOCATION--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Location" >
+                <param name="android-package" value="cordova.plugins.Diagnostic_Location"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module name="Diagnostic_Location" src="www/android/diagnostic.location.js">
+            <merges target="cordova.plugins.diagnostic.location" />
+        </js-module>
+
+        <source-file src="src/android/Diagnostic_Location.java" target-dir="src/cordova/plugins" />
+        --><!--END_MODULE LOCATION-->
+
+        <!--BEGIN_MODULE BLUETOOTH--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Bluetooth" >
+                <param name="android-package" value="cordova.plugins.Diagnostic_Bluetooth"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <config-file parent="/*" target="AndroidManifest.xml">
+            <uses-permission android:name="android.permission.BLUETOOTH" />
+        </config-file>
+
+        <js-module name="Diagnostic_Bluetooth" src="www/android/diagnostic.bluetooth.js">
+            <merges target="cordova.plugins.diagnostic.bluetooth" />
+        </js-module>
+
+        <source-file src="src/android/Diagnostic_Bluetooth.java" target-dir="src/cordova/plugins" />
+        --><!--END_MODULE BLUETOOTH-->
+
+        <!--BEGIN_MODULE WIFI--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Wifi" >
+                <param name="android-package" value="cordova.plugins.Diagnostic_Wifi"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module name="Diagnostic_Wifi" src="www/android/diagnostic.wifi.js">
+            <merges target="cordova.plugins.diagnostic.wifi" />
+        </js-module>
+
+        <source-file src="src/android/Diagnostic_Wifi.java" target-dir="src/cordova/plugins" />
+        --><!--END_MODULE WIFI-->
+
+        <!--BEGIN_MODULE CAMERA--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Camera" >
+                <param name="android-package" value="cordova.plugins.Diagnostic_Camera"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module name="Diagnostic_Camera" src="www/android/diagnostic.camera.js">
+            <merges target="cordova.plugins.diagnostic.camera" />
+        </js-module>
+
+        <source-file src="src/android/Diagnostic_Camera.java" target-dir="src/cordova/plugins" />
+        --><!--END_MODULE CAMERA-->
+
+        <!--BEGIN_MODULE NOTIFICATIONS--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Notifications" >
+                <param name="android-package" value="cordova.plugins.Diagnostic_Notifications"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module name="Diagnostic_Notifications" src="www/android/diagnostic.notifications.js">
+            <merges target="cordova.plugins.diagnostic.notifications" />
+        </js-module>
+
+        <source-file src="src/android/Diagnostic_Notifications.java" target-dir="src/cordova/plugins" />
+        --><!--END_MODULE NOTIFICATIONS-->
+
+        <!--BEGIN_MODULE MICROPHONE--><!--
+        <js-module name="Diagnostic_Microphone" src="www/android/diagnostic.microphone.js">
+            <merges target="cordova.plugins.diagnostic.microphone" />
+        </js-module>
+        --><!--END_MODULE MICROPHONE-->
+
+        <!--BEGIN_MODULE CONTACTS--><!--
+        <js-module name="Diagnostic_Contacts" src="www/android/diagnostic.contacts.js">
+            <merges target="cordova.plugins.diagnostic.contacts" />
+        </js-module>
+        --><!--END_MODULE CONTACTS-->
+
+        <!--BEGIN_MODULE CALENDAR--><!--
+        <js-module name="Diagnostic_Calendar" src="www/android/diagnostic.calendar.js">
+            <merges target="cordova.plugins.diagnostic.calendar" />
+        </js-module>
+        --><!--END_MODULE CALENDAR-->
+
+        <!--BEGIN_MODULE NFC--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_NFC" >
+                <param name="android-package" value="cordova.plugins.Diagnostic_NFC"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module name="Diagnostic_NFC" src="www/android/diagnostic.nfc.js">
+            <merges target="cordova.plugins.diagnostic.nfc" />
+        </js-module>
+
+        <source-file src="src/android/Diagnostic_NFC.java" target-dir="src/cordova/plugins" />
+        --><!--END_MODULE NFC-->
+
+        <!--BEGIN_MODULE EXTERNAL_STORAGE-->
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_External_Storage" >
+                <param name="android-package" value="cordova.plugins.Diagnostic_External_Storage"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <js-module name="Diagnostic_External_Storage" src="www/android/diagnostic.external_storage.js">
+            <merges target="cordova.plugins.diagnostic.external_storage" />
+        </js-module>
+
+        <source-file src="src/android/Diagnostic_External_Storage.java" target-dir="src/cordova/plugins" />
+        <!--END_MODULE EXTERNAL_STORAGE-->
+    </platform>
+
+    <platform name="windows">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic" >
+                <param name="windows-package" value="cordova.plugins.Diagnostic"/>
+            </feature>
+        </config-file>
+
+        <js-module src="www/windows/diagnostic.js" name="Diagnostic">
+            <merges target="cordova.plugins.diagnostic" />
+        </js-module>
+
+        <js-module src="src/windows/diagnosticProxy.js" name="diagnosticProxy">
+            <merges target="" />
+        </js-module>
+
+        <!--BEGIN_MODULE LOCATION--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Location" >
+                <param name="windows-package" value="cordova.plugins.Diagnostic_Location"/>
+            </feature>
+        </config-file>
+
+        <js-module src="www/windows/diagnostic.location.js" name="Diagnostic_Location">
+            <merges target="cordova.plugins.diagnostic.location" />
+        </js-module>
+
+        <js-module src="src/windows/diagnosticProxy.location.js" name="diagnosticProxy.location">
+            <merges target="" />
+        </js-module>
+        --><!--END_MODULE LOCATION-->
+
+        <!--BEGIN_MODULE BLUETOOTH--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Bluetooth" >
+                <param name="windows-package" value="cordova.plugins.Diagnostic_Bluetooth"/>
+            </feature>
+        </config-file>
+
+        <js-module src="www/windows/diagnostic.bluetooth.js" name="Diagnostic_Bluetooth">
+            <merges target="cordova.plugins.diagnostic.bluetooth" />
+        </js-module>
+
+        <js-module src="src/windows/diagnosticProxy.bluetooth.js" name="diagnosticProxy.bluetooth">
+            <merges target="" />
+        </js-module>
+        --><!--END_MODULE BLUETOOTH-->
+
+        <!--BEGIN_MODULE WIFI--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Wifi" >
+                <param name="windows-package" value="cordova.plugins.Diagnostic_Wifi"/>
+            </feature>
+        </config-file>
+
+        <js-module src="www/windows/diagnostic.wifi.js" name="Diagnostic_Wifi">
+            <merges target="cordova.plugins.diagnostic.wifi" />
+        </js-module>
+
+        <js-module src="src/windows/diagnosticProxy.wifi.js" name="diagnosticProxy.wifi">
+            <merges target="" />
+        </js-module>
+        --><!--END_MODULE WIFI-->
+
+        <!--BEGIN_MODULE CAMERA--><!--
+        <config-file target="config.xml" parent="/*">
+            <feature name="Diagnostic_Camera" >
+                <param name="windows-package" value="cordova.plugins.Diagnostic_Camera"/>
+            </feature>
+        </config-file>
+
+        <js-module src="www/windows/diagnostic.camera.js" name="Diagnostic_Camera">
+            <merges target="cordova.plugins.diagnostic.camera" />
+        </js-module>
+
+        <js-module src="src/windows/diagnosticProxy.camera.js" name="diagnosticProxy.camera">
+            <merges target="" />
+        </js-module>
+        --><!--END_MODULE CAMERA-->
+    </platform>
+</plugin>

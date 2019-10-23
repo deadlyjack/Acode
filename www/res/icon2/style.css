@@ -1,0 +1,162 @@
+@font-face {
+  font-family: 'icon';
+  src: url('fonts/icons.eot?r7gt50');
+  src: url('fonts/icons.eot?r7gt50#iefix') format('embedded-opentype'),
+    url('fonts/icons.ttf?r7gt50') format('truetype'),
+    url('fonts/icons.woff?r7gt50') format('woff'),
+    url('fonts/icons.svg?r7gt50#icons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.icon.image:before {
+  content: "\e90d";
+}
+
+.icon.images:before {
+  content: "\e90e";
+}
+
+.icon.headphones:before {
+  content: "\e910";
+}
+
+.icon.music:before {
+  content: "\e911";
+}
+
+.icon.play:before {
+  content: "\e912";
+}
+
+.icon.film:before {
+  content: "\e913";
+}
+
+.icon.video-camera:before {
+  content: "\e914";
+}
+
+.icon.file-empty:before {
+  content: "\e924";
+}
+
+.icon.files-empty:before {
+  content: "\e925";
+}
+
+.icon.file-text2:before {
+  content: "\e926";
+}
+
+.icon.file-picture:before {
+  content: "\e927";
+}
+
+.icon.file-music:before {
+  content: "\e928";
+}
+
+.icon.file-play:before {
+  content: "\e929";
+}
+
+.icon.file-video:before {
+  content: "\e92a";
+}
+
+.icon.file-zip:before {
+  content: "\e92b";
+}
+
+.icon.copy:before {
+  content: "\e92c";
+}
+
+.icon.paste:before {
+  content: "\e92d";
+}
+
+.icon.stack:before {
+  content: "\e92e";
+}
+
+.icon.folder:before {
+  content: "\e92f";
+}
+
+.icon.folder-open:before {
+  content: "\e930";
+}
+
+.icon.undo:before {
+  content: "\e965";
+}
+
+.icon.redo:before {
+  content: "\e966";
+}
+
+.icon.undo2:before {
+  content: "\e967";
+}
+
+.icon.redo2:before {
+  content: "\e968";
+}
+
+.icon.spinner:before {
+  content: "\e97a";
+}
+
+.icon.spinner2:before {
+  content: "\e97b";
+}
+
+.icon.heart:before {
+  content: "\e9da";
+}
+
+.icon.loop2:before {
+  content: "\ea2e";
+}
+
+.icon.embed:before {
+  content: "\ea7f";
+}
+
+.icon.embed2:before {
+  content: "\ea80";
+}
+
+.icon.share2:before {
+  content: "\ea82";
+}
+
+.icon.instagram:before {
+  content: "\ea92";
+}
+
+.icon.whatsapp:before {
+  content: "\ea93";
+}
+
+.icon.telegram:before {
+  content: "\ea95";
+}
+
+.icon.twitter:before {
+  content: "\ea96";
+}
+
+.icon.android:before {
+  content: "\eac0";
+}
+
+.icon.html-five2:before {
+  content: "\eae5";
+}
+
+.icon.css3:before {
+  content: "\eae6";
+}

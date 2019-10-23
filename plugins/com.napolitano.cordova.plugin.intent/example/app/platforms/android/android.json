@@ -1,0 +1,53 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {
+            "res/xml/config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"Whitelist\"><param name=\"android-package\" value=\"org.apache.cordova.whitelist.WhitelistPlugin\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"IntentPlugin\"><param name=\"android-package\" value=\"com.napolitano.cordova.plugin.intent.IntentPlugin\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "installed_plugins": {
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.napolitano.cordova.example.intent"
+        },
+        "com.napolitano.cordova.plugin.intent": {
+            "PACKAGE_NAME": "com.napolitano.cordova.example.intent"
+        }
+    },
+    "dependent_plugins": {},
+    "modules": [
+        {
+            "file": "plugins/cordova-plugin-whitelist/whitelist.js",
+            "id": "cordova-plugin-whitelist.whitelist",
+            "pluginId": "cordova-plugin-whitelist",
+            "runs": true
+        },
+        {
+            "file": "plugins/com.napolitano.cordova.plugin.intent/www/android/IntentPlugin.js",
+            "id": "com.napolitano.cordova.plugin.intent.IntentPlugin",
+            "pluginId": "com.napolitano.cordova.plugin.intent",
+            "clobbers": [
+                "IntentPlugin"
+            ]
+        }
+    ],
+    "plugin_metadata": {
+        "cordova-plugin-whitelist": "1.2.0",
+        "com.napolitano.cordova.plugin.intent": "0.1.2"
+    }
+}

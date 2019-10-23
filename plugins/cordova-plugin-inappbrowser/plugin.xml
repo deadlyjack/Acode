@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+           id="cordova-plugin-inappbrowser"
+      version="3.1.0">
+
+    <name>InAppBrowser</name>
+    <description>Cordova InAppBrowser Plugin</description>
+    <license>Apache 2.0</license>
+    <keywords>cordova,in,app,browser,inappbrowser</keywords>
+    <repo>https://github.com/apache/cordova-plugin-inappbrowser</repo>
+    <issue>https://github.com/apache/cordova-plugin-inappbrowser/issues</issue>
+
+    <engines>
+      <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
+    </engines>
+
+    <!-- android -->
+    <platform name="android">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="cordova.InAppBrowser.open" />
+            <clobbers target="window.open" />
+        </js-module>
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="InAppBrowser">
+                <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <source-file src="src/android/InAppBrowserDialog.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />
+
+        <!-- drawable src/android/resources -->
+        <resource-file src="src/android/res/drawable-hdpi/ic_action_next_item.png" target="res/drawable-hdpi/ic_action_next_item.png" />
+        <resource-file src="src/android/res/drawable-mdpi/ic_action_next_item.png" target="res/drawable-mdpi/ic_action_next_item.png" />
+        <resource-file src="src/android/res/drawable-xhdpi/ic_action_next_item.png" target="res/drawable-xhdpi/ic_action_next_item.png" />
+        <resource-file src="src/android/res/drawable-xxhdpi/ic_action_next_item.png" target="res/drawable-xxhdpi/ic_action_next_item.png" />
+
+        <resource-file src="src/android/res/drawable-hdpi/ic_action_previous_item.png" target="res/drawable-hdpi/ic_action_previous_item.png" />
+        <resource-file src="src/android/res/drawable-mdpi/ic_action_previous_item.png" target="res/drawable-mdpi/ic_action_previous_item.png" />
+        <resource-file src="src/android/res/drawable-xhdpi/ic_action_previous_item.png" target="res/drawable-xhdpi/ic_action_previous_item.png" />
+        <resource-file src="src/android/res/drawable-xxhdpi/ic_action_previous_item.png" target="res/drawable-xxhdpi/ic_action_previous_item.png" />
+
+        <resource-file src="src/android/res/drawable-hdpi/ic_action_remove.png" target="res/drawable-hdpi/ic_action_remove.png" />
+        <resource-file src="src/android/res/drawable-mdpi/ic_action_remove.png" target="res/drawable-mdpi/ic_action_remove.png" />
+        <resource-file src="src/android/res/drawable-xhdpi/ic_action_remove.png" target="res/drawable-xhdpi/ic_action_remove.png" />
+        <resource-file src="src/android/res/drawable-xxhdpi/ic_action_remove.png" target="res/drawable-xxhdpi/ic_action_remove.png" />
+
+    </platform>
+
+    <!-- ios -->
+    <platform name="ios">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="cordova.InAppBrowser.open" />
+            <clobbers target="window.open" />
+        </js-module>
+        <config-file target="config.xml" parent="/*">
+            <feature name="InAppBrowser">
+                <param name="ios-package" value="CDVInAppBrowser" />
+                <param name="onload" value="true" />
+            </feature>
+            <feature name="UIInAppBrowser">
+                <param name="ios-package" value="CDVUIInAppBrowser" />
+                <param name="onload" value="true" />
+            </feature>
+            <feature name="WKInAppBrowser">
+                <param name="ios-package" value="CDVWKInAppBrowser" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/CDVInAppBrowser.h" />
+	    <source-file src="src/ios/CDVInAppBrowser.m" />
+        <header-file src="src/ios/CDVInAppBrowserOptions.h" />
+        <source-file src="src/ios/CDVInAppBrowserOptions.m" />
+        <header-file src="src/ios/CDVInAppBrowserNavigationController.h" />
+        <source-file src="src/ios/CDVInAppBrowserNavigationController.m" />
+	    <header-file src="src/ios/CDVUIInAppBrowser.h" />
+	    <source-file src="src/ios/CDVUIInAppBrowser.m" />
+	    <header-file src="src/ios/CDVWKInAppBrowser.h" />
+	    <source-file src="src/ios/CDVWKInAppBrowser.m" />
+	    <header-file src="src/ios/CDVWKInAppBrowserUIDelegate.h" />
+	    <source-file src="src/ios/CDVWKInAppBrowserUIDelegate.m" />
+
+	    <framework src="CoreGraphics.framework" />
+    </platform>
+
+    <!-- osx -->
+    <platform name="osx">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="cordova.InAppBrowser.open" />
+            <clobbers target="window.open" />
+        </js-module>
+        <config-file target="config.xml" parent="/*">
+            <feature name="InAppBrowser">
+                <param name="osx-package" value="CDVInAppBrowser" />
+            </feature>
+        </config-file>
+
+        <header-file src="src/osx/CDVInAppBrowser.h" />
+        <source-file src="src/osx/CDVInAppBrowser.m" />
+    </platform>
+
+    <!-- windows -->
+    <platform name="windows">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="cordova.InAppBrowser.open" />
+            <clobbers target="window.open" />
+        </js-module>
+        <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
+            <runs />
+        </js-module>
+        <asset src="www/inappbrowser.css" target="css/inappbrowser.css" />
+    </platform>
+
+    <!-- browser -->
+    <platform name="browser">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="cordova.InAppBrowser.open" />
+            <clobbers target="window.open" />
+        </js-module>
+        <js-module src="src/browser/InAppBrowserProxy.js" name="InAppBrowserProxy">
+            <runs />
+        </js-module>
+    </platform>
+</plugin>

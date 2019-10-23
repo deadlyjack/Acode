@@ -1,0 +1,97 @@
+@import './variables.scss';
+
+.page,
+body {
+    &.device-android {
+
+        #sidenav {
+            padding-top: 25px;
+        }
+
+        .header,
+        header {
+            padding-top: $statusbarWidth;
+            height: $headerHeight + $statusbarWidth;
+            box-sizing: border-box;
+        }
+    }
+}
+
+.header,
+header {
+    z-index: 98;
+    position: sticky;
+    top: 0;
+    left: 0;
+    height: $headerHeight;
+    background-color: $primary;
+    width: 100%;
+
+    >*:nth-child(2) {
+        flex: unset !important;
+        margin: auto;
+        font-weight: bold;
+        font-size: 1.4em;
+        white-space: nowrap;
+        overflow: auto;
+    }
+}
+
+.tile {
+    display: flex;
+    flex-wrap: nowrap;
+    padding: 0 5px;
+    box-sizing: border-box;
+
+    &.cut {
+        opacity: 0.6;
+    }
+
+    &.light {
+        color: white;
+    }
+
+    >*:nth-child(2) {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        font-weight: 400;
+        overflow: auto;
+        padding: 0 2.5px;
+        white-space: pre;
+        user-select: none;
+
+        &.sub-text {
+            display: block;
+            text-align: center;
+
+            &::after {
+                content: attr(data-subText);
+                font-size: 0.58em;
+                opacity: 0.6;
+                display: block;
+                position: sticky;
+                left: 0;
+                text-align: center;
+            }
+        }
+    }
+
+    >*:first-child {
+        margin-right: 5px;
+    }
+
+    >*:last-child {
+        margin-left: 5px;
+    }
+
+    .icon {
+        height: $headerHeight;
+        width: $headerHeight;
+        font-size: 2em;
+
+        &:active {
+            transform: scale(0.95);
+        }
+    }
+}

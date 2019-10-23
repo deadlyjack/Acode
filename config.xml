@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.foxdebug.acode" version="0.0.4.21" 
+    xmlns="http://www.w3.org/ns/widgets" 
+    xmlns:cdv="http://cordova.apache.org/ns/1.0" 
+    xmlns:android="http://schemas.android.com/apk/res/android" android-versionCode="21">
+    <name>Acode</name>
+    <description>
+        Light weight code editor and web IDE for android.
+    </description>
+    <author email="dellevenjack@gmail.com" href="https://acode.foxdebug.com">
+       Ajit Kumar (dellevenjack)
+    </author>
+    <content src="index.html" />
+    <plugin name="cordova-plugin-whitelist" spec="1" />
+    <access origin="*" launch-external="yes" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+
+    <preference name="cordova.plugins.diagnostic.modules" value="EXTERNAL_STORAGE " />
+
+    <platform name="android">
+
+        <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/colors.xml" />
+        <allow-intent href="market:*" />
+
+        <preference name="DisallowOverscroll" value="true"/>
+        <!-- <preference name="Orientation" value="portrait"/> -->
+        <preference name="BackgroundColor" value="0xffffffff"/>
+        <preference name="StatusBarStyle" value="lightcontent" />
+        <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+        <preference name="AndroidExtraFilesystems" value="sdcard,cache" />
+
+        <preference name="android-minSdkVersion" value="21" />
+
+        <preference name="AndroidLaunchMode" value="singleTask" />
+        <preference name="prerendered-icon" value="false" />
+
+        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+            <application android:usesCleartextTraffic="true" />
+        </edit-config>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="./application/activity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:mimeType="text/*" />
+                <data android:mimeType="application/javascript" />
+                <data android:mimeType="application/x-javascript" />
+                <data android:mimeType="application/ecmascript" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/x-octet-stream" />
+                <data android:mimeType="application/xml" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <data android:mimeType="text/*" />
+                <data android:mimeType="application/javascript" />
+                <data android:mimeType="application/x-javascript" />
+                <data android:mimeType="application/ecmascript" />
+                <data android:mimeType="application/xml" />
+                <data android:mimeType="application/octet-stream" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="http" android:host="*" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="https" android:host="*" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </config-file>
+
+        <icon background="@color/ic_launcher_background" density="mdpi" foreground="res/icon/android/mipmap-mdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="hdpi" foreground="res/icon/android/mipmap-hdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="xhdpi" foreground="res/icon/android/mipmap-xhdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="xxhdpi" foreground="res/icon/android/mipmap-xxhdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="xxxhdpi" foreground="res/icon/android/mipmap-xxxhdpi/ic_launcher_foreground.png" />
+    </platform>
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+    </platform>
+</widget>

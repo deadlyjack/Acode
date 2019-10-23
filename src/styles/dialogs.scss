@@ -1,0 +1,139 @@
+@import './variables.scss';
+
+.prompt {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1) translateZ(0);
+
+    z-index: 109;
+
+    height: fit-content;
+    max-height: 80vh;
+    width: 100vw;
+    max-width: 320px;
+    background-color: $primary;
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
+
+    display: flex;
+    flex-direction: column;
+
+    &.select {
+
+        min-width: 220px;
+        width: fit-content;
+        max-width: 320px;
+
+        .title {
+            justify-content: center;
+        }
+    }
+
+    ul {
+        overflow-y: auto;
+        padding: 10px;
+        list-style: none;
+
+        li {
+
+            &.selected span {
+                color: $textSecondry !important;
+            }
+
+            &:not(:last-child) {
+                border-bottom: 0.02rem solid rgba(238, 238, 238, 0.251);
+            }
+
+            height: 40px;
+            text-transform: uppercase;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $dialogText;
+        }
+    }
+
+    &+.mask {
+        z-index: 108;
+        background-color: black;
+        opacity: 0.4;
+        transition: all 300ms ease;
+        transform: translateZ(0);
+        animation: animate-darkness 300ms ease 1;
+
+    }
+
+    &.hide {
+        transition: all 300ms ease;
+        transform: translate(-50%, -50%) scale(0.8) translateZ(0);
+        opacity: 0;
+
+        &+.mask {
+            opacity: 0;
+        }
+    }
+
+    .title {
+        display: flex;
+        align-items: center;
+        font-size: 1.25em;
+        color: $dialogText;
+
+        &:not(:empty) {
+            min-height: 40px;
+            padding: 10px 10px 0 10px;
+        }
+    }
+
+    .message {
+        color: $dialogText;
+        padding: 10px;
+        min-height: 40px;
+        font-size: 1.2em;
+    }
+
+    .input {
+        max-height: calc(100vh - 80px);
+        width: 100%;
+        max-width: 300px;
+        background-color: inherit;
+        border: none;
+        color: $dialogText;
+        border-bottom: solid 2px currentColor;
+        margin: auto;
+        text-indent: 0;
+        font-size: 1.2em;
+    }
+
+    li {
+        .icon {
+            font-size: 0.85em;
+        }
+    }
+
+    .error-msg {
+        color: $errorText;
+        height: fit-content;
+
+        &:not(:empty) {
+            margin: 10px auto;
+        }
+    }
+
+    .button-container {
+        margin-top: 20px;
+    }
+}
+
+@keyframes animate-darkness {
+    0% {
+        opacity: 0;
+        transform: translateZ(0);
+    }
+
+    100% {
+        opacity: 0.4;
+        transform: translateZ(0);
+    }
+}

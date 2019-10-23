@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.apache.cordova.test">
+
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="14" />
+
+    <application>
+        <uses-library android:name="android.test.runner" />
+    </application>
+
+    <instrumentation android:name="android.test.InstrumentationTestRunner"
+                     android:targetPackage="org.apache.cordova.test"
+                     android:handleProfiling="false"
+                     android:functionalTest="false"
+                     android:label="Tests for org.apache.cordova.test"/>
+</manifest>

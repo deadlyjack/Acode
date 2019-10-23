@@ -1,0 +1,30 @@
+{
+    "browser": true
+  , "devel": true
+  , "bitwise": true
+  , "undef": true
+  , "trailing": true
+  , "quotmark": false
+  , "indent": 4
+  , "unused": "vars"
+  , "latedef": "nofunc"
+  , "globals": {
+        "module": false,
+        "exports": false,
+        "require": false,
+        "cordova": false,
+        "File": true,
+        "FileSystem": true,
+        "FileReader": true,
+        "FileWriter": true,
+        "FileError": true,
+        "LocalFileSystem": true,
+        "Metadata": true,
+        "Flags": true,
+        "DirectoryEntry": true,
+        "resolveLocalFileSystemURL": false,
+        "requestFileSystem": true,
+        "FILESYSTEM_PREFIX": true,
+        "FILESYSTEM_PROTOCOL": true
+    }
+}

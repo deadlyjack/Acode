@@ -1,0 +1,6 @@
+{
+    "exclude": ["**/node_modules", "**/platforms", "**/plugings", "**/www"],
+    "compilerOptions": {
+        "target": "es2015"
+    }
+}

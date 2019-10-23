@@ -1,0 +1,149 @@
+@import './variables.scss';
+
+$lightText : #333e59;
+
+.theme-light {
+
+    header,
+    .prompt,
+    #sidenav {
+        background-color: white;
+
+        span,
+        i,
+        button,
+        strong {
+            color: $lightText !important;
+        }
+    }
+
+    header {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    #sidenav {
+        li.active {
+            span:nth-child(2) {
+                color: gold !important;
+            }
+        }
+    }
+
+    .icon.float {
+        background-color: white !important;
+        color: $lightText !important;
+    }
+
+    footer {
+        background-color: white;
+
+        &:first-of-type {
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .prompt,
+    .button-container {
+        button {
+            background-color: white;
+            color: $lightText !important;
+        }
+
+        textarea,
+        input {
+            color: $lightText;
+            border-color: currentColor;
+        }
+
+        input::placeholder {
+            color: #757b88 !important;
+        }
+    }
+}
+
+$bgDark : #313131;
+$pageBgDark: #252525;
+$textDark : white;
+
+.theme-dark {
+    background-color: $pageBgDark !important;
+
+    .page {
+        background-color: $pageBgDark !important;
+
+        .dir-list .folder {
+            color: rgb(144, 255, 93);
+        }
+
+        small,
+        div,
+        span:not(.icon) {
+            color: white !important;
+            border-color: #fff2 !important;
+        }
+    }
+
+    a {
+        color: rgb(181, 180, 233);
+    }
+
+    .context-menu,
+    header,
+    .prompt,
+    #sidenav {
+        background-color: $bgDark;
+
+        span,
+        i,
+        button {
+            color: $textDark !important;
+        }
+    }
+
+    .context-menu {
+        li.disabled span {
+            color: #999 !important;
+        }
+
+        hr {
+            color: #4a4a4a !important;
+        }
+    }
+
+    .prompt ul li.selected span {
+        color: $textSecondry !important;
+    }
+
+    #sidenav {
+        li.active {
+            span:nth-child(2) {
+                color: gold !important;
+            }
+        }
+    }
+
+    .icon.float {
+        background-color: $bgDark !important;
+        color: $textDark !important;
+    }
+
+    footer {
+        background-color: $bgDark;
+    }
+
+    .button-container {
+        button {
+            background-color: $bgDark;
+            color: $textDark !important;
+        }
+
+        input {
+            color: $textDark;
+            border-color: currentColor;
+        }
+
+        input::placeholder {
+            color: #757b88 !important;
+        }
+    }
+}

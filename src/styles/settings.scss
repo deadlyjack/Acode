@@ -1,0 +1,46 @@
+.main.settings {
+    padding-top: 5px;
+
+    >.setting-item {
+        display: flex;
+        min-height: 60px;
+
+        &:active {
+            transition: all 100ms ease;
+            transform: scale(0.95);
+        }
+
+        &:not(:last-child) {
+            margin-bottom: 5px;
+            border-bottom: solid 1px #f3e9e9;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+
+            .text {
+                flex: 1.2;
+                display: flex;
+                align-items: center;
+            }
+
+            .value {
+                flex: 0.8;
+                display: flex;
+                align-items: center;
+                opacity: 0.6;
+            }
+        }
+
+        .icon {
+            height: 60px;
+            width: 60px;
+
+            &.no-icon {
+                width: 20px;
+            }
+        }
+    }
+}
