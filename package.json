@@ -5,15 +5,14 @@
   "description": "Acode is android and IOS code editor app",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "build-start": "webpack --env=none && cordova run android",
-    "start-android": "cordova run android",
-    "start-browser": "cordova run browser",
+    "build-run": "webpack --env=none && cordova run android",
+    "run-android": "cordova run android",
+    "run-browser": "cordova run browser",
     "rm-android": "cordova platform remove android",
     "add-android": "cordova platform add android",
     "rebuild": "cordova platform remove android && cordova platform add android && cordova run android",
-    "build-release": "webpack --env=production && cordova build android --release"
+    "build-release": "webpack && cordova build android --release"
   },
   "keywords": [
     "ecosystem:cordova"
@@ -23,6 +22,7 @@
   "dependencies": {
     "@babel/runtime": "^7.5.5",
     "autosize": "^4.0.2",
+    "cordova-android": "^8.1.0",
     "cordova-clipboard": "^1.3.0",
     "cordova-custom-config": "^5.1.0",
     "cordova-plugin-android-permissions": "^1.0.0",
@@ -79,7 +79,9 @@
       },
       "cordova-clipboard": {}
     },
-    "platforms": []
+    "platforms": [
+      "android"
+    ]
   },
   "repository": {
     "type": "git",
