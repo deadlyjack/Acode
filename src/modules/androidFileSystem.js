@@ -84,9 +84,9 @@ function readFile(filename) {
             responseType: "arraybuffer"
         }).then(res => {
 
-            if (res.response)
+            if (res)
                 resolve({
-                    data: res.response
+                    data: res
                 });
             else
                 return Promise.reject();

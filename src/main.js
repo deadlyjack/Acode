@@ -16,8 +16,7 @@ import './styles/overwriteAceStyle.scss';
 //import modules
 import "core-js/stable";
 import {
-  tag,
-  bubble
+  tag
 } from "html-element-js";
 import gen from './components/gen';
 import tile from "./components/tile";
@@ -36,6 +35,7 @@ import settingsPage from './page/settings/mainSettings';
 import help from "./page/help";
 import demoPage from "./page/demoPages";
 import clipboardAction from "./modules/clipboard";
+import ajax from "./modules/ajax";
 
 //@ts-check
 
@@ -119,7 +119,6 @@ function App() {
     className: 'icon float bottom right file-control play',
     onclick: runPreview.bind(runBtn, editorManager)
   });
-  bubble(runBtn);
   //#endregion
 
   //#region initialization
@@ -550,7 +549,8 @@ function App() {
       row1.search.click();
     }
 
-    editorManager.activeEditor.editor.focus();
+    const activeEditor = editorManager.activeEditor;
+
     if (footerRow2.parentElement) {
       mainFooter.removeChild(footerRow2);
       app.classList.remove('twostories');
@@ -558,6 +558,8 @@ function App() {
       mainFooter.append(footerRow2);
       app.classList.add('twostories');
     }
+
+    activeEditor.editor.focus();
   };
 
   row2.moveup.onclick = function () {
@@ -802,8 +804,7 @@ function App() {
   window.getCloseMessage = function () {
     const numEditor = editorManager.hasUnsavedEditor();
     if (numEditor) {
-      const msg = strings["number of unsaved file warning"];
-      return `${numEditor} ${numEditor === 1 ? msg.replace('files', 'file') : msg}`;
+      return strings["unsaved files close app"];
     }
   };
 
@@ -976,11 +977,10 @@ function Main() {
 
   const language = navigator.language.toLowerCase();
   let lang = null;
-  if (!localStorage.globalSettings && language in constants.string) {
+  if (!localStorage.globalSettings && language in constants.langList) {
     lang = language;
   }
   window.appSettings = new Settings(lang);
-  window.strings = constants.string[appSettings.value.lang];
   window.actionStack = ActionStack();
   window.editorCount = 0;
   window.alert = dialogs.alert;
@@ -999,41 +999,51 @@ function Main() {
   }
 
   document.addEventListener("deviceready", () => {
-    const version = localStorage.getItem('version');
-    if (version !== AppVersion.version) {
-      localStorage.clear();
-      localStorage.setItem('version', AppVersion.version);
-    }
+    const url = `${cordova.file.applicationDirectory}www/lang/${appSettings.value.lang}.json`;
+    fs.readFile(url)
+      .then(res => {
+        const decoder = new TextDecoder('utf-8');
+        const text = decoder.decode(res.data);
+        window.strings = JSON.parse(text);
+        runApp();
+      });
+  });
+}
 
-    document.body = tag(document.body);
-    window.app = document.body;
-    window.onerror = function (message, file, lineno, colno) {
-      const errFile = cordova.file.externalApplicationStorageDirectory;
-      window.resolveLocalFileSystemURL(errFile, dirEntry => {
-        dirEntry.getFile('error.log', {
-          create: true
-        }, fileEntry => {
-          fileEntry.createWriter(fw => {
-            fw.seek(fw.length);
-            fw.write(`------------------------\n\t${file}:${lineno}:${colno}\n\t${message}\n`);
-          });
+function runApp() {
+  const version = localStorage.getItem('version');
+  if (version !== AppVersion.version) {
+    localStorage.clear();
+    localStorage.setItem('version', AppVersion.version);
+  }
+
+  document.body = tag(document.body);
+  window.app = document.body;
+  window.onerror = function (message, file, lineno, colno) {
+    const errFile = cordova.file.externalApplicationStorageDirectory;
+    window.resolveLocalFileSystemURL(errFile, dirEntry => {
+      dirEntry.getFile('error.log', {
+        create: true
+      }, fileEntry => {
+        fileEntry.createWriter(fw => {
+          fw.seek(fw.length);
+          fw.write(`------------------------\n\t${file}:${lineno}:${colno}\n\t${message}\n`);
         });
       });
-    };
-    document.addEventListener('backbutton', actionStack.pop);
-    window.beautify = ace.require("ace/ext/beautify").beautify;
-    if (!localStorage.initFlag) {
-      document.body.classList.remove('loading', 'splash');
-      NavigationBar.backgroundColorByHexString("#9999ff");
-      StatusBar.backgroundColorByHexString("#9999ff");
-      demoPage().then(() => {
-        new App();
-      });
-    } else {
+    });
+  };
+  document.addEventListener('backbutton', actionStack.pop);
+  window.beautify = ace.require("ace/ext/beautify").beautify;
+  if (!localStorage.initFlag) {
+    document.body.classList.remove('loading', 'splash');
+    NavigationBar.backgroundColorByHexString("#9999ff");
+    StatusBar.backgroundColorByHexString("#9999ff");
+    demoPage().then(() => {
       new App();
-    }
-    // new App();
-  });
+    });
+  } else {
+    new App();
+  }
 }
 
 //#region global funtions
@@ -1238,14 +1248,14 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
   });
 }
 
-function addFolder(res, sidebar, thisObj, index) {
+function addFolder(folder, sidebar, thisObj, index) {
   return new Promise(resolve => {
     /**
      * @type {Manager}
      */
     const editorManager = thisObj.editorManager;
-    const name = res.name === 'File Browser' ? 'Home' : res.name;
-    const rootUrl = res.url;
+    const name = folder.name === 'File Browser' ? 'Home' : folder.name;
+    const rootUrl = folder.url;
     const closeFolder = tag('span', {
       className: 'icon cancel'
     });
@@ -1260,7 +1270,6 @@ function addFolder(res, sidebar, thisObj, index) {
         sidebar.removeChild(rootNode);
         rootNode = null;
       }
-      // addedFolder = addedFolder.filter(folder => folder.url !== rootUrl);
       const tmpFolders = {};
       for (let url in addedFolder) {
         if (url !== rootUrl) tmpFolders[url] = addedFolder[url];
@@ -1306,6 +1315,10 @@ function addFolder(res, sidebar, thisObj, index) {
             createFileTile(rootNode, item);
           }
         });
+        resolve(index);
+      }).catch(() => {
+        rootNode.remove();
+        delete addedFolder[rootUrl];
         resolve(index);
       });
       return rootNode;
@@ -1621,42 +1634,57 @@ function restoreTheme(darken) {
 function runPreview(editorManager) {
   const activeEditor = editorManager.activeEditor;
   if (activeEditor.fileUri) {
-    dialogs.select('Select mode', ['desktop', 'mobile'])
-      .then(mode => {
-        const ref = cordova.InAppBrowser.open(editorManager.activeEditor.fileUri, '_blank', 'location=yes, clearcache=yes');
-        ref.addEventListener('loadstart', function () {
-          ref.executeScript({
-            code: "const scripttag = document.createElement('script');scripttag.textContent = `" + constants.INJECTION + "`; if(document.head) document.head.appendChild(scripttag); else document.children[0].innerHTML += `<script>" + constants.INJECTION + "</script>`"
+    let uri = activeEditor.fileUri;
+    window.resolveLocalFileSystemURL(uri, entry => {
+      if (entry.isDirectory) return;
+      entry.getParent(parent => {
+        fs.readFile(uri)
+          .then(res => {
+            const decoder = new TextDecoder('utf-8');
+            const url = `${cordova.file.applicationDirectory}www/js/injection.min.js`;
+            let text = decoder.decode(res.data);
+            fs.readFile(url)
+              .then(res => {
+                let js = decoder.decode(res.data);
+                js = `<script>${js}</script>`;
+                text = text.split('<head>');
+                text = `${text[0]}<head>${js}${text[1]}`;
+                const name = parent.nativeURL + '.run_' + entry.name;
+                fs.writeFile(name, text, true, false)
+                  .then(() => {
+                    run(name);
+                  });
+              });
           });
-        });
-        ref.addEventListener('loadstop', function () {
-          ref.executeScript({
-            code: `document.body.appendChild(__c_toggler__); window.addEventListener('error', console.error);`
-          });
-
-          if (mode === 'mobile') {
-            ref.executeScript({
-              code: `var allMetas = document.querySelectorAll('meta');
-            var get = false;
-            for(var __i = 0; __i < allMetas.length; ++__i){
-              if(allMetas[__i].content === 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'){
-                  get = true;
-                  break;
-              }
-            }
-          
-            if(!get){
-              var metaTag=document.createElement('meta');
-              metaTag.name = "viewport"
-              metaTag.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
-              document.getElementsByTagName('head')[0].appendChild(metaTag);
-            }`
-            })
-          }
-        });
-      });
+      })
+    });
   } else {
     alert(strings.warning.toUpperCase(), strings['save file to run']);
+  }
+
+  function run(uri) {
+    const mode = appSettings.value.previewMode;
+    if (mode === strings['not set']) {
+      dialogs.select('Select mode', ['desktop', 'mobile'])
+        .then(mode => {
+          run(mode);
+        });
+    } else {
+      run(mode);
+    }
+
+    function run(mode) {
+      const ref = cordova.InAppBrowser.open(uri, '_blank', 'location=yes, clearcache=yes');
+      ref.addEventListener('loadstart', function () {
+        ref.executeScript({
+          code: `window.__mode = '${mode}';`
+        });
+      });
+
+      ref.addEventListener('exit', function () {
+        fs.deleteFile(uri);
+      });
+    }
   }
 }
 //#endregion

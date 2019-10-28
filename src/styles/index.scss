@@ -29,11 +29,6 @@ html {
     height: 100%;
 }
 
-.ace_editor,
-.ace_editor * {
-    font-family: monospace
-}
-
 .loading {
 
     &.splash {
@@ -312,14 +307,6 @@ ul {
 
 input {
     text-indent: 10px;
-}
-
-.ace_scroller.ace_scroll-left {
-    box-shadow: none !important;
-}
-
-.ace_editor {
-    position: unset;
 }
 
 .main {

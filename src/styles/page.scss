@@ -143,6 +143,10 @@ body {
     min-height: calc(100vh - #{$headerHeight});
   }
 
+  .editor-container {
+    height: 100%;
+  }
+
   &.bottom-bar {
 
     .float {
@@ -152,8 +156,8 @@ body {
       }
     }
 
-    main,
-    .main {
+    >main,
+    >.main {
       height: calc(100vh - #{$footerHeight + $headerHeight});
       min-height: calc(100vh - #{$footerHeight + $headerHeight});
     }

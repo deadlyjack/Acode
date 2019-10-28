@@ -2301,14 +2301,16 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
     var valueResetRegex = isIOS ? /\s/ : /\n/;
 
     var TextInput = function (parentNode, host) {
-        var text = dom.createElement("textarea");
+        var text = document.createElement('textarea');
+
+        if (!window.appSettings.value.autoCorrect) {
+            text.autocomplete = "new-password";
+        }
+
         text.className = "ace_text-input";
-
-        text.setAttribute("wrap", "off");
-        text.setAttribute("autocorrect", "off");
-        text.setAttribute("autocapitalize", "off");
-        text.setAttribute("spellcheck", false);
-
+        text.wrap = "off";
+        text.spellcheck = false;
+        text.autocapitalize = "none";
         text.style.opacity = "0";
         parentNode.insertBefore(text, parentNode.firstChild);
 
@@ -2788,12 +2790,13 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
         this.setCopyWithEmptySelection = function (value) {};
 
         this.onContextMenu = function (e) {
+            e.preventDefault();
             afterContextMenu = true;
             resetSelection();
-            host._emit("nativecontextmenu", {
-                target: host,
-                domEvent: e
-            });
+            // host._emit("nativecontextmenu", {
+            //     target: host,
+            //     domEvent: e
+            // });
             this.moveToMouse(e, true);
         };
 
@@ -3937,31 +3940,6 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
         var vX = 0;
         var vY = 0;
         var pressed;
-
-        function handleLongTap() {
-            longTouchTimer = null;
-            clearTimeout(longTouchTimer);
-            mode = "wait";
-        }
-
-        function switchToSelectionMode() {
-            longTouchTimer = null;
-            clearTimeout(longTouchTimer);
-            editor.selection.moveToPosition(pos);
-            var range = clickCount >= 2 ?
-                editor.selection.getLineRange(pos.row) :
-                editor.session.getBracketRange(pos);
-            if (range && !range.isEmpty()) {
-                editor.selection.setRange(range);
-            } else {
-                editor.textInput.getElement().dispatchEvent(new KeyboardEvent('keydown', {
-                    keyCode: 68,
-                    ctrlKey: true
-                }));
-            }
-            mode = "wait";
-        }
-
         el.addEventListener("touchstart", function (e) {
 
             if (e.target.parentElement.className === "clipboard-contextmneu") return;
@@ -4050,7 +4028,6 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
             } else if (longTouchTimer) {
                 editor.selection.moveToPosition(pos);
                 animationSteps = 0;
-                showContextMenu();
             } else if (mode == "scroll") {
                 animate();
                 e.preventDefault();
@@ -4127,6 +4104,30 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                 if (oldScrollTop == editor.session.getScrollTop())
                     animationSteps = 0;
             }, 10);
+        }
+
+        function handleLongTap() {
+            longTouchTimer = null;
+            clearTimeout(longTouchTimer);
+            mode = "wait";
+        }
+
+        function switchToSelectionMode() {
+            longTouchTimer = null;
+            clearTimeout(longTouchTimer);
+            editor.selection.moveToPosition(pos);
+            var range = clickCount >= 2 ?
+                editor.selection.getLineRange(pos.row) :
+                editor.session.getBracketRange(pos);
+            if (range && !range.isEmpty()) {
+                editor.selection.setRange(range);
+            } else {
+                editor.textInput.getElement().dispatchEvent(new KeyboardEvent('keydown', {
+                    keyCode: 68,
+                    ctrlKey: true
+                }));
+            }
+            mode = "wait";
         }
     };
 
@@ -18651,44 +18652,7 @@ background-color: rgba(255, 255, 0,0.2);\
 position: absolute;\
 z-index: 8;\
 }\
-.ace_mobile-menu {\
-position: absolute;\
-line-height: 1.5;\
-border-radius: 4px;\
--ms-user-select: none;\
--moz-user-select: none;\
--webkit-user-select: none;\
-user-select: none;\
-background: white;\
-box-shadow: 1px 3px 2px grey;\
-border: 1px solid #dcdcdc;\
-color: black;\
-}\
-.ace_dark > .ace_mobile-menu {\
-background: #333;\
-color: #ccc;\
-box-shadow: 1px 3px 2px grey;\
-border: 1px solid #444;\
-}\
-.ace_mobile-button {\
-padding: 2px;\
-cursor: pointer;\
-overflow: hidden;\
-}\
-.ace_mobile-button:hover {\
-background-color: #eee;\
-opacity:1;\
-}\
-.ace_mobile-button:active {\
-background-color: #ddd;\
-}\
-.ace_placeholder {\
-font-family: arial;\
-transform: scale(0.9);\
-opacity: 0.7;\
-transform-origin: left;\
-text-indent: 10px;\
-}";
+";
 
     var useragent = require("./lib/useragent");
     var HIDE_TEXTAREA = useragent.isIE;

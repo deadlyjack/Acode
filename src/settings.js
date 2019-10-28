@@ -49,13 +49,27 @@ class Settings {
             linenumbers: true,
             beautify: false,
             compileSCSS: false,
-            linting: false
+            linting: false,
+            autoCorrect: true,
+            previewMode: 'none'
         };
 
         if ('globalSettings' in localStorage) {
             try {
                 const savedSettings = JSON.parse(localStorage.getItem('globalSettings'));
+                let falg = false;
                 this.value = savedSettings;
+                for (let key in this.defaultSettings) {
+                    if (!this.value[key]) {
+                        this.value[key] = this.defaultSettings[key];
+                        falg = true;
+                    }
+                }
+
+                if (falg) {
+                    this.update();
+                }
+
             } catch (error) {
                 this.reset();
             }

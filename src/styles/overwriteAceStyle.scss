@@ -1,3 +1,8 @@
+.ace_editor,
+.ace_editor * {
+    font-family: monospace
+}
+
 .ace_mobile-menu {
     width: fit-content;
     position: absolute;
@@ -57,7 +62,7 @@
     }
 }
 
-.ace_promt_wrapper {
+.ace_prompt_wrapper {
     position: fixed;
     top: 0;
     right: 0;
@@ -97,4 +102,12 @@
 .ace_tooltip {
     max-width: 80vw;
     white-space: pre-line;
+}
+
+.ace_scroller.ace_scroll-left {
+    box-shadow: none !important;
+}
+
+.ace-container {
+    height: 100%;
 }

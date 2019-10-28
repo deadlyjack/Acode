@@ -58,14 +58,14 @@ export default function settingsMain() {
     gen.settingsItems(settingsList, settingsOptions, changeSetting);
 
     function changeSetting() {
-
+        const lanuguages = [];
+        const langList = constants.langList;
+        for (let lang in langList) {
+            lanuguages.push([lang, langList[lang]]);
+        }
         switch (this.key) {
             case 'language':
-                dialogs.select(this.text, [
-                        ['en-us', constants.string['en-us'].lang],
-                        ['hi-in', constants.string['hi-in'].lang],
-                        ['id-id', constants.string['id-id'].lang]
-                    ], {
+                dialogs.select(this.text, lanuguages, {
                         default: values.lang
                     })
                     .then(res => {

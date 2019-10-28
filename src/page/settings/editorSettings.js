@@ -21,42 +21,47 @@ export default function editorSettings() {
     };
 
 
-    const values = appSettings.value;
+    const value = appSettings.value;
 
     const settingsOptions = [{
             key: 'font size',
             text: strings['font size'],
-            subText: values.fontSize,
+            subText: value.fontSize,
         },
         {
             key: 'text wrap',
             text: strings['text wrap'],
-            subText: values.textWrap ? strings.yes : strings.no,
+            subText: value.textWrap ? strings.yes : strings.no,
         },
         {
             key: 'soft tab',
             text: strings['soft tab'],
-            subText: values.softTab ? strings.yes : strings.no,
+            subText: value.softTab ? strings.yes : strings.no,
         },
         {
             key: 'tab size',
             text: strings['tab size'],
-            subText: values.tabSize,
+            subText: value.tabSize,
         },
         {
             key: 'linenumbers',
             text: strings['show line numbers'],
-            subText: values.linenumbers ? strings.yes : strings.no,
+            subText: value.linenumbers ? strings.yes : strings.no,
         },
         {
             key: 'beautify',
             text: strings['beautify on save'],
-            subText: values.beautify ? strings.yes : strings.no,
+            subText: value.beautify ? strings.yes : strings.no,
         },
         {
             key: 'linting',
             text: strings['linting'],
-            subText: values.linting ? strings.yes : strings.no,
+            subText: value.linting ? strings.yes : strings.no,
+        },
+        {
+            key: 'previewMode',
+            text: strings['preview mode'],
+            subText: value.previewMode
         }
 
     ];
@@ -71,7 +76,7 @@ export default function editorSettings() {
                     required: true,
                     match: constants.FONT_SIZE
                 }).then(res => {
-                    if (res === values.fontSize) return;
+                    if (res === value.fontSize) return;
                     appSettings.value.fontSize = res;
                     appSettings.update();
                     window.beforeClose();
@@ -83,7 +88,7 @@ export default function editorSettings() {
                 dialogs.prompt(this.text, appSettings.value.tabSize, 'numeric', {
                     required: true
                 }).then(res => {
-                    if (res === values.tabSize) return;
+                    if (res === value.tabSize) return;
                     appSettings.value.tabSize = res;
                     appSettings.update();
                     window.beforeClose();
@@ -96,10 +101,10 @@ export default function editorSettings() {
                         [true, strings.yes],
                         [false, strings.no]
                     ], {
-                        default: values.textWrap ? strings.yes : strings.no,
+                        default: value.textWrap ? strings.yes : strings.no,
                     })
                     .then(res => {
-                        if (res === values.textWrap) return;
+                        if (res === value.textWrap) return;
                         appSettings.value.textWrap = res;
                         appSettings.update();
                         window.beforeClose();
@@ -112,10 +117,10 @@ export default function editorSettings() {
                         [true, strings.yes],
                         [false, strings.no]
                     ], {
-                        default: values.softTab ? strings.yes : strings.no,
+                        default: value.softTab ? strings.yes : strings.no,
                     })
                     .then(res => {
-                        if (res === values.softTab) return;
+                        if (res === value.softTab) return;
                         appSettings.value.softTab = res;
                         appSettings.update();
                         window.beforeClose();
@@ -128,10 +133,10 @@ export default function editorSettings() {
                         [true, strings.yes],
                         [false, strings.no]
                     ], {
-                        default: values.linenumbers ? strings.yes : strings.no,
+                        default: value.linenumbers ? strings.yes : strings.no,
                     })
                     .then(res => {
-                        if (res === values.linenumbers) return;
+                        if (res === value.linenumbers) return;
                         appSettings.value.linenumbers = res;
                         appSettings.update();
                         window.beforeClose();
@@ -144,10 +149,10 @@ export default function editorSettings() {
                         [true, strings.yes],
                         [false, strings.no]
                     ], {
-                        default: values.beautify ? strings.yes : strings.no,
+                        default: value.beautify ? strings.yes : strings.no,
                     })
                     .then(res => {
-                        if (res === values.beautify) return;
+                        if (res === value.beautify) return;
                         appSettings.value.beautify = res;
                         appSettings.update();
                         this.changeSubText(res ? strings.yes : strings.no);
@@ -159,13 +164,29 @@ export default function editorSettings() {
                         [true, strings.yes],
                         [false, strings.no]
                     ], {
-                        default: values.linting ? strings.yes : strings.no,
+                        default: value.linting ? strings.yes : strings.no,
                     })
                     .then(res => {
-                        if (res === values.linting) return;
+                        if (res === value.linting) return;
                         appSettings.value.linting = res;
                         appSettings.update();
                         this.changeSubText(res ? strings.yes : strings.no);
+                    });
+                break;
+
+            case 'previewMode':
+                dialogs.select(this.text, [
+                        'none',
+                        'mobile',
+                        'desktop'
+                    ], {
+                        default: value.previewMode
+                    })
+                    .then(res => {
+                        if (res === value.previewMode) return;
+                        appSettings.value.previewMode = res;
+                        appSettings.update();
+                        this.changeSubText(res);
                     });
                 break;
 

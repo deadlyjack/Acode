@@ -13,11 +13,6 @@ interface searchSettings {
     wholeWord: boolean;
 }
 
-interface Footer {
-    row1: Array<Array<string>> | Array<string>;
-    row2: Array<Array<string>> | Array<string>;
-}
-
 interface Settings {
     fileBrowser: fileBrowserSettings;
     maxFileSize: number;
@@ -32,7 +27,7 @@ interface Settings {
     tabSize: number;
     linenumbers: boolean,
     beautify: boolean,
-    footer: Footer
+    previewMode: 'mobile' | 'desktop' | 'none'
 }
 
 interface AppSettings {

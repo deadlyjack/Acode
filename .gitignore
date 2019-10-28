@@ -1,2 +1,4 @@
 node_modules
 platforms
+.vscode
+release-signing.properties

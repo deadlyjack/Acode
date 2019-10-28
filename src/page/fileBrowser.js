@@ -30,7 +30,8 @@ function FileBrowser(type = 'file', option = null) {
         const fileList = tag('ul', {
             className: 'main dir-list',
             attr: {
-                "data-empty-folder": strings['empty folder message']
+                "data-empty-folder": strings['empty folder message'],
+                "data-type": type
             }
         });
         const actionsToDispose = [];

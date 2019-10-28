@@ -29,6 +29,18 @@ export default function help(opts) {
             key: 'qa',
             text: strings['qa section'],
             icon: 'chat_bubble'
+        },
+        {
+            key: 'Q8',
+            text: strings.Q8,
+            type: 'a',
+            href: 'mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=version-' + AppVersion.version
+        },
+        {
+            key: 'Q7',
+            text: strings.Q7,
+            type: 'a',
+            href: 'https://telegram.me/joinchat/LbomMBLApFc6fvvdPQMm6w',
         }
     ];
 

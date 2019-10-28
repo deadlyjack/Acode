@@ -18,20 +18,8 @@ export default function qnaSection() {
     };
 
     const questions = [{
-            key: 'Q1',
-            text: strings.Q1
-        },
-        {
             key: 'Q2',
             text: strings.Q2
-        },
-        {
-            key: 'Q3',
-            text: strings.Q3
-        },
-        {
-            key: 'Q4',
-            text: strings.Q4
         },
         {
             key: 'Q5',
@@ -40,18 +28,6 @@ export default function qnaSection() {
         {
             key: 'Q6',
             text: strings.Q6
-        },
-        {
-            key: 'Q7',
-            text: strings.Q7,
-            type: 'a',
-            href: 'https://telegram.me/joinchat/LbomMBLApFc6fvvdPQMm6w',
-        },
-        {
-            key: 'Q8',
-            text: strings.Q8,
-            type: 'a',
-            href: 'mailto:dellevenjack@gmail.com'
         }
     ];
 

@@ -92,7 +92,7 @@ function EditorManager(sidebar, header, body) {
 
         const id = tmpID || ++counter;
         const container = tag('div', {
-            className: 'editor-container main'
+            className: 'editor-container'
         });
         /**
          * @type {AceAjax.Editor}
@@ -134,7 +134,7 @@ function EditorManager(sidebar, header, body) {
             }
         };
 
-        thisEditor.controls.menu.onclick = function (e) {
+        thisEditor.controls.menu.ontouchend = function (e) {
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
@@ -352,7 +352,7 @@ function EditorManager(sidebar, header, body) {
         if (!thisEditor) return;
 
         if (thisEditor.isUnsaved && !force) {
-            dialogs.confirm(strings.warning.toUpperCase(), strings['unsaved file warning']).then(closeEditor);
+            dialogs.confirm(strings.warning.toUpperCase(), strings['unsaved file']).then(closeEditor);
         } else {
             closeEditor();
         }

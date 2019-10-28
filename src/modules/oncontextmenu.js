@@ -29,10 +29,22 @@ function oncontextmenu(e, editor, controls, thiseditor, $content) {
 
     if (thiseditor.callBeforeContextMenu) thiseditor.callBeforeContextMenu();
 
-    const lineHeight = editor.renderer.lineHeight;
     const MouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
     const ev = new MouseEvent(e, editor);
     const pos = ev.getDocumentPosition();
+
+    editor.gotoLine(parseInt(pos.row + 1), parseInt(pos.column + 1));
+    editor.textInput.getElement().dispatchEvent(new KeyboardEvent('keydown', {
+        keyCode: 68,
+        ctrlKey: true
+    }));
+
+    enableDoubleMode(editor, controls, thiseditor, $content);
+}
+
+function enableDoubleMode(editor, controls, thiseditor, $content) {
+    const MouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
+    const lineHeight = editor.renderer.lineHeight;
     const $cm = controls.menu;
     const $cursor = editor.container.querySelector('.ace_cursor-layer>.ace_cursor');
     const initialScroll = {
@@ -49,16 +61,9 @@ function oncontextmenu(e, editor, controls, thiseditor, $content) {
             y: 0
         }
     }
-
     thiseditor.updateControls = updateControls;
     thiseditor.callBeforeContextMenu = containerOnClick;
     controls.end.onclick = null;
-    editor.gotoLine(parseInt(pos.row + 1), parseInt(pos.column + 1));
-    editor.textInput.getElement().dispatchEvent(new KeyboardEvent('keydown', {
-        keyCode: 68,
-        ctrlKey: true
-    }));
-
     $content.addEventListener('click', containerOnClick);
     editor.session.on('changeScrollTop', updatePosition);
     editor.session.on('changeScrollLeft', updatePosition);
@@ -272,7 +277,8 @@ function enableSingleMode(editor, controls, thiseditor, $content) {
     editor.selection.on('changeCursor', onchange);
     editor.on('change', onchange);
 
-    $content.append(controls.end);
+    controls.end.style.display = 'none';
+    thiseditor.container.append(controls.end);
     controls.end.ontouchstart = function (e) {
         touchStart.call(this, e);
     };
@@ -294,6 +300,10 @@ function enableSingleMode(editor, controls, thiseditor, $content) {
             const ev = new MouseEvent(e, editor);
             const pos = ev.getDocumentPosition();
 
+            if ($cm.isConnected) {
+                $cm.remove();
+            }
+
             editor.selection.moveCursorToPosition(pos);
             editor.selection.setSelectionAnchor(pos.row, pos.column);
             editor.renderer.scrollCursorIntoView(pos);
@@ -304,7 +314,8 @@ function enableSingleMode(editor, controls, thiseditor, $content) {
             document.ontouchend = null;
             el.touchStart = null;
             if (!$cm.isConnected) {
-                $content.appendChild($cm);
+                thiseditor.container.appendChild($cm);
+                updateCm();
             } else {
                 $cm.remove();
             }
@@ -330,7 +341,14 @@ function enableSingleMode(editor, controls, thiseditor, $content) {
 
     function update(left = 0, top = 0) {
         controls.end.style.transform = `translate3d(${cpos.x + 2 + left}px, ${cpos.y + top}px, 0) rotate(45deg)`;
+        controls.end.style.display = 'block';
+    }
 
+    function updateCm() {
+        const {
+            left,
+            top
+        } = initialScroll;
         const cm = {
             left: cpos.x + left,
             top: cpos.y - (40 + lineHeight) + top

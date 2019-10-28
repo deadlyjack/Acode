@@ -8,13 +8,16 @@
  * @param {"application/json"|"application/x-www-form-urlencoded"} [options.contentType] 
  * @param {function(response):void} [options.onsuccess] 
  * @param {function(response):void} [options.onload] 
+ * @param {function} [options.onloadend]
+ * @param {boolean} [options.response]
  * @param {function(xhr):void} [options.xhr] 
  * @param {function(err):void} [options.onerror]
  * @param {boolean} [options.serialize = true]
- * @returns {Promise}
+ * @returns {Promise<XMLHttpRequest>}
  */
 function ajax(options) {
     const xhr = getHTTP();
+    const response = options.response === undefined ? true : options.response;
 
     return new Promise((resolve, reject) => {
         options = options || {};
@@ -29,7 +32,11 @@ function ajax(options) {
         options.onload = options.onload || callback;
         options.onerror = options.onerror || callback;
 
-        const data = (options.serialize && options.data) ? serialize(options.data) : options.data;
+        let data = options.data && serialize(options.data);
+
+        if (options.data && contentType === 'application/json') {
+            data = JSON.stringify(options.data);
+        }
 
         xhr.open(method, url, true);
         if (options.xhr) options.xhr(xhr);
@@ -37,14 +44,27 @@ function ajax(options) {
         xhr.setRequestHeader("Content-Type", contentType);
         xhr.send(data);
 
+        if (options.onloadend) {
+            xhr.addEventListener('loadend', options.onloadend);
+        }
+        if (options.onload) {
+            xhr.addEventListener('load', options.onload);
+        }
+        if (options.onerror) {
+            xhr.addEventListener('error', options.onerror);
+        }
+
         xhr.addEventListener('readystatechange', function () {
 
             if (xhr.readyState !== 4) return;
 
             if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 0) {
-                resolve(xhr);
+                if (options.onsuccess) {
+                    options.onsuccess(xhr.response);
+                }
+                resolve(response ? xhr.response : xhr);
             } else {
-                reject(xhr);
+                reject(response ? xhr.response : xhr);
             }
 
         });
