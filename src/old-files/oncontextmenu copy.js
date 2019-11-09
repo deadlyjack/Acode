@@ -1,17 +1,16 @@
 /**
- * 
- * @param {AceAjax.Editor} editor 
- * @param {Object} controls 
- * @param {HTMLElement} container 
+ * @param {File} thiseditor 
  */
-function textControl(editor, controls, container) {
-    const $content = container.querySelector('.ace_scroller');
+function textControl(thiseditor) {
+    const editor = thiseditor.editor;
+    const controls = thiseditor.controls;
+    const $content = editor.container.querySelector('.ace_scroller');
     $content.addEventListener('contextmenu', function (e) {
-        oncontextmenu(e, editor, controls, container, $content);
+        oncontextmenu(e, editor, controls, thiseditor, $content);
     });
     $content.addEventListener('click', function (e) {
-        if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
-        enableSingleMode(editor, controls, container, $content);
+        if (thiseditor.callBeforeContextMenu) thiseditor.callBeforeContextMenu();
+        enableSingleMode(editor, controls, thiseditor, $content);
     });
 }
 /**
@@ -21,14 +20,14 @@ function textControl(editor, controls, container) {
  * @param {HTMLElement} controls.start
  * @param {HTMLElement} controls.end
  * @param {HTMLElement} controls.menu
- * @param {HTMLElement} container
+ * @param {File} thiseditor
  * @param {HTMLElement} $content
  */
-function oncontextmenu(e, editor, controls, container, $content) {
+function oncontextmenu(e, editor, controls, thiseditor, $content) {
     e.preventDefault();
     editor.focus();
 
-    if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
+    if (thiseditor.callBeforeContextMenu) thiseditor.callBeforeContextMenu();
 
     const MouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
     const ev = new MouseEvent(e, editor);
@@ -40,17 +39,10 @@ function oncontextmenu(e, editor, controls, container, $content) {
         ctrlKey: true
     }));
 
-    enableDoubleMode(editor, controls, container, $content);
+    enableDoubleMode(editor, controls, thiseditor, $content);
 }
 
-/**
- * 
- * @param {AceAjax.Editor} editor 
- * @param {Controls} controls 
- * @param {HTMLElement} container 
- * @param {HTMLElement} $content 
- */
-function enableDoubleMode(editor, controls, container, $content) {
+function enableDoubleMode(editor, controls, thiseditor, $content) {
     const MouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
     const lineHeight = editor.renderer.lineHeight;
     const $cm = controls.menu;
@@ -69,8 +61,8 @@ function enableDoubleMode(editor, controls, container, $content) {
             y: 0
         }
     }
-    controls.update = updateControls;
-    controls.callBeforeContextMenu = containerOnClick;
+    thiseditor.updateControls = updateControls;
+    thiseditor.callBeforeContextMenu = containerOnClick;
     controls.end.onclick = null;
     $content.addEventListener('click', containerOnClick);
     editor.session.on('changeScrollTop', updatePosition);
@@ -87,7 +79,7 @@ function enableDoubleMode(editor, controls, container, $content) {
     };
 
     setTimeout(() => {
-        container.append(controls.start, controls.end, $cm);
+        thiseditor.container.append(controls.start, controls.end, $cm);
         updateControls();
     }, 0);
 
@@ -121,7 +113,7 @@ function enableDoubleMode(editor, controls, container, $content) {
             document.ontouchmove = null;
             document.ontouchend = null;
             el.touchStart = null;
-            container.appendChild($cm);
+            thiseditor.container.appendChild($cm);
         }
     }
 
@@ -258,10 +250,10 @@ function enableDoubleMode(editor, controls, container, $content) {
  * @param {HTMLElement} controls.start
  * @param {HTMLElement} controls.end
  * @param {HTMLElement} controls.menu
- * @param {HTMLElement} container
+ * @param {File} thiseditor
  * @param {HTMLElement} $content
  */
-function enableSingleMode(editor, controls, container, $content) {
+function enableSingleMode(editor, controls, thiseditor, $content) {
     const selectedText = editor.getCopyText();
     if (selectedText) return;
     const $cursor = editor.container.querySelector('.ace_cursor-layer>.ace_cursor');
@@ -277,8 +269,8 @@ function enableSingleMode(editor, controls, container, $content) {
         y: 0
     }
     $cm.innerHTML = '<span action="paste">paste</span><span action="select all">select all<span>';
-    controls.update = updateEnd;
-    controls.callBeforeContextMenu = callBeforeContextMenu;
+    thiseditor.updateControls = updateEnd;
+    thiseditor.callBeforeContextMenu = callBeforeContextMenu;
 
     editor.session.on('changeScrollTop', hide);
     editor.session.on('changeScrollLeft', hide);
@@ -286,7 +278,7 @@ function enableSingleMode(editor, controls, container, $content) {
     editor.on('change', onchange);
 
     controls.end.style.display = 'none';
-    container.append(controls.end);
+    thiseditor.container.append(controls.end);
     controls.end.ontouchstart = function (e) {
         touchStart.call(this, e);
     };
@@ -296,7 +288,7 @@ function enableSingleMode(editor, controls, container, $content) {
 
     const timeout = setTimeout(() => {
         updateEnd();
-        container.append(controls.end);
+        thiseditor.container.append(controls.end);
     }, 0)
 
     function touchStart() {
@@ -308,9 +300,9 @@ function enableSingleMode(editor, controls, container, $content) {
             const ev = new MouseEvent(e, editor);
             const pos = ev.getDocumentPosition();
 
-            // if ($cm.isConnected) {
-            //     $cm.remove();
-            // }
+            if ($cm.isConnected) {
+                $cm.remove();
+            }
 
             editor.selection.moveCursorToPosition(pos);
             editor.selection.setSelectionAnchor(pos.row, pos.column);
@@ -322,7 +314,7 @@ function enableSingleMode(editor, controls, container, $content) {
             document.ontouchend = null;
             el.touchStart = null;
             if (!$cm.isConnected) {
-                container.appendChild($cm);
+                thiseditor.container.appendChild($cm);
                 updateCm();
             } else {
                 $cm.remove();
@@ -338,7 +330,6 @@ function enableSingleMode(editor, controls, container, $content) {
     }
 
     function updateEnd() {
-        $cm.remove();
         const cursor = $cursor.getBoundingClientRect();
 
         cpos.x = cursor.right - 5;

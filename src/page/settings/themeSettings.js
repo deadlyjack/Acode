@@ -1,9 +1,7 @@
 import Page from "../../components/page";
 import dialogs from "../../components/dialogs";
 import constants from "../../constants";
-import {
-    tag
-} from "html-element-js";
+import tag from 'html-tag-js';
 import gen from "../../components/gen";
 
 export default function themeSettings() {
@@ -37,16 +35,17 @@ export default function themeSettings() {
     gen.settingsItems(settingsList, settingsOptions, changeSetting);
 
     function changeSetting() {
+        const editor = editorManager.editor;
 
         switch (this.key) {
             case 'editor':
                 dialogs.select(this.text, constants.themeList, {
                     default: values.editorTheme.split('/').slice(-1)[0]
                 }).then(res => {
-                    appSettings.value.editorTheme = `ace/theme/` + res;
+                    res = `ace/theme/` + res;
+                    editor.setTheme(res);
+                    appSettings.value.editorTheme = res;
                     appSettings.update();
-                    window.beforeClose();
-                    location.reload();
                 });
                 break;
 
@@ -59,10 +58,7 @@ export default function themeSettings() {
                     .then(res => {
                         appSettings.value.appTheme = res;
                         appSettings.update();
-                        if (window.beforeClose) {
-                            window.beforeClose();
-                            location.reload();
-                        }
+                        window.restoreTheme();
                     });
                 break;
 

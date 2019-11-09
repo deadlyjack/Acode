@@ -1,8 +1,7 @@
+import tag from 'html-tag-js';
+
 import Page from "../components/page";
 import gen from "../components/gen";
-import {
-    tag
-} from "html-element-js";
 import iconDef from "./iconDef";
 import qnaSection from "./qnaSection";
 

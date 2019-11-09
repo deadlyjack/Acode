@@ -6,7 +6,7 @@
     min-width: 220px;
     max-width: 320px;
     min-height: 40px;
-    max-height: calc(100vh - 40px);
+    max-height: calc(100vh - 80px);
     overflow-y: auto;
 
     &+.mask {
@@ -33,20 +33,11 @@
         display: flex;
         height: 50px;
         align-items: center;
-        justify-content: center;
         padding: 0 10px;
 
         &.disabled {
             pointer-events: none;
-            color: #999;
-        }
-
-        .text {
-            flex: 1;
-            display: inline-flex;
-            align-items: center;
-            padding: 0 5px;
-            box-sizing: border-box;
+            color: #999 !important;
         }
     }
 

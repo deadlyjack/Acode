@@ -2827,7 +2827,7 @@ define("ace/ext/prompt", ["require", "exports", "module", "ace/range", "ace/lib/
             });
             return commandsByName;
         }
-        var excludeCommandsList = ["insertstring", "inserttext", "setIndentation", "paste", "cut", "copy"];
+        var excludeCommandsList = ["insertstring", "inserttext", "setIndentation", "paste", "cut", "copy", 'showSettingsMenu'];
         var shortcutsArray = getEditorCommandsByName(excludeCommandsList);
         shortcutsArray = shortcutsArray.map(function (item) {
             return {

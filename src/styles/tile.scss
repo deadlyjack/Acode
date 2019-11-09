@@ -91,7 +91,8 @@ header {
         font-size: 2em;
 
         &:active {
-            transform: scale(0.95);
+            transition: all 100ms ease;
+            transform: scale(0.95) translateZ(0);
         }
     }
 }

@@ -29,61 +29,6 @@ html {
     height: 100%;
 }
 
-.loading {
-
-    &.splash {
-        &::before {
-            background-color: white;
-            background-image: url('../res/logo/logo-text.png');
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: 60vw;
-            position: fixed;
-            top: 0;
-            right: 0;
-            height: 100%;
-            width: 100%;
-            animation: none;
-            border-radius: 0;
-            box-shadow: none;
-        }
-
-        &::after {
-            top: 70vh;
-            height: 6px;
-            border-radius: 3px;
-            box-shadow: none;
-        }
-    }
-
-    &::before {
-        content: '';
-        z-index: 107;
-        animation: move-around 2s ease infinite reverse;
-    }
-
-    &:before,
-    &:after {
-        content: '';
-        position: fixed;
-        top: calc(50% - 2px);
-        left: 0px;
-        right: 0px;
-        margin: auto;
-        height: 6px;
-        width: 40px;
-        background-color: rgb(211, 106, 106);
-        animation: move-around 2s ease infinite;
-        transform-origin: left;
-        border-radius: 2px;
-        box-shadow: 0 0 0px 4px white;
-    }
-
-    &::after {
-        z-index: 108;
-    }
-}
-
 .mask {
     position: fixed;
     left: 0;

@@ -1,8 +1,5 @@
 //#region Imports
-import {
-    tag,
-    toggleSwitch
-} from 'html-element-js';
+import tag from 'html-tag-js';
 import Page from '../components/page';
 import fs from '../modules/androidFileSystem';
 import tile from '../components/tile';
@@ -10,6 +7,7 @@ import helpers from '../modules/helpers';
 import contextMenu from '../components/contextMenu';
 import dialogs from '../components/dialogs';
 import constants from "../constants";
+import filesSettings from './settings/filesSettings';
 //#endregion
 /**
  * 
@@ -41,28 +39,6 @@ function FileBrowser(type = 'file', option = null) {
             toggle: menuToggler,
             transformOrigin: 'top right'
         });
-        const menuOptions = {
-            'showHiddenFiles': toggleSwitch({
-                valType: "on/off",
-                size: 20,
-                onchange: function () {
-                    appSettings.value.fileBrowser.showHiddenFiles = this.value;
-                    appSettings.update();
-                    refresh();
-                },
-                value: appSettings.value.fileBrowser.showHiddenFiles
-            }),
-            'sortByName': toggleSwitch({
-                valType: "on/off",
-                size: 20,
-                onchange: function () {
-                    appSettings.value.fileBrowser.sortByName = this.value;
-                    appSettings.update();
-                    refresh();
-                },
-                value: appSettings.value.fileBrowser.sortByName
-            })
-        };
         const root = 'file:///storage/';
         let parent = null;
         let cachedDir = {};
@@ -84,16 +60,14 @@ function FileBrowser(type = 'file', option = null) {
                 page.hide();
             }
         });
-        fbMenu.append(...[
-            tile({
-                text: strings['show hidden files'],
-                tail: menuOptions.showHiddenFiles
-            }),
-            tile({
-                text: strings['sort by name'],
-                tail: menuOptions.sortByName
-            })
-        ]);
+        fbMenu.innerHTML = `<li action="settings">${strings.settings}</li>`;
+        fbMenu.onclick = function (e) {
+            fbMenu.hide();
+            const action = e.target.getAttribute('action');
+            if (action && action === 'settings') {
+                filesSettings(refresh);
+            }
+        }
         page.onhide = function () {
             let id = '';
             while ((id = actionsToDispose.pop())) {

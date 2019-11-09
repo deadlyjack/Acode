@@ -1,6 +1,4 @@
-import {
-    tag
-} from "html-element-js";
+import tag from 'html-tag-js';
 import themeSettings from "./settings/themeSettings";
 import settingsMain from "./settings/mainSettings";
 import qnaSection from "./qnaSection";
@@ -94,27 +92,31 @@ export default function demoPage() {
                 tag('a', {
                     href: "https://play.google.com/store/apps/details?id=org.pocketworkstation.pckeyboard",
                     className: 'rec-tile install',
-                    textContent: `Hacker's keyboard is recommended`
+                    textContent: strings.o1
                 }),
                 tag('div', {
                     className: 'rec-tile',
-                    textContent: "Please read QnA's before using app",
+                    textContent: strings.o2,
                     onclick: function () {
                         qnaSection();
                     }
                 }),
                 tag('div', {
                     className: 'rec-tile',
-                    textContent: 'Choose theme',
+                    textContent: strings.theme,
                     onclick: function () {
-                        themeSettings();
+                        themeSettings({
+                            editors: []
+                        });
                     }
                 }),
                 tag('div', {
                     className: 'rec-tile',
-                    textContent: 'Choose language',
+                    textContent: strings["change language"],
                     onclick: function () {
-                        settingsMain();
+                        settingsMain({
+                            editors: []
+                        }, true);
                     }
                 })
             ]
@@ -132,7 +134,6 @@ export default function demoPage() {
                 page.classList.add('hide');
                 setTimeout(() => {
                     page.remove();
-                    localStorage.setItem('initFlag', 'true');
                     document.ontouchstart = null;
                     resolve();
                 }, 300);

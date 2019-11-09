@@ -1,3 +1,4 @@
+import fs from './modules/androidFileSystem';
 /**
  * @typedef {object} fileBrowserSettings
  * @property {string} showHiddenFiles
@@ -40,55 +41,85 @@ class Settings {
                 backwards: true
             },
             lang,
-            fontSize: "14px",
+            fontSize: "12px",
             editorTheme: "ace/theme/textmate",
             appTheme: "default",
-            textWrap: false,
+            textWrap: true,
             softTab: true,
-            tabSize: 4,
+            tabSize: 2,
             linenumbers: true,
             beautify: false,
             compileSCSS: false,
             linting: false,
             autoCorrect: true,
-            previewMode: 'none'
+            previewMode: 'none',
+            initFlag: false
         };
+        this.settingsFile = cordova.file.externalApplicationStorageDirectory + 'settings.json';
+        this.loaded = false;
+        this.onload = null;
+        this.onsave = null;
 
         if ('globalSettings' in localStorage) {
             try {
                 const savedSettings = JSON.parse(localStorage.getItem('globalSettings'));
-                let falg = false;
+                localStorage.removeItem('globalSettings');
                 this.value = savedSettings;
-                for (let key in this.defaultSettings) {
-                    if (!this.value[key]) {
-                        this.value[key] = this.defaultSettings[key];
-                        falg = true;
-                    }
-                }
-
-                if (falg) {
-                    this.update();
-                }
-
+                this.loaded = true;
+                this.checkSettings();
+                this.update();
             } catch (error) {
                 this.reset();
             }
         } else {
-            this.value = this.defaultSettings;
-            localStorage.setItem('globalSettings', JSON.stringify(this.value));
+            fs.readFile(this.settingsFile)
+                .then((res) => {
+                    const decoder = new TextDecoder();
+                    const settings = JSON.parse(decoder.decode(res.data));
+                    this.value = settings;
+                    this.checkSettings();
+                    this.loaded = true;
+                    if (this.onload) this.onload();
+                }).catch(() => {
+                    fs.writeFile(this.settingsFile, JSON.stringify(this.value), true, false)
+                        .then(() => {
+                            this.value = this.defaultSettings;
+                            this.loaded = true;
+                            if (this.onload) this.onload();
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                        });
+                });
         }
     }
-    update(settings = null) {
-        if (settings) {
-            this.value = settings;
-        }
-
-        localStorage.setItem('globalSettings', JSON.stringify(this.value));
+    update(showToast = true) {
+        fs.writeFile(this.settingsFile, JSON.stringify(this.value), true, false)
+            .then(() => {
+                if (this.onsave) this.onsave();
+                if (showToast)
+                    plugins.toast.showShortBottom(strings['settings saved']);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
     }
 
     reset() {
         this.value = this.defaultSettings;
-        this.update();
+        this.update(false);
+    }
+
+    checkSettings() {
+        let falg = false;
+        for (let key in this.defaultSettings) {
+            if (!(key in this.value)) {
+                this.value[key] = this.defaultSettings[key];
+                falg = true;
+            }
+        }
+        if (falg)
+            this.update();
     }
 }
 

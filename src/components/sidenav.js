@@ -1,6 +1,4 @@
-import {
-    tag
-} from 'html-element-js';
+import tag from 'html-tag-js';
 
 /**
  * @typedef {object} SideBar
@@ -46,8 +44,7 @@ function sidenav(activator, toggler) {
     function show() {
         el.onshow();
         el.activated = true;
-        el.restore(parent);
-        mask.restore(parent);
+        parent.append(el, mask);
         el.classList.add('show');
         document.ontouchstart = ontouchstart;
 
@@ -98,9 +95,8 @@ function sidenav(activator, toggler) {
      * @param {TouchEvent} e 
      */
     function ontouchmove(e) {
-        if (!el.parentElement) {
-            el.restore(parent);
-            mask.restore(parent);
+        if (!el.isConnected) {
+            parent.append(el, mask);
             el.scrollTop = scrollPosition;
             activator.style.overflow = 'hidden';
         }

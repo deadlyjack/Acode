@@ -1,6 +1,4 @@
-import {
-    tag
-} from "html-element-js";
+import tag from 'html-tag-js';
 import autosize from 'autosize';
 import tile from "./tile";
 
@@ -159,7 +157,7 @@ function alert(titleText, message) {
         }
     });
     const alertDiv = tag('div', {
-        className: 'prompt',
+        className: 'prompt alert',
         children: [
             titleSpan,
             messageSpan,

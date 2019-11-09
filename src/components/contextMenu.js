@@ -1,6 +1,4 @@
-import {
-    tag
-} from "html-element-js";
+import tag from 'html-tag-js';
 
 /**
  * @typedef {object} contextMenuObj
@@ -21,9 +19,10 @@ import {
  * @param {function():void} [pos.onhide] 
  * @returns {HTMLElement & contextMenuObj}
  */
-function contextMenu(pos = {}) {
+function contextMenu(pos = {}, innerHTML) {
     const el = tag('ul', {
         className: 'context-menu',
+        innerHTML: innerHTML,
         style: {
             top: pos.top || 'auto',
             left: pos.left || 'auto',

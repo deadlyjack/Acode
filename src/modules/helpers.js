@@ -171,6 +171,26 @@ function removeLineBreaks(str) {
     return str.replace(/(\r\n)+|\r+|\n+|\t+/g, '');
 }
 
+/**
+ * 
+ * @param {string} url 
+ */
+function updateFolders(url) {
+    for (let key in addedFolder) {
+        if (new RegExp(key).test(url)) {
+            url = url.replace(url.split('/').slice(-1), '');
+            addedFolder[key].reload(url);
+        }
+    }
+}
+
+/**
+ * @returns {number}
+ */
+function idGenereator() {
+    return parseInt((((1 + Math.random()) * 0x10000) | 0).toString(10).substring(1));
+}
+
 export default {
     getExt,
     getErrorMessage,
@@ -178,5 +198,7 @@ export default {
     getLangNameFromExt,
     getIconForFile,
     removeLineBreaks,
-    convertToFile
+    convertToFile,
+    updateFolders,
+    idGenereator
 };

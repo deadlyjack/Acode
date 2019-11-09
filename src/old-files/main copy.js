@@ -14,23 +14,24 @@ import './styles/overwriteAceStyle.scss';
 
 import "core-js/stable";
 import tag from 'html-tag-js';
-import gen from './components/gen';
-import tile from "./components/tile";
-import sidenav from './components/sidenav';
-import contextMenu from './components/contextMenu';
-import EditorManager from './modules/editorManager';
-import fs from './modules/androidFileSystem';
-import ActionStack from "./modules/actionStack";
-import helpers from "./modules/helpers";
-import Settings from "./settings";
-import dialogs from "./components/dialogs";
-import constants from "./constants";
-import demoPage from "./page/demoPages";
-import HandleIntent from "./modules/handleIntent";
-import createEditorFromURI from "./modules/createEditorFromURI";
-import addFolder from "./modules/addFolder";
-import menuHandler from "./modules/menuHandler";
-import saveFile from "./modules/saveFile";
+import gen from '../components/gen';
+import tile from "../components/tile";
+import sidenav from '../components/sidenav';
+import contextMenu from '../components/contextMenu';
+import EditorManager from '../modules/editorManager';
+import fs from '../modules/androidFileSystem';
+import ActionStack from "../modules/actionStack";
+import helpers from "../modules/helpers";
+import Settings from "../settings";
+import dialogs from "../components/dialogs";
+import constants from "../constants";
+import demoPage from "../page/demoPages";
+import clipboardAction from "../modules/clipboard";
+import HandleIntent from "../modules/handleIntent";
+import createEditorFromURI from "../modules/createEditorFromURI";
+import addFolder from "../modules/addFolder";
+import menuHandler from "../modules/menuHandler";
+import saveFile from "../modules/saveFile";
 
 //@ts-check
 
@@ -168,8 +169,6 @@ function App() {
     <hr>
     <li action="goto" class="disabled">${strings['goto']}</li>
     <hr>
-    <li action="console">${strings['console']}</li>
-    <hr>
     <li action="settings">${strings.settings}</li>
     <li action="help">${strings.help}</li>`;
   const row1 = gen.iconButton(footerOptions.row1);
@@ -193,7 +192,6 @@ function App() {
   }
 
   window.editorManager = EditorManager(sidebar, header, main);
-  const editor = editorManager.editor;
   //#endregion
 
   //#region initialization
@@ -246,7 +244,8 @@ function App() {
   //#region footer
 
   row1.tab.onclick = function () {
-    editor.focus();
+    const activeEditor = editorManager.activeFile;
+    activeEditor.editor.focus();
     const keyevent = new KeyboardEvent("keydown", {
       key: 9,
       keyCode: 9,
@@ -254,13 +253,13 @@ function App() {
     });
 
     document.querySelector('.ace_text-input').dispatchEvent(keyevent);
-    if (editorManager.controls.update) {
-      editorManager.controls.update();
+    if (activeEditor.updateControls) {
+      activeEditor.updateControls();
     }
   };
 
   row1.shift.onclick = function () {
-    editorManager.editor.focus();
+    editorManager.activeFile.editor.focus();
     if (this.isActive) {
       this.classList.remove('active');
       this.isActive = false;
@@ -271,13 +270,19 @@ function App() {
   };
 
   row1.undo.onclick = function () {
-    editor.focus();
-    editor.undo();
+    const activeEditor = editorManager.activeFile;
+    activeEditor.editor.focus();
+    if (activeEditor) {
+      activeEditor.editor.undo();
+    }
   };
 
   row1.redo.onclick = function () {
-    editor.focus();
-    editor.redo();
+    const activeEditor = editorManager.activeFile;
+    activeEditor.editor.focus();
+    if (activeEditor) {
+      activeEditor.editor.redo();
+    }
   };
 
   row1.search.onclick = function () {
@@ -285,7 +290,11 @@ function App() {
       mainFooter.removeChild(footerRow2);
       app.classList.remove('twostories');
     }
-    let lastActive = editor;
+    /**
+     * @type {File}
+     */
+    const activeEditor = editorManager.activeFile;
+    let lastActive = activeEditor.editor;
     let init = false;
     const findInput = tag('input', {
       type: 'text',
@@ -308,7 +317,7 @@ function App() {
         lastActive.focus();
         const options = JSON.parse(JSON.stringify(appSettings.value.search));
         if (initFind())
-          editor.findNext(options, false);
+          activeEditor.editor.findNext(options, false);
       }
     });
     const prevBtn = tag('button', {
@@ -317,7 +326,7 @@ function App() {
         lastActive.focus();
         const options = JSON.parse(JSON.stringify(appSettings.value.search));
         if (initFind())
-          editor.findPrevious(options, false);
+          activeEditor.editor.findPrevious(options, false);
       }
     });
     const replaceBtn = tag('button', {
@@ -325,7 +334,7 @@ function App() {
       onclick: function () {
         lastActive.focus();
         if (initFind(true))
-          editor.replace(replaceInput.value);
+          activeEditor.editor.replace(replaceInput.value);
       }
     });
     const replaceAllBtn = tag('button', {
@@ -333,7 +342,7 @@ function App() {
       onclick: function () {
         lastActive.focus();
         if (initFind(true))
-          editor.replaceAll(replaceInput.value);
+          activeEditor.editor.replaceAll(replaceInput.value);
       }
     });
     const find = tag('footer', {
@@ -360,7 +369,7 @@ function App() {
       if (!init) {
         const options = JSON.parse(JSON.stringify(appSettings.value.search));
         if (!findInput.value) return false;
-        editor.find(findInput.value, options, false);
+        activeEditor.editor.find(findInput.value, options, false);
         init = true;
         return !!replace;
       }
@@ -368,7 +377,7 @@ function App() {
     }
     const fun = this.onclick;
     this.onclick = function () {
-      editor.focus();
+      activeEditor.editor.focus();
       app.classList.remove('threestories');
       mainFooter.removeChild(find);
       mainFooter.removeChild(replace);
@@ -377,11 +386,18 @@ function App() {
   };
 
   row1.save.onclick = function () {
-    saveFile(editorManager.activeFile);
+    const activeEditor = editorManager.activeFile;
+    if (!activeEditor) return;
+    if (activeEditor.fileUri || activeEditor.contentUri)
+      activeEditor.editor.focus();
+
+    saveFile(activeEditor);
   };
 
   row1.clipboard.onclick = function () {
-    editor.execCommand('openCommandPallete');
+    const activeEditor = editorManager.activeFile;
+    if (!activeEditor) return;
+    activeEditor.ace.execCommand('openCommandPallete');
   }
 
   row1.row2.onclick = function () {
@@ -389,6 +405,8 @@ function App() {
     if (app.classList.contains('threestories')) {
       row1.search.click();
     }
+
+    const activeEditor = editorManager.activeFile;
 
     if (footerRow2.parentElement) {
       mainFooter.removeChild(footerRow2);
@@ -398,17 +416,23 @@ function App() {
       app.classList.add('twostories');
     }
 
-    editor.focus();
+    activeEditor.editor.focus();
   };
 
   row2.moveup.onclick = function () {
-    editor.focus();
-    editor.moveLinesUp();
+    const activeEditor = editorManager.activeFile;
+    activeEditor.editor.focus();
+    if (activeEditor) {
+      activeEditor.editor.moveLinesUp();
+    }
   };
 
   row2.movedown.onclick = function () {
-    editor.focus();
-    editor.moveLinesDown();
+    const activeEditor = editorManager.activeFile;
+    activeEditor.editor.focus();
+    if (activeEditor) {
+      activeEditor.editor.moveLinesDown();
+    }
   };
 
   row2.left.ontouchstart = function () {
@@ -423,7 +447,7 @@ function App() {
       });
 
       document.querySelector('.ace_text-input').dispatchEvent(keyevent);
-      editor.focus();
+      editorManager.activeFile.editor.focus();
     }
   };
 
@@ -439,7 +463,7 @@ function App() {
       });
 
       document.querySelector('.ace_text-input').dispatchEvent(keyevent);
-      editor.focus();
+      editorManager.activeFile.editor.focus();
     }
   };
 
@@ -456,7 +480,7 @@ function App() {
       });
 
       document.querySelector('.ace_text-input').dispatchEvent(keyevent);
-      editor.focus();
+      editorManager.activeFile.editor.focus();
     }
   };
 
@@ -472,21 +496,23 @@ function App() {
       });
 
       document.querySelector('.ace_text-input').dispatchEvent(keyevent);
-      editor.focus();
+      editorManager.activeFile.editor.focus();
     }
   };
 
   row2.left.ontouchend = row2.right.ontouchend = row2.up.ontouchend = row2.down.ontouchend = rmInterval;
   row2.left.onclick = row2.right.onclick = row2.up.onclick = row2.down.onclick = function () {
-    editor.focus();
+    editorManager.activeFile.editor.focus();
   };
 
   row2.copyup.onclick = function () {
+    const editor = editorManager.activeFile.editor;
     editor.focus();
     editor.copyLinesUp();
   };
 
   row2.copydown.onclick = function () {
+    const editor = editorManager.activeFile.editor;
     editor.focus();
     editor.copyLinesDown();
   };
@@ -534,25 +560,25 @@ function App() {
     /**
      * @type {File}
      */
-    const activeFile = this.activeFile;
+    const activeEditor = this.activeFile;
 
-    if (!mainFooter.parentElement && activeFile) {
+    if (!mainFooter.parentElement && activeEditor) {
       app.classList.add('bottom-bar');
       app.append(mainFooter);
     }
 
-    if (!activeFile) {
+    if (!activeEditor) {
       fileOptions.save.classList.add('disabled');
       fileOptions.saveAs.classList.add('disabled');
       fileOptions.goto.classList.add('disabled');
       app.classList.remove('bottom-bar');
       mainFooter.remove();
       runBtn.remove();
-    } else if (activeFile) {
+    } else if (activeEditor) {
       fileOptions.saveAs.classList.remove('disabled');
       fileOptions.goto.classList.remove('disabled');
 
-      if (!activeFile.readOnly) {
+      if (!activeEditor.readOnly) {
         fileOptions.save.classList.remove('disabled');
         row1.save.classList.remove('disabled');
       } else {
@@ -560,15 +586,15 @@ function App() {
         row1.save.classList.add('disabled');
       }
 
-      if (activeFile.isUnsaved) {
-        activeFile.assocTile.classList.add('notice');
+      if (activeEditor.isUnsaved) {
+        activeEditor.assocTile.classList.add('notice');
         row1.save.classList.add('notice');
       } else {
-        activeFile.assocTile.classList.remove('notice');
+        activeEditor.assocTile.classList.remove('notice');
         row1.save.classList.remove('notice');
       }
 
-      if (['html', 'htm', 'xhtml'].includes(helpers.getExt(activeFile.filename))) {
+      if (['html', 'htm', 'xhtml'].includes(helpers.getExt(activeEditor.filename))) {
         app.appendChild(runBtn);
       } else {
         runBtn.remove();
@@ -577,32 +603,30 @@ function App() {
   };
 
   window.beforeClose = function () {
-    if (!editorManager) return;
-
     const lsEditor = [];
     const allFolders = Object.keys(addedFolder);
     const folders = [];
-    const activeFile = editorManager.activeFile;
+    const activeEditor = editorManager.activeFile;
     const unsaved = [];
 
-    for (let file of editorManager.files) {
+    for (let editor of editorManager.files) {
       const edit = {};
-      edit.name = file.filename;
-      if (file.fileUri) {
-        edit.fileUri = file.fileUri;
-        edit.readOnly = file.readOnly ? 'true' : '';
+      edit.name = editor.filename;
+      if (editor.fileUri) {
+        edit.fileUri = editor.fileUri;
+        edit.readOnly = editor.readOnly ? 'true' : '';
         unsaved.push({
-          id: btoa(file.id),
-          fileUri: file.fileUri
+          id: btoa(editor.id),
+          fileUri: editor.fileUri
         });
-      } else if (file.contentUri) {
-        edit.contentUri = file.contentUri;
+      } else if (editor.contentUri) {
+        edit.contentUri = editor.contentUri;
         edit.readOnly = true;
       }
-      if (file.isUnsaved) {
-        edit.data = file.session.getValue();
+      if (editor.isUnsaved) {
+        edit.data = editor.editor.getValue();
       }
-      edit.cursorPos = editorManager.editor.getCursorPosition();
+      edit.cursorPos = editor.editor.getCursorPosition();
       lsEditor.push(edit);
     }
 
@@ -626,8 +650,8 @@ function App() {
       });
     });
 
-    if (activeFile) {
-      localStorage.setItem('lastfile', activeFile.fileUri || activeFile.contentUri || activeFile.filename);
+    if (activeEditor) {
+      localStorage.setItem('lastfile', activeEditor.fileUri || activeEditor.contentUri || activeEditor.filename);
     }
 
     localStorage.setItem('files', JSON.stringify(lsEditor));
@@ -635,15 +659,15 @@ function App() {
   };
 
   window.getCloseMessage = function () {
-    const numFiles = editorManager.hasUnsavedFiles();
-    if (numFiles) {
+    const numEditor = editorManager.hasUnsavedEditor();
+    if (numEditor) {
       return strings["unsaved files close app"];
     }
   };
 
   sidebar.onshow = function () {
-    const activeFile = editorManager.activeFile;
-    if (activeFile) editor.blur();
+    const activeEditor = editorManager.activeFile;
+    if (activeEditor) activeEditor.editor.blur();
   };
 
   function loadFiles() {
@@ -694,11 +718,14 @@ function App() {
 
           } else {
             const render = file.name === lastfile;
-            const newFile = editorManager.addNewFile(file.name, {
+            const activeEditor = editorManager.addNewFile(file.name, {
               render
             });
-            newFile.session.insert(file.cursorPos, file.data);
-            newFile.session.setUndoManager(new ace.UndoManager());
+            activeEditor.editor.setValue(file.data || '', -1);
+            activeEditor.editor.getSession().setUndoManager(new ace.UndoManager());
+            if (file.cursorPos) {
+              activeEditor.editor.moveCursorToPosition(file.cursorPos);
+            }
 
             if (i === files.length - 1) resolve();
           }
@@ -730,15 +757,12 @@ function App() {
         addedFolder[key].reload();
       }
     }
-    const files = editorManager.files;
-
-    if (!files.length) return editorManager.addNewFile('untitled');
-
+    const editors = editorManager.files;
     const dir = cordova.file.externalCacheDirectory;
-    files.map(file => {
-      if (file.fileUri) {
-        const id = btoa(file.id);
-        window.resolveLocalFileSystemURL(dir + id, entry => {
+    editors.map(editor => {
+      if (editor.fileUri) {
+        const id = btoa(editor.id);
+        window.resolveLocalFileSystemURL(dir + id, file => {
           fs.readFile(dir + id).then(res => {
             const data = res.data;
             const decoder = new TextDecoder("utf-8");
@@ -749,21 +773,21 @@ function App() {
                 console.log(err);
               });
 
-            window.resolveLocalFileSystemURL(file.fileUri, () => {
-              fs.readFile(file.fileUri).then(res => {
+            window.resolveLocalFileSystemURL(editor.fileUri, () => {
+              fs.readFile(editor.fileUri).then(res => {
                 const data = res.data;
                 // const decoder = new TextDecoder("utf-8");
                 const text = decoder.decode(data);
 
                 if (text !== originalText) {
-                  if (!file.isUnsaved) {
-                    update(file, text);
+                  if (!editor.isUnsaved) {
+                    update(editor, text);
                   } else {
-                    dialogs.confirm(strings.warning.toUpperCase(), file.filename + strings['file changed'])
+                    dialogs.confirm(strings.warning.toUpperCase(), editor.filename + strings['file changed'])
                       .then(() => {
-                        update(file, text);
+                        update(editor, text);
                         editorManager.onupdate.call({
-                          activeFile: editorManager.activeFile
+                          activeEditor: editorManager.activeFile
                         });
                       });
                   }
@@ -773,7 +797,7 @@ function App() {
               });
             }, err => {
               if (err.code === 1) {
-                editorManager.removeFile(file);
+                editorManager.removeFile(editor);
               }
             });
           });
@@ -787,16 +811,16 @@ function App() {
 
     /**
      * 
-     * @param {File} file 
+     * @param {File} editor 
      * @param {string} text 
      */
-    function update(file, text) {
-      const cursorPos = editorManager.editor.getCursorPosition();
-      file.session.setValue(text);
-      file.isUnsaved = false;
-      editorManager.editor.gotoLine(cursorPos.row, cursorPos.column);
-      editorManager.editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
-      file.assocTile.classList.remove('notice');
+    function update(editor, text) {
+      const cursorPos = editor.editor.getCursorPosition();
+      editor.editor.setValue(text);
+      editor.isUnsaved = false;
+      editor.editor.gotoLine(cursorPos.row, cursorPos.column);
+      editor.editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
+      editor.assocTile.classList.remove('notice');
     }
   }
   //#endregion
@@ -856,9 +880,9 @@ function restoreTheme(darken) {
 }
 
 function runPreview() {
-  const activeFile = editorManager.activeFile;
-  if (activeFile.fileUri) {
-    let uri = activeFile.fileUri;
+  const activeEditor = editorManager.activeFile;
+  if (activeEditor.fileUri) {
+    let uri = activeEditor.fileUri;
     window.resolveLocalFileSystemURL(uri, entry => {
       if (entry.isDirectory) return;
       entry.getParent(parent => {
@@ -871,26 +895,13 @@ function runPreview() {
               .then(res => {
                 let js = decoder.decode(res.data);
                 let code = js;
-                let css, codes = [];
                 js = `<script>${js}</script>`;
                 text = text.split('<head>');
                 text = `${text[0]}<head>${js}${text[1]}`;
                 const name = parent.nativeURL + '.run_' + entry.name;
-                fs.readFile(`${cordova.file.applicationDirectory}www/css/console.css`)
-                  .then(res => {
-                    css = decoder.decode(res.data);
-                    return fs.readFile(`${cordova.file.applicationDirectory}www/js/codeflask.min.js`);
-                  })
-                  .then(res => {
-                    codes.push(decoder.decode(res.data));
-                    return fs.readFile(`${cordova.file.applicationDirectory}www/js/esprisma.js`);
-                  })
-                  .then(res => {
-                    codes.push(decoder.decode(res.data));
-                    return fs.writeFile(name, text, true, false);
-                  })
+                fs.writeFile(name, text, true, false)
                   .then(() => {
-                    run(name, code, codes, css);
+                    run(name, code);
                   });
               });
           });
@@ -900,7 +911,7 @@ function runPreview() {
     alert(strings.warning.toUpperCase(), strings['save file to run']);
   }
 
-  function run(uri, code, codes, style) {
+  function run(uri, code) {
     const mode = appSettings.value.previewMode;
     if (mode === 'none') {
       dialogs.select('Select mode', ['desktop', 'mobile'])
@@ -919,27 +930,25 @@ function runPreview() {
       const options = `location=yes,hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,useWideViewPort=${useDesktop},toolbarcolor=${themeColor},toolbartranslucent=yes,navigationbuttoncolor=${color},closebuttoncolor=${color}`;
       const ref = cordova.InAppBrowser.open(uri, '_blank', options);
       ref.addEventListener('loadstart', function () {
+        ref.insertCSS({
+          file: `${cordova.file.applicationDirectory}www/css/console.css`
+        });
         ref.executeScript({
           code
+        });
+        ref.executeScript({
+          file: `${cordova.file.applicationDirectory}www/js/codeflask.min.js`
         });
         ref.executeScript({
           code: `
             if(!window.consoleLoaded){
               window.addEventListener('error', function(err){
-                console.error(err);
+                console.log(err);
               })
             }
-            sessionStorage.setItem('_$mode', '${mode}');
+            window.__mode = '${mode}';
+            window.__log = function(res){(function(res){console.log(res)})(res)};
           `
-        });
-      });
-
-      ref.addEventListener('loadstop', function () {
-        ref.insertCSS({
-          code: style
-        });
-        ref.executeScript({
-          code: codes.join(';')
         });
       });
 

@@ -3924,25 +3924,26 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
     "use strict";
 
     var MouseEvent = require("./mouse_event").MouseEvent;
+    var dom = require("../lib/dom");
 
     exports.addTouchListeners = function (el, editor) {
         var mode = "scroll";
         var startX;
         var startY;
         var touchStartT;
+        var lastT;
         var longTouchTimer;
         var animationTimer;
         var animationSteps = 0;
         var pos;
         var clickCount = 0;
-        var mvY, mvX, animation, arX = [],
-            arY = [];
+        var vX = 0;
+        var vY = 0;
+        var pressed;
         el.addEventListener("touchstart", function (e) {
 
             if (e.target.parentElement.className === "clipboard-contextmneu") return;
             if (e.target.classList.contains("cursor-control")) return;
-
-            cancelAnimationFrame(animation);
 
             var touches = e.touches;
             if (longTouchTimer || touches.length > 1) {
@@ -3953,9 +3954,11 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                 return;
             }
 
+            pressed = editor.$mouseHandler.isMousePressed = true;
             var h = editor.renderer.layerConfig.lineHeight;
             var w = editor.renderer.layerConfig.lineHeight;
             var t = e.timeStamp;
+            lastT = t;
             var touchObj = touches[0];
             var x = touchObj.clientX;
             var y = touchObj.clientY;
@@ -3964,6 +3967,7 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
 
             startX = e.clientX = x;
             startY = e.clientY = y;
+            vX = vY = 0;
 
             var ev = new MouseEvent(e, editor);
             pos = ev.getDocumentPosition();
@@ -4016,6 +4020,7 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
 
         el.addEventListener("touchend", function (e) {
 
+            pressed = editor.$mouseHandler.isMousePressed = false;
             if (animationTimer) clearInterval(animationTimer);
             if (mode == "zoom") {
                 mode = "";
@@ -4024,23 +4029,7 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                 editor.selection.moveToPosition(pos);
                 animationSteps = 0;
             } else if (mode == "scroll") {
-                let sum = 0;
-                let tx = Math.abs(mvX) * 8;
-                let ty = Math.abs(mvY) * 8;
-                arX = [];
-                arY = [];
-                for (let i = 1; sum < tx; ++i) {
-                    sum += i;
-                    arX.push(i);
-                }
-
-                sum = 0;
-                for (let i = 1; sum < ty; ++i) {
-                    sum += i;
-                    arY.push(i);
-                }
-
-                requestAnimationFrame(animate);
+                animate();
                 e.preventDefault();
             }
             clearTimeout(longTouchTimer);
@@ -4070,36 +4059,51 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                     return e.preventDefault();
             }
 
-            mvX = startX - touchObj.clientX;
-            mvY = startY - touchObj.clientY;
-
             startX = touchObj.clientX;
             startY = touchObj.clientY;
 
             e.clientX = touchObj.clientX;
             e.clientY = touchObj.clientY;
 
+            var t = e.timeStamp;
+            var dt = t - lastT;
+            lastT = t;
             if (mode == "scroll") {
-                editor.renderer.scrollBy(mvX, mvY);
+                var mouseEvent = new MouseEvent(e, editor);
+                mouseEvent.speed = 1;
+                mouseEvent.wheelX = wheelX;
+                mouseEvent.wheelY = wheelY;
+                if (10 * Math.abs(wheelX) < Math.abs(wheelY)) wheelX = 0;
+                if (10 * Math.abs(wheelY) < Math.abs(wheelX)) wheelY = 0;
+                if (dt != 0) {
+                    vX = wheelX / dt;
+                    vY = wheelY / dt;
+                }
+                editor._emit("mousewheel", mouseEvent);
+                if (!mouseEvent.propagationStopped) {
+                    vX = vY = 0;
+                }
             } else {
                 e.preventDefault();
             }
         });
 
         function animate() {
-            let xlen = arX.length;
-            let ylen = arY.length;
-
-            if (xlen === 0 && ylen === 0) {
-                mvX = 0;
-                mvY = 0;
-                return;
-            }
-
-            let xsign = mvX < 0 ? -1 : 1;
-            let ysign = mvY < 0 ? -1 : 1;
-            editor.renderer.scrollBy(xlen ? xsign * arX.pop() : 0, ylen ? ysign * arY.pop() : 0);
-            animation = requestAnimationFrame(animate);
+            animationSteps += 60;
+            animationTimer = setInterval(function () {
+                if (animationSteps-- <= 0) {
+                    clearInterval(animationTimer);
+                    animationTimer = null;
+                }
+                if (Math.abs(vX) < 0.01) vX = 0;
+                if (Math.abs(vY) < 0.01) vY = 0;
+                if (animationSteps < 20) vX = 0.9 * vX;
+                if (animationSteps < 20) vY = 0.9 * vY;
+                var oldScrollTop = editor.session.getScrollTop();
+                editor.renderer.scrollBy(10 * vX, 10 * vY);
+                if (oldScrollTop == editor.session.getScrollTop())
+                    animationSteps = 0;
+            }, 10);
         }
 
         function handleLongTap() {

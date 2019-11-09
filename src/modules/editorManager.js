@@ -1,8 +1,6 @@
 import list from '../components/list';
 import clipboardAction from './clipboard';
-import {
-    tag
-} from 'html-element-js';
+import tag from 'html-tag-js';
 import helper from '../modules/helpers';
 import tile from "../components/tile";
 import fs from './androidFileSystem';
@@ -32,37 +30,61 @@ import textControl from './oncontextmenu';
  */
 function EditorManager(sidebar, header, body) {
     const openFileList = list.collaspable(strings['active files']);
-    /**
-     * @type {acodeEditor[]}
-     */
     let counter = 0;
-    const thisObj = {
+    const container = tag('div', {
+        className: 'editor-container'
+    });
+    const editor = ace.edit(container);
+    const controls = {
+        start: tag('span', {
+            className: 'cursor-control start'
+        }),
+        end: tag('span', {
+            className: 'cursor-control end'
+        }),
+        menu: tag('div', {
+            className: 'clipboard-contextmneu',
+            innerHTML: '<span action="copy">copy</span><span action="cut">cut</span><span action="paste">paste</span><span action="select all">select all<span>',
+        }),
+        update: () => {}
+    }
+
+    const manager = {
+        editor,
         addNewFile,
-        getEditor,
-        switchEditor,
-        activeEditor: null,
-        update,
+        getFile,
+        switchFile,
+        activeFile: null,
         onupdate: () => {},
-        hasUnsavedEditor,
-        editors: [],
-        removeEditor,
-        updateLocation
+        hasUnsavedFiles,
+        files: [],
+        removeFile,
+        controls
     };
 
-    sidebar.append(openFileList);
+    body.appendChild(container);
+    setupEditor(editor);
 
-    /**
-     * 
-     * @param {string} id 
-     */
-    function getEditor(id) {
-        for (let editor of thisObj.editors) {
-            if (editor.id === id)
-                return editor;
+    textControl(editor, controls, container);
+    controls.menu.ontouchend = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        const action = e.target.getAttribute('action');
+        if (action) {
+            clipboardAction(action);
         }
-
-        return null;
     }
+    editor.on('change', function () {
+        if (manager.activeFile && !manager.activeFile.isUnsaved) {
+            manager.activeFile.assocTile.classList.add('notice');
+            manager.activeFile.isUnsaved = true;
+            if (manager.activeFile)
+                manager.onupdate();
+        }
+    });
+
+    sidebar.append(openFileList);
 
     /**
      * 
@@ -77,143 +99,123 @@ function EditorManager(sidebar, header, body) {
      * @param {boolean} [options.render]
      * @param {boolean} [options.readOnly]
      * @param {Object} [options.cursorPos]
-     * @returns {acodeEditor}
+     * @returns {File}
      */
     function addNewFile(filename, options = {}) {
 
-        let tmpID = options.fileUri || options.contentUri;
-        if (getEditor(tmpID)) {
-            if (thisObj.activeEditor.id !== tmpID) switchEditor(tmpID);
+        let doesExists = getFile(options.fileUri || options.contentUri);
+        if (doesExists) {
+            if (manager.activeFile.id !== doesExists.id) switchFile(doesExists.id);
             return;
         }
 
         options.isUnsaved = options.isUnsaved === undefined ? true : options.isUnsaved;
         options.render = options.render === undefined ? true : options.render;
 
-        const id = tmpID || ++counter;
-        const container = tag('div', {
-            className: 'editor-container'
-        });
-        /**
-         * @type {AceAjax.Editor}
-         */
-        const editor = ace.edit(container);
         const removeBtn = tag('span', {
             className: 'icon cancel'
         });
-        const assocTile = tile({
-            lead: tag('i', {
-                className: helper.getIconForFile(filename),
-            }),
-            text: filename,
-            tail: removeBtn
-        });
-        let thisEditor = {
-            id,
-            container,
-            editor,
-            filename,
-            assocTile,
+        let file = {
+            id: ++counter,
+            session: ace.createEditSession(options.text || ''),
             fileUri: options.fileUri,
             contentUri: options.contentUri,
-            location: options.location,
+            name: filename,
             isUnsaved: options.isUnsaved,
-            readOnly: options.readOnly,
-            updateControls: null,
-            controls: {
-                start: tag('span', {
-                    className: 'cursor-control start'
+            readOnly: options.readOnly || options.isContentUri,
+            assocTile: tile({
+                lead: tag('i', {
+                    className: helper.getIconForFile(filename),
                 }),
-                end: tag('span', {
-                    className: 'cursor-control end'
-                }),
-                menu: tag('div', {
-                    className: 'clipboard-contextmneu',
-                    innerHTML: '<span action="copy">copy</span><span action="cut">cut</span><span action="paste">paste</span><span action="select all">select all<span>',
-                })
+                text: filename,
+                tail: removeBtn
+            }),
+            get filename() {
+                return this.name;
+            },
+            set filename(name) {
+                if (!name) return;
+                header.text(name);
+                this.assocTile.text(name);
+                if (helpers.getExt(this.name) !== helpers.getExt(name)) {
+                    setupSession({
+                        session: this.session,
+                        filename: name
+                    });
+                    this.assocTile.lead(tag('i', {
+                        className: helper.getIconForFile(name)
+                    }));
+                }
+
+                if (this.fileUri) this.fileUri = this.location + name;
+                this.name = name;
+                manager.onupdate();
+            },
+            get location() {
+                if (this.fileUri)
+                    return this.fileUri.replace(this.filename, '');
+                return null;
+            },
+            set location(url) {
+                if (!url) return;
+                if (this.readOnly) {
+                    this.readOnly = false;
+                    this.contentUri = null;
+                }
+                this.fileUri = url + this.filename
+                setSubText(this);
+                helpers.updateFolders(this.location);
+                manager.onupdate();
             }
         };
-
-        thisEditor.controls.menu.ontouchend = function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            const action = e.target.getAttribute('action');
-            if (action) {
-                clipboardAction(action, thisEditor);
-            }
-        };
-
-        if (options.text) {
-            editor.setValue(options.text, -1);
-            editor.getSession().setUndoManager(new ace.UndoManager());
-        }
 
         if (options.isUnsaved) {
-            assocTile.classList.add('notice');
+            file.assocTile.classList.add('notice');
         }
 
-        editor.on('change', function () {
-            if (!thisEditor.isUnsaved) {
-                thisEditor.assocTile.classList.add('notice');
-                thisEditor.isUnsaved = true;
-                if (thisObj.activeEditor)
-                    thisObj.onupdate();
-            }
-        });
+        file.assocTile.classList.add('light');
 
-        assocTile.classList.add('light');
-
-        setMode(editor, filename);
-
-        assocTile.addEventListener('click', function (e) {
-            if (thisObj.activeEditor && (e.target === removeBtn || thisObj.activeEditor.id === thisEditor.id)) return;
+        file.assocTile.addEventListener('click', function (e) {
+            if (manager.activeFile && (e.target === removeBtn || manager.activeFile.id === file.id)) return;
             sidebar.hide();
-            switchEditor(thisEditor.id);
+            switchFile(file.id);
         });
 
-        assocTile.addEventListener('contextmenu', function (e) {
+        file.assocTile.addEventListener('contextmenu', function (e) {
             if (e.target === removeBtn) return;
-            if (thisEditor.isContentUri) return alert('Cannot rename this file. Please open this file from the this app to rename.');
-            dialogs.prompt('Rename', thisEditor.filename)
+            dialogs.prompt('Rename', file.filename)
                 .then(newname => {
-                    if (!newname || newname === thisEditor.filename) return;
+                    if (!newname || newname === file.filename) return;
                     newname = helper.removeLineBreaks(newname);
-                    if (thisEditor.fileUri) {
-                        fs.renameFile(thisEditor.fileUri, newname)
+
+                    if (file.fileUri) {
+                        fs.renameFile(file.fileUri, newname)
                             .then(() => {
-                                for (let key in addedFolder) {
-                                    if (new RegExp(key).test(thisEditor.id)) {
-                                        addedFolder[key].reload();
-                                    }
-                                }
-                                thisObj.onupdate();
-                                const id = thisEditor.location ? thisEditor.location + encodeURI(newname) : thisEditor;
-                                update(id, newname);
+                                file.filename = newname;
+                                helpers.updateFolders(file.location);
                                 window.plugins.toast.showShortBottom(strings['file renamed']);
+                            })
+                            .catch(err => {
+                                if (err.code !== 0)
+                                    alert(strings['unable to remane'] + helper.getErrorMessage(err.code));
+                                else
+                                    console.error(err);
                             });
+                    } else if (file.contentUri) {
+                        alert(strings['unable to rename']);
                     } else {
-                        update(thisEditor.location + encodeURI(newname), newname);
+                        file.filename = newname;
+                        window.plugins.toast.showShortBottom(strings['file renamed']);
                     }
-                })
-                .catch(err => {
-                    if (err.code !== 0) {
-                        alert('Unable to remane file. Error: ' + helper.getErrorMessage(err.code));
-                    } else if (typeof err === 'string') {
-                        alert("Error: " + err);
-                    }
-                    console.error(err);
                 });
         });
 
-        textControl(thisEditor);
-
-        removeBtn.addEventListener('click', () => removeEditor(thisEditor));
-        thisObj.editors.push(thisEditor);
-        openFileList.addListTile(assocTile);
+        removeBtn.addEventListener('click', () => removeFile(file));
+        manager.files.push(file);
+        openFileList.addListTile(file.assocTile);
 
         if (options.render) {
-            switchEditor(thisEditor.id);
+            switchFile(file.id);
             setTimeout(() => {
                 if (options.cursorPos) {
                     editor.moveCursorToPosition(options.cursorPos);
@@ -221,164 +223,147 @@ function EditorManager(sidebar, header, body) {
             }, 100);
         }
 
-        return thisEditor;
+        return file;
     }
 
-    function setSubText(editor) {
-        if (editor.location) {
-            let text = editor.location;
+    /**
+     * 
+     * @param {File} file 
+     */
+    function setSubText(file) {
+        let text = 'Read Only';
+        if (file.location) {
+            text = file.location;
             if (text.length > 30) {
                 text = '...' + text.slice(text.length - 27);
             }
-            header.subText(decodeURI(text));
+        } else if (!file.readOnly) {
+            text = 'New File';
         }
+        header.subText(decodeURI(text));
     }
 
-    function switchEditor(id) {
-        if (thisObj.activeEditor) {
-            thisObj.activeEditor.assocTile.classList.remove('active');
-            body.removeChild(thisObj.activeEditor.container);
-        }
-        for (let editor of thisObj.editors) {
-            if (id === editor.id) {
-                body.append(editor.container);
-                if (editor.readOnly) {
-                    header.text(editor.filename + ' (read only)');
-                } else {
-                    header.text(editor.filename);
+    function switchFile(id) {
+        for (let file of manager.files) {
+            if (id === file.id) {
+
+                if (manager.activeFile) {
+                    manager.activeFile.assocTile.classList.remove('active');
                 }
-                setSubText(editor);
-                editor.assocTile.classList.add('active');
-                thisObj.activeEditor = editor;
-                thisObj.onupdate();
+                manager.controls.update();
+
+                editor.setSession(file.session);
+                editor.focus();
+                setTimeout(controls.update, 100);
+
+                header.text(file.filename);
+                setSubText(file);
+                setupSession(file);
+                file.assocTile.classList.add('active');
+                manager.activeFile = file;
+                manager.onupdate();
                 return;
             }
         }
 
-        thisObj.onupdate();
+        manager.onupdate();
     }
 
     /**
      * 
      * @param {AceAjax.Editor} editor 
-     * @param {string} filename 
      */
-    function setMode(editor, filename) {
-        setLanguage(editor, filename);
-        editor.getSession().setUseWorker(!!appSettings.value.linting);
-        editor.setFontSize(appSettings.value.fontSize);
+    function setupEditor(editor) {
+        ace.require("ace/ext/emmet");
+        window.modelist = ace.require('ace/ext/modelist');
+        const settings = appSettings.value;
+
+        editor.setFontSize(settings.fontSize);
         editor.setHighlightSelectedWord(true);
         editor.setKeyboardHandler("ace/keyboard/sublime");
         editor.setOptions({
             animatedScroll: false,
             tooltipFollowsMouse: false,
-            wrap: appSettings.value.textWrap,
-            theme: appSettings.value.editorTheme,
-            tabSize: appSettings.value.tabSize,
-            useSoftTabs: appSettings.value.softTab,
-            showGutter: appSettings.value.linenumbers,
-            showLineNumbers: appSettings.value.linenumbers
+            theme: settings.editorTheme,
+            showGutter: settings.linenumbers,
+            showLineNumbers: settings.linenumbers,
+            enableEmmet: true
         });
     }
 
-    function setLanguage(editor, filename) {
-        const modelist = ace.require('ace/ext/modelist');
+    function setupSession(file) {
+        const session = file.session;
+        const filename = file.filename;
+        const settings = appSettings.value;
         const mode = modelist.getModeForPath(filename).mode;
-        editor.session.setMode(mode);
-        if (['html', 'haml', 'jade', 'slim', 'jsx', 'xml', 'xsl', 'css', 'scss', 'sass', 'less', 'stylus'].includes(helper.getExt(filename))) {
-            ace.require("ace/ext/emmet");
-            editor.setOption("enableEmmet", true);
+        if (file.session.$modeId !== mode) {
+            session.setOptions({
+                mode,
+                wrap: settings.textWrap,
+                tabSize: settings.tabSize,
+                useSoftTabs: settings.softTab,
+                useWorker: appSettings.value.linting
+            });
         }
     }
 
-    /**
-     * 
-     * @param {string} newid 
-     * @param {string} filename 
-     * @param {string} location
-     */
-    function update(newid, filename, location, editor) {
-        /**
-         * @type {acodeEditor}
-         */
-        const activeEditor = editor || thisObj.activeEditor;
-
-        activeEditor.isUnsaved = false;
-        activeEditor.id = newid;
-        activeEditor.readOnly = false;
-        if (filename) {
-            if (helpers.getExt(activeEditor.filename) !== helpers.getExt(filename)) {
-                setMode(activeEditor.editor, filename);
-                activeEditor.assocTile.lead(tag('i', {
-                    className: helper.getIconForFile(filename)
-                }));
-            }
-            activeEditor.filename = filename;
-            header.text(filename);
-            if (activeEditor.location) activeEditor.fileUri = activeEditor.location + encodeURI(filename);
-            activeEditor.assocTile.text(filename);
-            activeEditor.assocTile.lead(tag('i', {
-                className: helper.getIconForFile(filename)
-            }));
-        }
-        if (location) {
-            updateLocation(activeEditor, location, filename);
-        }
-        window.plugins.toast.showShortBottom('file saved');
-        thisObj.onupdate();
-    }
-
-    function updateLocation(editor, location, filename = '') {
-        editor.fileUri = editor.id = location + encodeURI((filename || editor.filename));
-        editor.location = location;
-        setSubText(editor);
-    }
-
-    function hasUnsavedEditor() {
+    function hasUnsavedFiles() {
         let count = 0;
-        for (let editor of thisObj.editors) {
+        for (let editor of manager.files) {
             if (editor.isUnsaved) ++count;
         }
 
         return count;
     }
 
-    function removeEditor(id, force) {
+    function removeFile(id, force) {
         /**
-         * @type {acodeEditor}
+         * @type {File}
          */
-        const thisEditor = typeof id === "string" ? getEditor(id) : id;
+        const file = typeof id === "string" ? getFile(id) : id;
 
-        if (!thisEditor) return;
+        if (!file) return;
 
-        if (thisEditor.isUnsaved && !force) {
-            dialogs.confirm(strings.warning.toUpperCase(), strings['unsaved file']).then(closeEditor);
+        if (file.isUnsaved && !force) {
+            dialogs.confirm(strings.warning.toUpperCase(), strings['unsaved file']).then(closeFile);
         } else {
-            closeEditor();
+            closeFile();
         }
 
-        function closeEditor() {
-            thisObj.editors = thisObj.editors.filter(editor => editor.id !== thisEditor.id);
+        function closeFile() {
+            manager.files = manager.files.filter(editor => editor.id !== file.id);
 
-            if (!thisObj.editors.length) {
-                thisEditor.editor.blur();
-                thisEditor.container.remove();
-                header.text('Acode');
-                header.subText(null);
-                thisObj.activeEditor = null;
+            if (!manager.files.length) {
+                editor.setSession(new ace.EditSession(""));
+                addNewFile('untitled');
             } else {
-                if (thisEditor.id === thisObj.activeEditor.id) {
-                    switchEditor(thisObj.editors[thisObj.editors.length - 1].id);
+                if (file.id === manager.activeFile.id) {
+                    switchFile(manager.files[manager.files.length - 1].id);
                 }
             }
 
-            thisEditor.assocTile.remove();
-            thisEditor.editor.destroy();
-            thisObj.onupdate();
+            file.assocTile.remove();
+            delete manager.files[id];
+            manager.onupdate();
         }
     }
 
-    return thisObj;
+    /**
+     * 
+     * @param {number | string} id 
+     */
+    function getFile(id) {
+        for (let file of manager.files) {
+            if (typeof id === 'number' && file.id === id)
+                return file;
+            else if (typeof id === 'string' && (file.fileUri === id || file.contentUri === id))
+                return file;
+        }
+
+        return null;
+    }
+
+    return manager;
 }
 
 export default EditorManager;

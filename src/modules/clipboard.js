@@ -1,11 +1,10 @@
 /**
  * 
- * @param {*} action 
- * @param {acodeEditor} acodeEditor 
+ * @param {string} action 
  */
-function clipboardAction(action, acodeEditor) {
+function clipboardAction(action) {
     const clipboard = cordova.plugins.clipboard;
-    const editor = acodeEditor.editor;
+    const editor = editorManager.editor;
     const selectedText = editor.getCopyText();
     switch (action) {
         case 'copy':
@@ -40,10 +39,6 @@ function clipboardAction(action, acodeEditor) {
                 acodeEditor.controls.start.remove();
                 acodeEditor.controls.end.remove();
             }, 0);
-            break;
-
-        case 'openCommandPallete':
-            editor.execCommand(action);
             break;
     }
     editor.focus();

@@ -2,9 +2,7 @@ import Page from "../../components/page";
 import gen from "../../components/gen";
 import dialogs from "../../components/dialogs";
 import constants from "../../constants";
-import {
-    tag
-} from "html-element-js";
+import tag from 'html-tag-js';
 
 export default function editorSettings() {
     const page = Page(strings['editor settings']);
@@ -57,19 +55,13 @@ export default function editorSettings() {
             key: 'linting',
             text: strings['linting'],
             subText: value.linting ? strings.yes : strings.no,
-        },
-        {
-            key: 'previewMode',
-            text: strings['preview mode'],
-            subText: value.previewMode
         }
-
     ];
 
     gen.settingsItems(settingsList, settingsOptions, changeSetting);
 
     function changeSetting() {
-
+        const files = editorManager.files;
         switch (this.key) {
             case 'font size':
                 dialogs.prompt(this.text, appSettings.value.fontSize, 'text', {
@@ -77,10 +69,10 @@ export default function editorSettings() {
                     match: constants.FONT_SIZE
                 }).then(res => {
                     if (res === value.fontSize) return;
+                    editorManager.editor.setFontSize(res);
                     appSettings.value.fontSize = res;
                     appSettings.update();
-                    window.beforeClose();
-                    location.reload();
+                    this.changeSubText(res);
                 });
                 break;
 
@@ -90,9 +82,11 @@ export default function editorSettings() {
                 }).then(res => {
                     if (res === value.tabSize) return;
                     appSettings.value.tabSize = res;
+                    files.map(file => {
+                        file.session.setOption('tabSize', res);
+                    });
                     appSettings.update();
-                    window.beforeClose();
-                    location.reload();
+                    this.changeSubText(res);
                 });
                 break;
 
@@ -101,14 +95,16 @@ export default function editorSettings() {
                         [true, strings.yes],
                         [false, strings.no]
                     ], {
-                        default: value.textWrap ? strings.yes : strings.no,
+                        default: value.textWrap
                     })
                     .then(res => {
                         if (res === value.textWrap) return;
+                        files.map(file => {
+                            file.session.setOption('wrap', res);
+                        });
                         appSettings.value.textWrap = res;
                         appSettings.update();
-                        window.beforeClose();
-                        location.reload();
+                        this.changeSubText(res ? strings.yes : strings.no, );
                     });
                 break;
 
@@ -117,14 +113,16 @@ export default function editorSettings() {
                         [true, strings.yes],
                         [false, strings.no]
                     ], {
-                        default: value.softTab ? strings.yes : strings.no,
+                        default: value.softTab
                     })
                     .then(res => {
                         if (res === value.softTab) return;
+                        files.map(file => {
+                            file.session.setOption('useSoftTabs', res);
+                        });
                         appSettings.value.softTab = res;
                         appSettings.update();
-                        window.beforeClose();
-                        location.reload();
+                        this.changeSubText(res ? strings.yes : strings.no, );
                     });
                 break;
 
@@ -133,14 +131,17 @@ export default function editorSettings() {
                         [true, strings.yes],
                         [false, strings.no]
                     ], {
-                        default: value.linenumbers ? strings.yes : strings.no,
+                        default: value.linenumbers
                     })
                     .then(res => {
                         if (res === value.linenumbers) return;
+                        editorManager.editor.setOptions({
+                            showGutter: res,
+                            showLineNumbers: res
+                        });
                         appSettings.value.linenumbers = res;
                         appSettings.update();
-                        window.beforeClose();
-                        location.reload();
+                        this.changeSubText(res ? strings.yes : strings.no, );
                     });
                 break;
 
@@ -149,7 +150,7 @@ export default function editorSettings() {
                         [true, strings.yes],
                         [false, strings.no]
                     ], {
-                        default: value.beautify ? strings.yes : strings.no,
+                        default: value.beautify
                     })
                     .then(res => {
                         if (res === value.beautify) return;
@@ -164,29 +165,16 @@ export default function editorSettings() {
                         [true, strings.yes],
                         [false, strings.no]
                     ], {
-                        default: value.linting ? strings.yes : strings.no,
+                        default: value.linting
                     })
                     .then(res => {
                         if (res === value.linting) return;
+                        files.map(file => {
+                            file.session.setUseWorker(res);
+                        });
                         appSettings.value.linting = res;
                         appSettings.update();
                         this.changeSubText(res ? strings.yes : strings.no);
-                    });
-                break;
-
-            case 'previewMode':
-                dialogs.select(this.text, [
-                        'none',
-                        'mobile',
-                        'desktop'
-                    ], {
-                        default: value.previewMode
-                    })
-                    .then(res => {
-                        if (res === value.previewMode) return;
-                        appSettings.value.previewMode = res;
-                        appSettings.update();
-                        this.changeSubText(res);
                     });
                 break;
 

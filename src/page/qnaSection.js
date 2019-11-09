@@ -1,8 +1,6 @@
 import Page from "../components/page";
 import gen from "../components/gen";
-import {
-    tag
-} from "html-element-js";
+import tag from 'html-tag-js';
 
 export default function qnaSection() {
     const page = Page(strings['qa section']);

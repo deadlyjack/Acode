@@ -1,6 +1,4 @@
-import {
-    tag
-} from "html-element-js";
+import tag from 'html-tag-js';
 import tile from "./tile";
 
 /**

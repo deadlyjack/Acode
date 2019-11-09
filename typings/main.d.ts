@@ -1,5 +1,5 @@
 /// <reference path="../node_modules/@types/ace/"/>
-/// <reference path="../node_modules/html-element-js/dist/html.d.ts"/>
+/// <reference path="../node_modules/html-tag-js/dist/tag.d.ts"/>
 
 interface fileBrowserSettings {
     showHiddenFiles: "on" | "off";
@@ -27,6 +27,7 @@ interface Settings {
     tabSize: number;
     linenumbers: boolean,
     beautify: boolean,
+    linting: boolean,
     previewMode: 'mobile' | 'desktop' | 'none'
 }
 
@@ -34,6 +35,9 @@ interface AppSettings {
     value: Settings;
     update(settings?: String): void;
     reset(): void;
+    onload: () => void;
+    onsave: () => void;
+    loaded: boolean;
 }
 
 interface ActionStackOptions {
@@ -53,34 +57,40 @@ interface storedFiles {
     url?: string;
 }
 
-interface fileOptons {
+interface fileOptions {
     name: string;
     dir: string;
 }
 
 interface newFileOptions {
-    filename: string;
     contentUri?: string;
+    filename: string;
     fileUri?: string;
     location?: string;
+    text?: string;
+    render?: boolean;
+    readonly?: boolean;
+    cursorPos?: AceAjax.Position
 }
 
 interface Controls {
     start: HTMLSpanElement;
     end: HTMLSpanElement;
     menu: HTMLSpanElement;
+    update: () => void;
 }
 
-interface acodeEditor extends newFileOptions {
-    isUnsaved: boolean;
-    id: string;
-    container: HTMLDivElement;
-    editor: AceAjax.Editor;
+interface File {
     assocTile: HTMLElement;
-    updateControls: function(): void;
-    controls: Controls;
+    contentUri: string;
+    fileUri: string;
+    filename: string;
+    id: string;
+    isUnsaved: boolean;
+    location: string;
     readonly: boolean;
-    isUnsaved: boolean
+    updateControls: function(): void;
+    session: AceAjax.IEditSession;
 }
 
 interface elementContainer {
@@ -88,20 +98,15 @@ interface elementContainer {
 }
 
 interface Manager {
-    /**
-     * Create new editor
-     * @param filename 
-     * @param options 
-     */
-    addNewFile(filename: string, options: newFileOptions): acodeEditor;
-    getEditor(id: string): acodeEditor;
-    switchEditor(id: string): void;
-    activeEditor: acodeEditor;
-    update(newid: string, filename: string, location: string, editor: acodeEditor): void;
+    addNewFile(filename: string, options: newFileOptions): File;
+    getFile(id: string): File;
+    switchFile(id: string): void;
+    removeFile(id: string | File, force: boolean): void;
+    editor: AceAjax.Editor;
+    activeFile: File;
     onupdate: function(): void;
-    editors: acodeEditor[];
-    removeEditor(id: string | acodeEditor, force: boolean): void;
-    updateLocation(editor: acodeEditor, location: string): void;
+    files: Array<File>;
+    controls: Controls;
 }
 
 interface Strings {
@@ -151,6 +156,8 @@ declare var ace: AceAjax;
 declare var fileClipBoard: FileClipBoard;
 
 declare var addedFolder: Folders;
+
+declare var editorManager: Manager;
 
 declare var app: HTMLDivElement;
 /**

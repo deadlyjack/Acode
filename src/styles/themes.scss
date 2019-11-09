@@ -68,6 +68,34 @@ $textDark : white;
 .theme-dark {
     background-color: $pageBgDark !important;
 
+    .ace_prompt_wrapper {
+        .ace_prompt_container {
+            box-shadow: none;
+        }
+
+        .ace_editor {
+            background-color: $bgDark !important;
+            color: $textDark !important;
+
+            box-shadow: none;
+            border: none;
+
+            .ace_cursor {
+                color: white !important;
+            }
+        }
+
+        .ace_active-line {
+            background-color: $pageBgDark !important;
+        }
+    }
+
+    &.splash {
+        &::before {
+            background-color: $bgDark;
+        }
+    }
+
     .page {
         background-color: $pageBgDark !important;
 
@@ -75,6 +103,8 @@ $textDark : white;
             color: rgb(144, 255, 93);
         }
 
+        a,
+        button,
         small,
         div,
         span:not(.icon) {
@@ -87,16 +117,29 @@ $textDark : white;
         color: rgb(181, 180, 233);
     }
 
+    .clipboard-contextmneu {
+        background-color: $bgDark;
+
+        >span {
+            color: #999;
+
+            &:not(:last-child) {
+                border-right: solid 1px #777;
+            }
+        }
+    }
+
     .context-menu,
     header,
     .prompt,
     #sidenav {
         background-color: $bgDark;
 
+        li,
         span,
         i,
         button {
-            color: $textDark !important;
+            color: $textDark;
         }
     }
 

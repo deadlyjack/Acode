@@ -3,7 +3,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
   mode: 'production',
   entry: {
-    main: "./src/main.js"
+    main: "./src/main.js",
+    injection: "./www/js/injection.js"
   },
   output: {
     path: path.resolve(__dirname, "www/js"),
@@ -12,7 +13,7 @@ module.exports = {
   },
   module: {
     rules: [{
-        test: /\.t.js/,
+        test: /\.hbs$/,
         use: ['raw-loader']
       },
       {

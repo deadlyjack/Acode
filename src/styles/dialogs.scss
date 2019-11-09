@@ -18,6 +18,12 @@
     display: flex;
     flex-direction: column;
 
+    &.alert {
+        .title {
+            text-transform: uppercase;
+        }
+    }
+
     &.select {
 
         min-width: 220px;
@@ -58,10 +64,6 @@
         z-index: 108;
         background-color: black;
         opacity: 0.4;
-        transition: all 300ms ease;
-        transform: translateZ(0);
-        animation: animate-darkness 300ms ease 1;
-
     }
 
     &.hide {
@@ -123,17 +125,5 @@
 
     .button-container {
         margin-top: 20px;
-    }
-}
-
-@keyframes animate-darkness {
-    0% {
-        opacity: 0;
-        transform: translateZ(0);
-    }
-
-    100% {
-        opacity: 0.4;
-        transform: translateZ(0);
     }
 }

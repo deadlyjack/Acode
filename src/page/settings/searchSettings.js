@@ -1,9 +1,6 @@
 import Page from "../../components/page";
 import dialogs from "../../components/dialogs";
-import constants from "../../constants";
-import {
-    tag
-} from "html-element-js";
+import tag from 'html-tag-js';
 import gen from "../../components/gen";
 
 export default function searchSettings() {
