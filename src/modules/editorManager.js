@@ -35,6 +35,7 @@ function EditorManager(sidebar, header, body) {
         className: 'editor-container'
     });
     const editor = ace.edit(container);
+    const fullContent = '<span action="copy">copy</span><span action="cut">cut</span><span action="paste">paste</span><span action="select all">select all<span>';
     const controls = {
         start: tag('span', {
             className: 'cursor-control start'
@@ -44,8 +45,9 @@ function EditorManager(sidebar, header, body) {
         }),
         menu: tag('div', {
             className: 'clipboard-contextmneu',
-            innerHTML: '<span action="copy">copy</span><span action="cut">cut</span><span action="paste">paste</span><span action="select all">select all<span>',
+            innerHTML: fullContent,
         }),
+        fullContent,
         update: () => {}
     }
 
@@ -102,8 +104,8 @@ function EditorManager(sidebar, header, body) {
      * @returns {File}
      */
     function addNewFile(filename, options = {}) {
-
-        let doesExists = getFile(options.fileUri || options.contentUri);
+        const uri = options.fileUri || options.contentUri;
+        let doesExists = getFile(uri || filename, !uri);
         if (doesExists) {
             if (manager.activeFile.id !== doesExists.id) switchFile(doesExists.id);
             return;
@@ -214,13 +216,13 @@ function EditorManager(sidebar, header, body) {
         manager.files.push(file);
         openFileList.addListTile(file.assocTile);
 
+        setupSession(file);
+
         if (options.render) {
             switchFile(file.id);
-            setTimeout(() => {
-                if (options.cursorPos) {
-                    editor.moveCursorToPosition(options.cursorPos);
-                }
-            }, 100);
+            if (options.cursorPos) {
+                editor.moveCursorToPosition(options.cursorPos);
+            }
         }
 
         return file;
@@ -258,7 +260,6 @@ function EditorManager(sidebar, header, body) {
 
                 header.text(file.filename);
                 setSubText(file);
-                setupSession(file);
                 file.assocTile.classList.add('active');
                 manager.activeFile = file;
                 manager.onupdate();
@@ -335,7 +336,11 @@ function EditorManager(sidebar, header, body) {
 
             if (!manager.files.length) {
                 editor.setSession(new ace.EditSession(""));
-                addNewFile('untitled');
+                sidebar.hide();
+                addNewFile('untitled', {
+                    isUnsaved: false,
+                    render: true
+                });
             } else {
                 if (file.id === manager.activeFile.id) {
                     switchFile(manager.files[manager.files.length - 1].id);
@@ -352,11 +357,13 @@ function EditorManager(sidebar, header, body) {
      * 
      * @param {number | string} id 
      */
-    function getFile(id) {
+    function getFile(id, isName) {
         for (let file of manager.files) {
             if (typeof id === 'number' && file.id === id)
                 return file;
             else if (typeof id === 'string' && (file.fileUri === id || file.contentUri === id))
+                return file;
+            else if (isName && !file.location && file.name === id)
                 return file;
         }
 

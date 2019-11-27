@@ -27,7 +27,10 @@ function saveFile(file, as) {
                             save(file, url, filename);
                         });
                 } else {
-                    save(file, url);
+                    checkFile(url, file.filename)
+                        .then((filename) => {
+                            save(file, url, filename);
+                        })
                 }
             });
     }
@@ -86,34 +89,45 @@ function newfilename(url, name) {
     });
 
     function getfilename(resolve) {
-        dialogs.prompt(strings['enter file name'], name || '', "filename", {
+        dialogs.prompt(strings['enter file name'], name || '', strings['new file'], {
                 match: constants.FILE_NAME_REGEX,
                 required: true,
             })
             .then(filename => {
                 if (filename) {
-                    window.resolveLocalFileSystemURL(url + filename, function (entry) {
-                        dialogs.select(strings["file already exists"], [
-                                ['overwrite', strings.overwrite],
-                                ['newname', strings['enter file name']]
-                            ])
-                            .then(res => {
-                                if (res === 'overwrite') {
-                                    resolve({
-                                        overwrite: true,
-                                        filename
-                                    });
-                                } else {
-                                    getfilename(resolve);
-                                }
-                            });
-                        return;
-                    }, function (err) {
-                        if (err.code === 1) resolve(filename);
-                    });
+                    check(url, filename, resolve);
                 }
             });
     }
+}
+
+function checkFile(url, filename) {
+    return new Promise(resolve => {
+        check(url, filename, resolve);
+    });
+}
+
+
+function check(url, filename, resolve) {
+    window.resolveLocalFileSystemURL(url + filename, function (entry) {
+        dialogs.select(strings["file already exists"], [
+                ['overwrite', strings.overwrite],
+                ['newname', strings['enter file name']]
+            ])
+            .then(res => {
+                if (res === 'overwrite') {
+                    resolve({
+                        overwrite: true,
+                        filename
+                    });
+                } else {
+                    getfilename(resolve);
+                }
+            });
+        return;
+    }, function (err) {
+        if (err.code === 1) resolve(filename);
+    });
 }
 
 function error(err) {

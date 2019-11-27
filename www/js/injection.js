@@ -11,6 +11,7 @@
     }
     let isFocused = false;
     let flag;
+    let flask;
 
     input.id = '__c-input';
     inputContainer.appendChild(input);
@@ -46,6 +47,19 @@
     const consoleElement = document.createElement('c-console');
     const counter = {};
     consoleElement.appendChild(inputContainer);
+
+    consoleElement.onclick = function (e) {
+        const el = e.target;
+        const action = el.getAttribute('action');
+
+
+        if (action === 'use code') {
+            const value = el.getAttribute('data-code');
+
+            flask.updateCode(value);
+            flask.elTextarea.focus();
+        }
+    }
 
     if (!window.consoleLoaded) {
         window.addEventListener('load', loadConsole);
@@ -105,7 +119,7 @@
             document.body.appendChild(clearBtn);
             document.body.appendChild(consoleElement);
             if (!flag) {
-                const flask = new CodeFlask('#__c-input', {
+                flask = new CodeFlask('#__c-input', {
                     language: 'js'
                 });
                 /**
@@ -124,9 +138,13 @@
                             const regex = /[\[|{\(\)\}\]]/g;
                             let code = this.value.trim();
                             let isOdd = (code.length - code.replace(regex, '').length) % 2;
+                            const $code = document.createElement('c-code');
+                            $code.textContent = code.length > 50 ? code.substr(0, 50) + '...' : code;
+                            $code.setAttribute('data-code', code);
+                            $code.setAttribute('action', 'use code');
                             if (!code || isOdd) return;
                             flask.updateCode('');
-                            console.log(errId + 'code', `<c-code>${code.length > 50 ? code.substr(0, 50) + '...' : code}</c-code>`);
+                            console.log(errId + 'code', $code.outerHTML);
                             const parsed = (function () {
                                 try {
                                     return esprima.parse(code, {
@@ -149,19 +167,32 @@
 
                             if (extra) {
                                 const script = document.createElement('script');
-                                script.textContent = extra;
-                                document.body.appendChild(script);
-                            }
-                            try {
-                                let res = window.eval(code);
-                                console.log(errId + 'log', res);
-                            } catch (error) {
-                                console.error(error);
+                                try {
+                                    eval(extra);
+                                    script.textContent = extra;
+                                    document.body.appendChild(script);
+                                    document.body.removeChild(script);
+
+                                    exec(code);
+                                } catch (error) {
+                                    console.error(error);
+                                }
+                            } else {
+                                exec(code);
                             }
                         }
                     });
                 }
                 flag = true;
+            }
+        }
+
+        function exec(code) {
+            try {
+                let res = window.eval(code);
+                console.log(errId + 'log', res);
+            } catch (error) {
+                console.error(error);
             }
         }
     }
@@ -273,11 +304,13 @@
         let error = null;
         let args = Object.values(arguments);
         let mode = 'normal';
+        let qoutes = '';
         if (arguments.length === 0) {
             args = [undefined];
         }
         if (arguments[0] === errId + 'error') {
             error = arguments[1];
+            qoutes = 'no-qoutes';
             const filename = error.filename || 'console';
             args = [errId, error.message];
             clean = filename;
@@ -339,12 +372,21 @@
                 }
 
                 const valid = (['code', 'console'].indexOf(args[0]) > -1) ? args.length > 2 : args.length > 1;
+
+                if (type === 'undefined' || type === 'string') {
+                    arg = arg + ''
+                } else {
+                    arg = arg.toString();
+                }
                 if (/^%c/.test(arg) && valid) {
                     flag = true;
                     msg.textContent = arg.replace(/%[a-zA-Z]/, '');
                 } else {
-                    msg.textContent = arg + '';
+                    msg.textContent = arg;
                 }
+
+                if (qoutes && type === 'string')
+                    msg.classList.add(qoutes);
 
             } else {
                 if (flag) flag = false;

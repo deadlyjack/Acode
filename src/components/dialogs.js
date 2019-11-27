@@ -224,7 +224,7 @@ function confirm(titleText, message) {
             }
         });
         const confirmDiv = tag('div', {
-            className: 'prompt',
+            className: 'prompt confirm',
             children: [
                 titleSpan,
                 messageSpan,

@@ -19,7 +19,7 @@ import tag from 'html-tag-js';
  * @param {function():void} [pos.onhide] 
  * @returns {HTMLElement & contextMenuObj}
  */
-function contextMenu(pos = {}, innerHTML) {
+function contextMenu(innerHTML, pos = {}) {
     const el = tag('ul', {
         className: 'context-menu',
         innerHTML: innerHTML,

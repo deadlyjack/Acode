@@ -3,11 +3,6 @@
         display: flex;
         min-height: 60px;
 
-        &:active {
-            transition: all 100ms ease;
-            background-color: rgba($color: #000000, $alpha: 0.5);
-        }
-
         &:not(:last-child) {
             border-bottom: solid 1px #f3e9e9;
         }

@@ -42,8 +42,9 @@ export default function themeSettings() {
                 dialogs.select(this.text, constants.themeList, {
                     default: values.editorTheme.split('/').slice(-1)[0]
                 }).then(res => {
+                    this.changeSubText(res);
                     res = `ace/theme/` + res;
-                    editor.setTheme(res);
+                    if (editor) editor.setTheme(res);
                     appSettings.value.editorTheme = res;
                     appSettings.update();
                 });
@@ -59,6 +60,7 @@ export default function themeSettings() {
                         appSettings.value.appTheme = res;
                         appSettings.update();
                         window.restoreTheme();
+                        this.changeSubText(res);
                     });
                 break;
 

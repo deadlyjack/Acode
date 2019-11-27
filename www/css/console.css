@@ -101,10 +101,21 @@ c-type {
 }
 
 c-code {
+    position: relative;
     color: #966;
-    word-wrap: pre;
-    font-size: 0.8em;
+    font-size: 1em;
     font-family: 'Courier New', Courier, monospace;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+c-code::after {
+    content: 'use';
+    background-color: #666;
+    color: white;
+    border-radius: 4px;
+    padding: 0 0.4em;
+    font-size: 0.6em;
 }
 
 c-code::before {
@@ -188,12 +199,12 @@ c-text.__c-string {
     color: rgb(59, 161, 59);
 }
 
-c-text.__c-string::before {
+c-text.__c-string:not(.no-qoutes)::before {
     content: '"';
     margin-right: 2px;
 }
 
-c-text.__c-string::after {
+c-text.__c-string:not(.no-qoutes)::after {
     content: '"';
     margin-left: 2px;
 }

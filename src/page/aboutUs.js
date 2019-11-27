@@ -19,7 +19,7 @@ export default function aboutUs() {
         tag('span', {
             className: 'logo',
             style: {
-                backgroundImage: `url(./res/logo/logo.png)`
+                backgroundImage: `url(./res/logo/logo-min.png)`
             }
         }),
         tag('h2', {

@@ -14,6 +14,7 @@ import './styles/overwriteAceStyle.scss';
 
 import "core-js/stable";
 import tag from 'html-tag-js';
+import mustache from 'mustache';
 import gen from './components/gen';
 import tile from "./components/tile";
 import sidenav from './components/sidenav';
@@ -31,6 +32,10 @@ import createEditorFromURI from "./modules/createEditorFromURI";
 import addFolder from "./modules/addFolder";
 import menuHandler from "./modules/menuHandler";
 import saveFile from "./modules/saveFile";
+
+import $_menu from './views/menu.hbs';
+import $_row1 from './views/footer/row1.hbs';
+import $_row2 from './views/footer/row2.hbs';
 
 //@ts-check
 
@@ -160,26 +165,16 @@ function App() {
       ['copydown', 'custom copyline-down']
     ]
   };
-  const menu = `<li action="newFile">${strings['new file']}</li>
-    <li action="save" class="disabled">${strings.save}</li>
-    <li action="saveAs" class="disabled">${strings['save as']}</li>
-    <li action="openFile">${strings['open file']}</li>
-    <li action="openFolder">${strings['open folder']}</li>
-    <hr>
-    <li action="goto" class="disabled">${strings['goto']}</li>
-    <hr>
-    <li action="console">${strings['console']}</li>
-    <hr>
-    <li action="settings">${strings.settings}</li>
-    <li action="help">${strings.help}</li>`;
   const row1 = gen.iconButton(footerOptions.row1);
   const row2 = gen.iconButton(footerOptions.row2);
-  const $mainMenu = contextMenu({
+
+  const $mainMenu = contextMenu(mustache.render($_menu, strings), {
     top: '6px',
     right: '6px',
     toggle: menuToggler,
     transformOrigin: 'top right'
-  }, menu);
+  });
+
   const main = tag('main');
   const sidebar = sidenav(main, toggler);
   const runBtn = tag('button', {
@@ -695,15 +690,22 @@ function App() {
           } else {
             const render = file.name === lastfile;
             const newFile = editorManager.addNewFile(file.name, {
-              render
+              render,
+              isUnsaved: !!file.data
             });
-            newFile.session.insert(file.cursorPos, file.data);
-            newFile.session.setUndoManager(new ace.UndoManager());
+            if (file.data) {
+              newFile.session.insert(file.cursorPos, file.data);
+              newFile.session.setUndoManager(new ace.UndoManager());
+            }
 
             if (i === files.length - 1) resolve();
           }
         });
       } else {
+        editorManager.addNewFile('untitled', {
+          isUnsaved: false,
+          render: true
+        });
         resolve();
       }
     });
@@ -731,8 +733,6 @@ function App() {
       }
     }
     const files = editorManager.files;
-
-    if (!files.length) return editorManager.addNewFile('untitled');
 
     const dir = cordova.file.externalCacheDirectory;
     files.map(file => {

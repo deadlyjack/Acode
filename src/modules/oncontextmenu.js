@@ -380,7 +380,7 @@ function enableSingleMode(editor, controls, container, $content) {
         if (timeout) clearTimeout(timeout);
         controls.end.remove();
         $cm.remove();
-        $cm.innerHTML = '<span action="copy">copy</span><span action="cut">cut</span><span action="paste">paste</span><span action="select all">select all<span>';
+        $cm.innerHTML = controls.fullContent;
         editor.session.off('changeScrollTop', hide);
         editor.session.off('changeScrollLeft', hide);
         editor.selection.off('changeCursor', onchange);

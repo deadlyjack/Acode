@@ -68,6 +68,17 @@ $textDark : white;
 .theme-dark {
     background-color: $pageBgDark !important;
 
+    body {
+        &.loading {
+
+            &.splash {
+                &::before {
+                    background-color: $bgDark;
+                }
+            }
+        }
+    }
+
     .ace_prompt_wrapper {
         .ace_prompt_container {
             box-shadow: none;

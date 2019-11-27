@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.foxdebug.acode" version="0.0.4.31" 
+<widget id="com.foxdebug.acode" version="0.0.4.39" 
     xmlns="http://www.w3.org/ns/widgets" 
     xmlns:cdv="http://cordova.apache.org/ns/1.0" 
-    xmlns:android="http://schemas.android.com/apk/res/android" android-versionCode="31">
+    xmlns:android="http://schemas.android.com/apk/res/android" android-versionCode="39">
     <name>Acode</name>
     <description>
         Light weight code editor and web IDE for android.
     </description>
-    <author email="dellevenjack@gmail.com" href="https://acode.foxdebug.com">
+    <author email="dellevenjack@gmail.com" href="https://foxdebug.com">
        Ajit Kumar (dellevenjack)
     </author>
     <content src="index.html" />
@@ -29,7 +29,7 @@
 
         <preference name="DisallowOverscroll" value="true"/>
         <!-- <preference name="Orientation" value="portrait"/> -->
-        <preference name="BackgroundColor" value="0xffffffff"/>
+        <preference name="BackgroundColor" value="0x313131ff"/>
         <preference name="StatusBarStyle" value="lightcontent" />
         <preference name="AndroidPersistentFileLocation" value="Compatibility" />
         <preference name="AndroidExtraFilesystems" value="sdcard,cache" />
@@ -41,6 +41,7 @@
 
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
             <application android:usesCleartextTraffic="true" />
+            <application android:resizeableActivity="false" />
         </edit-config>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">

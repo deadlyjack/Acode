@@ -33,7 +33,7 @@ function FileBrowser(type = 'file', option = null) {
             }
         });
         const actionsToDispose = [];
-        const fbMenu = contextMenu({
+        const fbMenu = contextMenu(`<li action="settings">${strings.settings}</li>`, {
             top: '8px',
             right: '8px',
             toggle: menuToggler,
@@ -60,7 +60,6 @@ function FileBrowser(type = 'file', option = null) {
                 page.hide();
             }
         });
-        fbMenu.innerHTML = `<li action="settings">${strings.settings}</li>`;
         fbMenu.onclick = function (e) {
             fbMenu.hide();
             const action = e.target.getAttribute('action');

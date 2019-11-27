@@ -10,7 +10,7 @@ function clipboardAction(action) {
         case 'copy':
             if (selectedText) {
                 clipboard.copy(selectedText);
-                acodeEditor.updateControls();
+                editorManager.controls.update();
                 plugins.toast.showShortBottom('copied to clipboard');
             }
             break;
@@ -21,7 +21,7 @@ function clipboardAction(action) {
                 ranges.map(range => {
                     editor.remove(range);
                 });
-                acodeEditor.updateControls();
+                editorManager.controls.update();
                 plugins.toast.showShortBottom('copied to clipboard');
             }
             break;
@@ -29,15 +29,15 @@ function clipboardAction(action) {
         case 'paste':
             clipboard.paste(text => {
                 editor.execCommand('paste', text);
-                acodeEditor.updateControls();
+                editorManager.controls.update();
             });
             break;
 
         case 'select all':
             editor.selectAll();
             setTimeout(() => {
-                acodeEditor.controls.start.remove();
-                acodeEditor.controls.end.remove();
+                editorManager.controls.start.remove();
+                editorManager.controls.end.remove();
             }, 0);
             break;
     }
