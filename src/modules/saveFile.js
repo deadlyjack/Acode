@@ -1,7 +1,7 @@
 import FileBrowser from '../page/fileBrowser';
 import dialogs from '../components/dialogs';
 import helpers from "./helpers";
-import fs from './androidFileSystem';
+import fs from './utils/androidFileSystem';
 import constants from "../constants";
 
 /**
@@ -44,7 +44,9 @@ function saveFile(file, as) {
  */
 function save(file, url, filename) {
     const editor = editorManager.editor;
-    if (appSettings.value.beautify) {
+    const ext = helpers.getExt(filename || file.filename);
+    const _beautify = appSettings.value.beautify;
+    if (_beautify[0] !== '*' && _beautify.indexOf(ext) < 0) {
         let pos = editor.getCursorPosition();
         const tmp = editorManager.onupdate;
         editorManager.onupdate = () => {};

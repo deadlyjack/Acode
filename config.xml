@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.foxdebug.acode" version="0.0.4.39" 
+<widget id="com.foxdebug.acode" version="0.0.4.40" 
     xmlns="http://www.w3.org/ns/widgets" 
     xmlns:cdv="http://cordova.apache.org/ns/1.0" 
-    xmlns:android="http://schemas.android.com/apk/res/android" android-versionCode="39">
+    xmlns:android="http://schemas.android.com/apk/res/android" android-versionCode="40">
     <name>Acode</name>
     <description>
         Light weight code editor and web IDE for android.

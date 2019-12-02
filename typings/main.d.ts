@@ -26,7 +26,7 @@ interface Settings {
     softTab: boolean;
     tabSize: number;
     linenumbers: boolean,
-    beautify: boolean,
+    beautify: Array<string>,
     linting: boolean,
     previewMode: 'mobile' | 'desktop' | 'none'
 }

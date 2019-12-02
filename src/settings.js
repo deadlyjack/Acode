@@ -1,4 +1,4 @@
-import fs from './modules/androidFileSystem';
+import fs from './modules/utils/androidFileSystem';
 /**
  * @typedef {object} fileBrowserSettings
  * @property {string} showHiddenFiles
@@ -48,7 +48,7 @@ class Settings {
             softTab: true,
             tabSize: 2,
             linenumbers: true,
-            beautify: false,
+            beautify: ['*'],
             compileSCSS: false,
             linting: false,
             autoCorrect: true,
@@ -64,6 +64,8 @@ class Settings {
             try {
                 const savedSettings = JSON.parse(localStorage.getItem('globalSettings'));
                 localStorage.removeItem('globalSettings');
+
+                if (!Array.isArray(savedSettings.beautify)) savedSettings.beautify = ['*'];
                 this.value = savedSettings;
                 this.loaded = true;
                 this.checkSettings();
@@ -76,6 +78,7 @@ class Settings {
                 .then((res) => {
                     const decoder = new TextDecoder();
                     const settings = JSON.parse(decoder.decode(res.data));
+                    if (!Array.isArray(settings.beautify)) savedSettings.beautify = ['*'];
                     this.value = settings;
                     this.checkSettings();
                     this.loaded = true;

@@ -1,10 +1,10 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: {
     main: "./src/main.js",
-    injection: "./www/js/injection.js"
+    injection: "./src/injection.js"
   },
   output: {
     path: path.resolve(__dirname, "www/js"),

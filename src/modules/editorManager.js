@@ -3,10 +3,10 @@ import clipboardAction from './clipboard';
 import tag from 'html-tag-js';
 import helper from '../modules/helpers';
 import tile from "../components/tile";
-import fs from './androidFileSystem';
+import fs from './utils/androidFileSystem';
 import dialogs from '../components/dialogs';
 import helpers from '../modules/helpers';
-import textControl from './oncontextmenu';
+import textControl from './events/oncontextmenu';
 
 /**
  * @typedef {object} ActiveEditor
@@ -288,7 +288,10 @@ function EditorManager(sidebar, header, body) {
             theme: settings.editorTheme,
             showGutter: settings.linenumbers,
             showLineNumbers: settings.linenumbers,
-            enableEmmet: true
+            enableEmmet: true,
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
         });
     }
 

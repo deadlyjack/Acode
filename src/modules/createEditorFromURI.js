@@ -1,4 +1,4 @@
-import fs from "./androidFileSystem";
+import fs from "./utils/androidFileSystem";
 import helpers from "./helpers";
 
 export default createEditorFromURI;

@@ -49,7 +49,7 @@ export default function editorSettings() {
         {
             key: 'beautify',
             text: strings['beautify on save'],
-            subText: value.beautify ? strings.yes : strings.no,
+            subText: strings.except + ': ' + value.beautify.join(','),
         },
         {
             key: 'linting',
@@ -146,17 +146,15 @@ export default function editorSettings() {
                 break;
 
             case 'beautify':
-                dialogs.select(this.text, [
-                        [true, strings.yes],
-                        [false, strings.no]
-                    ], {
-                        default: value.beautify
-                    })
+                dialogs.prompt(strings.except + ' (eg. php,py)', value.beautify.join(','))
                     .then(res => {
-                        if (res === value.beautify) return;
-                        appSettings.value.beautify = res;
+                        const files = res.split(',');
+                        files.map((file, i) => {
+                            files[i] = file.trim().toLowerCase();
+                        });
+                        appSettings.value.beautify = files;
                         appSettings.update();
-                        this.changeSubText(res ? strings.yes : strings.no);
+                        this.changeSubText(strings.except + ': ' + res);
                     });
                 break;
 

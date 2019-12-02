@@ -1,7 +1,7 @@
 //#region Imports
 import tag from 'html-tag-js';
 import Page from '../components/page';
-import fs from '../modules/androidFileSystem';
+import fs from '../modules/utils/androidFileSystem';
 import tile from '../components/tile';
 import helpers from '../modules/helpers';
 import contextMenu from '../components/contextMenu';
@@ -161,6 +161,7 @@ function FileBrowser(type = 'file', option = null) {
                 };
                 list.map(dir => plotList(dir, root));
                 document.body.append(page);
+                fileList.firstChild.focus();
 
                 if (type === 'folder') {
                     folderOption.classList.add('disabled');
@@ -168,8 +169,8 @@ function FileBrowser(type = 'file', option = null) {
             } else {
                 loadDir(cordova.file.externalRootDirectory).then(() => {
                     document.body.append(page);
+                    fileList.firstChild.focus();
                 });
-
             }
         });
 
@@ -233,6 +234,8 @@ function FileBrowser(type = 'file', option = null) {
                     }
                 })
             });
+
+            listItem.tabIndex = '0';
 
             if (item.isDirectory) {
                 if (item.canWrite !== false || type === 'file') {

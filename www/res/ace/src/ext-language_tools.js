@@ -1710,52 +1710,7 @@ var Autocomplete = function() {
     };
 
     this.showDocTooltip = function(item) {
-        if (!this.tooltipNode) {
-            this.tooltipNode = dom.createElement("div");
-            this.tooltipNode.className = "ace_tooltip ace_doc-tooltip";
-            this.tooltipNode.style.margin = 0;
-            this.tooltipNode.style.pointerEvents = "auto";
-            this.tooltipNode.tabIndex = -1;
-            this.tooltipNode.onblur = this.blurListener.bind(this);
-            this.tooltipNode.onclick = this.onTooltipClick.bind(this);
-        }
-
-        var tooltipNode = this.tooltipNode;
-        if (item.docHTML) {
-            tooltipNode.innerHTML = item.docHTML;
-        } else if (item.docText) {
-            tooltipNode.textContent = item.docText;
-        }
-
-        if (!tooltipNode.parentNode)
-            document.body.appendChild(tooltipNode);
-        var popup = this.popup;
-        var rect = popup.container.getBoundingClientRect();
-        tooltipNode.style.top = popup.container.style.top;
-        tooltipNode.style.bottom = popup.container.style.bottom;
-
-        tooltipNode.style.display = "block";
-        if (window.innerWidth - rect.right < 320) {
-            if (rect.left < 320) {
-                if(popup.isTopdown) {
-                    tooltipNode.style.top = rect.bottom + "px";
-                    tooltipNode.style.left = rect.left + "px";
-                    tooltipNode.style.right = "";
-                    tooltipNode.style.bottom = "";
-                } else {
-                    tooltipNode.style.top = popup.container.offsetTop - tooltipNode.offsetHeight + "px";
-                    tooltipNode.style.left = rect.left + "px";
-                    tooltipNode.style.right = "";
-                    tooltipNode.style.bottom = "";
-                }
-            } else {
-                tooltipNode.style.right = window.innerWidth - rect.left + "px";
-                tooltipNode.style.left = "";
-            }
-        } else {
-            tooltipNode.style.left = (rect.right + 1) + "px";
-            tooltipNode.style.right = "";
-        }
+        return;
     };
 
     this.hideDocTooltip = function() {

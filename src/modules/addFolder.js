@@ -1,6 +1,6 @@
 import tag from 'html-tag-js';
 import list from "../components/list";
-import fs from "./androidFileSystem";
+import fs from "./utils/androidFileSystem";
 import dialogs from "../components/dialogs";
 import helpers from "./helpers";
 import tile from "../components/tile";
