@@ -2,12 +2,15 @@ import Page from "../../components/page";
 import gen from "../../components/gen";
 import dialogs from "../../components/dialogs";
 import constants from "../../constants";
-import tag from 'html-tag-js';
+import tag, {
+    parse
+} from 'html-tag-js';
+import saveFile from "../../modules/saveFile";
 
 export default function editorSettings() {
     const page = Page(strings['editor settings']);
     const settingsList = tag('div', {
-        className: 'main settings'
+        className: 'main list'
     });
 
     actionStack.push({
@@ -22,6 +25,11 @@ export default function editorSettings() {
     const value = appSettings.value;
 
     const settingsOptions = [{
+            key: 'autosave',
+            text: strings.autosave,
+            subText: value.autosave ? value.autosave + '' : strings.no,
+        },
+        {
             key: 'font size',
             text: strings['font size'],
             subText: value.fontSize,
@@ -55,14 +63,40 @@ export default function editorSettings() {
             key: 'linting',
             text: strings['linting'],
             subText: value.linting ? strings.yes : strings.no,
+        },
+        {
+            key: 'showSpaces',
+            text: strings['show spaces'],
+            subText: value.showSpaces ? strings.yes : strings.no,
         }
     ];
 
-    gen.settingsItems(settingsList, settingsOptions, changeSetting);
+    gen.listItems(settingsList, settingsOptions, changeSetting);
 
     function changeSetting() {
         const files = editorManager.files;
         switch (this.key) {
+            case 'autosave':
+                dialogs.prompt(strings.delay + ' (>1000)', value.autosave, 'number')
+                    .then(res => {
+                        res = parseInt(res);
+                        if (isNaN(res) || res < 1000 && res !== 0) return alert(strings.info, strings['invalid value']);
+                        appSettings.value.autosave = res;
+                        appSettings.update();
+                        this.changeSubText(res ? res + '' : strings.no);
+
+                        if (res) {
+                            if (saveInterval) clearInterval(saveInterval);
+                            saveInterval = setInterval(() => {
+                                editorManager.files.map(file => {
+                                    if (file.isUnsaved && file.location) saveFile(file, undefined, false);
+                                });
+                            }, res);
+                        } else if (saveInterval) {
+                            clearInterval(saveInterval);
+                        }
+                    });
+                break;
             case 'font size':
                 dialogs.prompt(this.text, appSettings.value.fontSize, 'text', {
                     required: true,
@@ -172,6 +206,22 @@ export default function editorSettings() {
                         });
                         appSettings.value.linting = res;
                         appSettings.update();
+                        this.changeSubText(res ? strings.yes : strings.no);
+                    });
+                break;
+
+            case 'showSpaces':
+                dialogs.select(this.text, [
+                        [true, strings.yes],
+                        [false, strings.no]
+                    ], {
+                        default: value.showSpaces
+                    })
+                    .then(res => {
+                        if (res === value.showSpaces) return;
+                        appSettings.value.showSpaces = res;
+                        appSettings.update();
+                        editorManager.editor.setOption('showInvisibles', res);
                         this.changeSubText(res ? strings.yes : strings.no);
                     });
                 break;

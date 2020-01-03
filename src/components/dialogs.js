@@ -1,21 +1,20 @@
 import tag from 'html-tag-js';
 import autosize from 'autosize';
 import tile from "./tile";
+/**
+ * @typedef {"text"|"numberic"|"tel"|"search"|"email"|"url"} Types
+ */
 
 /**
  * 
  * @param {string} message 
  * @param {string} defaultValue 
- * @param {"text"|"numberic"|"tel"|"search"|"email", "url"} type 
+ * @param {Types} type 
  * @param {object} options
  * @param {RegExp} options.match
  * @param {boolean} options.required
  */
 function prompt(message, defaultValue, type = 'text', options = {}) {
-    if (type === 'number') {
-        type = 'numeric';
-    }
-
     return new Promise((resolve) => {
 
         const inputType = type === 'text' ? 'textarea' : 'input';
@@ -57,8 +56,9 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
             className: 'prompt',
             onsubmit: (e) => {
                 e.preventDefault();
-                if (!okBtn.disabled)
+                if (!okBtn.disabled) {
                     resolve(input.value);
+                }
             },
             children: [
                 messageSpan,
@@ -87,7 +87,7 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
         input.oninput = function () {
             if (options.match && !options.match.test(this.value)) {
                 okBtn.disabled = true;
-                errorMessage.textContent = 'Not a valid input';
+                errorMessage.textContent = strings['invalid value'];
             } else {
                 okBtn.disabled = false;
                 errorMessage.textContent = '';
@@ -120,6 +120,166 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
         function hide() {
             actionStack.remove('prompt');
             hidePrompt();
+        }
+    });
+}
+
+
+/**
+ * @typedef {Object} Input
+ * @property {string} id
+ * @property {Types} type
+ * @property {boolean} required
+ * @property {RegExp} match
+ * @property {string} value
+ * @property {string} [placeholder]
+ */
+
+/**
+ * 
+ * @param {string} message 
+ * @param {Array<Input>} inputs 
+ * @returns {Promise<Array<string>>}
+ */
+function multiPrompt(message, inputs) {
+    return new Promise((resolve) => {
+        const messageSpan = tag('span', {
+            textContent: message,
+            className: 'message'
+        });
+        let inputAr = [];
+
+        const okBtn = tag('button', {
+            type: "submit",
+            textContent: strings.ok,
+            onclick: function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                for (let $input of inputAr) {
+                    if ($input.isRequired && !$input.value) {
+                        $errorMessage.textContent = strings.required;
+                        $promptDiv.insertBefore($errorMessage, $input.nextElementSibling);
+                        return;
+                    }
+                }
+                hide();
+                resolve(getValue());
+            }
+        });
+        const cancelBtn = tag('button', {
+            textContent: strings.cancel,
+            type: 'button',
+            onclick: function () {
+                hide();
+            }
+        });
+        const $errorMessage = tag("span", {
+            className: 'error-msg'
+        });
+        const mask = tag('span', {
+            className: 'mask'
+        });
+
+        inputs.map(input => {
+            const {
+                id,
+                required,
+                type,
+                match,
+                value,
+                placeholder
+            } = input;
+
+            const inputType = type === 'text' ? 'textarea' : 'input';
+            let _type = type === 'filename' ? 'text' : type;
+
+            const $input = tag(inputType, {
+                id,
+                placeholder,
+                value: value,
+                className: 'input',
+                isRequired: required
+            });
+
+            if (inputType === 'textarea') {
+                $input.rows = 1;
+                $input.inputMode = _type;
+                autosize($input);
+            } else {
+                $input.type = _type;
+            }
+
+            $input.oninput = function () {
+                if (match && !match.test(this.value)) {
+                    okBtn.disabled = true;
+                    $promptDiv.insertBefore($errorMessage, $input.nextElementSibling);
+                    $errorMessage.textContent = strings['invalid value'];
+                } else {
+                    okBtn.disabled = false;
+                    $errorMessage.textContent = '';
+                }
+            };
+
+            $input.onfocus = function () {
+                this.select();
+            };
+
+            inputAr.push($input)
+        });
+
+        const $promptDiv = tag('form', {
+            action: "#",
+            className: 'prompt multi',
+            onsubmit: (e) => {
+                e.preventDefault();
+                if (!okBtn.disabled) {
+                    resolve(getValue());
+                }
+            },
+            children: [
+                messageSpan,
+                ...inputAr,
+                tag('div', {
+                    className: 'button-container',
+                    children: [
+                        cancelBtn,
+                        okBtn
+                    ]
+                })
+            ]
+        });
+
+        actionStack.push({
+            id: 'prompt',
+            action: hidePrompt
+        });
+
+        window.restoreTheme(true);
+        document.body.append($promptDiv, mask);
+        inputAr[0].focus();
+
+        function hidePrompt() {
+            $promptDiv.classList.add('hide');
+            window.restoreTheme();
+            setTimeout(() => {
+                document.body.removeChild($promptDiv);
+                document.body.removeChild(mask);
+            }, 300);
+        }
+
+        function hide() {
+            actionStack.remove('prompt');
+            hidePrompt();
+        }
+
+        function getValue() {
+            const values = {};
+            inputAr.map($input => {
+                values[$input.id] = $input.value;
+            });
+
+            return values;
         }
     });
 }
@@ -355,9 +515,72 @@ function select(title, options, opts = {}) {
     });
 }
 
+/**
+ * 
+ * @param {string} titleText 
+ * @param {string} message 
+ */
+function loaderShow(titleText, message) {
+    if (!message && titleText) {
+        message = titleText;
+        titleText = '';
+    }
+
+    const titleSpan = tag('strong', {
+        className: 'title',
+        textContent: titleText
+    });
+    const messageSpan = tag('span', {
+        className: 'message loader',
+        children: [
+            tag('span', {
+                className: 'loader'
+            }),
+            tag('div', {
+                className: 'message',
+                innerHTML: message
+            })
+        ]
+    });
+    const loaderDiv = tag('div', {
+        className: 'prompt alert',
+        id: '__loader',
+        children: [
+            titleSpan,
+            messageSpan
+        ]
+    });
+    const mask = tag('span', {
+        className: 'mask',
+        id: '__loader-mask'
+    });
+
+    window.freeze = true;
+    document.body.append(loaderDiv, mask);
+    window.restoreTheme(true);
+}
+
+function loaderHide() {
+    const loaderDiv = document.querySelector('#__loader');
+    const mask = document.querySelector('#__loader-mask');
+
+    if (!loaderDiv) return;
+
+    loaderDiv.classList.add('hide');
+    window.restoreTheme();
+    setTimeout(() => {
+        window.freeze = false;
+        loaderDiv.remove();
+        mask.remove();
+    }, 300);
+}
+
 export default {
     prompt,
+    multiPrompt,
     alert,
     confirm,
-    select
+    select,
+    loaderShow,
+    loaderHide
 };

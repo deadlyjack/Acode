@@ -6,7 +6,7 @@ import gen from "../../components/gen";
 export default function filesSettings(callback) {
     const page = Page(strings.settings);
     const settingsList = tag('div', {
-        className: 'main settings'
+        className: 'main list'
     });
 
     actionStack.push({
@@ -31,7 +31,7 @@ export default function filesSettings(callback) {
         }
     ];
 
-    gen.settingsItems(settingsList, settingsOptions, changeSetting);
+    gen.listItems(settingsList, settingsOptions, changeSetting);
 
     function changeSetting() {
         switch (this.key) {

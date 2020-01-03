@@ -60,7 +60,7 @@ function iconButton(options) {
     return opts;
 }
 
-function settingsItems(settingsList, settingsOptions, changeSetting) {
+function listItems(settingsList, settingsOptions, changeSetting) {
     settingsList.textContent = '';
     const settings = {};
 
@@ -74,14 +74,14 @@ function settingsItems(settingsList, settingsOptions, changeSetting) {
             child: text
         });
         const tmp = tag(setting.type || 'div', {
-            className: 'setting-item',
+            className: 'list-item',
             children: [
                 tag('i', {
                     className: `icon ${setting.icon || 'no-icon'}`
                 }),
                 container
             ],
-            href: setting.href || ''
+            href: setting.href || undefined
         });
         const subText = tag('small', {
             className: 'value',
@@ -113,5 +113,5 @@ function settingsItems(settingsList, settingsOptions, changeSetting) {
 export default {
     listTileGen,
     iconButton,
-    settingsItems
+    listItems: listItems
 };

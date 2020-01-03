@@ -5,12 +5,9 @@ import './styles/sidenav.scss';
 import './styles/tile.scss';
 import './styles/contextMenu.scss';
 import './styles/dialogs.scss';
-import './styles/settings.scss';
-import './styles/aboutUs.scss';
 import './styles/themes.scss';
 import './styles/help.scss';
-import './styles/demo-page.scss';
-import './styles/overwriteAceStyle.scss';
+import './styles/overideAceStyle.scss';
 
 import "core-js/stable";
 import tag from 'html-tag-js';
@@ -25,22 +22,26 @@ import helpers from "./modules/helpers";
 import Settings from "./settings";
 import dialogs from "./components/dialogs";
 import constants from "./constants";
-import demoPage from "./page/demoPages";
 import HandleIntent from "./modules/handleIntent";
 import createEditorFromURI from "./modules/createEditorFromURI";
 import addFolder from "./modules/addFolder";
 import menuHandler from "./modules/menuHandler";
 import quickToolAction from "./modules/events/quicktools";
 import arrowkeys from "./modules/events/arrowkeys";
+// import gitHub from "./modules/gitHub";
 
 import $_menu from './views/menu.hbs';
 import $_row1 from './views/footer/row1.hbs';
 import $_row2 from './views/footer/row2.hbs';
+import $_search from './views/footer/search.hbs';
+import saveFile from "./modules/saveFile";
+import git from "./modules/git";
 //@ts-check
 
 window.onload = Main;
 
 function Main() {
+  let timeout;
   const oldPreventDefault = TouchEvent.prototype.preventDefault;
   TouchEvent.prototype.preventDefault = function () {
     if (this.cancelable) {
@@ -63,6 +64,7 @@ function Main() {
   window.restoreTheme = restoreTheme;
   window.getCloseMessage = () => {};
   window.beforeClose = null;
+  window.saveInterval = null;
   window.editorManager = {
     files: [],
     activeFile: null
@@ -76,6 +78,23 @@ function Main() {
   }
 
   document.addEventListener("deviceready", () => {
+
+    const permissions = cordova.plugins.permissions;
+    const requiredPermissions = [
+      permissions.WRITE_EXTERNAL_STORAGE,
+      permissions.WRITE_MEDIA_STORAGE
+    ];
+
+    requiredPermissions.map((permission, i) => {
+      permissions.checkPermission(permission, (status) => success(status, i));
+    });
+
+    function success(status, i) {
+      if (!status.hasPermission) {
+        permissions.requestPermission(requiredPermissions[i], () => {});
+      }
+    }
+
     window.appSettings = new Settings(lang);
     if (appSettings.loaded) {
       ondeviceready();
@@ -86,43 +105,69 @@ function Main() {
 
   function ondeviceready() {
     const url = `${cordova.file.applicationDirectory}www/lang/${appSettings.value.lang}.json`;
+    window.gitRecordURL = cordova.file.externalDataDirectory + 'git/.gitfiles';
     fs.readFile(url)
       .then(res => {
         const decoder = new TextDecoder('utf-8');
         const text = decoder.decode(res.data);
         window.strings = JSON.parse(text);
+        initGit();
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
+  function initGit() {
+
+    timeout = setTimeout(initGit, 1000);
+
+    git.init()
+      .then(res => {
+        if (timeout) clearTimeout(timeout);
+        window.gitRecord = res;
         runApp();
+      })
+      .catch(err => {
+        if (timeout) clearTimeout(timeout);
+        console.log(err);
       });
   }
 }
 
 function runApp() {
+  document.body.addEventListener('click', function (e) {
+    const el = e.target;
+    if (el instanceof HTMLAnchorElement) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      window.open(el.href, '_system');
+    }
+  });
+
   const version = localStorage.getItem('version');
-  if (version !== AppVersion.version) {
+  if (version !== BuildInfo.version) {
     localStorage.clear();
-    localStorage.setItem('version', AppVersion.version);
+    localStorage.setItem('version', BuildInfo.version);
   }
 
   document.body = tag(document.body);
   window.app = document.body;
-  document.addEventListener('backbutton', actionStack.pop);
+  document.addEventListener('backbutton', backButton);
   window.beautify = ace.require("ace/ext/beautify").beautify;
-  if (!appSettings.value.initFlag) {
-    document.body.classList.remove('loading', 'splash');
-    NavigationBar.backgroundColorByHexString("#9999ff");
-    StatusBar.backgroundColorByHexString("#9999ff");
-    demoPage().then(() => {
-      appSettings.value.initFlag = true;
-      appSettings.update(false);
-      new App();
-    });
-  } else {
-    new App();
+
+  new App();
+
+  function backButton() {
+    if (window.freeze) return;
+    actionStack.pop();
   }
 }
 
 function App() {
   //#region declaration
+  const _search = mustache.render($_search, strings);
   const $toggler = tag('span', {
     className: 'icon menu'
   });
@@ -148,9 +193,12 @@ function App() {
 
   const $main = tag('main');
   const $sidebar = sidenav($main, $toggler);
-  const runBtn = tag('button', {
-    className: 'icon float bottom right file-control play',
-    onclick: runPreview.bind(runBtn, editorManager)
+  const $runBtn = tag('span', {
+    className: 'icon play_arrow',
+    onclick: runPreview.bind($runBtn, editorManager),
+    style: {
+      fontSize: '1.2em'
+    }
   });
   const fileOptions = {
     save: $mainMenu.querySelector('[action=save]'),
@@ -173,43 +221,11 @@ function App() {
   app.append($header, $main);
   //#endregion
 
-  //#region request management
-
-  const permissions = cordova.plugins.permissions;
-  const requiredPermissions = [
-    permissions.WRITE_EXTERNAL_STORAGE,
-    permissions.WRITE_MEDIA_STORAGE
-  ];
-
-  function permissionCheckError() {
-    // console.error('Permission denied');
-  }
-
-  requiredPermissions.map((permission, i) => {
-    permissions.checkPermission(permission, (status) => successCheckPermission(status, i));
-  });
-
-  function successCheckPermission(status, i) {
-    if (!status.hasPermission) {
-
-      permissions.requestPermission(
-        requiredPermissions[i],
-        status => {
-          if (!status.hasPermission) permissionCheckError();
-        },
-        permissionCheckError
-      );
-
-    }
-  }
-  //#endregion
-
   $mainMenu.addEventListener('click', handleMenu);
   $footer.addEventListener('click', handleFooter);
   $footer.addEventListener('touchstart', footerTouchStart);
   $footer.addEventListener('contextmenu', footerOnContextMenu);
 
-  //#region loading
   setTimeout(() => {
     loadFiles()
       .then(loadFolders)
@@ -235,7 +251,14 @@ function App() {
         document.addEventListener('resume', checkFiles);
         checkFiles();
 
-        //#endregion
+        const autosave = parseInt(appSettings.value.autosave);
+        if (autosave) {
+          saveInterval = setInterval(() => {
+            editorManager.files.map(file => {
+              if (file.isUnsaved && file.location) saveFile(file, undefined, false);
+            });
+          }, autosave);
+        }
       });
   }, 100);
 
@@ -257,7 +280,7 @@ function App() {
       fileOptions.goto.classList.add('disabled');
       app.classList.remove('bottom-bar');
       $footer.remove();
-      runBtn.remove();
+      $runBtn.remove();
     } else if (activeFile) {
       fileOptions.saveAs.classList.remove('disabled');
       fileOptions.goto.classList.remove('disabled');
@@ -279,9 +302,9 @@ function App() {
       }
 
       if (['html', 'htm', 'xhtml'].includes(helpers.getExt(activeFile.filename))) {
-        app.appendChild(runBtn);
+        $header.insertBefore($runBtn, $header.lastChild);
       } else {
-        runBtn.remove();
+        $runBtn.remove();
       }
     }
   };
@@ -298,6 +321,8 @@ function App() {
     for (let file of editorManager.files) {
       const edit = {};
       edit.name = file.filename;
+      edit.type = file.type;
+      if (edit.type === 'git') edit.sha = file.record.sha;
       if (file.fileUri) {
         edit.fileUri = file.fileUri;
         edit.readOnly = file.readOnly ? 'true' : '';
@@ -375,7 +400,20 @@ function App() {
             index: i
           };
 
-          if (file.fileUri) {
+          if (file.type === 'git') {
+            gitRecord.get(file.sha)
+              .then(record => {
+                if (record) {
+                  editorManager.addNewFile(file.name, {
+                    type: 'git',
+                    text: file.data || record.data,
+                    isUnsaved: file.data ? true : false,
+                    record
+                  });
+                }
+                if (i === files.length - 1) resolve();
+              });
+          } else if (file.fileUri) {
 
             if (file.fileUri === lastfile) {
               xtra.render = true;
@@ -397,7 +435,7 @@ function App() {
 
             createEditorFromURI({
               name: file.name,
-              dir: encodeURI(file.contentUri),
+              dir: file.contentUri,
             }, true, xtra).then(index => {
               if (index === files.length - 1) resolve();
             });
@@ -451,6 +489,7 @@ function App() {
 
     const dir = cordova.file.externalCacheDirectory;
     files.map(file => {
+      if (file.type === 'git') return;
       if (file.fileUri) {
         const id = btoa(file.id);
         window.resolveLocalFileSystemURL(dir + id, entry => {
@@ -531,9 +570,6 @@ function App() {
         case 'openFolder':
           param = $sidebar;
           break;
-        case 'help':
-          param = footerOptions;
-          break;
       }
       menuHandler[action](param);
     }
@@ -544,7 +580,7 @@ function App() {
    * @param {MouseEvent} e 
    */
   function handleFooter(e) {
-    quickToolAction(e, $footer, $_row1, $_row2);
+    quickToolAction(e, $footer, $_row1, $_row2, _search);
   }
 
   function footerTouchStart(e) {
@@ -611,7 +647,7 @@ function runPreview() {
                 js = `<script>${js}</script>`;
                 text = text.split('<head>');
                 text = `${text[0]}<head>${js}${text[1]}`;
-                const name = parent.nativeURL + '.run_' + entry.name;
+                const name = decodeURI(parent.nativeURL) + '.run_' + entry.name;
                 fs.readFile(`${cordova.file.applicationDirectory}www/css/console.css`)
                   .then(res => {
                     css = decoder.decode(res.data);
@@ -652,7 +688,7 @@ function runPreview() {
       const useDesktop = mode === 'desktop' ? 'yes' : 'no';
       const themeColor = theme === 'default' ? '#9999ff' : theme === 'dark' ? '#313131' : '#ffffff';
       const color = theme === 'light' ? '#9999ff' : '#ffffff';
-      const options = `location=yes,hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,useWideViewPort=${useDesktop},toolbarcolor=${themeColor},toolbartranslucent=yes,navigationbuttoncolor=${color},closebuttoncolor=${color}`;
+      const options = `location=yes,hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,useWideViewPort=${useDesktop},toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
       const ref = cordova.InAppBrowser.open(uri, '_blank', options);
       ref.addEventListener('loadstart', function () {
         ref.executeScript({

@@ -25,8 +25,8 @@ function listDir(path) {
  * @returns {Promise} 
  */
 function writeFile(filename, data, create = false, exclusive = true) {
-    const name = decodeURIComponent(filename.split('/').pop());
-    const path = filename.replace(encodeURIComponent(name), '');
+    const name = filename.split('/').pop();
+    const path = filename.replace(name, '');
     return new Promise((resolve, reject) => {
         if (!create) {
             window.resolveLocalFileSystemURL(filename, fileEntry => {

@@ -20,6 +20,18 @@
 -->
 # Release Notes
 
+### 1.3.4 (Jun 19, 2019)
+
+-   chore: manually fix lines breaks to LF ([`d804ef2`](https://github.com/apache/cordova-plugin-whitelist/commit/d804ef2))
+-   build: add `.gitattributes` to force LF (instead of possible CRLF on Windows) ([`ed0206b`](https://github.com/apache/cordova-plugin-whitelist/commit/ed0206b))
+-   build: add `.npmignore` to remove unneeded files from npm package ([`bf8fea5`](https://github.com/apache/cordova-plugin-whitelist/commit/bf8fea5))
+-   test,ci(travis): Tests (extracted from cordova-mobile-spec) ([#38](https://github.com/apache/cordova-plugin-whitelist/issues/38)) ([`e4f17b0`](https://github.com/apache/cordova-plugin-whitelist/commit/e4f17b0))
+-   docs: Added information on allow-navigation preceding allow-intent ([#41](https://github.com/apache/cordova-plugin-whitelist/issues/41)) ([`7725fed`](https://github.com/apache/cordova-plugin-whitelist/commit/7725fed))
+-   chore(github): Add or update GitHub pull request and issue template ([`86b3ee1`](https://github.com/apache/cordova-plugin-whitelist/commit/86b3ee1))
+-   fix: Remove information about cordova-android ([#27](https://github.com/apache/cordova-plugin-whitelist/issues/27)) ([`34ed9d0`](https://github.com/apache/cordova-plugin-whitelist/commit/34ed9d0))
+-   docs: remove JIRA link ([`fa78675`](https://github.com/apache/cordova-plugin-whitelist/commit/fa78675))
+-   docs: Clarify unconfigured Intent Whitelist behaviour ([#26](https://github.com/apache/cordova-plugin-whitelist/issues/26)) ([`8d3f86b`](https://github.com/apache/cordova-plugin-whitelist/commit/8d3f86b))
+
 ### 1.3.3 (Nov 06, 2017)
 * [CB-12847](https://issues.apache.org/jira/browse/CB-12847) added `bugs` entry to `package.json`.
 

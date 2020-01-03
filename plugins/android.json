@@ -19,7 +19,7 @@
     "cordova-plugin-android-permissions": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-appversion": {
+    "cordova-plugin-buildinfo": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-device": {
@@ -29,6 +29,12 @@
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-inappbrowser": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-ionic-keyboard": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-local-notification": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-navigationbar-color": {
@@ -51,5 +57,9 @@
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },
-  "dependent_plugins": {}
+  "dependent_plugins": {
+    "cordova-plugin-badge": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    }
+  }
 }

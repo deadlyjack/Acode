@@ -1,3 +1,5 @@
+@import './variables.scss';
+
 .context-menu {
     z-index: 104;
     box-sizing: border-box;
@@ -6,7 +8,7 @@
     min-width: 220px;
     max-width: 320px;
     min-height: 40px;
-    max-height: calc(100vh - 80px);
+    max-height: calc(100vh - 38px);
     overflow-y: auto;
 
     &+.mask {
@@ -34,6 +36,23 @@
         height: 50px;
         align-items: center;
         padding: 0 10px;
+
+        .text {
+            flex: 1;
+            pointer-events: none;
+        }
+
+        .icon {
+            pointer-events: none;
+            color: $primary;
+
+            &.save.notice::after {
+                content: '*';
+                font-size: 1em;
+                top: 0;
+                right: 0;
+            }
+        }
 
         &.disabled {
             pointer-events: none;

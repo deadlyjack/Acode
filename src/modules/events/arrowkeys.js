@@ -13,7 +13,7 @@ export default {
         const $textarea = editor.textInput.getElement();
         const shiftKey = footer.querySelector('#shift-key').getAttribute('data-state') === 'on' ? true : false;
 
-        editor.focus();
+        if (editorManager.state === 'focus') editor.focus();
 
         document.ontouchend = () => {
             this.onTouchEnd();

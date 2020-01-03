@@ -76,7 +76,7 @@ function enableDoubleMode(editor, controls, container, $content) {
     editor.session.on('changeScrollTop', updatePosition);
     editor.session.on('changeScrollLeft', updatePosition);
     editor.selection.on('changeCursor', onchange);
-    editor.on('change', onchange);
+    // editor.on('change', onchange);
 
     controls.start.ontouchstart = function (e) {
         touchStart.call(this, e, 'start');
@@ -245,7 +245,7 @@ function enableDoubleMode(editor, controls, container, $content) {
         editor.session.off('changeScrollTop', updatePosition);
         editor.session.off('changeScrollLeft', updatePosition);
         editor.selection.off('changeCursor', onchange);
-        editor.off('change', onchange);
+        // editor.off('change', onchange);
         controls.start.ontouchstart = null;
         controls.end.ontouchstart = null;
     }
@@ -268,10 +268,6 @@ function enableSingleMode(editor, controls, container, $content) {
     const $cm = controls.menu;
     const lineHeight = editor.renderer.lineHeight;
     const MouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
-    const initialScroll = {
-        top: 0,
-        left: 0
-    };
     const cpos = {
         x: 0,
         y: 0
@@ -283,7 +279,7 @@ function enableSingleMode(editor, controls, container, $content) {
     editor.session.on('changeScrollTop', hide);
     editor.session.on('changeScrollLeft', hide);
     editor.selection.on('changeCursor', onchange);
-    editor.on('change', onchange);
+    // editor.on('change', onchage);
 
     controls.end.style.display = 'none';
     container.append(controls.end);
@@ -308,10 +304,6 @@ function enableSingleMode(editor, controls, container, $content) {
             const ev = new MouseEvent(e, editor);
             const pos = ev.getDocumentPosition();
 
-            // if ($cm.isConnected) {
-            //     $cm.remove();
-            // }
-
             editor.selection.moveCursorToPosition(pos);
             editor.selection.setSelectionAnchor(pos.row, pos.column);
             editor.renderer.scrollCursorIntoView(pos);
@@ -331,14 +323,10 @@ function enableSingleMode(editor, controls, container, $content) {
     }
 
     function onchange() {
-        if ($cm.isConnected) {
-            $cm.remove();
-        }
         setTimeout(updateEnd, 0);
     }
 
     function updateEnd() {
-        $cm.remove();
         const cursor = $cursor.getBoundingClientRect();
 
         cpos.x = cursor.right - 5;
@@ -384,7 +372,7 @@ function enableSingleMode(editor, controls, container, $content) {
         editor.session.off('changeScrollTop', hide);
         editor.session.off('changeScrollLeft', hide);
         editor.selection.off('changeCursor', onchange);
-        editor.off('change', onchange);
+        // editor.off('change', onchage);
         controls.end.ontouchstart = null;
     }
 

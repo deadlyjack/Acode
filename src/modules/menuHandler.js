@@ -6,11 +6,13 @@ import constants from "../constants";
 import saveFile from "./saveFile";
 import help from "../page/help";
 import dialogs from "../components/dialogs";
-import FileBrowser from "../page/fileBrowser";
+import FileBrowser from "../page/fileBrowser/fileBrowser";
+import GithubLogin from "../page/login/login";
+import gitHub from "../page/github/gitHub";
 
 export default {
     newFile: function () {
-        dialogs.prompt(strings['enter file name'], '', "filename", {
+        dialogs.prompt(strings['enter file name'], strings['new file'], "filename", {
                 match: constants.FILE_NAME_REGEX,
                 required: true
             })
@@ -61,9 +63,9 @@ export default {
         /**
          * @type {File}
          */
-        const editor = editorManager.activeFile;
-        if (!editor) return;
-        saveFile(editor);
+        const file = editorManager.activeFile;
+        if (!file) return;
+        saveFile(file);
     },
     saveAs: function () {
         /**
@@ -90,11 +92,11 @@ export default {
             });
     },
     goto: function () {
-        dialogs.prompt('Enter line number', '', 'numeric').then(lineNumber => {
-                const activeEditor = editorManager.activeFile;
-                activeEditor.editor.focus();
-                if (activeEditor) {
-                    activeEditor.editor.gotoLine(lineNumber, 0, true);
+        dialogs.prompt(strings['enter line number'], '', 'number').then(lineNumber => {
+                const editor = editorManager.editor;
+                editor.focus();
+                if (editor) {
+                    editor.gotoLine(lineNumber, 0, true);
                 }
             })
             .catch(err => {
@@ -104,14 +106,11 @@ export default {
     settings: function () {
         settingsMain();
     },
-    help: function (footerOptions) {
-        help(footerOptions);
+    help: function () {
+        help();
     },
     console: function () {
-        const theme = appSettings.value.appTheme;
-        const themeColor = theme === 'default' ? '#9999ff' : theme === 'dark' ? '#313131' : '#ffffff';
-        const color = theme === 'light' ? '#9999ff' : '#ffffff';
-        const options = `location=yes,hidenavigationbuttons=yes,hideurlbar=yes,clearcache=yes,toolbarcolor=${themeColor},closebuttoncolor=${color}`
+        const options = `location=no,clearcache=yes,clearsessioncache=yes,zoom=no`
         const ref = cordova.InAppBrowser.open(`${cordova.file.applicationDirectory}www/console.html`, '_blank', options);
 
         ref.addEventListener('loadstart', function () {
@@ -124,6 +123,11 @@ export default {
                 }
               `
             });
-        })
+        });
+    },
+    github: function () {
+        if ((!localStorage.username || !localStorage.password) && !localStorage.token)
+            return GithubLogin();
+        gitHub();
     }
 };

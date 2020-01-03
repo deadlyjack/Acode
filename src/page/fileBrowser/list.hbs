@@ -1,0 +1,9 @@
+<ul class="list" id="list" empty-msg="{{msg}}">{{#list}}
+  {{#.}}
+  <li class="tile" url="{{nativeURL}}" {{#isDirectory}} action="folder" type="folder" {{/isDirectory}} {{#readOnly}}
+    read-only="true" {{/readOnly}} {{#isFile}} action="file" type="file" {{/isFile}} name="{{name}}">
+    <span class="icon {{type}}"></span>
+    <span class="text">{{name}}</span>
+  </li>
+  {{/.}}
+  {{/list}}</ul>

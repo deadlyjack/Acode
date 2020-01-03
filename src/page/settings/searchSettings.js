@@ -4,9 +4,9 @@ import tag from 'html-tag-js';
 import gen from "../../components/gen";
 
 export default function searchSettings() {
-    const page = Page('Search in editor');
+    const page = Page(strings.search);
     const settingsList = tag('div', {
-        className: 'main settings'
+        className: 'main list'
     });
 
     actionStack.push({
@@ -36,7 +36,7 @@ export default function searchSettings() {
         }
     ];
 
-    gen.settingsItems(settingsList, settingsOptions, changeSetting);
+    gen.listItems(settingsList, settingsOptions, changeSetting);
 
     function changeSetting() {
 

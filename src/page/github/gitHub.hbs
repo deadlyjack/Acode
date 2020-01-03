@@ -1,0 +1,23 @@
+<div class="main list" id="github">
+  {{#.}}
+  <div class="list-item" action="repo" owner="{{owner.login}}" name="{{name}}" id="{{id}}">
+    <span class="octicon main-icon" {{#private}}private{{/private}}></span>
+    <div class="container">
+      <span class="text">{{name}}</span>
+      <small class="value">
+        <div class="group">
+          <span class="octicon octicon-star"></span>
+          <span class="text">{{watchers}}</span>
+        </div>
+        <div class="group">
+          <span class="octicon octicon-repo-forked"></span>
+          <span class="text">{{forks}}</span>
+        </div>
+        <div class="group">
+          <span class="icon file {{language}}"></span>
+        </div>
+      </small>
+    </div>
+  </div>
+  {{/.}}
+</div>

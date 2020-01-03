@@ -1,4 +1,3 @@
-@import './common-class.scss';
 @import './variables.scss';
 
 * {
@@ -11,15 +10,56 @@
     }
 }
 
+.octicon,
 .icon {
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    text-decoration: none;
+    text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
+    &.hidden {
+        display: none !important;
+    }
+
     &.app-logo {
-        background-image: url(../res/logo/logo-min.png);
+        background-image: url(../res/logo/logo.png);
         background-position: center;
         background-size: 28px;
         background-repeat: no-repeat;
+    }
+
+    &.notice {
+        position: relative;
+
+        &::after {
+            content: '•';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: #ffda0c;
+            font-size: 2em;
+            height: fit-content;
+            line-height: 4px;
+        }
+    }
+
+    &.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    &:not(.float):active {
+        transition: all 100ms ease;
+        background-color: rgba(0, 0, 0, 0.2) !important;
+    }
+
+    &.active {
+        background-color: rgba(0, 0, 0, 0.2) !important;
     }
 }
 
@@ -38,59 +78,6 @@ html {
     width: 100vw;
     background-color: black;
     opacity: 0;
-}
-
-ul {
-    list-style: none;
-
-    &.dir-list {
-        .icon {
-            color: rgb(253, 162, 162);
-
-            &.folder {
-                color: rgba(156, 219, 127, 0.667);
-            }
-
-            &.code {
-                color: rgb(109, 207, 109);
-            }
-        }
-    }
-
-    &.main {
-        overflow-x: hidden;
-
-        li {
-            &.tile:active {
-                transition: all 300ms ease;
-                background-color: #bbb;
-            }
-
-            &:last-child {
-                border-bottom: solid 4px rgb(109, 122, 240);
-            }
-        }
-
-        &.empty {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 40px;
-
-            &::after {
-                content: attr(data-empty-folder);
-                color: #999;
-                text-align: center;
-                font-weight: 900;
-                background: transparent;
-            }
-        }
-
-        li:last-child {
-            border-bottom: none;
-        }
-
-    }
 }
 
 .button-container {
@@ -116,13 +103,13 @@ ul {
         align-items: center;
         justify-content: center;
         border: none;
-        background-color: inherit;
+        background-color: $primary;
         color: white;
         text-transform: uppercase;
 
         &:active {
             transition: all 100ms ease;
-            background-color: rgba($color: #000099, $alpha: 0.2);
+            background-color: darken($color: $primary, $amount: 20)
         }
 
         &:disabled {
@@ -131,16 +118,10 @@ ul {
     }
 
     input {
-        background-color: inherit;
-        border: none;
+        height: unset;
         color: white;
         border-bottom: 1px solid white;
         margin: 5px;
-        box-sizing: border-box;
-
-        &:focus {
-            border-width: 2px;
-        }
 
         &::placeholder {
             color: rgba(255, 255, 255, 0.6);
@@ -149,44 +130,30 @@ ul {
 
     .icon {
         font-size: 1.3em;
-
-        &.notice {
-            position: relative;
-
-            &::after {
-                content: '•';
-                position: absolute;
-                top: 5px;
-                right: 5px;
-                color: #ffda0c;
-                font-size: 2em;
-                height: fit-content;
-                line-height: 4px;
-            }
-        }
-
-        &.disabled {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        &:not(.float):active {
-            transition: all 100ms ease;
-            background-color: rgba(0, 0, 0, 0.2) !important;
-        }
-
-        &.active {
-            background-color: rgba(0, 0, 0, 0.2) !important;
-        }
     }
 
-    .undo,
-    .redo {
-        font-size: 0.8em;
-    }
-
+    .search,
     .save {
         font-size: 1em;
+    }
+}
+
+input {
+    height: 40px;
+    outline: none;
+    border: none;
+    background-color: inherit;
+    border-bottom: solid 1px black;
+    padding: 0;
+    box-sizing: border-box;
+    color: black;
+
+    &:focus {
+        border-bottom-width: 2px !important;
+    }
+
+    &::placeholder {
+        color: #999;
     }
 }
 
@@ -256,6 +223,22 @@ input {
 
 .main {
     position: relative;
+}
+
+.hr {
+    display: flex;
+    align-items: center;
+    margin: auto auto 15px auto;
+
+    &::after,
+    &::before {
+        content: '';
+        height: 1px;
+        width: 60px;
+        background-color: black;
+        margin: auto 15px;
+        opacity: 0.5;
+    }
 }
 
 @keyframes move-around {

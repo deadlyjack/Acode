@@ -1,3 +1,5 @@
+import Cryptojs from 'crypto-js';
+
 function getExt(fileName) {
     const res = /(?:\.([^.]+))?$/.exec(fileName);
 
@@ -55,13 +57,39 @@ function getLangNameFromExt(ext) {
     if (ext === 'js') return 'javascript';
     if (['kt', 'kts'].includes(ext)) return 'kotlin';
     if (ext === 'pde') return 'processinglang';
-    if (['py', 'pyc', 'pyd', 'pyo', 'pyw', 'pyz'].includes(ext)) return 'python';
+    if (['py', 'pyc', 'pyd', 'pyo', 'pyw', 'pyz', 'gyp'].includes(ext)) return 'python';
     if (ext === 'rb') return 'ruby';
     if (['rs', 'rlib'].includes(ext)) return 'rust';
     if (ext === 'src') return 'source';
     if (ext === 'ts') return 'typescript';
+    if (ext === 'hbs') return 'handlebars';
     if (ext === 'md') return 'markdown';
     if (ext === 'yml') return 'yaml';
+    return ext;
+}
+
+function getLangNameFromFileName(filename) {
+    const regex = {
+        webpack: /^webpack\.config\.js$/i,
+        yarn: /^yarn\.lock$/i,
+        npm: /(^package\.json$)|(^package\-lock\.json$)/i,
+        git: /(^\.gitignore$)|(^\.gitmodules$)/i,
+        postcss: /^postcss\.config\.js$/i,
+        ruby: /^rakefile$/i,
+        makefile: /^makefile$/i,
+        cmake: /^cmake$/i,
+        license: /^license$/i,
+        testjs: /\.test\.js$/i,
+        testts: /\.test\.ts$/i,
+        eslint: /(^\.eslintrc$)|(^\.eslintignore$)/i,
+        typescriptdef: /\.d\.ts$/i,
+    };
+    for (let type in regex) {
+        if (regex[type].test(filename)) return type;
+    }
+
+    const ext = getExt(filename);
+    return getLangNameFromExt(ext);
 }
 
 /**
@@ -69,13 +97,17 @@ function getLangNameFromExt(ext) {
  * @param {FileEntry[]} list 
  * @param {object} fileBrowser 
  */
-function sortDir(list, fileBrowser) {
+function sortDir(list, fileBrowser, readOnly = false) {
     const dir = [];
     const file = [];
     const sortByName = fileBrowser.sortByName === 'on' ? true : false;
     const showHiddenFile = fileBrowser.showHiddenFiles === 'on' ? true : false;
 
     list.map(item => {
+
+        item.type = item.isFile ? getIconForFile(item.name) : 'folder';
+        item.readOnly = readOnly;
+
         if ((item.name[0] === '.' && showHiddenFile) || item.name[0] !== '.') {
             if (item.isDirectory)
                 return dir.push(item);
@@ -110,9 +142,9 @@ function getIconForFile(filename) {
     if (['png', 'svg', 'jpeg', 'jpg', 'gif', 'ico'].includes(ext))
         return 'icon image';
     if (['wav', 'mp3', 'flac'].includes(ext))
-        return 'icon music';
+        return 'icon audiotrack';
     if (['zip', 'rar', 'tar', 'deb'].includes(ext))
-        return 'icon file-zip';
+        return 'icon zip';
 
     switch (ext) {
         case 'apk':
@@ -120,15 +152,14 @@ function getIconForFile(filename) {
         case 'text':
         case 'txt':
         case 'log':
-            return 'icon file-text2';
+            return 'icon document-text';
         case 'doc':
         case 'docx':
-            return 'icon file-word';
         case 'pdf':
-            return 'icon file-pdf';
+            return 'icon document';
 
         default:
-            return `file file_type_${ext} file_type_${getLangNameFromExt(ext)}`;
+            return `file file_type_${getLangNameFromFileName(filename)}`;
     }
 }
 
@@ -191,6 +222,18 @@ function idGenereator() {
     return parseInt((((1 + Math.random()) * 0x10000) | 0).toString(10).substring(1));
 }
 
+const credentials = {
+    key: 'xkism2wq3)(I#$MNkds0)*(73am)(*73_L:w3k[*(#WOd983jkdssap sduy*&T#W3elkiu8983hKLUYs*(&y))',
+
+    encrypt(str) {
+        return Cryptojs.AES.encrypt(str, this.key).toString();
+    },
+
+    decrypt(str) {
+        return Cryptojs.AES.decrypt(str, this.key).toString(Cryptojs.enc.Utf8);
+    }
+};
+
 export default {
     getExt,
     getErrorMessage,
@@ -200,5 +243,7 @@ export default {
     removeLineBreaks,
     convertToFile,
     updateFolders,
-    idGenereator
+    idGenereator,
+    credentials,
+    getLangNameFromFileName
 };

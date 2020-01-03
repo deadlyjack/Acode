@@ -7,7 +7,7 @@ import gen from "../../components/gen";
 export default function themeSettings() {
     const page = Page(strings.theme);
     const settingsList = tag('div', {
-        className: 'main settings'
+        className: 'main list'
     });
 
     actionStack.push({
@@ -32,14 +32,17 @@ export default function themeSettings() {
         }
     ];
 
-    gen.settingsItems(settingsList, settingsOptions, changeSetting);
+    gen.listItems(settingsList, settingsOptions, changeSetting);
 
     function changeSetting() {
         const editor = editorManager.editor;
-
+        const themeList = [];
+        constants.themeList.map(theme => {
+            themeList.push([theme, theme.replace(/_/g, ' ')]);
+        });
         switch (this.key) {
             case 'editor':
-                dialogs.select(this.text, constants.themeList, {
+                dialogs.select(this.text, themeList, {
                     default: values.editorTheme.split('/').slice(-1)[0]
                 }).then(res => {
                     this.changeSubText(res);

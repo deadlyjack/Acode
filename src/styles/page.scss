@@ -1,59 +1,29 @@
 @import './variables.scss';
 
 body {
+  header {
+    .icon {
+      font-size: 1.5em !important;
+    }
+  }
+
   &.loading {
 
     &.splash {
       &::before {
-        background-color: white;
-        background-image: url('../res/logo/logo circle-min.png');
+        content: '';
+        background-image: url('../res/logo/logo.png');
         background-position: center;
         background-repeat: no-repeat;
-        background-size: 60vw;
+        background-size: 180px;
+        background-color: #313131;
         position: fixed;
         top: 0;
         right: 0;
-        height: 100%;
-        width: 100%;
-        animation: none;
-        border-radius: 0;
-        box-shadow: none;
+        height: 100vh;
+        width: 100vw;
+        z-index: 999999;
       }
-
-      &::after {
-        display: none;
-        top: 70vh;
-        height: 6px;
-        border-radius: 3px;
-        box-shadow: none;
-      }
-    }
-
-    &::before {
-      content: '';
-      z-index: 107;
-      animation: move-around 2s ease infinite reverse;
-    }
-
-    &:before,
-    &:after {
-      content: '';
-      position: fixed;
-      top: calc(50% - 2px);
-      left: 0px;
-      right: 0px;
-      margin: auto;
-      height: 6px;
-      width: 40px;
-      background-color: rgb(211, 106, 106);
-      animation: move-around 2s ease infinite;
-      transform-origin: left;
-      border-radius: 2px;
-      box-shadow: 0 0 0px 4px white;
-    }
-
-    &::after {
-      z-index: 108;
     }
   }
 }
@@ -72,6 +42,54 @@ div.page {
   .main {
     max-width: 600px;
     margin: auto;
+
+    .navigation {
+      display: flex;
+      height: 30px;
+      border-bottom: solid 1px rgba(204, 204, 204, 0.1);
+      box-sizing: border-box;
+      overflow-x: auto;
+
+      &::after {
+        content: '';
+        display: block;
+        min-width: 10px;
+      }
+
+      .nav {
+        display: flex;
+        height: 25px;
+        margin: auto 2.5px;
+        font-size: 0.8em;
+        box-sizing: border-box;
+        align-items: center;
+
+        &::after {
+          content: attr(text);
+          border-radius: 4px;
+          padding: 2.5px;
+          box-sizing: border-box;
+          border: solid 1px #333;
+          background-color: #999;
+          color: white;
+          height: fit-content;
+          box-sizing: border-box;
+          white-space: nowrap;
+          word-break: keep-all;
+          box-sizing: border-box;
+        }
+
+        &.active::after {
+          background-color: rgb(49, 72, 146);
+        }
+
+        &::before {
+          font-family: 'code-editor-icon';
+          content: '\e9bd';
+          margin: auto 2.5px;
+        }
+      }
+    }
   }
 }
 
@@ -139,6 +157,10 @@ body {
     width: 100vw;
     z-index: 98;
     background-color: $primary;
+
+    .icon {
+      border-radius: unset;
+    }
   }
 
   .float {

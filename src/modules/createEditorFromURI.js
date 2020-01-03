@@ -11,9 +11,10 @@ export default createEditorFromURI;
 
 function createEditorFromURI(uri, isContentUri, data = {}) {
     return new Promise(resolve => {
+        uri = decode(uri);
         if (typeof uri === 'string') {
-            const name = decodeURI(uri.split('/').pop());
-            const dir = uri.replace(encodeURI(name), '');
+            const name = uri.split('/').pop();
+            const dir = uri.replace(name, '');
 
             uri = {
                 dir,
@@ -23,7 +24,7 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
         const name = uri.name;
         const ext = helpers.getExt(name);
         const location = isContentUri ? null : uri.dir;
-        const fileUri = location ? location + encodeURI(name) : null;
+        const fileUri = location ? location + name : null;
         const contentUri = isContentUri ? uri.dir : null;
         const settings = appSettings.value;
         const {
@@ -104,4 +105,9 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
                 resolve(index === undefined ? fileUri : index);
             });
     });
+}
+
+function decode(url) {
+    if (/%[0-9a-f]{2}/i.test(url)) return decode(decodeURI(url));
+    return url;
 }

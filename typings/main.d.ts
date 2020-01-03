@@ -14,6 +14,7 @@ interface searchSettings {
 }
 
 interface Settings {
+    autosave: number;
     fileBrowser: fileBrowserSettings;
     maxFileSize: number;
     filesNotAllowed: string[];
@@ -28,7 +29,8 @@ interface Settings {
     linenumbers: boolean,
     beautify: Array<string>,
     linting: boolean,
-    previewMode: 'mobile' | 'desktop' | 'none'
+    previewMode: 'mobile' | 'desktop' | 'none',
+    showSpaces: boolean
 }
 
 interface AppSettings {
@@ -70,7 +72,9 @@ interface newFileOptions {
     text?: string;
     render?: boolean;
     readonly?: boolean;
-    cursorPos?: AceAjax.Position
+    cursorPos?: AceAjax.Position;
+    type: 'regular' | 'git';
+    record: GitFileRecord;
 }
 
 interface Controls {
@@ -88,13 +92,35 @@ interface File {
     id: string;
     isUnsaved: boolean;
     location: string;
-    readonly: boolean;
+    readOnly: boolean;
+    type: 'regular' | 'git';
+    record: GitFileRecord,
     updateControls: function(): void;
     session: AceAjax.IEditSession;
 }
 
 interface elementContainer {
     [key: string]: HTMLElement
+}
+
+interface GitFileRecord {
+    name: string,
+    data: string,
+    sha: string,
+    repo: string,
+    branch?: string;
+    path: string;
+    branch: 'master' | string;
+    commitMessage: string;
+    setName(name: string): Promise<void>;
+    setData(data: string): Promise<void>;
+}
+
+interface GitRecord {
+    get(sha: string): Promise<GitFileRecord>;
+    add(gitFileRecord: GitFileRecord): void;
+    remove(sha: string): GitFileRecord;
+    update(sha: string, gitFileRecord: GitFileRecord): void;
 }
 
 interface Manager {
@@ -107,6 +133,7 @@ interface Manager {
     onupdate: function(): void;
     files: Array<File>;
     controls: Controls;
+    state: 'blur' | 'focus';
 }
 
 interface Strings {
@@ -150,16 +177,15 @@ declare var strings: Strings;
  * Handles back button click
  */
 declare var actionStack: ActionStack;
-
 declare var ace: AceAjax;
-
 declare var fileClipBoard: FileClipBoard;
-
 declare var addedFolder: Folders;
-
 declare var editorManager: Manager;
-
+declare var saveInterval: Number;
+declare var freeze: Boolean;
 declare var app: HTMLDivElement;
+declare var gitRecord: GitRecord;
+declare var gitRecordURL: string;
 /**
  * A custom alert box to show alert notification
  * @param title 

@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.foxdebug.acode" version="0.0.4.40" 
+<widget android-versionCode="49" id="com.foxdebug.acode" version="0.0.4.49" 
     xmlns="http://www.w3.org/ns/widgets" 
-    xmlns:cdv="http://cordova.apache.org/ns/1.0" 
-    xmlns:android="http://schemas.android.com/apk/res/android" android-versionCode="40">
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Acode</name>
     <description>
         Light weight code editor and web IDE for android.
@@ -11,44 +11,38 @@
        Ajit Kumar (dellevenjack)
     </author>
     <content src="index.html" />
-    <plugin name="cordova-plugin-whitelist" spec="1" />
-    <access origin="*" launch-external="yes" />
+    <access launch-external="yes" origin="*" />
+    <allow-navigation href="https://*/*" />
+    <allow-navigation href="http://*/*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="tel:*" />
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
-
     <preference name="cordova.plugins.diagnostic.modules" value="EXTERNAL_STORAGE " />
-
     <platform name="android">
-
         <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/colors.xml" />
         <allow-intent href="market:*" />
-
-        <preference name="DisallowOverscroll" value="true"/>
-        <!-- <preference name="Orientation" value="portrait"/> -->
-        <preference name="BackgroundColor" value="0x313131ff"/>
-        <preference name="StatusBarStyle" value="lightcontent" />
+        <preference name="fullscreen" value="false"/>
+        <preference name="SplashScreen" value="none"/>
+        <preference name="ShowTitle" value="true"/>
+        <preference name="DisallowOverscroll" value="true" />
+        <preference name="BackgroundColor" value="0xff313131" />
         <preference name="AndroidPersistentFileLocation" value="Compatibility" />
         <preference name="AndroidExtraFilesystems" value="sdcard,cache" />
-
         <preference name="android-minSdkVersion" value="21" />
-
         <preference name="AndroidLaunchMode" value="singleTask" />
         <preference name="prerendered-icon" value="false" />
-
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
             <application android:usesCleartextTraffic="true" />
             <application android:resizeableActivity="false" />
         </edit-config>
-
-        <config-file target="AndroidManifest.xml" parent="/manifest">
+        <config-file parent="/manifest" target="AndroidManifest.xml">
             <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
+            <uses-permission android:name="android.permission.WAKE_LOCK" />
         </config-file>
-
-        <config-file target="AndroidManifest.xml" parent="./application/activity">
+        <config-file parent="./application/activity" target="AndroidManifest.xml">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -61,7 +55,6 @@
                 <data android:mimeType="application/x-octet-stream" />
                 <data android:mimeType="application/xml" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.GET_CONTENT" />
                 <data android:mimeType="text/*" />
@@ -73,28 +66,25 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.OPENABLE" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-                <data android:scheme="http" android:host="*" />
+                <data android:host="*" android:scheme="http" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-                <data android:scheme="https" android:host="*" />
+                <data android:host="*" android:scheme="https" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
-
             <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
+                <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="*/*" />
             </intent-filter>
         </config-file>
-
+        <resource-file src="res/logo.png" target="app/src/main/res/drawable/logo.png" />
         <icon background="@color/ic_launcher_background" density="mdpi" foreground="res/icon/android/mipmap-mdpi/ic_launcher_foreground.png" />
         <icon background="@color/ic_launcher_background" density="hdpi" foreground="res/icon/android/mipmap-hdpi/ic_launcher_foreground.png" />
         <icon background="@color/ic_launcher_background" density="xhdpi" foreground="res/icon/android/mipmap-xhdpi/ic_launcher_foreground.png" />

@@ -1,0 +1,41 @@
+@font-face {
+  font-family: 'custicon';
+  src:
+    url('fonts/custicon.ttf?9u3usc') format('truetype'),
+    url('fonts/custicon.woff?9u3usc') format('woff'),
+    url('fonts/custicon.svg?9u3usc#custicon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.custom {
+  font-family: 'custicon' !important;
+}
+
+.icon.custom.shift:before {
+  content: "\e904";
+}
+
+.icon.custom.moveline-down:before {
+  content: "\e905";
+}
+
+.icon.custom.moveline-up:before {
+  content: "\e906";
+}
+
+.icon.custom.copyline-down:before {
+  content: "\e902";
+}
+
+.icon.custom.copyline-up:before {
+  content: "\e903";
+}
+
+.icon.custom.replace_all:before {
+  content: "\e900";
+}
+
+.icon.custom.replace:before {
+  content: "\e901";
+}

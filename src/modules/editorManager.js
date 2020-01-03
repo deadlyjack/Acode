@@ -7,6 +7,7 @@ import fs from './utils/androidFileSystem';
 import dialogs from '../components/dialogs';
 import helpers from '../modules/helpers';
 import textControl from './events/oncontextmenu';
+import constants from '../constants';
 
 /**
  * @typedef {object} ActiveEditor
@@ -34,6 +35,9 @@ function EditorManager(sidebar, header, body) {
     const container = tag('div', {
         className: 'editor-container'
     });
+    /**
+     * @type {AceAjax.Editor}
+     */
     const editor = ace.edit(container);
     const fullContent = '<span action="copy">copy</span><span action="cut">cut</span><span action="paste">paste</span><span action="select all">select all<span>';
     const controls = {
@@ -51,6 +55,9 @@ function EditorManager(sidebar, header, body) {
         update: () => {}
     }
 
+    /**
+     * @type {Manager}
+     */
     const manager = {
         editor,
         addNewFile,
@@ -61,7 +68,8 @@ function EditorManager(sidebar, header, body) {
         hasUnsavedFiles,
         files: [],
         removeFile,
-        controls
+        controls,
+        state: 'blur'
     };
 
     body.appendChild(container);
@@ -77,7 +85,24 @@ function EditorManager(sidebar, header, body) {
             clipboardAction(action);
         }
     }
-    editor.on('change', function () {
+    editor.on('focus', function () {
+        setTimeout(() => {
+            manager.state = 'focus';
+        }, 0);
+        window.addEventListener('native.keyboardhide', hide);
+
+        function hide() {
+            editor.blur();
+            window.removeEventListener('native.keyboardhide', hide);
+        }
+    });
+    editor.on('blur', function () {
+        setTimeout(() => {
+            manager.state = 'blur';
+        }, 0);
+    });
+    editor.on('change', function (e) {
+        if (e.type) console.log(e.type);
         if (manager.activeFile && !manager.activeFile.isUnsaved) {
             manager.activeFile.assocTile.classList.add('notice');
             manager.activeFile.isUnsaved = true;
@@ -91,20 +116,10 @@ function EditorManager(sidebar, header, body) {
     /**
      * 
      * @param {string} filename 
-     * @param {object} [options]
-     * @param {string} [options.text]
-     * @param {string} [options.fileUri]
-     * @param {string} [options.contentUri]
-     * @param {boolean} [options.isContentUri]
-     * @param {boolean} [options.isUnsaved]
-     * @param {string} [options.location]
-     * @param {boolean} [options.render]
-     * @param {boolean} [options.readOnly]
-     * @param {Object} [options.cursorPos]
-     * @returns {File}
+     * @param {newFileOptions} options 
      */
     function addNewFile(filename, options = {}) {
-        const uri = options.fileUri || options.contentUri;
+        const uri = options.fileUri || options.contentUri || (options.type === 'git' ? options.record.sha : undefined);
         let doesExists = getFile(uri || filename, !uri);
         if (doesExists) {
             if (manager.activeFile.id !== doesExists.id) switchFile(doesExists.id);
@@ -123,8 +138,10 @@ function EditorManager(sidebar, header, body) {
             fileUri: options.fileUri,
             contentUri: options.contentUri,
             name: filename,
+            type: options.type || 'regular',
             isUnsaved: options.isUnsaved,
             readOnly: options.readOnly || options.isContentUri,
+            record: options.record,
             assocTile: tile({
                 lead: tag('i', {
                     className: helper.getIconForFile(filename),
@@ -133,25 +150,44 @@ function EditorManager(sidebar, header, body) {
                 tail: removeBtn
             }),
             get filename() {
-                return this.name;
+                if (this.type === 'git') return this.record.name;
+                else return this.name;
             },
             set filename(name) {
-                if (!name) return;
-                header.text(name);
-                this.assocTile.text(name);
-                if (helpers.getExt(this.name) !== helpers.getExt(name)) {
-                    setupSession({
-                        session: this.session,
-                        filename: name
-                    });
-                    this.assocTile.lead(tag('i', {
-                        className: helper.getIconForFile(name)
-                    }));
-                }
+                (async () => {
+                    if (!name) return;
 
-                if (this.fileUri) this.fileUri = this.location + name;
-                this.name = name;
-                manager.onupdate();
+                    if (this.type === 'git') {
+                        try {
+                            await this.record.setName(name);
+                            this.name = name;
+                            manager.onupdate();
+                        } catch (error) {
+                            return;
+                        }
+                    } else if (this.fileUri) {
+                        this.fileUri = this.location + name;
+                    }
+
+                    if (editorManager.activeFile.id === this.id) header.text(name);
+
+                    this.assocTile.text(name);
+                    if (helpers.getExt(this.name) !== helpers.getExt(name)) {
+                        setupSession({
+                            session: this.session,
+                            filename: name
+                        });
+                        this.assocTile.lead(tag('i', {
+                            className: helper.getIconForFile(name),
+                            style: {
+                                paddingRight: '5px'
+                            }
+                        }));
+                    }
+
+                    this.name = name;
+                    manager.onupdate();
+                })();
             },
             get location() {
                 if (this.fileUri)
@@ -171,7 +207,7 @@ function EditorManager(sidebar, header, body) {
             }
         };
 
-        if (options.isUnsaved) {
+        if (options.isUnsaved && !options.readOnly) {
             file.assocTile.classList.add('notice');
         }
 
@@ -185,7 +221,9 @@ function EditorManager(sidebar, header, body) {
 
         file.assocTile.addEventListener('contextmenu', function (e) {
             if (e.target === removeBtn) return;
-            dialogs.prompt('Rename', file.filename)
+            dialogs.prompt('Rename', file.filename, 'filename', {
+                    match: constants.FILE_NAME_REGEX
+                })
                 .then(newname => {
                     if (!newname || newname === file.filename) return;
                     newname = helper.removeLineBreaks(newname);
@@ -207,7 +245,7 @@ function EditorManager(sidebar, header, body) {
                         alert(strings['unable to rename']);
                     } else {
                         file.filename = newname;
-                        window.plugins.toast.showShortBottom(strings['file renamed']);
+                        if (file.type === 'regular') window.plugins.toast.showShortBottom(strings['file renamed']);
                     }
                 });
         });
@@ -234,13 +272,15 @@ function EditorManager(sidebar, header, body) {
      */
     function setSubText(file) {
         let text = 'Read Only';
-        if (file.location) {
+        if (file.type === 'git') {
+            text = 'git • ' + file.record.repo + '/' + file.record.path;
+        } else if (file.location) {
             text = file.location;
             if (text.length > 30) {
                 text = '...' + text.slice(text.length - 27);
             }
         } else if (!file.readOnly) {
-            text = 'New File';
+            text = strings['new file'];
         }
         header.subText(decodeURI(text));
     }
@@ -291,7 +331,8 @@ function EditorManager(sidebar, header, body) {
             enableEmmet: true,
             enableBasicAutocompletion: true,
             enableSnippets: true,
-            enableLiveAutocompletion: true
+            enableLiveAutocompletion: true,
+            showInvisibles: settings.showSpaces
         });
     }
 
@@ -332,6 +373,8 @@ function EditorManager(sidebar, header, body) {
             dialogs.confirm(strings.warning.toUpperCase(), strings['unsaved file']).then(closeFile);
         } else {
             closeFile();
+
+            if (file.type === 'git') gitRecord.remove(file.record.sha);
         }
 
         function closeFile() {
@@ -362,6 +405,7 @@ function EditorManager(sidebar, header, body) {
      */
     function getFile(id, isName) {
         for (let file of manager.files) {
+            if (file.type === 'git' && id === file.record.sha) return file;
             if (typeof id === 'number' && file.id === id)
                 return file;
             else if (typeof id === 'string' && (file.fileUri === id || file.contentUri === id))

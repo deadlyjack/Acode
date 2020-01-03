@@ -18,6 +18,12 @@
     display: flex;
     flex-direction: column;
 
+    &.multi {
+        textarea:not(:first-of-type) {
+            margin-top: 20px;
+        }
+    }
+
     &.confirm,
     &.alert {
         .title {
@@ -82,6 +88,8 @@
         align-items: center;
         font-size: 1.25em;
         color: $dialogText;
+        word-break: break-all;
+        word-wrap: break-word;
 
         &:not(:empty) {
             min-height: 40px;
@@ -90,10 +98,48 @@
     }
 
     .message {
-        color: $dialogText;
-        padding: 10px;
-        min-height: 40px;
-        font-size: 1.2em;
+        word-break: break-all;
+        word-wrap: break-word;
+
+        &.loader {
+            display: flex;
+            align-items: center;
+
+            .loader {
+                height: 30px;
+                width: 30px;
+                border-radius: 50%;
+                border: solid 4px white;
+                border-bottom: solid 4px rgba($color: #000000, $alpha: 0) !important;
+                margin: 15px;
+                animation: rotate 1s linear infinite;
+
+                @keyframes rotate {
+                    0% {
+                        transform: rotate(0deg) translateZ(0);
+                    }
+
+                    100% {
+                        transform: rotate(360deg) translateZ(0);
+                    }
+                }
+            }
+
+            .message {
+                display: flex;
+                align-items: center;
+                word-break: break-all;
+                word-wrap: break-word;
+            }
+        }
+
+        .message,
+        &:not(.loader) {
+            color: $dialogText;
+            padding: 10px;
+            min-height: 40px;
+            font-size: 1.2em;
+        }
     }
 
     .input {
@@ -116,11 +162,11 @@
     }
 
     .error-msg {
-        color: $errorText;
+        color: $errorText !important;
         height: fit-content;
 
         &:not(:empty) {
-            margin: 10px auto;
+            margin: 10px auto 0 auto;
         }
     }
 

@@ -17,16 +17,14 @@ import tile from './tile';
  */
 function Page(title, options = {}) {
     const leadBtn = options.lead || tag('span', {
-        className: 'icon chevron_left',
+        className: 'icon arrow_back',
         onclick: hide
     });
     const header = tile({
         type: 'header',
         text: title,
         lead: leadBtn,
-        tail: options.tail || tag('span', {
-            className: 'icon'
-        })
+        tail: options.tail || undefined
     });
     const page = tag('div', {
         className: 'page',

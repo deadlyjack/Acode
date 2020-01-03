@@ -8,7 +8,7 @@ import qnaSection from "./qnaSection";
 export default function help(opts) {
     const page = Page(strings.help);
     const options = tag('div', {
-        className: 'main settings'
+        className: 'main list'
     });
 
     actionStack.push({
@@ -22,7 +22,7 @@ export default function help(opts) {
     const settingsOptions = [{
             key: 'icons',
             text: strings['icons definition'],
-            icon: 'toys'
+            icon: 'apps'
         },
         {
             key: 'qa',
@@ -33,7 +33,7 @@ export default function help(opts) {
             key: 'Q8',
             text: strings.Q8,
             type: 'a',
-            href: 'mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=version-' + AppVersion.version
+            href: 'mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=version-' + BuildInfo.version
         },
         {
             key: 'Q7',
@@ -43,7 +43,7 @@ export default function help(opts) {
         }
     ];
 
-    gen.settingsItems(options, settingsOptions, changeSetting);
+    gen.listItems(options, settingsOptions, changeSetting);
 
     function changeSetting() {
         switch (this.key) {

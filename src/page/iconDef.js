@@ -1,6 +1,7 @@
 import Page from "../components/page";
-import gen from "../components/gen";
 import tag from 'html-tag-js';
+import row1 from '../views/footer/row1.hbs';
+import row2 from '../views/footer/row2.hbs';
 
 export default function iconDef(options) {
     const page = Page(strings['icons definition']);
@@ -16,17 +17,18 @@ export default function iconDef(options) {
         actionStack.remove('iconDef');
     };
 
-    const icons = gen.iconButton([...options.row1, ...options.row2]);
+    const icons = [...tag.parse(row1).children, ...tag.parse(row2).children];
     const height = ((innerWidth > 600 ? 600 : innerWidth) / 6) + 'px';
 
-    for (const key in icons) {
-        icons[key].onclick = onclick.bind({
-            key: key + ' defination'
+    icons.map(icon => {
+        const action = icon.getAttribute('action');
+        icon.onclick = onclick.bind({
+            key: action + ' defination'
         });
-        icons[key].style.width = height;
-        icons[key].style.height = height;
-        iconList.append(icons[key]);
-    }
+        icon.style.width = height;
+        icon.style.height = height;
+        iconList.append(icon);
+    });
 
     function onclick() {
         alert(strings.info.toLocaleUpperCase(), strings[this.key]);

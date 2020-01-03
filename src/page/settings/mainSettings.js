@@ -4,14 +4,14 @@ import tag from 'html-tag-js';
 import searchSettings from "./searchSettings";
 import gen from "../../components/gen";
 import themeSettings from "./themeSettings";
-import aboutUs from "../aboutUs";
+import aboutUs from "../about/about";
 import editorSettings from "./editorSettings";
 import constants from "../../constants";
 
 export default function settingsMain(demo) {
     const page = Page(strings.settings);
     const settingsList = tag('div', {
-        className: 'main settings'
+        className: 'main list'
     });
 
     actionStack.push({
@@ -36,18 +36,18 @@ export default function settingsMain(demo) {
             key: 'previewMode',
             text: strings['preview mode'],
             subText: value.previewMode === 'none' ? strings['not set'] : value.previewMode,
-            icon: 'file-control play'
+            icon: 'play_circle_filled'
         }, {
             key: 'editor',
             text: strings['editor settings'],
-            icon: 'format_align_left'
+            icon: 'text_format'
         }, {
             key: 'theme',
             text: strings.theme,
-            icon: 'color_lens'
+            icon: 'color_lenspalette'
         }, {
             key: 'search',
-            text: 'Search',
+            text: strings.search,
             icon: 'search'
         }, {
             key: 'about',
@@ -56,7 +56,7 @@ export default function settingsMain(demo) {
         })
     }
 
-    gen.settingsItems(settingsList, settingsOptions, changeSetting);
+    gen.listItems(settingsList, settingsOptions, changeSetting);
 
     function changeSetting() {
         const lanuguages = [];
@@ -86,7 +86,7 @@ export default function settingsMain(demo) {
                         'mobile',
                         'desktop'
                     ], {
-                        default: value.previewMode === 'none' ? strings['not set'] : value.previewMode
+                        default: value.previewMode
                     })
                     .then(res => {
                         if (res === value.previewMode) return;

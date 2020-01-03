@@ -28,7 +28,6 @@ header {
     width: 100%;
 
     >*:nth-child(2) {
-        flex: unset !important;
         margin: auto;
         font-weight: bold;
         font-size: 1.2em;
@@ -63,7 +62,6 @@ header {
 
         &.sub-text {
             display: block;
-            text-align: center;
 
             &::after {
                 content: attr(data-subText);
@@ -72,7 +70,6 @@ header {
                 display: block;
                 position: sticky;
                 left: 0;
-                text-align: center;
             }
         }
     }
@@ -85,6 +82,7 @@ header {
         margin-left: 5px;
     }
 
+    .octicon,
     .icon {
         height: $headerHeight;
         width: $headerHeight;

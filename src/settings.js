@@ -28,6 +28,7 @@ class Settings {
          * @type {settingsValue}
          */
         this.defaultSettings = {
+            autosave: 0,
             fileBrowser: {
                 showHiddenFiles: 'off',
                 sortByName: 'off'
@@ -53,12 +54,27 @@ class Settings {
             linting: false,
             autoCorrect: true,
             previewMode: 'none',
-            initFlag: false
+            showSpaces: false
         };
         this.settingsFile = cordova.file.externalApplicationStorageDirectory + 'settings.json';
         this.loaded = false;
         this.onload = null;
         this.onsave = null;
+        let interval;
+        const save = () => {
+            interval = setInterval(() => {
+                fs.writeFile(this.settingsFile, JSON.stringify(this.value), true, false)
+                    .then(() => {
+                        this.value = this.defaultSettings;
+                        this.loaded = true;
+                        if (interval) clearInterval(interval);
+                        if (this.onload) this.onload();
+                    })
+                    .catch(() => {
+                        save();
+                    });
+            }, 1000);
+        }
 
         if ('globalSettings' in localStorage) {
             try {
@@ -83,17 +99,7 @@ class Settings {
                     this.checkSettings();
                     this.loaded = true;
                     if (this.onload) this.onload();
-                }).catch(() => {
-                    fs.writeFile(this.settingsFile, JSON.stringify(this.value), true, false)
-                        .then(() => {
-                            this.value = this.defaultSettings;
-                            this.loaded = true;
-                            if (this.onload) this.onload();
-                        })
-                        .catch((err) => {
-                            console.error(err);
-                        });
-                });
+                }).catch(save);
         }
     }
     update(showToast = true) {

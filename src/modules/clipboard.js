@@ -5,6 +5,10 @@
 function clipboardAction(action) {
     const clipboard = cordova.plugins.clipboard;
     const editor = editorManager.editor;
+    const {
+        menu,
+        fullContent
+    } = editorManager.controls;
     const selectedText = editor.getCopyText();
     switch (action) {
         case 'copy':
@@ -35,6 +39,12 @@ function clipboardAction(action) {
 
         case 'select all':
             editor.selectAll();
+            menu.innerHTML = fullContent;
+            const t = /translate3d\((.+)\)/.exec(menu.style.transform);
+            if (t && t[1]) {
+                const values = t[1].split(',');
+                menu.style.transform = `translate3d(40px, ${values[1]}, ${values[2]})`;
+            }
             setTimeout(() => {
                 editorManager.controls.start.remove();
                 editorManager.controls.end.remove();

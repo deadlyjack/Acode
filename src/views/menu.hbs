@@ -1,12 +1,48 @@
-<li action="newFile">{{new file}}</li>
-<li action="save" class="disabled">{{save}}</li>
-<li action="saveAs" class="disabled">{{save as}}</li>
-<li action="openFile">{{open file}}</li>
-<li action="openFolder">{{open folder}}</li>
+<li action="newFile">
+  <span class="text">{{new file}}</span>
+  <span class="icon file-control document-add"></span>
+</li>
+<li action="save" class="disabled">
+  <span class="text">{{save}}</span>
+  <span class="icon save"></span>
+</li>
+<li action="saveAs" class="disabled">
+  <span class="text">{{save as}}</span>
+  <span class="icon save notice"></span>
+</li>
+<li action="openFile">
+  <span class="text">{{open file}}</span>
+  <span class="icon document-text"></span>
+</li>
+<li action="openFolder">
+  <span class="text">{{open folder}}</span>
+  <span class="icon folder"></span></span>
+</li>
 <hr>
-<li action="goto" class="disabled">{{goto}}</li>
+<li action="goto" class="disabled">
+  <span class="text">{{goto}}</span>
+</li>
 <hr>
-<li action="console">{{console}}</li>
+<li action="console">
+  <span class="text">{{console}}</span>
+  <span class="icon file file_type_shell" style="
+    height: 16px;
+    width: 16px;
+    background-size: 15px;
+    background-position: center;
+  "></span>
+</li>
 <hr>
-<li action="settings">{{settings}}</li>
-<li action="help">{{help}}</li>
+<li action="github">
+  <span class="text">GitHub</span>
+  <span class="icon github"></span>
+</li>
+<hr>
+<li action="settings">
+  <span class="text">{{settings}}</span>
+  <span class="icon settings"></span>
+</li>
+<li action="help">
+  <span class="text">{{help}}</span>
+  <span class="icon help"></span>
+</li>

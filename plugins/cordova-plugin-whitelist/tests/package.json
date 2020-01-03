@@ -1,0 +1,15 @@
+{
+  "name": "cordova-plugin-whitelist-tests",
+  "version": "1.3.4",
+  "description": "",
+  "cordova": {
+    "id": "cordova-plugin-whitelist-tests",
+    "platforms": []
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "",
+  "license": "Apache 2.0"
+}
+

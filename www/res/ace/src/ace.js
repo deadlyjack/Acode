@@ -3935,7 +3935,8 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
         var animationSteps = 0;
         var pos;
         var clickCount = 0;
-        var mvY, mvX, animation, arX = [],
+        var mvY, mvX, animation, ge,
+            arX = [],
             arY = [];
         el.addEventListener("touchstart", function (e) {
 
@@ -4025,8 +4026,12 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                 animationSteps = 0;
             } else if (mode == "scroll") {
                 let sum = 0;
-                let tx = Math.abs(mvX) * 8;
-                let ty = Math.abs(mvY) * 8;
+                let tx = parseInt(Math.abs(mvX));
+                let ty = parseInt(Math.abs(mvY));
+
+                tx = tx * Math.sqrt(tx);
+                ty = ty * Math.sqrt(ty);
+
                 arX = [];
                 arY = [];
                 for (let i = 1; sum < tx; ++i) {
@@ -4080,15 +4085,17 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
             e.clientY = touchObj.clientY;
 
             if (mode == "scroll") {
-                editor.renderer.scrollBy(mvX, mvY);
+                // editor.renderer.scrollBy(mvX, mvY);
+                ge = e;
+                scroll(e, mvX, mvY);
             } else {
                 e.preventDefault();
             }
         });
 
         function animate() {
-            let xlen = arX.length;
-            let ylen = arY.length;
+            var xlen = arX.length;
+            var ylen = arY.length;
 
             if (xlen === 0 && ylen === 0) {
                 mvX = 0;
@@ -4096,10 +4103,21 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                 return;
             }
 
-            let xsign = mvX < 0 ? -1 : 1;
-            let ysign = mvY < 0 ? -1 : 1;
-            editor.renderer.scrollBy(xlen ? xsign * arX.pop() : 0, ylen ? ysign * arY.pop() : 0);
+            var xsign = mvX < 0 ? -1 : 1;
+            var ysign = mvY < 0 ? -1 : 1;
+            // editor.renderer.scrollBy(xlen ? xsign * arX.pop() : 0, ylen ? ysign * arY.pop() : 0);
+            var x = xlen ? xsign * arX.pop() : 0;
+            var y = ylen ? ysign * arY.pop() : 0;
+            scroll(ge, x, y);
             animation = requestAnimationFrame(animate);
+        }
+
+        function scroll(e, x, y) {
+            var mouseEvent = new MouseEvent(e, editor);
+            mouseEvent.speed = 1;
+            mouseEvent.wheelX = x;
+            mouseEvent.wheelY = y;
+            editor._emit('mousewheel', mouseEvent);
         }
 
         function handleLongTap() {

@@ -5,7 +5,7 @@ import tag from 'html-tag-js';
 export default function qnaSection() {
     const page = Page(strings['qa section']);
     const questionList = tag('div', {
-        className: 'main settings'
+        className: 'main list'
     });
     actionStack.push({
         id: 'qnaSection',
@@ -29,16 +29,10 @@ export default function qnaSection() {
         }
     ];
 
-    gen.settingsItems(questionList, questions, changeSetting);
+    gen.listItems(questionList, questions, changeSetting);
 
     function changeSetting() {
-        if (this.key === 'Q7') {
-
-        } else if (this.key === 'Q8') {
-
-        } else {
-            alert(strings.info.toUpperCase(), strings['A' + this.key.slice(1)]);
-        }
+        alert(strings.info.toUpperCase(), strings['A' + this.key.slice(1)]);
     }
 
     page.append(questionList);

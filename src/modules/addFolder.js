@@ -106,10 +106,10 @@ function addFolder(folder, sidebar, index) {
                 text: item.name
             });
             listItem.type = 'file';
-            listItem.id = item.nativeURL;
+            listItem.id = decodeURI(item.nativeURL);
             listItem.name = item.name;
             listItem.addEventListener('click', function () {
-                createEditorFromURI.bind()(this.id).then(() => {
+                createEditorFromURI(this.id).then(() => {
                     sidebar.hide();
                 });
             });
@@ -119,8 +119,8 @@ function addFolder(folder, sidebar, index) {
                 }
                 navigator.vibrate(50);
                 dialogs.select(this.name, [
-                    ['copy', strings.copy, 'file-control clipboard'],
-                    ['cut', strings.cut, 'file-control edit-cut'],
+                    ['copy', strings.copy, 'copy'],
+                    ['cut', strings.cut, 'edit'],
                     ['delete', strings.delete, 'delete'],
                     ['rename', strings.rename, 'edit']
                 ]).then(res => {
@@ -132,11 +132,12 @@ function addFolder(folder, sidebar, index) {
 
         function createFolderTile(rootNode, item) {
             const name = item.name;
-            const node = graph[item.nativeURL] || list.collaspable(name, true, 'folder');
+            const nurl = decodeURI(item.nativeURL);
+            const node = graph[nurl] || list.collaspable(name, true, 'folder');
 
             node.textConten = '';
             node.titleEl.type = 'dir';
-            node.titleEl.id = item.nativeURL;
+            node.titleEl.id = nurl;
             node.titleEl.name = name;
 
             node.titleEl.oncontextmenu = function (e) {
@@ -145,19 +146,19 @@ function addFolder(folder, sidebar, index) {
                 }
                 navigator.vibrate(50);
                 dialogs.select(this.name, [
-                    ['copy', strings.copy, 'file-control clipboard'],
-                    ['cut', strings.cut, 'file-control edit-cut'],
-                    ['new folder', strings['new folder'], 'file-control folder-outline-add'],
-                    ['new file', strings['new file'], 'file-control document-add'],
-                    ['paste', strings.paste, 'file-control clipboard'],
+                    ['copy', strings.copy, 'copy'],
+                    ['cut', strings.cut, 'cut'],
+                    ['new folder', strings['new folder'], 'folder-add'],
+                    ['new file', strings['new file'], 'document-add'],
+                    ['paste', strings.paste, 'paste'],
                     ['rename', strings.rename, 'edit'],
                     ['delete', strings['delete'], 'delete']
                 ]).then(res => {
                     onSelect(res, this);
                 });
             };
-            graph[item.nativeURL] = node;
-            rootNode.addListTile(plotFolder(item.nativeURL, node));
+            graph[nurl] = node;
+            rootNode.addListTile(plotFolder(nurl, node));
         }
 
         function onSelect(selectedOption, obj) {
@@ -198,7 +199,7 @@ function addFolder(folder, sidebar, index) {
                         fs.renameFile(obj.id, newname)
                             .then((parent) => {
                                 success();
-                                let newid = parent.nativeURL + encodeURI(newname);
+                                let newid = decodeURI(parent.nativeURL) + newname;
                                 if (obj.type === 'file') {
 
                                     const editor = editorManager.getFile(obj.id);
@@ -251,7 +252,7 @@ function addFolder(folder, sidebar, index) {
                         window.resolveLocalFileSystemURL(obj.id, parent => {
                             obj = obj.parentElement;
 
-                            window.resolveLocalFileSystemURL(parent.nativeURL + fs.name, res => {
+                            window.resolveLocalFileSystemURL(decodeURI(parent.nativeURL) + fs.name, res => {
                                 dialogs.prompt(strings['enter file name'], fs.name, 'filename', {
                                         required: true,
                                         match: constants.FILE_NAME_REGEX
@@ -284,7 +285,7 @@ function addFolder(folder, sidebar, index) {
                 case 'new file':
                 case 'new folder':
                     const ask = selectedOption === 'new file' ? strings['enter file name'] : strings['enter folder name'];
-                    dialogs.prompt(ask, selectedOption, 'filename', {
+                    dialogs.prompt(ask, strings[selectedOption], 'filename', {
                         match: constants.FILE_NAME_REGEX,
                         required: true
                     }).then(filename => {
@@ -295,7 +296,7 @@ function addFolder(folder, sidebar, index) {
                                     exclusive: true
                                 }, res => {
                                     success();
-                                    reload(fs.nativeURL);
+                                    reload(decodeURI(fs.nativeURL));
                                 }, error);
                             } else {
                                 fs.getFile(filename, {
@@ -303,7 +304,7 @@ function addFolder(folder, sidebar, index) {
                                     exclusive: true
                                 }, res => {
                                     success();
-                                    reload(fs.nativeURL);
+                                    reload(decodeURI(fs.nativeURL));
                                 }, error);
                             }
                         });
@@ -330,7 +331,7 @@ function addFolder(folder, sidebar, index) {
                     } else {
                         success();
                         if (action === "moveTo") deleteFolder(el.parentElement.querySelector('ul'));
-                        reload(parent.nativeURL);
+                        reload(decodeURI(parent.nativeURL));
                     }
                     clearTimeout(timeout);
                     document.body.classList.remove('loading');

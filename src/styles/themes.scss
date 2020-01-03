@@ -6,14 +6,17 @@ $lightText : #333e59;
 
     header,
     .prompt,
-    #sidenav {
+    .prompt .loader,
+    #sidenav,
+    .context-menu {
         background-color: white;
 
-        span,
+        .list .tile :nth-child(2),
+        span:not(.error-msg),
         i,
         button,
         strong {
-            color: $lightText !important;
+            color: $lightText;
         }
     }
 
@@ -22,16 +25,16 @@ $lightText : #333e59;
     }
 
     #sidenav {
-        li.active {
+        .list .tile.active {
             span:nth-child(2) {
-                color: gold !important;
+                color: gold;
             }
         }
     }
 
     .icon.float {
-        background-color: white !important;
-        color: $lightText !important;
+        background-color: white;
+        color: $lightText;
     }
 
     footer {
@@ -46,7 +49,16 @@ $lightText : #333e59;
     .button-container {
         button {
             background-color: white;
-            color: $lightText !important;
+            color: $lightText;
+
+            &:active {
+                transition: all 100ms ease;
+                background-color: darken($color: white, $amount: 20)
+            }
+
+            &:disabled {
+                opacity: 0.6;
+            }
         }
 
         textarea,
@@ -56,7 +68,13 @@ $lightText : #333e59;
         }
 
         input::placeholder {
-            color: #757b88 !important;
+            color: #757b88;
+        }
+    }
+
+    .prompt {
+        .message.loader .loader {
+            border: solid 4px $primary;
         }
     }
 }
@@ -66,18 +84,7 @@ $pageBgDark: #252525;
 $textDark : white;
 
 .theme-dark {
-    background-color: $pageBgDark !important;
-
-    body {
-        &.loading {
-
-            &.splash {
-                &::before {
-                    background-color: $bgDark;
-                }
-            }
-        }
-    }
+    background-color: $pageBgDark;
 
     .ace_prompt_wrapper {
         .ace_prompt_container {
@@ -85,19 +92,36 @@ $textDark : white;
         }
 
         .ace_editor {
-            background-color: $bgDark !important;
-            color: $textDark !important;
+            background-color: $bgDark;
+            color: $textDark;
 
             box-shadow: none;
             border: none;
 
             .ace_cursor {
-                color: white !important;
+                color: white;
             }
         }
 
         .ace_active-line {
-            background-color: $pageBgDark !important;
+            background-color: $pageBgDark;
+        }
+    }
+
+    .hr {
+
+        &::after,
+        &::before {
+            background-color: #ccc;
+        }
+    }
+
+    input {
+        border-bottom: solid 1px currentColor;
+        color: $textDark;
+
+        &::placeholder {
+            color: #757b88;
         }
     }
 
@@ -108,19 +132,15 @@ $textDark : white;
     }
 
     .page {
-        background-color: $pageBgDark !important;
-
-        .dir-list .folder {
-            color: rgb(144, 255, 93);
-        }
+        background-color: $pageBgDark;
 
         a,
         button,
         small,
         div,
         span:not(.icon) {
-            color: white !important;
-            border-color: #fff2 !important;
+            color: white;
+            border-color: #fff2;
         }
     }
 
@@ -147,38 +167,43 @@ $textDark : white;
         background-color: $bgDark;
 
         li,
-        span,
+        span:not(.error-msg),
         i,
         button {
             color: $textDark;
+
+            &::after,
+            &::before {
+                color: $textDark;
+            }
         }
     }
 
     .context-menu {
         li.disabled span {
-            color: #999 !important;
+            color: #999;
         }
 
         hr {
-            color: #4a4a4a !important;
+            color: #4a4a4a;
         }
     }
 
     .prompt ul li.selected span {
-        color: $textSecondry !important;
+        color: $textSecondry;
     }
 
     #sidenav {
         li.active {
             span:nth-child(2) {
-                color: gold !important;
+                color: gold;
             }
         }
     }
 
     .icon.float {
-        background-color: $bgDark !important;
-        color: $textDark !important;
+        background-color: $bgDark;
+        color: $textDark;
     }
 
     footer {
@@ -188,16 +213,16 @@ $textDark : white;
     .button-container {
         button {
             background-color: $bgDark;
-            color: $textDark !important;
-        }
-
-        input {
             color: $textDark;
-            border-color: currentColor;
-        }
 
-        input::placeholder {
-            color: #757b88 !important;
+            &:active {
+                transition: all 100ms ease;
+                background-color: darken($color: $bgDark, $amount: 20)
+            }
+
+            &:disabled {
+                opacity: 0.6;
+            }
         }
     }
 }
