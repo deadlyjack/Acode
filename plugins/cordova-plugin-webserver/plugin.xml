@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
+    id="cordova-plugin-webserver"
+    version="1.1.0">
+  <engines>
+    <engine name="cordova" version=">=6.5.0" />
+  </engines>
+
+  <name>Webserver for Cordova Apps</name>
+  <keywords>webserver,cordova,http, request, response,server</keywords>
+  <repo>https://github.com/bykof/cordova-plugin-webserver</repo>
+  <issue>https://github.com/bykof/cordova-plugin-webserver/issues</issue>
+
+  <js-module src="webserver.js" name="webserver">
+    <clobbers target="webserver" />
+  </js-module>
+
+  <platform name="android">
+    <framework src="org.nanohttpd:nanohttpd:+" />
+    <source-file src="src/android/Webserver.java" target-dir="src/org/apache/cordova/plugin"/>
+    <source-file src="src/android/NanoHTTPDWebserver.java" target-dir="src/org/apache/cordova/plugin"/>
+    <config-file target="config.xml" parent="/*">
+      <feature name="Webserver">
+        <param name="android-package" value="org.apache.cordova.plugin.Webserver"/>
+      </feature>
+    </config-file>
+  </platform>
+
+  <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+      <feature name="Webserver">
+        <param name="ios-package" value="Webserver" />
+      </feature>
+    </config-file>
+
+    <source-file src="src/ios/Webserver.swift" />
+    <source-file src="src/ios/SynchronizedDictionary.swift" />
+    <dependency id="cordova-plugin-add-swift-support" version="2.0.2"/>
+
+    <framework src="libz.tbd" />
+    <framework src="libxml2.tbd" />
+
+    <podspec>
+      <config>
+        <source url="https://github.com/CocoaPods/Specs.git"/>
+      </config>
+      <pods use-frameworks="true">
+        <pod name="GCDWebServer" spec="~> 3.5.2"/>
+      </pods>
+    </podspec>
+    
+    <!-- GCDWebserver -->
+    <header-file src="src/ios/GCDWebServer-Bridging-Header.h" type="BridgingHeader"/>
+
+  </platform>
+</plugin>

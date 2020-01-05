@@ -142,5 +142,13 @@
     },
     "is_top_level": true,
     "variables": {}
+  },
+  "cordova-plugin-webserver": {
+    "source": {
+      "type": "registry",
+      "id": "https://github.com/bykof/cordova-plugin-webserver"
+    },
+    "is_top_level": true,
+    "variables": {}
   }
 }

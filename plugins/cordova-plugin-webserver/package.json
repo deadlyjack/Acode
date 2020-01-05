@@ -1,0 +1,76 @@
+{
+  "_from": "git+https://github.com/bykof/cordova-plugin-webserver.git",
+  "_id": "cordova-plugin-webserver@1.0.1",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/cordova-plugin-webserver",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "https://github.com/bykof/cordova-plugin-webserver",
+    "rawSpec": "https://github.com/bykof/cordova-plugin-webserver",
+    "saveSpec": "git+https://github.com/bykof/cordova-plugin-webserver.git",
+    "fetchSpec": "https://github.com/bykof/cordova-plugin-webserver.git",
+    "gitCommittish": null
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "git+https://github.com/bykof/cordova-plugin-webserver.git#3cba720a64269e7169b655cc7eb62f5cfaedbb59",
+  "_spec": "https://github.com/bykof/cordova-plugin-webserver",
+  "_where": "/mnt/sda1/cordova/code editor",
+  "author": {
+    "name": "Michael Bykovski"
+  },
+  "browser": {
+    "cordova": false
+  },
+  "bugs": {
+    "url": "https://github.com/bykof/cordova-plugin-webserver/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova-plugin-webserver",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "dependencies": {
+    "universal-router": "^5.1.0"
+  },
+  "deprecated": false,
+  "description": "Cordova Plugin Webserver",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "cordova": "^8.0.0"
+  },
+  "homepage": "https://github.com/bykof/cordova-plugin-webserver/",
+  "keywords": [
+    "cordova",
+    "ios",
+    "android",
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova:plugin",
+    "webserver",
+    "http",
+    "request",
+    "response"
+  ],
+  "license": "Apache-2.0",
+  "name": "cordova-plugin-webserver",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bykof/cordova-plugin-webserver.git"
+  },
+  "scripts": {
+    "build": "./node_modules/babel-cli/bin/babel.js src/www/webserver.js --out-file webserver.js"
+  },
+  "version": "1.0.1"
+}

@@ -47,10 +47,10 @@ function addFolder(folder, sidebar, index) {
             }
             navigator.vibrate(50);
             dialogs.select(name, [
-                ['new folder', strings['new folder'], 'file-control folder-outline-add'],
-                ['new file', strings['new file'], 'file-control document-add'],
-                ['paste', strings.paste, 'file-control clipboard'],
-                ['reload', strings.reload, 'loop']
+                ['new folder', strings['new folder'], 'folder-add'],
+                ['new file', strings['new file'], 'document-add'],
+                ['paste', strings.paste, 'paste'],
+                ['reload', strings.reload, 'refresh']
             ]).then(res => {
                 if (res === 'reload') {
                     reload();

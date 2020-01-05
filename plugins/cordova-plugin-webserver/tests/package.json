@@ -1,0 +1,14 @@
+{
+  "name": "cordova-plugin-webserver-tests",
+  "version": "1.0.0",
+  "description": "",
+  "cordova": {
+    "id": "cordova-plugin-webserver-tests",
+    "platforms": []
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Michael Bykovski",
+  "license": "Apache 2.0"
+}

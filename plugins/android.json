@@ -55,6 +55,9 @@
     "cordova.plugins.diagnostic": {
       "ANDROID_SUPPORT_VERSION": "28.+",
       "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-webserver": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },
   "dependent_plugins": {

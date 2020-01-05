@@ -33,11 +33,6 @@ export default function settingsMain(demo) {
 
     if (!demo) {
         settingsOptions.push({
-            key: 'previewMode',
-            text: strings['preview mode'],
-            subText: value.previewMode === 'none' ? strings['not set'] : value.previewMode,
-            icon: 'play_circle_filled'
-        }, {
             key: 'editor',
             text: strings['editor settings'],
             icon: 'text_format'
@@ -77,23 +72,6 @@ export default function settingsMain(demo) {
                             window.beforeClose();
                             location.reload();
                         };
-                    });
-                break;
-
-            case 'previewMode':
-                dialogs.select(this.text, [
-                        ['none', strings['not set']],
-                        'mobile',
-                        'desktop'
-                    ], {
-                        default: value.previewMode
-                    })
-                    .then(res => {
-                        if (res === value.previewMode) return;
-                        appSettings.value.previewMode = res;
-                        appSettings.update();
-                        if (res === 'none') res = strings['not set'];
-                        this.changeSubText(res);
                     });
                 break;
 

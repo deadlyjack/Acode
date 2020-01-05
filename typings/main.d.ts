@@ -29,7 +29,7 @@ interface Settings {
     linenumbers: boolean,
     beautify: Array<string>,
     linting: boolean,
-    previewMode: 'mobile' | 'desktop' | 'none',
+    previewMode: 'browser' | 'in app' | 'none',
     showSpaces: boolean
 }
 

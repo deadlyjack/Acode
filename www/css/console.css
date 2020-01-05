@@ -163,7 +163,7 @@ c-text {
     overflow: auto;
     box-sizing: border-box;
     max-width: 100vw;
-    font-size: 0.9;
+    font-size: 0.9em;
 }
 
 c-text.__c-boolean {

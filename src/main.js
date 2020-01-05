@@ -82,7 +82,8 @@ function Main() {
     const permissions = cordova.plugins.permissions;
     const requiredPermissions = [
       permissions.WRITE_EXTERNAL_STORAGE,
-      permissions.WRITE_MEDIA_STORAGE
+      permissions.WRITE_MEDIA_STORAGE,
+      permissions.MANAGE_DOCUMENTS
     ];
 
     requiredPermissions.map((permission, i) => {
@@ -631,93 +632,91 @@ function runPreview() {
   const activeFile = editorManager.activeFile;
   if (activeFile.fileUri) {
     let uri = activeFile.fileUri;
-    window.resolveLocalFileSystemURL(uri, entry => {
-      if (entry.isDirectory) return;
-      entry.getParent(parent => {
-        fs.readFile(uri)
-          .then(res => {
-            const decoder = new TextDecoder('utf-8');
-            const url = `${cordova.file.applicationDirectory}www/js/injection.build.js`;
-            let text = decoder.decode(res.data);
-            fs.readFile(url)
-              .then(res => {
-                let js = decoder.decode(res.data);
-                let code = js;
-                let css, codes = [];
-                js = `<script>${js}</script>`;
-                text = text.split('<head>');
-                text = `${text[0]}<head>${js}${text[1]}`;
-                const name = decodeURI(parent.nativeURL) + '.run_' + entry.name;
-                fs.readFile(`${cordova.file.applicationDirectory}www/css/console.css`)
-                  .then(res => {
-                    css = decoder.decode(res.data);
-                    return fs.readFile(`${cordova.file.applicationDirectory}www/js/codeflask.min.js`);
-                  })
-                  .then(res => {
-                    codes.push(decoder.decode(res.data));
-                    return fs.readFile(`${cordova.file.applicationDirectory}www/js/esprisma.js`);
-                  })
-                  .then(res => {
-                    codes.push(decoder.decode(res.data));
-                    return fs.writeFile(name, text, true, false);
-                  })
-                  .then(() => {
-                    run(name, code, codes, css);
-                  });
-              });
-          });
-      })
-    });
+    run(uri);
   } else {
     alert(strings.warning.toUpperCase(), strings['save file to run']);
   }
 
-  function run(uri, code, codes, style) {
-    const mode = appSettings.value.previewMode;
-    if (mode === 'none') {
-      dialogs.select('Select mode', ['desktop', 'mobile'])
-        .then(mode => {
-          _run(mode);
-        });
-    } else {
-      _run(mode);
+  function run(uri) {
+    const uriAr = uri.split('/');
+    const filename = uriAr.pop();
+    const path = uriAr.join('/');
+    const decoder = new TextDecoder('utf-8');
+    openServer();
+
+    function openServer() {
+      webserver.start(() => {
+        openBrowser();
+      }, err => {
+        if (err === "Server already running") {
+          openBrowser();
+        }
+      }, 8080);
+
+      webserver.onRequest(req => {
+        const reqPath = req.path;
+        const assets = `${cordova.file.applicationDirectory}www`;
+        if (reqPath === '/_console.js') {
+          const url = `${assets}/js/injection.build.js`;
+          sendFileContent(url, req.requestId, 'application/javascript');
+        } else if (reqPath === '/_esprisma.js') {
+          const url = `${assets}/js/esprisma.js`;
+          sendFileContent(url, req.requestId, 'application/javascript');
+        } else if (reqPath === '/_codeflask.js') {
+          const url = `${assets}/js/codeflask.min.js`;
+          sendFileContent(url, req.requestId, 'application/javascript');
+        } else if (reqPath === '/_console.css') {
+          const url = `${assets}/css/console.css`;
+          sendFileContent(url, req.requestId, 'text/css');
+        } else if (helpers.getExt(reqPath) === 'html') {
+          fs.readFile(path + reqPath)
+            .then(res => {
+              let text = decoder.decode(res.data);
+              const js = `<script src="_console.js"></script><script src="_esprisma.js"></script><script src="_codeflask.js"></script><link rel="stylesheet" href="_console.css">`;
+              text = text.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
+              text = text.split('<head>');
+              text = `${text[0]}<head>${js}${text[1]}`;
+
+              sendText(text, req.requestId);
+            })
+        } else {
+          sendFile(path.replace('file://', '') + reqPath, req.requestId);
+        }
+      });
     }
 
-    function _run(mode) {
+    function sendFile(path, id) {
+      webserver.sendResponse(id, {
+        status: 200,
+        path,
+        headers: {}
+      });
+    }
+
+    function sendFileContent(url, id, mimeType) {
+      fs.readFile(url)
+        .then(res => {
+          const text = decoder.decode(res.data);
+          sendText(text, id, mimeType);
+        })
+    }
+
+    function sendText(text, id, mimeType) {
+      webserver.sendResponse(id, {
+        status: 200,
+        body: text,
+        headers: {
+          'Content-Type': mimeType || 'text/html'
+        }
+      });
+    }
+
+    function openBrowser() {
       const theme = appSettings.value.appTheme;
-      const useDesktop = mode === 'desktop' ? 'yes' : 'no';
       const themeColor = theme === 'default' ? '#9999ff' : theme === 'dark' ? '#313131' : '#ffffff';
       const color = theme === 'light' ? '#9999ff' : '#ffffff';
-      const options = `location=yes,hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,useWideViewPort=${useDesktop},toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
-      const ref = cordova.InAppBrowser.open(uri, '_blank', options);
-      ref.addEventListener('loadstart', function () {
-        ref.executeScript({
-          code
-        });
-        ref.executeScript({
-          code: `
-            if(!window.consoleLoaded){
-              window.addEventListener('error', function(err){
-                console.error(err);
-              })
-            }
-            sessionStorage.setItem('_$mode', '${mode}');
-          `
-        });
-      });
-
-      ref.addEventListener('loadstop', function () {
-        ref.insertCSS({
-          code: style
-        });
-        ref.executeScript({
-          code: codes.join(';')
-        });
-      });
-
-      ref.addEventListener('exit', function () {
-        fs.deleteFile(uri);
-      });
+      const options = `location=yes,hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
+      window.open('http://localhost:8080/' + filename, '_system', options);
     }
   }
 }

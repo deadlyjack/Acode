@@ -397,8 +397,9 @@
 
         if (clean) {
             const stack = document.createElement('c-stack');
+            clean = decodeURI(clean.replace('.run_', '').replace(/\)$/, '').replace(location.origin, ''));
             clean = clean.length > 35 ? '...' + clean.substr(clean.length - 32) : clean;
-            stack.textContent = clean.replace('.run_', '').replace(/\)$/, '');
+            stack.textContent = clean;
             messages.appendChild(stack);
         } else if (mode === 'code') {
             messages.style.marginBottom = '0';

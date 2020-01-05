@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+  id="cordova-plugin-webserver-tests"
+  version="1.0.0">
+  <name>Cordova Plugin Webserver Tests</name>
+  <license>Apache 2.0</license>
+
+  <js-module src="tests.js" name="tests">
+  </js-module>
+</plugin>
