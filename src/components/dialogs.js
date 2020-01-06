@@ -575,6 +575,54 @@ function loaderHide() {
     }, 300);
 }
 
+/**
+ * 
+ * @param {string} titleText 
+ * @param {string} html 
+ */
+function box(titleText, html) {
+    const box = tag('div', {
+        className: 'prompt box',
+        children: [
+            tag('strong', {
+                className: 'title',
+                textContent: titleText
+            }),
+            tag('div', {
+                className: 'message',
+                innerHTML: html
+            })
+        ]
+    });
+    const mask = tag('span', {
+        className: 'mask',
+        onclick: hide
+    });
+
+    actionStack.push({
+        id: 'box',
+        action: hideSelect
+    });
+
+    document.body.append(box, mask);
+
+    window.restoreTheme(true);
+
+    function hideSelect() {
+        box.classList.add('hide');
+        window.restoreTheme();
+        setTimeout(() => {
+            document.body.removeChild(box);
+            document.body.removeChild(mask);
+        }, 300);
+    }
+
+    function hide() {
+        actionStack.remove('box');
+        hideSelect();
+    }
+}
+
 export default {
     prompt,
     multiPrompt,
@@ -582,5 +630,6 @@ export default {
     confirm,
     select,
     loaderShow,
-    loaderHide
+    loaderHide,
+    box
 };

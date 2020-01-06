@@ -36,6 +36,7 @@ interface Settings {
 interface AppSettings {
     value: Settings;
     update(settings?: String): void;
+    defaultSettings: Settings;
     reset(): void;
     onload: () => void;
     onsave: () => void;

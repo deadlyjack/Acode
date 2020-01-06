@@ -3,7 +3,6 @@ import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
 import fs from '../../modules/utils/androidFileSystem';
-import tile from '../../components/tile';
 import helpers from '../../modules/helpers';
 import contextMenu from '../../components/contextMenu';
 import dialogs from '../../components/dialogs';

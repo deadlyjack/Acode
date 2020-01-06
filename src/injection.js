@@ -76,13 +76,17 @@
         }
     }
 
+
     window.consoleLoaded = true;
 
     function loadConsole() {
         if (sessionStorage.getItem('__mode') === 'console') {
             toggleConsole();
         } else {
-            document.body.appendChild(toggler);
+            setInterval(() => {
+                if (!toggler.isConnected)
+                    document.body.appendChild(toggler);
+            }, 1000);
         }
         const allMetas = document.querySelectorAll('meta');
 

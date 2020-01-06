@@ -109,6 +109,9 @@ function addFolder(folder, sidebar, index) {
             listItem.id = decodeURI(item.nativeURL);
             listItem.name = item.name;
             listItem.addEventListener('click', function () {
+                if (appSettings.defaultSettings.filesNotAllowed.includes(helpers.getExt(this.name))) {
+                    return alert(strings.notice, `'${ext}' ${strings['file is not supported']}`);
+                }
                 createEditorFromURI(this.id).then(() => {
                     sidebar.hide();
                 });

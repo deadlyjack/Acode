@@ -1,4 +1,4 @@
-import FileBrowser from '../page/fileBrowser/fileBrowser';
+import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import dialogs from '../components/dialogs';
 import helpers from "./helpers";
 import fs from './utils/androidFileSystem';

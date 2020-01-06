@@ -1,6 +1,6 @@
 import saveFile from "../saveFile";
 import tag from 'html-tag-js';
-import searchSettings from "../../page/settings/searchSettings";
+import searchSettings from "../../pages/settings/searchSettings";
 
 /**
  * 
@@ -73,7 +73,12 @@ function quickToolAction(e, footer, row1, row2, search) {
             break;
 
         case 'undo':
-            editor.undo();
+            if (editor.session.getUndoManager().hasUndo()) {
+                editor.undo();
+            } else {
+                editorManager.activeFile.isUnsaved = false;
+                editorManager.onupdate();
+            }
             break;
 
         case 'redo':

@@ -12,6 +12,7 @@ import './styles/overideAceStyle.scss';
 import "core-js/stable";
 import tag from 'html-tag-js';
 import mustache from 'mustache';
+import mimeType from 'mime-types';
 import tile from "./components/tile";
 import sidenav from './components/sidenav';
 import contextMenu from './components/contextMenu';
@@ -630,94 +631,145 @@ function restoreTheme(darken) {
 
 function runPreview() {
   const activeFile = editorManager.activeFile;
-  if (activeFile.fileUri) {
-    let uri = activeFile.fileUri;
-    run(uri);
-  } else {
-    alert(strings.warning.toUpperCase(), strings['save file to run']);
+
+  const filename = activeFile.filename;
+  const path = activeFile.location;
+  const decoder = new TextDecoder('utf-8');
+
+  webserver.start(() => {
+    openBrowser();
+  }, err => {
+    if (err === "Server already running") {
+      openBrowser();
+    } else {
+      console.log(err);
+    }
+  }, 8080);
+
+  webserver.onRequest(req => {
+    let reqPath = req.path;
+    const assets = `${cordova.file.applicationDirectory}www`;
+
+    if (reqPath === '/') {
+      reqPath = 'index.html';
+    }
+
+    if (reqPath === '/_console.js') {
+      const url = `${assets}/js/injection.build.js`;
+      sendFileContent(url, req.requestId, 'application/javascript');
+    } else if (reqPath === '/_esprisma.js') {
+      const url = `${assets}/js/esprisma.js`;
+      sendFileContent(url, req.requestId, 'application/javascript');
+    } else if (reqPath === '/_codeflask.js') {
+      const url = `${assets}/js/codeflask.min.js`;
+      sendFileContent(url, req.requestId, 'application/javascript');
+    } else if (reqPath === '/_console.css') {
+      const url = `${assets}/css/console.css`;
+      sendFileContent(url, req.requestId, 'text/css');
+    } else if (helpers.getExt(reqPath) === 'html') {
+      if (reqPath === '/' + filename && (activeFile.isUnsaved || !activeFile.location || activeFile.type === 'git')) {
+        sendHTML(activeFile.session.getValue(), req.requestId);
+      } else {
+        fs.readFile(path + reqPath)
+          .then(res => {
+            let text = decoder.decode(res.data);
+            sendHTML(text, req.requestId);
+          });
+      }
+    } else {
+      if (activeFile.type === 'git') {
+        const cache = cordova.file.cacheDirectory;
+        const uri = cache + activeFile.record.sha + encodeURIComponent(reqPath) + '.' + helpers.getExt(reqPath);
+
+        window.resolveLocalFileSystemURL(uri, () => {
+          sendFile(uri.replace('file://', ''), req.requestId);
+        }, err => {
+          if (err.code === 1) {
+            git.getGitFile(activeFile.record, reqPath.slice(1))
+              .then(res => {
+                const data = helpers.b64toBlob(res, mimeType.lookup(reqPath));
+                fs.writeFile(uri, data, true, false)
+                  .then(() => {
+                    sendFile(uri.replace('file://', ''), req.requestId);
+                  })
+                  .catch(err => {
+                    if (err.code) dialogs.alert(strings.error, helpers.getErrorMessage(err.code));
+                    console.log(err);
+                  });
+              })
+              .catch(err => {
+                console.log(err);
+                error();
+              })
+          } else {
+            error();
+          }
+        });
+      } else {
+        if (path) sendFile(path.replace('file://', '') + reqPath, req.requestId);
+        else error();
+      }
+    }
+
+    function error() {
+      webserver.sendResponse(req.requestId, {
+        status: 404
+      });
+    }
+  });
+
+  /**
+   * 
+   * @param {string} text 
+   * @param {string} id 
+   */
+  function sendHTML(text, id) {
+    const js = `<script src="_console.js"></script><script src="_esprisma.js"></script><script src="_codeflask.js"></script><link rel="stylesheet" href="_console.css">`;
+    text = text.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
+    const part = text.split('<head>');
+    if (part.length === 2) {
+      text = `${part[0]}<head>${js}${part[1]}`;
+    } else if (/<html>/i.test(text)) {
+      text = text.replace('<html>', `<head>${js}</head>`)
+    } else {
+      text = `<head>${js}</head>` + text;
+    }
+
+    sendText(text, id);
   }
 
-  function run(uri) {
-    const uriAr = uri.split('/');
-    const filename = uriAr.pop();
-    const path = uriAr.join('/');
-    const decoder = new TextDecoder('utf-8');
-    openServer();
+  function sendFile(path, id) {
+    webserver.sendResponse(id, {
+      status: 200,
+      path,
+      headers: {}
+    });
+  }
 
-    function openServer() {
-      webserver.start(() => {
-        openBrowser();
-      }, err => {
-        if (err === "Server already running") {
-          openBrowser();
-        }
-      }, 8080);
+  function sendFileContent(url, id, mimeType) {
+    fs.readFile(url)
+      .then(res => {
+        const text = decoder.decode(res.data);
+        sendText(text, id, mimeType);
+      })
+  }
 
-      webserver.onRequest(req => {
-        const reqPath = req.path;
-        const assets = `${cordova.file.applicationDirectory}www`;
-        if (reqPath === '/_console.js') {
-          const url = `${assets}/js/injection.build.js`;
-          sendFileContent(url, req.requestId, 'application/javascript');
-        } else if (reqPath === '/_esprisma.js') {
-          const url = `${assets}/js/esprisma.js`;
-          sendFileContent(url, req.requestId, 'application/javascript');
-        } else if (reqPath === '/_codeflask.js') {
-          const url = `${assets}/js/codeflask.min.js`;
-          sendFileContent(url, req.requestId, 'application/javascript');
-        } else if (reqPath === '/_console.css') {
-          const url = `${assets}/css/console.css`;
-          sendFileContent(url, req.requestId, 'text/css');
-        } else if (helpers.getExt(reqPath) === 'html') {
-          fs.readFile(path + reqPath)
-            .then(res => {
-              let text = decoder.decode(res.data);
-              const js = `<script src="_console.js"></script><script src="_esprisma.js"></script><script src="_codeflask.js"></script><link rel="stylesheet" href="_console.css">`;
-              text = text.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
-              text = text.split('<head>');
-              text = `${text[0]}<head>${js}${text[1]}`;
+  function sendText(text, id, mimeType) {
+    webserver.sendResponse(id, {
+      status: 200,
+      body: text,
+      headers: {
+        'Content-Type': mimeType || 'text/html'
+      }
+    });
+  }
 
-              sendText(text, req.requestId);
-            })
-        } else {
-          sendFile(path.replace('file://', '') + reqPath, req.requestId);
-        }
-      });
-    }
-
-    function sendFile(path, id) {
-      webserver.sendResponse(id, {
-        status: 200,
-        path,
-        headers: {}
-      });
-    }
-
-    function sendFileContent(url, id, mimeType) {
-      fs.readFile(url)
-        .then(res => {
-          const text = decoder.decode(res.data);
-          sendText(text, id, mimeType);
-        })
-    }
-
-    function sendText(text, id, mimeType) {
-      webserver.sendResponse(id, {
-        status: 200,
-        body: text,
-        headers: {
-          'Content-Type': mimeType || 'text/html'
-        }
-      });
-    }
-
-    function openBrowser() {
-      const theme = appSettings.value.appTheme;
-      const themeColor = theme === 'default' ? '#9999ff' : theme === 'dark' ? '#313131' : '#ffffff';
-      const color = theme === 'light' ? '#9999ff' : '#ffffff';
-      const options = `location=yes,hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
-      window.open('http://localhost:8080/' + filename, '_system', options);
-    }
+  function openBrowser() {
+    const theme = appSettings.value.appTheme;
+    const themeColor = theme === 'default' ? '#9999ff' : theme === 'dark' ? '#313131' : '#ffffff';
+    const color = theme === 'light' ? '#9999ff' : '#ffffff';
+    const options = `location=yes,hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
+    window.open('http://localhost:8080/' + filename, '_system', options);
   }
 }
 //#endregion

@@ -34,7 +34,7 @@ class Settings {
                 sortByName: 'off'
             },
             maxFileSize: 5,
-            filesNotAllowed: ['zip', 'apk', 'doc', 'docx', 'mp3', 'mp4', 'avi', 'flac', 'mov', 'png', 'jpg', 'jpeg', 'rar', 'pdf', 'gif'],
+            filesNotAllowed: ['zip', 'apk', 'doc', 'docx', 'mp3', 'mp4', 'avi', 'flac', 'mov', 'rar', 'pdf', 'gif'],
             search: {
                 caseSensitive: false,
                 regExp: false,

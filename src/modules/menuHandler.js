@@ -1,14 +1,14 @@
-import settingsMain from "../page/settings/mainSettings";
+import settingsMain from "../pages/settings/mainSettings";
 import createEditorFromURI from "./createEditorFromURI";
 import addFolder from "./addFolder";
 import helpers from "./helpers";
 import constants from "../constants";
 import saveFile from "./saveFile";
-import help from "../page/help";
+import help from "../pages/help";
 import dialogs from "../components/dialogs";
-import FileBrowser from "../page/fileBrowser/fileBrowser";
-import GithubLogin from "../page/login/login";
-import gitHub from "../page/github/gitHub";
+import FileBrowser from "../pages/fileBrowser/fileBrowser";
+import GithubLogin from "../pages/login/login";
+import gitHub from "../pages/github/gitHub";
 
 export default {
     newFile: function () {
@@ -30,7 +30,7 @@ export default {
         FileBrowser('file', function (uri) {
                 const ext = helpers.getExt(uri);
 
-                if (appSettings.value.filesNotAllowed.includes((ext || '').toLowerCase())) {
+                if (appSettings.defaultSettings.filesNotAllowed.includes((ext || '').toLowerCase())) {
                     alert(strings.notice.toUpperCase(), `'${ext}' ${strings['file is not supported']}`);
                     return false;
                 }

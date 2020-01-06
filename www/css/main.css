@@ -225,6 +225,9 @@ input {
     margin: auto 15px;
     opacity: 0.5; }
 
+.d-none {
+  display: none !important; }
+
 @-webkit-keyframes move-around {
   0% {
     -webkit-transform: scaleX(1) translate3d(-100px, 0, 0);
@@ -812,11 +815,6 @@ header {
     .context-menu li .icon {
       pointer-events: none;
       color: #99f; }
-      .context-menu li .icon.save.notice::after {
-        content: '*';
-        font-size: 1em;
-        top: 0;
-        right: 0; }
     .context-menu li.disabled {
       pointer-events: none;
       color: #999 !important; }
@@ -923,8 +921,14 @@ header {
       min-height: 40px;
       padding: 10px 10px 0 10px; }
   .prompt .message {
-    word-break: break-all;
-    word-wrap: break-word; }
+    overflow: auto;
+    font-size: 0.9em; }
+    .prompt .message img {
+      max-width: 100%;
+      max-height: 100%;
+      margin: auto;
+      display: -webkit-box;
+      display: flex; }
     .prompt .message.loader {
       display: -webkit-box;
       display: flex;
@@ -960,8 +964,8 @@ header {
         display: flex;
         -webkit-box-align: center;
         align-items: center;
-        word-break: break-all;
-        word-wrap: break-word; }
+        overflow: auto;
+        font-size: 0.9em; }
     .prompt .message .message, .prompt .message:not(.loader) {
       color: white;
       padding: 10px;

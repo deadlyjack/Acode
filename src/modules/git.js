@@ -119,6 +119,9 @@ function Record(owner, sha, name, data, repo, path) {
     get repo() {
       return _record.repo;
     },
+    get owner() {
+      return _record.owner;
+    },
     set branch(str) {
       _record.branch = str;
     },
@@ -310,7 +313,33 @@ function GitRecord(obj) {
   };
 }
 
+/**
+ * 
+ * @param {GitFileRecord} record 
+ * @param {string} _path 
+ */
+function getGitFile(record, _path) {
+  const {
+    repo,
+    owner,
+    branch,
+    path
+  } = record;
+
+  const repository = gitHub().getRepo(owner, repo);
+  return new Promise((resolve, reject) => {
+    repository.getSha(branch, (path ? path + '/' : '') + _path)
+      .then(res => {
+        resolve(atob(res.data.content));
+      })
+      .catch(err => {
+        reject(err);
+      })
+  });
+}
+
 export default {
   init,
-  GitHub: gitHub
+  GitHub: gitHub,
+  getGitFile
 }

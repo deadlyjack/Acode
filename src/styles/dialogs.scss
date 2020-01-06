@@ -98,8 +98,15 @@
     }
 
     .message {
-        word-break: break-all;
-        word-wrap: break-word;
+        overflow: auto;
+        font-size: 0.9em;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            margin: auto;
+            display: flex;
+        }
 
         &.loader {
             display: flex;
@@ -128,8 +135,8 @@
             .message {
                 display: flex;
                 align-items: center;
-                word-break: break-all;
-                word-wrap: break-word;
+                overflow: auto;
+                font-size: 0.9em;
             }
         }
 

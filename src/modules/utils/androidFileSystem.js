@@ -20,7 +20,7 @@ function listDir(path) {
 /**
  * 
  * @param {string} filename 
- * @param {string} data
+ * @param {any} data
  * @param {boolean} create
  * @returns {Promise} 
  */

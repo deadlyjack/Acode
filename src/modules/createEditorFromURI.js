@@ -1,5 +1,9 @@
 import fs from "./utils/androidFileSystem";
 import helpers from "./helpers";
+import {
+    lookup
+} from 'mime-types';
+import dialogs from "../components/dialogs";
 
 export default createEditorFromURI;
 /**
@@ -34,10 +38,6 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
             index,
             timeout
         } = data;
-
-        if (settings.filesNotAllowed.includes(ext)) {
-            return alert(strings.notice, `'${ext}' ${strings['file is not supported']}`);
-        }
 
         const existingFile = editorManager.getFile(fileUri);
         if (existingFile) {
@@ -77,6 +77,14 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
                 const text = decoder.decode(data);
 
                 if (/[\x00-\x08\x0E-\x1F]/.test(text)) {
+                    if (/image/i.test(lookup(name))) {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(new Blob([data]));
+                        reader.onloadend = function () {
+                            dialogs.box(name, `<img src='${reader.result}'>`);
+                        }
+                        return;
+                    }
                     if (timeout) clearTimeout(timeout);
                     document.body.classList.remove('loading');
                     return alert(strings.error.toUpperCase(), strings['file not supported']);

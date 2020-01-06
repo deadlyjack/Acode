@@ -45,13 +45,6 @@
         .icon {
             pointer-events: none;
             color: $primary;
-
-            &.save.notice::after {
-                content: '*';
-                font-size: 1em;
-                top: 0;
-                right: 0;
-            }
         }
 
         &.disabled {
