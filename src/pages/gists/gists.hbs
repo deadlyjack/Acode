@@ -1,0 +1,21 @@
+<div class="main list" id="gists">
+  {{#.}}
+  <div class="list-item" action="gist" data-url="{{html_url}}" owner="{{owner.login}}" name="{{name}}" id="{{id}}">
+    <span class="octicon main-icon" {{#private}}private{{/private}}></span>
+    <div class="container">
+      <span class="text">{{name}}</span>
+      <small class="value">
+        <div class="group">
+          <span class="octicon octicon-file-code"></span>
+          <span class="text">{{files_count}}</span>
+        </div>
+        <div class="group">
+          <span class="octicon octicon-comment"></span>
+          <span class="text">{{comments}}</span>
+        </div>
+      </small>
+    </div>
+    <span class="icon open_in_browser" action="open"></span>
+  </div>
+  {{/.}}
+</div>

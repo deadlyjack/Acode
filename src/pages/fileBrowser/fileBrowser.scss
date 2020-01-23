@@ -34,17 +34,6 @@
           margin: auto 15px;
         }
       }
-
-      .icon {
-        &.file {
-          background-position: center;
-          background-size: 30px;
-        }
-
-        &.folder {
-          color: rgb(206, 206, 53);
-        }
-      }
     }
   }
 }

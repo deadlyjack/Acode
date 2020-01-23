@@ -273,6 +273,7 @@ function enableSingleMode(editor, controls, container, $content) {
         y: 0
     }
     $cm.innerHTML = '<span action="paste">paste</span><span action="select all">select all<span>';
+    editorManager.activeFile.controls = true;
     controls.update = updateEnd;
     controls.callBeforeContextMenu = callBeforeContextMenu;
 
@@ -327,6 +328,7 @@ function enableSingleMode(editor, controls, container, $content) {
     }
 
     function updateEnd() {
+        if (!editorManager.activeFile.controls) return controls.end.remove();
         const cursor = $cursor.getBoundingClientRect();
 
         cpos.x = cursor.right - 5;

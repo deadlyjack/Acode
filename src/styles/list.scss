@@ -127,7 +127,7 @@
             }
         }
 
-        * {
+        *:not([action]) {
             pointer-events: none;
         }
     }
@@ -142,8 +142,22 @@ ul {
 
         li {
 
-            * {
+            &.tile {
+                .icon {
+                    &.file {
+                        background-position: center;
+                        background-size: 30px;
+                    }
+
+                    &.folder {
+                        color: rgb(206, 206, 53);
+                    }
+                }
+            }
+
+            *:not([action]) {
                 pointer-events: none;
+                overflow: hidden;
             }
 
             &.tile:active {

@@ -10,6 +10,9 @@ function clipboardAction(action) {
         fullContent
     } = editorManager.controls;
     const selectedText = editor.getCopyText();
+
+    if (action !== 'select all') editorManager.controls.menu.remove();
+
     switch (action) {
         case 'copy':
             if (selectedText) {
@@ -24,6 +27,7 @@ function clipboardAction(action) {
                 const ranges = editor.selection.getAllRanges();
                 ranges.map(range => {
                     editor.remove(range);
+                    return range;
                 });
                 editorManager.controls.update();
                 plugins.toast.showShortBottom('copied to clipboard');

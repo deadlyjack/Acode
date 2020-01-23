@@ -39,7 +39,6 @@ function addFolder(folder, sidebar, index) {
                 if (url !== rootUrl) tmpFolders[url] = addedFolder[url];
             }
             addedFolder = tmpFolders;
-            this.removeEvents();
         });
         rootNode.titleEl.addEventListener('contextmenu', function (e) {
             if (e.cancelable) {
@@ -78,6 +77,7 @@ function addFolder(folder, sidebar, index) {
                     } else {
                         createFileTile(rootNode, item);
                     }
+                    return item;
                 });
                 resolve(index);
             }).catch(() => {
@@ -220,6 +220,7 @@ function addFolder(folder, sidebar, index) {
                                         if (ed.location === obj.id) {
                                             editorManager.updateLocation(ed, newid);
                                         }
+                                        return ed;
                                     });
                                     obj.parentElement.text(newname);
                                 }
@@ -365,6 +366,7 @@ function addFolder(folder, sidebar, index) {
                     if (editor) {
                         editorManager.removeFile(editor);
                     }
+                    return item;
                 });
 
                 obj.parentElement.remove();

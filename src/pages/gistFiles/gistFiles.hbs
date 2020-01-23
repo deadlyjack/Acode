@@ -1,0 +1,11 @@
+<div id="gistFiles" class="main list">
+  {{#files}}
+  <div class="list-item" action="file" data-filename="{{filename}}">
+    <span class="icon {{type}}"></span>
+    <div class="container">
+      <span class="text">{{filename}}</span>
+    </div>
+    <span class="icon share" action="share"></span>
+  </div>
+  {{/files}}
+</div>

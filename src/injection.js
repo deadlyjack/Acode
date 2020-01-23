@@ -83,6 +83,8 @@
         if (sessionStorage.getItem('__mode') === 'console') {
             toggleConsole();
         } else {
+            if (!toggler.isConnected)
+                document.body.appendChild(toggler);
             setInterval(() => {
                 if (!toggler.isConnected)
                     document.body.appendChild(toggler);
@@ -134,7 +136,6 @@
                     editor.addEventListener('keydown', function (e) {
                         const key = e.keyCode || e.which;
                         isFocused = true;
-
                         if (key === 13) {
                             e.preventDefault();
                             e.stopPropagation();
@@ -143,54 +144,24 @@
                             let code = this.value.trim();
                             let isOdd = (code.length - code.replace(regex, '').length) % 2;
                             const $code = document.createElement('c-code');
+
+                            const curPos = this.selectionStart;
+                            const char = code.substr(curPos - 1, 1);
+                            if (char === '\n' || char === '\r') {
+                                code = code.substr(0, curPos - 1) + code.substr(curPos);
+                            }
+
                             $code.textContent = code.length > 50 ? code.substr(0, 50) + '...' : code;
                             $code.setAttribute('data-code', code);
                             $code.setAttribute('action', 'use code');
                             if (!code || isOdd) return;
                             flask.updateCode('');
                             console.log(errId + 'code', $code.outerHTML);
-                            const parsed = (function () {
-                                try {
-                                    return esprima.parse(code, {
-                                        range: true
-                                    }).body
-                                } catch (e) {
-                                    return [];
-                                }
-                            })();
-                            let extra = '';
-                            parsed.map(st => {
-                                if (st.type === "VariableDeclaration") {
-                                    if (['const', 'let'].indexOf(st.kind) < 0) return;
-
-                                    const range = st.range;
-                                    const excode = code.substring(range[0], range[1]) + ';';
-                                    extra += excode;
-                                }
-                            });
-
-                            if (extra) {
-                                const script = document.createElement('script');
-                                script.textContent = extra;
-                                document.body.appendChild(script);
-                                document.body.removeChild(script);
-                                exec(code);
-                            } else {
-                                exec(code);
-                            }
+                            execute(code);
                         }
                     });
                 }
                 flag = true;
-            }
-        }
-
-        function exec(code) {
-            try {
-                let res = window.eval(code);
-                console.log(errId + 'log', res);
-            } catch (error) {
-                console.error(error);
             }
         }
     }
@@ -287,6 +258,7 @@
             let parameter = '(';
             params.map((param) => {
                 parameter += param.type === "RestElement" ? '...' + param.argument.name : param.name + ',';
+                return param;
             });
             parameter = parameter.replace(/,$/, '');
             parameter += ')' + (type === 'arrow' ? '=>' : '') + '{...}';
@@ -455,4 +427,52 @@
         count: count,
         clear: clear
     };
+
+    function execute(code) {
+        const parsed = (function () {
+            try {
+                return esprima.parse(code, {
+                    range: true
+                }).body
+            } catch (e) {
+                return [];
+            }
+        })();
+        let extra = '';
+        parsed.map(st => {
+            if (st.type === "VariableDeclaration") {
+                if (['const', 'let'].indexOf(st.kind) < 0) return;
+
+                const range = st.range;
+                const excode = code.substring(range[0], range[1]) + ';';
+                extra += excode;
+            }
+            return st;
+        });
+
+        if (extra) {
+            const script = document.createElement('script');
+            script.textContent = extra;
+            document.body.appendChild(script);
+            document.body.removeChild(script);
+            exec(code);
+        } else {
+            exec(code);
+        }
+
+        function exec(code) {
+            try {
+                let res = window.eval(code);
+                console.log(errId + 'log', res);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+
+    if (!window.consoleLoaded) {
+        window.addEventListener('error', function (err) {
+            console.error(err);
+        });
+    }
 })();

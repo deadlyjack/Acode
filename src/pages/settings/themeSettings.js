@@ -23,7 +23,7 @@ export default function themeSettings() {
     const settingsOptions = [{
             key: 'editor',
             text: strings['editor theme'],
-            subText: values.editorTheme.split('/').slice(-1)[0],
+            subText: values.editorTheme.split('/').slice(-1)[0].replace(/_/g, ' '),
         },
         {
             key: 'app',
@@ -49,6 +49,7 @@ export default function themeSettings() {
                     res = `ace/theme/` + res;
                     if (editor) editor.setTheme(res);
                     appSettings.value.editorTheme = res;
+                    this.changeSubText(res.editorTheme.split('/').slice(-1)[0].replace(/_/g, ' '));
                     appSettings.update();
                 });
                 break;
@@ -60,6 +61,10 @@ export default function themeSettings() {
                         default: appSettings.value.appTheme
                     })
                     .then(res => {
+                        if (res === 'dark' && /(free)$/.test(BuildInfo.packageName)) {
+                            window.open('https://play.google.com/store/apps/details?id=com.foxdebug.acode', '_system');
+                            return;
+                        }
                         appSettings.value.appTheme = res;
                         appSettings.update();
                         window.restoreTheme();

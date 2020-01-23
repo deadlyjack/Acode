@@ -1,6 +1,5 @@
 {
     "lang": "English",
-    "A1": "To select text, double tap where you want to start selecting and drag to position where you want to end selection, or enable shift key and use arrow keys in second footer row to select text.",
     "A2": "Emmet is a plugin which greatly improves HTML & CSS workflow. To know more go to https://emmet.io",
     "A3": "To cut, copy and paste text, first select the text and then tap and hold for editor context menu.",
     "A4": "To cut, copy and paste file, tap and hold on file or folder in side navigation menu for file and folder options.",
@@ -17,7 +16,6 @@
     "cancel": "cancel",
     "change language": "Change language",
     "close app": "Close the application?",
-    "clipboard defination": "Contains clipboard options like, cut, copy, paste and select all and also contain option to toggle command palette",
     "commit message": "Commit message",
     "console": "Console",
     "control file and folders": "Control files and folder",
@@ -25,6 +23,7 @@
     "copyline-down defination": "Copy active line downward.",
     "copyline-up defination": "Copy active line upward.",
     "create folder error": "Sorry, unable create new folder",
+    "create new": "Create new",
     "cut": "Cut",
     "delete": "Delete",
     "delete {name}": "Delete {name}?",

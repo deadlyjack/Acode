@@ -3,7 +3,7 @@ import dialogs from "../components/dialogs";
 import helpers from "./helpers";
 import GitHub from 'github-api';
 
-
+//Creates new github object
 function gitHub() {
   return new GitHub({
     username: localStorage.username ? helpers.credentials.decrypt(localStorage.username) : undefined,
@@ -12,36 +12,60 @@ function gitHub() {
   })
 }
 
+/**
+ *Initialize github object if directory named git exists 
+ *then it checks for all git repositories record file
+ **/
 function init() {
   return new Promise((resolve, reject) => {
     const path = cordova.file.externalDataDirectory;
     const url = path + 'git/';
     let interval;
+
     window.resolveLocalFileSystemURL(url, success, error);
 
     function success() {
-      fs.readFile(gitRecordURL)
+      initFile(gitRecordURL)
         .then(res => {
-          const data = res.data;
-          const decoder = new TextDecoder('utf-8');
-          const gitrecord = JSON.parse(helpers.credentials.decrypt(decoder.decode(data)));
-          resolve(GitRecord(gitrecord));
+          window.gitRecord = GitRecord(res);
+          return initFile(gistRecordURL);
+        })
+        .then(res => {
+          window.gistRecord = GistRecord(res);
+          resolve();
         })
         .catch(err => {
-          if (err.code === 1) {
-            const text = helpers.credentials.encrypt('{}');
-            fs.writeFile(gitRecordURL, text, true, false)
-              .then(() => {
-                resolve(GitRecord({}));
-              })
-              .catch(err => {
-                if (err.code) {
-                  fileError(err.code);
-                }
-                reject(err);
-              });
+          if (err.code) {
+            fileError(err.code);
           }
-        });
+          reject(err);
+        })
+    }
+
+
+    function initFile(file) {
+      return new Promise((resolve, reject) => {
+
+        fs.readFile(file) //initialized in main.js on device ready event
+          .then(res => {
+            const data = res.data;
+            const decoder = new TextDecoder('utf-8');
+            const val = JSON.parse(helpers.credentials.decrypt(decoder.decode(data)));
+            resolve(val);
+          })
+          .catch(err => {
+            if (err.code === 1) {
+              const text = helpers.credentials.encrypt('{}');
+              fs.writeFile(file, text, true, false)
+                .then(() => {
+                  resolve({});
+                })
+                .catch(err => {
+                  reject(err);
+                });
+            }
+          });
+      })
     }
 
     function error(err) {
@@ -67,13 +91,13 @@ function fileError(code) {
 }
 
 /**
- * 
+ * Creats a git repository record object
  * @param {string} sha 
  * @param {string} name 
  * @param {string} data 
  * @param {object} repo 
  * @param {string} path 
- * @returns {GitFileRecord}
+ * @returns {Repo}
  */
 function Record(owner, sha, name, data, repo, path) {
   if (!owner || !sha || !name || !repo) {
@@ -204,7 +228,7 @@ function Record(owner, sha, name, data, repo, path) {
 
 /**
  * 
- * @param {GitFileRecord} obj
+ * @param {Repo} obj
  * @returns {GitRecord} 
  */
 function GitRecord(obj) {
@@ -281,7 +305,7 @@ function GitRecord(obj) {
    * 
    * @param {string} [echo] 
    * @param {string} [data] 
-   * @param {GitFileRecord} [record] 
+   * @param {Repo} [record] 
    */
   function save(echo = false, data = null, record = null) {
     let text = helpers.credentials.encrypt(JSON.stringify(gitRecord));
@@ -314,8 +338,188 @@ function GitRecord(obj) {
 }
 
 /**
+ * Creats a gist object to manage gist file in editor
+ * @param {string} id  
+ * @param {GistFiles} files  
+ * @returns {Gist}
+ */
+function Gist(id, files) {
+  const gist = gitHub().getGist(id);
+  const _this = {
+    id,
+    files
+  };
+
+  function setData(name, text) {
+    return new Promise((resolve, reject) => {
+      _this.files[name].content = text;
+      const update = {
+        files: {}
+      };
+
+
+      dialogs.loaderShow(name, strings.saving + '...');
+      update.files[name] = _this.files[name];
+      gist.update(update)
+        .then(res => {
+          if (res.status === 200 || res.statusText === 'OK') {
+            gistRecord.update(_this);
+            resolve();
+          } else {
+            console.error(res);
+            reject(res);
+          }
+        })
+        .catch(err => {
+          error(err);
+          reject();
+        })
+        .finally(dialogs.loaderHide);
+    });
+  }
+
+  function setName(name, newName) {
+    if (!newName) return new Error('newName cannot be empty');
+
+    return new Promise((resolve, reject) => {
+
+      const update = {
+        files: {}
+      };
+      update.files[name] = {};
+      update.files[name].filename = newName;
+      dialogs.loaderShow(name, strings.loading + '...');
+      gist.update(update)
+        .then(res => {
+          if (res.status === 200 || res.statusText === 'OK') {
+            const file = _this.files[name];
+            delete _this.files[name];
+            _this.files[newName] = file;
+            gistRecord.update(_this);
+            resolve();
+          } else {
+            console.error(res);
+            reject(res);
+          }
+        })
+        .catch(err => {
+          error(err);
+          reject();
+        })
+        .finally(dialogs.loaderHide);
+    });
+  }
+
+  return {
+    get id() {
+      return _this.id;
+    },
+    files: _this.files,
+    setName,
+    setData
+  };
+}
+
+
+/**
  * 
- * @param {GitFileRecord} record 
+ * @param {object} obj 
+ * @returns {GistRecord}
+ */
+function GistRecord(obj) {
+  let gistRecord = obj;
+
+  /**
+   * 
+   * @param {object} obj 
+   * @returns {Gist}
+   */
+  function add(obj) {
+    const id = obj.id;
+    const _files = obj.files;
+    const files = {};
+
+    for (let filename in _files) {
+      const file = _files[filename];
+      files[filename] = {
+        filename: file.filename,
+        content: file.content
+      }
+    }
+    gistRecord[obj.id] = {
+      id,
+      files
+    };
+    save();
+    return Gist(id, files);
+  }
+
+  /**
+   * gets the gist with file content
+   * @param {string} id 
+   * @returns {Gist}
+   */
+  function get(id) {
+    if (id in gistRecord) {
+      const {
+        files
+      } = gistRecord[id];
+      return Gist(id, files);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * 
+   * @param {Gist} gist 
+   */
+  function update(gist) {
+    add(gist);
+  }
+
+  /**
+   * 
+   * @param {Gist} gist 
+   * @returns {Gist}
+   */
+  function remove(gist) {
+    const _gist = gistRecord[gist.id];
+    delete gistRecord[gist.id];
+
+    return _gist;
+  }
+
+  function save(echo = null) {
+    let text = helpers.credentials.encrypt(JSON.stringify(gistRecord));
+    let url = gistRecordURL;
+    fs.writeFile(url, text, true, false)
+      .then(() => {
+        if (echo) window.plugins.toast.showShortBottom(echo);
+      })
+      .catch(err => {
+        console.error(err);
+        if (err.code) fileError(err.code);
+      });
+  }
+
+  function reset() {
+    gistRecord = {};
+    save();
+  }
+
+  return {
+    add,
+    get,
+    update,
+    remove,
+    reset
+  }
+}
+
+/**
+ * 
+ * @param {Repo} record 
  * @param {string} _path 
  */
 function getGitFile(record, _path) {
@@ -334,7 +538,7 @@ function getGitFile(record, _path) {
       })
       .catch(err => {
         reject(err);
-      })
+      });
   });
 }
 

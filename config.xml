@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="51" id="com.foxdebug.acode" version="0.0.5.51" 
+<widget android-versionCode="54" id="com.foxdebug.acode" version="0.0.5.54" 
     xmlns="http://www.w3.org/ns/widgets" 
     xmlns:android="http://schemas.android.com/apk/res/android" 
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -23,19 +23,20 @@
     <preference name="cordova.plugins.diagnostic.modules" value="EXTERNAL_STORAGE " />
     <platform name="android">
         <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/colors.xml" />
+        <resource-file src="/res/network_security_config.xml" target="/app/src/main/res/xml/network_security_config.xml" />
         <allow-intent href="market:*" />
         <preference name="fullscreen" value="false"/>
         <preference name="SplashScreen" value="none"/>
         <preference name="ShowTitle" value="true"/>
         <preference name="DisallowOverscroll" value="true" />
-        <preference name="BackgroundColor" value="0xff313131" />
+        <preference name="BackgroundColor" value="0xFF313131" />
         <preference name="AndroidPersistentFileLocation" value="Compatibility" />
         <preference name="AndroidExtraFilesystems" value="sdcard,cache" />
         <preference name="android-minSdkVersion" value="21" />
         <preference name="AndroidLaunchMode" value="singleTask" />
         <preference name="prerendered-icon" value="false" />
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-            <application android:usesCleartextTraffic="true" />
+            <application android:networkSecurityConfig="@xml/network_security_config" />
             <application android:resizeableActivity="false" />
         </edit-config>
         <config-file parent="/manifest" target="AndroidManifest.xml">

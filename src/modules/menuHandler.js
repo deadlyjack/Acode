@@ -9,6 +9,7 @@ import dialogs from "../components/dialogs";
 import FileBrowser from "../pages/fileBrowser/fileBrowser";
 import GithubLogin from "../pages/login/login";
 import gitHub from "../pages/github/gitHub";
+import runPreview from "./runPreview";
 
 export default {
     newFile: function () {
@@ -110,20 +111,7 @@ export default {
         help();
     },
     console: function () {
-        const options = `location=no,clearcache=yes,clearsessioncache=yes,zoom=no`
-        const ref = cordova.InAppBrowser.open(`${cordova.file.applicationDirectory}www/console.html`, '_blank', options);
-
-        ref.addEventListener('loadstart', function () {
-            ref.executeScript({
-                code: `
-                if(!window.consoleLoaded){
-                  window.addEventListener('error', function(err){
-                    console.error(err);
-                  })
-                }
-              `
-            });
-        });
+        runPreview(true, 'in app');
     },
     github: function () {
         if ((!localStorage.username || !localStorage.password) && !localStorage.token)

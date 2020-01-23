@@ -6,6 +6,23 @@
   *:focus {
     outline: none; }
 
+.list::-webkit-scrollbar,
+.prompt::-webkit-scrollbar,
+.scroll::-webkit-scrollbar {
+  width: 4px;
+  height: 4px; }
+
+.list::-webkit-scrollbar-track,
+.prompt::-webkit-scrollbar-track,
+.scroll::-webkit-scrollbar-track {
+  background: transparent; }
+
+.list::-webkit-scrollbar-thumb,
+.prompt::-webkit-scrollbar-thumb,
+.scroll::-webkit-scrollbar-thumb {
+  background: #99f;
+  border-radius: 2px; }
+
 .octicon,
 .icon {
   -webkit-user-select: none;
@@ -51,6 +68,9 @@
   .icon.disabled {
     opacity: 0.6;
     pointer-events: none; }
+  .octicon.dull,
+  .icon.dull {
+    opacity: 0.6; }
   .octicon:not(.float):active,
   .icon:not(.float):active {
     -webkit-transition: all 100ms ease;
@@ -59,6 +79,12 @@
   .octicon.active,
   .icon.active {
     background-color: rgba(0, 0, 0, 0.2) !important; }
+  .octicon.foxdebug,
+  .icon.foxdebug {
+    background-image: url(../res/logo/favicon.ico);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 18px; }
 
 html {
   overflow: auto;
@@ -577,7 +603,7 @@ body .float {
       .list > .list-item .octicon.no-icon,
       .list > .list-item .icon.no-icon {
         width: 20px; }
-    .list > .list-item * {
+    .list > .list-item *:not([action]) {
       pointer-events: none; }
 
 ul {
@@ -585,8 +611,14 @@ ul {
   ul.list {
     overflow-x: hidden;
     overflow-y: auto; }
-    ul.list li * {
-      pointer-events: none; }
+    ul.list li.tile .icon.file {
+      background-position: center;
+      background-size: 30px; }
+    ul.list li.tile .icon.folder {
+      color: #cece35; }
+    ul.list li *:not([action]) {
+      pointer-events: none;
+      overflow: hidden; }
     ul.list li.tile:active {
       -webkit-transition: all 300ms ease;
       transition: all 300ms ease;
@@ -811,7 +843,8 @@ header {
     .context-menu li .text {
       -webkit-box-flex: 1;
       flex: 1;
-      pointer-events: none; }
+      pointer-events: none;
+      text-transform: capitalize; }
     .context-menu li .icon {
       pointer-events: none;
       color: #99f; }
@@ -1087,6 +1120,10 @@ header {
 
 .theme-dark {
   background-color: #252525; }
+  .theme-dark .list::-webkit-scrollbar-thumb,
+  .theme-dark .prompt::-webkit-scrollbar-thumb,
+  .theme-dark .scroll::-webkit-scrollbar-thumb {
+    background: #313131; }
   .theme-dark .ace_prompt_wrapper .ace_prompt_container {
     box-shadow: none; }
   .theme-dark .ace_prompt_wrapper .ace_editor {
@@ -1317,16 +1354,18 @@ header {
 .ace-container {
   height: 100%; }
 
-#about-page .logo {
-  display: block;
-  height: 50vw;
-  width: 50vw;
-  border-radius: 50%;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.2);
-  margin: 15px auto; }
+#about-page {
+  overflow: auto; }
+  #about-page .logo {
+    display: block;
+    height: 50vw;
+    width: 50vw;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.2);
+    margin: 15px auto; }
 
 #file-browser .tile .icon {
   color: #415585; }
@@ -1349,11 +1388,6 @@ header {
     border-radius: 4px;
     padding: 5px;
     margin: auto 15px; }
-  #file-browser #list .tile .icon.file {
-    background-position: center;
-    background-size: 30px; }
-  #file-browser #list .tile .icon.folder {
-    color: #cece35; }
 
 #github-login .form {
   display: -webkit-box;
@@ -1372,36 +1406,106 @@ header {
     text-align: center;
     margin: 15px auto; }
 
-#github .list-item .icon.file {
+#github .list-item .octicon {
+  font-size: 1.8em;
+  color: #6a737d !important; }
+
+#github .profile {
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  padding-bottom: 16px;
+  border-bottom: solid 1px rgba(204, 204, 204, 0.4); }
+  #github .profile img {
+    height: 150px;
+    width: 150px;
+    border-radius: 50%;
+    margin: 16px;
+    background-color: rgba(0, 0, 0, 0.2); }
+  #github .profile .info {
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    margin-bottom: 16px; }
+    #github .profile .info small {
+      opacity: 0.8; }
+  #github .profile .tags {
+    -webkit-box-flex: 1;
+    flex: 1;
+    display: -webkit-box;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 0 8px 16px;
+    box-sizing: border-box; }
+    #github .profile .tags .tag {
+      height: 32px;
+      margin: 8px 16px 0 8px;
+      text-transform: capitalize; }
+      #github .profile .tags .tag::after {
+        display: -webkit-inline-box;
+        display: inline-flex;
+        -webkit-box-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        align-items: center;
+        height: 1em;
+        padding: 0 4px;
+        font-size: 0.8em;
+        content: attr(data-value);
+        background-color: #99f;
+        color: white;
+        border-radius: 4px;
+        height: -webkit-fit-content;
+        height: -moz-fit-content;
+        height: fit-content;
+        margin-left: 4px; }
+  #github .profile .button-container {
+    width: calc(100% - 32px);
+    max-width: 450px; }
+
+#repos .list-item .icon.file {
   background-size: 16px;
   background-position: center; }
 
-#github .list-item .octicon.main-icon {
+#repos .list-item .octicon.main-icon {
   font-size: 1.8em;
   color: #6a737d !important; }
-  #github .list-item .octicon.main-icon::before {
+  #repos .list-item .octicon.main-icon::before {
     content: "\f001"; }
-  #github .list-item .octicon.main-icon[private] {
+  #repos .list-item .octicon.main-icon[private] {
     color: #dbab09 !important; }
-    #github .list-item .octicon.main-icon[private]::before {
+    #repos .list-item .octicon.main-icon[private]::before {
       content: '\f06a'; }
 
-#github .list-item .value {
+#repos .list-item .value {
   text-transform: unset;
   display: -webkit-box;
   display: flex; }
-  #github .list-item .value .group {
+  #repos .list-item .value .group {
     display: -webkit-box;
     display: flex;
     -webkit-box-align: center;
     align-items: center;
     margin-right: 15px; }
-    #github .list-item .value .group .octicon,
-    #github .list-item .value .group .icon {
+    #repos .list-item .value .group .octicon,
+    #repos .list-item .value .group .icon {
       height: 30px;
-      width: 30px; }
+      width: 30px;
+      font-size: 1em; }
 
-#github .list-item .private > .text::after {
+#repos .list-item .private > .text::after {
   content: 'private';
   font-size: 0.6em;
   border-radius: 4px;
@@ -2029,4 +2133,50 @@ header {
     padding-left: 112px !important; }
   #info-page .pl-12 {
     padding-left: 128px !important; }
+
+#gists .list-item .icon.file {
+  background-size: 16px;
+  background-position: center; }
+
+#gists .list-item .octicon.main-icon {
+  font-size: 1.8em;
+  color: #6a737d !important; }
+  #gists .list-item .octicon.main-icon::before {
+    content: "\f00e"; }
+  #gists .list-item .octicon.main-icon[private] {
+    color: #dbab09 !important; }
+    #gists .list-item .octicon.main-icon[private]::before {
+      content: '\f08c'; }
+
+#gists .list-item .value {
+  text-transform: unset;
+  display: -webkit-box;
+  display: flex; }
+  #gists .list-item .value .group {
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    margin-right: 15px; }
+    #gists .list-item .value .group .octicon,
+    #gists .list-item .value .group .icon {
+      height: 30px;
+      width: 30px;
+      font-size: 1em; }
+
+#gists .list-item .private > .text::after {
+  content: 'private';
+  font-size: 0.6em;
+  border-radius: 4px;
+  background-color: #ccc;
+  color: #333;
+  border: solid 1px #333;
+  margin: auto 5px;
+  padding: 0 2.5px; }
+
+#gistFiles .list-item .icon {
+  font-size: 1em; }
+  #gistFiles .list-item .icon.file {
+    background-position: center;
+    background-size: 26px; }
 

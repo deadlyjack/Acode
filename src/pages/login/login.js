@@ -80,7 +80,6 @@ export default function GithubLogin() {
       localStorage.setItem('password', password);
     }
 
-    dialogs.loaderShow('GitHub', strings.loading + '...');
     gitHub({
       $loginPage: $page
     });

@@ -89,6 +89,7 @@ function ajax(options) {
         let serial = "";
         keys.map((key, index) => {
             serial += key + (data[key] ? ("=" + data[key]) : '') + (index < keys.length - 1 ? '&' : '');
+            return key;
         });
 
         return encodeURI(serial);

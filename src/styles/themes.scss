@@ -86,6 +86,14 @@ $textDark : white;
 .theme-dark {
     background-color: $pageBgDark;
 
+    .list,
+    .prompt,
+    .scroll {
+        &::-webkit-scrollbar-thumb {
+            background: $bgDark;
+        }
+    }
+
     .ace_prompt_wrapper {
         .ace_prompt_container {
             box-shadow: none;

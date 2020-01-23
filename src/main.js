@@ -12,7 +12,6 @@ import './styles/overideAceStyle.scss';
 import "core-js/stable";
 import tag from 'html-tag-js';
 import mustache from 'mustache';
-import mimeType from 'mime-types';
 import tile from "./components/tile";
 import sidenav from './components/sidenav';
 import contextMenu from './components/contextMenu';
@@ -37,6 +36,8 @@ import $_row2 from './views/footer/row2.hbs';
 import $_search from './views/footer/search.hbs';
 import saveFile from "./modules/saveFile";
 import git from "./modules/git";
+import runPreview from "./modules/runPreview";
+import PHP from "./modules/php";
 //@ts-check
 
 window.onload = Main;
@@ -108,6 +109,7 @@ function Main() {
   function ondeviceready() {
     const url = `${cordova.file.applicationDirectory}www/lang/${appSettings.value.lang}.json`;
     window.gitRecordURL = cordova.file.externalDataDirectory + 'git/.gitfiles';
+    window.gistRecordURL = cordova.file.externalDataDirectory + 'git/.gistfiles';
     fs.readFile(url)
       .then(res => {
         const decoder = new TextDecoder('utf-8');
@@ -125,9 +127,8 @@ function Main() {
     timeout = setTimeout(initGit, 1000);
 
     git.init()
-      .then(res => {
+      .then(() => {
         if (timeout) clearTimeout(timeout);
-        window.gitRecord = res;
         runApp();
       })
       .catch(err => {
@@ -197,11 +198,39 @@ function App() {
   const $sidebar = sidenav($main, $toggler);
   const $runBtn = tag('span', {
     className: 'icon play_arrow',
-    onclick: runPreview.bind($runBtn, editorManager),
+    onclick: function () {
+      let target = appSettings.value.previewMode;
+      let console = false;
+      if (helpers.getExt(editorManager.activeFile.filename) === 'js') {
+        console = true;
+        target = 'in app';
+      }
+      if (target === 'none') {
+        dialogs.select(strings['preview mode'], ['browser', 'in app'])
+          .then(res => {
+            runPreview(console, res);
+          });
+      } else {
+        runPreview(console, target);
+      }
+    },
     style: {
       fontSize: '1.2em'
     }
   });
+  const $edit = tag('span', {
+    className: 'icon edit',
+    onclick: function () {
+      const file = editorManager.activeFile;
+      file.editable = !file.editable;
+      if (file.editable) this.classList.remove('dull');
+      else this.classList.add('dull');
+      editorManager.onupdate();
+    },
+    attr: {
+      style: 'font-size: 1.2em !important;'
+    }
+  })
   const fileOptions = {
     save: $mainMenu.querySelector('[action=save]'),
     saveAs: $mainMenu.querySelector('[action=saveAs]'),
@@ -258,6 +287,7 @@ function App() {
           saveInterval = setInterval(() => {
             editorManager.files.map(file => {
               if (file.isUnsaved && file.location) saveFile(file, undefined, false);
+              return file;
             });
           }, autosave);
         }
@@ -274,6 +304,10 @@ function App() {
     if (!$footer.parentElement && activeFile) {
       app.classList.add('bottom-bar');
       app.append($footer);
+    }
+
+    if (!$edit.isConnected) {
+      $header.insertBefore($edit, $header.lastChild);
     }
 
     if (!activeFile) {
@@ -303,7 +337,11 @@ function App() {
         $save.classList.remove('notice');
       }
 
-      if (['html', 'htm', 'xhtml'].includes(helpers.getExt(activeFile.filename))) {
+      this.editor.setReadOnly(!activeFile.editable);
+      if (activeFile.editable) $edit.classList.remove('dull');
+      else $edit.classList.add('dull');
+
+      if (['html', 'htm', 'xhtml', 'md', 'js', 'php'].includes(helpers.getExt(activeFile.filename))) {
         $header.insertBefore($runBtn, $header.lastChild);
       } else {
         $runBtn.remove();
@@ -325,6 +363,7 @@ function App() {
       edit.name = file.filename;
       edit.type = file.type;
       if (edit.type === 'git') edit.sha = file.record.sha;
+      else if (edit.type === 'gist') edit.id = file.record.id;
       if (file.fileUri) {
         edit.fileUri = file.fileUri;
         edit.readOnly = file.readOnly ? 'true' : '';
@@ -354,6 +393,7 @@ function App() {
       }, err => {
         console.error(err);
       });
+      return file;
     });
 
     allFolders.map(folder => {
@@ -361,6 +401,7 @@ function App() {
         url: folder,
         name: addedFolder[folder].name
       });
+      return folder;
     });
 
     if (activeFile) {
@@ -415,6 +456,18 @@ function App() {
                 }
                 if (i === files.length - 1) resolve();
               });
+          } else if (file.type === 'gist') {
+            const gist = gistRecord.get(file.id);
+            if (gist) {
+              const gistFile = gist.files[file.name];
+              editorManager.addNewFile(file.name, {
+                type: 'gist',
+                text: file.data || gistFile.content,
+                isUnsaved: file.data ? true : false,
+                record: gist
+              });
+            }
+            if (i === files.length - 1) resolve();
           } else if (file.fileUri) {
 
             if (file.fileUri === lastfile) {
@@ -455,6 +508,7 @@ function App() {
 
             if (i === files.length - 1) resolve();
           }
+          return file;
         });
       } else {
         editorManager.addNewFile('untitled', {
@@ -474,6 +528,7 @@ function App() {
           addFolder(folder, $sidebar, i).then(index => {
             if (index === folders.length - 1) resolve();
           });
+          return folder;
         });
       } else {
         resolve();
@@ -535,6 +590,7 @@ function App() {
           });
         }, err => {});
       }
+      return file;
     });
 
     if (!editorManager.activeFile) {
@@ -626,150 +682,6 @@ function restoreTheme(darken) {
     NavigationBar.backgroundColorByHexString(hexColor, true);
     StatusBar.backgroundColorByHexString(hexColor);
     StatusBar.styleLightContent();
-  }
-}
-
-function runPreview() {
-  const activeFile = editorManager.activeFile;
-
-  const filename = activeFile.filename;
-  const path = activeFile.location;
-  const decoder = new TextDecoder('utf-8');
-
-  webserver.start(() => {
-    openBrowser();
-  }, err => {
-    if (err === "Server already running") {
-      openBrowser();
-    } else {
-      console.log(err);
-    }
-  }, 8080);
-
-  webserver.onRequest(req => {
-    let reqPath = req.path;
-    const assets = `${cordova.file.applicationDirectory}www`;
-
-    if (reqPath === '/') {
-      reqPath = 'index.html';
-    }
-
-    if (reqPath === '/_console.js') {
-      const url = `${assets}/js/injection.build.js`;
-      sendFileContent(url, req.requestId, 'application/javascript');
-    } else if (reqPath === '/_esprisma.js') {
-      const url = `${assets}/js/esprisma.js`;
-      sendFileContent(url, req.requestId, 'application/javascript');
-    } else if (reqPath === '/_codeflask.js') {
-      const url = `${assets}/js/codeflask.min.js`;
-      sendFileContent(url, req.requestId, 'application/javascript');
-    } else if (reqPath === '/_console.css') {
-      const url = `${assets}/css/console.css`;
-      sendFileContent(url, req.requestId, 'text/css');
-    } else if (helpers.getExt(reqPath) === 'html') {
-      if (reqPath === '/' + filename && (activeFile.isUnsaved || !activeFile.location || activeFile.type === 'git')) {
-        sendHTML(activeFile.session.getValue(), req.requestId);
-      } else {
-        fs.readFile(path + reqPath)
-          .then(res => {
-            let text = decoder.decode(res.data);
-            sendHTML(text, req.requestId);
-          });
-      }
-    } else {
-      if (activeFile.type === 'git') {
-        const cache = cordova.file.cacheDirectory;
-        const uri = cache + activeFile.record.sha + encodeURIComponent(reqPath) + '.' + helpers.getExt(reqPath);
-
-        window.resolveLocalFileSystemURL(uri, () => {
-          sendFile(uri.replace('file://', ''), req.requestId);
-        }, err => {
-          if (err.code === 1) {
-            git.getGitFile(activeFile.record, reqPath.slice(1))
-              .then(res => {
-                const data = helpers.b64toBlob(res, mimeType.lookup(reqPath));
-                fs.writeFile(uri, data, true, false)
-                  .then(() => {
-                    sendFile(uri.replace('file://', ''), req.requestId);
-                  })
-                  .catch(err => {
-                    if (err.code) dialogs.alert(strings.error, helpers.getErrorMessage(err.code));
-                    console.log(err);
-                  });
-              })
-              .catch(err => {
-                console.log(err);
-                error();
-              })
-          } else {
-            error();
-          }
-        });
-      } else {
-        if (path) sendFile(path.replace('file://', '') + reqPath, req.requestId);
-        else error();
-      }
-    }
-
-    function error() {
-      webserver.sendResponse(req.requestId, {
-        status: 404
-      });
-    }
-  });
-
-  /**
-   * 
-   * @param {string} text 
-   * @param {string} id 
-   */
-  function sendHTML(text, id) {
-    const js = `<script src="_console.js"></script><script src="_esprisma.js"></script><script src="_codeflask.js"></script><link rel="stylesheet" href="_console.css">`;
-    text = text.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
-    const part = text.split('<head>');
-    if (part.length === 2) {
-      text = `${part[0]}<head>${js}${part[1]}`;
-    } else if (/<html>/i.test(text)) {
-      text = text.replace('<html>', `<head>${js}</head>`)
-    } else {
-      text = `<head>${js}</head>` + text;
-    }
-
-    sendText(text, id);
-  }
-
-  function sendFile(path, id) {
-    webserver.sendResponse(id, {
-      status: 200,
-      path,
-      headers: {}
-    });
-  }
-
-  function sendFileContent(url, id, mimeType) {
-    fs.readFile(url)
-      .then(res => {
-        const text = decoder.decode(res.data);
-        sendText(text, id, mimeType);
-      })
-  }
-
-  function sendText(text, id, mimeType) {
-    webserver.sendResponse(id, {
-      status: 200,
-      body: text,
-      headers: {
-        'Content-Type': mimeType || 'text/html'
-      }
-    });
-  }
-
-  function openBrowser() {
-    const theme = appSettings.value.appTheme;
-    const themeColor = theme === 'default' ? '#9999ff' : theme === 'dark' ? '#313131' : '#ffffff';
-    const color = theme === 'light' ? '#9999ff' : '#ffffff';
-    const options = `location=yes,hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
-    window.open('http://localhost:8080/' + filename, '_system', options);
   }
 }
 //#endregion

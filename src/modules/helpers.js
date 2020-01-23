@@ -65,6 +65,8 @@ function getLangNameFromExt(ext) {
     if (ext === 'hbs') return 'handlebars';
     if (ext === 'md') return 'markdown';
     if (ext === 'yml') return 'yaml';
+    if (['doc', 'docx', 'odt', 'rtf', 'wpd'].includes(ext)) return 'word';
+    if (['dex', 'cell', 'def', 'ods', 'ots', 'uos'].includes(ext)) return 'excel';
     return ext;
 }
 
@@ -83,6 +85,7 @@ function getLangNameFromFileName(filename) {
         testts: /\.test\.ts$/i,
         eslint: /(^\.eslintrc$)|(^\.eslintignore$)/i,
         typescriptdef: /\.d\.ts$/i,
+        babel: /\.babelrc/
     };
     for (let type in regex) {
         if (regex[type].test(filename)) return type;
@@ -115,6 +118,8 @@ function sortDir(list, fileBrowser, readOnly = false) {
             if (item.isFile)
                 return file.push(item);
         }
+
+        return item;
     });
 
     if (sortByName) {
@@ -137,26 +142,17 @@ function sortDir(list, fileBrowser, readOnly = false) {
 function getIconForFile(filename) {
     let ext = (getExt(filename) || '').toLowerCase();
 
-    if (['mp4', 'm4a', 'mov', '3gp', 'wmv', 'flv', 'avi'].includes(ext))
-        return 'icon movie';
-    if (['png', 'svg', 'jpeg', 'jpg', 'gif', 'ico'].includes(ext))
-        return 'icon image';
-    if (['wav', 'mp3', 'flac'].includes(ext))
-        return 'icon audiotrack';
-    if (['zip', 'rar', 'tar', 'deb'].includes(ext))
-        return 'icon zip';
+    if (['mp4', 'm4a', 'mov', '3gp', 'wmv', 'flv', 'avi'].includes(ext)) return 'movie';
+    if (['png', 'svg', 'jpeg', 'jpg', 'gif', 'ico'].includes(ext)) return 'image';
+    if (['wav', 'mp3', 'flac'].includes(ext)) return 'audiotrack';
+    if (['zip', 'rar', 'tar', 'deb'].includes(ext)) return 'zip';
 
     switch (ext) {
         case 'apk':
-            return 'icon android';
+            return 'android';
         case 'text':
         case 'txt':
-        case 'log':
-            return 'icon document-text';
-        case 'doc':
-        case 'docx':
-        case 'pdf':
-            return 'icon document';
+            return 'document-text';
 
         default:
             return `file file_type_${getLangNameFromFileName(filename)}`;

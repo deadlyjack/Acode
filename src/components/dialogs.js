@@ -225,7 +225,8 @@ function multiPrompt(message, inputs) {
                 this.select();
             };
 
-            inputAr.push($input)
+            inputAr.push($input);
+            return input;
         });
 
         const $promptDiv = tag('form', {
@@ -277,6 +278,7 @@ function multiPrompt(message, inputs) {
             const values = {};
             inputAr.map($input => {
                 values[$input.id] = $input.value;
+                return $input;
             });
 
             return values;
@@ -439,7 +441,9 @@ function select(title, options, opts = {}) {
             className: 'title',
             textContent: title
         });
-        const list = tag('ul');
+        const list = tag('ul', {
+            className: 'scroll'
+        });
         const selectDiv = tag('div', {
             className: 'prompt select',
             children: titleSpan ? [
@@ -451,6 +455,7 @@ function select(title, options, opts = {}) {
             className: 'mask',
             onclick: hide
         });
+        let defaultVal;
 
         options.map(option => {
 
@@ -477,9 +482,7 @@ function select(title, options, opts = {}) {
 
             if (opts.default === value) {
                 item.classList.add('selected');
-                setTimeout(function () {
-                    item.scrollIntoView();
-                }, 10);
+                defaultVal = item;
             }
 
             item.onclick = function () {
@@ -488,6 +491,8 @@ function select(title, options, opts = {}) {
             };
 
             list.append(item);
+
+            return option;
         });
 
         actionStack.push({
@@ -496,6 +501,7 @@ function select(title, options, opts = {}) {
         });
 
         document.body.append(selectDiv, mask);
+        if (defaultVal) defaultVal.scrollIntoView();
 
         window.restoreTheme(true);
 
@@ -526,6 +532,10 @@ function loaderShow(titleText, message) {
         titleText = '';
     }
 
+    const oldLoaderDiv = tag.get('#__loader');
+
+    if (oldLoaderDiv) oldLoaderDiv.textContent = '';
+
     const titleSpan = tag('strong', {
         className: 'title',
         textContent: titleText
@@ -542,22 +552,22 @@ function loaderShow(titleText, message) {
             })
         ]
     });
-    const loaderDiv = tag('div', {
+    const loaderDiv = oldLoaderDiv || tag('div', {
         className: 'prompt alert',
-        id: '__loader',
-        children: [
-            titleSpan,
-            messageSpan
-        ]
+        id: '__loader'
     });
-    const mask = tag('span', {
+    const mask = tag.get('#__loader-mask') || tag('span', {
         className: 'mask',
         id: '__loader-mask'
     });
 
-    window.freeze = true;
-    document.body.append(loaderDiv, mask);
-    window.restoreTheme(true);
+    loaderDiv.append(titleSpan, messageSpan);
+
+    if (!oldLoaderDiv) {
+        window.freeze = true;
+        document.body.append(loaderDiv, mask);
+        window.restoreTheme(true);
+    }
 }
 
 function loaderHide() {

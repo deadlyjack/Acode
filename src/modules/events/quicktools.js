@@ -73,12 +73,16 @@ function quickToolAction(e, footer, row1, row2, search) {
             break;
 
         case 'undo':
-            if (editor.session.getUndoManager().hasUndo()) {
+            if (editor.session.getUndoManager().hasUndo())
                 editor.undo();
-            } else {
+            else
+                break;
+
+            if (!editor.session.getUndoManager().hasUndo()) {
                 editorManager.activeFile.isUnsaved = false;
                 editorManager.onupdate();
             }
+
             break;
 
         case 'redo':

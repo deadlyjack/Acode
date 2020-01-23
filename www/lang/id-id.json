@@ -1,6 +1,5 @@
 {
     "lang": "Indonesian",
-    "A1": "Untuk memilih teks, ketuk dua kali di mana Anda ingin mulai memilih dan seret ke posisi di mana Anda ingin mengakhiri pilihan, atau aktifkan tombol shift dan gunakan tombol panah di baris footer kedua untuk memilih teks.",
     "A2": "Emmet adalah plugin yang sangat meningkatkan alur kerja HTML & CSS. Untuk mengetahui lebih lanjut, buka https://emmet.io",
     "A3": "Untuk memotong, menyalin, dan menempelkan teks, pertama pilih teks, lalu ketuk dan tahan untuk menu konteks editor.",
     "A4": "Untuk memotong, menyalin, dan menempel file, ketuk dan tahan file atau folder di menu navigasi samping untuk opsi file dan folder.",
@@ -17,7 +16,6 @@
     "cancel": "membatalkan",
     "change language": "Ganti BAHASA",
     "close app": "Tutup aplikasi?",
-    "clipboard defination": "Berisi opsi clipboard seperti, memotong, menyalin, menempel dan memilih semua dan juga berisi opsi untuk beralih palet perintah",
     "commit message": "Commit message",
     "console": "Konsol",
     "control file and folders": "Kontrol file dan folder",

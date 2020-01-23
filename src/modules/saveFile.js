@@ -12,43 +12,54 @@ import constants from "../constants";
  */
 function saveFile(file, as = false, showToast = true) {
 
-    if (file.type === 'git') {
-        return dialogs.multiPrompt('Commit', [{
-                id: 'message',
-                placeholder: 'Commit message',
-                value: file.record.commitMessage,
-                type: 'text',
-                required: true,
-            }, {
-                id: 'branch',
-                placeholder: 'Branch',
-                value: file.record.branch,
-                type: 'text',
-                required: true
-            }])
-            .then(res => {
-                if (!res.branch || !res.message) return;
-                file.record.branch = res.branch;
-                file.record.commitMessage = res.message;
-                file.record.setData(file.session.getValue())
-                    .then(() => {
-                        file.isUnsaved = false;
-                        editorManager.onupdate();
-                    })
-                    .catch(() => {
-                        window.plugins.toast.showShortBottom(strings.error);
-                    });
-            });
-    }
+    if (!as) {
 
-    if (file.contentUri && !as)
-        return alert(strings.warning.toUpperCase(), strings["read only file"]);
+        if (file.type === 'git') {
+            dialogs.multiPrompt('Commit', [{
+                    id: 'message',
+                    placeholder: 'Commit message',
+                    value: file.record.commitMessage,
+                    type: 'text',
+                    required: true,
+                }, {
+                    id: 'branch',
+                    placeholder: 'Branch',
+                    value: file.record.branch,
+                    type: 'text',
+                    required: true
+                }])
+                .then(res => {
+                    if (!res.branch || !res.message) return;
+                    file.record.branch = res.branch;
+                    file.record.commitMessage = res.message;
+                    file.record.setData(file.session.getValue())
+                        .then(() => {
+                            file.isUnsaved = false;
+                            editorManager.onupdate();
+                        })
+                        .catch(() => {
+                            window.plugins.toast.showShortBottom(strings.error);
+                        });
+                });
+        } else if (file.type === 'gist') {
+            file.record.setData(file.name, file.session.getValue())
+                .then(() => {
+                    file.isUnsaved = false;
+                    editorManager.onupdate();
+                })
+                .catch(err => {
+                    console.log(err);
+                    dialogs.alert(strings.error, err.toString());
+                });
+        } else if (file.contentUri) {
+            alert(strings.warning.toUpperCase(), strings["read only file"]);
+        } else if (file.fileUri) {
+            save(file, undefined, undefined, showToast);
+        }
 
-    if (file.filename === 'untitled' && !file.location) as = true;
-
-    if (file.fileUri && !as) {
-        save(file, undefined, undefined, showToast);
     } else {
+
+        editorManager.editor.blur();
         FileBrowser('folder', strings['save here'])
             .then(res => {
                 let url = file.location === res.url ? undefined : res.url;
@@ -61,7 +72,7 @@ function saveFile(file, as = false, showToast = true) {
                     checkFile(url, file.filename)
                         .then((filename) => {
                             save(file, url, filename);
-                        })
+                        });
                 }
             });
     }

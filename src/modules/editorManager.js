@@ -134,10 +134,12 @@ function EditorManager(sidebar, header, body) {
         });
         let file = {
             id: ++counter,
+            controls: false,
             session: ace.createEditSession(options.text || ''),
             fileUri: options.fileUri,
             contentUri: options.contentUri,
             name: filename,
+            editable: true,
             type: options.type || 'regular',
             isUnsaved: options.isUnsaved,
             readOnly: options.readOnly || options.isContentUri,
@@ -154,40 +156,7 @@ function EditorManager(sidebar, header, body) {
                 else return this.name;
             },
             set filename(name) {
-                (async () => {
-                    if (!name) return;
-
-                    if (this.type === 'git') {
-                        try {
-                            await this.record.setName(name);
-                            this.name = name;
-                            manager.onupdate();
-                        } catch (error) {
-                            return;
-                        }
-                    } else if (this.fileUri) {
-                        this.fileUri = this.location + name;
-                    }
-
-                    if (editorManager.activeFile.id === this.id) header.text(name);
-
-                    this.assocTile.text(name);
-                    if (helpers.getExt(this.name) !== helpers.getExt(name)) {
-                        setupSession({
-                            session: this.session,
-                            filename: name
-                        });
-                        this.assocTile.lead(tag('i', {
-                            className: helper.getIconForFile(name),
-                            style: {
-                                paddingRight: '5px'
-                            }
-                        }));
-                    }
-
-                    this.name = name;
-                    manager.onupdate();
-                })();
+                changeName.call(this, name);
             },
             get location() {
                 if (this.fileUri)
@@ -274,6 +243,9 @@ function EditorManager(sidebar, header, body) {
         let text = 'Read Only';
         if (file.type === 'git') {
             text = 'git • ' + file.record.repo + '/' + file.record.path;
+        } else if (file.type === 'gist') {
+            const id = file.record.id;
+            text = 'gist • ' + (id.length > 10 ? '...' + id.substring(id.length - 7) : id);
         } else if (file.location) {
             text = file.location;
             if (text.length > 30) {
@@ -292,7 +264,6 @@ function EditorManager(sidebar, header, body) {
                 if (manager.activeFile) {
                     manager.activeFile.assocTile.classList.remove('active');
                 }
-                manager.controls.update();
 
                 editor.setSession(file.session);
                 editor.focus();
@@ -334,6 +305,10 @@ function EditorManager(sidebar, header, body) {
             enableLiveAutocompletion: true,
             showInvisibles: settings.showSpaces
         });
+
+        if (!appSettings.value.linting) {
+            editor.renderer.setMargin(0, 0, -16, 0);
+        }
     }
 
     function setupSession(file) {
@@ -375,6 +350,7 @@ function EditorManager(sidebar, header, body) {
             closeFile();
 
             if (file.type === 'git') gitRecord.remove(file.record.sha);
+            else if (file.type === 'gist') gistRecord.remove(file.record);
         }
 
         function closeFile() {
@@ -415,6 +391,55 @@ function EditorManager(sidebar, header, body) {
         }
 
         return null;
+    }
+
+
+    async function changeName(name) {
+        if (!name) return;
+
+        if (this.type === 'git') {
+            try {
+                await this.record.setName(name);
+                this.name = name;
+                manager.onupdate();
+            } catch (err) {
+                return error(err);
+            }
+        } else if (this.type === 'gist') {
+            try {
+                await this.record.setName(this.name, name);
+                this.name = name;
+                manager.onupdate();
+            } catch (err) {
+                return error(err);
+            }
+        } else if (this.fileUri) {
+            this.fileUri = this.location + name;
+        }
+
+        if (editorManager.activeFile.id === this.id) header.text(name);
+
+        this.assocTile.text(name);
+        if (helpers.getExt(this.name) !== helpers.getExt(name)) {
+            setupSession({
+                session: this.session,
+                filename: name
+            });
+            this.assocTile.lead(tag('i', {
+                className: helper.getIconForFile(name),
+                style: {
+                    paddingRight: '5px'
+                }
+            }));
+        }
+
+        this.name = name;
+        manager.onupdate();
+
+        function error(err) {
+            dialogs.alert(strings.error, err.toString());
+            console.log(err);
+        }
     }
 
     return manager;

@@ -184,7 +184,8 @@ function FileBrowser(type = 'file', option = null) {
                 update();
                 const item = cachedDir[path];
                 render(item.list);
-                $page.scrollTop = item.scroll;
+                const $list = tag.get('#list');
+                $list.scrollTop = item.scroll;
                 name = item.name;
             } else {
                 fs.listDir(path)
@@ -213,7 +214,8 @@ function FileBrowser(type = 'file', option = null) {
 
                 currentDir.url = path;
                 currentDir.name = name;
-                $page.scrollTop = 0;
+                const $list = tag.get('#list');
+                if ($list) $list.scrollTop = 0;
                 navigate(name, path);
                 $page.settitle(name + (readOnly ? ' (read only)' : ''));
             }
@@ -246,7 +248,7 @@ function FileBrowser(type = 'file', option = null) {
 
             function folder() {
                 const currentUrl = currentDir.url;
-                cachedDir[currentUrl].scroll = $page.scrollTop;
+                cachedDir[currentUrl].scroll = tag.get('#list').scrollTop;
                 actionsToDispose.push(currentUrl);
                 actionStack.push({
                     id: currentUrl,

@@ -10,6 +10,24 @@
     }
 }
 
+.list,
+.prompt,
+.scroll {
+    &::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $primary;
+        border-radius: 2px;
+    }
+}
+
 .octicon,
 .icon {
     user-select: none;
@@ -53,6 +71,10 @@
         pointer-events: none;
     }
 
+    &.dull {
+        opacity: 0.6;
+    }
+
     &:not(.float):active {
         transition: all 100ms ease;
         background-color: rgba(0, 0, 0, 0.2) !important;
@@ -60,6 +82,13 @@
 
     &.active {
         background-color: rgba(0, 0, 0, 0.2) !important;
+    }
+
+    &.foxdebug {
+        background-image: url(../res/logo/favicon.ico);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 18px;
     }
 }
 

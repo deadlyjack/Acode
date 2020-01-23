@@ -37,6 +37,11 @@ export default function settingsMain(demo) {
             text: strings['editor settings'],
             icon: 'text_format'
         }, {
+            key: 'previewMode',
+            text: strings['preview mode'],
+            icon: 'play_arrow',
+            subText: value.previewMode === 'none' ? strings['not set'] : value.previewMode
+        }, {
             key: 'theme',
             text: strings.theme,
             icon: 'color_lenspalette'
@@ -89,6 +94,18 @@ export default function settingsMain(demo) {
 
             case 'about':
                 aboutUs();
+                break;
+
+            case 'previewMode':
+                dialogs.select(this.text, ['browser', 'in app', ['none', strings['not set']]], {
+                        default: value.previewMode
+                    })
+                    .then(res => {
+                        if (res === value.previewMode) return;
+                        appSettings.value.previewMode = res;
+                        appSettings.update();
+                        this.changeSubText(res === 'none' ? strings['not set'] : res);
+                    });
                 break;
 
             default:

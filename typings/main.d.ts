@@ -26,11 +26,11 @@ interface Settings {
     textWrap: boolean;
     softTab: boolean;
     tabSize: number;
-    linenumbers: boolean,
-    beautify: Array<string>,
-    linting: boolean,
-    previewMode: 'browser' | 'in app' | 'none',
-    showSpaces: boolean
+    linenumbers: boolean;
+    beautify: Array<string>;
+    linting: boolean;
+    previewMode: 'browser' | 'in app' | 'none';
+    showSpaces: boolean;
 }
 
 interface AppSettings {
@@ -74,8 +74,8 @@ interface newFileOptions {
     render?: boolean;
     readonly?: boolean;
     cursorPos?: AceAjax.Position;
-    type: 'regular' | 'git';
-    record: GitFileRecord;
+    type: 'regular' | 'git' | 'gist';
+    record: Repo | Gist;
 }
 
 interface Controls {
@@ -94,21 +94,31 @@ interface File {
     isUnsaved: boolean;
     location: string;
     readOnly: boolean;
-    type: 'regular' | 'git';
-    record: GitFileRecord,
+    type: 'regular' | 'git' | 'gist';
+    record: Repo | Gist,
     updateControls: function(): void;
     session: AceAjax.IEditSession;
+    editable: boolean;
 }
 
 interface elementContainer {
     [key: string]: HTMLElement
 }
 
-interface GitFileRecord {
-    name: string,
-    data: string,
-    sha: string,
-    repo: string,
+interface GistFile {
+    filename: string;
+    content: string;
+}
+
+interface GistFiles {
+    [filename: string]: GistFile;
+}
+
+interface Repo {
+    name: string;
+    data: string;
+    sha: string;
+    repo: string;
     branch?: string;
     path: string;
     branch: 'master' | string;
@@ -117,11 +127,26 @@ interface GitFileRecord {
     setData(data: string): Promise<void>;
 }
 
+interface Gist {
+    id: string;
+    files: GistFiles;
+    setName(name: string, newName: string): Promise<void>;
+    setData(name: string, text: string): Promise<void>;
+}
+
 interface GitRecord {
-    get(sha: string): Promise<GitFileRecord>;
-    add(gitFileRecord: GitFileRecord): void;
-    remove(sha: string): GitFileRecord;
-    update(sha: string, gitFileRecord: GitFileRecord): void;
+    get(sha: string): Promise<Repo>;
+    add(gitFileRecord: Repo): void;
+    remove(sha: string): Repo;
+    update(sha: string, gitFileRecord: Repo): void;
+}
+
+interface GistRecord {
+    get(id: string): Gist;
+    add(gist: any): void;
+    remove(gist: Gist): Gist;
+    update(gist: Gist): void;
+    reset(): void;
 }
 
 interface Manager {
@@ -186,7 +211,9 @@ declare var saveInterval: Number;
 declare var freeze: Boolean;
 declare var app: HTMLDivElement;
 declare var gitRecord: GitRecord;
+declare var gistRecord: GistRecord;
 declare var gitRecordURL: string;
+declare var gistRecordURL: string;
 /**
  * A custom alert box to show alert notification
  * @param title 

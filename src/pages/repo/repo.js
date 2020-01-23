@@ -58,7 +58,9 @@ export default function Repo(owner, repoName, $gitHubPage) {
     repo.getSha('master', '')
       .then(res => {
         render(res.data, repoName, 'root');
-      });
+      })
+      .catch(error)
+      .finally(dialogs.loaderHide);
   }
 
   /**
@@ -191,7 +193,9 @@ export default function Repo(owner, repoName, $gitHubPage) {
           .then(res => {
             const data = res.data;
             render(data.tree, name, sha);
-          });
+          })
+          .catch(error)
+          .finally(dialogs.loaderHide);
       }
 
       actionStack.push({
@@ -232,9 +236,16 @@ export default function Repo(owner, repoName, $gitHubPage) {
           });
 
           $page.hide();
-          $gitHubPage.hide();
+          actionStack.pop();
+          actionStack.pop();
           dialogs.loaderHide();
         });
     }
+  }
+
+  function error(err) {
+    console.log(err);
+    actionStack.pop();
+    dialogs.alert(strings.error, err.toString());
   }
 }
