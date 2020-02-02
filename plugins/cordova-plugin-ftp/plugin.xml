@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:rim="http://www.blackberry.com/ns/widgets"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="cordova-plugin-ftp"
+    version="1.1.1">
+    <name>Ftp</name>
+    <description>Cordova Ftp Plugin</description>
+    <license>Apache 2.0</license>
+    <keywords>cordova,ftp</keywords>
+    <repo>https://github.com/xfally/cordova-plugin-ftp.git</repo>
+
+    <js-module src="www/ftp.js" name="ftp">
+        <clobbers target="cordova.plugin.ftp" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="Ftp">
+                <param name="android-package" value="io.github.xfally.cordova.plugin.ftp.CDVFtp" />
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/CDVFtp.java" target-dir="src/io/github/xfally/cordova/plugin/ftp" />
+
+        <lib-file src="src/android/libs/ftp4j-1.7.2.jar" />
+    </platform>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Ftp">
+                <param name="ios-package" value="CDVFtp"/>
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/CDVFtp.h" />
+        <source-file src="src/ios/CDVFtp.m" />
+
+        <header-file src="src/ios/GoldRaccoon/Sources/GRRequestsManager.h" />
+        <source-file src="src/ios/GoldRaccoon/Sources/GRRequestsManager.m" />
+        <header-file src="src/ios/GoldRaccoon/Sources/GRRequestsManagerProtocol.h" />
+        <header-file src="src/ios/GoldRaccoon/Sources/Requests/GRCreateDirectoryRequest.h" />
+        <source-file src="src/ios/GoldRaccoon/Sources/Requests/GRCreateDirectoryRequest.m" />
+        <header-file src="src/ios/GoldRaccoon/Sources/Requests/GRDeleteRequest.h" />
+        <source-file src="src/ios/GoldRaccoon/Sources/Requests/GRDeleteRequest.m" />
+        <header-file src="src/ios/GoldRaccoon/Sources/Requests/GRDownloadRequest.h" />
+        <source-file src="src/ios/GoldRaccoon/Sources/Requests/GRDownloadRequest.m" />
+        <header-file src="src/ios/GoldRaccoon/Sources/Requests/GRListingRequest.h" />
+        <source-file src="src/ios/GoldRaccoon/Sources/Requests/GRListingRequest.m" />
+        <header-file src="src/ios/GoldRaccoon/Sources/Requests/GRRequest.h" />
+        <source-file src="src/ios/GoldRaccoon/Sources/Requests/GRRequest.m" />
+        <header-file src="src/ios/GoldRaccoon/Sources/Requests/GRRequestProtocol.h" />
+        <header-file src="src/ios/GoldRaccoon/Sources/Requests/GRUploadRequest.h" />
+        <source-file src="src/ios/GoldRaccoon/Sources/Requests/GRUploadRequest.m" />
+        <header-file src="src/ios/GoldRaccoon/Sources/Utils/GRError.h" />
+        <source-file src="src/ios/GoldRaccoon/Sources/Utils/GRError.m" />
+        <header-file src="src/ios/GoldRaccoon/Sources/Utils/GRQueue.h" />
+        <source-file src="src/ios/GoldRaccoon/Sources/Utils/GRQueue.m" />
+        <header-file src="src/ios/GoldRaccoon/Sources/Utils/GRStreamInfo.h" />
+        <source-file src="src/ios/GoldRaccoon/Sources/Utils/GRStreamInfo.m" />
+
+        <framework src="CFNetwork.framework" />
+    </platform>
+
+</plugin>

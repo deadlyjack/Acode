@@ -13,12 +13,12 @@ export default {
         const $textarea = editor.textInput.getElement();
         const shiftKey = footer.querySelector('#shift-key').getAttribute('data-state') === 'on' ? true : false;
 
-        if (editorManager.state === 'focus') editor.focus();
+        // if (editorManager.state === 'focus') editor.focus();
 
         document.ontouchend = () => {
             this.onTouchEnd();
             document.ontouchend = null;
-        }
+        };
 
         switch (action) {
             case 'left':
@@ -37,6 +37,9 @@ export default {
                 this.dispatchKey(40, shiftKey, $textarea);
                 break;
         }
+
+        e.preventDefault();
+        e.stopPropagation();
     },
     onTouchEnd: function () {
         if (this.interval) clearInterval(this.interval);
@@ -55,4 +58,4 @@ export default {
             $textarea.dispatchEvent(keyevent);
         }
     }
-}
+};

@@ -12587,13 +12587,70 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
         };
     }
     exports.commands = [{
+            name: 'newFile',
+            description: 'Create new file',
+            bindKey: bindKey("Ctrl-N", "Command-N"),
+            exec: function (editor) {
+                if (Acode) {
+                    Acode.exec('new-file');
+                }
+            },
+            readOnly: true
+        }, {
+            name: 'openFile',
+            description: 'Open a file',
+            bindKey: bindKey("Ctrl-O", "Command-O"),
+            exec: function (editor) {
+                if (Acode) {
+                    Acode.exec('open-file');
+                }
+            },
+            readOnly: true
+        }, {
+            name: 'openFolder',
+            description: 'Open a folder',
+            bindKey: bindKey("Ctrl-Shift-O", "Command-Shift-O"),
+            exec: function (editor) {
+                if (Acode) {
+                    Acode.exec('open-folder');
+                }
+            },
+            readOnly: true
+        }, {
+            name: 'saveFileAs',
+            description: 'Save as current file',
+            bindKey: bindKey('Ctrl-Shift-S', 'Command-Shift-S'),
+            exec: function (editor) {
+                if (Acode) {
+                    Acode.exec('save-as');
+                }
+            },
+            readOnly: true
+        }, {
+            name: 'nextFile',
+            description: 'Open next file tab',
+            bindKey: bindKey("Ctrl-Tab", "Command-Tab"),
+            exec: function (editor) {
+                if (Acode) {
+                    Acode.exec('next-file')
+                }
+            }
+        }, {
+            name: 'prevFile',
+            description: 'Open previous file tab',
+            bindKey: bindKey("Ctrl-Shift-Tab", "Command-Shift-Tab"),
+            exec: function (editor) {
+                if (Acode) {
+                    Acode.exec('prev-file')
+                }
+            }
+        }, {
             name: "showSettingsMenu",
             bindKey: bindKey("Ctrl-,", "Command-,"),
             exec: function (editor) {
-                config.loadModule("ace/ext/settings_menu", function (module) {
-                    module.init(editor);
-                    editor.showSettingsMenu();
-                });
+                if (Acode) {
+                    Acode.exec('open', 'settings');
+                }
             },
             readOnly: true
         }, {
@@ -12635,13 +12692,11 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
         }, {
             name: "gotoline",
             description: "Go to line...",
-            bindKey: bindKey("Ctrl-L", "Command-L"),
-            exec: function (editor, line) {
-                if (typeof line === "number" && !isNaN(line))
-                    editor.gotoLine(line);
-                editor.prompt({
-                    $type: "gotoLine"
-                });
+            bindKey: bindKey("Ctrl-G", "Command-G"),
+            exec: function () {
+                if (Acode) {
+                    Acode.exec('goto');
+                }
             },
             readOnly: true
         }, {
@@ -12711,7 +12766,7 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
         }, {
             name: "findnext",
             description: "Find next",
-            bindKey: bindKey("Ctrl-K", "Command-G"),
+            bindKey: bindKey("Ctrl-K", "Command-K"),
             exec: function (editor) {
                 editor.findNext();
             },
@@ -12721,7 +12776,7 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
         }, {
             name: "findprevious",
             description: "Find previous",
-            bindKey: bindKey("Ctrl-Shift-K", "Command-Shift-G"),
+            bindKey: bindKey("Ctrl-Shift-K", "Command-Shift-K"),
             exec: function (editor) {
                 editor.findPrevious();
             },
@@ -12742,7 +12797,7 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
         }, {
             name: "selectOrFindPrevious",
             description: "Select or find previous",
-            bindKey: bindKey("Alt-Shift-K", "Ctrl-Shift-G"),
+            bindKey: bindKey("Alt-Shift-K", "Option-Shift-G"),
             exec: function (editor) {
                 if (editor.selection.isEmpty())
                     editor.selection.selectWord();
@@ -12755,9 +12810,9 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
             description: "Find",
             bindKey: bindKey("Ctrl-F", "Command-F"),
             exec: function (editor) {
-                config.loadModule("ace/ext/searchbox", function (e) {
-                    e.Search(editor);
-                });
+                if (Acode) {
+                    Acode.exec('find');
+                }
             },
             readOnly: true
         }, {
@@ -12845,7 +12900,7 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
         }, {
             name: "golinedown",
             description: "Go line down",
-            bindKey: bindKey("Down", "Down|Ctrl-N"),
+            bindKey: bindKey("Down", "Down"),
             exec: function (editor, args) {
                 editor.navigateDown(args.times);
             },
@@ -13204,9 +13259,9 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
             description: "Replace",
             bindKey: bindKey("Ctrl-H", "Command-Option-F"),
             exec: function (editor) {
-                config.loadModule("ace/ext/searchbox", function (e) {
-                    e.Search(editor, true);
-                });
+                if (Acode) {
+                    Acode.exec('replace');
+                }
             }
         }, {
             name: "undo",
@@ -13401,7 +13456,7 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
         }, {
             name: "splitline",
             description: "Split line",
-            bindKey: bindKey(null, "Ctrl-O"),
+            bindKey: bindKey(null, null),
             exec: function (editor) {
                 editor.splitLine();
             },

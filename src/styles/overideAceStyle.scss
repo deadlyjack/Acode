@@ -62,6 +62,10 @@
     }
 }
 
+.ace_prompt_mask {
+    z-index: 107;
+}
+
 .ace_prompt_wrapper {
     position: fixed;
     top: 0;
@@ -72,6 +76,7 @@
     width: 90vw;
     max-width: 600px;
     height: fit-content;
+    z-index: 108;
 
     .ace_prompt_container {
         position: relative;

@@ -5,6 +5,7 @@ var PHP = function (code, opts) {
     opts.filesystem = opts.filesystem || typeof (window) !== "undefined" ? new PHP.Adapters.XHRFileSystem() : androidFileSystem;
     opts.SERVER = opts.SERVER || {};
     opts.SERVER.SCRIPT_FILENAME = opts.SERVER.SCRIPT_FILENAME || "";
+    // if (opts.path) PHP.PATH = opts.path.slice(-1) === '/' ? opts.path.slice(0, -1) : opts.path;
     if (opts.path) PHP.PATH = opts.path;
     else PHP.PATH = '';
 
@@ -74,7 +75,7 @@ PHP.Utils.ClassName = function (classVar) {
         VARIABLE = PHP.VM.Variable.prototype;
     if (classVar instanceof PHP.VM.Variable) {
         if (classVar[VARIABLE.TYPE] === VARIABLE.STRING) {
-            return classVar[COMPILER.VARIABLE_VALUE]
+            return classVar[COMPILER.VARIABLE_VALUE];
         } else {
             return classVar[COMPILER.VARIABLE_VALUE][COMPILER.CLASS_NAME];
         }
@@ -253,7 +254,7 @@ PHP.Utils.StaticHandler = function (staticHandler, staticVars, handler, $Global)
         vars.forEach(function (varName) {
             var val = $Global(varName);
             val[VARIABLE.DEFINED] = true;
-            handler(varName, val)
+            handler(varName, val);
         });
     };
 
@@ -746,7 +747,7 @@ COMPILER.fixString = function (result) {
     */
 
 
-}
+};
 
 
 PHP.Compiler.prototype.Node_Expr_ArrayDimFetch = function (action) {
@@ -756,7 +757,7 @@ PHP.Compiler.prototype.Node_Expr_ArrayDimFetch = function (action) {
     if (action.dim !== undefined && action.dim !== null && (/^Node_Expr_(FuncCall|Plus)$/.test(action.dim.type))) {
 
 
-        var tmp = "var dim" + ++this.FUNC_NUM + " = " + this.CREATE_VARIABLE + "(" + this.source(action.dim) + "." + this.VARIABLE_VALUE + ");";
+        var tmp = "var dim" + (++this.FUNC_NUM) + " = " + this.CREATE_VARIABLE + "(" + this.source(action.dim) + "." + this.VARIABLE_VALUE + ");";
 
 
 
@@ -906,7 +907,7 @@ PHP.Compiler.prototype.Node_Expr_FuncCall = function (action) {
             if (this.INSIDE_METHOD) {
                 src += ", ctx";
             } else {
-                src += ", undefined"
+                src += ", undefined";
             }
             src += ", ENV";
             // args.push("$");
@@ -1515,7 +1516,7 @@ PHP.Compiler.prototype.Node_Stmt_Interface = function (action) {
     }, this);
 
 
-    src += "." + this.CLASS_DECLARE + '()})'
+    src += "." + this.CLASS_DECLARE + '()})';
 
 
     return src;
@@ -1530,7 +1531,7 @@ PHP.Compiler.prototype.Node_Stmt_Class = function (action) {
 
     if (action.Implements.length > 0) {
         if (action.Extends !== null) {
-            src += ", "
+            src += ", ";
         }
 
         // properly borken somewhere in the parser
@@ -1538,19 +1539,7 @@ PHP.Compiler.prototype.Node_Stmt_Class = function (action) {
 
         var ints = [];
 
-        function addInterface(interf) {
-
-            interf.forEach(function (item) {
-                if (Array.isArray(item)) {
-                    addInterface(item);
-                } else {
-
-                    ints.push('"' + item.parts + '"');
-                }
-            });
-        }
-
-        addInterface(action.Implements);
+        addInterface(action.Implements, ints);
         /*
         src += (Array.isArray(action.Implements[ 0 ]) ? action.Implements[ 0 ] : action.Implements ).map(function( item ){
 
@@ -1561,6 +1550,18 @@ PHP.Compiler.prototype.Node_Stmt_Class = function (action) {
         src += "]";
     }
 
+    function addInterface(interf, ints) {
+
+        interf.forEach(function (item) {
+            if (Array.isArray(item)) {
+                addInterface(item, ints);
+            } else {
+
+                ints.push('"' + item.parts + '"');
+            }
+        });
+    }
+
     src += "}, function( M, $, $$ ){\n M";
 
     this.currentClass = action.name;
@@ -1568,9 +1569,9 @@ PHP.Compiler.prototype.Node_Stmt_Class = function (action) {
         src += this.source(stmt);
     }, this);
 
-    src += "." + this.CLASS_DECLARE + '()'
+    src += "." + this.CLASS_DECLARE + '()';
 
-    src += "})"
+    src += "})";
 
 
 
@@ -1611,7 +1612,7 @@ PHP.Compiler.prototype.Node_Stmt_For = function (action) {
         src += "(" + this.source(action.cond) + ")." + PHP.VM.Variable.prototype.CAST_BOOL + "." + this.VARIABLE_VALUE;
     }
 
-    src += "; "
+    src += "; ";
 
     // if ( !Array.isArray(action.loop) || action.loop.length !== 1 ) { // change
 
@@ -1648,7 +1649,7 @@ PHP.Compiler.prototype.Node_Stmt_While = function (action) {
 PHP.Compiler.prototype.Node_Stmt_Do = function (action) {
 
     var src = this.LABEL + this.LABEL_COUNT++ + ":\n";
-    src += "do {\n"
+    src += "do {\n";
     src += this.stmts(action.stmts);
     src += "} while( " + this.source(action.cond) + "." + PHP.VM.Variable.prototype.CAST_BOOL + "." + this.VARIABLE_VALUE + ")";
 
@@ -1707,11 +1708,9 @@ PHP.Compiler.prototype.Node_Stmt_Foreach = function (action) {
     if (action.keyVar !== null) {
         src += ', ' + this.source(action.keyVar);
     }
-    src += ')) {\n'
-
+    src += ')) {\n';
     src += this.stmts(action.stmts);
-
-    src += '} '
+    src += '} ';
 
     src += this.CTX + "$foreachEnd( iterator" + count + " )";
     return src;
@@ -1726,7 +1725,7 @@ PHP.Compiler.prototype.Node_Stmt_Continue = function (action) {
 
 PHP.Compiler.prototype.Node_Stmt_Break = function (action) {
 
-    var src = "break"
+    var src = "break";
 
     if (action.num !== null) {
         src += " " + this.LABEL + (this.LABEL_COUNT - action.num.value);
@@ -1738,7 +1737,7 @@ PHP.Compiler.prototype.Node_Stmt_Function = function (action) {
 
     var src = this.CTX + action.name + " = Function.prototype.bind.apply( function( " + this.VARIABLE + ", " + this.FUNCTION_STATIC + ", " + this.FUNCTION_GLOBAL + "  ) {\n";
 
-    src += this.VARIABLE + " = " + this.VARIABLE + "(["
+    src += this.VARIABLE + " = " + this.VARIABLE + "([";
     var params = [];
     ((action.params[0] === undefined || !Array.isArray(action.params[0])) ? action.params : action.params[0]).forEach(function (param) {
 
@@ -1746,32 +1745,27 @@ PHP.Compiler.prototype.Node_Stmt_Function = function (action) {
             var item = '{' + this.PARAM_NAME + ':"' + param.name + '"';
 
             if (param.byRef === true) {
-                item += "," + this.PARAM_BYREF + ':true'
+                item += "," + this.PARAM_BYREF + ':true';
             }
 
             if (param.def !== null) {
-                item += ", " + this.PROPERTY_DEFAULT + ": " + this.source(param.def)
+                item += ", " + this.PROPERTY_DEFAULT + ": " + this.source(param.def);
             }
 
             if (param.Type !== null) {
-                item += ", " + this.PROPERTY_TYPE + ': "' + this.source(param.Type) + '"'
+                item += ", " + this.PROPERTY_TYPE + ': "' + this.source(param.Type) + '"';
             }
 
 
-            item += '}'
+            item += '}';
             params.push(item);
         }
 
     }, this);
 
-    src += params.join(", ") + "], arguments);\n"
-
+    src += params.join(", ") + "], arguments);\n";
     src += this.stmts(action.stmts);
-
-
-
     src += "}, (" + this.CTX + this.FUNCTION_HANDLER + ')( ENV, "' + action.name + '", ' + action.byRef + '  ))';
-
 
     return src;
 };
@@ -1873,7 +1867,7 @@ PHP.Compiler.prototype.Node_Stmt_If = function (action) {
         }, this);
     }
 
-    src += "}"
+    src += "}";
 
 
 
@@ -1905,8 +1899,7 @@ PHP.Compiler.prototype.Node_Stmt_TryCatch = function (action) {
         src += this.source(Catch);
     }, this);
 
-    src += ";\n }"
-
+    src += ";\n }";
 
     this.source(action.expr);
     return src;
@@ -1915,7 +1908,7 @@ PHP.Compiler.prototype.Node_Stmt_TryCatch = function (action) {
 PHP.Compiler.prototype.Node_Stmt_Catch = function (action) {
     var src = "." + this.CATCH + '( "' + action.variable + '", "' + action.Type.parts + '", ' + this.VARIABLE + ', function() {\n';
     src += this.stmts(action.stmts);
-    src += "})"
+    src += "})";
     return src;
 
 };
@@ -1938,22 +1931,22 @@ PHP.Compiler.prototype.Node_Stmt_ClassMethod = function (action) {
 
 
         if (prop.def !== null) {
-            obj += ", " + this.PROPERTY_DEFAULT + ": " + this.source(prop.def)
+            obj += ", " + this.PROPERTY_DEFAULT + ": " + this.source(prop.def);
         }
 
         if (prop.Type !== null) {
-            obj += ", " + this.PROPERTY_TYPE + ': "' + this.source(prop.Type) + '"'
+            obj += ", " + this.PROPERTY_TYPE + ': "' + this.source(prop.Type) + '"';
         }
 
         if (prop.byRef === true) {
-            obj += ", " + this.PARAM_BYREF + ': true'
+            obj += ", " + this.PARAM_BYREF + ': true';
         }
 
         obj += "}";
 
         props.push(obj);
 
-    }, this)
+    }, this);
 
     src += props.join(", ") + '], ' + action.byRef + ', function( ' + this.VARIABLE + ', ctx, $Static ) {\n';
 
@@ -1970,7 +1963,7 @@ PHP.Compiler.prototype.Node_Stmt_ClassConst = function (action) {
     var src = "";
 
     ((Array.isArray(action.consts[0])) ? action.consts[0] : action.consts).forEach(function (constant) {
-        src += "." + this.CLASS_CONSTANT + '("' + constant.name + '", ' + this.source(constant.value) + ")\n"
+        src += "." + this.CLASS_CONSTANT + '("' + constant.name + '", ' + this.source(constant.value) + ")\n";
     }, this);
     return src;
 
@@ -1993,7 +1986,7 @@ PHP.Compiler.prototype.Node_Scalar_Encapsed = function (action) {
 
     action.parts.forEach(function (part) {
         if (typeof part === "string") {
-            parts.push(this.fixString(part))
+            parts.push(this.fixString(part));
         } else {
 
 
@@ -2501,16 +2494,12 @@ PHP.Modules.prototype[PHP.Compiler.prototype.SIGNATURE] = function (args, name, 
                         case C.E_ERROR:
                             this[COMPILER.DISPLAY_HANDLER] = false;
                             throw new PHP.Halt(msg, level, lineAppend, catchable);
-                            return;
-                            break;
                         case C.E_RECOVERABLE_ERROR:
                             this[COMPILER.DISPLAY_HANDLER] = false;
                             //    this.$ob( "\nCatchable fatal error: " + msg + lineAppend + "\n");
 
                             throw new PHP.Halt(msg, level, lineAppend, catchable);
                             //   throw new PHP.Halt( level );
-                            return;
-                            break;
 
                         case C.E_WARNING:
                         case C.E_CORE_WARNING:
@@ -2520,11 +2509,9 @@ PHP.Modules.prototype[PHP.Compiler.prototype.SIGNATURE] = function (args, name, 
                                 this.echo(new PHP.VM.Variable("\nWarning: " + msg + lineAppend + "\n"));
                             }
                             return;
-                            break;
                         case C.E_PARSE:
                             this.echo(new PHP.VM.Variable("\nParse error: " + msg + lineAppend + "\n"));
                             return;
-                            break;
                         case C.E_CORE_NOTICE:
                         case C.E_NOTICE:
                             if (checkType("E_NOTICE")) {
@@ -2541,15 +2528,12 @@ PHP.Modules.prototype[PHP.Compiler.prototype.SIGNATURE] = function (args, name, 
                                 }
                             }
                             return;
-                            break;
                         case C.E_DEPRECATED:
                             if (checkType("E_DEPRECATED")) {
                                 this.echo(new PHP.VM.Variable("\nDeprecated: " + msg + lineAppend + "\n"));
                                 return;
                             }
-
                             break;
-
                         default:
                             this.echo(new PHP.VM.Variable("\nDefault Warning: " + msg + lineAppend + "\n"));
                             return;
@@ -2562,7 +2546,7 @@ PHP.Modules.prototype[PHP.Compiler.prototype.SIGNATURE] = function (args, name, 
 
     };
 
-})(PHP.Modules.prototype)
+})(PHP.Modules.prototype);
 
 
 
@@ -2683,7 +2667,7 @@ PHP.Modules.prototype.array_push = function (array) {
     var COMPILER = PHP.Compiler.prototype,
         VARIABLE = PHP.VM.Variable.prototype;
 
-    array[COMPILER.VARIABLE_VALUE][COMPILER.METHOD_CALL](this, "append", arguments[1])
+    array[COMPILER.VARIABLE_VALUE][COMPILER.METHOD_CALL](this, "append", arguments[1]);
 };
 
 
@@ -3386,7 +3370,7 @@ PHP.Modules.prototype.foreach = function (iterator, byRef, value, key) {
         var index, lowerLoop = function (index) {
             while (compareTo[--index] === undefined && index > 0) {}
             return index;
-        }
+        };
 
         if (iterator.breakNext === true) {
             return false;
@@ -3466,7 +3450,7 @@ PHP.Modules.prototype.foreach = function (iterator, byRef, value, key) {
 
 
     } else if (expr[VAR.TYPE] === VAR.OBJECT) {
-        var objectValue = expr[COMPILER.VARIABLE_VALUE]
+        var objectValue = expr[COMPILER.VARIABLE_VALUE];
 
 
         // iteratorAggregate implemented objects
@@ -3525,11 +3509,13 @@ PHP.Modules.prototype.$include = function ($, $Static, file) {
     var COMPILER = PHP.Compiler.prototype,
         filename = file[COMPILER.VARIABLE_VALUE];
 
-    this[COMPILER.FILE_PATH] = this[COMPILER.FILE_PATH] || PHP.PATH;
+    // this[COMPILER.FILE_PATH] = this[COMPILER.FILE_PATH] || PHP.PATH;
 
-    var path = this[COMPILER.FILE_PATH];
+    // var path = this[COMPILER.FILE_PATH];
+    let path = PHP.PATH;
+    // var loaded_file = (/^(.:|\/)/.test(filename)) ? filename : path + "/" + filename;
+    let loaded_file = resolve(path, filename);
 
-    var loaded_file = (/^(.:|\/)/.test(filename)) ? filename : path + "/" + filename;
     var $this = this;
     this.$Included.Include(loaded_file);
     try {
@@ -3555,11 +3541,39 @@ PHP.Modules.prototype.$include = function ($, $Static, file) {
     // execture code in current context ($)
     var exec = new Function("$$", "$", "ENV", "$Static", compiler.src);
 
-    this[COMPILER.FILE_PATH] = PHP.Utils.Path(loaded_file);
+    // this[COMPILER.FILE_PATH] = PHP.Utils.Path(loaded_file);
+    PHP.PATH = PHP.Utils.Path(loaded_file);
 
     exec.call(this, function (arg) {
         return new PHP.VM.Variable(arg);
     }, $, this, $Static);
+
+    PHP.PATH = path;
+
+    /**
+     * 
+     * @param {string} path 
+     * @param {string} filename 
+     */
+    function resolve(path, filename) {
+        const REGEX_back = /^(\.\.\/)/;
+        const REGEX_current = /^(\.\/)/;
+        const REGEX_root = /^(\/)+/;
+
+        path = path.slice(-1) === '/' ? path.slice(0, -1) : path;
+
+        if (REGEX_root.test(filename)) {
+            return filename.replace(REGEX_root, '/');
+        } else if (REGEX_current.test(filename)) {
+            return resolve(path, filename.replace(REGEX_current, ''));
+        } else if (REGEX_back.test(filename)) {
+            path = path.substring(0, path.lastIndexOf('/'));
+            filename = filename.replace(REGEX_back, '');
+            return resolve(path, filename);
+        } else {
+            return path + '/' + filename;
+        }
+    }
 };
 
 
@@ -4295,8 +4309,8 @@ PHP.Modules.prototype.getenv = function (name) {
 
     switch (variableValue) {
         case "TEST_PHP_EXECUTABLE":
-            return new PHP.VM.Variable(PHP.Constants.PHP_BINARY)
-            break;
+            return new PHP.VM.Variable(PHP.Constants.PHP_BINARY);
+
         default:
             return new PHP.VM.Variable(false);
 
@@ -4471,7 +4485,7 @@ PHP.Modules.prototype.flush = function () {
 
         this[COMPILER.OUTPUT_BUFFERS][index] = value;
 
-    }
+    };
 
     MODULES.ob_start = function (output_callback, chunk_size, erase) {
 
@@ -4543,7 +4557,7 @@ PHP.Modules.prototype.flush = function () {
         }
 
         this[OUTPUT_BUFFERS].push("");
-        types.push(type)
+        types.push(type);
         flags.push(CONSTANTS.PHP_OUTPUT_HANDLER_STDFLAGS | type);
         handlers.push(handler);
 
@@ -4701,7 +4715,7 @@ PHP.Modules.prototype.flush = function () {
         if (full_status !== undefined && full_status[COMPILER.VARIABLE_VALUE] === true) {
             var arr = [];
             handlers.forEach(function (handler, index) {
-                arr.push(item(index, this.array(get_status(index))))
+                arr.push(item(index, this.array(get_status(index))));
             }, this);
             return this.array(arr);
         } else {
@@ -4887,7 +4901,7 @@ PHP.Modules.prototype.explode = function (delim, string) {
 
 
         items.forEach(function (val, index) {
-            arr.push(item(index, val))
+            arr.push(item(index, val));
         });
 
         return this.array(arr);
@@ -5028,7 +5042,7 @@ PHP.Modules.prototype.setlocale = function (category) {
 
     Array.prototype.slice.call(arguments, 1).some(function (localeVar) {
 
-        var locale = localeVar[COMPILER.VARIABLE_VALUE]
+        var locale = localeVar[COMPILER.VARIABLE_VALUE];
 
         return Object.keys(PHP.Locales).some(function (key) {
 

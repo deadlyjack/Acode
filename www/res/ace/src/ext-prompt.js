@@ -2209,7 +2209,7 @@ background: #f0f0f0;\
         }
 
         closer.className = 'ace_prompt_wrapper';
-        mask.className = 'mask';
+        mask.className = 'mask ace_prompt_mask';
         closer.addEventListener('click', function (e) {
             if (!ignoreFocusOut) {
                 close();

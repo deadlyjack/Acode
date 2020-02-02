@@ -61,13 +61,18 @@ export default function editorSettings() {
         },
         {
             key: 'linting',
-            text: strings['linting'],
+            text: strings.linting,
             subText: value.linting ? strings.yes : strings.no,
         },
         {
             key: 'showSpaces',
             text: strings['show spaces'],
             subText: value.showSpaces ? strings.yes : strings.no,
+        },
+        {
+            key: 'openFileListPos',
+            text: strings['active files'],
+            subText: value.openFileListPos,
         }
     ];
 
@@ -226,7 +231,17 @@ export default function editorSettings() {
                     });
                 break;
 
-            default:
+            case 'openFileListPos':
+                dialogs.select(this.text, ['sidebar', 'header'], {
+                        default: value.openFileListPos
+                    })
+                    .then(res => {
+                        if (res === value.openFileListPos) return;
+                        appSettings.value.openFileListPos = res;
+                        appSettings.update();
+                        editorManager.moveOpenFileList();
+                        this.changeSubText(res);
+                    });
                 break;
         }
     }

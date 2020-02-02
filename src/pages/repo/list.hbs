@@ -3,7 +3,9 @@
     action="{{#isDirectory}}folder{{/isDirectory}}{{#isFile}}file{{/isFile}}">
     <span class="icon {{type}}"></span>
     <span class="container">
-      <span class="text">{{name}}</span>
+      <div class="text">
+        <span>{{name}}</span>
+      </div>
       {{#isFile}}
       <small class="value">{{size}}</small>
       {{/isFile}}

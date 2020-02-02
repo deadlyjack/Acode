@@ -43,8 +43,8 @@ class Settings {
             },
             lang,
             fontSize: "12px",
-            editorTheme: "ace/theme/textmate",
-            appTheme: "default",
+            editorTheme: /free/.test(BuildInfo.name) ? "ace/theme/textmate" : "ace/theme/pastel_on_dark",
+            appTheme: /free/.test(BuildInfo.name) ? "default" : "dark",
             textWrap: true,
             softTab: true,
             tabSize: 2,
@@ -54,7 +54,8 @@ class Settings {
             linting: false,
             autoCorrect: true,
             previewMode: 'none',
-            showSpaces: false
+            showSpaces: false,
+            openFileListPos: 'sidebar'
         };
         this.settingsFile = cordova.file.externalApplicationStorageDirectory + 'settings.json';
         this.loaded = false;
@@ -74,7 +75,7 @@ class Settings {
                         save();
                     });
             }, 1000);
-        }
+        };
 
         if ('globalSettings' in localStorage) {
             try {

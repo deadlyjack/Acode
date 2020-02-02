@@ -9,7 +9,7 @@ function gitHub() {
     username: localStorage.username ? helpers.credentials.decrypt(localStorage.username) : undefined,
     password: localStorage.password ? helpers.credentials.decrypt(localStorage.password) : undefined,
     token: localStorage.token ? helpers.credentials.decrypt(localStorage.token) : undefined
-  })
+  });
 }
 
 /**
@@ -39,7 +39,7 @@ function init() {
             fileError(err.code);
           }
           reject(err);
-        })
+        });
     }
 
 
@@ -65,7 +65,7 @@ function init() {
                 });
             }
           });
-      })
+      });
     }
 
     function error(err) {
@@ -88,6 +88,11 @@ function init() {
 
 function fileError(code) {
   dialogs.alert(strings.error, helpers.getErrorMessage(code));
+}
+
+function error(err) {
+  if (err) dialogs.alert(strings.error, err.toString());
+  throw err;
 }
 
 /**
@@ -121,11 +126,6 @@ function Record(owner, sha, name, data, repo, path) {
     gitRecord.update(sha, _record, data);
   }
 
-  function error(err) {
-    window.plugins.toast.showShortBottom(strings.error);
-    console.log(err);
-  }
-
   function getPath(name) {
     return path ? path + '/' + name : name;
   }
@@ -150,7 +150,7 @@ function Record(owner, sha, name, data, repo, path) {
       _record.branch = str;
     },
     get name() {
-      return _record.name
+      return _record.name;
     },
     setName: str => {
       return new Promise((resolve, reject) => {
@@ -164,7 +164,7 @@ function Record(owner, sha, name, data, repo, path) {
           .then(res => {
             if (res.statusText === 'OK') {
               _path = getPath(str);
-              return repository.writeFile(branch, _path, data, `Rename ${name} to ${str}`, {})
+              return repository.writeFile(branch, _path, data, `Rename ${name} to ${str}`, {});
             }
 
             return Promise.reject(res);
@@ -250,7 +250,7 @@ function GitRecord(obj) {
           const text = decoder.decode(res.data);
           let record;
           try {
-            record = Record(owner, sha, name, text, repo, path)
+            record = Record(owner, sha, name, text, repo, path);
           } catch (error) {
             remove(sha);
           }
@@ -286,7 +286,7 @@ function GitRecord(obj) {
       .catch(err => {
         if (err.code) FileError(err.code);
         console.log(err);
-      })
+      });
     return record;
   }
 
@@ -340,29 +340,71 @@ function GitRecord(obj) {
 /**
  * Creats a gist object to manage gist file in editor
  * @param {string} id  
- * @param {GistFiles} files  
+ * @param {GistFiles} [files]  
+ * @param {boolean} [isNew]  
+ * @param {boolean} [_public]  
  * @returns {Gist}
  */
-function Gist(id, files) {
+function Gist(id, files, isNew, _public) {
   const gist = gitHub().getGist(id);
   const _this = {
     id,
-    files
+    files,
+    isNew,
+    public: _public
   };
 
-  function setData(name, text) {
+  /**
+   * 
+   * @param {string} name 
+   * @returns {File}
+   */
+  function getFile(name) {
+    for (let f of editorManager.files) {
+      if (f.type === 'gist' && f.record.id === _this.id && f.name === name) return f;
+    }
+  }
+
+  function setData(name, text, isDelete = false) {
     return new Promise((resolve, reject) => {
       _this.files[name].content = text;
       const update = {
         files: {}
       };
-
+      update.files[name] = _this.files[name];
 
       dialogs.loaderShow(name, strings.saving + '...');
-      update.files[name] = _this.files[name];
+      if (_this.isNew) {
+        update.public = _this.public;
+        gist.create(update)
+          .then(res => {
+            if (res.status === 201) {
+              _this.id = res.data.id;
+              gistRecord.update(_this);
+              _this.isNew = false;
+              editorManager.setSubText(getFile(name));
+              resolve();
+            }
+          })
+          .catch(err => {
+            error(err);
+            reject();
+          })
+          .finally(dialogs.loaderHide);
+
+        return;
+      }
+
       gist.update(update)
         .then(res => {
+          if (!res) return Promise.reject('No response');
           if (res.status === 200 || res.statusText === 'OK') {
+
+            if (isDelete) {
+              delete _this.files[name];
+              editorManager.removeFile(getFile(name), true);
+            }
+
             gistRecord.update(_this);
             resolve();
           } else {
@@ -383,6 +425,11 @@ function Gist(id, files) {
 
     return new Promise((resolve, reject) => {
 
+      if (_this.isNew) {
+        changeName();
+        return resolve();
+      }
+
       const update = {
         files: {}
       };
@@ -392,10 +439,7 @@ function Gist(id, files) {
       gist.update(update)
         .then(res => {
           if (res.status === 200 || res.statusText === 'OK') {
-            const file = _this.files[name];
-            delete _this.files[name];
-            _this.files[newName] = file;
-            gistRecord.update(_this);
+
             resolve();
           } else {
             console.error(res);
@@ -408,15 +452,38 @@ function Gist(id, files) {
         })
         .finally(dialogs.loaderHide);
     });
+
+    function changeName() {
+      const file = _this.files[name];
+      delete _this.files[name];
+      _this.files[newName] = file;
+      gistRecord.update(_this);
+    }
+  }
+
+  function addFile(name) {
+    _this.files[name] = {
+      filename: name
+    };
+    gistRecord.update(_this);
+  }
+
+  function removeFile(name) {
+    return setData(name, '', true);
   }
 
   return {
     get id() {
       return _this.id;
     },
+    get isNew() {
+      return _this.isNew;
+    },
     files: _this.files,
     setName,
-    setData
+    setData,
+    addFile,
+    removeFile
   };
 }
 
@@ -432,9 +499,10 @@ function GistRecord(obj) {
   /**
    * 
    * @param {object} obj 
+   * @param {boolean} isNew 
    * @returns {Gist}
    */
-  function add(obj) {
+  function add(obj, isNew = false) {
     const id = obj.id;
     const _files = obj.files;
     const files = {};
@@ -444,27 +512,28 @@ function GistRecord(obj) {
       files[filename] = {
         filename: file.filename,
         content: file.content
-      }
+      };
     }
     gistRecord[obj.id] = {
       id,
       files
     };
     save();
-    return Gist(id, files);
+    return Gist(id, files, isNew, !!obj.public);
   }
 
   /**
    * gets the gist with file content
    * @param {string} id 
+   * @param {boolean} wasNew 
    * @returns {Gist}
    */
-  function get(id) {
+  function get(id, wasNew = false) {
     if (id in gistRecord) {
       const {
         files
       } = gistRecord[id];
-      return Gist(id, files);
+      return Gist(id, files, wasNew);
     } else {
       return null;
     }
@@ -514,7 +583,7 @@ function GistRecord(obj) {
     update,
     remove,
     reset
-  }
+  };
 }
 
 /**
@@ -546,4 +615,4 @@ export default {
   init,
   GitHub: gitHub,
   getGitFile
-}
+};

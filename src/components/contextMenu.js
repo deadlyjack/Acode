@@ -21,7 +21,7 @@ import tag from 'html-tag-js';
  */
 function contextMenu(innerHTML, pos = {}) {
     const el = tag('ul', {
-        className: 'context-menu',
+        className: 'context-menu scroll',
         innerHTML: innerHTML,
         style: {
             top: pos.top || 'auto',

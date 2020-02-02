@@ -12,7 +12,10 @@ import constants from "../constants";
  */
 function saveFile(file, as = false, showToast = true) {
 
-    if (!as) {
+    let newFile = false;
+    if (file.type === 'regular' && !file.location) newFile = true;
+
+    if (!as && !newFile) {
 
         if (file.type === 'git') {
             dialogs.multiPrompt('Commit', [{
@@ -37,19 +40,21 @@ function saveFile(file, as = false, showToast = true) {
                             file.isUnsaved = false;
                             editorManager.onupdate();
                         })
-                        .catch(() => {
-                            window.plugins.toast.showShortBottom(strings.error);
+                        .catch((err) => {
+                            if (err) dialogs.alert(strings.error, err.toString());
+                            else window.plugins.toast.showShortBottom(strings.error);
                         });
                 });
         } else if (file.type === 'gist') {
             file.record.setData(file.name, file.session.getValue())
                 .then(() => {
+                    window.plugins.toast.showLongBottom(strings['file saved']);
                     file.isUnsaved = false;
                     editorManager.onupdate();
                 })
                 .catch(err => {
-                    console.log(err);
-                    dialogs.alert(strings.error, err.toString());
+                    if (err) dialogs.alert(strings.error, err.toString());
+                    else window.plugins.toast.showShortBottom(strings.error);
                 });
         } else if (file.contentUri) {
             alert(strings.warning.toUpperCase(), strings["read only file"]);
@@ -130,20 +135,20 @@ function saveFile(file, as = false, showToast = true) {
      */
     function newfilename(url, name) {
         return new Promise((resolve) => {
-            getfilename(resolve);
+            getfilename(resolve, url, name);
         });
+    }
 
-        function getfilename(resolve) {
-            dialogs.prompt(strings['enter file name'], name || '', strings['new file'], {
-                    match: constants.FILE_NAME_REGEX,
-                    required: true,
-                })
-                .then(filename => {
-                    if (filename) {
-                        check(url, filename, resolve);
-                    }
-                });
-        }
+    function getfilename(resolve, url, name) {
+        dialogs.prompt(strings['enter file name'], name || '', strings['new file'], {
+                match: constants.FILE_NAME_REGEX,
+                required: true,
+            })
+            .then(filename => {
+                if (filename) {
+                    check(url, filename, resolve);
+                }
+            });
     }
 
     function checkFile(url, filename) {
@@ -166,7 +171,7 @@ function saveFile(file, as = false, showToast = true) {
                             filename
                         });
                     } else {
-                        getfilename(resolve);
+                        getfilename(resolve, url, filename);
                     }
                 });
             return;

@@ -37,7 +37,11 @@ div.page {
   overflow-y: auto;
   background-color: white;
   animation: page-transition 200ms ease 1;
-  z-index: 101;
+  z-index: 107;
+
+  &.primary {
+    z-index: unset;
+  }
 
   .main {
     max-width: 600px;
@@ -93,12 +97,19 @@ div.page {
   }
 }
 
-body {
+#root {
+  &.top-bar {
+    >header {
+      margin-bottom: 30px;
+    }
+  }
+
   &.twostories {
-    .float {
-      &.bottom {
-        bottom: 80px !important;
-        top: auto !important;
+
+    &.top-bar {
+      main {
+        height: calc(100vh - #{$footerHeight * 2 + $headerHeight + 30}) !important;
+        min-height: calc(100vh - #{$footerHeight * 2 + $headerHeight + 30}) !important;
       }
     }
 
@@ -109,10 +120,11 @@ body {
   }
 
   &.threestories {
-    .float {
-      &.bottom {
-        bottom: 120px !important;
-        top: auto !important;
+
+    &.top-bar {
+      main {
+        height: calc(100vh - #{$footerHeight * 3 + $headerHeight + 30}) !important;
+        min-height: calc(100vh - #{$footerHeight * 3 + $headerHeight + 30}) !important;
       }
     }
 
@@ -147,60 +159,19 @@ body {
     position: sticky;
     top: 0;
     left: 0;
-    width: 100vw;
+    width: 100%;
   }
 
   footer {
     position: sticky;
     bottom: 0;
     left: 0;
-    width: 100vw;
+    width: 100%;
     z-index: 98;
     background-color: $primary;
 
     .icon {
       border-radius: unset;
-    }
-  }
-
-  .float {
-    position: absolute;
-    height: 60px;
-    width: 60px;
-    border: none;
-    border-radius: 50%;
-    background-color: $primary;
-    color: $textPrimary;
-    font-size: 1.4em;
-    animation: float-appear 300ms ease 1;
-    z-index: 10;
-    margin: 10px;
-    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.4);
-
-    &:active {
-      transition: 300ms ease;
-      background-color: darken($color: $primary, $amount: 5);
-    }
-
-    &.top {
-      bottom: auto;
-      top: 40px;
-    }
-
-    &.center {
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    &.left {
-      right: auto;
-      left: 0;
-    }
-
-    &.right {
-      left: auto;
-      right: 0;
     }
   }
 }
@@ -229,10 +200,12 @@ body {
 
   &.bottom-bar {
 
-    .float {
-      &.bottom {
-        bottom: $footerHeight;
-        top: auto;
+    &.top-bar {
+
+      >main,
+      >.main {
+        height: calc(100vh - #{$footerHeight + $headerHeight + 30});
+        min-height: calc(100vh - #{$footerHeight + $headerHeight + 30});
       }
     }
 

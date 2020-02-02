@@ -3,5 +3,6 @@
     ["@babel/transform-runtime", {
       "regenerator": true
     }]
-  ]
+  ],
+  "compact": true
 }

@@ -44,22 +44,23 @@
       box-sizing: border-box;
 
       .tag {
+        display: flex;
+        align-items: center;
         height: 32px;
         margin: 8px 16px 0 8px;
         text-transform: capitalize;
 
         &::after {
+          content: attr(data-value);
+          height: 1.4em;
           display: inline-flex;
           justify-content: center;
           align-items: center;
-          height: 1em;
-          padding: 0 4px;
+          padding: 0 6px;
           font-size: 0.8em;
-          content: attr(data-value);
           background-color: $primary;
           color: white;
           border-radius: 4px;
-          height: fit-content;
           margin-left: 4px;
         }
       }

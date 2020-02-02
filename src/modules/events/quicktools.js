@@ -19,31 +19,18 @@ function quickToolAction(e, footer, row1, row2, search) {
 
     const editor = editorManager.editor;
     const $row2 = footer.querySelector('#row2');
-    const $searchRow1 = footer.querySelector('#search_row1')
-    const $searchRow2 = footer.querySelector('#search_row2')
+    const $searchRow1 = footer.querySelector('#search_row1');
+    const $searchRow2 = footer.querySelector('#search_row2');
     const $textarea = editor.textInput.getElement();
     const shiftKey = footer.querySelector('#shift-key').getAttribute('data-state') === 'on' ? true : false;
-    let state, skip = false,
-        replaceWith = '';
+    let $searchInput = footer.querySelector('#searchInput'),
+        $replaceInput = footer.querySelector('#replaceInput'),
+        state, selectedText = editor.getCopyText();
+
+    if (selectedText.length > 50) selectedText = '';
 
     if (!['pallete', 'search', 'search-settings'].includes(action) &&
         editorManager.state === 'focus') editor.focus();
-
-    if (['next', 'prev', 'replace', 'replace-all'].includes(action)) {
-        const searchValue = footer.querySelector('#searchInput').value;
-        if (!searchValue) return;
-
-        const searching = footer.getAttribute('data-searching');
-        if (searching !== searchValue) {
-            footer.setAttribute('data-searching', searchValue);
-            initializeSearch(searchValue);
-            skip = true;
-        }
-
-        if (['replace', 'replace-all', 'search-settings'].includes(action)) {
-            replaceWith = footer.querySelector('#replaceInput').value;
-        }
-    }
 
 
     switch (action) {
@@ -95,11 +82,18 @@ function quickToolAction(e, footer, row1, row2, search) {
                     removeRow2();
                 }
                 footer.append(...tag.parse(search));
-                footer.querySelector('#searchInput').focus();
-                app.classList.add('threestories');
+                if (!$searchInput) $searchInput = footer.querySelector('#searchInput');
+                $searchInput.value = selectedText || '';
+                if (!selectedText) $searchInput.focus();
+                $searchInput.oninput = function () {
+                    if (this.value) find(false, false);
+                };
+                root.classList.add('threestories');
+                find(false, false);
             } else {
                 removeSearchRow2();
             }
+            editor.resize(true);
             break;
 
         case 'save':
@@ -112,10 +106,11 @@ function quickToolAction(e, footer, row1, row2, search) {
                     removeSearchRow2();
                 }
                 footer.appendChild(tag.parse(row2));
-                app.classList.add('twostories');
+                root.classList.add('twostories');
             } else {
                 removeRow2();
             }
+            editor.resize(true);
             break;
 
         case 'moveline-up':
@@ -135,23 +130,21 @@ function quickToolAction(e, footer, row1, row2, search) {
             break;
 
         case 'next':
-            if (!skip)
-                editorManager.editor.findNext();
+            find(true, false);
             break;
 
         case 'prev':
-            if (!skip)
-                editorManager.editor.findPrevious();
+            find(true, true);
             break;
 
         case 'replace':
             if (!replaceWith) return;
-            editor.replace(replaceWith);
+            editor.replace($replaceInput.value);
             break;
 
         case 'replace-all':
             if (!replaceWith) return;
-            editor.replaceAll(replaceWith);
+            editor.replaceAll($replaceInput.value);
             break;
 
         case 'search-settings':
@@ -162,24 +155,56 @@ function quickToolAction(e, footer, row1, row2, search) {
 
     function removeRow2() {
         footer.removeChild($row2);
-        app.classList.remove('twostories');
+        root.classList.remove('twostories');
     }
 
     function removeSearchRow2() {
         footer.removeAttribute('data-searching');
         footer.removeChild($searchRow1);
         footer.removeChild($searchRow2);
-        app.classList.remove('threestories');
+        root.classList.remove('threestories');
     }
 
-    function initializeSearch(search) {
+    function find(skip, backward) {
         const searchSettings = appSettings.value.search;
-        editor.find(search, {
+        editor.find($searchInput.value, {
+            skipCurrent: skip,
+            backwards: backward,
             caseSensitive: searchSettings.caseSensitive,
             wrap: searchSettings.wrap,
             wholeWord: searchSettings.wholeWord,
             regExp: searchSettings.regExp
         });
+
+        updateStatus();
+    }
+
+    function updateStatus() {
+        var regex = editor.$search.$options.re;
+        var all = 0;
+        var before = 0;
+        const MAX_COUNT = 999;
+        if (regex) {
+            const value = editor.getValue();
+            const offset = editor.session.doc.positionToIndex(editor.selection.anchor);
+            let last = regex.lastIndex = 0;
+            let m;
+            while ((m = regex.exec(value))) {
+                all++;
+                last = m.index;
+                if (last <= offset)
+                    before++;
+                if (all > MAX_COUNT)
+                    break;
+                if (!m[0]) {
+                    regex.lastIndex = last += 1;
+                    if (last >= value.length)
+                        break;
+                }
+            }
+        }
+        footer.querySelector('#total-result').textContent = all > MAX_COUNT ? '999+' : all;
+        footer.querySelector('#current-pos').textContent = before;
     }
 }
 

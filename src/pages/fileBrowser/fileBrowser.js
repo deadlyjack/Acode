@@ -73,7 +73,7 @@ function FileBrowser(type = 'file', option = null) {
             if (action && action === 'settings') {
                 filesSettings(refresh);
             }
-        }
+        };
 
         $page.onhide = function () {
             let id = '';
@@ -289,6 +289,7 @@ function FileBrowser(type = 'file', option = null) {
             const $oldList = $content.querySelector('#list');
             if ($oldList) $oldList.remove();
             $content.append($list);
+            $list.focus();
         }
 
         function navigate(name, url) {
@@ -304,7 +305,8 @@ function FileBrowser(type = 'file', option = null) {
                     url,
                     text: name,
                     name
-                }
+                },
+                tabIndex: -1
             });
 
             $navigation.append($nav);

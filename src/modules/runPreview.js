@@ -25,17 +25,22 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
   const decoder = new TextDecoder('utf-8');
 
-  webserver.stop();
+  start();
 
-  webserver.start(() => {
-    openBrowser();
-  }, err => {
-    if (err === "Server already running") {
+  function start() {
+    webserver.stop();
+
+    webserver.start(() => {
       openBrowser();
-    } else {
-      console.log(err);
-    }
-  }, port);
+    }, err => {
+      if (err === "Server already running") {
+        openBrowser();
+      } else {
+        ++port;
+        start();
+      }
+    }, port);
+  }
 
   webserver.onRequest(req => {
     let reqPath = req.path;
@@ -103,7 +108,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
         <title>${filename}</title>
       </head>
       
-      <body">${html}</body>
+      <body>${html}</body>
       
       </html>`;
       sendText(doc, req.requestId, HTML);
@@ -131,7 +136,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
               .catch(err => {
                 console.log(err);
                 error();
-              })
+              });
           } else {
             error();
           }
@@ -168,7 +173,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     if (part.length === 2) {
       text = `${part[0]}<head>${js}${part[1]}`;
     } else if (/<html>/i.test(text)) {
-      text = text.replace('<html>', `<head>${js}</head>`)
+      text = text.replace('<html>', `<html><head>${js}</head>`);
     } else {
       text = `<head>${js}</head>` + text;
     }
@@ -194,7 +199,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
         } else {
           sendText(text, id, mime);
         }
-      })
+      });
   }
 
   function sendText(text, id, mimeType, processText) {
@@ -212,7 +217,14 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     const themeColor = theme === 'default' ? '#9999ff' : theme === 'dark' ? '#313131' : '#ffffff';
     const color = theme === 'light' ? '#9999ff' : '#ffffff';
     const options = `location=${isConsole?'no':'yes'},hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
-    cordova.InAppBrowser.open(`http://localhost:${port}/` + filename, target, options);
+    let ref = cordova.InAppBrowser.open(`http://localhost:${port}/` + filename, target, options);
+
+    ref.addEventListener('exit', () => {
+
+      if (AdMob) AdMob.showInterstitial();
+
+    });
+
   }
 
   function checkFile(reqPath) {

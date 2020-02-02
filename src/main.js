@@ -25,7 +25,6 @@ import constants from "./constants";
 import HandleIntent from "./modules/handleIntent";
 import createEditorFromURI from "./modules/createEditorFromURI";
 import addFolder from "./modules/addFolder";
-import menuHandler from "./modules/menuHandler";
 import quickToolAction from "./modules/events/quicktools";
 import arrowkeys from "./modules/events/arrowkeys";
 // import gitHub from "./modules/gitHub";
@@ -34,10 +33,12 @@ import $_menu from './views/menu.hbs';
 import $_row1 from './views/footer/row1.hbs';
 import $_row2 from './views/footer/row2.hbs';
 import $_search from './views/footer/search.hbs';
+import $_rating from './views/rating.hbs';
 import saveFile from "./modules/saveFile";
 import git from "./modules/git";
 import runPreview from "./modules/runPreview";
-import PHP from "./modules/php";
+import Admob from "./modules/admob";
+import commands from "./modules/commands";
 //@ts-check
 
 window.onload = Main;
@@ -57,6 +58,7 @@ function Main() {
     lang = language;
   }
 
+  window.app = document.body = tag(document.body);
   window.actionStack = ActionStack();
   window.editorCount = 0;
   window.alert = dialogs.alert;
@@ -70,7 +72,7 @@ function Main() {
   window.editorManager = {
     files: [],
     activeFile: null
-  }
+  };
 
   if (!('files' in localStorage)) {
     localStorage.setItem('files', '[]');
@@ -139,7 +141,7 @@ function Main() {
 }
 
 function runApp() {
-  document.body.addEventListener('click', function (e) {
+  app.addEventListener('click', function (e) {
     const el = e.target;
     if (el instanceof HTMLAnchorElement) {
       e.preventDefault();
@@ -149,14 +151,27 @@ function runApp() {
     }
   });
 
+  if (window.AdMob) Admob();
+  else window.AdMob = null;
+
   const version = localStorage.getItem('version');
   if (version !== BuildInfo.version) {
     localStorage.clear();
     localStorage.setItem('version', BuildInfo.version);
   }
 
-  document.body = tag(document.body);
-  window.app = document.body;
+  const Acode = {
+    exec: function (key, val) {
+      if (key in commands) {
+        commands[key](val);
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
+  window.Acode = Acode;
   document.addEventListener('backbutton', backButton);
   window.beautify = ace.require("ace/ext/beautify").beautify;
 
@@ -184,16 +199,15 @@ function App() {
     tail: $menuToggler
   });
   const $footer = tag('footer', {
-    innerHTML: mustache.render($_row1, strings)
+    innerHTML: mustache.render($_row1, strings),
+    tabIndex: -1
   });
-
   const $mainMenu = contextMenu(mustache.render($_menu, strings), {
     top: '6px',
     right: '6px',
     toggle: $menuToggler,
     transformOrigin: 'top right'
   });
-
   const $main = tag('main');
   const $sidebar = sidenav($main, $toggler);
   const $runBtn = tag('span', {
@@ -230,13 +244,14 @@ function App() {
     attr: {
       style: 'font-size: 1.2em !important;'
     }
-  })
+  });
   const fileOptions = {
     save: $mainMenu.querySelector('[action=save]'),
-    saveAs: $mainMenu.querySelector('[action=saveAs]'),
+    saveAs: $mainMenu.querySelector('[action="save-as"]'),
     goto: $mainMenu.querySelector('[action=goto]')
-  }
+  };
 
+  $sidebar.setAttribute('empty-msg', strings['open folder']);
   window.editorManager = EditorManager($sidebar, $header, $main);
   const editor = editorManager.editor;
   //#endregion
@@ -245,28 +260,35 @@ function App() {
   window.restoreTheme();
   $main.setAttribute("data-empty-msg", strings['no editor message']);
 
+  let count = parseInt(localStorage.count) || 0;
+  if (count === 3) {
+
+    const html = $_rating;
+    dialogs.box('Did you like the app?', html, onInteract);
+
+  } else if (count < 3) {
+    localStorage.count = ++count;
+  }
   //#endregion
 
   //#region rendering
   $header.classList.add('light');
-  app.append($header, $main);
+  root.append($header, $main);
   //#endregion
 
   $mainMenu.addEventListener('click', handleMenu);
   $footer.addEventListener('click', handleFooter);
   $footer.addEventListener('touchstart', footerTouchStart);
   $footer.addEventListener('contextmenu', footerOnContextMenu);
+  window.beforeClose = saveState;
 
   setTimeout(() => {
     loadFiles()
       .then(loadFolders)
       .then(() => {
         setTimeout(() => {
-          document.body.classList.remove('loading', 'splash');
+          app.classList.remove('loading', 'splash');
           window.isLoading = false;
-          localStorage.removeItem('files');
-          localStorage.removeItem('folders');
-          localStorage.removeItem('lastfile');
         }, 500);
         //#region event listeners 
         if (cordova.platformId === 'android') {
@@ -302,8 +324,8 @@ function App() {
     const $save = $footer.querySelector('[action=save]');
 
     if (!$footer.parentElement && activeFile) {
-      app.classList.add('bottom-bar');
-      app.append($footer);
+      root.classList.add('bottom-bar');
+      root.append($footer);
     }
 
     if (!$edit.isConnected) {
@@ -314,7 +336,7 @@ function App() {
       fileOptions.save.classList.add('disabled');
       fileOptions.saveAs.classList.add('disabled');
       fileOptions.goto.classList.add('disabled');
-      app.classList.remove('bottom-bar');
+      root.classList.remove('bottom-bar');
       $footer.remove();
       $runBtn.remove();
     } else if (activeFile) {
@@ -347,10 +369,49 @@ function App() {
         $runBtn.remove();
       }
     }
+
+    saveState();
   };
 
-  window.beforeClose = function () {
-    if (!editorManager) return;
+  window.getCloseMessage = function () {
+    const numFiles = editorManager.hasUnsavedFiles();
+    if (numFiles) {
+      return strings["unsaved files close app"];
+    }
+  };
+
+  $sidebar.onshow = function () {
+    const activeFile = editorManager.activeFile;
+    if (activeFile) editor.blur();
+  };
+
+  function onInteract(e) {
+    /**
+     * @type {HTMLSpanElement}
+     */
+    const $el = e.target;
+    if (!$el) return;
+    let val = $el.getAttribute('value');
+    if (val) val = parseInt(val);
+    const siblings = $el.parentElement.children;
+    const len = siblings.length;
+    for (let i = 0; i < len; ++i) {
+      const star = siblings[i];
+      star.classList.remove('stargrade', 'star_outline');
+      if (i < val) star.classList.add('stargrade');
+      else star.classList.add('star_outline');
+    }
+
+    setTimeout(() => {
+      if (val === 5) window.open(`https://play.google.com/store/apps/details?id=${BuildInfo.packageName}`, '_system');
+      else window.open(`mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=version-${BuildInfo.version}`, '_system');
+    }, 100);
+
+    localStorage.count = 4;
+  }
+
+  function saveState() {
+    if (!editorManager || isLoading) return;
 
     const lsEditor = [];
     const allFolders = Object.keys(addedFolder);
@@ -363,7 +424,10 @@ function App() {
       edit.name = file.filename;
       edit.type = file.type;
       if (edit.type === 'git') edit.sha = file.record.sha;
-      else if (edit.type === 'gist') edit.id = file.record.id;
+      else if (edit.type === 'gist') {
+        edit.id = file.record.id;
+        edit.isNew = file.record.isNew;
+      }
       if (file.fileUri) {
         edit.fileUri = file.fileUri;
         edit.readOnly = file.readOnly ? 'true' : '';
@@ -410,19 +474,7 @@ function App() {
 
     localStorage.setItem('files', JSON.stringify(lsEditor));
     localStorage.setItem('folders', JSON.stringify(folders));
-  };
-
-  window.getCloseMessage = function () {
-    const numFiles = editorManager.hasUnsavedFiles();
-    if (numFiles) {
-      return strings["unsaved files close app"];
-    }
-  };
-
-  $sidebar.onshow = function () {
-    const activeFile = editorManager.activeFile;
-    if (activeFile) editor.blur();
-  };
+  }
 
   function loadFiles() {
     return new Promise((resolve) => {
@@ -457,7 +509,7 @@ function App() {
                 if (i === files.length - 1) resolve();
               });
           } else if (file.type === 'gist') {
-            const gist = gistRecord.get(file.id);
+            const gist = gistRecord.get(file.id, file.isNew);
             if (gist) {
               const gistFile = gist.files[file.name];
               editorManager.addNewFile(file.name, {
@@ -594,7 +646,7 @@ function App() {
     });
 
     if (!editorManager.activeFile) {
-      document.body.focus();
+      app.focus();
     }
 
     /**
@@ -618,19 +670,13 @@ function App() {
    * @param {MouseEvent} e 
    */
   function handleMenu(e) {
-    const action = e.target.getAttribute('action');
+    const $target = e.target;
+    const action = $target.getAttribute('action');
+    const value = $target.getAttribute('value');
     if (!action) return;
 
     $mainMenu.hide();
-    if (action in menuHandler) {
-      let param;
-      switch (action) {
-        case 'openFolder':
-          param = $sidebar;
-          break;
-      }
-      menuHandler[action](param);
-    }
+    Acode.exec(action, value);
   }
 
   /**
@@ -653,6 +699,7 @@ function App() {
     e.preventDefault();
     editor.focus();
   }
+
 }
 
 //#region global funtions
@@ -660,25 +707,25 @@ function App() {
 function restoreTheme(darken) {
   if (appSettings.value.appTheme === 'default') {
     const hexColor = darken ? '#5c5c99' : '#9999ff';
-    document.body.classList.remove('theme-light');
-    document.body.classList.remove('theme-dark');
-    document.body.classList.add('theme-default');
+    app.classList.remove('theme-light');
+    app.classList.remove('theme-dark');
+    app.classList.add('theme-default');
     NavigationBar.backgroundColorByHexString(hexColor, false);
     StatusBar.backgroundColorByHexString(hexColor);
     StatusBar.styleLightContent();
   } else if (appSettings.value.appTheme === 'light') {
     const hexColor = darken ? '#999999' : '#ffffff';
-    document.body.classList.remove('theme-default');
-    document.body.classList.remove('theme-dark');
-    document.body.classList.add('theme-light');
+    app.classList.remove('theme-default');
+    app.classList.remove('theme-dark');
+    app.classList.add('theme-light');
     NavigationBar.backgroundColorByHexString(hexColor, !!darken);
     StatusBar.backgroundColorByHexString(hexColor);
     StatusBar.styleDefault();
   } else {
     const hexColor = darken ? '#1d1d1d' : '#313131';
-    document.body.classList.remove('theme-default');
-    document.body.classList.remove('theme-light');
-    document.body.classList.add('theme-dark');
+    app.classList.remove('theme-default');
+    app.classList.remove('theme-light');
+    app.classList.add('theme-dark');
     NavigationBar.backgroundColorByHexString(hexColor, true);
     StatusBar.backgroundColorByHexString(hexColor);
     StatusBar.styleLightContent();

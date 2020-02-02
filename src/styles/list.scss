@@ -1,5 +1,5 @@
 .list {
-    min-width: 100%;
+    width: 100%;
 
     &:not(.collaspable) {
         overflow-y: auto;
@@ -101,11 +101,18 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
 
             .text {
                 flex: 1.2;
                 display: flex;
                 align-items: center;
+
+                span {
+                    width: 100%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
             }
 
             .value {
@@ -125,6 +132,10 @@
             &.no-icon {
                 width: 20px;
             }
+        }
+
+        .icon {
+            font-size: 1.4em;
         }
 
         *:not([action]) {
@@ -153,6 +164,14 @@ ul {
                         color: rgb(206, 206, 53);
                     }
                 }
+
+                .text {
+                    span {
+                        width: 100%;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
             }
 
             *:not([action]) {
@@ -170,25 +189,35 @@ ul {
             }
         }
 
-        &:empty,
-        &.empty {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 40px;
-
-            &::after {
-                content: attr(empty-msg);
-                color: #999;
-                text-align: center;
-                font-weight: 900;
-                background: transparent;
-            }
-        }
-
         li:last-child {
             border-bottom: none;
         }
 
+    }
+}
+
+.list {
+
+    &:empty,
+    &.empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+
+        &::after {
+            content: attr(empty-msg);
+            color: #999;
+            text-align: center;
+            font-weight: 900;
+            background: transparent;
+        }
+    }
+}
+
+.list-item,
+.tile {
+    &:focus {
+        background-color: rgba($color: #000000, $alpha: 0.2);
     }
 }

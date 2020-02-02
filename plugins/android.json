@@ -46,6 +46,9 @@
     "cordova-plugin-vibration": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
+    "cordova-plugin-webserver": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
     "cordova-plugin-whitelist": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
@@ -56,7 +59,7 @@
       "ANDROID_SUPPORT_VERSION": "28.+",
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-webserver": {
+    "cordova-plugin-ftp": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

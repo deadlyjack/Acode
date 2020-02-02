@@ -3,7 +3,9 @@
   <div class="list-item" data-url="{{html_url}}" action="repo" owner="{{owner.login}}" name="{{name}}" id="{{id}}">
     <span class="octicon main-icon" {{#private}}private{{/private}}></span>
     <div class="container">
-      <span class="text">{{name}}</span>
+      <div class="text">
+        <span>{{name}}</span>
+      </div>
       <small class="value">
         <div class="group">
           <span class="octicon octicon-star"></span>

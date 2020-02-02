@@ -1,11 +1,11 @@
-<div id="gistFiles" class="main list">
-  {{#files}}
-  <div class="list-item" action="file" data-filename="{{filename}}">
+<div id="gistFiles" empty-msg="{{msg}}" class="main list">{{#files}}
+  <div class="list-item" action="file" filename="{{filename}}">
     <span class="icon {{type}}"></span>
     <div class="container">
-      <span class="text">{{filename}}</span>
+      <div class="text">
+        <span>{{filename}}</span>
+      </div>
     </div>
-    <span class="icon share" action="share"></span>
+    <span class="icon delete" action="delete-file"></span>
   </div>
-  {{/files}}
-</div>
+  {{/files}}</div>

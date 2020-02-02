@@ -67,6 +67,7 @@ function getLangNameFromExt(ext) {
     if (ext === 'yml') return 'yaml';
     if (['doc', 'docx', 'odt', 'rtf', 'wpd'].includes(ext)) return 'word';
     if (['dex', 'cell', 'def', 'ods', 'ots', 'uos'].includes(ext)) return 'excel';
+    if (['txt', 'csv'].includes(ext)) return 'text';
     return ext;
 }
 
@@ -140,23 +141,17 @@ function sortDir(list, fileBrowser, readOnly = false) {
  */
 
 function getIconForFile(filename) {
+    let file;
     let ext = (getExt(filename) || '').toLowerCase();
 
-    if (['mp4', 'm4a', 'mov', '3gp', 'wmv', 'flv', 'avi'].includes(ext)) return 'movie';
-    if (['png', 'svg', 'jpeg', 'jpg', 'gif', 'ico'].includes(ext)) return 'image';
-    if (['wav', 'mp3', 'flac'].includes(ext)) return 'audiotrack';
-    if (['zip', 'rar', 'tar', 'deb'].includes(ext)) return 'zip';
+    if (['mp4', 'm4a', 'mov', '3gp', 'wmv', 'flv', 'avi'].includes(ext)) file = 'movie';
+    if (['png', 'svg', 'jpeg', 'jpg', 'gif', 'ico'].includes(ext)) file = 'image';
+    if (['wav', 'mp3', 'flac'].includes(ext)) file = 'audiotrack';
+    if (['zip', 'rar', 'tar', 'deb'].includes(ext)) file = 'zip';
+    if (ext === 'apk') file = 'android';
 
-    switch (ext) {
-        case 'apk':
-            return 'android';
-        case 'text':
-        case 'txt':
-            return 'document-text';
-
-        default:
-            return `file file_type_${getLangNameFromFileName(filename)}`;
-    }
+    if (file) return 'icon ' + file;
+    return `file file_type_${getLangNameFromFileName(filename)}`;
 }
 
 /**

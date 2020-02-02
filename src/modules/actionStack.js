@@ -43,7 +43,10 @@ function ActionStack() {
     return {
         push,
         pop,
-        remove
+        remove,
+        get length() {
+            return stack.length;
+        }
     };
 }
 

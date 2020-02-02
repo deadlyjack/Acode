@@ -1,7 +1,7 @@
 @import './variables.scss';
 
 .context-menu {
-    z-index: 104;
+    z-index: 109;
     box-sizing: border-box;
     position: fixed;
     width: fit-content;
@@ -12,7 +12,7 @@
     overflow-y: auto;
 
     &+.mask {
-        z-index: 103;
+        z-index: 108;
     }
 
     background-color: white;

@@ -6,7 +6,7 @@
     top: 50%;
     transform: translate(-50%, -50%) scale(1) translateZ(0);
 
-    z-index: 109;
+    z-index: 110;
 
     height: fit-content;
     max-height: 80vh;
@@ -68,7 +68,7 @@
     }
 
     &+.mask {
-        z-index: 108;
+        z-index: 109;
         background-color: black;
         opacity: 0.4;
     }

@@ -30,6 +30,19 @@ $lightText : #333e59;
                 color: gold;
             }
         }
+
+        &::after {
+            color: #999;
+        }
+    }
+
+    .open-file-list {
+        background-color: white;
+
+        .icon,
+        .text {
+            color: $lightText;
+        }
     }
 
     .icon.float {
@@ -47,24 +60,11 @@ $lightText : #333e59;
 
     .prompt,
     .button-container {
-        button {
-            background-color: white;
-            color: $lightText;
+        background-color: white;
+        color: $lightText;
 
-            &:active {
-                transition: all 100ms ease;
-                background-color: darken($color: white, $amount: 20)
-            }
-
-            &:disabled {
-                opacity: 0.6;
-            }
-        }
-
-        textarea,
-        input {
-            color: $lightText;
-            border-color: currentColor;
+        button:active {
+            background-color: darken($color: white, $amount: 20);
         }
 
         input::placeholder {
@@ -87,10 +87,30 @@ $textDark : white;
     background-color: $pageBgDark;
 
     .list,
-    .prompt,
     .scroll {
         &::-webkit-scrollbar-thumb {
             background: $bgDark;
+        }
+    }
+
+    .context-menu {
+        &::-webkit-scrollbar-thumb {
+            background: $pageBgDark;
+        }
+    }
+
+    .prompt {
+        &::-webkit-scrollbar-thumb {
+            background: $pageBgDark;
+        }
+    }
+
+    .open-file-list {
+        background-color: $bgDark;
+
+        .icon,
+        .text {
+            color: $textDark;
         }
     }
 
@@ -142,13 +162,19 @@ $textDark : white;
     .page {
         background-color: $pageBgDark;
 
-        a,
-        button,
-        small,
-        div,
-        span:not(.icon) {
-            color: white;
-            border-color: #fff2;
+        .main {
+
+            a,
+            button,
+            small,
+            span {
+                color: white;
+                border-color: #fff2;
+            }
+
+            .icon {
+                color: $primary;
+            }
         }
     }
 
@@ -160,7 +186,7 @@ $textDark : white;
         background-color: $bgDark;
 
         >span {
-            color: #999;
+            color: #ccc;
 
             &:not(:last-child) {
                 border-right: solid 1px #777;
@@ -219,18 +245,11 @@ $textDark : white;
     }
 
     .button-container {
-        button {
-            background-color: $bgDark;
-            color: $textDark;
+        background-color: $bgDark;
+        color: $textDark;
 
-            &:active {
-                transition: all 100ms ease;
-                background-color: darken($color: $bgDark, $amount: 20)
-            }
-
-            &:disabled {
-                opacity: 0.6;
-            }
+        button:active {
+            background-color: darken($color: $bgDark, $amount: 20);
         }
     }
 }

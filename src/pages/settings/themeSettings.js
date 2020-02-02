@@ -45,12 +45,11 @@ export default function themeSettings() {
                 dialogs.select(this.text, themeList, {
                     default: values.editorTheme.split('/').slice(-1)[0]
                 }).then(res => {
-                    this.changeSubText(res);
-                    res = `ace/theme/` + res;
-                    if (editor) editor.setTheme(res);
-                    appSettings.value.editorTheme = res;
-                    this.changeSubText(res.editorTheme.split('/').slice(-1)[0].replace(/_/g, ' '));
+                    const theme = `ace/theme/` + res;
+                    if (editor) editor.setTheme(theme);
+                    appSettings.value.editorTheme = theme;
                     appSettings.update();
+                    this.changeSubText(res.replace(/_/g, ' '));
                 });
                 break;
 

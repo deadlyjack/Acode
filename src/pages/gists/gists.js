@@ -12,8 +12,9 @@ import fs from '../../modules/utils/androidFileSystem';
 import dialogs from '../../components/dialogs';
 import git from '../../modules/git';
 import GistFiles from '../gistFiles/gistFiles';
+import constants from '../../constants';
 
-function Gists() {
+function Gists(callbackGists) {
   const $search = tag('span', {
     className: 'icon search hidden'
   });
@@ -58,30 +59,36 @@ function Gists() {
    * @param {Array<object>} res
    */
   function render(res) {
-    gists = res;
 
+    const $oldContent = $page.querySelector('#gists');
+    if ($oldContent) $oldContent.remove();
+
+    gists = callbackGists ? callbackGists(res) : res;
     gists.map(gist => {
       const files = Object.values(gist.files);
-      const {
-        filename
-      } = files[0];
+      let filename = files.length > 0 ? files[0].filename : gist.id;
 
+      gist.private = !gist.public;
       gist.name = filename;
       gist.files_count = files.length;
     });
-    const $content = tag.parse(mustache.render(_template, gists));
+    const $content = tag.parse(mustache.render(_template, {
+      gists,
+      msg: strings['empty folder message']
+    }));
 
     $content.addEventListener('click', handleClick);
 
     $page.append($content);
-    document.body.appendChild($page);
-
-    actionStack.push({
-      id: 'repos',
-      action: $page.hide
-    });
-    $page.onhide = function () {
-      actionStack.remove('repos');
+    if (!$page.isConnected) {
+      app.appendChild($page);
+      actionStack.push({
+        id: 'repos',
+        action: $page.hide
+      });
+      $page.onhide = function () {
+        actionStack.remove('repos');
+      };
     }
   }
 
@@ -96,7 +103,7 @@ function Gists() {
     const $el = e.target;
     const action = $el.getAttribute('action');
 
-    if (action === 'reload') $cm.hide();
+    if (['reload', 'create'].includes(action)) $cm.hide();
     switch (action) {
       case 'gist':
         getGist();
@@ -107,10 +114,57 @@ function Gists() {
         break;
 
       case 'reload':
-        $page.querySelector('#gists').remove();
         loadRepos();
         gistRecord.reset();
         break;
+
+      case 'share':
+        break; //TODO: make it work
+
+      case 'create':
+        createGist();
+        break;
+    }
+
+    function createGist() {
+      const newGist = {
+        id: parseInt(Math.random() * new Date().getTime()).toString(16),
+        files: {},
+        public: false
+      };
+      dialogs.select('', ['public', 'private'], {
+          default: 'priavate'
+        })
+        .then(res => {
+
+          if (res === 'public') newGist.public = true;
+
+          return dialogs.prompt(strings['enter file name'], strings['new file'], 'text', {
+            match: constants.FILE_NAME_REGEX,
+            required: true
+          });
+        })
+        .then(filename => {
+          const file = {
+            filename,
+            content: ''
+          };
+          newGist.files[filename] = file;
+
+          const gist = gistRecord.add(newGist, true);
+
+          editorManager.addNewFile(filename, {
+            type: 'gist',
+            text: file.content,
+            isUnsaved: false,
+            record: gist,
+            render: true
+          });
+
+          actionStack.pop();
+          actionStack.pop();
+
+        });
     }
 
     function getGist() {
@@ -123,33 +177,18 @@ function Gists() {
           .then(res => {
             const data = res.data;
             gist = gistRecord.add(data);
-            openFile();
+            GistFiles(gist);
+          })
+          .catch(err => {
+            if (err) {
+              dialogs.alert(strings.error, err.toString());
+            }
           })
           .finally(() => {
             dialogs.loaderHide();
           });
       } else {
-        openFile();
-      }
-
-      function openFile() {
-        const files = Object.keys(gist.files);
-        if (files.length > 1) {
-
-          GistFiles(gist);
-
-        } else {
-          const file = gist.files[files[0]];
-          editorManager.addNewFile(file.filename, {
-            type: 'gist',
-            text: file.content,
-            record: gist,
-            isUnsaved: false
-          });
-
-          actionStack.pop();
-          actionStack.pop();
-        }
+        GistFiles(gist);
       }
 
     }

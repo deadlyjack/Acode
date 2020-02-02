@@ -6,7 +6,7 @@ import tile from "../components/tile";
 import fs from './utils/androidFileSystem';
 import dialogs from '../components/dialogs';
 import helpers from '../modules/helpers';
-import textControl from './events/oncontextmenu';
+import textControl from './events/selection';
 import constants from '../constants';
 
 /**
@@ -24,13 +24,16 @@ import constants from '../constants';
 
 /**
  * 
- * @param {HTMLElement} sidebar 
- * @param {HTMLElement} header 
- * @param {HTMLElement} body 
+ * @param {HTMLElement} $sidebar 
+ * @param {HTMLElement} $header 
+ * @param {HTMLElement} $body 
  * @returns {Manager}
  */
-function EditorManager(sidebar, header, body) {
-    const openFileList = list.collaspable(strings['active files']);
+function EditorManager($sidebar, $header, $body) {
+    /**
+     * @type {import('../components/tile').Tile | HTMLElement}
+     */
+    let $openFileList;
     let counter = 0;
     const container = tag('div', {
         className: 'editor-container'
@@ -53,7 +56,7 @@ function EditorManager(sidebar, header, body) {
         }),
         fullContent,
         update: () => {}
-    }
+    };
 
     /**
      * @type {Manager}
@@ -69,10 +72,15 @@ function EditorManager(sidebar, header, body) {
         files: [],
         removeFile,
         controls,
-        state: 'blur'
+        state: 'blur',
+        setSubText,
+        moveOpenFileList,
+        sidebar: $sidebar
     };
 
-    body.appendChild(container);
+    moveOpenFileList();
+
+    $body.appendChild(container);
     setupEditor(editor);
 
     textControl(editor, controls, container);
@@ -84,7 +92,7 @@ function EditorManager(sidebar, header, body) {
         if (action) {
             clipboardAction(action);
         }
-    }
+    };
     editor.on('focus', function () {
         setTimeout(() => {
             manager.state = 'focus';
@@ -111,8 +119,6 @@ function EditorManager(sidebar, header, body) {
         }
     });
 
-    sidebar.append(openFileList);
-
     /**
      * 
      * @param {string} filename 
@@ -130,8 +136,22 @@ function EditorManager(sidebar, header, body) {
         options.render = options.render === undefined ? true : options.render;
 
         const removeBtn = tag('span', {
-            className: 'icon cancel'
+            className: 'icon cancel',
+            attr: {
+                action: ''
+            },
+            onclick: () => {
+                removeFile(file);
+            }
         });
+        const assocTile = tile({
+            lead: tag('i', {
+                className: helper.getIconForFile(filename),
+            }),
+            text: filename,
+            tail: removeBtn
+        });
+
         let file = {
             id: ++counter,
             controls: false,
@@ -144,13 +164,7 @@ function EditorManager(sidebar, header, body) {
             isUnsaved: options.isUnsaved,
             readOnly: options.readOnly || options.isContentUri,
             record: options.record,
-            assocTile: tile({
-                lead: tag('i', {
-                    className: helper.getIconForFile(filename),
-                }),
-                text: filename,
-                tail: removeBtn
-            }),
+            assocTile,
             get filename() {
                 if (this.type === 'git') return this.record.name;
                 else return this.name;
@@ -169,7 +183,7 @@ function EditorManager(sidebar, header, body) {
                     this.readOnly = false;
                     this.contentUri = null;
                 }
-                this.fileUri = url + this.filename
+                this.fileUri = url + this.filename;
                 setSubText(this);
                 helpers.updateFolders(this.location);
                 manager.onupdate();
@@ -184,11 +198,29 @@ function EditorManager(sidebar, header, body) {
 
         file.assocTile.addEventListener('click', function (e) {
             if (manager.activeFile && (e.target === removeBtn || manager.activeFile.id === file.id)) return;
-            sidebar.hide();
+            $sidebar.hide();
             switchFile(file.id);
         });
 
-        file.assocTile.addEventListener('contextmenu', function (e) {
+        file.assocTile.addEventListener('contextmenu', rename);
+        manager.files.push(file);
+
+        if (appSettings.value.openFileListPos === 'header') {
+            $openFileList.append(file.assocTile);
+        } else {
+            $openFileList.addListTile(file.assocTile);
+        }
+
+        setupSession(file);
+
+        if (options.render) {
+            switchFile(file.id);
+            if (options.cursorPos) {
+                editor.moveCursorToPosition(options.cursorPos);
+            }
+        }
+
+        function rename(e) {
             if (e.target === removeBtn) return;
             dialogs.prompt('Rename', file.filename, 'filename', {
                     match: constants.FILE_NAME_REGEX
@@ -217,19 +249,6 @@ function EditorManager(sidebar, header, body) {
                         if (file.type === 'regular') window.plugins.toast.showShortBottom(strings['file renamed']);
                     }
                 });
-        });
-
-        removeBtn.addEventListener('click', () => removeFile(file));
-        manager.files.push(file);
-        openFileList.addListTile(file.assocTile);
-
-        setupSession(file);
-
-        if (options.render) {
-            switchFile(file.id);
-            if (options.cursorPos) {
-                editor.moveCursorToPosition(options.cursorPos);
-            }
         }
 
         return file;
@@ -254,7 +273,7 @@ function EditorManager(sidebar, header, body) {
         } else if (!file.readOnly) {
             text = strings['new file'];
         }
-        header.subText(decodeURI(text));
+        $header.subText(decodeURI(text));
     }
 
     function switchFile(id) {
@@ -266,14 +285,15 @@ function EditorManager(sidebar, header, body) {
                 }
 
                 editor.setSession(file.session);
-                editor.focus();
+                if (manager.state === 'focus') editor.focus();
                 setTimeout(controls.update, 100);
 
-                header.text(file.filename);
+                $header.text(file.filename);
                 setSubText(file);
                 file.assocTile.classList.add('active');
                 manager.activeFile = file;
                 manager.onupdate();
+                file.assocTile.scrollIntoView();
                 return;
             }
         }
@@ -309,6 +329,34 @@ function EditorManager(sidebar, header, body) {
         if (!appSettings.value.linting) {
             editor.renderer.setMargin(0, 0, -16, 0);
         }
+    }
+
+    function moveOpenFileList() {
+        let $list;
+
+        if ($openFileList) {
+            if ($openFileList.classList.contains('collaspable')) {
+                $list = [...$openFileList.list.children];
+            } else {
+                $list = [...$openFileList.children];
+            }
+            $openFileList.remove();
+        }
+
+        if (appSettings.value.openFileListPos === 'header') {
+            $openFileList = tag('ul', {
+                className: 'open-file-list'
+            });
+            if ($list) $openFileList.append(...$list);
+            root.append($openFileList);
+            root.classList.add('top-bar');
+        } else {
+            $openFileList = list.collaspable(strings['active files']);
+            if ($list) $openFileList.list.append(...$list);
+            $sidebar.insertBefore($openFileList, $sidebar.firstElementChild);
+            root.classList.remove('top-bar');
+        }
+        editor.resize(true);
     }
 
     function setupSession(file) {
@@ -358,7 +406,7 @@ function EditorManager(sidebar, header, body) {
 
             if (!manager.files.length) {
                 editor.setSession(new ace.EditSession(""));
-                sidebar.hide();
+                $sidebar.hide();
                 addNewFile('untitled', {
                     isUnsaved: false,
                     render: true
@@ -417,7 +465,7 @@ function EditorManager(sidebar, header, body) {
             this.fileUri = this.location + name;
         }
 
-        if (editorManager.activeFile.id === this.id) header.text(name);
+        if (editorManager.activeFile.id === this.id) $header.text(name);
 
         this.assocTile.text(name);
         if (helpers.getExt(this.name) !== helpers.getExt(name)) {

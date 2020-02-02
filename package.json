@@ -30,6 +30,7 @@
     "cordova-plugin-buildinfo": "^4.0.0",
     "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-file": "^6.0.2",
+    "cordova-plugin-ftp": "^1.1.1",
     "cordova-plugin-inappbrowser": "^3.1.0",
     "cordova-plugin-intent": "git+https://github.com/napolitano/cordova-plugin-intent.git",
     "cordova-plugin-ionic-keyboard": "^2.2.0",
@@ -89,7 +90,8 @@
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-local-notification": {},
       "cordova-plugin-buildinfo": {},
-      "cordova-plugin-webserver": {}
+      "cordova-plugin-webserver": {},
+      "cordova-plugin-ftp": {}
     },
     "platforms": [
       "android"

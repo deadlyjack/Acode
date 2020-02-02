@@ -1,6 +1,10 @@
 /// <reference path="../node_modules/@types/ace/"/>
 /// <reference path="../node_modules/html-tag-js/dist/tag.d.ts"/>
 
+interface Acode {
+    exec(command: string, value?: any): boolean;
+}
+
 interface fileBrowserSettings {
     showHiddenFiles: "on" | "off";
     sortByName: "on" | "off";
@@ -31,6 +35,7 @@ interface Settings {
     linting: boolean;
     previewMode: 'browser' | 'in app' | 'none';
     showSpaces: boolean;
+    openFileListPos: 'sidebar' | 'header';
 }
 
 interface AppSettings {
@@ -52,6 +57,7 @@ interface ActionStack {
     push(options: ActionStackOptions): void;
     pop(): ActionStack;
     remove(id: string): void;
+    length: Number;
 }
 
 interface storedFiles {
@@ -82,6 +88,7 @@ interface Controls {
     start: HTMLSpanElement;
     end: HTMLSpanElement;
     menu: HTMLSpanElement;
+    fullContent: string;
     update: () => void;
 }
 
@@ -115,9 +122,9 @@ interface GistFiles {
 }
 
 interface Repo {
+    readonly sha: string;
     name: string;
     data: string;
-    sha: string;
     repo: string;
     branch?: string;
     path: string;
@@ -128,10 +135,13 @@ interface Repo {
 }
 
 interface Gist {
-    id: string;
+    readonly id: string;
+    readonly isNew: boolean;
     files: GistFiles;
     setName(name: string, newName: string): Promise<void>;
     setData(name: string, text: string): Promise<void>;
+    addFile(name: string): void;
+    removeFile(name: string): Promise<void>;
 }
 
 interface GitRecord {
@@ -143,7 +153,7 @@ interface GitRecord {
 
 interface GistRecord {
     get(id: string): Gist;
-    add(gist: any): void;
+    add(gist: any, isNew?: boolean): void;
     remove(gist: Gist): Gist;
     update(gist: Gist): void;
     reset(): void;
@@ -160,6 +170,9 @@ interface Manager {
     files: Array<File>;
     controls: Controls;
     state: 'blur' | 'focus';
+    setSubText(file: File): void;
+    moveOpenFileList(): void;
+    sidebar: HTMLDivElement;
 }
 
 interface Strings {
@@ -209,11 +222,13 @@ declare var addedFolder: Folders;
 declare var editorManager: Manager;
 declare var saveInterval: Number;
 declare var freeze: Boolean;
-declare var app: HTMLDivElement;
+declare var app: HTMLBodyElement;
+declare var root: HTMLDivElement;
 declare var gitRecord: GitRecord;
 declare var gistRecord: GistRecord;
 declare var gitRecordURL: string;
 declare var gistRecordURL: string;
+declare var Acode: Acode;
 /**
  * A custom alert box to show alert notification
  * @param title 

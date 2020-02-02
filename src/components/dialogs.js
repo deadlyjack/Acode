@@ -104,7 +104,8 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
         });
 
         window.restoreTheme(true);
-        document.body.append(promptDiv, mask);
+        app.append(promptDiv, mask);
+        if (AdMob) AdMob.showBanner(AdMob.AD_POSITION.TOP_CENTER);
         input.focus();
         autosize(input);
 
@@ -112,8 +113,9 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
             promptDiv.classList.add('hide');
             window.restoreTheme();
             setTimeout(() => {
-                document.body.removeChild(promptDiv);
-                document.body.removeChild(mask);
+                if (AdMob) AdMob.hideBanner();
+                app.removeChild(promptDiv);
+                app.removeChild(mask);
             }, 300);
         }
 
@@ -298,10 +300,11 @@ function alert(titleText, message) {
         titleText = '';
     }
 
-    const regex = /(https?:\/\/)?((www[^\.]?)\.)?([\w\d]+)\.([a-zA-Z]{2,8})(\/[^ ]*)?/;
+    const regex = /(https?:\/\/[^\s]+)/g;
     if (regex.test(message)) {
-        const exec = regex.exec(message);
-        message = message.replace(exec[0], `<a href='${exec[0]}'>${exec[0]}</a>`);
+        message = message.replace(regex, function (url) {
+            return `<a href='${url}'>${url}</a>`;
+        });
     }
 
     const titleSpan = tag('strong', {
@@ -338,16 +341,17 @@ function alert(titleText, message) {
         action: hideAlert
     });
 
-    document.body.append(alertDiv, mask);
-
+    if (AdMob) AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
+    app.append(alertDiv, mask);
     window.restoreTheme(true);
 
     function hideAlert() {
         alertDiv.classList.add('hide');
         window.restoreTheme();
         setTimeout(() => {
-            document.body.removeChild(alertDiv);
-            document.body.removeChild(mask);
+            if (AdMob) AdMob.hideBanner();
+            app.removeChild(alertDiv);
+            app.removeChild(mask);
         }, 300);
     }
 
@@ -408,16 +412,17 @@ function confirm(titleText, message) {
             action: hideAlert
         });
 
-        document.body.append(confirmDiv, mask);
-
+        if (AdMob) AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
+        app.append(confirmDiv, mask);
         window.restoreTheme(true);
 
         function hideAlert() {
             confirmDiv.classList.add('hide');
             window.restoreTheme();
             setTimeout(() => {
-                document.body.removeChild(confirmDiv);
-                document.body.removeChild(mask);
+                if (AdMob) AdMob.hideBanner();
+                app.removeChild(confirmDiv);
+                app.removeChild(mask);
             }, 300);
         }
 
@@ -561,6 +566,7 @@ function loaderShow(titleText, message) {
         id: '__loader-mask'
     });
 
+    if (AdMob) AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
     loaderDiv.append(titleSpan, messageSpan);
 
     if (!oldLoaderDiv) {
@@ -579,6 +585,7 @@ function loaderHide() {
     loaderDiv.classList.add('hide');
     window.restoreTheme();
     setTimeout(() => {
+        if (AdMob) AdMob.hideBanner();
         window.freeze = false;
         loaderDiv.remove();
         mask.remove();
@@ -589,8 +596,9 @@ function loaderHide() {
  * 
  * @param {string} titleText 
  * @param {string} html 
+ * @param {function(Event):void} onclick
  */
-function box(titleText, html) {
+function box(titleText, html, onclick) {
     const box = tag('div', {
         className: 'prompt box',
         children: [
@@ -600,7 +608,8 @@ function box(titleText, html) {
             }),
             tag('div', {
                 className: 'message',
-                innerHTML: html
+                innerHTML: html,
+                onclick
             })
         ]
     });
