@@ -11,6 +11,7 @@ import GithubLogin from "../pages/login/login";
 import gitHub from "../pages/github/gitHub";
 import runPreview from "./runPreview";
 import help from '../pages/help';
+import recents from './recents';
 
 const commands = {
   "console": function () {
@@ -45,7 +46,9 @@ const commands = {
       .then(filename => {
         if (filename) {
           filename = helpers.removeLineBreaks(filename);
-          editorManager.addNewFile(filename);
+          editorManager.addNewFile(filename, {
+            isUnsaved: false
+          });
         }
       })
       .catch(err => {
@@ -76,19 +79,18 @@ const commands = {
         return true;
       })
       .then(res => {
-        const uri = res.url;
-        const timeout = setTimeout(() => {
-          document.body.classList.add('loading');
-        }, 500);
-        createEditorFromURI(uri, undefined, {
-          readOnly: res.readOnly,
-          timeout
-        }).then(() => {
-          if (timeout) {
-            clearTimeout(timeout);
-          }
-          document.body.classList.remove('loading');
-        });
+        const {
+          url,
+          isContentUri,
+          filename
+        } = res;
+
+        const createOption = {
+          fileUri: isContentUri ? null : url,
+          contentUri: isContentUri ? url : null,
+          name: filename
+        };
+        createEditorFromURI(createOption, undefined);
       })
       .catch(err => {
         if (err.code) {
@@ -96,6 +98,7 @@ const commands = {
         } else if (err.code !== 0) {
           alert(strings.error.toUpperCase(), strings['unable to open file']);
         }
+        console.error(err);
       });
   },
   "open-folder": function () {
@@ -123,6 +126,41 @@ const commands = {
     else --fileIndex;
 
     editorManager.switchFile(editorManager.files[fileIndex].id);
+  },
+  "recent": function () {
+    const all = [];
+    let files = recents.files;
+    let dirs = recents.folders;
+    const MAX = 20;
+    const shortName = name => name.length > MAX ? '...' + name.substr(-MAX - 3) : name;
+    for (let dir of dirs)
+      all.push([{
+        type: 'dir',
+        val: dir
+      }, shortName(decodeURI(dir)), 'icon folder']);
+    for (let file of files)
+      all.push([{
+        type: 'file',
+        val: file
+      }, shortName(decodeURI(file)), helpers.getIconForFile(file)]);
+
+    all.push(['clear', strings.clear, 'icon clearclose']);
+
+    dialogs.select(strings['open recent'], all, {
+        textTransform: false
+      })
+      .then(res => {
+        if (res.type === 'file') {
+          createEditorFromURI(res.val);
+        } else if (res.type === 'dir') {
+          addFolder(res.val, editorManager.sidebar);
+        } else if (res === 'clear') {
+          delete localStorage.recentFiles;
+          delete localStorage.recentFolders;
+          recents.files = [];
+          recents.folders = [];
+        }
+      });
   },
   "replace": function () {
     this.find();

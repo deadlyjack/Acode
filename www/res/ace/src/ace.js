@@ -4025,24 +4025,24 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                 editor.selection.moveToPosition(pos);
                 animationSteps = 0;
             } else if (mode == "scroll") {
-                let sum = 0;
-                let tx = parseInt(Math.abs(mvX));
-                let ty = parseInt(Math.abs(mvY));
+                var sum = 0;
+                var tx = parseInt(Math.abs(mvX));
+                var ty = parseInt(Math.abs(mvY));
 
                 tx = tx * Math.sqrt(tx);
                 ty = ty * Math.sqrt(ty);
 
                 arX = [];
                 arY = [];
-                for (let i = 1; sum < tx; ++i) {
+                for (var i = 1; sum < tx; ++i) {
                     sum += i;
                     arX.push(i);
                 }
 
                 sum = 0;
-                for (let i = 1; sum < ty; ++i) {
-                    sum += i;
-                    arY.push(i);
+                for (var _i = 1; sum < ty; ++_i) {
+                    sum += _i;
+                    arY.push(_i);
                 }
 
                 requestAnimationFrame(animate);

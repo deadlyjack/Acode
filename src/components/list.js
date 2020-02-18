@@ -6,6 +6,8 @@ import tile from "./tile";
  * @property {HTMLElement} titleEl
  * @property {function(HTMLElement):void} addListTile
  * @property {function():void} clearList
+ * @property {function(void):void} ontoggle
+ * @property {boolean} collasped
  */
 
 export default {
@@ -17,58 +19,64 @@ export default {
      * @param {object} [options] 
      * @param {HTMLElement} [options.tail] 
      * @param {string} [options.type] 
+     * @param {boolean} [options.allCaps] 
      * @returns {HTMLElement & Collaspable}
      */
     collaspable: function (titleText, hidden, type = 'indicator', options = {}) {
-        const ul = tag('ul');
-        const collaspeIndicator = tag('span', {
+        const $ul = tag('ul');
+        const $collaspeIndicator = tag('span', {
             className: `icon ${type}`
         });
         const title = tile({
-            lead: collaspeIndicator,
+            lead: $collaspeIndicator,
             type: 'div',
-            text: titleText.toUpperCase(),
+            text: options.allCaps ? titleText.toUpperCase() : titleText,
             tail: options.tail
         });
-        const mainWrapper = tag(options.type || 'div', {
+        const $mainWrapper = tag(options.type || 'div', {
             className: 'list collaspable',
             children: [
                 title,
-                ul
+                $ul
             ]
         });
 
         if (hidden) {
-            mainWrapper.classList.add('hidden');
+            $mainWrapper.classList.add('hidden');
         }
 
         title.classList.add('light');
         title.addEventListener('click', function () {
-            if (mainWrapper.classList.contains('hidden')) {
-                mainWrapper.classList.remove('hidden');
+            if ($mainWrapper.classList.contains('hidden')) {
+                $mainWrapper.classList.remove('hidden');
+                $mainWrapper.collasped = false;
+                if ($mainWrapper.ontoggle) $mainWrapper.ontoggle(false);
             } else {
-                mainWrapper.classList.add('hidden');
+                $mainWrapper.classList.add('hidden');
+                $mainWrapper.collasped = true;
+                if ($mainWrapper.ontoggle) $mainWrapper.ontoggle(true);
             }
         });
 
         function addListTile(listTile) {
-            ul.append(listTile);
+            $ul.append(listTile);
         }
 
         function clearList() {
-            ul.textContent = '';
+            $ul.textContent = '';
         }
 
         function text(str) {
             title.text(str.toUpperCase());
         }
 
-        mainWrapper.titleEl = title;
-        mainWrapper.addListTile = addListTile;
-        mainWrapper.clearList = clearList;
-        mainWrapper.text = text;
-        mainWrapper.list = ul;
+        $mainWrapper.titleEl = title;
+        $mainWrapper.addListTile = addListTile;
+        $mainWrapper.clearList = clearList;
+        $mainWrapper.text = text;
+        $mainWrapper.list = $ul;
+        $mainWrapper.ontoggle = () => {};
 
-        return mainWrapper;
+        return $mainWrapper;
     }
 };

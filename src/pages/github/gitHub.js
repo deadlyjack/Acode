@@ -8,7 +8,7 @@ import _template from './gitHub.hbs';
 import _menu from './menu.hbs';
 import './gitHub.scss';
 import contextMenu from '../../components/contextMenu';
-import fs from '../../modules/utils/androidFileSystem';
+import fs from '../../modules/utils/internalFs';
 import dialogs from '../../components/dialogs';
 import git from '../../modules/git';
 import Repos from '../repos/repos';
@@ -23,7 +23,10 @@ function gitHub(options = {}) {
     className: 'icon search hidden'
   });
   const $menuToggler = tag('span', {
-    className: 'icon more_vert'
+    className: 'icon more_vert',
+    attr: {
+      action: 'toggle-menu'
+    }
   });
   const $page = Page('Github');
   const {
@@ -89,6 +92,7 @@ function gitHub(options = {}) {
           $page.append($content);
           $content.addEventListener('click', handleClick);
         });
+        break;
       case 'open':
         window.open($el.getAttribute('data-value'), '_system');
         break;
@@ -108,7 +112,7 @@ function gitHub(options = {}) {
 
     $page.onhide = function () {
       actionStack.remove('github');
-    }
+    };
 
     $content.addEventListener('click', handleClick);
   }
@@ -170,7 +174,7 @@ function gitHub(options = {}) {
     if (localStorage.token) delete localStorage.token;
     fs.deleteFile(githubFile)
       .then(() => {
-        return fs.deleteFile(gitProfile)
+        return fs.deleteFile(gitProfile);
       })
       .then(() => {
         if (onlogout) onlogout();

@@ -34,7 +34,10 @@ function GistFiles(gist) {
   };
   const $content = tag.parse(mustache.render(_template, views));
   const $menuToggler = tag('span', {
-    className: 'icon more_vert'
+    className: 'icon more_vert',
+    attr: {
+      action: 'toggle-menu'
+    }
   });
   const $cm = contextMenu(mustache.render(_menu, strings), {
     top: '8px',

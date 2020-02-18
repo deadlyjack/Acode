@@ -3,11 +3,11 @@ import clipboardAction from './clipboard';
 import tag from 'html-tag-js';
 import helper from '../modules/helpers';
 import tile from "../components/tile";
-import fs from './utils/androidFileSystem';
 import dialogs from '../components/dialogs';
 import helpers from '../modules/helpers';
 import textControl from './events/selection';
 import constants from '../constants';
+import fsOperation from './utils/fsOperation';
 
 /**
  * @typedef {object} ActiveEditor
@@ -42,7 +42,8 @@ function EditorManager($sidebar, $header, $body) {
      * @type {AceAjax.Editor}
      */
     const editor = ace.edit(container);
-    const fullContent = '<span action="copy">copy</span><span action="cut">cut</span><span action="paste">paste</span><span action="select all">select all<span>';
+    const readOnlyContent = '<span action="copy">copy</span><span action="select all">select all<span>';
+    const fullContent = `<span action="copy">copy</span><span action="cut">cut</span><span action="paste">paste</span><span action="select all">select all</span>`;
     const controls = {
         start: tag('span', {
             className: 'cursor-control start'
@@ -54,8 +55,31 @@ function EditorManager($sidebar, $header, $body) {
             className: 'clipboard-contextmneu',
             innerHTML: fullContent,
         }),
+        color: tag('span', {
+            className: 'icon color',
+            attr: {
+                action: 'color'
+            }
+        }),
         fullContent,
-        update: () => {}
+        readOnlyContent,
+        update: () => {},
+        checkForColor: function () {
+            const copyTxt = editor.getCopyText();
+            const readOnly = editor.getReadOnly();
+
+            if (this.color.isConnected && readOnly) {
+                this.color.remove();
+            } else {
+
+                if (copyTxt) this.color.style.color = copyTxt;
+
+                if (readOnly) this.color.classList.add('disabled');
+                else this.color.classList.remove('disabled');
+
+                if (!this.color.isConnected) controls.menu.appendChild(this.color);
+            }
+        }
     };
 
     /**
@@ -79,10 +103,8 @@ function EditorManager($sidebar, $header, $body) {
     };
 
     moveOpenFileList();
-
     $body.appendChild(container);
     setupEditor(editor);
-
     textControl(editor, controls, container);
     controls.menu.ontouchend = function (e) {
         e.preventDefault();
@@ -125,8 +147,13 @@ function EditorManager($sidebar, $header, $body) {
      * @param {newFileOptions} options 
      */
     function addNewFile(filename, options = {}) {
-        const uri = options.fileUri || options.contentUri || (options.type === 'git' ? options.record.sha : undefined);
-        let doesExists = getFile(uri || filename, !uri);
+
+        let doesExists = null;
+        if (options.id) doesExists = getFile(options.id, "id");
+        else if (options.fileUri) doesExists = getFile(options.fileUri, "fileUri");
+        else if (options.contentUri) doesExists = getFile(options.contentUri, "contentUri");
+        else if (options.record) doesExists = getFile(options.record, options.type);
+
         if (doesExists) {
             if (manager.activeFile.id !== doesExists.id) switchFile(doesExists.id);
             return;
@@ -151,9 +178,11 @@ function EditorManager($sidebar, $header, $body) {
             text: filename,
             tail: removeBtn
         });
+        let id = options.id || ++counter;
+        while (getFile(id, "id")) id = ++counter;
 
         let file = {
-            id: ++counter,
+            id,
             controls: false,
             session: ace.createEditSession(options.text || ''),
             fileUri: options.fileUri,
@@ -162,7 +191,6 @@ function EditorManager($sidebar, $header, $body) {
             editable: true,
             type: options.type || 'regular',
             isUnsaved: options.isUnsaved,
-            readOnly: options.readOnly || options.isContentUri,
             record: options.record,
             assocTile,
             get filename() {
@@ -174,7 +202,7 @@ function EditorManager($sidebar, $header, $body) {
             },
             get location() {
                 if (this.fileUri)
-                    return this.fileUri.replace(this.filename, '');
+                    return this.fileUri.replace(new RegExp(this.filename + '$'), '');
                 return null;
             },
             set location(url) {
@@ -218,6 +246,9 @@ function EditorManager($sidebar, $header, $body) {
             if (options.cursorPos) {
                 editor.moveCursorToPosition(options.cursorPos);
             }
+
+            const defaultFile = getFile(constants.DEFAULT_SESSION, "id");
+            if (defaultFile && !defaultFile.session.getValue()) manager.removeFile(defaultFile);
         }
 
         function rename(e) {
@@ -230,17 +261,18 @@ function EditorManager($sidebar, $header, $body) {
                     newname = helper.removeLineBreaks(newname);
 
                     if (file.fileUri) {
-                        fs.renameFile(file.fileUri, newname)
+                        fsOperation(file.fileUri)
+                            .then(fs => {
+                                return fs.renameTo(newname);
+                            })
                             .then(() => {
                                 file.filename = newname;
                                 helpers.updateFolders(file.location);
                                 window.plugins.toast.showShortBottom(strings['file renamed']);
                             })
                             .catch(err => {
-                                if (err.code !== 0)
-                                    alert(strings['unable to remane'] + helper.getErrorMessage(err.code));
-                                else
-                                    console.error(err);
+                                helpers.error(err);
+                                console.error(err);
                             });
                     } else if (file.contentUri) {
                         alert(strings['unable to rename']);
@@ -250,6 +282,10 @@ function EditorManager($sidebar, $header, $body) {
                     }
                 });
         }
+
+        setTimeout(() => {
+            editor.resize(true);
+        }, 0);
 
         return file;
     }
@@ -265,8 +301,8 @@ function EditorManager($sidebar, $header, $body) {
         } else if (file.type === 'gist') {
             const id = file.record.id;
             text = 'gist • ' + (id.length > 10 ? '...' + id.substring(id.length - 7) : id);
-        } else if (file.location) {
-            text = file.location;
+        } else if (file.location || file.contentUri) {
+            text = file.location || file.contentUri;
             if (text.length > 30) {
                 text = '...' + text.slice(text.length - 27);
             }
@@ -307,7 +343,6 @@ function EditorManager($sidebar, $header, $body) {
      */
     function setupEditor(editor) {
         ace.require("ace/ext/emmet");
-        window.modelist = ace.require('ace/ext/modelist');
         const settings = appSettings.value;
 
         editor.setFontSize(settings.fontSize);
@@ -326,7 +361,7 @@ function EditorManager($sidebar, $header, $body) {
             showInvisibles: settings.showSpaces
         });
 
-        if (!appSettings.value.linting) {
+        if (!appSettings.value.linting && appSettings.value.linenumbers) {
             editor.renderer.setMargin(0, 0, -16, 0);
         }
     }
@@ -356,7 +391,6 @@ function EditorManager($sidebar, $header, $body) {
             $sidebar.insertBefore($openFileList, $sidebar.firstElementChild);
             root.classList.remove('top-bar');
         }
-        editor.resize(true);
     }
 
     function setupSession(file) {
@@ -388,9 +422,9 @@ function EditorManager($sidebar, $header, $body) {
         /**
          * @type {File}
          */
-        const file = typeof id === "string" ? getFile(id) : id;
+        const file = typeof id === "string" ? getFile(id, "id") : id;
 
-        if (!file) return;
+        if (!file || (manager.files.length === 1 && file.id === constants.DEFAULT_SESSION)) return;
 
         if (file.isUnsaved && !force) {
             dialogs.confirm(strings.warning.toUpperCase(), strings['unsaved file']).then(closeFile);
@@ -404,41 +438,54 @@ function EditorManager($sidebar, $header, $body) {
         function closeFile() {
             manager.files = manager.files.filter(editor => editor.id !== file.id);
 
-            if (!manager.files.length) {
-                editor.setSession(new ace.EditSession(""));
-                $sidebar.hide();
-                addNewFile('untitled', {
-                    isUnsaved: false,
-                    render: true
-                });
-            } else {
-                if (file.id === manager.activeFile.id) {
-                    switchFile(manager.files[manager.files.length - 1].id);
+            if (file.id !== constants.DEFAULT_SESSION) {
+                if (!manager.files.length) {
+                    editor.setSession(new ace.EditSession(""));
+                    $sidebar.hide();
+                    addNewFile('untitled.txt', {
+                        isUnsaved: false,
+                        render: true,
+                        id: constants.DEFAULT_SESSION
+                    });
+                } else {
+                    if (file.id === manager.activeFile.id) {
+                        switchFile(manager.files[manager.files.length - 1].id);
+                    }
                 }
             }
 
             file.assocTile.remove();
-            delete manager.files[id];
             manager.onupdate();
         }
     }
 
     /**
      * 
-     * @param {number | string} id 
+     * @param {string|number|Repo|Gist} checkFor 
+     * @param {"id"|"name"|"fileUri"|"contentUri"|"git"|"gist"} [type] 
      */
-    function getFile(id, isName) {
+    function getFile(checkFor, type = "id") {
+
+        if (typeof type !== "string") return null;
+        if (typeof checkFor === 'string' && !["id" | "name"].includes(type)) checkFor = helpers.decodeURL(checkFor);
+
+        let result = null;
         for (let file of manager.files) {
-            if (file.type === 'git' && id === file.record.sha) return file;
-            if (typeof id === 'number' && file.id === id)
-                return file;
-            else if (typeof id === 'string' && (file.fileUri === id || file.contentUri === id))
-                return file;
-            else if (isName && !file.location && file.name === id)
-                return file;
+            if (typeof type === "string") {
+
+                if (type === "id" && file.id === checkFor) result = file;
+                else if (type === "name" && file.name === checkFor) result = file;
+                else if (type === "fileUri" && file.fileUri === checkFor) result = file;
+                else if (type === "contentUri" && file.contentUri === checkFor) result = file;
+                else if (type === "gist" && file.record && file.record.id === checkFor.id) result = file;
+                else if (type === "git" && file.record && file.record.sha === checkFor.sha) result = file;
+
+            }
+            if (result) break;
+
         }
 
-        return null;
+        return result;
     }
 
 

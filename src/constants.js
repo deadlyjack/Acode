@@ -1,5 +1,9 @@
 const FILE_NAME_REGEX = /^((?![:<>"\/\\\|\?\*]).)*$/;
 const FONT_SIZE = /^[0-9]{1,2}(px|em|pt|mm|pc|in)$/;
+const HEX_COLOR = /^#([a-f0-9]{3}){1,2}([a-f0-9]{2})?$/i;
+const RGB_COLOR = /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(\s*,\s*\d?(\.\d+)?)?\)$/i;
+const HSL_COLOR = /^hsla?\(([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(\s*,\s*\d?(\.\d+)?)?\)$/i;
+const DEFAULT_SESSION = "default-session";
 const langList = {
   'hi-in': 'हिंदी',
   'en-us': 'English',
@@ -14,6 +18,10 @@ const themeList = ["ambiance", "chaos", "chrome", "clouds", "clouds_midnight", "
 export default {
   FILE_NAME_REGEX,
   FONT_SIZE,
+  HEX_COLOR,
+  RGB_COLOR,
+  HSL_COLOR,
+  DEFAULT_SESSION,
   themeList,
   langList
 };

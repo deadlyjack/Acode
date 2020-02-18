@@ -1,4 +1,4 @@
-import androidFileSystem from "./utils/androidFileSystem";
+import androidFileSystem from "./utils/internalFs";
 
 var PHP = function (code, opts) {
     var opts = opts || {};

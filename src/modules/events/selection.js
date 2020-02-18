@@ -1,4 +1,5 @@
 import tag from 'html-tag-js';
+import helpers from '../helpers';
 /**
  * 
  * @param {AceAjax.Editor} editor 
@@ -79,6 +80,7 @@ function enableDoubleMode(editor, controls, container, $content, MouseEvent) {
             y: 0
         }
     };
+
     controls.update = updateControls;
     controls.callBeforeContextMenu = containerOnClick;
     controls.end.onclick = null;
@@ -146,7 +148,6 @@ function enableDoubleMode(editor, controls, container, $content, MouseEvent) {
 
         update(-scrollLeft, -scrollTop);
 
-        console.count('doublemode updatePosition');
     }
 
     function onchange() {
@@ -154,7 +155,6 @@ function enableDoubleMode(editor, controls, container, $content, MouseEvent) {
             updateControls('end');
         }, 0);
 
-        console.count('doublemode onchange');
     }
 
     function updateControls(mode) {
@@ -224,9 +224,8 @@ function enableDoubleMode(editor, controls, container, $content, MouseEvent) {
 
         initialScroll.top = scrollTop;
         initialScroll.left = scrollLeft;
+        controls.checkForColor();
         update();
-
-        console.count('doublemode updateControls');
     }
 
     function update(left = 0, top = 0) {
@@ -238,25 +237,33 @@ function enableDoubleMode(editor, controls, container, $content, MouseEvent) {
             left: cpos.end.x + left - offset,
             top: cpos.end.y - (40 + lineHeight) + top
         };
+        const containerWidth = innerWidth - 40;
+        let scale = 1;
 
-        $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0)`;
+        $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0) scale(${scale})`;
 
         const cmClient = $cm.getBoundingClientRect();
-        if (cmClient.right + 10 > innerWidth) {
-            cm.left = innerWidth - cmClient.width - 10;
+
+        if (cmClient.width > containerWidth) scale = (containerWidth) / cmClient.width;
+
+        if (cmClient.right > containerWidth) {
+            cm.left = containerWidth - cmClient.width;
+            cm.left = cm.left < 0 ? Math.abs(cm.left) / 2 : cm.left;
         }
 
-        if (cmClient.left < 10) {
-            cm.left = 10;
+        if (cmClient.left < 0) {
+            cm.left = 0;
+        }
+
+        if (cmClient.right > containerWidth) {
+            cm.left = (containerWidth - (cmClient.width * scale)) / 2;
         }
 
         if (cmClient.top < 0) {
             cm.top = 50;
         }
 
-        $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0)`;
-
-        console.count('doublemode update');
+        $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0) scale(${scale})`;
     }
 
     function containerOnClick() {
@@ -270,8 +277,6 @@ function enableDoubleMode(editor, controls, container, $content, MouseEvent) {
         editor.selection.off('changeCursor', onchange);
         controls.start.ontouchstart = null;
         controls.end.ontouchstart = null;
-
-        console.count('doublemode containerOnClick');
     }
 }
 
@@ -295,11 +300,11 @@ function enableSingleMode(editor, controls, container, $content, MouseEvent) {
         x: 0,
         y: 0
     };
+    const lessConent = `${editor.getReadOnly()? '' : '<span action="paste">paste</span>'}<span action="select all">select all<span>`;
     let updateTimeout;
-    const lessConent = '<span action="paste">paste</span><span action="select all">select all<span>';
 
     $cm.innerHTML = lessConent;
-    editorManager.activeFile.controls = true;
+    if (editorManager.activeFile) editorManager.activeFile.controls = true;
     controls.update = updateEnd;
     controls.callBeforeContextMenu = callBeforeContextMenu;
 
@@ -307,6 +312,8 @@ function enableSingleMode(editor, controls, container, $content, MouseEvent) {
     editor.session.on('changeScrollTop', hide);
     editor.session.on('changeScrollLeft', hide);
     editor.selection.on('changeCursor', onchange);
+
+    updateEnd();
 
     const mObserver = new MutationObserver(oberser);
 
@@ -351,7 +358,7 @@ function enableSingleMode(editor, controls, container, $content, MouseEvent) {
             el.touchStart = null;
             if (showCm) {
                 if (editor.getCopyText()) {
-                    $cm.innerHTML = controls.fullContent;
+                    $cm.innerHTML = controlscontrols[editor.getReadOnly() ? 'readOnlyContent' : 'fullContent'];
                 } else {
                     $cm.innerHTML = lessConent;
                 }
@@ -359,6 +366,7 @@ function enableSingleMode(editor, controls, container, $content, MouseEvent) {
                 updateCm();
             } else if (!move) {
                 container.appendChild($cm);
+                controls.checkForColor();
                 updateCm();
             }
         };
@@ -366,8 +374,6 @@ function enableSingleMode(editor, controls, container, $content, MouseEvent) {
 
     function onchange() {
         updateTimeout = setTimeout(updateEnd, 0);
-
-        console.count('singlemode onchange');
     }
 
     function updateEnd() {
@@ -379,15 +385,12 @@ function enableSingleMode(editor, controls, container, $content, MouseEvent) {
 
         update();
 
-        console.count('singlemode updateEnd');
     }
 
     function update(left = 0, top = 0) {
         const offset = parseFloat(root.style.marginLeft) || 0;
         controls.end.style.transform = `translate3d(${cpos.x + 2 + left - offset}px, ${cpos.y + top}px, 0) rotate(45deg)`;
         controls.end.style.display = 'block';
-
-        console.count('singlemode update');
     }
 
     function updateCm() {
@@ -397,7 +400,9 @@ function enableSingleMode(editor, controls, container, $content, MouseEvent) {
             top: cpos.y - (40 + lineHeight)
         };
 
-        $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0)`;
+        let scale = 1;
+
+        $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0) scale(${scale})`;
 
         const cmClient = $cm.getBoundingClientRect();
         if (cmClient.right + 10 > innerWidth) {
@@ -412,15 +417,14 @@ function enableSingleMode(editor, controls, container, $content, MouseEvent) {
             cm.top = 50;
         }
 
-        $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0)`;
-
-        console.count('singlemode updateCm');
+        //TODO: expriment
+        $cm.style.transform = `translate3d(${cm.left * scale}px, ${cm.top}px, 0) scale(${scale})`;
     }
 
     function callBeforeContextMenu() {
         controls.end.remove();
         $cm.remove();
-        $cm.innerHTML = controls.fullContent;
+        $cm.innerHTML = controls[editor.getReadOnly() ? 'readOnlyContent' : 'fullContent'];
         editor.session.off('changeScrollTop', hide);
         editor.session.off('changeScrollLeft', hide);
         editor.selection.off('changeCursor', onchange);
@@ -428,7 +432,6 @@ function enableSingleMode(editor, controls, container, $content, MouseEvent) {
         mObserver.disconnect();
         controls.end.ontouchstart = null;
 
-        console.count('singlemode callBeforeContentMenu');
     }
 
     function hide() {

@@ -7,7 +7,7 @@ import './login.scss';
 import helpers from '../../modules/helpers';
 import gitHub from '../github/gitHub';
 import dialogs from '../../components/dialogs';
-import fs from '../../modules/utils/androidFileSystem';
+import fs from '../../modules/utils/internalFs';
 
 export default function GithubLogin() {
   const $page = Page('Github Login');
@@ -29,11 +29,11 @@ export default function GithubLogin() {
 
   $page.onhide = function () {
     actionStack.remove('github login');
-  }
+  };
 
   $page.setMessage = function (msg) {
     $errorMsg.textContent = msg;
-  }
+  };
 
   document.body.appendChild($page);
 
@@ -66,14 +66,14 @@ export default function GithubLogin() {
     const credentials = helpers.credentials;
 
     if (!username && !token)
-      return $errorMsg.textContent = 'Please enter username and password or token!';
+      return ($errorMsg.textContent = 'Please enter username and password or token!');
 
 
     if (token) {
       localStorage.setItem('token', credentials.encrypt(token));
     }
     if (username) {
-      if (!password) return $errorMsg.textContent = 'Please enter password!';
+      if (!password) return ($errorMsg.textContent = 'Please enter password!');
       username = credentials.encrypt(username);
       password = credentials.encrypt(password);
       localStorage.setItem('username', username);

@@ -138,13 +138,11 @@ function quickToolAction(e, footer, row1, row2, search) {
             break;
 
         case 'replace':
-            if (!replaceWith) return;
-            editor.replace($replaceInput.value);
+            editor.replace($replaceInput.value || '');
             break;
 
         case 'replace-all':
-            if (!replaceWith) return;
-            editor.replaceAll($replaceInput.value);
+            editor.replaceAll($replaceInput.value || '');
             break;
 
         case 'search-settings':

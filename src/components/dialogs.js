@@ -1,6 +1,8 @@
 import tag from 'html-tag-js';
 import autosize from 'autosize';
+import Picker from 'vanilla-picker';
 import tile from "./tile";
+import helpers from '../modules/helpers';
 /**
  * @typedef {"text"|"numberic"|"tel"|"search"|"email"|"url"} Types
  */
@@ -317,9 +319,7 @@ function alert(titleText, message) {
     });
     const okBtn = tag('button', {
         textContent: strings.ok,
-        onclick: function () {
-            hide();
-        }
+        onclick: hide
     });
     const alertDiv = tag('div', {
         className: 'prompt alert',
@@ -333,7 +333,8 @@ function alert(titleText, message) {
         ]
     });
     const mask = tag('span', {
-        className: 'mask'
+        className: 'mask',
+        onclick: hide
     });
 
     actionStack.push({
@@ -439,6 +440,7 @@ function confirm(titleText, message) {
  * @param {string[]} options 
  * @param {object} opts 
  * @param {string} opts.default 
+ * @param {boolean} opts.textTransform 
  */
 function select(title, options, opts = {}) {
     return new Promise(resolve => {
@@ -447,7 +449,7 @@ function select(title, options, opts = {}) {
             textContent: title
         });
         const list = tag('ul', {
-            className: 'scroll'
+            className: 'scroll' + (opts.textTransform === false ? ' no-text-transform' : '')
         });
         const selectDiv = tag('div', {
             className: 'prompt select',
@@ -467,6 +469,7 @@ function select(title, options, opts = {}) {
             let value = null;
             let text = null;
             let lead = null;
+            let disabled = false;
             if (Array.isArray(option)) {
                 value = option[0];
                 text = option[1];
@@ -476,6 +479,12 @@ function select(title, options, opts = {}) {
                         className: `icon ${option[2]}`
                     });
                 }
+
+                option.map((o, i) => {
+                    if (typeof o === 'boolean' && i > 1) disabled = !o;
+                    return o;
+                });
+
             } else {
                 value = text = option;
             }
@@ -494,6 +503,8 @@ function select(title, options, opts = {}) {
                 resolve(value);
                 hide();
             };
+
+            if (disabled) item.classList.add('disabled');
 
             list.append(item);
 
@@ -522,6 +533,10 @@ function select(title, options, opts = {}) {
         function hide() {
             actionStack.remove('select');
             hideSelect();
+            let listItems = [...list.children];
+            listItems.map(item => {
+                item.onclick = null;
+            });
         }
     });
 }
@@ -597,8 +612,9 @@ function loaderHide() {
  * @param {string} titleText 
  * @param {string} html 
  * @param {function(Event):void} onclick
+ * @param {function():void} onhide
  */
-function box(titleText, html, onclick) {
+function box(titleText, html, onclick, onhide) {
     const box = tag('div', {
         className: 'prompt box',
         children: [
@@ -637,9 +653,138 @@ function box(titleText, html, onclick) {
     }
 
     function hide() {
+        const imgs = box.getAll('img');
+        if (imgs) {
+            for (let img of imgs) {
+                URL.revokeObjectURL(img.src);
+            }
+        }
         actionStack.remove('box');
         hideSelect();
+        if (onhide) onhide();
     }
+}
+
+/**
+ * Choose color
+ * @param {string} defaultColor 
+ */
+function color(defaultColor) {
+    let type = helpers.checkColorType(defaultColor) || 'hex';
+    return new Promise(resolve => {
+        const colorModes = ['hsl', 'hex', 'rgb'];
+        let mode = colorModes.indexOf(type);
+        let color = null;
+
+        const parent = tag('div', {
+            className: 'message color-picker'
+        });
+        const okBtn = tag('button', {
+            textContent: strings.ok,
+            onclick: function () {
+                hide();
+                resolve(color);
+            }
+        });
+        const toggleMode = tag('button', {
+            textContent: type,
+            onclick: function (e) {
+                ++mode;
+                if (mode >= colorModes.length) mode = 0;
+                type = colorModes[mode];
+                this.textContent = type;
+                picker.setOptions({
+                    color,
+                    editorFormat: type
+                });
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            }
+        });
+        const box = tag('div', {
+            className: 'prompt box',
+            children: [
+                tag('strong', {
+                    className: 'title',
+                    textContent: strings['choose color']
+                }),
+                parent,
+                tag('div', {
+                    className: 'button-container',
+                    children: [toggleMode, okBtn]
+                })
+            ]
+        });
+        const mask = tag('span', {
+            className: 'mask',
+            onclick: hide
+        });
+        const picker = new Picker({
+            parent,
+            popup: false,
+            editor: true,
+            color: defaultColor,
+            onChange,
+            alpha: true,
+            editorFormat: type
+        });
+
+        picker.show();
+
+        actionStack.push({
+            id: 'box',
+            action: hideSelect
+        });
+
+        document.body.append(box, mask);
+
+        window.restoreTheme(true);
+
+        function hideSelect() {
+            box.classList.add('hide');
+            window.restoreTheme();
+            setTimeout(() => {
+                document.body.removeChild(box);
+                document.body.removeChild(mask);
+            }, 300);
+        }
+
+        function hide() {
+            actionStack.remove('box');
+            hideSelect();
+            picker.destroy();
+        }
+
+        function onChange(c) {
+            if (!c) return;
+
+            const alpha = c.rgba[3] < 1 ? true : false;
+            if (type === 'hex') {
+
+                if (alpha) color = c.hex;
+                else color = c.hex.slice(0, -2);
+
+            } else if (type === 'rgb') {
+
+                if (alpha) color = c.rgbaString;
+                else color = c.rgbString;
+
+            } else {
+
+                if (alpha) color = c.hslaString;
+                else color = c.hslString;
+
+            }
+
+            if (color) {
+                setTimeout(() => {
+                    const $editor = box.get('.picker_editor');
+                    if ($editor) $editor.style.backgroundColor = color;
+                }, 0);
+            }
+        }
+    });
 }
 
 export default {
@@ -650,5 +795,6 @@ export default {
     select,
     loaderShow,
     loaderHide,
-    box
+    box,
+    color
 };

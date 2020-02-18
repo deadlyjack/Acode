@@ -70,7 +70,7 @@ export default function editorSettings() {
             subText: value.showSpaces ? strings.yes : strings.no,
         },
         {
-            key: 'openFileListPos',
+            key: 'activefiles',
             text: strings['active files'],
             subText: value.openFileListPos,
         }
@@ -143,7 +143,7 @@ export default function editorSettings() {
                         });
                         appSettings.value.textWrap = res;
                         appSettings.update();
-                        this.changeSubText(res ? strings.yes : strings.no, );
+                        this.changeSubText(res ? strings.yes : strings.no);
                     });
                 break;
 
@@ -161,7 +161,7 @@ export default function editorSettings() {
                         });
                         appSettings.value.softTab = res;
                         appSettings.update();
-                        this.changeSubText(res ? strings.yes : strings.no, );
+                        this.changeSubText(res ? strings.yes : strings.no);
                     });
                 break;
 
@@ -178,9 +178,15 @@ export default function editorSettings() {
                             showGutter: res,
                             showLineNumbers: res
                         });
+                        if (res) {
+                            editorManager.editor.renderer.setMargin(0, 0, -16, 0);
+                        } else {
+                            editorManager.editor.renderer.setMargin(0, 0, 0, 0);
+                        }
                         appSettings.value.linenumbers = res;
                         appSettings.update();
-                        this.changeSubText(res ? strings.yes : strings.no, );
+                        this.changeSubText(res ? strings.yes : strings.no);
+                        editorManager.editor.resize(true);
                     });
                 break;
 
@@ -231,7 +237,7 @@ export default function editorSettings() {
                     });
                 break;
 
-            case 'openFileListPos':
+            case 'activefiles':
                 dialogs.select(this.text, ['sidebar', 'header'], {
                         default: value.openFileListPos
                     })

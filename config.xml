@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.foxdebug.acode" android-versionCode="62" version="0.0.6.62" 
+<widget id="com.foxdebug.acode" android-versionCode="70" version="0.0.7.70" 
     xmlns="http://www.w3.org/ns/widgets" 
     xmlns:android="http://schemas.android.com/apk/res/android" 
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -20,7 +20,9 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+
     <preference name="cordova.plugins.diagnostic.modules" value="EXTERNAL_STORAGE " />
+
     <platform name="android">
         <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/colors.xml" />
         <resource-file src="/res/network_security_config.xml" target="/app/src/main/res/xml/network_security_config.xml" />
@@ -31,65 +33,39 @@
         <preference name="DisallowOverscroll" value="true" />
         <preference name="BackgroundColor" value="0xFF313131" />
         <preference name="AndroidPersistentFileLocation" value="Compatibility" />
-        <preference name="AndroidExtraFilesystems" value="sdcard,cache" />
-        <preference name="android-minSdkVersion" value="21" />
+        <preference name="android-minSdkVersion" value="22" />
         <preference name="AndroidLaunchMode" value="singleTask" />
         <preference name="prerendered-icon" value="false" />
+
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
             <application android:networkSecurityConfig="@xml/network_security_config" />
             <application android:usesCleartextTraffic="true" />
             <application android:resizeableActivity="false" />
         </edit-config>
-        <config-file parent="/manifest" target="AndroidManifest.xml">
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
-            <uses-permission android:name="android.permission.WAKE_LOCK" />
-            <uses-permission android:name="android.permission.INTERNET"/>
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-            <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/>
-            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
         </config-file>
+
         <config-file parent="./application/activity" target="AndroidManifest.xml">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:mimeType="text/*" />
-                <data android:mimeType="application/javascript" />
-                <data android:mimeType="application/x-javascript" />
-                <data android:mimeType="application/ecmascript" />
-                <data android:mimeType="application/octet-stream" />
-                <data android:mimeType="application/x-octet-stream" />
-                <data android:mimeType="application/xml" />
+                <data android:mimeType="xml/*" />
+                <data android:mimeType="application/*" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.GET_CONTENT" />
-                <data android:mimeType="text/*" />
-                <data android:mimeType="application/javascript" />
-                <data android:mimeType="application/x-javascript" />
-                <data android:mimeType="application/ecmascript" />
-                <data android:mimeType="application/xml" />
-                <data android:mimeType="application/octet-stream" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.OPENABLE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data android:host="*" android:scheme="http" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data android:host="*" android:scheme="https" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="*/*" />
+                <data android:mimeType="text/*" />
+                <data android:mimeType="xml/*" />
+                <data android:mimeType="application/*" />
             </intent-filter>
         </config-file>
+
         <resource-file src="res/logo.png" target="app/src/main/res/drawable/logo.png" />
         <icon background="@color/ic_launcher_background" density="mdpi" foreground="res/icon/android/mipmap-mdpi/ic_launcher_foreground.png" />
         <icon background="@color/ic_launcher_background" density="hdpi" foreground="res/icon/android/mipmap-hdpi/ic_launcher_foreground.png" />

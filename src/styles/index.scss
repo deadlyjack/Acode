@@ -20,6 +20,10 @@ body {
     height: 100%;
 }
 
+body {
+    background-color: $primary;
+}
+
 .open-file-list {
     position: absolute;
     top: 0;
@@ -56,6 +60,8 @@ body {
         }
 
         .text {
+            display: inline-block;
+            white-space: nowrap;
             max-width: 180px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -69,6 +75,7 @@ body {
             width: 20px;
             font-size: 1em;
             background-size: 14px;
+            background-position: center;
         }
     }
 }
@@ -119,6 +126,18 @@ body {
         background-position: center;
         background-size: 28px;
         background-repeat: no-repeat;
+    }
+
+    &.color {
+        display: flex;
+
+        &::before {
+            content: '';
+            height: 16px;
+            width: 16px;
+            border: solid 1px rgba($color: #999, $alpha: 0.5);
+            background-color: currentColor;
+        }
     }
 
     &.notice {
@@ -327,9 +346,15 @@ input {
         text-align: center;
         color: #333;
         user-select: none;
+        white-space: nowrap;
 
         &:not(:last-child) {
             border-right: solid 1px #ccc;
+        }
+
+        &.disabled {
+            opacity: 0.6;
+            pointer-events: none;
         }
     }
 }

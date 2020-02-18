@@ -6,10 +6,9 @@ import './repo.scss';
 
 import tag from 'html-tag-js';
 import mustache from 'mustache';
+import mimeType from 'mime-types';
 import Page from '../../components/page';
 import helpers from '../../modules/helpers';
-
-
 import dialogs from '../../components/dialogs';
 import git from '../../modules/git';
 import contextMenu from '../../components/contextMenu';
@@ -18,7 +17,10 @@ import Info from '../info/info';
 export default function Repo(owner, repoName, $gitHubPage) {
   const $page = Page(repoName);
   const $menuToggler = tag('span', {
-    className: 'icon more_vert'
+    className: 'icon more_vert',
+    attr: {
+      action: 'toggle-menu'
+    }
   });
   const $content = tag.parse(_template);
   const $navigation = $content.querySelector('.navigation');
@@ -50,8 +52,8 @@ export default function Repo(owner, repoName, $gitHubPage) {
     actionStack.remove('repo');
     idsToFlush.map(id => {
       actionStack.remove(id);
-    })
-  }
+    });
+  };
 
   function getRepo() {
     dialogs.loaderShow(repoName, strings.loading + '...');
@@ -117,10 +119,10 @@ export default function Repo(owner, repoName, $gitHubPage) {
         list,
         name,
         sha
-      }
+      };
       cachedTree[sha] = currentTree;
     } else {
-      currentTree = cachedTree[sha]
+      currentTree = cachedTree[sha];
     }
   }
 
@@ -217,27 +219,51 @@ export default function Repo(owner, repoName, $gitHubPage) {
 
     function file() {
       dialogs.loaderShow(name, strings.loading + '...');
-      repo.getBlob(sha)
-        .then(res => {
-          const record = gitRecord.add({
-            sha,
-            data: res.data,
-            name,
-            repo: repoName,
-            path: path.slice(1).join('/'),
-            owner
-          });
+      const ext = helpers.getExt(name);
+      const mime = mimeType.lookup(ext);
+      const type = /image/i.test(mime) ? 'blob' : null;
+      repo.getBlob(sha, 'blob')
+        .then(async res => {
+          let data = res.data;
+          if (!type) {
+            if (data instanceof Blob) {
+              try {
+                data = await data.text();
+              } catch (error) {
+                console.error(error);
+                dialogs.alert(strings.error, strings['unable to open file']);
+              }
+            }
+            const record = gitRecord.add({
+              sha,
+              data,
+              name,
+              repo: repoName,
+              path: path.slice(1).join('/'),
+              owner
+            });
 
-          editorManager.addNewFile(name, {
-            type: 'git',
-            record,
-            text: res.data,
-            isUnsaved: false
-          });
+            editorManager.addNewFile(name, {
+              type: 'git',
+              record,
+              text: data,
+              isUnsaved: false
+            });
 
-          $page.hide();
-          actionStack.pop();
-          actionStack.pop();
+            $page.hide();
+            actionStack.pop();
+            actionStack.pop();
+
+          } else if (type === 'blob') {
+
+            dialogs.box(name, `<img src='${URL.createObjectURL(data)}'>`);
+
+          } else {
+            alert(strings.error.toUpperCase(), strings['file not supported']);
+          }
+
+        })
+        .finally(() => {
           dialogs.loaderHide();
         });
     }

@@ -1,4 +1,4 @@
-import fs from './modules/utils/androidFileSystem';
+import fs from './modules/utils/internalFs';
 /**
  * @typedef {object} fileBrowserSettings
  * @property {string} showHiddenFiles
@@ -55,9 +55,9 @@ class Settings {
             autoCorrect: true,
             previewMode: 'none',
             showSpaces: false,
-            openFileListPos: 'sidebar'
+            openFileListPos: 'header'
         };
-        this.settingsFile = cordova.file.externalApplicationStorageDirectory + 'settings.json';
+        this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;
         this.onload = null;
         this.onsave = null;

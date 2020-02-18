@@ -1,5 +1,6 @@
 import createEditorFromURI from './createEditorFromURI';
 import helpers from "./helpers";
+import dialogs from '../components/dialogs';
 
 export default HandleIntent;
 
@@ -19,54 +20,32 @@ function HandleIntent(intent = {}) {
     const type = intent.action.split('.').slice(-1)[0];
     let timeout = null;
 
-    if (!window.isLoading) {
-        timeout = setTimeout(() => {
-            document.body.classList.add('loading');
-        }, 300);
-    }
+    timeout = setTimeout(() => {
+        dialogs.loaderShow(strings.loading + '...');
+    }, 300);
 
     if (type === 'VIEW') {
-        if (!intent.error && intent.fileUri) {
-            createEditorFromURI(intent.fileUri).then(stopLoading);
-        } else if (intent.error && intent.filename) {
-            const url = helpers.convertToFile(intent.data) || intent.data;
-            createEditorFromURI({
-                dir: url.dir || url,
-                name: intent.filename
-            }, true).then(stopLoading);
-        } else if (intent.error) {
-            if (intent.data) {
-                let directory = helpers.convertToFile(intent.data);
-                let isContentUri = false;
-                let name = intent.filename;
 
-                if (!directory && !name) {
-                    stopLoading();
-                    alert(strings.error.toUpperCase(), strings['unable to open file']);
-                    return;
-                } else if (!directory && name) {
-                    directory = intent.data;
-                } else if (directory.dir) {
-                    let tmp = directory;
-                    directory = directory.dir;
-                    if (!name && tmp.name) {
-                        name = tmp.name;
-                    } else {
-                        stopLoading();
-                        alert(strings.error.toUpperCase(), strings['unable to open file']);
-                        return;
-                    }
-                }
+        if (intent.fileUri) {
+
+            window.resolveLocalFileSystemURL(intent.fileUri, () => {
+
                 createEditorFromURI({
-                    directory,
-                    name
-                }, isContentUri, {
-                    readOnly: !!isContentUri
+                    fileUri: intent.fileUri,
+                    contentUri: intent.data,
+                    name: intent.filename
                 }).then(stopLoading);
-            } else {
-                alert(strings.error.toUpperCase(), strings['unable to open file']);
-                stopLoading();
-            }
+
+            }, () => {
+
+                checkAndCreate();
+
+            });
+
+        } else if (intent.data) {
+
+            checkAndCreate();
+
         }
     } else if (type === 'SEND') {
         if (intent.fileUri) {
@@ -92,10 +71,28 @@ function HandleIntent(intent = {}) {
         stopLoading();
     }
 
+    function checkAndCreate() {
+        helpers.convertToFile(intent.data)
+            .then(url => {
+                return createEditorFromURI({
+                    name: intent.filename,
+                    fileUri: url,
+                    contentUri: intent.data
+                }, false);
+            })
+            .catch(() => {
+                return createEditorFromURI({
+                    contentUri: intent.data,
+                    name: intent.filename
+                }, true);
+            })
+            .finally(stopLoading);
+    }
+
     function stopLoading() {
         if (timeout) {
             clearTimeout(timeout);
         }
-        document.body.classList.remove('loading');
+        dialogs.loaderHide();
     }
 }

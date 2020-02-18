@@ -3,6 +3,7 @@
 $lightText : #333e59;
 
 .theme-light {
+    background-color: white;
 
     header,
     .prompt,
@@ -15,7 +16,8 @@ $lightText : #333e59;
         span:not(.error-msg),
         i,
         button,
-        strong {
+        strong,
+        input {
             color: $lightText;
         }
     }

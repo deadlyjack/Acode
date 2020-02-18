@@ -1,8 +1,8 @@
 {
   "_from": "cordova-plugin-device",
-  "_id": "cordova-plugin-device@2.0.2",
+  "_id": "cordova-plugin-device@2.0.3",
   "_inBundle": false,
-  "_integrity": "sha1-/Ajzci5n7ve2xnv8mag99q3Quro=",
+  "_integrity": "sha512-Jb3V72btxf3XHpkPQsGdyc8N6tVBYn1vsxSFj43fIz9vonJDUThYPCJJHqk6PX6N4dJw6I4FjxkpfCR4LDYMlw==",
   "_location": "/cordova-plugin-device",
   "_phantomChildren": {},
   "_requested": {
@@ -19,10 +19,10 @@
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-device/-/cordova-plugin-device-2.0.2.tgz",
-  "_shasum": "fc08f3722e67eef7b6c67bfc99a83df6add0baba",
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-device/-/cordova-plugin-device-2.0.3.tgz",
+  "_shasum": "c2b41b7efd0455dd097f89356d85bfdd5dadeb0f",
   "_spec": "cordova-plugin-device",
-  "_where": "D:\\cordova\\Acode",
+  "_where": "/mnt/sda1/cordova/code editor",
   "author": {
     "name": "Apache Software Foundation"
   },
@@ -80,5 +80,5 @@
     "test": "npm run eslint"
   },
   "types": "./types/index.d.ts",
-  "version": "2.0.2"
+  "version": "2.0.3"
 }

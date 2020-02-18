@@ -8,6 +8,7 @@ import './styles/dialogs.scss';
 import './styles/themes.scss';
 import './styles/help.scss';
 import './styles/overideAceStyle.scss';
+import * as tePolly from 'text-encoding-polyfill';
 
 import "core-js/stable";
 import tag from 'html-tag-js';
@@ -16,7 +17,7 @@ import tile from "./components/tile";
 import sidenav from './components/sidenav';
 import contextMenu from './components/contextMenu';
 import EditorManager from './modules/editorManager';
-import fs from './modules/utils/androidFileSystem';
+import fs from './modules/utils/internalFs';
 import ActionStack from "./modules/actionStack";
 import helpers from "./modules/helpers";
 import Settings from "./settings";
@@ -39,9 +40,20 @@ import git from "./modules/git";
 import runPreview from "./modules/runPreview";
 import Admob from "./modules/admob";
 import commands from "./modules/commands";
+import externalStorage from "./modules/externalStorage";
 //@ts-check
 
 window.onload = Main;
+window.TextDecoder = tePolly.TextDecoder;
+window.TextEncoder = tePolly.TextEncoder;
+
+if (!HTMLElement.prototype.append) {
+  HTMLElement.prototype.append = function (...nodes) {
+    nodes.map(node => {
+      this.appendChild(node);
+    });
+  };
+}
 
 function Main() {
   let timeout;
@@ -58,6 +70,7 @@ function Main() {
     lang = language;
   }
 
+  window.root = tag(window.root);
   window.app = document.body = tag(document.body);
   window.actionStack = ActionStack();
   window.editorCount = 0;
@@ -73,6 +86,8 @@ function Main() {
     files: [],
     activeFile: null
   };
+  window.externalStorage = externalStorage;
+  window.modelist = ace.require('ace/ext/modelist');
 
   if (!('files' in localStorage)) {
     localStorage.setItem('files', '[]');
@@ -83,11 +98,18 @@ function Main() {
 
   document.addEventListener("deviceready", () => {
 
+    window.DATA_STORAGE = cordova.file.externalDataDirectory || cordova.file.dataDirectory;
+    window.CACHE_STORAGE = cordova.file.externalCacheDirectory || cordova.file.cacheDirectory;
+    window.gitRecordURL = DATA_STORAGE + 'git/.gitfiles';
+    window.gistRecordURL = DATA_STORAGE + 'git/.gistfiles';
+
+    if (window.AdMob) Admob();
+    else window.AdMob = null;
+
     const permissions = cordova.plugins.permissions;
     const requiredPermissions = [
       permissions.WRITE_EXTERNAL_STORAGE,
-      permissions.WRITE_MEDIA_STORAGE,
-      permissions.MANAGE_DOCUMENTS
+      permissions.WRITE_MEDIA_STORAGE
     ];
 
     requiredPermissions.map((permission, i) => {
@@ -110,8 +132,7 @@ function Main() {
 
   function ondeviceready() {
     const url = `${cordova.file.applicationDirectory}www/lang/${appSettings.value.lang}.json`;
-    window.gitRecordURL = cordova.file.externalDataDirectory + 'git/.gitfiles';
-    window.gistRecordURL = cordova.file.externalDataDirectory + 'git/.gistfiles';
+
     fs.readFile(url)
       .then(res => {
         const decoder = new TextDecoder('utf-8');
@@ -151,9 +172,6 @@ function runApp() {
     }
   });
 
-  if (window.AdMob) Admob();
-  else window.AdMob = null;
-
   const version = localStorage.getItem('version');
   if (version !== BuildInfo.version) {
     localStorage.clear();
@@ -187,10 +205,16 @@ function App() {
   //#region declaration
   const _search = mustache.render($_search, strings);
   const $toggler = tag('span', {
-    className: 'icon menu'
+    className: 'icon menu',
+    attr: {
+      action: 'toggle-sidebar'
+    }
   });
   const $menuToggler = tag("span", {
-    className: 'icon more_vert'
+    className: 'icon more_vert',
+    attr: {
+      action: 'toggle-menu'
+    }
   });
   const $header = tile({
     type: 'header',
@@ -212,6 +236,9 @@ function App() {
   const $sidebar = sidenav($main, $toggler);
   const $runBtn = tag('span', {
     className: 'icon play_arrow',
+    attr: {
+      action: 'run-file'
+    },
     onclick: function () {
       let target = appSettings.value.previewMode;
       let console = false;
@@ -242,7 +269,8 @@ function App() {
       editorManager.onupdate();
     },
     attr: {
-      style: 'font-size: 1.2em !important;'
+      style: 'font-size: 1.2em !important;',
+      action: 'toggle-readonly'
     }
   });
   const fileOptions = {
@@ -264,7 +292,7 @@ function App() {
   if (count === 3) {
 
     const html = $_rating;
-    dialogs.box('Did you like the app?', html, onInteract);
+    dialogs.box('Did you like the app?', html, onInteract, onhide);
 
   } else if (count < 3) {
     localStorage.count = ++count;
@@ -300,7 +328,7 @@ function App() {
           navigator.app.overrideButton("menubutton", true);
         }
 
-        document.addEventListener('pause', window.beforeClose);
+        document.addEventListener('pause', saveState);
         document.addEventListener('resume', checkFiles);
         checkFiles();
 
@@ -404,10 +432,15 @@ function App() {
 
     setTimeout(() => {
       if (val === 5) window.open(`https://play.google.com/store/apps/details?id=${BuildInfo.packageName}`, '_system');
-      else window.open(`mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=version-${BuildInfo.version}`, '_system');
+      else window.open(`mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=${val} stars <br> ${helpers.getFeedbackBody()}`, '_system');
     }, 100);
 
     localStorage.count = 4;
+  }
+
+  function onhide() {
+    const count = localStorage.count;
+    if (count < 4) localStorage.count = -3;
   }
 
   function saveState() {
@@ -420,24 +453,25 @@ function App() {
     const unsaved = [];
 
     for (let file of editorManager.files) {
+      if (file.id === constants.DEFAULT_SESSION && !file.session.getValue()) continue;
       const edit = {};
       edit.name = file.filename;
       edit.type = file.type;
+      edit.id = file.id;
       if (edit.type === 'git') edit.sha = file.record.sha;
       else if (edit.type === 'gist') {
-        edit.id = file.record.id;
+        edit.recordid = file.record.id;
         edit.isNew = file.record.isNew;
       }
       if (file.fileUri) {
         edit.fileUri = file.fileUri;
-        edit.readOnly = file.readOnly ? 'true' : '';
+        edit.contentUri = file.contentUri;
         unsaved.push({
           id: btoa(file.id),
           fileUri: file.fileUri
         });
       } else if (file.contentUri) {
         edit.contentUri = file.contentUri;
-        edit.readOnly = true;
       }
       if (file.isUnsaved) {
         edit.data = file.session.getValue();
@@ -448,8 +482,7 @@ function App() {
 
     unsaved.map(file => {
       window.resolveLocalFileSystemURL(file.fileUri, fs => {
-        const extDir = cordova.file.externalCacheDirectory;
-        window.resolveLocalFileSystemURL(extDir, parent => {
+        window.resolveLocalFileSystemURL(CACHE_STORAGE, parent => {
           fs.copyTo(parent, file.id);
         }, err => {
           console.error(err);
@@ -460,16 +493,19 @@ function App() {
       return file;
     });
 
-    allFolders.map(folder => {
+    allFolders.map(url => {
+      const {
+        name
+      } = addedFolder[url];
       folders.push({
-        url: folder,
-        name: addedFolder[folder].name
+        url,
+        name
       });
-      return folder;
+      return url;
     });
 
     if (activeFile) {
-      localStorage.setItem('lastfile', activeFile.fileUri || activeFile.contentUri || activeFile.filename);
+      localStorage.setItem('lastfile', activeFile.id);
     }
 
     localStorage.setItem('files', JSON.stringify(lsEditor));
@@ -490,8 +526,7 @@ function App() {
             text: file.data,
             cursorPos: file.cursorPos,
             saved: false,
-            render: false,
-            readOnly: !!file.readOnly,
+            render: (files.length === 1 || (file.id + '') === lastfile) ? true : false,
             index: i
           };
 
@@ -503,35 +538,40 @@ function App() {
                     type: 'git',
                     text: file.data || record.data,
                     isUnsaved: file.data ? true : false,
-                    record
+                    record,
+                    render: xtra.render,
+                    cursorPos: file.cursorPos
                   });
                 }
                 if (i === files.length - 1) resolve();
               });
           } else if (file.type === 'gist') {
-            const gist = gistRecord.get(file.id, file.isNew);
+            const gist = gistRecord.get(file.recordid, file.isNew);
             if (gist) {
               const gistFile = gist.files[file.name];
               editorManager.addNewFile(file.name, {
                 type: 'gist',
                 text: file.data || gistFile.content,
                 isUnsaved: file.data ? true : false,
-                record: gist
+                record: gist,
+                render: xtra.render,
+                cursorPos: file.cursorPos
               });
             }
             if (i === files.length - 1) resolve();
           } else if (file.fileUri) {
 
-            if (file.fileUri === lastfile) {
-              xtra.render = true;
-            }
+
             if (file.data) {
               xtra.saved = false;
             } else {
               xtra.saved = true;
             }
 
-            createEditorFromURI(file.fileUri, false, xtra).then(index => {
+            createEditorFromURI({
+              fileUri: file.fileUri,
+              contentUri: file.contentUri
+            }, false, xtra).then(index => {
               if (index === files.length - 1) resolve();
             });
           } else if (file.contentUri) {
@@ -542,15 +582,14 @@ function App() {
 
             createEditorFromURI({
               name: file.name,
-              dir: file.contentUri,
+              contentUri: file.contentUri,
             }, true, xtra).then(index => {
               if (index === files.length - 1) resolve();
             });
 
           } else {
-            const render = file.name === lastfile;
             const newFile = editorManager.addNewFile(file.name, {
-              render,
+              render: xtra.render,
               isUnsaved: !!file.data
             });
             if (file.data) {
@@ -563,9 +602,10 @@ function App() {
           return file;
         });
       } else {
-        editorManager.addNewFile('untitled', {
+        editorManager.addNewFile('untitled.txt', {
           isUnsaved: false,
-          render: true
+          render: true,
+          id: constants.DEFAULT_SESSION
         });
         resolve();
       }
@@ -596,18 +636,17 @@ function App() {
     }
     const files = editorManager.files;
 
-    const dir = cordova.file.externalCacheDirectory;
     files.map(file => {
       if (file.type === 'git') return;
       if (file.fileUri) {
         const id = btoa(file.id);
-        window.resolveLocalFileSystemURL(dir + id, entry => {
-          fs.readFile(dir + id).then(res => {
+        window.resolveLocalFileSystemURL(CACHE_STORAGE + id, entry => {
+          fs.readFile(CACHE_STORAGE + id).then(res => {
             const data = res.data;
             const decoder = new TextDecoder("utf-8");
             const originalText = decoder.decode(data);
 
-            fs.deleteFile(dir + id)
+            fs.deleteFile(CACHE_STORAGE + id)
               .catch(err => {
                 console.log(err);
               });
@@ -615,7 +654,6 @@ function App() {
             window.resolveLocalFileSystemURL(file.fileUri, () => {
               fs.readFile(file.fileUri).then(res => {
                 const data = res.data;
-                // const decoder = new TextDecoder("utf-8");
                 const text = decoder.decode(data);
 
                 if (text !== originalText) {

@@ -5,7 +5,7 @@ function Admob() {
   });
 
   AdMob.createBanner({
-    adId: 'ca-app-pub-9184710420764586/3924534388',
+    adId: 'ca-app-pub-9292130311136531/6117546903',
     position: AdMob.AD_POSITION.BOTTOM_CENTER,
     adSize: AdMob.AD_SIZE.SMART_BANNER,
     overlap: true,
@@ -13,7 +13,7 @@ function Admob() {
   });
 
   AdMob.prepareInterstitial({
-    adId: 'ca-app-pub-9184710420764586/8163726949',
+    adId: 'ca-app-pub-9292130311136531/3160211077',
     autoShow: false
   });
 }

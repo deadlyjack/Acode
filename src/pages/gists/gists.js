@@ -8,7 +8,7 @@ import _template from './gists.hbs';
 import _menu from './menu.hbs';
 import './gists.scss';
 import contextMenu from '../../components/contextMenu';
-import fs from '../../modules/utils/androidFileSystem';
+import fs from '../../modules/utils/internalFs';
 import dialogs from '../../components/dialogs';
 import git from '../../modules/git';
 import GistFiles from '../gistFiles/gistFiles';
@@ -19,7 +19,10 @@ function Gists(callbackGists) {
     className: 'icon search hidden'
   });
   const $menuToggler = tag('span', {
-    className: 'icon more_vert'
+    className: 'icon more_vert',
+    attr: {
+      action: 'toggle-menu'
+    }
   });
   const $page = Page('Gists');
   const {

@@ -44,7 +44,7 @@ export default function filesSettings(callback) {
                 }).then(res => {
                     appSettings.value.fileBrowser.sortByName = res;
                     appSettings.update();
-                    this.changeSubText(values.fileBrowser.sortByName === 'on' ? strings.yes : strings.no)
+                    this.changeSubText(values.fileBrowser.sortByName === 'on' ? strings.yes : strings.no);
                     if (callback) callback();
                 });
                 break;

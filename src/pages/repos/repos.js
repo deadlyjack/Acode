@@ -9,7 +9,7 @@ import _menu from './menu.hbs';
 import './repos.scss';
 import Repo from '../repo/repo';
 import contextMenu from '../../components/contextMenu';
-import fs from '../../modules/utils/androidFileSystem';
+import fs from '../../modules/utils/internalFs';
 import dialogs from '../../components/dialogs';
 import git from '../../modules/git';
 
@@ -18,7 +18,10 @@ function Repos() {
     className: 'icon search hidden'
   });
   const $menuToggler = tag('span', {
-    className: 'icon more_vert'
+    className: 'icon more_vert',
+    attr: {
+      action: 'toggle-menu'
+    }
   });
   const $page = Page('Repositories');
   const {
@@ -67,7 +70,7 @@ function Repos() {
         updated_at
       } = repo;
 
-      repo.size = (size / 1024).toFixed(2) + 'KB'
+      repo.size = (size / 1024).toFixed(2) + 'KB';
       repo.updated_at = new Date(updated_at).toLocaleDateString();
       repo.language = `file_type_${(language || 'text').toLowerCase()}`;
     });
@@ -84,7 +87,7 @@ function Repos() {
     });
     $page.onhide = function () {
       actionStack.remove('repos');
-    }
+    };
 
     dialogs.loaderHide();
   }
@@ -100,7 +103,7 @@ function Repos() {
     const $el = e.target;
     const action = $el.getAttribute('action');
 
-    if (action === 'url') $cm.hide();
+    if (action === 'reload') $cm.hide();
     switch (action) {
       case 'repo':
         const name = $el.getAttribute('name');

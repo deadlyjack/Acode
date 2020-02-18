@@ -1,3 +1,5 @@
+import dialogs from "../components/dialogs";
+
 /**
  * 
  * @param {string} action 
@@ -7,17 +9,22 @@ function clipboardAction(action) {
     const editor = editorManager.editor;
     const {
         menu,
-        fullContent
+        fullContent,
+        readOnlyContent,
+        color,
+        start,
+        end,
+        update
     } = editorManager.controls;
     const selectedText = editor.getCopyText();
 
-    if (action !== 'select all') editorManager.controls.menu.remove();
+    if (!['select all', 'color'].includes(action)) menu.remove();
 
     switch (action) {
         case 'copy':
             if (selectedText) {
                 clipboard.copy(selectedText);
-                editorManager.controls.update();
+                update();
                 plugins.toast.showShortBottom('copied to clipboard');
             }
             break;
@@ -29,7 +36,7 @@ function clipboardAction(action) {
                     editor.remove(range);
                     return range;
                 });
-                editorManager.controls.update();
+                update();
                 plugins.toast.showShortBottom('copied to clipboard');
             }
             break;
@@ -37,22 +44,32 @@ function clipboardAction(action) {
         case 'paste':
             clipboard.paste(text => {
                 editor.execCommand('paste', text);
-                editorManager.controls.update();
+                update();
             });
             break;
 
         case 'select all':
             editor.selectAll();
-            menu.innerHTML = fullContent;
+            menu.innerHTML = editor.getReadOnly() ? readOnlyContent : fullContent;
             const t = /translate3d\((.+)\)/.exec(menu.style.transform);
             if (t && t[1]) {
                 const values = t[1].split(',');
                 menu.style.transform = `translate3d(40px, ${values[1]}, ${values[2]})`;
             }
             setTimeout(() => {
-                editorManager.controls.start.remove();
-                editorManager.controls.end.remove();
+                start.remove();
+                end.remove();
             }, 0);
+            break;
+
+        case 'color':
+            dialogs.color(color.style.color)
+                .then(color => {
+                    editor.insert(color);
+                    menu.remove();
+                    editor.focus();
+                    menu.innerHTML = editor.getReadOnly() ? readOnlyContent : fullContent;
+                });
             break;
     }
     editor.focus();

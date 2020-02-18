@@ -1,45 +1,54 @@
-import fs from "./utils/androidFileSystem";
+import fs from "./utils/internalFs";
 import helpers from "./helpers";
 import {
     lookup
 } from 'mime-types';
 import dialogs from "../components/dialogs";
+import recents from "./recents";
 
 export default createEditorFromURI;
 /**
  * 
  * @param {string|fileOptions} uri 
  * @param {boolean} isContentUri 
- * @param {string} data
+ * @param {object} data
  */
 
 function createEditorFromURI(uri, isContentUri, data = {}) {
     return new Promise(resolve => {
-        uri = decode(uri);
-        if (typeof uri === 'string') {
-            const name = uri.split('/').pop();
-            const dir = uri.replace(name, '');
+        let name, location, fileUri, contentUri;
 
-            uri = {
-                dir,
-                name
-            };
+        if (typeof uri === 'string') {
+            uri = helpers.decodeURL(uri);
+
+            name = uri.split('/').pop();
+
+            if (!isContentUri) {
+                location = helpers.getPath(uri, name);
+                fileUri = uri;
+            } else {
+                contentUri = uri;
+            }
+
+        } else {
+            name = uri.name;
+            fileUri = helpers.decodeURL(uri.fileUri);
+            contentUri = helpers.decodeURL(uri.contentUri);
+
+            if (fileUri) {
+                if (!name)
+                    name = name = fileUri.split('/').pop();
+                location = helpers.getPath(fileUri, name);
+            }
         }
-        const name = uri.name;
-        const ext = helpers.getExt(name);
-        const location = isContentUri ? null : uri.dir;
-        const fileUri = location ? location + name : null;
-        const contentUri = isContentUri ? uri.dir : null;
         const settings = appSettings.value;
         const {
             cursorPos,
             render,
-            readOnly,
-            index,
-            timeout
+            index
         } = data;
 
-        const existingFile = editorManager.getFile(fileUri);
+        const existingFile = editorManager.getFile(fileUri, "fileUri");
         if (existingFile) {
             editorManager.switchFile(existingFile.id);
             resolve(fileUri);
@@ -54,68 +63,77 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
                 render,
                 text: data.text,
                 cursorPos: data.cursorPos,
-                isUnsaved: true,
-                readOnly
+                isUnsaved: true
             });
             resolve(index === undefined ? fileUri : index);
             return;
         }
 
+        if (!fileUri)
+            dialogs.loaderShow(strings.loading + "...");
         fs.readFile(fileUri || contentUri)
-            .then(res => {
-                /**
-                 * @type {ArrayBuffer}
-                 */
-                const data = res.data;
-                const size = res.file && res.file.size || data.byteLength;
-
-                if (size * 0.000001 > settings.maxFileSize) {
-                    return alert(strings.error.toUpperCase(), `${strings['file too large']} ${settings.maxFileSize}MB`);
-                }
-
-                const decoder = new TextDecoder("utf-8");
-                const text = decoder.decode(data);
-
-                if (/[\x00-\x08\x0E-\x1F]/.test(text)) {
-                    if (/image/i.test(lookup(name))) {
-                        const reader = new FileReader();
-                        reader.readAsDataURL(new Blob([data]));
-                        reader.onloadend = function () {
-                            dialogs.box(name, `<img src='${reader.result}'>`);
-                        }
-                        return;
-                    }
-                    if (timeout) clearTimeout(timeout);
-                    document.body.classList.remove('loading');
-                    return alert(strings.error.toUpperCase(), strings['file not supported']);
-                }
-
-                editorManager.addNewFile(name, {
-                    fileUri,
-                    contentUri,
-                    isContentUri,
-                    location,
-                    cursorPos,
-                    text,
-                    isUnsaved: false,
-                    render,
-                    readOnly
-                });
-
-                resolve(index === undefined ? fileUri : index);
-            })
+            .then(createFile)
             .catch(err => {
-                if (err.code) {
-                    alert(strings.error.toUpperCase(), `${strings['unable to open file']} (${helpers.getErrorMessage(err.code)}).`);
+
+                if (fileUri && contentUri) {
+                    dialogs.loaderShow(strings.loading + '...');
+                    fs.readFile(contentUri)
+                        .then(createFile)
+                        .then(err => {
+                            resolve(index === undefined ? fileUri || contentUri : index);
+                        })
+                        .finally(dialogs.loaderHide);
+                } else {
+                    helpers.error(err);
+                    console.log(err);
                 }
-                console.error(err);
 
-                resolve(index === undefined ? fileUri : index);
+                resolve(index === undefined ? fileUri || contentUri : index);
+            })
+            .finally(dialogs.loaderHide);
+
+
+        /**
+         * 
+         * @param {object} res 
+         * @param {ArrayBuffer} res.data 
+         */
+        function createFile(res) {
+
+            const data = res.data;
+            const size = res.file && res.file.size || data.byteLength;
+
+            if (size * 0.000001 > settings.maxFileSize) {
+                return alert(strings.error.toUpperCase(), `${strings['file too large']} ${settings.maxFileSize}MB`);
+            }
+
+            const decoder = new TextDecoder("utf-8");
+            const text = decoder.decode(data);
+
+            if (helpers.isBinary(text)) {
+                if (/image/i.test(lookup(name))) {
+                    const blob = new Blob([data]);
+                    dialogs.box(name, `<img src='${URL.createObjectURL(blob)}'>`);
+                    return;
+                }
+                if (timeout) clearTimeout(timeout);
+                return alert(strings.error.toUpperCase(), strings['file not supported']);
+            }
+
+            editorManager.addNewFile(name, {
+                fileUri,
+                contentUri,
+                isContentUri,
+                location,
+                cursorPos,
+                text,
+                isUnsaved: false,
+                render
             });
-    });
-}
 
-function decode(url) {
-    if (/%[0-9a-f]{2}/i.test(url)) return decode(decodeURI(url));
-    return url;
+            recents.addFile(fileUri);
+
+            resolve(index === undefined ? fileUri : index);
+        }
+    });
 }

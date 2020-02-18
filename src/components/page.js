@@ -18,7 +18,10 @@ import tile from './tile';
 function Page(title, options = {}) {
     const leadBtn = options.lead || tag('span', {
         className: 'icon arrow_back',
-        onclick: hide
+        onclick: hide,
+        attr: {
+            action: 'go-back'
+        }
     });
     const header = tile({
         type: 'header',

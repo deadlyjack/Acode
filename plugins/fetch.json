@@ -93,7 +93,9 @@
       "id": "cordova.plugins.diagnostic@5.0.0"
     },
     "is_top_level": true,
-    "variables": {}
+    "variables": {
+      "ANDROID_SUPPORT_VERSION": "28.+"
+    }
   },
   "cordova-clipboard": {
     "source": {
@@ -115,14 +117,6 @@
     "source": {
       "type": "registry",
       "id": "cordova-plugin-ionic-keyboard"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-local-notification": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-local-notification"
     },
     "is_top_level": true,
     "variables": {}
@@ -163,6 +157,14 @@
     "source": {
       "type": "registry",
       "id": "cordova-plugin-ftp"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "com.foxdebug.sdcard": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sda1/cordova/code editor/node_modules/tree-chooser"
     },
     "is_top_level": true,
     "variables": {}

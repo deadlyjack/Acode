@@ -20,6 +20,19 @@
 -->
 # Release Notes
 
+### 2.0.3 (Jun 14, 2019)
+
+-   build: add .gitattributes to force LF (instead of possible CRLF on Windows) ([`02ae405`](https://github.com/apache/cordova-plugin-device/commit/02ae405))
+-   build: add .npmignore to remove unneeded files from npm package ([`8dbe703`](https://github.com/apache/cordova-plugin-device/commit/8dbe703))
+-   docs: remove outdated translations ([`db4e1f1`](https://github.com/apache/cordova-plugin-device/commit/db4e1f1))
+-   ci(travis): Remove android 4.4 that SauceLabs removed ([`594fa61`](https://github.com/apache/cordova-plugin-device/commit/594fa61))
+-   ci(travis): Update Travis CI configuration for new paramedic ([#97](https://github.com/apache/cordova-plugin-device/issues/97)) ([`db0ad32`](https://github.com/apache/cordova-plugin-device/commit/db0ad32))
+-   feat: update typings ([#90](https://github.com/apache/cordova-plugin-device/issues/90)) ([`52a0655`](https://github.com/apache/cordova-plugin-device/commit/52a0655), [`61ad76c`](https://github.com/apache/cordova-plugin-device/commit/61ad76c))
+-   chore(github): Add or update GitHub pull request and issue template ([`e213286`](https://github.com/apache/cordova-plugin-device/commit/e213286))
+-   docs: remove JIRA link ([`2d12d55`](https://github.com/apache/cordova-plugin-device/commit/2d12d55))
+-   ci(travis): also accept terms for android sdk `android-27` ([`f870c9b`](https://github.com/apache/cordova-plugin-device/commit/f870c9b))
+-   fix: [CB-14106](https://issues.apache.org/jira/browse/CB-14106) - device.model is different on simulator and on real device ([#80](https://github.com/apache/cordova-plugin-device/issues/80)) ([`d65cdf6`](https://github.com/apache/cordova-plugin-device/commit/d65cdf6))
+
 ### 2.0.2 (Apr 12, 2018)
 * [CB-13893](https://issues.apache.org/jira/browse/CB-13893) **iOS** delete `libz.tbd` from device plugin
 

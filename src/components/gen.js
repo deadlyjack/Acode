@@ -8,6 +8,7 @@ import tag from 'html-tag-js';
 function listTileGen(options) {
     const menuoptions = {};
     let counter = 0;
+
     options.map(option => {
         let key = '';
         let text = '';
@@ -65,6 +66,10 @@ function iconButton(options) {
 function listItems(settingsList, settingsOptions, changeSetting) {
     settingsList.textContent = '';
     const settings = {};
+
+    settingsOptions.sort((a, b) => {
+        return a.key < b.key ? -1 : 1;
+    });
 
     for (let setting of settingsOptions) {
         const text = tag('span', {

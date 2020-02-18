@@ -90,6 +90,8 @@ interface Controls {
     menu: HTMLSpanElement;
     fullContent: string;
     update: () => void;
+    color: HTMLSpanElement;
+    checkForColor(): void;
 }
 
 interface File {
@@ -106,6 +108,58 @@ interface File {
     updateControls: function(): void;
     session: AceAjax.IEditSession;
     editable: boolean;
+    canWrite: boolean;
+    origin: string;
+    uuid: string;
+}
+
+interface ExternalFs {
+    createFile(parent: string, filename: string): Promise<'SUCCESS'>;
+    createDir(parent: string, path: string): Promise<'SUCCESS'>;
+    deleteFile(filename: string): Promise<'SUCCESS'>;
+    writeFile(filename: string, content: string): Promise<'SUCCESS'>;
+    renameFile(src: string, newname: string): Promise<'SUCCESS'>;
+    copy(src: string, dest: string): Promise<'SUCCESS'>;
+    move(src: string, dest: string): Promise<'SUCCESS'>;
+    uuid: string;
+}
+
+interface fileData {
+    file: FileEntry;
+    data: ArrayBuffer;
+}
+
+interface InternalFs {
+    listDir(path: string): Promise<Entry[]>;
+    createFile(parent: string, filename: string): Promise<void>;
+    createDir(parent: string, dirname: string): Promise<void>;
+    deleteFile(filename: string): Promise<void>;
+    readFile(filename: string): Promise<fileData>;
+    writeFile(filename: string, content: string, create: boolean, exclusive: boolean): Promise<void>;
+    renameFile(src: string, newname: string): Promise<void>;
+}
+
+interface FileSystem {
+    writeFile(content: string): Promise<void>;
+    createFile(name: string): Promise<void>,
+    createDirectory(name: string): Promise<void>;
+    deleteFile(): Promise<void>;
+    copyTo(dest: string): Promise<void>;
+    moveTo(dset: string): Promise<void>;
+    renameTo(newName: string): Promise<void>;
+}
+
+interface externalStorageData {
+    path: string;
+    name: string;
+    origin: string;
+}
+
+interface externalStorage {
+    get(uuid: string): externalStorageData;
+    savePath(uuid: string, path: string): void;
+    saveOrigin(uuid: string, origin: string): void;
+    saveName(uuid: string, name: string): void;
 }
 
 interface elementContainer {
@@ -161,7 +215,7 @@ interface GistRecord {
 
 interface Manager {
     addNewFile(filename: string, options: newFileOptions): File;
-    getFile(id: string): File;
+    getFile(checkFor: string | number | Repo | Gist, type: "id" | "name" | "fileUri" | "contentUri" | "git" | "gist"): File;
     switchFile(id: string): void;
     removeFile(id: string | File, force: boolean): void;
     editor: AceAjax.Editor;
@@ -186,6 +240,7 @@ interface Folders {
 interface Folder {
     reload(): void;
     name: string;
+    remove(): void;
 }
 
 interface Window {
@@ -197,7 +252,7 @@ interface Window {
 interface FileClipBoard {
     method: "copy" | "cut";
     type: "file" | "dir";
-    uri: string
+    nodeId: string
 }
 
 /**
@@ -229,6 +284,9 @@ declare var gistRecord: GistRecord;
 declare var gitRecordURL: string;
 declare var gistRecordURL: string;
 declare var Acode: Acode;
+declare var DATA_STORAGE: string;
+declare var CACHE_STORAGE: string;
+declare var externalStorage: externalStorage;
 /**
  * A custom alert box to show alert notification
  * @param title 

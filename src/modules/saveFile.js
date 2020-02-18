@@ -1,8 +1,9 @@
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import dialogs from '../components/dialogs';
 import helpers from "./helpers";
-import fs from './utils/androidFileSystem';
 import constants from "../constants";
+import recents from './recents';
+import fsOperation from './utils/fsOperation';
 
 /**
  * 
@@ -12,8 +13,10 @@ import constants from "../constants";
  */
 function saveFile(file, as = false, showToast = true) {
 
+    beautifyFile();
+
     let newFile = false;
-    if (file.type === 'regular' && !file.location) newFile = true;
+    if (file.type === 'regular' && !file.location && !file.contentUri) newFile = true;
 
     if (!as && !newFile) {
 
@@ -56,10 +59,8 @@ function saveFile(file, as = false, showToast = true) {
                     if (err) dialogs.alert(strings.error, err.toString());
                     else window.plugins.toast.showShortBottom(strings.error);
                 });
-        } else if (file.contentUri) {
-            alert(strings.warning.toUpperCase(), strings["read only file"]);
-        } else if (file.fileUri) {
-            save(file, undefined, undefined, showToast);
+        } else if (file.fileUri || file.contentUri) {
+            save();
         }
 
     } else {
@@ -71,12 +72,12 @@ function saveFile(file, as = false, showToast = true) {
                 if (as) {
                     newfilename(res.url, file.filename)
                         .then(filename => {
-                            save(file, url, filename);
+                            save(url, filename);
                         });
                 } else {
                     checkFile(url, file.filename)
                         .then((filename) => {
-                            save(file, url, filename);
+                            save(url, filename);
                         });
                 }
             });
@@ -87,46 +88,71 @@ function saveFile(file, as = false, showToast = true) {
      * @param {File} file 
      * @param {string} [url] 
      * @param {string} [filename]
+     * @param {boolean} [canWrite]
+     * @param {string} [uuid]
+     * @param {string} [origin]
      */
-    function save(file, url, filename) {
-        const editor = editorManager.editor;
-        const ext = helpers.getExt(filename || file.filename);
-        const _beautify = appSettings.value.beautify;
-        if (_beautify[0] !== '*' && _beautify.indexOf(ext) < 0) {
-            let pos = editor.getCursorPosition();
-            const tmp = editorManager.onupdate;
-            editorManager.onupdate = () => {};
-            beautify(file.session);
-            editorManager.onupdate = tmp;
-            editor.gotoLine(pos.row + 1, pos.column);
-        }
-
+    function save(url, filename) {
         const data = file.session.getValue();
-        let exclusive = false;
+        let createFile = false;
         if (url) {
-            exclusive = true;
-            file.location = url;
+            file.location = helpers.decodeURL(url);
             file.type = 'regular';
             file.record = null;
         }
         if (filename) {
             if (filename.overwrite) {
-                exclusive = false;
                 filename = filename.filename;
-            } else {
-                exclusive = true;
+            } else if (url) {
+                createFile = true;
             }
             file.filename = filename;
+            beautifyFile();
         }
 
-        fs.writeFile(file.fileUri, data, true, exclusive)
-            .then(() => {
-                file.isUnsaved = false;
-                if (showToast) window.plugins.toast.showShortBottom(strings['file saved']);
-                if (url) helpers.updateFolders(file.fileUri);
-                editorManager.onupdate();
-            })
-            .catch(error);
+        if (createFile) {
+
+            fsOperation(file.location)
+                .then(fs => {
+                    return fs.createFile(file.filename);
+                })
+                .then(() => {
+                    return fsOperation(file.fileUri);
+                })
+                .then(fs => {
+                    fs.writeFile(data);
+                })
+                .then(() => {
+                    updateFile();
+                })
+                .catch(err => {
+                    helpers.error(err);
+                    console.error(err);
+                });
+
+        } else {
+            fsOperation(file.fileUri || file.contentUri)
+                .then(fs => {
+                    return fs.writeFile(data);
+                })
+                .then(() => {
+                    updateFile();
+                })
+                .catch(err => {
+                    helpers.error(err);
+                    console.error(err);
+                });
+        }
+
+        function updateFile() {
+            file.isUnsaved = false;
+            if (showToast) window.plugins.toast.showShortBottom(strings['file saved']);
+            if (url) {
+                helpers.updateFolders(file.location);
+                recents.addFile(file.fileUri);
+            }
+            editorManager.onupdate();
+        }
     }
 
     /**
@@ -180,11 +206,18 @@ function saveFile(file, as = false, showToast = true) {
         });
     }
 
-    function error(err) {
-        if (err.code)
-            alert(strings.error.toUpperCase(), `${strings['unable to save file']}. ${helpers.getErrorMessage(err.code)}`);
-        else
-            console.log(err);
+    function beautifyFile(name = null) {
+        const editor = editorManager.editor;
+        const ext = helpers.getExt(name || file.filename);
+        const _beautify = appSettings.value.beautify;
+        if (_beautify[0] !== '*' && _beautify.indexOf(ext) < 0) {
+            let pos = editor.getCursorPosition();
+            const tmp = editorManager.onupdate;
+            editorManager.onupdate = () => {};
+            beautify(file.session);
+            editorManager.onupdate = tmp;
+            editor.gotoLine(pos.row + 1, pos.column);
+        }
     }
 }
 

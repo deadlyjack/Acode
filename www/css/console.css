@@ -138,13 +138,14 @@ c-key {
 }
 
 c-message.error {
+    border-bottom: solid 1px rgba(255, 255, 255, 0.4);
     background-color: #f66;
-    color: #300
+    color: inherit
 }
 
 c-message.error::after {
     background-color: #cc4343;
-    color: #fff
+    color: inherit
 }
 
 c-stack:not(:empty) {
@@ -161,7 +162,8 @@ c-stack:not(:empty) {
     background-color: inherit;
     padding: 0 5px;
     box-sizing: border-box;
-    font-size: .8em
+    font-size: .8em;
+    color: inherit;
 }
 
 c-text {

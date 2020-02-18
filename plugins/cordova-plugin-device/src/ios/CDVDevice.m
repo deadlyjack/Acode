@@ -28,6 +28,9 @@
 
 - (NSString*)modelVersion
 {
+#if TARGET_IPHONE_SIMULATOR
+    NSString* platform = NSProcessInfo.processInfo.environment[@"SIMULATOR_MODEL_IDENTIFIER"];
+#else
     size_t size;
 
     sysctlbyname("hw.machine", NULL, &size, NULL, 0);
@@ -35,7 +38,7 @@
     sysctlbyname("hw.machine", machine, &size, NULL, 0);
     NSString* platform = [NSString stringWithUTF8String:machine];
     free(machine);
-
+#endif
     return platform;
 }
 

@@ -17,7 +17,7 @@ function sidenav(activator, toggler) {
     let mode = innerWidth > 750 ? 'tab' : 'phone';
     const $el = tag('div', {
         id: 'sidenav',
-        className: mode
+        className: mode + ' scroll'
     });
     const mask = tag('span', {
         className: 'mask',
@@ -35,9 +35,8 @@ function sidenav(activator, toggler) {
         _innerWidth = innerWidth;
     activator = activator || app;
 
-    if (toggler) {
+    if (toggler)
         toggler.addEventListener('click', toggle);
-    }
 
     if (mode === 'phone')
         activator.addEventListener('touchstart', ontouchstart);

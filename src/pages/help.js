@@ -4,6 +4,7 @@ import Page from "../components/page";
 import gen from "../components/gen";
 import iconDef from "./iconDef";
 import qnaSection from "./qnaSection";
+import helpers from '../modules/helpers';
 
 export default function help(opts) {
     const page = Page(strings.help);
@@ -33,7 +34,7 @@ export default function help(opts) {
             key: 'Q8',
             text: strings.Q8,
             type: 'a',
-            href: 'mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=version-' + BuildInfo.version
+            href: 'mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=' + helpers.getFeedbackBody()
         },
         {
             key: 'Q7',

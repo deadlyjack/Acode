@@ -1,6 +1,6 @@
 import mimeType from 'mime-types';
 import marked from 'marked';
-import fs from './utils/androidFileSystem';
+import fs from './utils/internalFs';
 import helpers from './helpers';
 import dialogs from '../components/dialogs';
 import git from './git';
@@ -114,8 +114,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       sendText(doc, req.requestId, HTML);
     } else {
       if (activeFile.type === 'git') {
-        const cache = cordova.file.cacheDirectory;
-        const uri = cache + activeFile.record.sha + encodeURIComponent(reqPath) + '.' + ext;
+        const uri = CACHE_STORAGE + activeFile.record.sha + encodeURIComponent(reqPath) + '.' + ext;
 
         window.resolveLocalFileSystemURL(uri, () => {
           sendFile(uri.replace('file://', ''), req.requestId);
@@ -144,7 +143,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       } else {
         if (path) {
           const url = path + reqPath;
-          const file = editorManager.getFile(url);
+          const file = editorManager.getFile(url, "fileUri");
           if (file && file.isUnsaved) {
             sendText(file.session.getValue(), req.requestId, mimeType.lookup(file.filename));
           } else {
@@ -218,6 +217,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     const color = theme === 'light' ? '#9999ff' : '#ffffff';
     const options = `location=${isConsole?'no':'yes'},hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
     let ref = cordova.InAppBrowser.open(`http://localhost:${port}/` + filename, target, options);
+    // let ref = cordova.InAppBrowser.open(`http://localhost/` + filename, target, options);
 
     ref.addEventListener('exit', () => {
 

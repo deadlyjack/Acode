@@ -2,7 +2,7 @@
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
-import fs from '../../modules/utils/androidFileSystem';
+import fs from '../../modules/utils/internalFs';
 import helpers from '../../modules/helpers';
 import contextMenu from '../../components/contextMenu';
 import dialogs from '../../components/dialogs';
@@ -12,6 +12,9 @@ import filesSettings from '../settings/filesSettings';
 import _template from './fileBrowser.hbs';
 import _list from './list.hbs';
 import './fileBrowser.scss';
+import externalFs from '../../modules/utils/externalFs';
+import fsOperation from '../../modules/utils/fsOperation';
+import createEditorFromURI from '../../modules/createEditorFromURI';
 //#endregion
 /**
  * 
@@ -24,7 +27,10 @@ function FileBrowser(type = 'file', option = null) {
     return new Promise((resolve, reject) => {
         //#region Declaration
         const $menuToggler = tag('i', {
-            className: 'icon more_vert'
+            className: 'icon more_vert',
+            attr: {
+                action: 'toggle-menu'
+            }
         });
         const $search = tag('i', {
             className: 'icon search hidden'
@@ -45,13 +51,15 @@ function FileBrowser(type = 'file', option = null) {
         let cachedDir = {};
         let currentDir = {
             url: root,
-            name: 'File browser',
-            readOnly: false
+            name: 'File browser'
         };
         let folderOption;
         //#endregion
 
         $content.addEventListener('click', handleClick);
+        $content.addEventListener('contextmenu', function (e) {
+            handleClick(e, 'contextmenu');
+        });
         $page.append($content);
         $page.querySelector('header').append($search, $menuToggler);
         document.body.append($page);
@@ -107,92 +115,113 @@ function FileBrowser(type = 'file', option = null) {
             };
 
             createFolder.onclick = () => {
+                const {
+                    url,
+                    name
+                } = currentDir;
+
                 prompt(strings['enter folder name'], strings['new folder'], 'filename', {
-                        match: constants.FILE_NAME_REGEX,
-                        required: true
-                    }).then(dirname => {
-                        if (!dirname) return;
-                        dirname = helpers.removeLineBreaks(dirname);
-                        const {
-                            url,
-                            name
-                        } = currentDir;
-                        fs.createDir(url, dirname).then(() => {
-                            if (cachedDir[url]) delete cachedDir[url];
-                            for (let key in addedFolder) {
-                                if (new RegExp(key).test(currentDir.url)) {
-                                    addedFolder[key].reload();
-                                }
-                            }
+                    match: constants.FILE_NAME_REGEX,
+                    required: true
+                }).then(dirname => {
+                    if (!dirname) return;
+                    dirname = helpers.removeLineBreaks(dirname);
+
+                    fsOperation(url)
+                        .then(fs => {
+                            return fs.createDirectory(dirname);
+                        })
+                        .then(() => {
+                            updateAddedFolder(url);
+                            window.plugins.toast.showLongBottom(strings.success);
                             loadDir(url, name);
-                        }).catch(err => {
-                            if (err.code) {
-                                alert(strings.error.toUpperCase(), `${strings['create folder error']} ` + helpers.getErrorMessage(err.code));
-                            } else {
-                                alert(strings.error.toUpperCase(), strings['create folder error']);
-                            }
+                        }).catch(e => {
+                            console.log(e);
+                            helpers.error(e);
                         });
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    });
+                });
             };
         }
 
-        cordova.plugins.diagnostic.getExternalSdCardDetails(ls => {
-            if (ls.length > 0) {
-                const list = [];
-                ls.map(card => {
-                    const name = card.path.match('com.foxdebug.acode/files') ? 'Aplication Storage' : card.path.split('/').splice(-1)[0];
+        externalFs.listExternalStorages()
+            .then(res => {
+
+                cordova.plugins.diagnostic.getExternalSdCardDetails(ls => {
+                    const list = [];
+                    if (ls.length > 0) {
+                        ls.map(card => {
+                            const name = card.path.split('/').splice(-1)[0];
+                            const path = card.filePath + '/';
+                            if (name === "files") return card;
+                            list.push({
+                                name: res[name] || name,
+                                nativeURL: path,
+                                origin: path,
+                                isDirectory: true,
+                                parent: true,
+                                type: 'folder'
+                            });
+                            return card;
+                        });
+                    }
+
+                    const path = cordova.file.externalRootDirectory;
                     list.push({
-                        name,
-                        readOnly: !card.canWrite,
-                        nativeURL: card.filePath + '/',
+                        nativeURL: path,
+                        name: 'Internal storage',
                         isDirectory: true,
                         parent: true,
-                        type: 'folder'
+                        type: 'folder',
                     });
+
+                    if (type === "file") {
+                        list.push({
+                            name: "Select document",
+                            isDirectory: true,
+                            type: 'folder',
+                            "open-doc": true
+                        });
+                    }
+
+                    cachedDir[root] = {
+                        name,
+                        list
+                    };
+
+                    navigate('/', root);
+                    render(list);
+
+                    if (type === 'folder') {
+                        folderOption.classList.add('disabled');
+                    }
                 });
 
-                list.push({
-                    readOnly: false,
-                    nativeURL: cordova.file.externalRootDirectory,
-                    name: 'Internal storage',
-                    isDirectory: true,
-                    parent: true,
-                    type: 'folder'
-                });
+            });
 
-                cachedDir[root] = {
-                    name,
-                    list
-                };
+        function loadDir(path = root, name = 'File Browser') {
 
-                navigate('/', root);
-                render(list);
+            let url = path;
 
-                if (type === 'folder') {
-                    folderOption.classList.add('disabled');
-                }
-            } else {
-                loadDir(cordova.file.externalRootDirectory);
+            if (typeof path === 'object') {
+                url = path.url;
+                name = path.name;
             }
-        });
 
-        function loadDir(path = root, name = 'File Browser', readOnly = false) {
-            if (path in cachedDir) {
+            if (url in cachedDir) {
                 update();
-                const item = cachedDir[path];
+                const item = cachedDir[url];
                 render(item.list);
                 const $list = tag.get('#list');
                 $list.scrollTop = item.scroll;
                 name = item.name;
             } else {
-                fs.listDir(path)
+                fs.listDir(url)
                     .then(list => {
                         update();
-                        list = helpers.sortDir(list, appSettings.value.fileBrowser, readOnly);
-                        cachedDir[path] = {
+                        list = helpers.sortDir(list,
+                            appSettings.value.fileBrowser
+                        );
+                        cachedDir[url] = {
                             name,
                             list
                         };
@@ -200,42 +229,47 @@ function FileBrowser(type = 'file', option = null) {
                     })
                     .catch(err => {
                         actionStack.remove(currentDir.url);
-                        if (err.code) console.log(helpers.getErrorMessage(err.code));
+                        helpers.error(err);
+                        console.log(err);
                     });
             }
 
             function update() {
                 if (type === 'folder')
-                    if (path === root) {
+                    if (url === root) {
                         folderOption.classList.add('disabled');
                     } else {
                         folderOption.classList.remove('disabled');
                     }
 
-                currentDir.url = path;
+                currentDir.url = url;
                 currentDir.name = name;
                 const $list = tag.get('#list');
                 if ($list) $list.scrollTop = 0;
-                navigate(name, path);
-                $page.settitle(name + (readOnly ? ' (read only)' : ''));
+                navigate(name, url);
+                $page.settitle(name);
             }
         }
 
         /**
          * 
          * @param {MouseEvent} e 
+         * @param {"contextmenu"} [contextMenu] 
          */
-        function handleClick(e) {
+        function handleClick(e, contextMenu) {
             /**
              * @type {HTMLElement}
              */
             const $el = e.target;
-            const action = $el.getAttribute('action');
+            let action = $el.getAttribute('action');
             if (!action) return;
 
             const url = $el.getAttribute('url');
-            const readOnly = !!$el.getAttribute('read-only');
             const name = $el.getAttribute('name');
+            const opendoc = $el.getAttribute('open-doc');
+
+            if (opendoc) action = "open-doc";
+
             switch (action) {
                 case 'navigation':
                 case 'folder':
@@ -244,34 +278,90 @@ function FileBrowser(type = 'file', option = null) {
                 case 'file':
                     file();
                     break;
+                case "open-doc":
+                    openDoc();
+                    break;
             }
 
             function folder() {
-                const currentUrl = currentDir.url;
-                cachedDir[currentUrl].scroll = tag.get('#list').scrollTop;
-                actionsToDispose.push(currentUrl);
-                actionStack.push({
-                    id: currentUrl,
-                    action: function () {
-                        actionsToDispose.pop();
-                        loadDir(currentUrl, currentDir.name);
-                        if (action === 'folder') {
-                            const $nav = $navigation.lastChild;
-                            if ($nav) $nav.remove();
+                if (contextMenu !== 'contextmenu') {
+                    const currentUrl = currentDir.url;
+                    const dir = JSON.parse(JSON.stringify(currentDir));
+                    cachedDir[currentUrl].scroll = tag.get('#list').scrollTop;
+                    actionsToDispose.push(currentUrl);
+                    actionStack.push({
+                        id: currentUrl,
+                        action: function () {
+                            actionsToDispose.pop();
+                            loadDir(dir);
+                            if (action === 'folder') {
+                                const $nav = $navigation.lastChild;
+                                if ($nav) $nav.remove();
+                            }
                         }
-                    }
-                });
-                loadDir(url, name, readOnly);
+                    });
+                    loadDir(url, name);
+                } else {
+                    cmhandle();
+                }
             }
 
             function file() {
-                if (typeof option === 'function' && option(name)) {
-                    $page.hide();
-                    resolve({
-                        url,
-                        readOnly
-                    });
+                if (contextMenu !== "contextmenu") {
+                    if (typeof option === 'function' && option(name)) {
+                        $page.hide();
+                        resolve({
+                            url
+                        });
+                    }
+                } else {
+                    cmhandle();
                 }
+            }
+
+            function cmhandle() {
+                navigator.vibrate(50);
+                dialogs.select('', [
+                        ['delete', strings.delete, 'delete']
+                    ])
+                    .then(res => {
+
+                        switch (res) {
+                            case 'delete':
+                                remove();
+                                break;
+                        }
+
+                    });
+            }
+
+            function remove() {
+                fsOperation(url)
+                    .then(fs => {
+                        return fs.deleteFile();
+                    })
+                    .then(() => {
+                        updateAddedFolder(url);
+                        window.plugins.toast.showShortBottom(strings.success);
+                        loadDir(currentDir);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        helpers.error(err);
+                    });
+            }
+
+            function openDoc() {
+                SDcard.openDoc(res => {
+                    res.isContentUri = true;
+                    res.url = res.uri;
+                    resolve(res);
+                    $page.hide();
+
+                }, err => {
+                    helpers.error(err);
+                    console.error(err);
+                });
             }
         }
 
@@ -311,6 +401,18 @@ function FileBrowser(type = 'file', option = null) {
 
             $navigation.append($nav);
             $navigation.scrollLeft = $navigation.scrollWidth;
+        }
+
+        function updateAddedFolder(url) {
+            if (cachedDir[url]) delete cachedDir[url];
+            if (cachedDir[currentDir.url]) delete cachedDir[currentDir.url];
+            for (let key in addedFolder) {
+                if (key === url) {
+                    addedFolder[key].remove();
+                } else if (new RegExp(key).test(currentDir.url)) {
+                    addedFolder[key].reload();
+                }
+            }
         }
     });
 }

@@ -1,10 +1,8 @@
-// Type definitions for Apache Cordova Device plugin
+// Type definitions for cordova-plugin-device 2.0
 // Project: https://github.com/apache/cordova-plugin-device
 // Definitions by: Microsoft Open Technologies Inc <http://msopentech.com>
+//                 Tim Brust <https://github.com/timbru31>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// 
-// Copyright (c) Microsoft Open Technologies Inc
-// Licensed under the MIT license 
 
 /**
  * This plugin defines a global device object, which describes the device's hardware and software.
@@ -26,11 +24,12 @@ interface Device {
     uuid: string;
     /** Get the operating system version. */
     version: string;
-	/** Get the device's manufacturer. */
-	manufacturer: string;
-	/** Whether the device is running on a simulator. */
-	isVirtual: boolean;
-	/** Get the device hardware serial number. */
-	serial: string;}
+    /** Get the device's manufacturer. */
+    manufacturer: string;
+    /** Whether the device is running on a simulator. */
+    isVirtual: boolean;
+    /** Get the device hardware serial number. */
+    serial: string;
+}
 
 declare var device: Device;

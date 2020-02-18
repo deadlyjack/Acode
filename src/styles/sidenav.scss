@@ -82,6 +82,11 @@
             li {
                 >*:nth-child(2) {
                     color: white;
+                    display: unset;
+                    line-height: 30px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 &.active {
@@ -92,7 +97,7 @@
             }
 
             .list {
-                width: fit-content;
+                min-width: fit-content;
             }
         }
     }

@@ -1,7 +1,7 @@
-import fs from "./utils/androidFileSystem";
+import fs from "./utils/internalFs";
 import dialogs from "../components/dialogs";
 import helpers from "./helpers";
-import GitHub from 'github-api';
+import GitHub from './utils/GitHubAPI/GitHub';
 
 //Creates new github object
 function gitHub() {
@@ -18,8 +18,7 @@ function gitHub() {
  **/
 function init() {
   return new Promise((resolve, reject) => {
-    const path = cordova.file.externalDataDirectory;
-    const url = path + 'git/';
+    const url = DATA_STORAGE + 'git/';
     let interval;
 
     window.resolveLocalFileSystemURL(url, success, error);
@@ -70,7 +69,7 @@ function init() {
 
     function error(err) {
       if (err.code === 1) {
-        fs.createDir(path, 'git')
+        fs.createDir(DATA_STORAGE, 'git')
           .then(() => {
             if (interval) clearInterval(interval);
             init();
@@ -244,7 +243,7 @@ function GitRecord(obj) {
         path,
         owner
       } = record;
-      fs.readFile(cordova.file.externalDataDirectory + 'git/' + sha)
+      fs.readFile(DATA_STORAGE + 'git/' + sha)
         .then(res => {
           const decoder = new TextDecoder('utf-8');
           const text = decoder.decode(res.data);
@@ -282,7 +281,7 @@ function GitRecord(obj) {
     };
     save();
     const record = Record(owner, sha, name, data, repo, path);
-    fs.writeFile(cordova.file.externalDataDirectory + 'git/' + record.sha, data, true, false)
+    fs.writeFile(DATA_STORAGE + 'git/' + record.sha, data, true, false)
       .catch(err => {
         if (err.code) FileError(err.code);
         console.log(err);
@@ -292,7 +291,7 @@ function GitRecord(obj) {
 
   function remove(sha) {
     delete gitRecord[sha];
-    fs.deleteFile(cordova.file.externalDataDirectory + 'git/' + sha);
+    fs.deleteFile(DATA_STORAGE + 'git/' + sha);
     save();
   }
 
@@ -314,7 +313,7 @@ function GitRecord(obj) {
     if (data) {
       if (!record) return;
       text = record.data;
-      url = cordova.file.externalDataDirectory + 'git/' + record.sha;
+      url = DATA_STORAGE + 'git/' + record.sha;
     }
 
     fs.writeFile(url, text, true, false)

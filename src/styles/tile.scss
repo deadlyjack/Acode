@@ -19,20 +19,19 @@ body {
 
 .header,
 header {
-    z-index: 98;
-    position: sticky;
-    top: 0;
-    left: 0;
-    height: $headerHeight;
-    background-color: $primary;
-    width: 100%;
+    &.tile {
+        z-index: 98;
+        height: $headerHeight;
+        background-color: $primary;
 
-    >*:nth-child(2) {
-        margin: auto;
-        font-weight: bold;
-        font-size: 1.2em;
-        white-space: nowrap;
-        overflow: auto;
+        >*:nth-child(2) {
+            pointer-events: unset !important;
+            margin: auto;
+            font-weight: bold;
+            font-size: 1.2em;
+            white-space: nowrap;
+            overflow: auto;
+        }
     }
 }
 
@@ -41,6 +40,16 @@ header {
     flex-wrap: nowrap;
     padding: 0 5px;
     box-sizing: border-box;
+
+    &:disabled,
+    &.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    *:not([action]) {
+        pointer-events: none;
+    }
 
     &.cut {
         opacity: 0.6;
@@ -72,14 +81,6 @@ header {
                 left: 0;
             }
         }
-    }
-
-    >*:first-child {
-        margin-right: 5px;
-    }
-
-    >*:last-child {
-        margin-left: 5px;
     }
 
     .octicon,

@@ -11,7 +11,10 @@ import constants from "../../constants";
 export default function settingsMain(demo) {
     const page = Page(strings.settings);
     const settingsList = tag('div', {
-        className: 'main list'
+        className: 'main list',
+        style: {
+            textTransform: "capitalize"
+        }
     });
 
     actionStack.push({
@@ -53,7 +56,7 @@ export default function settingsMain(demo) {
             key: 'about',
             text: strings.about,
             icon: 'app-logo'
-        })
+        });
     }
 
     gen.listItems(settingsList, settingsOptions, changeSetting);

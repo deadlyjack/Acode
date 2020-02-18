@@ -8,7 +8,7 @@
         '&': '&amp;',
         '<': '&lt;',
         '>': '&gt;'
-    }
+    };
     let isFocused = false;
     let flag;
     let flask;
@@ -28,7 +28,7 @@
         setTimeout(() => {
             isFocused = false;
         }, 0);
-    }
+    };
 
     toggler.onclick = toggleConsole;
 
@@ -59,7 +59,7 @@
             flask.updateCode(value);
             flask.elTextarea.focus();
         }
-    }
+    };
 
     if (!window.consoleLoaded) {
         window.addEventListener('load', loadConsole);
@@ -72,7 +72,7 @@
         } else {
             document.addEventListener('readystatechange', function () {
                 if (this.readyState === 'complete') loadConsole();
-            })
+            });
         }
     }
 
@@ -104,8 +104,8 @@
 
             if (!get) {
                 const metaTag = document.createElement('meta');
-                metaTag.name = "viewport"
-                metaTag.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+                metaTag.name = "viewport";
+                metaTag.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0";
                 document.getElementsByTagName('head')[0].appendChild(metaTag);
             }
         } else if (window.__mode === 'desktop') {
@@ -238,8 +238,8 @@
         try {
             parsed = esprima.parse(data.toString()).body[0];
         } catch (error) {
-            const fun = ('(' + data.toString() + ')').replace(/\{.*\}/, '{}')
-            parsed = esprima.parse(fun).body[0]
+            const fun = ('(' + data.toString() + ')').replace(/\{.*\}/, '{}');
+            parsed = esprima.parse(fun).body[0];
         }
 
         if (parsed.type === "ExpressionStatement") {
@@ -343,8 +343,8 @@
 
                 const valid = (['code', 'console'].indexOf(args[0]) > -1) ? args.length > 2 : args.length > 1;
 
-                if (type === 'undefined' || type === 'string') {
-                    arg = arg + ''
+                if (type === 'undefined' || type === 'string' || arg === null) {
+                    arg = arg + '';
                 } else {
                     arg = arg.toString();
                 }
@@ -433,7 +433,7 @@
             try {
                 return esprima.parse(code, {
                     range: true
-                }).body
+                }).body;
             } catch (e) {
                 return [];
             }
