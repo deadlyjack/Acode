@@ -1361,6 +1361,7 @@ Checks if Bluetooth is available to the app.
 Returns true if the device has Bluetooth capabilities AND if Bluetooth setting is switched on (same on Android, iOS and Windows 10 UWP)
 
 On Android this requires permission `<uses-permission android:name="android.permission.BLUETOOTH" />`
+Calling on iOS 13+ will request runtime permission to access Bluetooth (if not already requested).
 
     cordova.plugins.diagnostic.isBluetoothAvailable(successCallback, errorCallback);
 
@@ -1391,6 +1392,7 @@ Platforms: Android
 Checks if the device setting for Bluetooth is switched on.
 
 On Android this requires permission `<uses-permission android:name="android.permission.BLUETOOTH" />`
+Calling on iOS 13+ will request runtime permission to access Bluetooth (if not already requested).
 
     cordova.plugins.diagnostic.isBluetoothAvailable(successCallback, errorCallback);
 
@@ -1486,6 +1488,7 @@ The function is passed a single string parameter containing the error message.
 Platforms: Android and iOS
 
 Returns the state of Bluetooth on the device.
+Calling on iOS 13+ will request runtime permission to access Bluetooth (if not already requested).
 
     cordova.plugins.diagnostic.getBluetoothState(successCallback, errorCallback);
 
@@ -1573,8 +1576,9 @@ Platforms: Android and iOS
 
 Registers a function to be called when a change in Bluetooth state occurs.
 Pass in a falsey value to de-register the currently registered function.
-
 This is triggered when Bluetooth state changes so is useful for detecting changes made in quick settings which would not result in pause/resume events being fired.
+
+Calling on iOS 13+ will request runtime permission to access Bluetooth (if not already requested).
 
     cordova.plugins.diagnostic.registerBluetoothStateChangeHandler(successCallback);
 

@@ -7,6 +7,9 @@
     "files": {}
   },
   "installed_plugins": {
+    "com.foxdebug.sdcard": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
     "com.napolitano.cordova.plugin.intent": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
@@ -14,6 +17,9 @@
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-custom-config": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-disable-http-cache": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-android-permissions": {
@@ -29,6 +35,9 @@
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-ftp": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-inappbrowser": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-ionic-keyboard": {
@@ -54,15 +63,6 @@
     },
     "cordova.plugins.diagnostic": {
       "ANDROID_SUPPORT_VERSION": "28.+",
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
-    "cordova-disable-http-cache": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
-    "com.foxdebug.sdcard": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
-    "cordova-plugin-inappbrowser": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

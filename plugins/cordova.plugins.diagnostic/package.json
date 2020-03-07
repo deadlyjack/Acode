@@ -1,28 +1,28 @@
 {
-  "_from": "cordova.plugins.diagnostic@5.0.0",
-  "_id": "cordova.plugins.diagnostic@5.0.0",
+  "_from": "cordova.plugins.diagnostic@5.0.1",
+  "_id": "cordova.plugins.diagnostic@5.0.1",
   "_inBundle": false,
-  "_integrity": "sha512-6gbvq9gmomsfIftiX8/YU3Y9ALamMLv6QD+4pOgGc/HpKIzSKesq5tMnvzSt48tVxzlJkQzxXpPyVZ6YYfhUpA==",
+  "_integrity": "sha512-nuHDm0EQZcoz1DIFLG7/cdxhFL2LHVi9hWZ+gLNO5GsMSvjMh1PRGuoBjOjvBjsqTFlYbWEetu1/tgZ/29qbfg==",
   "_location": "/cordova.plugins.diagnostic",
   "_phantomChildren": {},
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "cordova.plugins.diagnostic@5.0.0",
+    "raw": "cordova.plugins.diagnostic@5.0.1",
     "name": "cordova.plugins.diagnostic",
     "escapedName": "cordova.plugins.diagnostic",
-    "rawSpec": "5.0.0",
+    "rawSpec": "5.0.1",
     "saveSpec": null,
-    "fetchSpec": "5.0.0"
+    "fetchSpec": "5.0.1"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/cordova.plugins.diagnostic/-/cordova.plugins.diagnostic-5.0.0.tgz",
-  "_shasum": "7c136d88e93ede88b825f9a3c4f977db9292f8af",
-  "_spec": "cordova.plugins.diagnostic@5.0.0",
-  "_where": "/media/dellevenjack/Projects/git/Acode",
+  "_resolved": "https://registry.npmjs.org/cordova.plugins.diagnostic/-/cordova.plugins.diagnostic-5.0.1.tgz",
+  "_shasum": "63eb32020320777b7b3778786c2abc08ac3db7f8",
+  "_spec": "cordova.plugins.diagnostic@5.0.1",
+  "_where": "/mnt/sda1/cordova/code editor",
   "author": {
     "name": "Dave Alden"
   },
@@ -82,5 +82,5 @@
     "postinstall": "node ./scripts/apply-modules.js"
   },
   "types": "./cordova.plugins.diagnostic.d.ts",
-  "version": "5.0.0"
+  "version": "5.0.1"
 }

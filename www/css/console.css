@@ -33,6 +33,7 @@ c-console {
     z-index: 99998;
     animation: --page-transition .1s ease 1;
     color: #eee;
+    font-family: "Roboto", sans-serif;
 }
 
 c-console .codeflask,
@@ -63,8 +64,15 @@ c-input::before {
     height: 200px;
 }
 
-.codeflask__flatten {
+c-console .codeflask__code,
+c-console .codeflask__flatten {
+    font-family: "Roboto", sans-serif !important;
     padding: 0 !important;
+    font-size: 1rem !important;
+}
+
+c-console textarea.codeflask__flatten {
+    color: transparent;
 }
 
 #__c-input:focus {

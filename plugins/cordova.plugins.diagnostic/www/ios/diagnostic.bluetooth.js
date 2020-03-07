@@ -95,6 +95,11 @@ var Diagnostic_Bluetooth = (function(){
      */
     Diagnostic_Bluetooth.registerBluetoothStateChangeHandler = function(successCallback){
         Diagnostic_Bluetooth._onBluetoothStateChange = successCallback || function(){};
+        return cordova.exec(successCallback,
+            null,
+            'Diagnostic_Bluetooth',
+            'ensureBluetoothManager',
+            []);
     };
 
     /**

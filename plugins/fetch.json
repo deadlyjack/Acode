@@ -79,16 +79,6 @@
     "is_top_level": false,
     "variables": {}
   },
-  "cordova.plugins.diagnostic": {
-    "source": {
-      "type": "registry",
-      "id": "cordova.plugins.diagnostic@5.0.0"
-    },
-    "is_top_level": true,
-    "variables": {
-      "ANDROID_SUPPORT_VERSION": "28.+"
-    }
-  },
   "cordova-clipboard": {
     "source": {
       "type": "registry",
@@ -153,14 +143,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-disable-http-cache": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-disable-http-cache"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "com.foxdebug.sdcard": {
     "source": {
       "type": "local",
@@ -189,6 +171,22 @@
     "source": {
       "type": "local",
       "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-plugin-inappbrowser"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova.plugins.diagnostic": {
+    "source": {
+      "type": "registry",
+      "id": "cordova.plugins.diagnostic@5.0.1"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-disable-http-cache": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-disable-http-cache"
     },
     "is_top_level": true,
     "variables": {}

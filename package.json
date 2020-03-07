@@ -42,7 +42,7 @@
     "cordova-plugin-vibration": "^3.1.1",
     "cordova-plugin-webserver": "git+https://github.com/bykof/cordova-plugin-webserver.git",
     "cordova-plugin-x-toast": "^2.7.2",
-    "cordova.plugins.diagnostic": "^5.0.0",
+    "cordova.plugins.diagnostic": "^5.0.1",
     "core-js": "^3.2.0",
     "crypto-js": "^3.1.9-1",
     "debug": "^4.1.1",
@@ -88,17 +88,17 @@
       "cordova-plugin-x-toast": {},
       "cordova-plugin-android-permissions": {},
       "cordova-plugin-vibration": {},
-      "cordova.plugins.diagnostic": {
-        "ANDROID_SUPPORT_VERSION": "28.+"
-      },
       "cordova-clipboard": {},
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-buildinfo": {},
       "cordova-plugin-webserver": {},
       "cordova-plugin-ftp": {},
-      "cordova-disable-http-cache": {},
       "com.foxdebug.sdcard": {},
-      "cordova-plugin-inappbrowser": {}
+      "cordova-plugin-inappbrowser": {},
+      "cordova.plugins.diagnostic": {
+        "ANDROID_SUPPORT_VERSION": "28.+"
+      },
+      "cordova-disable-http-cache": {}
     },
     "platforms": [
       "android"

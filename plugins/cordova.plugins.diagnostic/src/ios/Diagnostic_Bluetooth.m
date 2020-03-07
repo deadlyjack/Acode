@@ -21,12 +21,6 @@ static NSString*const LOG_TAG = @"Diagnostic_Bluetooth[native]";
     [super pluginInitialize];
 
     diagnostic = [Diagnostic getInstance];
-
-    self.bluetoothManager = [[CBCentralManager alloc]
-                             initWithDelegate:self
-                             queue:dispatch_get_main_queue()
-                             options:@{CBCentralManagerOptionShowPowerAlertKey: @(NO)}];
-    [self centralManagerDidUpdateState:self.bluetoothManager]; // Show initial state
 }
 
 /********************************/
@@ -78,6 +72,7 @@ static NSString*const LOG_TAG = @"Diagnostic_Bluetooth[native]";
                  When the application requests to start scanning for bluetooth devices that is when the user is presented with a consent dialog.
                  */
                 [diagnostic logDebug:@"Requesting bluetooth authorization"];
+                [self ensureBluetoothManager];
                 [self.bluetoothManager scanForPeripheralsWithServices:nil options:nil];
                 [self.bluetoothManager stopScan];
             }else{
@@ -91,6 +86,20 @@ static NSString*const LOG_TAG = @"Diagnostic_Bluetooth[native]";
     }];
 }
 
+- (void) ensureBluetoothManager: (CDVInvokedUrlCommand*)command
+{
+    [self.commandDelegate runInBackground:^{
+        @try {
+            [self ensureBluetoothManager];
+            [diagnostic sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] :command];
+        }
+        @catch (NSException *exception) {
+            [diagnostic handlePluginException:exception :command];
+        }
+    }];
+
+}
+
 /********************************/
 #pragma mark - Internals
 /********************************/
@@ -99,6 +108,7 @@ static NSString*const LOG_TAG = @"Diagnostic_Bluetooth[native]";
     NSString* state;
     NSString* description;
 
+    [self ensureBluetoothManager];
     switch(self.bluetoothManager.state)
     {
 
@@ -155,6 +165,16 @@ static NSString*const LOG_TAG = @"Diagnostic_Bluetooth[native]";
 
 
     return state;
+}
+
+- (void) ensureBluetoothManager {
+    if(![self.bluetoothManager isKindOfClass:[CBCentralManager class]]){
+        self.bluetoothManager = [[CBCentralManager alloc]
+                                 initWithDelegate:self
+                                 queue:dispatch_get_main_queue()
+                                 options:@{CBCentralManagerOptionShowPowerAlertKey: @(NO)}];
+        [self centralManagerDidUpdateState:self.bluetoothManager]; // Send initial state
+    }
 }
 
 /********************************/

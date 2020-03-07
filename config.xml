@@ -43,10 +43,6 @@
             <application android:resizeableActivity="false" />
         </edit-config>
 
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
-        </config-file>
-
         <config-file parent="./application/activity" target="AndroidManifest.xml">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -67,6 +63,7 @@
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
             <uses-permission android:name="android.permission.INTERNET"/>
             <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
         </config-file>

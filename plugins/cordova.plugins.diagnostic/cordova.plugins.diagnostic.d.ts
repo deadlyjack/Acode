@@ -16,7 +16,32 @@ interface Diagnostic {
      * See http://developer.android.com/guide/topics/security/permissions.html#perm-groups
      * @type {Object}
      */
-    permission?: any;
+    permission: {
+        "READ_CALENDAR": "READ_CALENDAR";
+        "WRITE_CALENDAR": "WRITE_CALENDAR";
+        "CAMERA": "CAMERA";
+        "READ_CONTACTS": "READ_CONTACTS";
+        "WRITE_CONTACTS": "WRITE_CONTACTS";
+        "GET_ACCOUNTS": "GET_ACCOUNTS";
+        "ACCESS_FINE_LOCATION": "ACCESS_FINE_LOCATION";
+        "ACCESS_COARSE_LOCATION": "ACCESS_COARSE_LOCATION";
+        "RECORD_AUDIO": "RECORD_AUDIO";
+        "READ_PHONE_STATE": "READ_PHONE_STATE";
+        "CALL_PHONE": "CALL_PHONE";
+        "ADD_VOICEMAIL": "ADD_VOICEMAIL";
+        "USE_SIP": "USE_SIP";
+        "PROCESS_OUTGOING_CALLS": "PROCESS_OUTGOING_CALLS";
+        "READ_CALL_LOG": "READ_CALL_LOG";
+        "WRITE_CALL_LOG": "WRITE_CALL_LOG";
+        "SEND_SMS": "SEND_SMS";
+        "RECEIVE_SMS": "RECEIVE_SMS";
+        "READ_SMS": "READ_SMS";
+        "RECEIVE_WAP_PUSH": "RECEIVE_WAP_PUSH";
+        "RECEIVE_MMS": "RECEIVE_MMS";
+        "WRITE_EXTERNAL_STORAGE": "WRITE_EXTERNAL_STORAGE";
+        "READ_EXTERNAL_STORAGE": "READ_EXTERNAL_STORAGE";
+        "BODY_SENSORS": "BODY_SENSORS";
+    };
 
     /**
      * ANDROID ONLY
@@ -24,28 +49,61 @@ interface Diagnostic {
      * See http://developer.android.com/guide/topics/security/permissions.html#perm-groups
      * @type {Object}
      */
-    permissionGroups?: any;
+    permissionGroups: {
+        "CALENDAR": ["READ_CALENDAR", "WRITE_CALENDAR"];
+        "CAMERA": ["CAMERA"];
+        "CONTACTS": ["READ_CONTACTS", "WRITE_CONTACTS", "GET_ACCOUNTS"];
+        "LOCATION": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"];
+        "MICROPHONE": ["RECORD_AUDIO"];
+        "PHONE": ["READ_PHONE_STATE", "CALL_PHONE", "ADD_VOICEMAIL", "USE_SIP", "PROCESS_OUTGOING_CALLS", "READ_CALL_LOG", "WRITE_CALL_LOG"];
+        "SENSORS": ["BODY_SENSORS"];
+        "SMS": ["SEND_SMS", "RECEIVE_SMS", "READ_SMS", "RECEIVE_WAP_PUSH", "RECEIVE_MMS"];
+        "STORAGE": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"];
+    };
 
     /**
      * ANDROID and iOS ONLY
      * Constants for requesting and reporting the various permission states.
      * @type {Object}
      */
-    permissionStatus?: any;
+    permissionStatus: {
+        // Android only
+        "DENIED_ONCE": "DENIED_ONCE";
+
+        // iOS only
+        "RESTRICTED": "restricted";
+        "GRANTED_WHEN_IN_USE": "authorized_when_in_use";
+
+        // Both iOS and Android
+        "GRANTED": "authorized"|"GRANTED";
+        "NOT_REQUESTED": "not_determined"|"NOT_REQUESTED";
+        "DENIED_ALWAYS": "denied_always"|"DENIED_ALWAYS";
+    };
 
     /**
      * iOS ONLY
      * Constants for requesting and reporting the various motion states.
      * @type {Object}
      */
-    motionStatus?: any;
+    motionStatus: {
+        UNKNOWN: "unknown";
+        NOT_REQUESTED: "not_requested";
+        DENIED_ALWAYS: "denied_always";
+        RESTRICTED: "restricted";
+        GRANTED: "authorized";
+        NOT_AVAILABLE: "not_available";
+        NOT_DETERMINED: "not_determined";
+    };
 
     /**
      * iOS ONLY
      * Location authorization mode
      * @type {Object}
      */
-    locationAuthorizationMode?: any;
+    locationAuthorizationMode: {
+        "ALWAYS": "always";
+        "WHEN_IN_USE": "when_in_use";
+    };
 
 
     /**
@@ -53,14 +111,33 @@ interface Diagnostic {
      * Constants for the various location modes on Android.
      * @type {Object}
      */
-    locationMode?: any;
+    locationMode: {
+        "HIGH_ACCURACY": "high_accuracy";
+        "DEVICE_ONLY": "device_only";
+        "BATTERY_SAVING": "battery_saving";
+        "LOCATION_OFF": "location_off";
+    };
 
     /**
      * ANDROID and iOS ONLY
      * Constants for the various Bluetooth hardware states.
      * @type {Object}
      */
-    bluetoothState?: any;
+    bluetoothState: {
+        // iOS only
+        "RESETTING": "resetting";
+        "UNSUPPORTED": "unsupported";
+        "UNAUTHORIZED": "unauthorized";
+
+        // Android only
+        "POWERING_OFF": "powering_off";
+        "POWERING_ON": "powering_on";
+
+        // Both iOS and Android
+        "UNKNOWN": "unknown";
+        "POWERED_OFF": "powered_off";
+        "POWERED_ON": "powered_on";
+    };
 
 
     /**
@@ -68,21 +145,43 @@ interface Diagnostic {
      * Constants for the various NFC power states.
      * @type {Object}
      */
-    NFCState?: any;
+    NFCState: {
+        "UNKNOWN": "unknown";
+        "POWERED_OFF": "powered_off";
+        "POWERING_ON": "powering_on";
+        "POWERED_ON": "powered_on";
+        "POWERING_OFF": "powering_off";
+    };
 
     /**
      * ANDROID ONLY
      * Constants for the various CPU architectures.
      * @type {Object}
      */
-    cpuArchitecture?: any;
+    cpuArchitecture: {
+        // Android only
+        MIPS: "MIPS";
+        MIPS_64: "MIPS_64";
+
+        // Both iOS and Android
+        UNKNOWN: "unknown";
+        ARMv6: "ARMv6";
+        ARMv7: "ARMv7";
+        ARMv8: "ARMv8";
+        X86: "X86";
+        X86_64: "X86_64";
+    };
 
     /**
      * iOS ONLY
      * Constants for requesting/reporting the various types of remote notification permission types on iOS devices.
      * @type {Object}
      */
-    remoteNotificationType?: any;
+    remoteNotificationType: {
+        ALERT: "alert";
+        SOUND: "sound";
+        BADGE: "badge";
+    };
 
     /**
      * Checks if app is able to access device location.

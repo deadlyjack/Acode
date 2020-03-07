@@ -19,5 +19,6 @@
 - (void) isBluetoothAvailable: (CDVInvokedUrlCommand*)command;
 - (void) getBluetoothState: (CDVInvokedUrlCommand*)command;
 - (void) requestBluetoothAuthorization: (CDVInvokedUrlCommand*)command;
+- (void) ensureBluetoothManager: (CDVInvokedUrlCommand*)command;
 
 @end

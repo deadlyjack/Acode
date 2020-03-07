@@ -25,7 +25,6 @@ extern NSString*const AUTHORIZATION_GRANTED;
 
 @property (nonatomic) float osVersion;
 @property (nonatomic) BOOL debugEnabled;
-@property (nonatomic, retain) NSUserDefaults* settings;
 
 // Plugin API
 - (void) enableDebug: (CDVInvokedUrlCommand*)command;

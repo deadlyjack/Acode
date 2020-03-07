@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="cordova.plugins.diagnostic"
-    version="5.0.0">
+    version="5.0.1">
 
     <name>Diagnostic</name>
     <description>Cordova/Phonegap plugin to check the state of Location/WiFi/Camera/Bluetooth device settings.</description>
@@ -80,7 +80,11 @@
         <framework src="CoreBluetooth.framework" />
 
         <config-file target="*-Info.plist" parent="NSBluetoothPeripheralUsageDescription">
-            <string>This app requires bluetooth access to function properly.</string>
+            <string>This app requires Bluetooth access to function properly.</string>
+        </config-file>
+
+        <config-file target="*-Info.plist" parent="NSBluetoothAlwaysUsageDescription">
+            <string>This app requires constant Bluetooth access to function properly.</string>
         </config-file>
         --><!--END_MODULE BLUETOOTH-->
 
