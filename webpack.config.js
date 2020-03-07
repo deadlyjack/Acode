@@ -1,7 +1,7 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: {
     main: "./src/main.js",
     injection: "./src/injection.js"
@@ -18,7 +18,6 @@ module.exports = {
       },
       {
         test: /\.m?js$/,
-        // exclude: /(node_modules)/,
         use: {
           loader: "babel-loader",
           options: {

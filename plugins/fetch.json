@@ -79,14 +79,6 @@
     "is_top_level": false,
     "variables": {}
   },
-  "cordova-plugin-inappbrowser": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-inappbrowser@3.1.0"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova.plugins.diagnostic": {
     "source": {
       "type": "registry",
@@ -161,10 +153,42 @@
     "is_top_level": true,
     "variables": {}
   },
+  "cordova-disable-http-cache": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-disable-http-cache"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
   "com.foxdebug.sdcard": {
     "source": {
       "type": "local",
       "path": "/mnt/sda1/cordova/code editor/node_modules/tree-chooser"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-facebook-audnet-sdk": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-facebook-audnet-sdk"
+    },
+    "is_top_level": false,
+    "variables": {}
+  },
+  "cordova-facebook-audience-network": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-facebook-audience-network"
+    },
+    "is_top_level": false,
+    "variables": {}
+  },
+  "cordova-plugin-inappbrowser": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-plugin-inappbrowser"
     },
     "is_top_level": true,
     "variables": {}

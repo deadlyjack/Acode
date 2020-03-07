@@ -78,7 +78,12 @@ public class SDcard extends CordovaPlugin {
 
       Intent intent = null;
 
-      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+      // VERSION.SDK_INT >= 0x00000018 && VERSION.SDK_INT < 0x0000001d
+
+      if (
+        android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N &&
+        android.os.Build.VERSION.SDK_INT <= 0x0000001c
+        ) {
         String SDcardUUID = args.getString(0);
         StorageVolume sdCard = null;
 

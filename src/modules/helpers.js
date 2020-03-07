@@ -516,6 +516,30 @@ function getFeedbackBody() {
     `;
 }
 
+function blob2text(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = function () {
+            resolve(reader.result);
+        };
+
+        reader.onerror = function () {
+            reject(reader.error);
+        };
+
+        reader.readAsText(blob);
+    });
+}
+
+/**
+ * Returns unique ID
+ * @returns {string}
+ */
+function uuid() {
+    return (new Date().getTime() + parseInt(Math.random() * 100000000000)).toString(36);
+}
+
 export default {
     getExt,
     getErrorMessage,
@@ -537,5 +561,7 @@ export default {
     subtract,
     canWrite,
     isParent,
-    getFeedbackBody
+    getFeedbackBody,
+    blob2text,
+    uuid
 };

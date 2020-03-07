@@ -8,7 +8,6 @@ import './styles/dialogs.scss';
 import './styles/themes.scss';
 import './styles/help.scss';
 import './styles/overideAceStyle.scss';
-import * as tePolly from 'text-encoding-polyfill';
 
 import "core-js/stable";
 import tag from 'html-tag-js';
@@ -28,9 +27,9 @@ import createEditorFromURI from "./modules/createEditorFromURI";
 import addFolder from "./modules/addFolder";
 import quickToolAction from "./modules/events/quicktools";
 import arrowkeys from "./modules/events/arrowkeys";
-// import gitHub from "./modules/gitHub";
 
 import $_menu from './views/menu.hbs';
+import $_fileMenu from './views/file-menu.hbs';
 import $_row1 from './views/footer/row1.hbs';
 import $_row2 from './views/footer/row2.hbs';
 import $_search from './views/footer/search.hbs';
@@ -38,14 +37,11 @@ import $_rating from './views/rating.hbs';
 import saveFile from "./modules/saveFile";
 import git from "./modules/git";
 import runPreview from "./modules/runPreview";
-import Admob from "./modules/admob";
 import commands from "./modules/commands";
 import externalStorage from "./modules/externalStorage";
 //@ts-check
 
 window.onload = Main;
-window.TextDecoder = tePolly.TextDecoder;
-window.TextEncoder = tePolly.TextEncoder;
 
 if (!HTMLElement.prototype.append) {
   HTMLElement.prototype.append = function (...nodes) {
@@ -103,9 +99,6 @@ function Main() {
     window.gitRecordURL = DATA_STORAGE + 'git/.gitfiles';
     window.gistRecordURL = DATA_STORAGE + 'git/.gistfiles';
 
-    if (window.AdMob) Admob();
-    else window.AdMob = null;
-
     const permissions = cordova.plugins.permissions;
     const requiredPermissions = [
       permissions.WRITE_EXTERNAL_STORAGE,
@@ -131,6 +124,10 @@ function Main() {
   });
 
   function ondeviceready() {
+
+    if (!window.loaded) window.loaded = true;
+    else return;
+
     const url = `${cordova.file.applicationDirectory}www/lang/${appSettings.value.lang}.json`;
 
     fs.readFile(url)
@@ -204,6 +201,13 @@ function runApp() {
 function App() {
   //#region declaration
   const _search = mustache.render($_search, strings);
+  const $edit = tag('span', {
+    className: 'icon edit',
+    attr: {
+      style: 'font-size: 1.2em !important;',
+      action: 'toggle-readonly'
+    }
+  });
   const $toggler = tag('span', {
     className: 'icon menu',
     attr: {
@@ -232,6 +236,26 @@ function App() {
     toggle: $menuToggler,
     transformOrigin: 'top right'
   });
+  const $fileMenu = contextMenu({
+    toggle: $edit,
+    top: '6px',
+    transformOrigin: 'top right',
+    innerHTML: () => {
+      return mustache.render($_fileMenu, {
+        string_rename: strings.rename, //TODO: create cli application to add new string
+        string_syntax: strings["syntax highlighting"],
+        string_encoding: strings.encoding,
+        string_readOnly: strings["read only"],
+        string_cut: strings.cut,
+        string_copy: strings.copy,
+        string_paste: strings.paste,
+        string_selectAll: strings["select all"],
+        file_mode: (editorManager.activeFile.session.getMode().$id || '').split('/').pop(),
+        file_encoding: editorManager.activeFile.encoding,
+        file_readOnly: editorManager.activeFile.editable ? strings.no : strings.yes
+      });
+    }
+  });
   const $main = tag('main');
   const $sidebar = sidenav($main, $toggler);
   const $runBtn = tag('span', {
@@ -239,38 +263,11 @@ function App() {
     attr: {
       action: 'run-file'
     },
-    onclick: function () {
-      let target = appSettings.value.previewMode;
-      let console = false;
-      if (helpers.getExt(editorManager.activeFile.filename) === 'js') {
-        console = true;
-        target = 'in app';
-      }
-      if (target === 'none') {
-        dialogs.select(strings['preview mode'], ['browser', 'in app'])
-          .then(res => {
-            runPreview(console, res);
-          });
-      } else {
-        runPreview(console, target);
-      }
+    onclick: () => {
+      runPreview();
     },
     style: {
       fontSize: '1.2em'
-    }
-  });
-  const $edit = tag('span', {
-    className: 'icon edit',
-    onclick: function () {
-      const file = editorManager.activeFile;
-      file.editable = !file.editable;
-      if (file.editable) this.classList.remove('dull');
-      else this.classList.add('dull');
-      editorManager.onupdate();
-    },
-    attr: {
-      style: 'font-size: 1.2em !important;',
-      action: 'toggle-readonly'
     }
   });
   const fileOptions = {
@@ -289,13 +286,11 @@ function App() {
   $main.setAttribute("data-empty-msg", strings['no editor message']);
 
   let count = parseInt(localStorage.count) || 0;
-  if (count === 3) {
+  if (count === constants.RATING_TIME) {
 
     const html = $_rating;
-    dialogs.box('Did you like the app?', html, onInteract, onhide);
+    dialogs.box('Did you like the app?', html, onInteract, onhide, strings.cancel);
 
-  } else if (count < 3) {
-    localStorage.count = ++count;
   }
   //#endregion
 
@@ -304,6 +299,7 @@ function App() {
   root.append($header, $main);
   //#endregion
 
+  $fileMenu.addEventListener('click', handleMenu);
   $mainMenu.addEventListener('click', handleMenu);
   $footer.addEventListener('click', handleFooter);
   $footer.addEventListener('touchstart', footerTouchStart);
@@ -388,8 +384,6 @@ function App() {
       }
 
       this.editor.setReadOnly(!activeFile.editable);
-      if (activeFile.editable) $edit.classList.remove('dull');
-      else $edit.classList.add('dull');
 
       if (['html', 'htm', 'xhtml', 'md', 'js', 'php'].includes(helpers.getExt(activeFile.filename))) {
         $header.insertBefore($runBtn, $header.lastChild);
@@ -435,7 +429,7 @@ function App() {
       else window.open(`mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=${val} stars <br> ${helpers.getFeedbackBody()}`, '_system');
     }, 100);
 
-    localStorage.count = 4;
+    localStorage.count = constants.RATING_TIME;
   }
 
   function onhide() {
@@ -713,7 +707,8 @@ function App() {
     const value = $target.getAttribute('value');
     if (!action) return;
 
-    $mainMenu.hide();
+    if ($mainMenu.contains($target)) $mainMenu.hide();
+    if ($fileMenu.contains($target)) $fileMenu.hide();
     Acode.exec(action, value);
   }
 

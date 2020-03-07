@@ -90,7 +90,8 @@ function fileError(code) {
 }
 
 function error(err) {
-  if (err) dialogs.alert(strings.error, err.toString());
+  if (err.response && err.response.status === 409) dialogs.alert(strings.error, strings["conflict error"]);
+  else if (err) dialogs.alert(strings.error, err.toString());
   throw err;
 }
 

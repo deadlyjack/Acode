@@ -11,6 +11,7 @@ import dialogs from '../../components/dialogs';
 import Gists from '../gists/gists';
 import git from '../../modules/git';
 import constants from '../../constants';
+import SearchBar from '../../components/searchbar';
 
 /**
  * 
@@ -45,12 +46,21 @@ function GistFiles(gist) {
     toggle: $menuToggler,
     transformOrigin: 'top right'
   });
+  const $search = tag('span', {
+    className: 'icon search',
+    attr: {
+      action: "search"
+    }
+  });
 
   $content.on('click', handleClick);
   $cm.on('click', handleClick);
   $page.append($content);
-  $page.querySelector('header').append($menuToggler);
+  $page.querySelector('header').append($search, $menuToggler);
   app.appendChild($page);
+  $search.onclick = () => {
+    SearchBar($page.querySelector('.list'));
+  };
 
   actionStack.push({
     id: 'gistFiles',

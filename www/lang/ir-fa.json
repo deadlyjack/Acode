@@ -19,6 +19,7 @@
   "commit message": "تایید پیام",
   "console": "خط فرمان",
   "control file and folders": "کنترل فایل ها و پوشه ها",
+  "conflict error": "Conflict! Please wait before another commit.",
   "copy": "کپی",
   "copyline-down defination": "خط فعال را به سمت پایین کپی میکند.",
   "copyline-up defination": "خط فعال را به سمت بالا کپی میکند.",
@@ -79,6 +80,7 @@
   "ok": "تایید",
   "overwrite": "رونویسی",
   "paste": "چسباندن",
+  "phpwarning": "این پیاده سازی PHP واقعی نیست ، فقط یک شبیه سازی است ، به عنوان مثال بسیاری از ویژگی ها کار نمی کنند. phpinfo() ، $_POST و غیره کار نمی کنند. من روی پیاده سازی PHP واقعی کار می کنم.",
   "preview mode": "حالت پیش نمایش",
   "Q1": "چگونه متنی را انتخاب کنم؟",
   "Q2": "emmet چیست؟",
@@ -133,5 +135,10 @@
   "welcome": "به Acode editor خوش آمدید",
   "use emmet": "استفاده از emmet",
   "use quick tools": "استفاده از ابزار سریع",
-  "yes": "بله"
+  "yes": "بله",
+  "github": "GitHub",
+  "encoding": "رمزگذاری متن",
+  "syntax highlighting": "برجسته نحو",
+  "read only": "فقط خواندنی",
+  "select all": "انتخاب همه"
 }

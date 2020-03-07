@@ -107,7 +107,6 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
 
         window.restoreTheme(true);
         app.append(promptDiv, mask);
-        if (AdMob) AdMob.showBanner(AdMob.AD_POSITION.TOP_CENTER);
         input.focus();
         autosize(input);
 
@@ -115,7 +114,6 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
             promptDiv.classList.add('hide');
             window.restoreTheme();
             setTimeout(() => {
-                if (AdMob) AdMob.hideBanner();
                 app.removeChild(promptDiv);
                 app.removeChild(mask);
             }, 300);
@@ -294,8 +292,9 @@ function multiPrompt(message, inputs) {
  * 
  * @param {string} titleText 
  * @param {string} message 
+ * @param {function():void} [onhide] 
  */
-function alert(titleText, message) {
+function alert(titleText, message, onhide) {
 
     if (!message && titleText) {
         message = titleText;
@@ -342,7 +341,6 @@ function alert(titleText, message) {
         action: hideAlert
     });
 
-    if (AdMob) AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
     app.append(alertDiv, mask);
     window.restoreTheme(true);
 
@@ -350,13 +348,13 @@ function alert(titleText, message) {
         alertDiv.classList.add('hide');
         window.restoreTheme();
         setTimeout(() => {
-            if (AdMob) AdMob.hideBanner();
             app.removeChild(alertDiv);
             app.removeChild(mask);
         }, 300);
     }
 
     function hide() {
+        if (onhide) onhide();
         actionStack.remove('alert');
         hideAlert();
     }
@@ -413,7 +411,6 @@ function confirm(titleText, message) {
             action: hideAlert
         });
 
-        if (AdMob) AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
         app.append(confirmDiv, mask);
         window.restoreTheme(true);
 
@@ -421,7 +418,6 @@ function confirm(titleText, message) {
             confirmDiv.classList.add('hide');
             window.restoreTheme();
             setTimeout(() => {
-                if (AdMob) AdMob.hideBanner();
                 app.removeChild(confirmDiv);
                 app.removeChild(mask);
             }, 300);
@@ -554,7 +550,7 @@ function loaderShow(titleText, message) {
 
     const oldLoaderDiv = tag.get('#__loader');
 
-    if (oldLoaderDiv) oldLoaderDiv.textContent = '';
+    if (oldLoaderDiv) oldLoaderDiv.remove();
 
     const titleSpan = tag('strong', {
         className: 'title',
@@ -574,15 +570,16 @@ function loaderShow(titleText, message) {
     });
     const loaderDiv = oldLoaderDiv || tag('div', {
         className: 'prompt alert',
-        id: '__loader'
+        id: '__loader',
+        children: [
+            titleSpan,
+            messageSpan
+        ]
     });
     const mask = tag.get('#__loader-mask') || tag('span', {
         className: 'mask',
         id: '__loader-mask'
     });
-
-    if (AdMob) AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
-    loaderDiv.append(titleSpan, messageSpan);
 
     if (!oldLoaderDiv) {
         window.freeze = true;
@@ -600,7 +597,6 @@ function loaderHide() {
     loaderDiv.classList.add('hide');
     window.restoreTheme();
     setTimeout(() => {
-        if (AdMob) AdMob.hideBanner();
         window.freeze = false;
         loaderDiv.remove();
         mask.remove();
@@ -613,8 +609,13 @@ function loaderHide() {
  * @param {string} html 
  * @param {function(Event):void} onclick
  * @param {function():void} onhide
+ * @param {string} [hideButtonText]
  */
-function box(titleText, html, onclick, onhide) {
+function box(titleText, html, onclick, onhide, hideButtonText) {
+    const okBtn = tag('button', {
+        textContent: hideButtonText || strings.ok,
+        onclick: hide
+    });
     const box = tag('div', {
         className: 'prompt box',
         children: [
@@ -626,6 +627,10 @@ function box(titleText, html, onclick, onhide) {
                 className: 'message',
                 innerHTML: html,
                 onclick
+            }),
+            tag('div', {
+                className: 'button-container',
+                child: okBtn
             })
         ]
     });

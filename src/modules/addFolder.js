@@ -20,10 +20,11 @@ export default addFolder;
 function addFolder(folder, sidebar, index) {
     return new Promise(resolve => {
 
-        if (folder.url in addedFolder) resolve();
 
         const rootUrl = typeof folder === 'string' ? folder : folder.url;
         let name = folder.name === 'File Browser' ? 'Home' : folder.name;
+
+        if (rootUrl in addedFolder) return resolve();
 
         if (!name) {
             name = decodeURI(rootUrl.slice(0, -1)).split('/').pop();
@@ -61,7 +62,10 @@ function addFolder(folder, sidebar, index) {
         function plotFolder(url, rootNode) {
             rootNode.clearList();
             fs.listDir(url).then(dirList => {
-                dirList = helpers.sortDir(dirList, appSettings.value.fileBrowser);
+                dirList = helpers.sortDir(dirList, {
+                    showHiddenFiles: "on",
+                    sortByName: 'on'
+                });
                 dirList.map(item => {
                     if (item.isDirectory) {
                         createFolderTile(rootNode, item);
@@ -82,10 +86,7 @@ function addFolder(folder, sidebar, index) {
         function createFileTile(rootNode, item) {
             const listItem = tile({
                 lead: tag('span', {
-                    className: helpers.getIconForFile(item.name),
-                    style: {
-                        paddingRight: '5px'
-                    }
+                    className: helpers.getIconForFile(item.name)
                 }),
                 text: item.name
             });
@@ -225,7 +226,7 @@ function addFolder(folder, sidebar, index) {
 
                                 if (type === 'file') {
 
-                                    const editor = editorManager.getFile(nativeURL, "fileUrl");
+                                    const editor = editorManager.getFile(nativeURL, "fileUri");
                                     if (editor) editor.filename = newname;
 
                                     $node.replaceChild(tag('i', {
@@ -368,18 +369,42 @@ function addFolder(folder, sidebar, index) {
 
                             if (res.isFile) {
                                 if (fileClipBoard.method === "cut") {
-                                    let editor = editorManager.getFile(src, "fileUri");
-                                    if (editor) editorManager.removeFile(editor, true);
                                     $clipBoardNode.remove();
                                 }
                                 const $file = createFileTile(null, res);
-                                $node.nextElementSibling.appendChild($file);
+                                const $ul = $node.nextElementSibling;
+                                $ul.appendChild($file);
                                 success();
                             } else {
                                 if (fileClipBoard.method === "cut") $clipBoardNode.parentElement.remove();
                                 const $folder = createFolderTile(null, res);
                                 appendFolder($node, $folder);
                                 success();
+                            }
+
+                            if (fileClipBoard.method === 'cut') {
+                                editorManager.files.map(file => {
+                                    let regex = new RegExp('^' + src);
+                                    if (regex.test(file.fileUri)) {
+                                        const text = file.session.getValue();
+                                        const isUnsaved = file.isUnsaved;
+                                        const cursorPos = editorManager.editor.getCursorPosition();
+                                        let uri;
+
+                                        if (res.isFile)
+                                            regex = new RegExp('^' + file.location);
+                                        uri = file.fileUri.replace(regex, dest);
+
+                                        createEditorFromURI(uri, false, {
+                                            text: isUnsaved ? text : null,
+                                            cursorPos
+                                        });
+
+                                        editorManager.removeFile(file, true);
+                                    }
+
+                                    return file;
+                                });
                             }
 
                         }, err => {
@@ -503,7 +528,7 @@ function addFolder(folder, sidebar, index) {
             const $node = e.target;
             const type = $node.getAttribute('type');
             const name = $node.getAttribute('name');
-            const clipBoardEnabled = fileClipBoard && document.getElementById(fileClipBoard.nodeId);
+            const clipBoardEnabled = fileClipBoard;
 
             const COPY = ['copy', strings.copy, 'copy'],
                 CUT = ['cut', strings.cut, 'cut'],
@@ -569,6 +594,8 @@ function addFolder(folder, sidebar, index) {
         function remove() {
             if (rootNode.parentElement) {
                 sidebar.removeChild(rootNode);
+                rootNode.removeEventListener('click', handleClick);
+                rootNode.removeEventListener('contextmenu', handleContextMenu);
                 rootNode = null;
             }
             const tmpFolders = {};

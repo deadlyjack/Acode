@@ -43,6 +43,12 @@
             flex: 1;
             pointer-events: none;
             text-transform: capitalize;
+
+            .value {
+                display: block;
+                opacity: 0.6;
+                font-size: 0.8em;
+            }
         }
 
         .icon {

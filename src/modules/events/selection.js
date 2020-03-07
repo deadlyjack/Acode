@@ -300,7 +300,7 @@ function enableSingleMode(editor, controls, container, $content, MouseEvent) {
         x: 0,
         y: 0
     };
-    const lessConent = `${editor.getReadOnly()? '' : '<span action="paste">paste</span>'}<span action="select all">select all<span>`;
+    const lessConent = `${editor.getReadOnly()? '' : `<span action="paste">${strings.paste}</span>`}<span action="select all">${strings["select all"]}<span>`;
     let updateTimeout;
 
     $cm.innerHTML = lessConent;

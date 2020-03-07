@@ -12,10 +12,34 @@ import gitHub from "../pages/github/gitHub";
 import runPreview from "./runPreview";
 import help from '../pages/help';
 import recents from './recents';
+import fsOperation from './utils/fsOperation';
+import Modes from '../pages/modes/modes';
+import clipboardAction from './clipboard';
 
 const commands = {
   "console": function () {
     runPreview(true, 'in app');
+  },
+  "copy": function () {
+    clipboardAction('copy');
+  },
+  "cut": function () {
+    clipboardAction('cut');
+  },
+  "encoding": function () {
+    dialogs.select(strings.encoding, constants.encodings, {
+        default: editorManager.activeFile.encoding
+      })
+      .then(encoding => {
+        const file = editorManager.activeFile;
+        file.encoding = encoding;
+        const text = file.session.getValue();
+        const decodedText = new TextEncoder().encode(text);
+        const newText = new TextDecoder(encoding).decode(decodedText);
+        file.session.setValue(newText);
+        file.isUnsaved = false;
+        editorManager.onupdate();
+      });
   },
   "find": function () {
     const $find = tag.get('#find-tool');
@@ -118,6 +142,9 @@ const commands = {
         }
       });
   },
+  "paste": function () {
+    clipboardAction('paste');
+  },
   "prev-file": function () {
     const len = editorManager.files.length;
     let fileIndex = editorManager.files.indexOf(editorManager.activeFile);
@@ -126,6 +153,11 @@ const commands = {
     else --fileIndex;
 
     editorManager.switchFile(editorManager.files[fileIndex].id);
+  },
+  "read-only": function () {
+    const file = editorManager.activeFile;
+    file.editable = !file.editable;
+    editorManager.onupdate();
   },
   "recent": function () {
     const all = [];
@@ -162,6 +194,37 @@ const commands = {
         }
       });
   },
+  "rename": function (file) {
+    file = file || editorManager.activeFile;
+    dialogs.prompt('Rename', file.filename, 'filename', {
+        match: constants.FILE_NAME_REGEX
+      })
+      .then(newname => {
+        if (!newname || newname === file.filename) return;
+        newname = helpers.removeLineBreaks(newname);
+
+        if (file.fileUri) {
+          fsOperation(file.fileUri)
+            .then(fs => {
+              return fs.renameTo(newname);
+            })
+            .then(() => {
+              file.filename = newname;
+              helpers.updateFolders(file.location);
+              window.plugins.toast.showShortBottom(strings['file renamed']);
+            })
+            .catch(err => {
+              helpers.error(err);
+              console.error(err);
+            });
+        } else if (file.contentUri) {
+          alert(strings['unable to rename']);
+        } else {
+          file.filename = newname;
+          if (file.type === 'regular') window.plugins.toast.showShortBottom(strings['file renamed']);
+        }
+      });
+  },
   "replace": function () {
     this.find();
   },
@@ -171,6 +234,15 @@ const commands = {
   "save-as": function () {
     saveFile(editorManager.activeFile, true);
   },
+  "select all": function () {
+    clipboardAction('select all');
+  },
+  "syntax": function () {
+    Modes()
+      .then(mode => {
+        editorManager.activeFile.session.setMode(mode);
+      });
+  }
 };
 
 export default commands;

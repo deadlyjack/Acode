@@ -35,10 +35,7 @@ export default {
         });
         const $mainWrapper = tag(options.type || 'div', {
             className: 'list collaspable',
-            children: [
-                title,
-                $ul
-            ]
+            children: [title, $ul]
         });
 
         if (hidden) {

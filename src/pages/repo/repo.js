@@ -13,6 +13,7 @@ import dialogs from '../../components/dialogs';
 import git from '../../modules/git';
 import contextMenu from '../../components/contextMenu';
 import Info from '../info/info';
+import SearchBar from '../../components/searchbar';
 
 export default function Repo(owner, repoName, $gitHubPage) {
   const $page = Page(repoName);
@@ -25,6 +26,12 @@ export default function Repo(owner, repoName, $gitHubPage) {
   const $content = tag.parse(_template);
   const $navigation = $content.querySelector('.navigation');
   const repo = git.GitHub().getRepo(owner, repoName);
+  const $search = tag('span', {
+    className: 'icon search',
+    attr: {
+      action: "search"
+    }
+  });
   let cachedTree = {};
   let currentTree = {};
   let idsToFlush = [];
@@ -40,7 +47,7 @@ export default function Repo(owner, repoName, $gitHubPage) {
   $cm.addEventListener('click', handleClick);
   $content.addEventListener('click', handleClick);
   $page.append($content);
-  $page.querySelector('header').append($menuToggler);
+  $page.querySelector('header').append($search, $menuToggler);
   document.body.appendChild($page);
 
   actionStack.push({
@@ -53,6 +60,9 @@ export default function Repo(owner, repoName, $gitHubPage) {
     idsToFlush.map(id => {
       actionStack.remove(id);
     });
+  };
+  $search.onclick = () => {
+    SearchBar($content.get(".list"));
   };
 
   function getRepo() {
@@ -104,7 +114,7 @@ export default function Repo(owner, repoName, $gitHubPage) {
       showHiddenFiles: 'on',
       sortByName: 'on'
     });
-    const $oldList = $content.querySelector('#list');
+    const $oldList = $content.querySelector('.list');
     if ($oldList) $oldList.remove();
     const $list = tag.parse(mustache.render(_list, {
       msg: strings['empty folder message'],
@@ -180,7 +190,7 @@ export default function Repo(owner, repoName, $gitHubPage) {
 
     function folder() {
 
-      currentTree.scroll = $content.querySelector('#list').scrollTop;
+      currentTree.scroll = $content.querySelector('.list').scrollTop;
 
       const {
         sha: csha,
@@ -228,7 +238,8 @@ export default function Repo(owner, repoName, $gitHubPage) {
           if (!type) {
             if (data instanceof Blob) {
               try {
-                data = await data.text();
+                if (data.text) data = await data.text();
+                else data = await helpers.blob2text(data);
               } catch (error) {
                 console.error(error);
                 dialogs.alert(strings.error, strings['unable to open file']);

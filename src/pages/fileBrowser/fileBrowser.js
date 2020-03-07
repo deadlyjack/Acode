@@ -15,6 +15,7 @@ import './fileBrowser.scss';
 import externalFs from '../../modules/utils/externalFs';
 import fsOperation from '../../modules/utils/fsOperation';
 import createEditorFromURI from '../../modules/createEditorFromURI';
+import SearchBar from '../../components/searchbar';
 //#endregion
 /**
  * 
@@ -33,7 +34,10 @@ function FileBrowser(type = 'file', option = null) {
             }
         });
         const $search = tag('i', {
-            className: 'icon search hidden'
+            className: 'icon search',
+            attr: {
+                action: 'search'
+            }
         });
         const $page = Page('File Browser');
         const $content = tag.parse(mustache.render(_template, {
@@ -57,9 +61,7 @@ function FileBrowser(type = 'file', option = null) {
         //#endregion
 
         $content.addEventListener('click', handleClick);
-        $content.addEventListener('contextmenu', function (e) {
-            handleClick(e, 'contextmenu');
-        });
+        $content.addEventListener('contextmenu', handleContentMenu);
         $page.append($content);
         $page.querySelector('header').append($search, $menuToggler);
         document.body.append($page);
@@ -83,12 +85,19 @@ function FileBrowser(type = 'file', option = null) {
             }
         };
 
+        $search.onclick = function () {
+            const $list = $content.get("#list");
+            if ($list) SearchBar($list);
+        };
+
         $page.onhide = function () {
             let id = '';
             while ((id = actionsToDispose.pop())) {
                 actionStack.remove(id);
             }
             actionStack.remove('filebrowser');
+            $content.removeEventListener('click', handleClick);
+            $content.removeEventListener('contextmenu', handleContentMenu);
         };
 
         if (type === 'folder') {
@@ -143,60 +152,67 @@ function FileBrowser(type = 'file', option = null) {
             };
         }
 
-        externalFs.listExternalStorages()
-            .then(res => {
+        const version = parseInt(device.version);
+        if (version < 7) {
+            genList();
+        } else {
+            externalFs.listExternalStorages()
+                .then(res => {
+                    genList(res);
+                });
+        }
 
-                cordova.plugins.diagnostic.getExternalSdCardDetails(ls => {
-                    const list = [];
-                    if (ls.length > 0) {
-                        ls.map(card => {
-                            const name = card.path.split('/').splice(-1)[0];
-                            const path = card.filePath + '/';
-                            if (name === "files") return card;
-                            list.push({
-                                name: res[name] || name,
-                                nativeURL: path,
-                                origin: path,
-                                isDirectory: true,
-                                parent: true,
-                                type: 'folder'
-                            });
-                            return card;
-                        });
-                    }
-
-                    const path = cordova.file.externalRootDirectory;
-                    list.push({
-                        nativeURL: path,
-                        name: 'Internal storage',
-                        isDirectory: true,
-                        parent: true,
-                        type: 'folder',
-                    });
-
-                    if (type === "file") {
+        function genList(res) {
+            cordova.plugins.diagnostic.getExternalSdCardDetails(ls => {
+                const list = [];
+                if (ls.length > 0) {
+                    ls.map(card => {
+                        const name = card.path.split('/').splice(-1)[0];
+                        const path = card.filePath + '/';
+                        if (name === "files") return card;
                         list.push({
-                            name: "Select document",
+                            name: res && res[name] ? res[name] : name,
+                            nativeURL: path,
+                            origin: path,
                             isDirectory: true,
-                            type: 'folder',
-                            "open-doc": true
+                            parent: true,
+                            type: 'folder'
                         });
-                    }
+                        return card;
+                    });
+                }
 
-                    cachedDir[root] = {
-                        name,
-                        list
-                    };
-
-                    navigate('/', root);
-                    render(list);
-
-                    if (type === 'folder') {
-                        folderOption.classList.add('disabled');
-                    }
+                const path = cordova.file.externalRootDirectory;
+                list.push({
+                    nativeURL: path,
+                    name: 'Internal storage',
+                    isDirectory: true,
+                    parent: true,
+                    type: 'folder',
                 });
 
+                if (type === "file") {
+                    list.push({
+                        name: "Select document",
+                        isDirectory: true,
+                        type: 'folder',
+                        "open-doc": true
+                    });
+                }
+
+                cachedDir[root] = {
+                    name,
+                    list
+                };
+
+                navigate('/', root);
+                render(list);
+
+                if (type === 'folder') {
+                    folderOption.classList.add('disabled');
+                }
             });
+        }
 
         function loadDir(path = root, name = 'File Browser') {
 
@@ -363,6 +379,10 @@ function FileBrowser(type = 'file', option = null) {
                     console.error(err);
                 });
             }
+        }
+
+        function handleContentMenu(e) {
+            handleClick(e, 'contextmenu');
         }
 
         function refresh() {

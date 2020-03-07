@@ -13,10 +13,14 @@ import dialogs from '../../components/dialogs';
 import git from '../../modules/git';
 import GistFiles from '../gistFiles/gistFiles';
 import constants from '../../constants';
+import SearchBar from '../../components/searchbar';
 
 function Gists(callbackGists) {
   const $search = tag('span', {
-    className: 'icon search hidden'
+    className: 'icon search',
+    attr: {
+      action: "search"
+    }
   });
   const $menuToggler = tag('span', {
     className: 'icon more_vert',
@@ -44,6 +48,9 @@ function Gists(callbackGists) {
 
   $cm.addEventListener('click', handleClick);
   $page.querySelector('header').append($search, $menuToggler);
+  $search.onclick = () => {
+    SearchBar($page.querySelector('.list'));
+  };
 
   fs.readFile(gistsFile)
     .then(res => {

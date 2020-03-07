@@ -12,10 +12,14 @@ import contextMenu from '../../components/contextMenu';
 import fs from '../../modules/utils/internalFs';
 import dialogs from '../../components/dialogs';
 import git from '../../modules/git';
+import SearchBar from '../../components/searchbar';
 
 function Repos() {
   const $search = tag('span', {
-    className: 'icon search hidden'
+    className: 'icon search',
+    attr: {
+      action: "search"
+    }
   });
   const $menuToggler = tag('span', {
     className: 'icon more_vert',
@@ -43,6 +47,9 @@ function Repos() {
 
   $cm.addEventListener('click', handleClick);
   $page.querySelector('header').append($search, $menuToggler);
+  $search.onclick = () => {
+    SearchBar($page.querySelector('#repos'));
+  };
 
   dialogs.loaderShow('GitHub', strings.loading + '...');
   fs.readFile(githubFile)

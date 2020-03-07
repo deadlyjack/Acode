@@ -61,6 +61,7 @@ $lightText : #333e59;
     }
 
     .prompt,
+    .prompt .input,
     .button-container {
         background-color: white;
         color: $lightText;
@@ -92,6 +93,14 @@ $textDark : white;
     .scroll {
         &::-webkit-scrollbar-thumb {
             background: $bgDark;
+        }
+    }
+
+    .prompt {
+        .scroll {
+            &::-webkit-scrollbar-thumb {
+                background: $pageBgDark;
+            }
         }
     }
 

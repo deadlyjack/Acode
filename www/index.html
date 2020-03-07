@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <link rel="stylesheet" href="./css/main.css" />
   <link rel="stylesheet" href="./res/fonts/Roboto/style.css" />
@@ -19,6 +19,11 @@
   <script src="./res/ace/src/ext-modelist.js"></script>
   <script src="./res/ace/src/keybinding-sublime.js"></script>
   <script src="cordova.js"></script>
+  <script>
+    window.TextDecoder = window.TextEncoder = null;
+  </script>
+  <script src="./js/encoding-indexes.js"></script>
+  <script src="./js/encoding.js"></script>
   <script defer src="./js/main.build.js"></script>
   <title>Acode</title>
 </head>

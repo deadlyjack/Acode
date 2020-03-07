@@ -19,6 +19,7 @@
   "commit message": "Commit message",
   "console": "控制台",
   "control file and folders": "控制文件和文件夹",
+  "conflict error": "Conflict! Please wait before another commit.",
   "copy": "复制",
   "copyline-down defination": "向下复制活动行.",
   "copyline-up defination": "向上复制活动行.",
@@ -79,6 +80,7 @@
   "ok": "确认",
   "overwrite": "覆盖",
   "paste": "粘贴",
+  "phpwarnging": "这个PHP实现不是真实的，它只是一个仿真，例如，许多功能将不起作用。 phpinfo() ，$_POST 等将不起作用。 我正在实现真正的PHP。",
   "preview mode": "预览模式",
   "Q1": "如何选择文本?",
   "Q2": "什么是Emmet工具?",
@@ -133,5 +135,10 @@
   "welcome": "欢迎使用Acode编辑器",
   "use emmet": "使用 Emmet工具",
   "use quick tools": "使用快捷键",
-  "yes": "是"
+  "yes": "是",
+  "github": "GitHub",
+  "encoding": "文字编码",
+  "syntax highlighting": "语法高亮",
+  "read only": "只读",
+  "select all": "全选"
 }

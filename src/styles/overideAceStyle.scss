@@ -115,3 +115,10 @@
 .ace-container {
     height: 100%;
 }
+
+.ace-editor {
+    .ace_text-input {
+        pointer-events: none !important;
+        user-select: none !important;
+    }
+}

@@ -33,7 +33,7 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
         } else {
             name = uri.name;
             fileUri = helpers.decodeURL(uri.fileUri);
-            contentUri = helpers.decodeURL(uri.contentUri);
+            contentUri = uri.contentUri;
 
             if (fileUri) {
                 if (!name)
@@ -48,7 +48,11 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
             index
         } = data;
 
-        const existingFile = editorManager.getFile(fileUri, "fileUri");
+        let existingFile;
+
+        if (fileUri) existingFile = editorManager.getFile(fileUri, "fileUri");
+        else if (contentUri) existingFile = editorManager.getFile(contentUri, "contentUri");
+
         if (existingFile) {
             editorManager.switchFile(existingFile.id);
             resolve(fileUri);

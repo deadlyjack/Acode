@@ -7,8 +7,6 @@ import dialogs from '../components/dialogs';
 import helpers from '../modules/helpers';
 import textControl from './events/selection';
 import constants from '../constants';
-import fsOperation from './utils/fsOperation';
-
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -42,8 +40,8 @@ function EditorManager($sidebar, $header, $body) {
      * @type {AceAjax.Editor}
      */
     const editor = ace.edit(container);
-    const readOnlyContent = '<span action="copy">copy</span><span action="select all">select all<span>';
-    const fullContent = `<span action="copy">copy</span><span action="cut">cut</span><span action="paste">paste</span><span action="select all">select all</span>`;
+    const readOnlyContent = `<span action="copy">${strings.copy}</span><span action="select all">${strings["select all"]}<span>`;
+    const fullContent = `<span action="copy">${strings.copy}</span><span action="cut">${strings.cut}</span><span action="paste">${strings.paste}</span><span action="select all">${strings["select all"]}</span>`;
     const controls = {
         start: tag('span', {
             className: 'cursor-control start'
@@ -179,6 +177,7 @@ function EditorManager($sidebar, $header, $body) {
             tail: removeBtn
         });
         let id = options.id || ++counter;
+        let _editable;
         while (getFile(id, "id")) id = ++counter;
 
         let file = {
@@ -192,6 +191,7 @@ function EditorManager($sidebar, $header, $body) {
             type: options.type || 'regular',
             isUnsaved: options.isUnsaved,
             record: options.record,
+            encoding: 'utf-8',
             assocTile,
             get filename() {
                 if (this.type === 'git') return this.record.name;
@@ -253,34 +253,7 @@ function EditorManager($sidebar, $header, $body) {
 
         function rename(e) {
             if (e.target === removeBtn) return;
-            dialogs.prompt('Rename', file.filename, 'filename', {
-                    match: constants.FILE_NAME_REGEX
-                })
-                .then(newname => {
-                    if (!newname || newname === file.filename) return;
-                    newname = helper.removeLineBreaks(newname);
-
-                    if (file.fileUri) {
-                        fsOperation(file.fileUri)
-                            .then(fs => {
-                                return fs.renameTo(newname);
-                            })
-                            .then(() => {
-                                file.filename = newname;
-                                helpers.updateFolders(file.location);
-                                window.plugins.toast.showShortBottom(strings['file renamed']);
-                            })
-                            .catch(err => {
-                                helpers.error(err);
-                                console.error(err);
-                            });
-                    } else if (file.contentUri) {
-                        alert(strings['unable to rename']);
-                    } else {
-                        file.filename = newname;
-                        if (file.type === 'regular') window.plugins.toast.showShortBottom(strings['file renamed']);
-                    }
-                });
+            Acode.exec("rename", file);
         }
 
         setTimeout(() => {
@@ -438,6 +411,7 @@ function EditorManager($sidebar, $header, $body) {
         function closeFile() {
             manager.files = manager.files.filter(editor => editor.id !== file.id);
 
+
             if (file.id !== constants.DEFAULT_SESSION) {
                 if (!manager.files.length) {
                     editor.setSession(new ace.EditSession(""));
@@ -455,6 +429,8 @@ function EditorManager($sidebar, $header, $body) {
             }
 
             file.assocTile.remove();
+            delete file.session;
+            delete file.assocTile;
             manager.onupdate();
         }
     }

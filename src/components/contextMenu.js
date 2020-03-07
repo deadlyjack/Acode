@@ -8,27 +8,34 @@ import tag from 'html-tag-js';
 
 /**
  * 
- * @param {object} [pos]
- * @param {number} [pos.left] 
- * @param {number} [pos.top] 
- * @param {number} [pos.bottom] 
- * @param {number} [pos.right] 
- * @param {string} [pos.transformOrigin] 
- * @param {HTMLElement} [pos.toggle] 
- * @param {function():void} [pos.onshow] 
- * @param {function():void} [pos.onhide] 
+ * @param {object} [opts]
+ * @param {number} [opts.left] 
+ * @param {number} [opts.top] 
+ * @param {number} [opts.bottom] 
+ * @param {number} [opts.right] 
+ * @param {string} [opts.transformOrigin] 
+ * @param {HTMLElement} [opts.toggle] 
+ * @param {function():void} [opts.onshow] 
+ * @param {function():void} [opts.onhide] 
  * @returns {HTMLElement & contextMenuObj}
  */
-function contextMenu(innerHTML, pos = {}) {
-    const el = tag('ul', {
+function contextMenu(innerHTML, opts) {
+    if (!opts && typeof innerHTML === 'object') {
+        opts = innerHTML;
+        innerHTML = null;
+    } else if (!opts) {
+        opts = {};
+    }
+
+    const $el = tag('ul', {
         className: 'context-menu scroll',
-        innerHTML: innerHTML,
+        innerHTML: innerHTML || '',
         style: {
-            top: pos.top || 'auto',
-            left: pos.left || 'auto',
-            right: pos.right || 'auto',
-            bottom: pos.bottom || 'auto',
-            transformOrigin: pos.transformOrigin || null
+            top: opts.top || 'auto',
+            left: opts.left || 'auto',
+            right: opts.right || 'auto',
+            bottom: opts.bottom || 'auto',
+            transformOrigin: opts.transformOrigin || null
         }
     });
     const mask = tag('span', {
@@ -41,34 +48,47 @@ function contextMenu(innerHTML, pos = {}) {
             id: 'main-menu',
             action: hide
         });
-        el.onshow();
-        el.classList.remove('hide');
-        document.body.append(el, mask);
+        $el.onshow();
+        $el.classList.remove('hide');
+
+        if (opts.innerHTML) {
+            $el.innerHTML = opts.innerHTML();
+        }
+
+        if (opts.toggle) {
+
+            const client = opts.toggle.getBoundingClientRect();
+            if (!opts.top && !opts.bottom) $el.style.top = client.top + 'px';
+            if (!opts.left && !opts.right) $el.style.right = (innerWidth - client.right) + 'px';
+
+        }
+
+        document.body.append($el, mask);
     }
 
     function hide() {
         actionStack.remove('main-menu');
-        el.onhide();
-        el.classList.add('hide');
+        $el.onhide();
+        $el.classList.add('hide');
         setTimeout(() => {
             document.body.removeChild(mask);
-            document.body.removeChild(el);
+            document.body.removeChild($el);
         }, 100);
     }
 
     function toggle() {
-        if (el.parentElement) return hide();
+        if ($el.parentElement) return hide();
         show();
     }
 
-    if (pos.toggle) pos.toggle.addEventListener('click', toggle);
+    if (opts.toggle) opts.toggle.addEventListener('click', toggle);
 
-    el.hide = hide;
-    el.show = show;
-    el.onshow = pos.onshow || (() => {});
-    el.onhide = pos.onhide || (() => {});
+    $el.hide = hide;
+    $el.show = show;
+    $el.onshow = opts.onshow || (() => {});
+    $el.onhide = opts.onhide || (() => {});
 
-    return el;
+    return $el;
 }
 
 

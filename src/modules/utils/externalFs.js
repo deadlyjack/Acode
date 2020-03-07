@@ -1,4 +1,5 @@
 import helpers from "../helpers";
+import dialogs from "../../components/dialogs";
 
 /**
  * 
@@ -27,6 +28,25 @@ function externalFs(uuid, uri) {
 
     if (!rootPath) {
 
+      const version = parseInt(device.version);
+      const versionAlpha = typeof device.version === 'string' ? device.version.toLocaleLowerCase() : "";
+      if (version < 7 || version > 9 || ['q', 'r'].includes(versionAlpha)) {
+
+        dialogs.box('INFO', '<p>Follow below steps to allow Acode to modify sdcard data.<p><br><img src="./res/imgs/steps.jpg">', () => {}, next);
+
+      } else {
+
+        next();
+
+      }
+
+
+
+    } else {
+      res(fs);
+    }
+
+    function next() {
       SDcard.open(uuid, result => {
         rootPath = result;
         externalStorage.savePath(uuid, result);
@@ -34,9 +54,6 @@ function externalFs(uuid, uri) {
       }, err => {
         rej(err);
       });
-
-    } else {
-      res(fs);
     }
 
   });
