@@ -104,7 +104,7 @@ function error(err) {
  * @param {string} path 
  * @returns {Repo}
  */
-function Record(owner, sha, name, data, repo, path) {
+function Record(owner, sha, name, data, repo, path, branch) {
   if (!owner || !sha || !name || !repo) {
     throw new Error('Could not create Record because one or more paramert value is not valid');
   }
@@ -115,7 +115,7 @@ function Record(owner, sha, name, data, repo, path) {
     path,
     repo,
     commitMessage: null,
-    branch: 'master',
+    branch,
     owner
   };
   const repository = gitHub().getRepo(owner, repo);
@@ -196,6 +196,9 @@ function Record(owner, sha, name, data, repo, path) {
     set commitMessage(str) {
       _record.commitMessage = str;
     },
+    get repository() {
+      return repository;
+    },
     setData: (txt) => {
       return new Promise((resolve, reject) => {
         _record.data = txt;
@@ -242,7 +245,8 @@ function GitRecord(obj) {
         name,
         repo,
         path,
-        owner
+        owner,
+        branch
       } = record;
       fs.readFile(DATA_STORAGE + 'git/' + sha)
         .then(res => {
@@ -250,7 +254,7 @@ function GitRecord(obj) {
           const text = decoder.decode(res.data);
           let record;
           try {
-            record = Record(owner, sha, name, text, repo, path);
+            record = Record(owner, sha, name, text, repo, path, branch);
           } catch (error) {
             remove(sha);
           }
@@ -271,17 +275,19 @@ function GitRecord(obj) {
       repo,
       data,
       path,
-      owner
+      owner,
+      branch
     } = obj;
     gitRecord[obj.sha] = {
       name,
       sha,
       repo,
       path,
-      owner
+      owner,
+      branch
     };
     save();
-    const record = Record(owner, sha, name, data, repo, path);
+    const record = Record(owner, sha, name, data, repo, path, branch);
     fs.writeFile(DATA_STORAGE + 'git/' + record.sha, data, true, false)
       .catch(err => {
         if (err.code) FileError(err.code);

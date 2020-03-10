@@ -140,5 +140,13 @@
   "encoding": "Pengkodean teks",
   "syntax highlighting": "Penyorotan sintaksis",
   "read only": "Baca saja",
-  "select all": "Pilih Semua"
+  "select all": "Pilih Semua",
+  "select branch": "Pilih cabang",
+  "create new branch": "Buat cabang baru",
+  "use branch": "Gunakan cabang",
+  "new branch": "Cabang baru",
+  "branch": "branch",
+  "key bindings": "binding kunci",
+  "edit": "sunting",
+  "reset": "ulang"
 }

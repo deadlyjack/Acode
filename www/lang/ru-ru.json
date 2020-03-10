@@ -137,5 +137,13 @@
   "encoding": "Кодировка текста",
   "syntax highlighting": "Подсветка синтаксиса",
   "read only": "только чтения",
-  "select all": "выбрать все"
+  "select all": "выбрать все",
+  "select branch": "Выберите филиал",
+  "create new branch": "Создать новую ветку",
+  "use branch": "Используйте ветку",
+  "new branch": "Новая ветка",
+  "branch": "branch",
+  "key bindings": "Привязки клавиш",
+  "edit": "редактировать",
+  "reset": "сброс настроек"
 }

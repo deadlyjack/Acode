@@ -69,15 +69,25 @@ $lightText : #333e59;
         button:active {
             background-color: darken($color: white, $amount: 20);
         }
-
-        input::placeholder {
-            color: #757b88;
-        }
     }
 
     .prompt {
         .message.loader .loader {
             border: solid 4px $primary;
+        }
+
+        .scroll {
+            &::-webkit-scrollbar-thumb {
+                background: $primary;
+            }
+        }
+    }
+
+    input,
+    textarea {
+        &::placeholder {
+            color: $lightText;
+            opacity: 0.8;
         }
     }
 }
@@ -158,9 +168,13 @@ $textDark : white;
     input {
         border-bottom: solid 1px currentColor;
         color: $textDark;
+    }
 
+    input,
+    textarea {
         &::placeholder {
-            color: #757b88;
+            color: white;
+            opacity: 0.8;
         }
     }
 

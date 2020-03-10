@@ -1,6 +1,9 @@
 import Cryptojs from 'crypto-js';
 import constants from '../constants';
 import dialogs from '../components/dialogs';
+import keyBindings from '../keyBindings';
+import fs from './utils/internalFs';
+import tag from 'html-tag-js';
 
 /**
  * 
@@ -540,6 +543,31 @@ function uuid() {
     return (new Date().getTime() + parseInt(Math.random() * 100000000000)).toString(36);
 }
 
+function resetKeyBindings() {
+    const customKeyBindings = {};
+    for (let binding in keyBindings) {
+        const {
+            key,
+            readOnly,
+            description
+        } = keyBindings[binding];
+        if (!readOnly) customKeyBindings[binding] = {
+            description,
+            key
+        };
+    }
+    fs.writeFile(KEYBINDING_FILE, JSON.stringify(customKeyBindings, undefined, 2), true, false);
+}
+
+function loadScript(...scripts) {
+    scripts.map(script => {
+        const $script = tag('script', {
+            src: script
+        });
+        document.head.append($script);
+    });
+}
+
 export default {
     getExt,
     getErrorMessage,
@@ -563,5 +591,7 @@ export default {
     isParent,
     getFeedbackBody,
     blob2text,
-    uuid
+    uuid,
+    resetKeyBindings,
+    loadScript
 };

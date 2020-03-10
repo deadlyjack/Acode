@@ -3,6 +3,7 @@ import autosize from 'autosize';
 import Picker from 'vanilla-picker';
 import tile from "./tile";
 import helpers from '../modules/helpers';
+import inputhints from './inputhints';
 /**
  * @typedef {"text"|"numberic"|"tel"|"search"|"email"|"url"} Types
  */
@@ -134,6 +135,7 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
  * @property {boolean} required
  * @property {RegExp} match
  * @property {string} value
+ * @property {function(function(Array<string>):void):void} hints
  * @property {string} [placeholder]
  */
 
@@ -190,7 +192,8 @@ function multiPrompt(message, inputs) {
                 type,
                 match,
                 value,
-                placeholder
+                placeholder,
+                hints
             } = input;
 
             const inputType = type === 'text' ? 'textarea' : 'input';
@@ -203,6 +206,10 @@ function multiPrompt(message, inputs) {
                 className: 'input',
                 isRequired: required
             });
+
+            if (hints) {
+                inputhints($input, hints);
+            }
 
             if (inputType === 'textarea') {
                 $input.rows = 1;

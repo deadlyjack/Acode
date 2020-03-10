@@ -23,16 +23,28 @@ function saveFile(file, as = false, showToast = true) {
         if (file.type === 'git') {
             dialogs.multiPrompt('Commit', [{
                     id: 'message',
-                    placeholder: 'Commit message',
+                    placeholder: strings['commit message'],
                     value: file.record.commitMessage,
                     type: 'text',
                     required: true,
                 }, {
                     id: 'branch',
-                    placeholder: 'Branch',
+                    placeholder: strings.branch,
                     value: file.record.branch,
                     type: 'text',
-                    required: true
+                    required: true,
+                    hints: cb => {
+                        file.record.repository.listBranches()
+                            .then(res => {
+                                const data = res.data;
+                                const branches = [];
+                                data.map(branch => {
+                                    branches.push(branch.name);
+                                    return branch;
+                                });
+                                cb(branches);
+                            });
+                    }
                 }])
                 .then(res => {
                     if (!res.branch || !res.message) return;

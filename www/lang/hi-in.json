@@ -28,7 +28,7 @@
   "delete": "इसे हटाएं",
   "delete {name}": "{name} को डिलीट करें?",
   "dependencies": "निर्भरता",
-  "dlay": "मिलीसेकंड में समय",
+  "delay": "मिलीसेकंड में समय",
   "down defination": "कर्सर को नीचे की ओर ले जाएं।",
   "editor settings": "एडिटर सेटिंग्स",
   "editor theme": "एडिटर का थीम",
@@ -140,5 +140,13 @@
   "encoding": "टेक्स्ट एन्कोडिंग",
   "syntax highlighting": "सिंटेक्स हाइलाइटिंग",
   "read only": "केवल पढ़ने के लिए",
-  "select all": "सेलेक्ट आल"
+  "select all": "सेलेक्ट आल",
+  "select branch": "शाखा का चयन करें",
+  "create new branch": "नई शाखा बनाएं",
+  "use branch": "शाखा का उपयोग करें",
+  "new branch": "नई शाखा",
+  "branch": "branch",
+  "key bindings": "की बिंडिंग्स",
+  "edit": "संपादित करें",
+  "reset": "रीसेट"
 }

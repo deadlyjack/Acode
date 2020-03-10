@@ -140,5 +140,13 @@
   "encoding": "رمزگذاری متن",
   "syntax highlighting": "برجسته نحو",
   "read only": "فقط خواندنی",
-  "select all": "انتخاب همه"
+  "select all": "انتخاب همه",
+  "select branch": "انتخاب شاخه",
+  "create new branch": "شعبه جدید ایجاد کنید",
+  "use branch": "از شاخه استفاده کنید",
+  "new branch": "شعبه جدید",
+  "branch": "branch",
+  "key bindings": "اتصالات کلیدی",
+  "edit": "ویرایش",
+  "reset": "تنظیم مجدد"
 }

@@ -39,6 +39,7 @@ import git from "./modules/git";
 import runPreview from "./modules/runPreview";
 import commands from "./modules/commands";
 import externalStorage from "./modules/externalStorage";
+import keyBindings from './keyBindings';
 //@ts-check
 
 window.onload = Main;
@@ -83,7 +84,7 @@ function Main() {
     activeFile: null
   };
   window.externalStorage = externalStorage;
-  window.modelist = ace.require('ace/ext/modelist');
+  window.customKeyBindings = null;
 
   if (!('files' in localStorage)) {
     localStorage.setItem('files', '[]');
@@ -96,6 +97,7 @@ function Main() {
 
     window.DATA_STORAGE = cordova.file.externalDataDirectory || cordova.file.dataDirectory;
     window.CACHE_STORAGE = cordova.file.externalCacheDirectory || cordova.file.cacheDirectory;
+    window.KEYBINDING_FILE = DATA_STORAGE + '.key-bindings.json';
     window.gitRecordURL = DATA_STORAGE + 'git/.gitfiles';
     window.gistRecordURL = DATA_STORAGE + 'git/.gistfiles';
 
@@ -130,15 +132,62 @@ function Main() {
 
     const url = `${cordova.file.applicationDirectory}www/lang/${appSettings.value.lang}.json`;
 
-    fs.readFile(url)
+    window.keyBindings = name => {
+      if (customKeyBindings && name in window.customKeyBindings)
+        return window.customKeyBindings[name].key;
+      else if (name in keyBindings)
+        return keyBindings[name].key;
+      else
+        return null;
+    };
+
+    fs.readFile(KEYBINDING_FILE)
       .then(res => {
         const decoder = new TextDecoder('utf-8');
         const text = decoder.decode(res.data);
-        window.strings = JSON.parse(text);
-        initGit();
+        try {
+
+          let bindings = JSON.parse(text);
+          window.customKeyBindings = bindings;
+
+        } catch (error) {
+
+          helpers.error(error);
+          return Promise.reject;
+
+        }
       })
-      .catch(err => {
-        console.log(err);
+      .catch(helpers.resetKeyBindings)
+      .finally(() => {
+
+        initAce();
+        const aceScript = [
+          "./res/ace/emmet-core.js",
+          "./res/ace/src/ext-language_tools.js",
+          "./res/ace/src/ext-emmet.js",
+          "./res/ace/src/ext-beautify.js",
+          "./res/ace/src/ext-modelist.js",
+          "./res/ace/src/keybinding-sublime.js"
+        ];
+        helpers.loadScript(...aceScript);
+
+        setTimeout(() => {
+
+          window.modelist = ace.require('ace/ext/modelist');
+
+          fs.readFile(url)
+            .then(res => {
+              const decoder = new TextDecoder('utf-8');
+              const text = decoder.decode(res.data);
+              window.strings = JSON.parse(text);
+              initGit();
+            })
+            .catch(err => {
+              console.log(err);
+            });
+
+        }, 100);
+
       });
   }
 
@@ -159,6 +208,7 @@ function Main() {
 }
 
 function runApp() {
+
   app.addEventListener('click', function (e) {
     const el = e.target;
     if (el instanceof HTMLAnchorElement) {

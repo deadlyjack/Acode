@@ -43,6 +43,12 @@
         width: fit-content;
         max-width: 320px;
 
+        ul li :nth-child(2) {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .title {
             justify-content: center;
         }

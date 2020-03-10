@@ -15,7 +15,7 @@ import contextMenu from '../../components/contextMenu';
 import Info from '../info/info';
 import SearchBar from '../../components/searchbar';
 
-export default function Repo(owner, repoName, $gitHubPage) {
+export default function Repo(owner, repoName) {
   const $page = Page(repoName);
   const $menuToggler = tag('span', {
     className: 'icon more_vert',
@@ -35,6 +35,21 @@ export default function Repo(owner, repoName, $gitHubPage) {
   let cachedTree = {};
   let currentTree = {};
   let idsToFlush = [];
+  let branch;
+  const branches = [];
+  const input1 = {
+    id: 'from',
+    placeholder: strings['use branch'],
+    hints: cb => {
+      cb(branches.slice(0, -1));
+    },
+    type: 'text'
+  };
+  const input2 = {
+    id: 'branch',
+    placeholder: strings['new branch'],
+    type: 'text'
+  };
   const path = [];
   const $cm = contextMenu(mustache.render(_menu, strings), {
     toggle: $menuToggler,
@@ -43,12 +58,32 @@ export default function Repo(owner, repoName, $gitHubPage) {
     transformOrigin: 'top right'
   });
 
-  getRepo();
-  $cm.addEventListener('click', handleClick);
-  $content.addEventListener('click', handleClick);
-  $page.append($content);
-  $page.querySelector('header').append($search, $menuToggler);
-  document.body.appendChild($page);
+  dialogs.loaderShow(repoName, strings.loading + '...');
+  repo.listBranches()
+    .then(res => {
+      dialogs.loaderHide();
+      const data = res.data;
+      data.map(branch => {
+        branches.push(branch.name);
+      });
+      branches.push(['add', strings['new branch'], 'add']);
+      return dialogs.select(strings['select branch'], branches);
+    })
+    .then(res => {
+      if (res === 'add') {
+        addBranch();
+      } else {
+        branch = res;
+        getRepo();
+      }
+    })
+    .catch(err => {
+      helpers.error(err);
+      console.error(err);
+    })
+    .finally(res => {
+      dialogs.loaderHide();
+    });
 
   actionStack.push({
     id: 'repo',
@@ -56,23 +91,49 @@ export default function Repo(owner, repoName, $gitHubPage) {
   });
 
   $page.onhide = function () {
+    $page.removeEventListener('click', handleClick);
     actionStack.remove('repo');
     idsToFlush.map(id => {
       actionStack.remove(id);
     });
   };
-  $search.onclick = () => {
-    SearchBar($content.get(".list"));
-  };
+
+  function addBranch() {
+    dialogs.multiPrompt(strings['create new branch'], [input1, input2])
+      .then(res => {
+        const from = res.from;
+        branch = res.branch;
+        dialogs.loaderShow('', strings.loading + '...');
+        return repo.createBranch(from, branch);
+      })
+      .then(getRepo)
+      .catch(err => {
+        helpers.error(err);
+        console.error(err);
+      })
+      .finally(() => {
+        dialogs.loaderHide();
+      });
+  }
 
   function getRepo() {
     dialogs.loaderShow(repoName, strings.loading + '...');
-    repo.getSha('master', '')
+    repo.getSha(branch, '')
       .then(res => {
-        render(res.data, repoName, 'root');
+        const list = res.data;
+        render(list, repoName, 'root');
       })
-      .catch(error)
-      .finally(dialogs.loaderHide);
+      .catch(err => {
+        helpers.error(err);
+        console.error(err);
+      })
+      .finally(() => {
+        dialogs.loaderHide();
+      });
+    $page.addEventListener('click', handleClick);
+    $page.append($content);
+    $page.querySelector('header').append($search, $menuToggler);
+    document.body.appendChild($page);
   }
 
   /**
@@ -93,6 +154,7 @@ export default function Repo(owner, repoName, $gitHubPage) {
   }
 
   function render(list, name, sha) {
+    $page.settitle(repoName + ` (${branch})`);
 
     if (!(sha in cachedTree)) {
       list.map(entry => {
@@ -107,7 +169,6 @@ export default function Repo(owner, repoName, $gitHubPage) {
         entry.isFile = !entry.isDirectory;
         entry.type = entry.isDir ? 'folder' : helpers.getIconForFile(name);
       });
-      dialogs.loaderHide();
     }
 
     list = helpers.sortDir(list, {
@@ -186,6 +247,10 @@ export default function Repo(owner, repoName, $gitHubPage) {
       case 'info':
         Info(repoName, owner);
         break;
+
+      case 'search':
+        SearchBar($content.get(".list"));
+        break;
     }
 
     function folder() {
@@ -249,6 +314,7 @@ export default function Repo(owner, repoName, $gitHubPage) {
               sha,
               data,
               name,
+              branch,
               repo: repoName,
               path: path.slice(1).join('/'),
               owner

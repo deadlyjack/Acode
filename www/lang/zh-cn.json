@@ -140,5 +140,13 @@
   "encoding": "文字编码",
   "syntax highlighting": "语法高亮",
   "read only": "只读",
-  "select all": "全选"
+  "select all": "全选",
+  "select branch": "选择分支",
+  "create new branch": "建立新分支",
+  "use branch": "使用分支",
+  "new branch": "新分支",
+  "branch": "branch",
+  "key bindings": "键绑定",
+  "edit": "编辑",
+  "reset": "重设"
 }

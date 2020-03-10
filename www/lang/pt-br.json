@@ -140,5 +140,13 @@
   "encoding": "Codificação de texto",
   "syntax highlighting": "Realce de sintaxe",
   "read only": "Somente leitura",
-  "select all": "selecionar tudo"
+  "select all": "selecionar tudo",
+  "select branch": "Selecionar ramo",
+  "create new branch": "Criar novo ramo",
+  "use branch": "Usar ramo",
+  "new branch": "Nova filial",
+  "branch": "branch",
+  "key bindings": "Ligações de teclas",
+  "edit": "editar",
+  "reset": "Redefinir"
 }

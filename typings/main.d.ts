@@ -286,6 +286,7 @@ declare var gistRecordURL: string;
 declare var Acode: Acode;
 declare var DATA_STORAGE: string;
 declare var CACHE_STORAGE: string;
+declare var KEYBINDING_FILE: string;
 declare var externalStorage: externalStorage;
 /**
  * A custom alert box to show alert notification

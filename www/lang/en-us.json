@@ -140,5 +140,13 @@
   "encoding": "Text encoding",
   "syntax highlighting": "Syntax highlighting",
   "read only": "Read only",
-  "select all": "select all"
+  "select all": "select all",
+  "select branch": "Select branch",
+  "create new branch": "Create new branch",
+  "use branch": "Use branch",
+  "new branch": "New branch",
+  "branch": "branch",
+  "key bindings": "Key bindings",
+  "edit": "edit",
+  "reset": "reset"
 }

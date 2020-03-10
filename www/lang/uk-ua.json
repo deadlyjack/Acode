@@ -137,5 +137,13 @@
   "encoding": "Кодування тексту",
   "syntax highlighting": "Підсвічування синтаксису",
   "read only": "лише читання",
-  "select all": "виберіть усіх"
+  "select all": "виберіть усіх",
+  "select branch": "Виберіть відділення",
+  "create new branch": "Створити нову гілку",
+  "use branch": "Використовуйте відділення",
+  "new branch": "Нова філія",
+  "branch": "branch",
+  "key bindings": "прив'язки клавіш",
+  "edit": "редагувати",
+  "reset": "підрегулювати"
 }

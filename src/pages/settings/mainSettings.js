@@ -7,9 +7,11 @@ import themeSettings from "./themeSettings";
 import aboutUs from "../about/about";
 import editorSettings from "./editorSettings";
 import constants from "../../constants";
+import helpers from "../../modules/helpers";
+import createEditorFromURI from "../../modules/createEditorFromURI";
 
 export default function settingsMain(demo) {
-    const page = Page(strings.settings);
+    const $page = Page(strings.settings);
     const settingsList = tag('div', {
         className: 'main list',
         style: {
@@ -19,9 +21,9 @@ export default function settingsMain(demo) {
 
     actionStack.push({
         id: 'settings-main',
-        action: page.hide
+        action: $page.hide
     });
-    page.onhide = function () {
+    $page.onhide = function () {
         actionStack.remove('settings-main');
     };
 
@@ -56,6 +58,10 @@ export default function settingsMain(demo) {
             key: 'about',
             text: strings.about,
             icon: 'app-logo'
+        }, {
+            key: 'keybindings',
+            text: strings['key bindings'],
+            icon: 'keyboard_hide'
         });
     }
 
@@ -99,6 +105,21 @@ export default function settingsMain(demo) {
                 aboutUs();
                 break;
 
+            case 'keybindings':
+                dialogs.select(strings['key bindings'], [
+                        ['edit', strings.edit],
+                        ['reset', strings.reset]
+                    ])
+                    .then(res => {
+                        if (res === 'edit') {
+                            $page.hide();
+                            createEditorFromURI(KEYBINDING_FILE);
+                        } else {
+                            helpers.resetKeyBindings();
+                        }
+                    });
+                break;
+
             case 'previewMode':
                 dialogs.select(this.text, ['browser', 'in app', ['none', strings['not set']]], {
                         default: value.previewMode
@@ -116,6 +137,6 @@ export default function settingsMain(demo) {
         }
     }
 
-    page.appendChild(settingsList);
-    document.body.append(page);
+    $page.appendChild(settingsList);
+    document.body.append($page);
 }
