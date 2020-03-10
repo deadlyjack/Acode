@@ -85,19 +85,6 @@ export default function Repo(owner, repoName) {
       dialogs.loaderHide();
     });
 
-  actionStack.push({
-    id: 'repo',
-    action: $page.hide
-  });
-
-  $page.onhide = function () {
-    $page.removeEventListener('click', handleClick);
-    actionStack.remove('repo');
-    idsToFlush.map(id => {
-      actionStack.remove(id);
-    });
-  };
-
   function addBranch() {
     dialogs.multiPrompt(strings['create new branch'], [input1, input2])
       .then(res => {
@@ -122,6 +109,18 @@ export default function Repo(owner, repoName) {
       .then(res => {
         const list = res.data;
         render(list, repoName, 'root');
+        actionStack.push({
+          id: 'repo',
+          action: $page.hide
+        });
+
+        $page.onhide = function () {
+          $page.removeEventListener('click', handleClick);
+          actionStack.remove('repo');
+          idsToFlush.map(id => {
+            actionStack.remove(id);
+          });
+        };
       })
       .catch(err => {
         helpers.error(err);
