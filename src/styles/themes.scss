@@ -17,7 +17,8 @@ $lightText : #333e59;
         i,
         button,
         strong,
-        input {
+        input,
+        .message {
             color: $lightText;
         }
     }

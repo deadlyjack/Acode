@@ -48,7 +48,8 @@ export default function Repo(owner, repoName) {
   const input2 = {
     id: 'branch',
     placeholder: strings['new branch'],
-    type: 'text'
+    type: 'text',
+    match: /^[a-z\-_0-9]+$/i
   };
   const path = [];
   const $cm = contextMenu(mustache.render(_menu, strings), {
