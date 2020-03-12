@@ -7,9 +7,6 @@
     "files": {}
   },
   "installed_plugins": {
-    "com.foxdebug.sdcard": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "com.napolitano.cordova.plugin.intent": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
@@ -63,6 +60,9 @@
     },
     "cordova.plugins.diagnostic": {
       "ANDROID_SUPPORT_VERSION": "28.+",
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-sdcard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

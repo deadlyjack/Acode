@@ -32,5 +32,8 @@ window.SDcard = {
   },
   copy: function (root, src, dest, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, "SDcard", "copy", [root, src, dest]);
+  },
+  getPath: function (root, file, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, "SDcard", "getpath", [root, file]);
   }
 };

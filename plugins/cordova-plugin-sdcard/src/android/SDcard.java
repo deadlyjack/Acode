@@ -67,8 +67,6 @@ public class SDcard extends CordovaPlugin {
 
     this.cb = callbackContext;
 
-    List<String> operations = Arrays.asList("write", "mkdir", "rename", "delete", "touch", "copy", "move");
-
     if ("open".equals(action)) {
 
       if(args.length() == 0){
@@ -130,7 +128,7 @@ public class SDcard extends CordovaPlugin {
 
       this.cb.success(volumes);
 
-    }else if(operations.contains(action)){
+    }else{
 
       if(args.length() < 2){
         this.error("Few paramerter are missing");
@@ -183,6 +181,10 @@ public class SDcard extends CordovaPlugin {
           if(action.equals("move")) this.move(arg1, arg2);
           else this.copy(arg1, arg2);
           break;
+
+        case "getpath":
+          this.getPath(arg1);
+        break;
 
         default:
         break;
@@ -487,6 +489,27 @@ public class SDcard extends CordovaPlugin {
 
     return false;
 
+  }
+
+  private void getPath(String src){
+    DocumentFile file = this.getDocumentFile(src);
+
+    if(file == null){
+
+      this.error("Unable to get file");
+      
+    }else{
+
+      Uri uri = file.getUri();
+      String path = uri.getPath();
+
+      if(path != null){
+        this.cb.success(uri.toString());
+      }else{
+        this.error("Unable to get path");
+      }
+
+    }
   }
 
   private void error(String err){

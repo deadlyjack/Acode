@@ -143,14 +143,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "com.foxdebug.sdcard": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sda1/cordova/code editor/node_modules/tree-chooser"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-facebook-audnet-sdk": {
     "source": {
       "type": "local",
@@ -187,6 +179,14 @@
     "source": {
       "type": "registry",
       "id": "cordova-disable-http-cache"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-sdcard": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sda1/cordova/code editor/node_modules/tree-chooser"
     },
     "is_top_level": true,
     "variables": {}

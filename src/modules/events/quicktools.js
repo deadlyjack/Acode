@@ -17,6 +17,10 @@ function quickToolAction(e, footer, row1, row2, search) {
 
     if (!action) return;
 
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
     const editor = editorManager.editor;
     const $row2 = footer.querySelector('#row2');
     const $searchRow1 = footer.querySelector('#search_row1');
@@ -39,7 +43,7 @@ function quickToolAction(e, footer, row1, row2, search) {
             break;
 
         case 'tab':
-            $textarea.dispatchEvent(new KeyboardEvent('keydown', {
+            $textarea.dispatchEvent(window.createKeyboardEvent('keydown', {
                 key: 9,
                 keyCode: 9,
                 shiftKey
@@ -49,11 +53,11 @@ function quickToolAction(e, footer, row1, row2, search) {
         case 'shift':
             state = el.getAttribute('data-state') || 'off';
             if (state === 'off') {
-                $textarea.dispatchEvent(new KeyboardEvent('keydown'));
+                $textarea.dispatchEvent(window.createKeyboardEvent('keydown'));
                 el.setAttribute('data-state', 'on');
                 el.classList.add('active');
             } else {
-                $textarea.dispatchEvent(new KeyboardEvent('keyup'));
+                $textarea.dispatchEvent(window.createKeyboardEvent('keyup'));
                 el.setAttribute('data-state', 'off');
                 el.classList.remove('active');
             }

@@ -1,0 +1,22 @@
+version 0.0.8.81
+☞ Project is now open source - https://github.com/deadlyjack/code-editor
+☞ Fixed tab and arrow keys (quick tool) not working
+☞ Fixed issue with linking css and js file
+☞ Bugs fixes
+
+version 0.0.8.80
+☞ Select GitHub-branch to edit
+☞ Add new branch to repository
+☞ Edit keybindings
+☞ Bugs fixes
+
+version 0.0.7.78
+☞ Select syntax highlighter for specific file
+☞ Select file encoding
+☞ New file menu (cut, copy, paste and rename)
+☞ Bugs fixes
+
+version 0.0.7.77
+☞ Added option to search file-folder
+☞ Added new language 'Português' (Thanks to ryan869h)
+☞ Bugs fixes

@@ -32,6 +32,8 @@ function EditorManager($sidebar, $header, $body) {
      * @type {import('../components/tile').Tile | HTMLElement}
      */
     let $openFileList;
+    let updateTimeout, TIMEOUT = 100,
+        updateflag = 0;
     let counter = 0;
     const container = tag('div', {
         className: 'editor-container'
@@ -130,14 +132,28 @@ function EditorManager($sidebar, $header, $body) {
         }, 0);
     });
     editor.on('change', function (e) {
-        if (e.type) console.log(e.type);
+        if (updateTimeout) {
+            clearTimeout(updateTimeout);
+            if (e.action === 'insert') ++updateflag;
+            else if (e.action === 'remove') --updateflag;
+        }
+        updateTimeout = setTimeout(() => {
+            if (updateflag) {
+                updateFile();
+            }
+            updateflag = 0;
+        }, TIMEOUT);
+
+    });
+
+    function updateFile() {
         if (manager.activeFile && !manager.activeFile.isUnsaved) {
             manager.activeFile.assocTile.classList.add('notice');
             manager.activeFile.isUnsaved = true;
             if (manager.activeFile)
                 manager.onupdate();
         }
-    });
+    }
 
     /**
      * 

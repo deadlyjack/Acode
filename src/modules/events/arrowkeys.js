@@ -49,7 +49,7 @@ export default {
         this.interval = setInterval(dispatchEvent, 100);
 
         function dispatchEvent() {
-            const keyevent = new KeyboardEvent("keydown", {
+            const keyevent = window.createKeyboardEvent("keydown", {
                 key,
                 keyCode: key,
                 shiftKey

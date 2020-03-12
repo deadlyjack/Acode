@@ -12639,7 +12639,7 @@ function initAce() {
             }, {
                 name: "nextFile",
                 description: "Open next file tab",
-                bindKey: bindKey("Ctrl-Tab"),
+                bindKey: bindKey("nextFile"),
                 exec: function () {
                     if (Acode) {
                         Acode.exec("next-file")

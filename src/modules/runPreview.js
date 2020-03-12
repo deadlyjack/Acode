@@ -1,25 +1,59 @@
 import mimeType from 'mime-types';
 import marked from 'marked';
+import mustache from 'mustache';
+import $_console from '../views/console.hbs';
+import $_markdown from '../views/markdown.hbs';
 import fs from './utils/internalFs';
 import helpers from './helpers';
 import dialogs from '../components/dialogs';
 import git from './git';
 import PHP from './php';
 import constants from '../constants';
+import externalFs from './utils/externalFs';
 
+/**
+ * Starts the server and run the active file in browser
+ * @param {Boolean} isConsole 
+ * @param {"_blank"|"_system"} target 
+ */
 function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   const activeFile = isConsole ? null : editorManager.activeFile;
+  const uuid = helpers.uuid();
 
   let filename, path, extension;
   let port = constants.PORT;
-  const HTML = mimeType.lookup('html');
+  let useExternalFs = false;
+  let relPath = null;
+  let rootPath = null;
+  let EXECUTING_SCRIPT = uuid + '_script.js';
+  const MIMETYPE_HTML = mimeType.lookup('html');
   const decoder = new TextDecoder('utf-8');
-
+  const CONSOLE_SCRIPT = uuid + '_console.js';
+  const ESPRISMA_SCRIPT = uuid + '_esprisma.js';
+  const CODEFLASK_SCRIPT = uuid + '_codeflask.js';
+  const CONSOLE_STYLE = uuid + '_console.css';
+  const MARKDOWN_STYLE = uuid + '_md.css';
+  const DOC_PROVIDER = "content://com.android.externalstorage.documents/document/";
 
   if (activeFile) {
     filename = activeFile.filename;
     path = activeFile.location;
     extension = helpers.getExt(filename);
+
+    if (!activeFile.fileUri && activeFile.contentUri) {
+
+      if (helpers.isParent(DOC_PROVIDER, activeFile.contentUri)) {
+        const [uuid, docpath] = decodeURIComponent(activeFile.contentUri.split('/').pop()).split(':');
+
+        if (uuid === 'primary') {
+          path = helpers.getPath(cordova.file.externalRootDirectory + docpath);
+        } else {
+          relPath = helpers.getPath(docpath);
+          useExternalFs = uuid;
+        }
+      }
+
+    }
   }
 
   if (extension === 'php') {
@@ -42,6 +76,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   } else {
 
     if (extension === 'js' || isConsole) {
+      EXECUTING_SCRIPT = filename;
       runConsole();
     }
 
@@ -72,7 +107,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     isConsole = true;
     target = '_blank';
     filename = 'console.html';
-    path = `${cordova.file.applicationDirectory}www`;
+    path = `${cordova.file.applicationDirectory}www/`;
     port = constants.CONSOLE_PORT;
   }
 
@@ -104,121 +139,175 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       }
     }, port);
     webserver.onRequest(req => {
-      let reqPath = req.path;
+      let reqPath = req.path.substr(1);
 
       if (reqPath === '/') {
-        reqPath = '/index.html';
+        reqPath = 'index.html';
       }
 
       const assets = `${cordova.file.applicationDirectory}www`;
       const ext = helpers.getExt(reqPath);
+      let url = null;
 
-      if (reqPath === '/_console.js') {
-        const url = `${assets}/js/injection.build.js`;
-        sendFileContent(url, req.requestId, 'application/javascript');
-      } else if (reqPath === '/_esprisma.js') {
-        const url = `${assets}/js/esprisma.js`;
-        sendFileContent(url, req.requestId, 'application/javascript');
-      } else if (reqPath === '/_codeflask.js') {
-        const url = `${assets}/js/codeflask.min.js`;
-        sendFileContent(url, req.requestId, 'application/javascript');
-      } else if (reqPath === '/__script.js') {
-        let text;
-        if (extension === 'js') text = activeFile.session.getValue();
-        else text = '';
-        sendText(text, req.requestId, 'application/javascript');
-      } else if (reqPath === '/_console.css') {
-        const url = `${assets}/css/console.css`;
-        sendFileContent(url, req.requestId, 'text/css');
-      } else if (reqPath === '/_md.css') {
-        const url = `${assets}/css/md.css`;
-        sendFileContent(url, req.requestId, 'text/css');
-      } else if (ext === 'php') {
-        if (checkFile(reqPath)) { //is active file, unsaved or git
-          const text = new PHP(activeFile.session.getValue(), {
-            path
-          }).vm.OUTPUT_BUFFER;
-          sendHTML(text, req.requestId);
-        } else {
-          const url = path + reqPath;
-          sendFileContent(url.replace('file://', ''), req.requestId, HTML, text => {
-            return new PHP(text, {
-              path
-            }).vm.OUTPUT_BUFFER;
-          });
-        }
-      } else if (ext === 'html') {
-        if (isConsole) {
-          const url = `${assets}/console.html`;
-          sendFileContent(url, req.requestId, HTML);
-        } else if (checkFile(reqPath)) {
-          sendHTML(activeFile.session.getValue(), req.requestId);
-        } else {
-          sendFileContent(path + reqPath, req.requestId, HTML);
-        }
-      } else if (ext === 'md') {
-        const html = marked(activeFile.session.getValue());
-        const doc = `<!DOCTYPE html>
-        <html lang="en">
-        
-        <head>
-          <meta charset="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-          <link rel="stylesheet" href="/_md.css" />
-          <title>${filename}</title>
-        </head>
-        
-        <body>${html}</body>
-        
-        </html>`;
-        sendText(doc, req.requestId, HTML);
-      } else {
-        if (activeFile && activeFile.type === 'git') {
-          const uri = CACHE_STORAGE + activeFile.record.sha + encodeURIComponent(reqPath) + '.' + ext;
+      switch (reqPath) {
+        case CONSOLE_SCRIPT:
+          url = `${assets}/js/injection.build.js`;
+          sendFileContent(url, req.requestId, 'application/javascript');
+          break;
 
-          window.resolveLocalFileSystemURL(uri, () => {
-            sendFile(uri.replace('file://', ''), req.requestId);
-          }, err => {
-            if (err.code === 1) {
-              git.getGitFile(activeFile.record, reqPath.slice(1))
-                .then(res => {
-                  const data = helpers.b64toBlob(res, mimeType.lookup(reqPath));
-                  fs.writeFile(uri, data, true, false)
-                    .then(() => {
-                      sendFile(uri.replace('file://', ''), req.requestId);
+        case ESPRISMA_SCRIPT:
+          url = `${assets}/js/esprisma.js`;
+          sendFileContent(url, req.requestId, 'application/javascript');
+          break;
+
+        case CODEFLASK_SCRIPT:
+          url = `${assets}/js/codeflask.min.js`;
+          sendFileContent(url, req.requestId, 'application/javascript');
+          break;
+
+        case EXECUTING_SCRIPT:
+          let text;
+          if (extension === 'js') text = activeFile.session.getValue();
+          else text = '';
+          sendText(text, req.requestId, 'application/javascript');
+          break;
+
+        case CONSOLE_STYLE:
+          url = `${assets}/css/console.css`;
+          sendFileContent(url, req.requestId, 'text/css');
+          break;
+
+        case MARKDOWN_STYLE:
+          url = `${assets}/css/md.css`;
+          sendFileContent(url, req.requestId, 'text/css');
+          break;
+
+        default:
+          sendAccToExt();
+          break;
+      }
+
+      function sendAccToExt() {
+        switch (ext) {
+          case 'php':
+            if (checkFile(reqPath)) { //is active file, unsaved or git
+              const text = new PHP(activeFile.session.getValue(), {
+                path
+              }).vm.OUTPUT_BUFFER;
+              sendHTML(text, req.requestId);
+            } else {
+              const url = path + reqPath;
+              sendFileContent(url.replace('file://', ''), req.requestId, MIMETYPE_HTML, text => {
+                return new PHP(text, {
+                  path
+                }).vm.OUTPUT_BUFFER;
+              });
+            }
+            break;
+
+          case 'html':
+            if (isConsole) {
+              const doc = mustache.render($_console, {
+                CONSOLE_SCRIPT,
+                CONSOLE_STYLE,
+                ESPRISMA_SCRIPT,
+                EXECUTING_SCRIPT,
+                CODEFLASK_SCRIPT
+              });
+              sendText(doc, req.requestId, MIMETYPE_HTML);
+            } else if (checkFile(reqPath)) {
+              sendHTML(activeFile.session.getValue(), req.requestId);
+            } else {
+              sendFileContent(path + reqPath, req.requestId, MIMETYPE_HTML);
+            }
+            break;
+
+          case 'md':
+            const html = marked(activeFile.session.getValue());
+            const doc = mustache.render($_markdown, {
+              html,
+              filename,
+              MARKDOWN_STYLE
+            });
+            sendText(doc, req.requestId, MIMETYPE_HTML);
+            break;
+
+          default:
+            if (activeFile && activeFile.type === 'git') {
+              const uri = CACHE_STORAGE + activeFile.record.sha + encodeURIComponent(reqPath) + '.' + ext;
+
+              window.resolveLocalFileSystemURL(uri, () => {
+                sendFile(uri.replace('file://', ''), req.requestId);
+              }, err => {
+                if (err.code === 1) {
+                  git.getGitFile(activeFile.record, reqPath.slice(1))
+                    .then(res => {
+                      const data = helpers.b64toBlob(res, mimeType.lookup(reqPath));
+                      fs.writeFile(uri, data, true, false)
+                        .then(() => {
+                          sendFile(uri.replace('file://', ''), req.requestId);
+                        })
+                        .catch(err => {
+                          if (err.code) dialogs.alert(strings.error, helpers.getErrorMessage(err.code));
+                          console.log(err);
+                        });
                     })
                     .catch(err => {
-                      if (err.code) dialogs.alert(strings.error, helpers.getErrorMessage(err.code));
                       console.log(err);
+                      error(req.requestId);
                     });
-                })
-                .catch(err => {
-                  console.log(err);
-                  error();
-                });
+                } else {
+                  error(req.requestId);
+                }
+              });
             } else {
-              error();
+              if (path) {
+                const url = path + reqPath;
+                const file = editorManager.getFile(url, "fileUri");
+                if (file && file.isUnsaved) {
+                  sendText(file.session.getValue(), req.requestId, mimeType.lookup(file.filename));
+                } else {
+                  sendFile(url, req.requestId);
+                }
+              } else if (useExternalFs) {
+                if (!rootPath) {
+                  const storage = externalStorage.get(useExternalFs);
+                  if (storage) {
+                    rootPath = storage.path;
+                    sendExternalFile(reqPath, req.requestId);
+                  } else {
+                    externalFs.getPath(useExternalFs)
+                      .then(res => {
+                        externalStorage.savePath(useExternalFs, res);
+                        rootPath = res;
+                        sendExternalFile(reqPath, req.requestId);
+                      });
+                  }
+                } else {
+                  sendExternalFile(reqPath, req.requestId);
+                }
+              } else {
+                error(req.requestId);
+              }
             }
-          });
-        } else {
-          if (path) {
-            const url = path + reqPath;
-            const file = editorManager.getFile(url, "fileUri");
-            if (file && file.isUnsaved) {
-              sendText(file.session.getValue(), req.requestId, mimeType.lookup(file.filename));
-            } else {
-              sendFile(url.replace('file://', ''), req.requestId);
-            }
-          } else error();
+            break;
         }
       }
+    });
+  }
 
-      function error() {
-        webserver.sendResponse(req.requestId, {
-          status: 404
-        });
-      }
+  function sendExternalFile(file, id) {
+    SDcard.getPath(rootPath, relPath + file, res => {
+      sendFileContent(res, id, mimeType.lookup(file));
+    }, err => {
+      console.log(err);
+      error(id);
+    });
+  }
+
+  function error(id) {
+    webserver.sendResponse(id, {
+      status: 404
     });
   }
 
@@ -229,7 +318,11 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
    * @param {string} id 
    */
   function sendHTML(text, id) {
-    const js = `<meta name="viewport" content="width=device-width, initial-scale=1.0" /><script src="_console.js"></script><script src="_esprisma.js"></script><script src="_codeflask.js"></script><link rel="stylesheet" href="_console.css">`;
+    const js = `<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script src="${CONSOLE_SCRIPT}"></script>
+<script src="${ESPRISMA_SCRIPT}"></script>
+<script src="${CODEFLASK_SCRIPT}"></script>
+<link rel="stylesheet" href="${CONSOLE_STYLE}">`;
     text = text.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
     const part = text.split('<head>');
     if (part.length === 2) {
@@ -244,11 +337,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function sendFile(path, id) {
-    webserver.sendResponse(id, {
-      status: 200,
-      path,
-      headers: {}
-    });
+    const type = mimeType.lookup(path);
+    sendFileContent(path, id, type);
   }
 
   function sendFileContent(url, id, mime, processText) {
@@ -256,11 +346,15 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       .then(res => {
         let text = decoder.decode(res.data);
         text = processText ? processText(text) : text;
-        if (mime === HTML) {
+        if (mime === MIMETYPE_HTML) {
           sendHTML(text, id);
         } else {
           sendText(text, id, mime);
         }
+      })
+      .catch(err => {
+        console.log(err);
+        error(id);
       });
   }
 
@@ -291,7 +385,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
   function checkFile(reqPath) {
     if (!activeFile) return false;
-    return reqPath === '/' + filename && (activeFile.isUnsaved || !activeFile.location || activeFile.type === 'git');
+    return (reqPath === filename) && (activeFile.isUnsaved || !activeFile.location || activeFile.type === 'git');
   }
 }
 

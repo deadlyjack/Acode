@@ -11,7 +11,7 @@ function externalFs(uuid, uri) {
 
   if (!uuid && !uri) throw new Error("uuid or uri required");
 
-  let rootPath = uuid ? externalStorage.get(uuid).path : uri;
+  let rootPath = uuid ? (externalStorage.get(uuid) || {}).path : uri;
   const fs = {
     writeFile,
     move,
@@ -122,6 +122,12 @@ function externalFs(uuid, uri) {
 externalFs.listExternalStorages = function () {
   return new Promise((resolve, reject) => {
     SDcard.list(res => resolve(res), err => reject(err));
+  });
+};
+
+externalFs.getPath = function (uuid) {
+  return new Promise((resolve, reject) => {
+    SDcard.open(uuid, resolve, reject);
   });
 };
 

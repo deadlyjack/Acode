@@ -92,12 +92,12 @@
       "cordova-plugin-buildinfo": {},
       "cordova-plugin-webserver": {},
       "cordova-plugin-ftp": {},
-      "com.foxdebug.sdcard": {},
       "cordova-plugin-inappbrowser": {},
       "cordova.plugins.diagnostic": {
         "ANDROID_SUPPORT_VERSION": "28.+"
       },
-      "cordova-disable-http-cache": {}
+      "cordova-disable-http-cache": {},
+      "cordova-plugin-sdcard": {}
     },
     "platforms": [
       "android"

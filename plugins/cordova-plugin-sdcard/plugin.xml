@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" 
-  xmlns:android="http://schemas.android.com/apk/res/android" id="com.foxdebug.sdcard" version="0.0.1">
+  xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-sdcard" version="0.0.1">
   <name>SDcard</name>
   <description>Choose folder to get read/write access to the document tree</description>
   <license>Apache 2.0</license>
