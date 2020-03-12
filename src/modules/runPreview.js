@@ -76,7 +76,6 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   } else {
 
     if (extension === 'js' || isConsole) {
-      EXECUTING_SCRIPT = filename;
       runConsole();
     }
 
@@ -104,6 +103,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function runConsole() {
+    if (!isConsole)
+      EXECUTING_SCRIPT = activeFile.filename;
     isConsole = true;
     target = '_blank';
     filename = 'console.html';

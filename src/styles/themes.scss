@@ -100,6 +100,19 @@ $textDark : white;
 .theme-dark {
     background-color: $pageBgDark;
 
+    #github-login {
+
+        .form {
+            input {
+                margin-bottom: 15px;
+
+                &::placeholder {
+                    color: $textDark;
+                }
+            }
+        }
+    }
+
     .list,
     .scroll {
         &::-webkit-scrollbar-thumb {
