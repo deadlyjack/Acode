@@ -1,8 +1,8 @@
 version 0.0.8.82
-☞ Categorized themes into light and dark mode (thanks to biraj795)
+☞ Categorised themes into light and dark mode (thanks to biraj795)
 ☞ Fixed unable to move console toggler
 ☞ Fixed font not loading
-☞ Fixed files not loading when prevewing git Project
+☞ Fixed files not loading when previewing git Project
 
 version 0.0.8.81
 ☞ Project is now open source - https://github.com/deadlyjack/code-editor
