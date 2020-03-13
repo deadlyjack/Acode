@@ -23,6 +23,14 @@ yarn lang search
 yarn lang update
 ```
 
+## How to build
+
+In order to build the app you must have Nodejs, NPM and Apache Cordova installed on your device. Use Cordova CLI to build application.
+
+First run `npm install` to install all dependencies, then run `webpack` to build src and then run `cordova build android`.
+
+If you have installed yarn you can simply run `yarn build-run` to build the apk and run on connect android device or emulator.
+
 ## Special thanks to
 
 - [Ace editor](https://ace.c9.io/)

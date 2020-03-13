@@ -283,7 +283,7 @@ export default function Repo(owner, repoName) {
           if (action === 'folder') {
             const $nav = $navigation.lastChild;
             if ($nav) {
-              path.pop();
+              path.pop(); //BUG: somehow path is not removing on back, fix it
               $nav.remove();
             }
           }
