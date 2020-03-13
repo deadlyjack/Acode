@@ -599,14 +599,12 @@ function loaderHide() {
     const loaderDiv = document.querySelector('#__loader');
     const mask = document.querySelector('#__loader-mask');
 
-    if (!loaderDiv) return;
-
-    loaderDiv.classList.add('hide');
+    if (loaderDiv) loaderDiv.classList.add('hide');
     window.restoreTheme();
     setTimeout(() => {
         window.freeze = false;
-        loaderDiv.remove();
-        mask.remove();
+        if (loaderDiv) loaderDiv.remove();
+        if (mask) mask.remove();
     }, 300);
 }
 

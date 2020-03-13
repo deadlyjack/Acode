@@ -241,7 +241,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
                 sendFile(uri.replace('file://', ''), req.requestId);
               }, err => {
                 if (err.code === 1) {
-                  git.getGitFile(activeFile.record, reqPath.slice(1))
+                  git.getGitFile(activeFile.record, reqPath)
                     .then(res => {
                       const data = helpers.b64toBlob(res, mimeType.lookup(reqPath));
                       fs.writeFile(uri, data, true, false)
@@ -338,8 +338,13 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function sendFile(path, id) {
+    path = path.replace(/^file:\/\//, '');
     const type = mimeType.lookup(path);
-    sendFileContent(path, id, type);
+    webserver.sendResponse(id, {
+      status: 200,
+      path,
+      headers: {}
+    });
   }
 
   function sendFileContent(url, id, mime, processText) {

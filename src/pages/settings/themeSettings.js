@@ -37,8 +37,13 @@ export default function themeSettings() {
     function changeSetting() {
         const editor = editorManager.editor;
         const themeList = [];
-        constants.themeList.map(theme => {
-            themeList.push([theme, theme.replace(/_/g, ' ')]);
+        constants.themeList.dark.map(theme => {
+            themeList.push([theme, theme.replace(/_/g, ' '), 'color dark']);
+            return theme;
+        });
+        constants.themeList.light.map(theme => {
+            themeList.push([theme, theme.replace(/_/g, ' '), 'color light']);
+            return theme;
         });
         switch (this.key) {
             case 'editor':

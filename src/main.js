@@ -186,7 +186,7 @@ function Main() {
               console.log(err);
             });
 
-        }, 100);
+        }, 300);
 
       });
   }
@@ -208,6 +208,9 @@ function Main() {
 }
 
 function runApp() {
+
+  if (!window.runAppInitialized) window.runAppInitialized = true;
+  else return;
 
   app.addEventListener('click', function (e) {
     const el = e.target;
@@ -249,6 +252,8 @@ function runApp() {
 }
 
 function App() {
+  if (!window.appInitialized) window.appInitialized = true;
+  else return;
   //#region declaration
   const _search = mustache.render($_search, strings);
   const $edit = tag('span', {

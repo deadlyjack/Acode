@@ -270,6 +270,15 @@ body {
             width: 16px;
             border: solid 1px rgba($color: #999, $alpha: 0.5);
             background-color: currentColor;
+            color: inherit !important;
+        }
+
+        &.dark {
+            color: #252525;
+        }
+
+        &.light {
+            color: #ffffff;
         }
     }
 

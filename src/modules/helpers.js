@@ -568,6 +568,31 @@ function loadScript(...scripts) {
     });
 }
 
+/**
+ * Resolve the path eg.
+```js
+resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
+```
+ * @param {string} path1 
+ * @param {string} path2 
+ */
+function resolvePath(path1, path2) {
+    if (path2[0] === '/') return path2;
+    if (!path1) return path2;
+    const path1Ar = path1.split('/');
+    const path2Ar = path2.split('/');
+
+    for (let dir of path2Ar) {
+        if (dir === '..') {
+            path1Ar.pop();
+        } else {
+            path1Ar.push(dir);
+        }
+    }
+
+    return path1Ar.join('/');
+}
+
 export default {
     getExt,
     getErrorMessage,
@@ -593,5 +618,6 @@ export default {
     blob2text,
     uuid,
     resetKeyBindings,
-    loadScript
+    loadScript,
+    resolvePath
 };

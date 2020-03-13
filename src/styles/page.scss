@@ -8,6 +8,7 @@ body {
   }
 
   &.loading {
+    position: relative;
 
     &.splash {
       &::before {
@@ -23,6 +24,32 @@ body {
         height: 100vh;
         width: 100vw;
         z-index: 999999;
+      }
+
+      &::after {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        content: '';
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+        border: solid 4px $primary;
+        border-bottom: solid 4px rgba($color: #000000, $alpha: 0) !important;
+        margin: 15px auto;
+        animation: rotate 1s linear infinite;
+        z-index: 999999;
+
+        @keyframes rotate {
+          0% {
+            transform: rotate(0deg) translateZ(0);
+          }
+
+          100% {
+            transform: rotate(360deg) translateZ(0);
+          }
+        }
       }
     }
   }
