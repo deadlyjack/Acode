@@ -29,7 +29,6 @@
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^6.0.2",
     "cordova-plugin-ftp": "^1.1.1",
-    "cordova-plugin-inappbrowser": "file:../plugins/cordova-plugin-inappbrowser",
     "cordova-plugin-intent": "git+https://github.com/napolitano/cordova-plugin-intent.git",
     "cordova-plugin-ionic-keyboard": "^2.2.0",
     "cordova-plugin-navigationbar-color": "0.0.9",
@@ -47,7 +46,6 @@
     "marked": "^0.8.0",
     "mime-types": "^2.1.26",
     "mustache": "^3.1.0",
-    "tree-chooser": "file:../plugins/cordova-plugin-sdcard",
     "utf8": "^3.0.0",
     "vanilla-picker": "^2.10.1",
     "yargs": "^15.1.0"
@@ -106,5 +104,9 @@
   "bugs": {
     "url": "https://github.com/deadlyjack/acode/issues"
   },
-  "homepage": "https://github.com/deadlyjack/acode#readme"
+  "homepage": "https://github.com/deadlyjack/acode#readme",
+  "resolutions": {
+    "acorn": ">=6.4.1",
+    "minimist": ">=1.2.2"
+  }
 }
