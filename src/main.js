@@ -34,10 +34,9 @@ import $_row1 from './views/footer/row1.hbs';
 import $_row2 from './views/footer/row2.hbs';
 import $_search from './views/footer/search.hbs';
 import $_rating from './views/rating.hbs';
-import saveFile from "./modules/saveFile";
 import git from "./modules/git";
 import runPreview from "./modules/runPreview";
-import commands from "./modules/commands";
+import commands from "./commands/commands";
 import externalStorage from "./modules/externalStorage";
 import keyBindings from './keyBindings';
 //@ts-check
@@ -85,6 +84,15 @@ function Main() {
   };
   window.externalStorage = externalStorage;
   window.customKeyBindings = null;
+  window.keyBindings = name => {
+    if (customKeyBindings && name in window.customKeyBindings)
+      return window.customKeyBindings[name].key;
+    else if (name in keyBindings)
+      return keyBindings[name].key;
+    else
+      return null;
+  };
+  window.defaultKeyBindings = keyBindings;
 
   if (!('files' in localStorage)) {
     localStorage.setItem('files', '[]');
@@ -130,16 +138,7 @@ function Main() {
     if (!window.loaded) window.loaded = true;
     else return;
 
-    const url = `${cordova.file.applicationDirectory}www/lang/${appSettings.value.lang}.json`;
-
-    window.keyBindings = name => {
-      if (customKeyBindings && name in window.customKeyBindings)
-        return window.customKeyBindings[name].key;
-      else if (name in keyBindings)
-        return keyBindings[name].key;
-      else
-        return null;
-    };
+    const languageFile = `${cordova.file.applicationDirectory}www/lang/${appSettings.value.lang}.json`;
 
     fs.readFile(KEYBINDING_FILE)
       .then(res => {
@@ -159,36 +158,36 @@ function Main() {
       })
       .catch(helpers.resetKeyBindings)
       .finally(() => {
-
-        initAce();
-        const aceScript = [
-          "./res/ace/emmet-core.js",
-          "./res/ace/src/ext-language_tools.js",
-          "./res/ace/src/ext-emmet.js",
-          "./res/ace/src/ext-beautify.js",
-          "./res/ace/src/ext-modelist.js",
-          "./res/ace/src/keybinding-sublime.js"
-        ];
-        helpers.loadScript(...aceScript);
-
-        setTimeout(() => {
-
-          window.modelist = ace.require('ace/ext/modelist');
-
-          fs.readFile(url)
-            .then(res => {
-              const decoder = new TextDecoder('utf-8');
-              const text = decoder.decode(res.data);
-              window.strings = JSON.parse(text);
-              initGit();
-            })
-            .catch(err => {
-              console.log(err);
-            });
-
-        }, 300);
-
+        loadAceEditor()
+          .then(() => {
+            ace.config.set('basePath', './res/ace/src/');
+            window.modelist = ace.require('ace/ext/modelist');
+            window.AceMouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
+            return fs.readFile(languageFile);
+          })
+          .then(res => {
+            const decoder = new TextDecoder('utf-8');
+            const text = decoder.decode(res.data);
+            window.strings = JSON.parse(text);
+            initGit();
+          })
+          .catch(err => {
+            helpers.error(err);
+            console.log(err);
+          });
       });
+
+    // fs.readFile(languageFile)
+    //   .then(res => {
+    //     const decoder = new TextDecoder('utf-8');
+    //     const text = decoder.decode(res.data);
+    //     window.strings = JSON.parse(text);
+    //     initGit();
+    //   })
+    //   .catch(err => {
+    //     helpers.error(err);
+    //     console.log(err);
+    //   });
   }
 
   function initGit() {
@@ -205,6 +204,19 @@ function Main() {
         console.log(err);
       });
   }
+}
+
+function loadAceEditor() {
+  const aceScript = [
+    "./res/ace/src/ace.js",
+    "./res/ace/emmet-core.js",
+    "./res/ace/src/ext-language_tools.js",
+    "./res/ace/src/ext-emmet.js",
+    "./res/ace/src/ext-beautify.js",
+    "./res/ace/src/ext-modelist.js",
+    "./res/ace/src/keybinding-sublime.js"
+  ];
+  return helpers.loadScript(...aceScript);
 }
 
 function runApp() {
@@ -387,7 +399,7 @@ function App() {
         if (autosave) {
           saveInterval = setInterval(() => {
             editorManager.files.map(file => {
-              if (file.isUnsaved && file.location) saveFile(file, undefined, false);
+              if (file.isUnsaved && file.location) Acode.exec("save", false);
               return file;
             });
           }, autosave);

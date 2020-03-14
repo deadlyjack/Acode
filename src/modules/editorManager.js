@@ -1,12 +1,13 @@
 import list from '../components/list';
 import clipboardAction from './clipboard';
 import tag from 'html-tag-js';
-import helper from '../modules/helpers';
 import tile from "../components/tile";
 import dialogs from '../components/dialogs';
 import helpers from '../modules/helpers';
 import textControl from './events/selection';
 import constants from '../constants';
+import fsOperation from './utils/fsOperation';
+import internalFs from './utils/internalFs';
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -32,12 +33,13 @@ function EditorManager($sidebar, $header, $body) {
      * @type {import('../components/tile').Tile | HTMLElement}
      */
     let $openFileList;
-    let updateTimeout, TIMEOUT = 100,
-        updateflag = 0;
-    let counter = 0;
+    let checkTimeout = null,
+        TIMEOUT_VALUE = 300,
+        ready = false;
     const container = tag('div', {
         className: 'editor-container'
     });
+    const queue = [];
     /**
      * @type {AceAjax.Editor}
      */
@@ -81,6 +83,7 @@ function EditorManager($sidebar, $header, $body) {
             }
         }
     };
+    const SESSION_PATH = cordova.file.cacheDirectory + 'session/';
 
     /**
      * @type {Manager}
@@ -99,7 +102,8 @@ function EditorManager($sidebar, $header, $body) {
         state: 'blur',
         setSubText,
         moveOpenFileList,
-        sidebar: $sidebar
+        sidebar: $sidebar,
+        container
     };
 
     moveOpenFileList();
@@ -132,27 +136,51 @@ function EditorManager($sidebar, $header, $body) {
         }, 0);
     });
     editor.on('change', function (e) {
-        if (updateTimeout) {
-            clearTimeout(updateTimeout);
-            if (e.action === 'insert') ++updateflag;
-            else if (e.action === 'remove') --updateflag;
-        }
-        updateTimeout = setTimeout(() => {
-            if (updateflag) {
-                updateFile();
-            }
-            updateflag = 0;
-        }, TIMEOUT);
-
+        if (checkTimeout) clearTimeout(checkTimeout);
+        checkTimeout = setTimeout(checkChanges, TIMEOUT_VALUE);
     });
 
-    function updateFile() {
-        if (manager.activeFile && !manager.activeFile.isUnsaved) {
-            manager.activeFile.assocTile.classList.add('notice');
-            manager.activeFile.isUnsaved = true;
-            if (manager.activeFile)
-                manager.onupdate();
+    function checkChanges() {
+        const file = SESSION_PATH + manager.activeFile.id;
+        const text = manager.activeFile.session.getValue();
+        const activeFile = manager.activeFile;
+        if (activeFile && !activeFile.isUnsaved & activeFile.sesstionCreated) {
+            internalFs.readFile(file)
+                .then(res => {
+                    const decoder = new TextDecoder("utf-8");
+                    const old_text = decoder.decode(res.data);
+                    if (old_text !== text) {
+                        manager.activeFile.assocTile.classList.add('notice');
+                        manager.activeFile.isUnsaved = true;
+                        manager.onupdate();
+                    }
+                })
+                .finally(() => {
+                    internalFs.writeFile(file, text, true, false);
+                });
         }
+    }
+
+    window.resolveLocalFileSystemURL(SESSION_PATH, () => {
+        ready = true;
+        emptyQueue();
+    }, () => {
+        internalFs.createDir(cordova.file.cacheDirectory, 'session')
+            .then(() => {
+                ready = true;
+                emptyQueue();
+            });
+    });
+
+    function emptyQueue() {
+        if (!queue.length) return;
+
+        const {
+            filename,
+            options
+        } = queue.splice(0, 1);
+        addNewFile(filename, options);
+        emptyQueue();
     }
 
     /**
@@ -161,6 +189,13 @@ function EditorManager($sidebar, $header, $body) {
      * @param {newFileOptions} options 
      */
     function addNewFile(filename, options = {}) {
+        if (!ready) {
+            queue.push({
+                filename,
+                options
+            });
+            return;
+        }
 
         let doesExists = null;
         if (options.id) doesExists = getFile(options.id, "id");
@@ -187,19 +222,19 @@ function EditorManager($sidebar, $header, $body) {
         });
         const assocTile = tile({
             lead: tag('i', {
-                className: helper.getIconForFile(filename),
+                className: helpers.getIconForFile(filename),
             }),
             text: filename,
             tail: removeBtn
         });
-        let id = options.id || ++counter;
-        let _editable;
-        while (getFile(id, "id")) id = ++counter;
+        const text = options.text || '';
+        let id = options.id || helpers.uuid();
 
         let file = {
             id,
+            sesstionCreated: false,
             controls: false,
-            session: ace.createEditSession(options.text || ''),
+            session: ace.createEditSession(text),
             fileUri: options.fileUri,
             contentUri: options.contentUri,
             name: filename,
@@ -233,6 +268,11 @@ function EditorManager($sidebar, $header, $body) {
                 manager.onupdate();
             }
         };
+
+        internalFs.writeFile(SESSION_PATH + id, text, true, false)
+            .then(() => {
+                file.sesstionCreated = true;
+            });
 
         if (options.isUnsaved && !options.readOnly) {
             file.assocTile.classList.add('notice');
@@ -513,7 +553,7 @@ function EditorManager($sidebar, $header, $body) {
                 filename: name
             });
             this.assocTile.lead(tag('i', {
-                className: helper.getIconForFile(name),
+                className: helpers.getIconForFile(name),
                 style: {
                     paddingRight: '5px'
                 }

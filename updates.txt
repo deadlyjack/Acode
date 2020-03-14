@@ -1,3 +1,6 @@
+version 0.0.8.83
+☞ Bugs fixes
+
 version 0.0.8.82
 ☞ Categorised themes into light and dark mode (thanks to biraj795)
 ☞ Fixed unable to move console toggler

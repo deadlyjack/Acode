@@ -4,6 +4,7 @@ import dialogs from '../components/dialogs';
 import keyBindings from '../keyBindings';
 import fs from './utils/internalFs';
 import tag from 'html-tag-js';
+import ajax from './utils/ajax';
 
 /**
  * 
@@ -559,13 +560,37 @@ function resetKeyBindings() {
     fs.writeFile(KEYBINDING_FILE, JSON.stringify(customKeyBindings, undefined, 2), true, false);
 }
 
+/**
+ * 
+ * @param  {...string} scripts 
+ * @returns {Promise<void>}
+ */
 function loadScript(...scripts) {
-    scripts.map(script => {
-        const $script = tag('script', {
-            src: script
-        });
-        document.head.append($script);
+
+    return new Promise((resolve, reject) => {
+        load();
+
+        function load() {
+
+            const script = scripts.splice(0, 1);
+            ajax({
+                    url: script,
+                    responseType: 'text'
+                }).then(res => {
+                    const $script = tag('script', {
+                        id: script,
+                        textContent: res
+                    });
+                    document.head.append($script);
+                })
+                .finally(() => {
+                    if (!scripts.length) resolve();
+                    else load();
+                });
+
+        }
     });
+
 }
 
 /**

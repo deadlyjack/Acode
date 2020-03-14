@@ -1,4 +1,3 @@
-import saveFile from "../saveFile";
 import tag from 'html-tag-js';
 import searchSettings from "../../pages/settings/searchSettings";
 
@@ -53,11 +52,11 @@ function quickToolAction(e, footer, row1, row2, search) {
         case 'shift':
             state = el.getAttribute('data-state') || 'off';
             if (state === 'off') {
-                $textarea.dispatchEvent(window.createKeyboardEvent('keydown'));
+                $textarea.dispatchEvent(window.createKeyboardEvent('keydown', {}));
                 el.setAttribute('data-state', 'on');
                 el.classList.add('active');
             } else {
-                $textarea.dispatchEvent(window.createKeyboardEvent('keyup'));
+                $textarea.dispatchEvent(window.createKeyboardEvent('keyup', {}));
                 el.setAttribute('data-state', 'off');
                 el.classList.remove('active');
             }
@@ -101,7 +100,7 @@ function quickToolAction(e, footer, row1, row2, search) {
             break;
 
         case 'save':
-            saveFile(editorManager.activeFile);
+            Acode.exec("save");
             break;
 
         case 'more':

@@ -4,7 +4,7 @@ module.exports = {
   mode: 'production',
   entry: {
     main: "./src/main.js",
-    injection: "./src/injection.js"
+    injection: "./src/injection.js",
   },
   output: {
     path: path.resolve(__dirname, "www/js"),

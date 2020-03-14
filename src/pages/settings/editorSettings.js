@@ -2,10 +2,7 @@ import Page from "../../components/page";
 import gen from "../../components/gen";
 import dialogs from "../../components/dialogs";
 import constants from "../../constants";
-import tag, {
-    parse
-} from 'html-tag-js';
-import saveFile from "../../modules/saveFile";
+import tag from 'html-tag-js';
 
 export default function editorSettings() {
     const page = Page(strings['editor settings']);
@@ -94,7 +91,7 @@ export default function editorSettings() {
                             if (saveInterval) clearInterval(saveInterval);
                             saveInterval = setInterval(() => {
                                 editorManager.files.map(file => {
-                                    if (file.isUnsaved && file.location) saveFile(file, undefined, false);
+                                    if (file.isUnsaved && file.location) Acode.exec("save", false);
                                 });
                             }, res);
                         } else if (saveInterval) {

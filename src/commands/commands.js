@@ -1,20 +1,21 @@
 import tag from 'html-tag-js';
 import saveFile from "./saveFile";
+import selectword from './selectword';
 import settingsMain from '../pages/settings/mainSettings';
 import dialogs from '../components/dialogs';
-import createEditorFromURI from "./createEditorFromURI";
-import addFolder from "./addFolder";
-import helpers from "./helpers";
+import createEditorFromURI from "../modules/createEditorFromURI";
+import addFolder from "../modules/addFolder";
+import helpers from "../modules/helpers";
 import constants from "../constants";
 import FileBrowser from "../pages/fileBrowser/fileBrowser";
 import GithubLogin from "../pages/login/login";
 import gitHub from "../pages/github/gitHub";
-import runPreview from "./runPreview";
+import runPreview from "../modules/runPreview";
 import help from '../pages/help';
-import recents from './recents';
-import fsOperation from './utils/fsOperation';
+import recents from '../modules/recents';
+import fsOperation from '../modules/utils/fsOperation';
 import Modes from '../pages/modes/modes';
-import clipboardAction from './clipboard';
+import clipboardAction from '../modules/clipboard';
 
 const commands = {
   "console": function () {
@@ -91,8 +92,10 @@ const commands = {
   "open": function (page) {
     if (page === 'settings') settingsMain();
     if (page === 'help') help();
+    editorManager.editor.blur();
   },
   "open-file": function () {
+    editorManager.editor.blur();
     FileBrowser('file', function (uri) {
         const ext = helpers.getExt(uri);
 
@@ -126,6 +129,7 @@ const commands = {
       });
   },
   "open-folder": function () {
+    editorManager.editor.blur();
     FileBrowser('folder')
       .then(res => {
         return addFolder(res, editorManager.sidebar);
@@ -228,16 +232,18 @@ const commands = {
   "replace": function () {
     this.find();
   },
-  "save": function () {
-    saveFile(editorManager.activeFile);
+  "save": function (toast) {
+    saveFile(editorManager.activeFile, false, toast);
   },
-  "save-as": function () {
-    saveFile(editorManager.activeFile, true);
+  "save-as": function (toast) {
+    saveFile(editorManager.activeFile, true, toast);
   },
   "select all": function () {
     clipboardAction('select all');
   },
+  "select-word": selectword,
   "syntax": function () {
+    editorManager.editor.blur();
     Modes()
       .then(mode => {
         editorManager.activeFile.session.setMode(mode);

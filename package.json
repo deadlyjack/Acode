@@ -6,14 +6,10 @@
   "main": "index.js",
   "scripts": {
     "lang": "node ./utils/lang.js",
+    "config-build": "node ./utils/config.js",
     "build": "webpack",
-    "build-run": "webpack && cordova run android",
-    "run-android": "cordova run android",
-    "run-browser": "cordova run browser",
-    "rm-android": "cordova platform remove android",
-    "add-android": "cordova platform add android",
-    "rebuild": "cordova platform remove android && cordova platform add android && cordova run android",
-    "build-release": "webpack && cordova build android --release"
+    "build-run": "yarn config-build d && webpack && cordova run android",
+    "build-release": "yarn config-build p && webpack && cordova build android --release"
   },
   "keywords": [
     "ecosystem:cordova"

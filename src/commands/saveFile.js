@@ -1,9 +1,9 @@
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import dialogs from '../components/dialogs';
-import helpers from "./helpers";
+import helpers from "../modules/helpers";
 import constants from "../constants";
-import recents from './recents';
-import fsOperation from './utils/fsOperation';
+import recents from '../modules/recents';
+import fsOperation from '../modules/utils/fsOperation';
 
 /**
  * 

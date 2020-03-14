@@ -227,6 +227,7 @@ interface Manager {
     setSubText(file: File): void;
     moveOpenFileList(): void;
     sidebar: HTMLDivElement;
+    container: HTMLDivElement;
 }
 
 interface Strings {
@@ -288,6 +289,7 @@ declare var DATA_STORAGE: string;
 declare var CACHE_STORAGE: string;
 declare var KEYBINDING_FILE: string;
 declare var externalStorage: externalStorage;
+declare var AceMouseEvent: any;
 /**
  * A custom alert box to show alert notification
  * @param title 
