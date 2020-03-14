@@ -1,3 +1,13 @@
+version 0.0.8.86
+☞ Added japanese language (thanks to wappo56)
+
+version 0.0.8.85
+☞ Fixed key bindings
+☞ Added key binding for action "run" - F5
+☞ Added key binding for action "rename" - F2
+☞ Added key binding for selecting word - Ctrl-D
+☞ Bugs fixes
+
 version 0.0.8.84
 ☞ Bugs fixes
 

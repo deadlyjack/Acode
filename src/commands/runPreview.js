@@ -3,13 +3,13 @@ import marked from 'marked';
 import mustache from 'mustache';
 import $_console from '../views/console.hbs';
 import $_markdown from '../views/markdown.hbs';
-import fs from './utils/internalFs';
-import helpers from './helpers';
+import fs from '../modules/utils/internalFs';
+import helpers from '../modules/helpers';
 import dialogs from '../components/dialogs';
-import git from './git';
-import PHP from './php';
+import git from '../modules/git';
+import PHP from '../modules/php';
 import constants from '../constants';
-import externalFs from './utils/externalFs';
+import externalFs from '../modules/utils/externalFs';
 
 /**
  * Starts the server and run the active file in browser

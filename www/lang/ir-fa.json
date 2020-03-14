@@ -148,5 +148,7 @@
   "branch": "branch",
   "key bindings": "اتصالات کلیدی",
   "edit": "ویرایش",
-  "reset": "تنظیم مجدد"
+  "reset": "تنظیم مجدد",
+  "color": "رنگ",
+  "select word": "کلمه را انتخاب کنید"
 }

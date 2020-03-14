@@ -1,6 +1,8 @@
 import tag from 'html-tag-js';
 import saveFile from "./saveFile";
 import selectword from './selectword';
+import runPreview from "./runPreview";
+
 import settingsMain from '../pages/settings/mainSettings';
 import dialogs from '../components/dialogs';
 import createEditorFromURI from "../modules/createEditorFromURI";
@@ -10,7 +12,6 @@ import constants from "../constants";
 import FileBrowser from "../pages/fileBrowser/fileBrowser";
 import GithubLogin from "../pages/login/login";
 import gitHub from "../pages/github/gitHub";
-import runPreview from "../modules/runPreview";
 import help from '../pages/help';
 import recents from '../modules/recents';
 import fsOperation from '../modules/utils/fsOperation';
@@ -23,6 +24,9 @@ const commands = {
   },
   "copy": function () {
     clipboardAction('copy');
+  },
+  "color": function () {
+    clipboardAction("color");
   },
   "cut": function () {
     clipboardAction('cut');
@@ -232,13 +236,16 @@ const commands = {
   "replace": function () {
     this.find();
   },
+  "run": function () {
+    runPreview();
+  },
   "save": function (toast) {
     saveFile(editorManager.activeFile, false, toast);
   },
   "save-as": function (toast) {
     saveFile(editorManager.activeFile, true, toast);
   },
-  "select all": function () {
+  "select-all": function () {
     clipboardAction('select all');
   },
   "select-word": selectword,

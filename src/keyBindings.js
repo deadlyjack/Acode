@@ -2,37 +2,62 @@ export default {
   "newFile": {
     "description": "Create new file",
     "key": "Ctrl-N",
-    "readOnly": true
+    "readOnly": true,
+    "action": "new-file"
   },
   "openFile": {
     "description": "Open a file",
     "key": "Ctrl-O",
-    "readOnly": true
+    "readOnly": true,
+    "action": "open-file"
   },
   "openFolder": {
     "description": "Open a folder",
     "key": "Ctrl-Shift-O",
-    "readOnly": true
+    "readOnly": true,
+    "action": "open-folder"
   },
   "saveFile": {
     "description": "Save current file",
     "key": "Ctrl-S",
-    "readOnly": true
+    "readOnly": true,
+    "action": "save"
   },
   "saveFileAs": {
     "description": "Save as current file",
     "key": "Ctrl-Shift-S",
-    "readOnly": true
+    "readOnly": true,
+    "action": "save-as"
   },
   "nextFile": {
     "description": "Open next file tab",
     "key": "Ctrl-Tab",
-    "readOnly": true
+    "readOnly": true,
+    "action": "next-file"
   },
   "prevFile": {
     "description": "Open previous file tab",
     "key": "Ctrl-Shift-Tab",
-    "readOnly": true
+    "readOnly": true,
+    "action": "prev-file"
+  },
+  "renameFile": {
+    "description": "Rename current file",
+    "key": "F2",
+    "readOnly": true,
+    "action": "rename"
+  },
+  "run": {
+    "description": "Preview HTML, PHP and MarkDownOpen previous file tab",
+    "key": "F5",
+    "readOnly": true,
+    "action": "rename"
+  },
+  "selectWord": {
+    "description": "Open previous file tab",
+    "key": "Ctrl-D",
+    "readOnly": false,
+    "action": "select-word"
   },
   "showSettingsMenu": {
     "key": "Ctrl-,",
@@ -70,7 +95,7 @@ export default {
     "readOnly": false
   },
   "toggleFoldWidget": {
-    "key": "F2",
+    "key": null,
     "readOnly": false
   },
   "toggleParentFoldWidget": {
@@ -304,7 +329,7 @@ export default {
   },
   "removeline": {
     "description": "Remove line",
-    "key": "Ctrl-D",
+    "key": null,
     "readOnly": false
   },
   "duplicateSelection": {

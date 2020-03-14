@@ -148,5 +148,7 @@
   "branch": "branch",
   "key bindings": "键绑定",
   "edit": "编辑",
-  "reset": "重设"
+  "reset": "重设",
+  "color": "颜色",
+  "select word": "选择单词"
 }

@@ -12,13 +12,13 @@ export default {
         const editor = editorManager.editor;
         const $textarea = editor.textInput.getElement();
         const shiftKey = footer.querySelector('#shift-key').getAttribute('data-state') === 'on' ? true : false;
-
-        // if (editorManager.state === 'focus') editor.focus();
-
+        const controls = editorManager.controls;
         document.ontouchend = () => {
             this.onTouchEnd();
             document.ontouchend = null;
         };
+
+        if (!shiftKey && controls.callBeforeContextMenu) controls.callBeforeContextMenu();
 
         switch (action) {
             case 'left':

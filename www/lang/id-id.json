@@ -148,5 +148,7 @@
   "branch": "branch",
   "key bindings": "binding kunci",
   "edit": "sunting",
-  "reset": "ulang"
+  "reset": "ulang",
+  "color": "warna",
+  "select word": "Pilih kata"
 }

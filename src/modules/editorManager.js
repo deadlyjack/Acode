@@ -377,7 +377,7 @@ function EditorManager($sidebar, $header, $body) {
 
         editor.setFontSize(settings.fontSize);
         editor.setHighlightSelectedWord(true);
-        editor.setKeyboardHandler("ace/keyboard/sublime");
+        // editor.setKeyboardHandler("ace/keyboard/sublime");
         editor.setOptions({
             animatedScroll: false,
             tooltipFollowsMouse: false,

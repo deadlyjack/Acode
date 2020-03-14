@@ -35,7 +35,6 @@ import $_row2 from './views/footer/row2.hbs';
 import $_search from './views/footer/search.hbs';
 import $_rating from './views/rating.hbs';
 import git from "./modules/git";
-import runPreview from "./modules/runPreview";
 import commands from "./commands/commands";
 import externalStorage from "./modules/externalStorage";
 import keyBindings from './keyBindings';
@@ -202,8 +201,7 @@ function loadAceEditor() {
     "./res/ace/src/ext-language_tools.js",
     "./res/ace/src/ext-emmet.js",
     "./res/ace/src/ext-beautify.js",
-    "./res/ace/src/ext-modelist.js",
-    "./res/ace/src/keybinding-sublime.js"
+    "./res/ace/src/ext-modelist.js"
   ];
   return helpers.loadScript(...aceScript);
 }
@@ -305,6 +303,8 @@ function App() {
         string_cut: strings.cut,
         string_copy: strings.copy,
         string_paste: strings.paste,
+        string_color: strings.color,
+        string_selectWord: strings["select word"],
         string_selectAll: strings["select all"],
         file_mode: (editorManager.activeFile.session.getMode().$id || '').split('/').pop(),
         file_encoding: editorManager.activeFile.encoding,
@@ -320,7 +320,7 @@ function App() {
       action: 'run-file'
     },
     onclick: () => {
-      runPreview();
+      Acode.exec("run");
     },
     style: {
       fontSize: '1.2em'

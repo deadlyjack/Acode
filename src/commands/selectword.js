@@ -50,7 +50,7 @@ function selectword() {
   setTimeout(() => {
     container.append(controls.start, controls.end, $cm);
     updateControls();
-  }, 0);
+  }, 100);
 
   function touchStart(e, action) {
     const el = this;

@@ -12653,6 +12653,36 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
             },
             readOnly: true
         }, {
+            name: "renameFile",
+            description: "Rename active file",
+            bindKey: bindKey("renameFile"),
+            exec: function () {
+                if (Acode) {
+                    Acode.exec("rename");
+                }
+            },
+            readOnly: true
+        }, {
+            name: "run",
+            description: "Preview HTML, PHP and MarkDown",
+            bindKey: bindKey("run"),
+            exec: function () {
+                if (Acode) {
+                    Acode.exec("run");
+                }
+            },
+            readOnly: true
+        }, {
+            name: "selectWord",
+            description: "Select word",
+            bindKey: bindKey("selectWord"),
+            exec: function () {
+                if (Acode) {
+                    Acode.exec("select-word");
+                }
+            },
+            readOnly: true
+        }, {
             name: "goToNextError",
             description: "Go to next error",
             bindKey: bindKey("goToNextError"),

@@ -148,5 +148,7 @@
   "branch": "branch",
   "key bindings": "Key bindings",
   "edit": "edit",
-  "reset": "reset"
+  "reset": "reset",
+  "color": "color",
+  "select word": "Select word"
 }
