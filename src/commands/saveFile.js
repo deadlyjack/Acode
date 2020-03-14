@@ -157,13 +157,16 @@ function saveFile(file, as = false, showToast = true) {
         }
 
         function updateFile() {
-            file.isUnsaved = false;
-            if (showToast) window.plugins.toast.showShortBottom(strings['file saved']);
-            if (url) {
-                helpers.updateFolders(file.location);
-                recents.addFile(file.fileUri);
-            }
-            editorManager.onupdate();
+            if (window.saveTimeout) clearTimeout(window.saveTimeout);
+            window.saveTimeout = setTimeout(() => {
+                file.isUnsaved = false;
+                if (showToast) window.plugins.toast.showShortBottom(strings['file saved']);
+                if (url) {
+                    helpers.updateFolders(file.location);
+                    recents.addFile(file.fileUri);
+                }
+                editorManager.onupdate();
+            }, editorManager.TIMEOUT_VALUE + 100);
         }
     }
 
@@ -228,7 +231,7 @@ function saveFile(file, as = false, showToast = true) {
             editorManager.onupdate = () => {};
             beautify(file.session);
             editorManager.onupdate = tmp;
-            editor.gotoLine(pos.row + 1, pos.column);
+            editor.selection.moveCursorToPosition(pos);
         }
     }
 }

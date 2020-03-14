@@ -103,7 +103,8 @@ function EditorManager($sidebar, $header, $body) {
         setSubText,
         moveOpenFileList,
         sidebar: $sidebar,
-        container
+        container,
+        TIMEOUT_VALUE
     };
 
     moveOpenFileList();
@@ -174,12 +175,11 @@ function EditorManager($sidebar, $header, $body) {
 
     function emptyQueue() {
         if (!queue.length) return;
-
         const {
             filename,
             options
-        } = queue.splice(0, 1);
-        addNewFile(filename, options);
+        } = queue.splice(0, 1)[0];
+        if (filename) addNewFile(filename, options);
         emptyQueue();
     }
 
@@ -194,6 +194,7 @@ function EditorManager($sidebar, $header, $body) {
                 filename,
                 options
             });
+            console.log(queue);
             return;
         }
 

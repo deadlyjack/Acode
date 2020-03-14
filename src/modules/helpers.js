@@ -618,6 +618,19 @@ function resolvePath(path1, path2) {
     return path1Ar.join('/');
 }
 
+/**
+ * 
+ * @param {string} string 
+ */
+function parseJSON(string) {
+    if (!string) return null;
+    try {
+        return JSON.parse(string);
+    } catch (e) {
+        return null;
+    }
+}
+
 export default {
     getExt,
     getErrorMessage,
@@ -644,5 +657,6 @@ export default {
     uuid,
     resetKeyBindings,
     loadScript,
-    resolvePath
+    resolvePath,
+    parseJSON
 };

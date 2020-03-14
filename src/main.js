@@ -94,13 +94,6 @@ function Main() {
   };
   window.defaultKeyBindings = keyBindings;
 
-  if (!('files' in localStorage)) {
-    localStorage.setItem('files', '[]');
-  }
-  if (!('folders' in localStorage)) {
-    localStorage.setItem('folders', '[]');
-  }
-
   document.addEventListener("deviceready", () => {
 
     window.DATA_STORAGE = cordova.file.externalDataDirectory || cordova.file.dataDirectory;
@@ -134,6 +127,14 @@ function Main() {
   });
 
   function ondeviceready() {
+
+    if (!('files' in localStorage)) {
+      localStorage.setItem('files', '[]');
+    }
+    if (!('folders' in localStorage)) {
+      localStorage.setItem('folders', '[]');
+    }
+
 
     if (!window.loaded) window.loaded = true;
     else return;
@@ -176,18 +177,6 @@ function Main() {
             console.log(err);
           });
       });
-
-    // fs.readFile(languageFile)
-    //   .then(res => {
-    //     const decoder = new TextDecoder('utf-8');
-    //     const text = decoder.decode(res.data);
-    //     window.strings = JSON.parse(text);
-    //     initGit();
-    //   })
-    //   .catch(err => {
-    //     helpers.error(err);
-    //     console.log(err);
-    //   });
   }
 
   function initGit() {
@@ -575,11 +564,18 @@ function App() {
 
   function loadFiles() {
     return new Promise((resolve) => {
-      if ('files' in localStorage && localStorage.files !== '[]') {
+      if ('files' in localStorage) {
         /**
          * @type {storedFiles[]}
          */
-        const files = JSON.parse(localStorage.getItem('files'));
+        const files = helpers.parseJSON(localStorage.getItem('files'));
+
+        if (!files || !files.length) {
+          createDefaultFile();
+          resolve();
+          return;
+        }
+
         const lastfile = localStorage.getItem('lastfile') || files.slice(-1)[0].url;
         files.map((file, i) => {
 
@@ -663,14 +659,18 @@ function App() {
           return file;
         });
       } else {
-        editorManager.addNewFile('untitled.txt', {
-          isUnsaved: false,
-          render: true,
-          id: constants.DEFAULT_SESSION
-        });
+        createDefaultFile();
         resolve();
       }
     });
+
+    function createDefaultFile() {
+      editorManager.addNewFile('untitled.txt', {
+        isUnsaved: false,
+        render: true,
+        id: constants.DEFAULT_SESSION
+      });
+    }
   }
 
   function loadFolders() {

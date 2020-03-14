@@ -1,4 +1,4 @@
-version 0.0.8.83
+version 0.0.8.84
 ☞ Bugs fixes
 
 version 0.0.8.82
