@@ -7,6 +7,8 @@ import tile from "./tile";
  * @property {function(HTMLElement):void} addListTile
  * @property {function():void} clearList
  * @property {function(void):void} ontoggle
+ * @property {function(void):void} collasp
+ * @property {function(void):void} uncollasp
  * @property {boolean} collasped
  */
 
@@ -34,26 +36,34 @@ export default {
             tail: options.tail
         });
         const $mainWrapper = tag(options.type || 'div', {
-            className: 'list collaspable',
+            className: 'list collaspable hidden',
             children: [title, $ul]
         });
 
-        if (hidden) {
-            $mainWrapper.classList.add('hidden');
+        title.classList.add('light');
+        title.addEventListener('click', toggle);
+
+        if (!hidden) setTimeout(toggle, 0);
+
+        function toggle() {
+            if ($mainWrapper.classList.contains('hidden')) {
+                uncollasp();
+            } else {
+                collasp();
+            }
         }
 
-        title.classList.add('light');
-        title.addEventListener('click', function () {
-            if ($mainWrapper.classList.contains('hidden')) {
-                $mainWrapper.classList.remove('hidden');
-                $mainWrapper.collasped = false;
-                if ($mainWrapper.ontoggle) $mainWrapper.ontoggle(false);
-            } else {
-                $mainWrapper.classList.add('hidden');
-                $mainWrapper.collasped = true;
-                if ($mainWrapper.ontoggle) $mainWrapper.ontoggle(true);
-            }
-        });
+        function collasp() {
+            $mainWrapper.classList.add('hidden');
+            $mainWrapper.collasped = true;
+            if ($mainWrapper.ontoggle) $mainWrapper.ontoggle(true);
+        }
+
+        function uncollasp() {
+            $mainWrapper.classList.remove('hidden');
+            $mainWrapper.collasped = false;
+            if ($mainWrapper.ontoggle) $mainWrapper.ontoggle(false);
+        }
 
         function addListTile(listTile) {
             $ul.append(listTile);
@@ -73,6 +83,8 @@ export default {
         $mainWrapper.text = text;
         $mainWrapper.list = $ul;
         $mainWrapper.ontoggle = () => {};
+        $mainWrapper.collasp = collasp;
+        $mainWrapper.uncollasp = uncollasp;
 
         return $mainWrapper;
     }

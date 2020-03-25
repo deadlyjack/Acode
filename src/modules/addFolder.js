@@ -49,15 +49,39 @@ function addFolder(folder, sidebar, index) {
         title.setAttribute('url', rootUrl);
         rootNode.addEventListener('click', handleClick);
         rootNode.addEventListener('contextmenu', handleContextMenu);
+        rootNode.ontoggle = function (isCollasped) {
+            if (isCollasped) return;
+            for (let key in addedFolder) {
+                if (key === rootUrl) continue;
+                addedFolder[key].rootNode.collasp();
+            }
+
+            if (appSettings.value.openFileListPos !== 'header') {
+                editorManager.openFileList.collasp();
+            }
+        };
 
         plotFolder(rootUrl, rootNode);
         sidebar.append(rootNode);
         addedFolder[rootUrl] = {
             reload: () => plotFolder(rootUrl, rootNode),
             name,
-            remove
+            remove,
+            rootNode
         };
+        updateHeight();
         recents.addFolder(rootUrl);
+
+        function updateHeight() {
+            let totalFolder = Object.keys(addedFolder).length;
+            let activeFiles = appSettings.value.openFileListPos !== 'header';
+            totalFolder -= (totalFolder ? 1 : 0);
+            totalFolder += (activeFiles ? 1 : 0);
+            for (let key in addedFolder) {
+                addedFolder[key].rootNode.style.maxHeight = `calc(100% - ${totalFolder*30}px)`;
+                addedFolder[key].rootNode.style.height = `calc(100% - ${totalFolder*30}px)`;
+            }
+        }
 
         function plotFolder(url, rootNode) {
             rootNode.clearList();
@@ -603,6 +627,7 @@ function addFolder(folder, sidebar, index) {
                 if (url !== rootUrl) tmpFolders[url] = addedFolder[url];
             }
             addedFolder = tmpFolders;
+            updateHeight();
         }
 
     });

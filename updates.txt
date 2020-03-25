@@ -1,5 +1,10 @@
 version 0.0.8.86
-☞ Added japanese language (thanks to wappo56)
+☞ Added Japanese language (thanks to wappo56)
+☞ Reorder tabs by dragging themes
+☞ Improved UI for sidenav
+☞ Keyboard shortcut works even if editor is not focused
+☞ Improved JS console
+☞ Hide quick tools
 
 version 0.0.8.85
 ☞ Fixed key bindings

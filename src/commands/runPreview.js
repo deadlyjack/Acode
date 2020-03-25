@@ -30,7 +30,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   const decoder = new TextDecoder('utf-8');
   const CONSOLE_SCRIPT = uuid + '_console.js';
   const ESPRISMA_SCRIPT = uuid + '_esprisma.js';
-  const CODEFLASK_SCRIPT = uuid + '_codeflask.js';
+  const EDITOR_SCRIPT = uuid + '_editor.js';
   const CONSOLE_STYLE = uuid + '_console.css';
   const MARKDOWN_STYLE = uuid + '_md.css';
   const DOC_PROVIDER = "content://com.android.externalstorage.documents/document/";
@@ -161,7 +161,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
           sendFileContent(url, req.requestId, 'application/javascript');
           break;
 
-        case CODEFLASK_SCRIPT:
+        case EDITOR_SCRIPT:
           url = `${assets}/js/codeflask.min.js`;
           sendFileContent(url, req.requestId, 'application/javascript');
           break;
@@ -213,7 +213,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
                 CONSOLE_STYLE,
                 ESPRISMA_SCRIPT,
                 EXECUTING_SCRIPT,
-                CODEFLASK_SCRIPT
+                EDITOR_SCRIPT
               });
               sendText(doc, req.requestId, MIMETYPE_HTML);
             } else if (checkFile(reqPath)) {
@@ -320,9 +320,9 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
    */
   function sendHTML(text, id) {
     const js = `<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script src="${EDITOR_SCRIPT}"></script>
 <script src="${CONSOLE_SCRIPT}"></script>
 <script src="${ESPRISMA_SCRIPT}"></script>
-<script src="${CODEFLASK_SCRIPT}"></script>
 <link rel="stylesheet" href="${CONSOLE_STYLE}">`;
     text = text.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
     const part = text.split('<head>');

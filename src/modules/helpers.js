@@ -515,7 +515,6 @@ function getFeedbackBody() {
     device: ${device.model||''} <br> 
     manufacturer: ${device.manufacturer||''} ${device.isVirtual?"(Virtual)":""} <br> 
     OS: ${device.version} <br> 
-    Res: ${innerWidth}✕${innerHeight} <br>
     info:
     `;
 }
@@ -631,6 +630,18 @@ function parseJSON(string) {
     }
 }
 
+/**
+ * 
+ * @param {KeyboardEvent} e 
+ * @returns {string}
+ */
+function getCombination(e) {
+    let key = e.ctrlKey ? 'Ctrl-' : '';
+    key += e.shiftKey ? 'Shift-' : '';
+    key += e.key;
+    return key.toLowerCase();
+}
+
 export default {
     getExt,
     getErrorMessage,
@@ -658,5 +669,6 @@ export default {
     resetKeyBindings,
     loadScript,
     resolvePath,
-    parseJSON
+    parseJSON,
+    getCombination
 };

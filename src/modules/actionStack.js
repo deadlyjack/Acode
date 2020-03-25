@@ -13,6 +13,7 @@ function ActionStack() {
     }
 
     function pop() {
+        if (window.freeze) return;
         const fun = stack.pop();
         if (fun) fun.action();
         else {

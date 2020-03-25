@@ -104,7 +104,12 @@ function EditorManager($sidebar, $header, $body) {
         moveOpenFileList,
         sidebar: $sidebar,
         container,
-        TIMEOUT_VALUE
+        get TIMEOUT_VALUE() {
+            return TIMEOUT_VALUE;
+        },
+        get openFileList() {
+            return $openFileList;
+        }
     };
 
     moveOpenFileList();
@@ -287,7 +292,6 @@ function EditorManager($sidebar, $header, $body) {
             switchFile(file.id);
         });
 
-        file.assocTile.addEventListener('contextmenu', rename);
         manager.files.push(file);
 
         if (appSettings.value.openFileListPos === 'header') {
@@ -306,11 +310,6 @@ function EditorManager($sidebar, $header, $body) {
 
             const defaultFile = getFile(constants.DEFAULT_SESSION, "id");
             if (defaultFile && !defaultFile.session.getValue()) manager.removeFile(defaultFile);
-        }
-
-        function rename(e) {
-            if (e.target === removeBtn) return;
-            Acode.exec("rename", file);
         }
 
         setTimeout(() => {
@@ -388,7 +387,8 @@ function EditorManager($sidebar, $header, $body) {
             enableBasicAutocompletion: true,
             enableSnippets: true,
             enableLiveAutocompletion: true,
-            showInvisibles: settings.showSpaces
+            showInvisibles: settings.showSpaces,
+            indentedSoftWrap: false
         });
 
         if (!appSettings.value.linting && appSettings.value.linenumbers) {
@@ -410,17 +410,116 @@ function EditorManager($sidebar, $header, $body) {
 
         if (appSettings.value.openFileListPos === 'header') {
             $openFileList = tag('ul', {
-                className: 'open-file-list'
+                className: 'open-file-list',
+                ontouchstart: checkForDrag,
+                onmousedown: checkForDrag
             });
             if ($list) $openFileList.append(...$list);
             root.append($openFileList);
             root.classList.add('top-bar');
         } else {
             $openFileList = list.collaspable(strings['active files']);
+            $openFileList.ontoggle = function (isCollasped) {
+                if (isCollasped) return;
+                for (let key in addedFolder) {
+                    addedFolder[key].rootNode.collasp();
+                }
+            };
             if ($list) $openFileList.list.append(...$list);
             $sidebar.insertBefore($openFileList, $sidebar.firstElementChild);
             root.classList.remove('top-bar');
         }
+    }
+
+    /**
+     * @this {HTMLElement}
+     * @param {MouseEvent|TouchEvent} e 
+     */
+    function checkForDrag(e) {
+        /**@type {HTMLElement} */
+        const $el = e.target;
+        const $parent = this;
+        if (!$el.classList.contains('tile')) return;
+        let timeout;
+
+
+        timeout = setTimeout(() => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            const event = e => e.touches && e.touches[0] || e;
+
+            let startX = event(e).clientX;
+            let startY = event(e).clientY;
+            let prevEnd = startX;
+            let position;
+            let left = $el.offsetLeft;
+            let $placeholder = $el.cloneNode(true);
+            let classFlag = false;
+
+            $placeholder.style.opacity = '0';
+            navigator.vibrate(50);
+            document.ontouchmove = document.onmousemove = null;
+            document.addEventListener('mousemove', drag, {
+                passive: false
+            });
+            document.addEventListener('touchmove', drag, {
+                passive: false
+            });
+            document.ontouchend = document.onmouseup = document.ontouchcancel = document.onmouseleave = function (e) {
+                $el.classList.remove('select');
+                $el.style.removeProperty('transform');
+                document.removeEventListener('mousemove', drag, {
+                    passive: false
+                });
+                document.removeEventListener('touchmove', drag, {
+                    passive: false
+                });
+                document.ontouchend = document.onmouseup = null;
+
+                $parent.replaceChild($el, $placeholder);
+            };
+
+            function drag(e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                const end = event(e).clientX;
+
+                position = (prevEnd - end) > 0 ? 'l' : 'r';
+                prevEnd = end;
+                const move = end - startX;
+                const $newEl = document.elementFromPoint(end, startY);
+
+                $el.style.transform = `translate3d(${left+move}px, 0, 0)`;
+                if (!classFlag) {
+                    $el.classList.add('select');
+                    $parent.insertBefore($placeholder, $el);
+                    classFlag = true;
+                }
+                if ($newEl.classList.contains('tile') && $el !== $newEl && $parent.contains($newEl)) {
+                    if (position === 'r') {
+                        if ($newEl.nextElementSibling) {
+                            $parent.insertBefore($placeholder, $newEl.nextElementSibling);
+                        } else {
+                            $parent.append($placeholder);
+                        }
+                    } else {
+                        $parent.insertBefore($placeholder, $newEl);
+                    }
+                }
+
+            }
+
+        }, 300);
+
+
+        document.ontouchend = document.onmouseup = document.ontouchmove = document.onmousemove = function (e) {
+            document.ontouchend = document.onmouseup = document.ontouchmove = document.onmousemove = null;
+            if (timeout) clearTimeout(timeout);
+        };
     }
 
     function setupSession(file) {

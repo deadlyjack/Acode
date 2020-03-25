@@ -129,9 +129,14 @@ div.page {
     >header {
       margin-bottom: 30px;
     }
+
+    main {
+      height: calc(100vh - #{$headerHeight + 30}) !important;
+      min-height: calc(100vh - #{$headerHeight + 30}) !important;
+    }
   }
 
-  &.twostories {
+  &[footer-height='2'] {
 
     &.top-bar {
       main {
@@ -146,7 +151,7 @@ div.page {
     }
   }
 
-  &.threestories {
+  &[footer-height='3'] {
 
     &.top-bar {
       main {
@@ -203,6 +208,27 @@ div.page {
   }
 }
 
+.page,
+#root {
+  &[footer-height='1'] {
+
+    &.top-bar {
+
+      >main,
+      >.main {
+        height: calc(100vh - #{$footerHeight + $headerHeight + 30}) !important;
+        min-height: calc(100vh - #{$footerHeight + $headerHeight + 30}) !important;
+      }
+    }
+
+    >main,
+    >.main {
+      height: calc(100vh - #{$footerHeight + $headerHeight}) !important;
+      min-height: calc(100vh - #{$footerHeight + $headerHeight}) !important;
+    }
+  }
+}
+
 .page {
   height: 100%;
   width: 100%;
@@ -223,24 +249,6 @@ div.page {
 
   .editor-container {
     height: 100%;
-  }
-
-  &.bottom-bar {
-
-    &.top-bar {
-
-      >main,
-      >.main {
-        height: calc(100vh - #{$footerHeight + $headerHeight + 30});
-        min-height: calc(100vh - #{$footerHeight + $headerHeight + 30});
-      }
-    }
-
-    >main,
-    >.main {
-      height: calc(100vh - #{$footerHeight + $headerHeight});
-      min-height: calc(100vh - #{$footerHeight + $headerHeight});
-    }
   }
 }
 

@@ -25,19 +25,16 @@ import constants from "./constants";
 import HandleIntent from "./modules/handleIntent";
 import createEditorFromURI from "./modules/createEditorFromURI";
 import addFolder from "./modules/addFolder";
-import quickToolAction from "./modules/events/quicktools";
 import arrowkeys from "./modules/events/arrowkeys";
 
 import $_menu from './views/menu.hbs';
 import $_fileMenu from './views/file-menu.hbs';
-import $_row1 from './views/footer/row1.hbs';
-import $_row2 from './views/footer/row2.hbs';
-import $_search from './views/footer/search.hbs';
 import $_rating from './views/rating.hbs';
 import git from "./modules/git";
 import commands from "./commands/commands";
 import externalStorage from "./modules/externalStorage";
 import keyBindings from './keyBindings';
+import handleQuickTools from "./modules/handleQuickTools";
 //@ts-check
 
 window.onload = Main;
@@ -83,15 +80,15 @@ function Main() {
   };
   window.externalStorage = externalStorage;
   window.customKeyBindings = null;
+  window.defaultKeyBindings = keyBindings;
   window.keyBindings = name => {
     if (customKeyBindings && name in window.customKeyBindings)
       return window.customKeyBindings[name].key;
-    else if (name in keyBindings)
-      return keyBindings[name].key;
+    else if (name in defaultKeyBindings)
+      return defaultKeyBindings[name].key;
     else
       return null;
   };
-  window.defaultKeyBindings = keyBindings;
 
   document.addEventListener("deviceready", () => {
 
@@ -239,22 +236,16 @@ function runApp() {
   };
 
   window.Acode = Acode;
-  document.addEventListener('backbutton', backButton);
+  document.addEventListener('backbutton', actionStack.pop);
   window.beautify = ace.require("ace/ext/beautify").beautify;
 
   new App();
-
-  function backButton() {
-    if (window.freeze) return;
-    actionStack.pop();
-  }
 }
 
 function App() {
   if (!window.appInitialized) window.appInitialized = true;
   else return;
   //#region declaration
-  const _search = mustache.render($_search, strings);
   const $edit = tag('span', {
     className: 'icon edit',
     attr: {
@@ -281,8 +272,9 @@ function App() {
     tail: $menuToggler
   });
   const $footer = tag('footer', {
-    innerHTML: mustache.render($_row1, strings),
-    tabIndex: -1
+    id: "quick-tools",
+    tabIndex: -1,
+    onclick: handleQuickTools.clickListener
   });
   const $mainMenu = contextMenu(mustache.render($_menu, strings), {
     top: '6px',
@@ -306,9 +298,11 @@ function App() {
         string_color: strings.color,
         string_selectWord: strings["select word"],
         string_selectAll: strings["select all"],
+        string_quickTools: strings["quick tools"],
         file_mode: (editorManager.activeFile.session.getMode().$id || '').split('/').pop(),
         file_encoding: editorManager.activeFile.encoding,
-        file_readOnly: editorManager.activeFile.editable ? strings.no : strings.yes
+        file_readOnly: editorManager.activeFile.editable ? strings.no : strings.yes,
+        setting_quickTools: appSettings.value.quickTools
       });
     }
   });
@@ -331,13 +325,14 @@ function App() {
     saveAs: $mainMenu.querySelector('[action="save-as"]'),
     goto: $mainMenu.querySelector('[action=goto]')
   };
+  const actions = ["saveFile", "saveFileAs", "newFile", "nextFile", "prevFile", "openFile", "run", "find", "replace"];
+  let registredKey = '';
 
   $sidebar.setAttribute('empty-msg', strings['open folder']);
   window.editorManager = EditorManager($sidebar, $header, $main);
   const editor = editorManager.editor;
   //#endregion
 
-  //#region initialization
   window.restoreTheme();
   $main.setAttribute("data-empty-msg", strings['no editor message']);
 
@@ -347,19 +342,23 @@ function App() {
     const html = $_rating;
     dialogs.box('Did you like the app?', html, onInteract, onhide, strings.cancel);
 
+  } else {
+    localStorage.count = ++count;
   }
-  //#endregion
 
   //#region rendering
   $header.classList.add('light');
-  root.append($header, $main);
+  root.append($header, $main, $footer);
   //#endregion
 
   $fileMenu.addEventListener('click', handleMenu);
   $mainMenu.addEventListener('click', handleMenu);
-  $footer.addEventListener('click', handleFooter);
   $footer.addEventListener('touchstart', footerTouchStart);
   $footer.addEventListener('contextmenu', footerOnContextMenu);
+  document.addEventListener('keydown', handleMainKeyDown);
+  document.addEventListener('keyup', handleMainKeyUp);
+
+  if (appSettings.value.quickTools) handleQuickTools.actions("enable-quick-tools");
   window.beforeClose = saveState;
 
   setTimeout(() => {
@@ -403,40 +402,28 @@ function App() {
     const activeFile = this.activeFile;
     const $save = $footer.querySelector('[action=save]');
 
-    if (!$footer.parentElement && activeFile) {
-      root.classList.add('bottom-bar');
-      root.append($footer);
-    }
-
     if (!$edit.isConnected) {
       $header.insertBefore($edit, $header.lastChild);
     }
 
-    if (!activeFile) {
-      fileOptions.save.classList.add('disabled');
-      fileOptions.saveAs.classList.add('disabled');
-      fileOptions.goto.classList.add('disabled');
-      root.classList.remove('bottom-bar');
-      $footer.remove();
-      $runBtn.remove();
-    } else if (activeFile) {
+    if (activeFile) {
       fileOptions.saveAs.classList.remove('disabled');
       fileOptions.goto.classList.remove('disabled');
 
       if (!activeFile.readOnly) {
         fileOptions.save.classList.remove('disabled');
-        $save.classList.remove('disabled');
+        if ($save) $save.classList.remove('disabled');
       } else {
         fileOptions.save.classList.add('disabled');
-        $save.classList.add('disabled');
+        if ($save) $save.classList.add('disabled');
       }
 
       if (activeFile.isUnsaved) {
         activeFile.assocTile.classList.add('notice');
-        $save.classList.add('notice');
+        if ($save) $save.classList.add('notice');
       } else {
         activeFile.assocTile.classList.remove('notice');
-        $save.classList.remove('notice');
+        if ($save) $save.classList.remove('notice');
       }
 
       this.editor.setReadOnly(!activeFile.editable);
@@ -462,6 +449,47 @@ function App() {
     const activeFile = editorManager.activeFile;
     if (activeFile) editor.blur();
   };
+
+  /**
+   * 
+   * @param {KeyboardEvent} e 
+   */
+  function handleMainKeyDown(e) {
+    registredKey = helpers.getCombination(e);
+    if (registredKey === 'escape') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      e.stopPropagation();
+    }
+  }
+
+  /**
+   * 
+   * @param {KeyboardEvent} e 
+   */
+  function handleMainKeyUp(e) {
+    let key = helpers.getCombination(e);
+    if (key !== registredKey) return;
+
+    if (key === 'escape') {
+      if (actionStack.length) actionStack.pop();
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      e.stopPropagation();
+      return;
+    }
+
+    if (actionStack.length || editorManager.editor.isFocused()) return;
+    for (let name in keyBindings) {
+      const obj = keyBindings[name];
+      const binding = (obj.key || '').toLowerCase();
+      if (
+        binding === key &&
+        actions.includes(name) &&
+        'action' in obj
+      ) Acode.exec(obj.action);
+    }
+  }
 
   function onInteract(e) {
     /**
@@ -489,8 +517,7 @@ function App() {
   }
 
   function onhide() {
-    const count = localStorage.count;
-    if (count < 4) localStorage.count = -3;
+    localStorage.count = -3;
   }
 
   function saveState() {
@@ -779,14 +806,6 @@ function App() {
     Acode.exec(action, value);
   }
 
-  /**
-   * 
-   * @param {MouseEvent} e 
-   */
-  function handleFooter(e) {
-    quickToolAction(e, $footer, $_row1, $_row2, _search);
-  }
-
   function footerTouchStart(e) {
     arrowkeys.onTouchStart(e, $footer);
   }
@@ -796,6 +815,7 @@ function App() {
    * @param {MouseEvent} e 
    */
   function footerOnContextMenu(e) {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
     e.preventDefault();
     editor.focus();
   }

@@ -115,7 +115,7 @@ function FileBrowser(type = 'file', option = null) {
                 ]
             });
 
-            $page.classList.add('bottom-bar');
+            $page.setAttribute('footer-height', 1);
             $page.append(folderOption);
 
             openFolder.onclick = () => {

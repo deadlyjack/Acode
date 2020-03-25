@@ -1,4 +1,12 @@
+import "core-js/stable";
 (function () {
+
+    if (!HTMLElement.prototype.append) {
+        HTMLElement.prototype.append = function (...node) {
+            for (let el of node) this.appendChild(el);
+        };
+    }
+
     if (window.consoleLoaded) return;
     const inputContainer = document.createElement('c-input');
     const input = document.createElement('div');
@@ -10,8 +18,8 @@
         '>': '&gt;'
     };
     let isFocused = false;
-    let flag;
-    let flask;
+    let flag, flask;
+    const _console = console;
 
     input.id = '__c-input';
     inputContainer.appendChild(input);
@@ -52,12 +60,16 @@
         const el = e.target;
         const action = el.getAttribute('action');
 
+        switch (action) {
+            case 'use code':
+                const value = el.getAttribute('data-code');
 
-        if (action === 'use code') {
-            const value = el.getAttribute('data-code');
+                flask.updateCode(value);
+                flask.elTextarea.focus();
+                break;
 
-            flask.updateCode(value);
-            flask.elTextarea.focus();
+            default:
+                break;
         }
     };
 
@@ -128,62 +140,94 @@
                 flask = new CodeFlask('#__c-input', {
                     language: 'js'
                 });
-                /**
-                 * @type {HTMLTextAreaElement}
-                 */
-                const editor = flask.elTextarea;
-                if (editor) {
-                    editor.addEventListener('keydown', function (e) {
-                        const key = e.keyCode || e.which;
-                        isFocused = true;
-                        if (key === 13) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            e.stopImmediatePropagation();
-                            const regex = /[\[|{\(\)\}\]]/g;
-                            let code = this.value.trim();
-                            let isOdd = (code.length - code.replace(regex, '').length) % 2;
-                            const $code = document.createElement('c-code');
+                const input = flask.elTextarea;
+                input.addEventListener('keydown', function (e) {
+                    const key = e.keyCode || e.which;
+                    isFocused = true;
+                    if (key === 13) {
+                        const regex = /[\[|{\(\)\}\]]/g;
+                        let code = this.value.trim();
+                        let isOdd = (code.length - code.replace(regex, '').length) % 2;
 
-                            const curPos = this.selectionStart;
-                            const char = code.substr(curPos - 1, 1);
-                            if (char === '\n' || char === '\r') {
-                                code = code.substr(0, curPos - 1) + code.substr(curPos);
-                            }
+                        if (!code || isOdd) return;
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
 
-                            $code.textContent = code.length > 50 ? code.substr(0, 50) + '...' : code;
-                            $code.setAttribute('data-code', code);
-                            $code.setAttribute('action', 'use code');
-                            if (!code || isOdd) return;
-                            flask.updateCode('');
-                            console.log(errId + 'code', $code.outerHTML);
-                            execute(code);
-                        }
-                    });
-                }
+                        const $code = document.createElement('c-code');
+
+                        // const curPos = this.selectionStart;
+                        // const char = code.substr(curPos - 1, 1);
+                        // if (char === '\n' || char === '\r') {
+                        //     code = code.substr(0, curPos - 1) + code.substr(curPos);
+                        // }
+
+                        $code.textContent = code.length > 50 ? code.substr(0, 50) + '...' : code;
+                        $code.setAttribute('data-code', code);
+                        $code.setAttribute('action', 'use code');
+                        flask.updateCode('');
+                        console.log(errId + 'code', $code.outerHTML);
+                        execute(code);
+                    }
+                });
                 flag = true;
             }
         }
     }
 
     function getBody(obj) {
-        let data = '';
 
-        if (typeof obj === 'object') {
+        const toggler = document.createElement('c-type');
+        const group = document.createElement('c-group');
+
+        toggler.onclick = function () {
+            // let data = '';
+            if (this.classList.contains("__show-data")) {
+                this.classList.remove("__show-data");
+                group.textContent = null;
+                return;
+            }
+
+            this.classList.toggle("__show-data");
+
+            let keys = [...Object.keys(obj), ...Object.getOwnPropertyNames(obj), "__proto__", "prototype"];
+            keys = [...new Set(keys)];
+
             for (let key in obj) {
+                if (!keys.includes(key)) append(key);
+            }
+            for (let key of keys) {
+                append(key);
+            }
+
+            function append(key, isProto) {
+                if (!(key in obj)) return;
                 let val = obj[key];
+                const $key = document.createElement('c-key');
                 const type = typeof val;
                 const $val = getElement(type);
-                if (type === 'function') {
-                    val = parseFuntion(val);
-                } else if (type === 'object' && val !== null) {
-                    val = val.constructor.name;
+                if (type === 'object' && val !== null) {
+                    $val.append(...getBody(val));
+                } else {
+                    if (type === 'function') {
+                        val = parseFuntion(val);
+                    }
+                    $val.textContent = escapeHTML(val + '');
                 }
 
-                $val.textContent = escapeHTML(val + '');
-                data += `<c-key>${key}</c-key>: ${$val.outerHTML}<br>`;
+                $key.textContent = key + ':';
+                if (isProto) $key.setAttribute("type", "proto");
+                const $line = document.createElement('c-line');
+                $line.append($key, $val);
+                group.append($line);
             }
-        }
+        };
+        toggler.setAttribute("type", "body-toggler");
+        toggler.textContent = obj.constructor && obj.constructor.name || 'Object';
+
+        return [toggler, group];
+
+        // return `<c-type action="toggle-body" class="__show-data">${type}</c-type><c-group>${data}</c-group>`;
 
         function replaceTag(tag) {
             return tagsToReplace[tag] || tag;
@@ -193,8 +237,6 @@
             if (!str) return;
             return str.replace(/[&<>]/g, replaceTag);
         }
-
-        return data;
     }
 
     function getElement(type) {
@@ -270,6 +312,8 @@
 
     function log() {
 
+        _console.log(...arguments);
+
         let clean = null;
         let error = null;
         let args = Object.values(arguments);
@@ -320,7 +364,7 @@
 
         for (let arg of args) {
             const type = typeof arg;
-            let msg;
+            let msg, extras;
             if (mode === 'code') {
                 messages.innerHTML = arg;
             } else if (type !== 'object' || arg === null) {
@@ -337,8 +381,9 @@
 
                 msg = getElement(type);
                 if (type === 'function') {
+                    const fun = arg;
                     arg = parseFuntion(arg);
-                    arg += getBody(arg);
+                    extras = getBody(fun);
                 }
 
                 const valid = (['code', 'console'].indexOf(args[0]) > -1) ? args.length > 2 : args.length > 1;
@@ -358,15 +403,17 @@
                 if (qoutes && type === 'string')
                     msg.classList.add(qoutes);
 
+                if (extras) {
+                    const $line = document.createElement('c-line');
+                    $line.append(...extras);
+                    msg.append($line);
+                }
+
             } else {
                 if (flag) flag = false;
-                let type;
                 let body = getBody(arg);
-                if (arg.constructor) {
-                    type = arg.constructor.name;
-                }
                 msg = document.createElement('c-text');
-                msg.innerHTML = `<c-type>${type}</c-type>` + body;
+                msg.append(...body);
             }
             if (msg) messages.appendChild(msg);
         }
@@ -385,6 +432,7 @@
     }
 
     function error() {
+        _console.error(...arguments);
         if (arguments.length === 0) return;
         const error = arguments[0];
         if (arguments[0] instanceof Error || arguments[0] instanceof ErrorEvent) {
@@ -429,35 +477,40 @@
     };
 
     function execute(code) {
-        const parsed = (function () {
-            try {
-                return esprima.parse(code, {
-                    range: true
-                }).body;
-            } catch (e) {
-                return [];
-            }
-        })();
-        let extra = '';
-        parsed.map(st => {
-            if (st.type === "VariableDeclaration") {
-                if (['const', 'let'].indexOf(st.kind) < 0) return;
 
-                const range = st.range;
-                const excode = code.substring(range[0], range[1]) + ';';
-                extra += excode;
-            }
-            return st;
-        });
+        try {
+            const parsed = esprima.parse(code, {
+                range: true
+            }).body;
+            doStuff(parsed);
+        } catch (e) {
 
-        if (extra) {
-            const script = document.createElement('script');
-            script.textContent = extra;
-            document.body.appendChild(script);
-            document.body.removeChild(script);
-            exec(code);
-        } else {
-            exec(code);
+            doStuff([]);
+
+        }
+
+        function doStuff(parsed) {
+            let extra = '';
+            parsed.map(st => {
+                if (st.type === "VariableDeclaration") {
+                    if (['const', 'let'].indexOf(st.kind) < 0) return;
+
+                    const range = st.range;
+                    const excode = code.substring(range[0], range[1]) + ';';
+                    extra += excode;
+                }
+                return st;
+            });
+
+            if (extra) {
+                const script = document.createElement('script');
+                script.textContent = extra;
+                document.body.appendChild(script);
+                document.body.removeChild(script);
+                exec(code);
+            } else {
+                exec(code);
+            }
         }
 
         function exec(code) {

@@ -41,6 +41,12 @@ header {
     padding: 0 5px;
     box-sizing: border-box;
 
+    &.select {
+        pointer-events: none;
+        border: solid 2px gold;
+        background-color: inherit !important;
+    }
+
     &:disabled,
     &.disabled {
         opacity: 0.6;

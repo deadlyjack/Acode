@@ -12,6 +12,8 @@ import fs from '../../modules/utils/internalFs';
 export default function GithubLogin() {
   const $page = Page('Github Login');
   const $content = tag.parse(mustache.render(_template, strings));
+  /**@type {HTMLFormElement} */
+  const $form = $content.get('.form');
   const $username = $content.get("#username");
   const $password = $content.get("#password");
   const $token = $content.get("#token");
@@ -20,7 +22,8 @@ export default function GithubLogin() {
 
   $page.append($content);
 
-  $content.addEventListener('click', handelClick);
+  $content.onclick = handelClick;
+  $form.onsubmit = storeCredentials;
 
   actionStack.push({
     id: 'github login',
@@ -48,18 +51,10 @@ export default function GithubLogin() {
     const $el = e.target;
 
     if ($el instanceof HTMLInputElement) $errorMsg.textContent = '';
-
-    const action = $el.getAttribute('action');
-    if (!action) return;
-
-    switch (action) {
-      case 'login':
-        storeCredentials();
-        break;
-    }
   }
 
-  function storeCredentials() {
+  function storeCredentials(e) {
+    e.preventDefault();
     let token = $token.value;
     let username = $username.value;
     let password = $password.value;

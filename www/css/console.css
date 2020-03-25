@@ -20,6 +20,10 @@ c-toggler:active {
     box-shadow: -1px 1px 4px rgba(0, 0, 0, .4)
 }
 
+c-line {
+    display: block;
+}
+
 c-console {
     box-sizing: border-box;
     padding-top: 65px;
@@ -34,6 +38,10 @@ c-console {
     animation: --page-transition .1s ease 1;
     color: #eee;
     font-family: "Roboto", sans-serif;
+}
+
+c-console br:last-of-type {
+    display: none;
 }
 
 c-console .codeflask,
@@ -66,7 +74,7 @@ c-input::before {
 
 c-console .codeflask__code,
 c-console .codeflask__flatten {
-    font-family: "Roboto", sans-serif !important;
+    font-family: 'Courier New', Courier, monospace;
     padding: 0 !important;
     font-size: 1rem !important;
 }
@@ -96,6 +104,7 @@ c-console::before {
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
     margin-bottom: 10px;
     color: white;
+    font-size: medium;
 }
 
 c-message {
@@ -103,17 +112,8 @@ c-message {
     display: flex;
     border-bottom: solid 1px rgba(204, 204, 204, 0.4);
     margin-bottom: 35px;
-    font-size: .9em;
+    font-size: .9rem;
     flex-wrap: wrap;
-}
-
-c-type {
-    display: block;
-    background-color: #aaa;
-    font-style: italic;
-    padding: 6px;
-    border-radius: 4px;
-    font-size: 0.8em;
 }
 
 c-code {
@@ -130,8 +130,8 @@ c-code::after {
     background-color: #666;
     color: inherit;
     border-radius: 4px;
-    padding: 0 0.4em;
-    font-size: 0.6em;
+    padding: 0 0.4rem;
+    font-size: 0.6rem;
 }
 
 c-code::before {
@@ -141,7 +141,7 @@ c-code::before {
 }
 
 c-key {
-    font-size: 0.9em;
+    font-size: 0.9rem;
     color: #c6f;
 }
 
@@ -170,7 +170,7 @@ c-stack:not(:empty) {
     background-color: inherit;
     padding: 0 5px;
     box-sizing: border-box;
-    font-size: .8em;
+    font-size: .8rem;
     color: inherit;
 }
 
@@ -181,7 +181,9 @@ c-text {
     overflow: auto;
     box-sizing: border-box;
     max-width: 100vw;
-    font-size: 0.9em;
+    font-size: 0.9rem;
+    width: 100%;
+    padding-left: 10px;
 }
 
 c-text.__c-boolean {
@@ -199,7 +201,7 @@ c-text.__c-symbol {
 c-text.__c-function {
     color: rgb(145, 136, 168);
     font-family: 'Courier New', Courier, monospace;
-    font-size: 0.9em;
+    font-size: 0.9rem;
 }
 
 c-text.__c-function::before {
@@ -232,6 +234,33 @@ c-message.error c-text {
     white-space: pre-wrap;
     word-break: break-word;
     color: white;
+}
+
+c-group {
+    display: none;
+    margin-left: 14px;
+}
+
+c-type[type="body-toggler"].__show-data+c-group {
+    display: block;
+}
+
+c-type[type="body-toggler"]::before {
+    display: inline-block;
+    content: '▸';
+    margin-right: 2.5px;
+}
+
+c-type[type="body-toggler"]::after {
+    content: '{...}';
+}
+
+c-type[type="body-toggler"].__show-data::before {
+    content: '▾';
+}
+
+c-type[type="body-toggler"].__show-data::after {
+    display: none;
 }
 
 @keyframes --page-transition {

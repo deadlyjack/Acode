@@ -2,8 +2,6 @@ import tag from 'html-tag-js';
 
 import Page from "../components/page";
 import gen from "../components/gen";
-import iconDef from "./iconDef";
-import qnaSection from "./qnaSection";
 import helpers from '../modules/helpers';
 
 export default function help(opts) {
@@ -21,45 +19,22 @@ export default function help(opts) {
     };
 
     const settingsOptions = [{
-            key: 'icons',
-            text: strings['icons definition'],
-            icon: 'apps'
-        },
-        {
-            key: 'qa',
-            text: strings['qa section'],
-            icon: 'chat_bubble'
-        },
-        {
-            key: 'Q8',
-            text: strings.Q8,
+            key: 'feedback',
+            text: 'Feedback',
             type: 'a',
             href: 'mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=' + helpers.getFeedbackBody()
         },
         {
-            key: 'Q7',
-            text: strings.Q7,
+            key: 'help',
+            text: strings.help,
             type: 'a',
-            href: 'https://telegram.me/joinchat/LbomMBLApFc6fvvdPQMm6w',
+            href: 'https://t.me/foxdebug_acode',
         }
     ];
 
     gen.listItems(options, settingsOptions, changeSetting);
 
-    function changeSetting() {
-        switch (this.key) {
-            case 'icons':
-                iconDef(opts);
-                break;
-
-            case 'qa':
-                qnaSection();
-                break;
-
-            default:
-                break;
-        }
-    }
+    function changeSetting() {}
 
     page.append(options);
     document.body.append(page);

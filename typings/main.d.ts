@@ -36,6 +36,7 @@ interface Settings {
     previewMode: 'browser' | 'in app' | 'none';
     showSpaces: boolean;
     openFileListPos: 'sidebar' | 'header';
+    quickTools: Boolean;
 }
 
 interface AppSettings {
@@ -228,6 +229,8 @@ interface Manager {
     moveOpenFileList(): void;
     sidebar: HTMLDivElement;
     container: HTMLDivElement;
+    readonly TIMEOUT_VALUE: number;
+    readonly openFileList: HTMLElement;
 }
 
 interface Strings {

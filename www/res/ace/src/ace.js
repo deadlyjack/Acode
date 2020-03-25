@@ -13191,13 +13191,6 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
             scrollIntoView: "animate",
             readOnly: true
         }, {
-            name: "passKeysToBrowser",
-            description: "Pass keys to browser",
-            bindKey: bindKey("passKeysToBrowser"),
-            exec: function () {},
-            passEvent: true,
-            readOnly: true
-        }, {
             name: "copy",
             description: "Copy",
             exec: function (editor) {},

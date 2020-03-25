@@ -50,12 +50,12 @@ class Settings {
             tabSize: 2,
             linenumbers: true,
             beautify: ['*'],
-            compileSCSS: false,
             linting: false,
             autoCorrect: true,
             previewMode: 'none',
             showSpaces: false,
-            openFileListPos: 'header'
+            openFileListPos: 'header',
+            quickTools: true
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;
@@ -77,31 +77,17 @@ class Settings {
             }, 1000);
         };
 
-        if ('globalSettings' in localStorage) {
-            try {
-                const savedSettings = JSON.parse(localStorage.getItem('globalSettings'));
-                localStorage.removeItem('globalSettings');
-
-                if (!Array.isArray(savedSettings.beautify)) savedSettings.beautify = ['*'];
-                this.value = savedSettings;
+        fs.readFile(this.settingsFile)
+            .then((res) => {
+                const decoder = new TextDecoder();
+                const settings = JSON.parse(decoder.decode(res.data));
+                if (!Array.isArray(settings.beautify)) savedSettings.beautify = ['*'];
+                for (let setting in this.defaultSettings)
+                    if (!(setting in settings)) settings[setting] = this.defaultSettings[setting];
+                this.value = settings;
                 this.loaded = true;
-                this.checkSettings();
-                this.update();
-            } catch (error) {
-                this.reset();
-            }
-        } else {
-            fs.readFile(this.settingsFile)
-                .then((res) => {
-                    const decoder = new TextDecoder();
-                    const settings = JSON.parse(decoder.decode(res.data));
-                    if (!Array.isArray(settings.beautify)) savedSettings.beautify = ['*'];
-                    this.value = settings;
-                    this.checkSettings();
-                    this.loaded = true;
-                    if (this.onload) this.onload();
-                }).catch(save);
-        }
+                if (this.onload) this.onload();
+            }).catch(save);
     }
     update(showToast = true) {
         fs.writeFile(this.settingsFile, JSON.stringify(this.value), true, false)
@@ -118,18 +104,6 @@ class Settings {
     reset() {
         this.value = this.defaultSettings;
         this.update(false);
-    }
-
-    checkSettings() {
-        let falg = false;
-        for (let key in this.defaultSettings) {
-            if (!(key in this.value)) {
-                this.value[key] = this.defaultSettings[key];
-                falg = true;
-            }
-        }
-        if (falg)
-            this.update();
     }
 }
 

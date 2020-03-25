@@ -17,6 +17,7 @@ import recents from '../modules/recents';
 import fsOperation from '../modules/utils/fsOperation';
 import Modes from '../pages/modes/modes';
 import clipboardAction from '../modules/clipboard';
+import handleQuickTools from '../modules/handleQuickTools';
 
 const commands = {
   "console": function () {
@@ -47,8 +48,7 @@ const commands = {
       });
   },
   "find": function () {
-    const $find = tag.get('#find-tool');
-    if ($find) $find.click();
+    handleQuickTools.actions('search');
   },
   "github": function () {
     if ((!localStorage.username || !localStorage.password) && !localStorage.token)
@@ -255,6 +255,9 @@ const commands = {
       .then(mode => {
         editorManager.activeFile.session.setMode(mode);
       });
+  },
+  "toggle-quick-tools": function () {
+    handleQuickTools.actions("toggle-quick-tools");
   }
 };
 

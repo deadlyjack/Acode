@@ -50,7 +50,7 @@ export default {
   "run": {
     "description": "Preview HTML, PHP and MarkDownOpen previous file tab",
     "key": "F5",
-    "readOnly": true,
+    "readOnly": false,
     "action": "rename"
   },
   "selectWord": {
@@ -61,15 +61,18 @@ export default {
   },
   "showSettingsMenu": {
     "key": "Ctrl-,",
-    "readOnly": true
+    "description": "Show settings menu",
+    "readOnly": false
   },
   "goToNextError": {
     "key": "Alt-E",
-    "readOnly": true
+    "description": "Go to next error",
+    "readOnly": false
   },
   "goToPreviousError": {
     "key": "Alt-Shift-E",
-    "readOnly": true
+    "description": "Go to previous error",
+    "readOnly": false
   },
   "selectall": {
     "description": "Select all",
@@ -254,13 +257,13 @@ export default {
   },
   "pagedown": {
     "description": "Page down",
-    "key": null,
+    "key": "PageUp",
     "readOnly": true
   },
   "gotopagedown": {
     "description": "Go to page down",
-    "key": "PageDown",
-    "readOnly": true
+    "key": null,
+    "readOnly": false
   },
   "selectpageup": {
     "description": "Select page up",
@@ -270,7 +273,7 @@ export default {
   "pageup": {
     "description": "Page up",
     "key": null,
-    "readOnly": true
+    "readOnly": false
   },
   "gotopageup": {
     "description": "Go to page up",
@@ -315,17 +318,12 @@ export default {
   "selecttomatching": {
     "description": "Select to matching",
     "key": "Ctrl-Shift-\\|Ctrl-Shift-P",
-    "readOnly": true
+    "readOnly": false
   },
   "expandToMatching": {
     "description": "Expand to matching",
     "key": "Ctrl-Shift-M",
-    "readOnly": true
-  },
-  "passKeysToBrowser": {
-    "description": "Pass keys to browser",
-    "key": null,
-    "readOnly": true
+    "readOnly": false
   },
   "removeline": {
     "description": "Remove line",
@@ -364,7 +362,7 @@ export default {
   },
   "replace": {
     "description": "Replace",
-    "key": "Ctrl-H",
+    "key": "Ctrl-R",
     "readOnly": false
   },
   "undo": {
