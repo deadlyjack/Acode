@@ -137,6 +137,7 @@ export default function editorSettings() {
                         if (res === value.textWrap) return;
                         files.map(file => {
                             file.session.setOption('wrap', res);
+                            return file;
                         });
                         appSettings.value.textWrap = res;
                         appSettings.update();

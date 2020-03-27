@@ -4,7 +4,8 @@ module.exports = {
   mode: 'production',
   entry: {
     main: "./src/main.js",
-    injection: "./src/injection.js",
+    // eruda: "./src/eruda.js",
+    console: "./src/console.js",
   },
   output: {
     path: path.resolve(__dirname, "www/js"),

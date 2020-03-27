@@ -257,7 +257,8 @@ function getIconForFile(filename) {
  * @param {string} url 
  */
 function _convertToFile(url) {
-    const providerRegex = /content\:\/\/(.*)(\/external_storage\/|\/file\/storage\/emulated\/0\/|\/external_dir\/)/;
+    // const providerRegex = /content\:\/\/(.*)(\/external_storage\/|\/file\/storage\/emulated\/0\/|\/external_dir\/)/;
+    const providerRegex = /content\:\/\/(((?![:<>"\/\\\|\?\*]).)*)(\/external_storage\/|\/(file\/)?storage\/emulated\/0\/|\/external_dir\/)/;
     const root = cordova.file.externalRootDirectory;
 
     const parsed = decodeURIComponent(url.split('/').slice(-1)[0]).split(':');

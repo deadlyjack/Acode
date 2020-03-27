@@ -1,3 +1,16 @@
+version 0.0.8.89
+☞ Fixed issue #9
+☞ Added new language 'Arabian' (thanks to Basel Al_hajeri)
+☞ Fixed shift button not working
+☞ Bugs fix
+
+version 0.0.8.88
+☞ Fix cannot edit file opened from termux
+☞ Bugs fix
+
+version 0.0.8.87
+☞ Bugs fix
+
 version 0.0.8.86
 ☞ Added Japanese language (thanks to wappo56)
 ☞ Reorder tabs by dragging themes

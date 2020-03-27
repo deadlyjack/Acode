@@ -61,7 +61,7 @@ function FileBrowser(type = 'file', option = null) {
         //#endregion
 
         $content.addEventListener('click', handleClick);
-        $content.addEventListener('contextmenu', handleContentMenu);
+        $content.addEventListener('contextmenu', handleContextMenu);
         $page.append($content);
         $page.querySelector('header').append($search, $menuToggler);
         document.body.append($page);
@@ -97,7 +97,7 @@ function FileBrowser(type = 'file', option = null) {
             }
             actionStack.remove('filebrowser');
             $content.removeEventListener('click', handleClick);
-            $content.removeEventListener('contextmenu', handleContentMenu);
+            $content.removeEventListener('contextmenu', handleContextMenu);
         };
 
         if (type === 'folder') {
@@ -338,16 +338,41 @@ function FileBrowser(type = 'file', option = null) {
             function cmhandle() {
                 navigator.vibrate(50);
                 dialogs.select('', [
-                        ['delete', strings.delete, 'delete']
+                        ['delete', strings.delete, 'delete'],
+                        ['rename', strings.rename, 'edit']
                     ])
                     .then(res => {
 
                         switch (res) {
                             case 'delete':
-                                remove();
+                                dialogs.confirm(strings["delete {name}"].replace('{name}', name))
+                                    .then(remove);
+                                break;
+                            case 'rename':
+                                dialogs.prompt(strings.rename, name, "text", {
+                                    match: constants.FILE_NAME_REGEX
+                                }).then(newname => {
+                                    rename(newname);
+                                });
                                 break;
                         }
 
+                    });
+            }
+
+            function rename(newname) {
+                fsOperation(url)
+                    .then(fs => {
+                        return fs.renameTo(newname);
+                    })
+                    .then(() => {
+                        updateAddedFolder(url);
+                        window.plugins.toast.showShortBottom(strings.success);
+                        loadDir(currentDir);
+                    })
+                    .catch(err => {
+                        helpers.error(err);
+                        console.error(err);
                     });
             }
 
@@ -381,7 +406,7 @@ function FileBrowser(type = 'file', option = null) {
             }
         }
 
-        function handleContentMenu(e) {
+        function handleContextMenu(e) {
             handleClick(e, 'contextmenu');
         }
 

@@ -204,7 +204,7 @@ const commands = {
   },
   "rename": function (file) {
     file = file || editorManager.activeFile;
-    dialogs.prompt('Rename', file.filename, 'filename', {
+    dialogs.prompt(strings.rename, file.filename, 'filename', {
         match: constants.FILE_NAME_REGEX
       })
       .then(newname => {
@@ -249,6 +249,7 @@ const commands = {
     clipboardAction('select all');
   },
   "select-word": selectword,
+  "select": () => selectword(false),
   "syntax": function () {
     editorManager.editor.blur();
     Modes()

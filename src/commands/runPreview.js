@@ -152,7 +152,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
       switch (reqPath) {
         case CONSOLE_SCRIPT:
-          url = `${assets}/js/injection.build.js`;
+          url = `${assets}/js/${appSettings.console || 'console'}.build.js`;
           sendFileContent(url, req.requestId, 'application/javascript');
           break;
 

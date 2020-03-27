@@ -3,6 +3,7 @@ import mustache from 'mustache';
 import Page from "../../components/page";
 import _template from './about.hbs';
 import './about.scss';
+import rateBox from '../../components/rateBox';
 
 export default function aboutUs() {
     const $page = Page(strings.about);
@@ -11,6 +12,23 @@ export default function aboutUs() {
         id: 'about',
         action: $page.hide
     });
+
+    $content.onclick = e => {
+        const $el = e.target;
+        if (!($el instanceof HTMLElement)) return;
+        const action = $el.getAttribute('action');
+        if (!action) return;
+
+        switch (action) {
+            case "rate-box":
+                rateBox();
+                break;
+
+            default:
+                break;
+        }
+    };
+
     $page.onhide = function () {
         actionStack.remove('about');
     };

@@ -329,8 +329,10 @@ export default function Repo(owner, repoName) {
             });
 
             $page.hide();
+            window.freeze = false;
             actionStack.pop();
             actionStack.pop();
+            window.freeze = true;
 
           } else if (type === 'blob') {
 

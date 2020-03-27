@@ -1,5 +1,4 @@
 import tag from 'html-tag-js';
-import helpers from '../helpers';
 /**
  * 
  * @param {AceAjax.Editor} editor 
@@ -21,24 +20,42 @@ function textControl(editor, controls, container) {
 
         Acode.exec("select-word");
     });
-    $content.addEventListener('click', function (e) {
-        if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
-        enableSingleMode();
+    $content.addEventListener('touchstart', ontouchstart);
 
-        const shiftKey = tag.get('#shift-key');
-        if (shiftKey && shiftKey.getAttribute('data-state') === 'on') {
-            const me = new AceMouseEvent(e, editor);
-            const pos = me.getDocumentPosition();
-            editor.selection.setRange({
-                start: oldPos,
-                end: pos
-            });
+    function ontouchstart(e) {
 
-        } else {
-            oldPos = editor.getCursorPosition();
-        }
-    });
+        document.ontouchmove = document.ontouchcancel = function () {
+            document.ontouchmove = document.ontouchcancel = document.ontouchend = null;
+        };
+
+        document.ontouchend = function () {
+            if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
+
+            const shiftKey = tag.get('#shift-key');
+            if (shiftKey && shiftKey.getAttribute('data-state') === 'on') {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                const me = new AceMouseEvent(e, editor);
+                const pos = me.getDocumentPosition();
+                setTimeout(() => {
+                    editor.selection.setRange({
+                        start: oldPos,
+                        end: pos
+                    });
+                    Acode.exec("select");
+                }, 0);
+
+            } else {
+                oldPos = editor.getCursorPosition();
+                enableSingleMode();
+            }
+
+            document.ontouchmove = document.ontouchcancel = document.ontouchend = null;
+        };
+    }
 }
+
 
 function enableSingleMode() {
     const {

@@ -29,12 +29,12 @@ import arrowkeys from "./modules/events/arrowkeys";
 
 import $_menu from './views/menu.hbs';
 import $_fileMenu from './views/file-menu.hbs';
-import $_rating from './views/rating.hbs';
 import git from "./modules/git";
 import commands from "./commands/commands";
 import externalStorage from "./modules/externalStorage";
 import keyBindings from './keyBindings';
 import handleQuickTools from "./modules/handleQuickTools";
+import rateBox from "./components/rateBox";
 //@ts-check
 
 window.onload = Main;
@@ -336,15 +336,10 @@ function App() {
   window.restoreTheme();
   $main.setAttribute("data-empty-msg", strings['no editor message']);
 
+  //Asks for rating if used more than 5 times
   let count = parseInt(localStorage.count) || 0;
-  if (count === constants.RATING_TIME) {
-
-    const html = $_rating;
-    dialogs.box('Did you like the app?', html, onInteract, onhide, strings.cancel);
-
-  } else {
-    localStorage.count = ++count;
-  }
+  if (count === constants.RATING_TIME) rateBox();
+  else localStorage.count = ++count;
 
   //#region rendering
   $header.classList.add('light');
@@ -489,35 +484,6 @@ function App() {
         'action' in obj
       ) Acode.exec(obj.action);
     }
-  }
-
-  function onInteract(e) {
-    /**
-     * @type {HTMLSpanElement}
-     */
-    const $el = e.target;
-    if (!$el) return;
-    let val = $el.getAttribute('value');
-    if (val) val = parseInt(val);
-    const siblings = $el.parentElement.children;
-    const len = siblings.length;
-    for (let i = 0; i < len; ++i) {
-      const star = siblings[i];
-      star.classList.remove('stargrade', 'star_outline');
-      if (i < val) star.classList.add('stargrade');
-      else star.classList.add('star_outline');
-    }
-
-    setTimeout(() => {
-      if (val === 5) window.open(`https://play.google.com/store/apps/details?id=${BuildInfo.packageName}`, '_system');
-      else window.open(`mailto:dellevenjack@gmail.com?subject=feedback - Acode code editor for android&body=${val} stars <br> ${helpers.getFeedbackBody()}`, '_system');
-    }, 100);
-
-    localStorage.count = constants.RATING_TIME;
-  }
-
-  function onhide() {
-    localStorage.count = -3;
   }
 
   function saveState() {

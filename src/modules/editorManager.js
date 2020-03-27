@@ -114,7 +114,7 @@ function EditorManager($sidebar, $header, $body) {
 
     moveOpenFileList();
     $body.appendChild(container);
-    setupEditor(editor);
+    setupEditor();
     textControl(editor, controls, container);
     controls.menu.ontouchend = function (e) {
         e.preventDefault();
@@ -366,11 +366,7 @@ function EditorManager($sidebar, $header, $body) {
         manager.onupdate();
     }
 
-    /**
-     * 
-     * @param {AceAjax.Editor} editor 
-     */
-    function setupEditor(editor) {
+    function setupEditor() {
         ace.require("ace/ext/emmet");
         const settings = appSettings.value;
 
@@ -394,6 +390,23 @@ function EditorManager($sidebar, $header, $body) {
         if (!appSettings.value.linting && appSettings.value.linenumbers) {
             editor.renderer.setMargin(0, 0, -16, 0);
         }
+    }
+
+    function setupSession(file) {
+        const session = file.session;
+        const filename = file.filename;
+        const settings = appSettings.value;
+        const mode = modelist.getModeForPath(filename).mode;
+        if (file.session.$modeId !== mode) {
+            session.setOptions({
+                mode,
+                // wrap: settings.textWrap,
+                tabSize: settings.tabSize,
+                useSoftTabs: settings.softTab,
+                useWorker: appSettings.value.linting
+            });
+        }
+        file.session.setOption('wrap', settings.textWrap);
     }
 
     function moveOpenFileList() {
@@ -520,22 +533,6 @@ function EditorManager($sidebar, $header, $body) {
             document.ontouchend = document.onmouseup = document.ontouchmove = document.onmousemove = null;
             if (timeout) clearTimeout(timeout);
         };
-    }
-
-    function setupSession(file) {
-        const session = file.session;
-        const filename = file.filename;
-        const settings = appSettings.value;
-        const mode = modelist.getModeForPath(filename).mode;
-        if (file.session.$modeId !== mode) {
-            session.setOptions({
-                mode,
-                wrap: settings.textWrap,
-                tabSize: settings.tabSize,
-                useSoftTabs: settings.softTab,
-                useWorker: appSettings.value.linting
-            });
-        }
     }
 
     function hasUnsavedFiles() {

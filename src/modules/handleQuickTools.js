@@ -37,15 +37,16 @@ function actions(action) {
       break;
 
     case 'shift':
-      state = el.getAttribute('data-state') || 'off';
+      const $el = $footer.querySelector('#shift-key');
+      state = $el.getAttribute('data-state') || 'off';
       if (state === 'off') {
         $textarea.dispatchEvent(window.createKeyboardEvent('keydown', {}));
-        el.setAttribute('data-state', 'on');
-        el.classList.add('active');
+        $el.setAttribute('data-state', 'on');
+        $el.classList.add('active');
       } else {
         $textarea.dispatchEvent(window.createKeyboardEvent('keyup', {}));
-        el.setAttribute('data-state', 'off');
-        el.classList.remove('active');
+        $el.setAttribute('data-state', 'off');
+        $el.classList.remove('active');
       }
       break;
 

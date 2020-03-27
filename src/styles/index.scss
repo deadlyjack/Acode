@@ -30,23 +30,12 @@ body {
     top: $headerHeight;
     height: 30px;
     width: 100%;
-    /*background-color: $primary;*/
+    background-color: $primary;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     display: flex;
     flex-direction: row !important;
-    background-color: inherit;
-
-    .text {
-        display: inline-block;
-        white-space: nowrap;
-        max-width: 180px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin: 0;
-        padding: 0;
-        color: #333e59;
-    }
+    color: white;
 
     li.tile {
         min-width: min-content;
@@ -56,6 +45,18 @@ body {
         align-items: center;
         margin: 0;
         padding: 0;
+        color: inherit;
+
+        .text {
+            display: inline-block;
+            white-space: nowrap;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0;
+            padding: 0;
+            color: inherit;
+        }
 
         &.select {
             position: absolute;
@@ -84,6 +85,7 @@ body {
             font-size: 1em;
             background-size: 14px;
             background-position: center;
+            color: inherit;
         }
     }
 }

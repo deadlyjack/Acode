@@ -180,6 +180,9 @@ import "core-js/stable";
         const toggler = document.createElement('c-type');
         const group = document.createElement('c-group');
 
+        if (obj instanceof Promise)
+            obj = getPromiseStatus(obj);
+
         toggler.onclick = function () {
             // let data = '';
             if (this.classList.contains("__show-data")) {
@@ -191,11 +194,13 @@ import "core-js/stable";
             this.classList.toggle("__show-data");
 
             let keys = [...Object.keys(obj), ...Object.getOwnPropertyNames(obj), "__proto__", "prototype"];
+
             keys = [...new Set(keys)];
 
             for (let key in obj) {
                 if (!keys.includes(key)) append(key);
             }
+
             for (let key of keys) {
                 append(key);
             }
@@ -239,6 +244,29 @@ import "core-js/stable";
         }
     }
 
+    function getPromiseStatus(obj) {
+        if (obj.info) return;
+        let status = "pending";
+        let value;
+        let result = obj.then(val => {
+            status = "resolved";
+            value = val;
+        }, () => {
+            status = "rejected";
+        });
+
+        Object.defineProperties(result, {
+            "[[PromiseStatus]]": {
+                get: () => status
+            },
+            "[[PromiseValue]]": {
+                get: () => value
+            }
+        });
+
+        return result;
+    }
+
     function getElement(type) {
         const el = document.createElement('c-text');
         switch (type) {
@@ -280,8 +308,12 @@ import "core-js/stable";
         try {
             parsed = esprima.parse(data.toString()).body[0];
         } catch (error) {
-            const fun = ('(' + data.toString() + ')').replace(/\{.*\}/, '{}');
-            parsed = esprima.parse(fun).body[0];
+            try {
+                const fun = ('(' + data.toString() + ')').replace(/\{.*\}/, '{}');
+                parsed = esprima.parse(fun).body[0];
+            } catch (error) {
+                return data.toString().replace(/({).*(})/, '$1...$2');
+            }
         }
 
         if (parsed.type === "ExpressionStatement") {

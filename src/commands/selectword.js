@@ -1,4 +1,4 @@
-function selectword() {
+function selectword(select = true) {
   const {
     editor,
     controls,
@@ -23,7 +23,7 @@ function selectword() {
     }
   };
 
-  editor.selectMore(1, false, true);
+  if (select) editor.selectMore(1, false, true);
   if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
   controls.update = updateControls;
   controls.callBeforeContextMenu = containerOnClick;

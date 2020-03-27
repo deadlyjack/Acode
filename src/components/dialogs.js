@@ -673,6 +673,10 @@ function box(titleText, html, onclick, onhide, hideButtonText) {
         hideSelect();
         if (onhide) onhide();
     }
+
+    return {
+        hide
+    };
 }
 
 /**

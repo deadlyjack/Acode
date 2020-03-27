@@ -41,11 +41,7 @@ $lightText : #333e59;
 
     .open-file-list {
         background-color: white;
-
-        .icon,
-        .text {
-            color: $lightText;
-        }
+        color: $lightText;
     }
 
     .icon.float {
