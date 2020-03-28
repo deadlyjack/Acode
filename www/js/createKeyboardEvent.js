@@ -34,7 +34,7 @@ function () { //closure
         _Object_defineProperty(e, {writable: true, configurable: true, value: 9})
         */
 
-        return ((e["keyIdentifier"] || e["key"]) == "+" && (e["keyLocation"] || e["location"]) == 3) && (
+        return ((e["keyIdentifier"] || e["key"]) == "+" && (e["location"]) || e["keyLocation"] == 3) && (
           e.ctrlKey ?
           e.altKey ? // webkit
           1 :

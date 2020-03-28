@@ -451,9 +451,18 @@ function EditorManager($sidebar, $header, $body) {
     function checkForDrag(e) {
         /**@type {HTMLElement} */
         const $el = e.target;
-        const $parent = this;
         if (!$el.classList.contains('tile')) return;
+
+
+        const $parent = this;
+        const type = e.type === 'mousedown' ? 'mousemove' : 'touchmove';
+        const opts = {
+            passive: false
+        };
         let timeout;
+
+        if ($el.eventAdded) return;
+        $el.eventAdded = true;
 
 
         timeout = setTimeout(() => {
@@ -471,30 +480,23 @@ function EditorManager($sidebar, $header, $body) {
             let classFlag = false;
 
             $placeholder.style.opacity = '0';
-            navigator.vibrate(50);
+            navigator.vibrate(10);
             document.ontouchmove = document.onmousemove = null;
-            document.addEventListener('mousemove', drag, {
-                passive: false
-            });
-            document.addEventListener('touchmove', drag, {
-                passive: false
-            });
+            document.addEventListener(type, drag, opts);
+            console.log("Adding listener", e.type);
+
             document.ontouchend = document.onmouseup = document.ontouchcancel = document.onmouseleave = function (e) {
                 $el.classList.remove('select');
                 $el.style.removeProperty('transform');
-                document.removeEventListener('mousemove', drag, {
-                    passive: false
-                });
-                document.removeEventListener('touchmove', drag, {
-                    passive: false
-                });
+                document.removeEventListener(type, drag, opts);
+                console.log("Remove listener", e.type);
                 document.ontouchend = document.onmouseup = null;
-
-                $parent.replaceChild($el, $placeholder);
+                if ($placeholder.isConnected) $parent.replaceChild($el, $placeholder);
+                $el.eventAdded = false;
             };
 
             function drag(e) {
-
+                console.log(e.type);
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
@@ -530,8 +532,10 @@ function EditorManager($sidebar, $header, $body) {
 
 
         document.ontouchend = document.onmouseup = document.ontouchmove = document.onmousemove = function (e) {
+            console.log("Touch end without tiggering drag");
             document.ontouchend = document.onmouseup = document.ontouchmove = document.onmousemove = null;
             if (timeout) clearTimeout(timeout);
+            $el.eventAdded = false;
         };
     }
 

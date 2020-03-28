@@ -119,5 +119,6 @@
   "reset": "reset",
   "color": "color",
   "select word": "Select word",
-  "quick tools": "Quick tools"
+  "quick tools": "Quick tools",
+  "select": "select"
 }

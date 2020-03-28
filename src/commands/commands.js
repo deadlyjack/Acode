@@ -249,7 +249,6 @@ const commands = {
     clipboardAction('select all');
   },
   "select-word": selectword,
-  "select": () => selectword(false),
   "syntax": function () {
     editorManager.editor.blur();
     Modes()

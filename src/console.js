@@ -1,5 +1,8 @@
 import "core-js/stable";
+import loadPolyFill from "./modules/polyfill";
+
 (function () {
+    loadPolyFill.apply(window);
 
     if (!HTMLElement.prototype.append) {
         HTMLElement.prototype.append = function (...node) {
@@ -30,7 +33,7 @@ import "core-js/stable";
     clearBtn.style.transform = "translate(-2px, 2px)";
 
     toggler.innerHTML = '&#9888;';
-    toggler.style.transform = "translate(2px, " + (innerHeight - 40) + "px)";
+    toggler.style.transform = "translate(2px, " + (innerHeight / 2) + "px)";
 
     input.onblur = function () {
         setTimeout(() => {
@@ -312,7 +315,10 @@ import "core-js/stable";
                 const fun = ('(' + data.toString() + ')').replace(/\{.*\}/, '{}');
                 parsed = esprima.parse(fun).body[0];
             } catch (error) {
-                return data.toString().replace(/({).*(})/, '$1...$2');
+                return data.toString()
+                    .replace(/({).*(})/, '$1...$2')
+                    .replace(/^function\s+[\w_$\d]+\s*/, '')
+                    .replace(/\s*/g, '');
             }
         }
 

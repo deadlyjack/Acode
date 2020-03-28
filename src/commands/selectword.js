@@ -1,4 +1,4 @@
-function selectword(select = true) {
+function selectword() {
   const {
     editor,
     controls,
@@ -23,15 +23,18 @@ function selectword(select = true) {
     }
   };
 
-  if (select) editor.selectMore(1, false, true);
+  editor.selectMore(1, false, true);
   if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
   controls.update = updateControls;
-  controls.callBeforeContextMenu = containerOnClick;
+  controls.callBeforeContextMenu = disable;
   controls.end.onclick = null;
-  $content.addEventListener('click', containerOnClick);
+  $content.addEventListener('click', disable);
   editor.session.on('changeScrollTop', updatePosition);
   editor.session.on('changeScrollLeft', updatePosition);
   editor.selection.on('changeCursor', onchange);
+  controls.checkForColor();
+
+  editor.textInput.getElement().oninput = disable;
 
   controls.start.ontouchstart = function (e) {
     touchStart.call(this, e, 'start');
@@ -53,6 +56,7 @@ function selectword(select = true) {
   }, 100);
 
   function touchStart(e, action) {
+    $cm.remove();
     const el = this;
 
     document.ontouchmove = function (e) {
@@ -79,10 +83,11 @@ function selectword(select = true) {
     };
 
     document.ontouchend = function () {
+      container.appendChild($cm);
+      updateControls(action);
       document.ontouchmove = null;
       document.ontouchend = null;
       el.touchStart = null;
-      container.appendChild($cm);
     };
   }
 
@@ -104,7 +109,7 @@ function selectword(select = true) {
   function updateControls(mode) {
     const selected = editor.getCopyText();
     if (!selected) {
-      return containerOnClick();
+      return disable();
     }
 
     const $singleMode = editor.container.querySelector('.ace_marker-layer>.ace_selection.ace_br15');
@@ -168,7 +173,7 @@ function selectword(select = true) {
 
     initialScroll.top = scrollTop;
     initialScroll.left = scrollLeft;
-    controls.checkForColor();
+    if ($cm.isConnected) controls.checkForColor();
     update();
   }
 
@@ -210,17 +215,18 @@ function selectword(select = true) {
     $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0) scale(${scale})`;
   }
 
-  function containerOnClick() {
+  function disable() {
     controls.start.remove();
     controls.end.remove();
     $cm.remove();
 
-    $content.removeEventListener('click', containerOnClick);
+    $content.removeEventListener('click', disable);
     editor.session.off('changeScrollTop', updatePosition);
     editor.session.off('changeScrollLeft', updatePosition);
     editor.selection.off('changeCursor', onchange);
     controls.start.ontouchstart = null;
     controls.end.ontouchstart = null;
+    editor.textInput.getElement().oninput = null;
   }
 }
 

@@ -62,6 +62,10 @@ function clipboardAction(action) {
             }, 0);
             break;
 
+        case 'select':
+            Acode.exec("select-word");
+            break;
+
         case 'color':
             dialogs.color(color.style.color)
                 .then(color => {

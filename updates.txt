@@ -1,3 +1,12 @@
+version 0.0.9.90
+☞ Disabled text context-menu (unrecoverable bug)
+☞ Added Fira code font
+☞ Updated Ace editor to 1.4.8
+☞ You can now see Promise result in console
+☞ Soft keyboard backspace issue solved
+☞ Disabled native cursor controller
+☞ Bugs fix
+
 version 0.0.8.89
 ☞ Fixed issue #9
 ☞ Added new language 'Arabian' (thanks to Basel Al_hajeri)

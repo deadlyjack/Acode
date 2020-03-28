@@ -35,17 +35,11 @@ import externalStorage from "./modules/externalStorage";
 import keyBindings from './keyBindings';
 import handleQuickTools from "./modules/handleQuickTools";
 import rateBox from "./components/rateBox";
+import loadPolyFill from "./modules/polyfill";
 //@ts-check
 
+loadPolyFill.apply(window);
 window.onload = Main;
-
-if (!HTMLElement.prototype.append) {
-  HTMLElement.prototype.append = function (...nodes) {
-    nodes.map(node => {
-      this.appendChild(node);
-    });
-  };
-}
 
 function Main() {
   let timeout;

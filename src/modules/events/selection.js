@@ -8,34 +8,31 @@ import tag from 'html-tag-js';
 function textControl(editor, controls, container) {
     const $content = container.querySelector('.ace_scroller');
     let oldPos = editor.getCursorPosition();
-    $content.addEventListener('contextmenu', function (e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-        editor.focus();
-
-        const ev = new AceMouseEvent(e, editor);
-        const pos = ev.getDocumentPosition();
-        editor.gotoLine(parseInt(pos.row + 1), parseInt(pos.column + 1));
-
-        Acode.exec("select-word");
-    });
     $content.addEventListener('touchstart', ontouchstart);
 
     function ontouchstart(e) {
+        let timeout;
 
         document.ontouchmove = document.ontouchcancel = function () {
+            if (timeout) clearTimeout(timeout);
             document.ontouchmove = document.ontouchcancel = document.ontouchend = null;
         };
 
+        // timeout = setTimeout(() => {
+        //     preventDefault(e);
+        //     document.ontouchend = null;
+        //     oncontextmenu(e);
+
+        //     setTimeout(editor.focus, 0);
+        // }, 300);
+
         document.ontouchend = function () {
+            if (timeout) clearTimeout(timeout);
             if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
 
             const shiftKey = tag.get('#shift-key');
             if (shiftKey && shiftKey.getAttribute('data-state') === 'on') {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
+                preventDefault(e);
                 const me = new AceMouseEvent(e, editor);
                 const pos = me.getDocumentPosition();
                 setTimeout(() => {
@@ -53,6 +50,20 @@ function textControl(editor, controls, container) {
 
             document.ontouchmove = document.ontouchcancel = document.ontouchend = null;
         };
+    }
+
+    function preventDefault(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+    }
+
+    function oncontextmenu(e) {
+        const ev = new AceMouseEvent(e, editor);
+        const pos = ev.getDocumentPosition();
+        editor.gotoLine(parseInt(pos.row + 1), parseInt(pos.column + 1));
+
+        Acode.exec("select-word");
     }
 }
 
@@ -72,7 +83,7 @@ function enableSingleMode() {
         x: 0,
         y: 0
     };
-    const lessConent = `${editor.getReadOnly()? '' : `<span action="paste">${strings.paste}</span>`}<span action="select all">${strings["select all"]}<span>`;
+    const lessConent = `<span action="select">${strings.select}</span>${editor.getReadOnly()? '' : `<span action="paste">${strings.paste}</span>`}<span action="select all">${strings["select all"]}<span>`;
     let updateTimeout;
 
     $cm.innerHTML = lessConent;
@@ -84,6 +95,7 @@ function enableSingleMode() {
     editor.session.on('changeScrollTop', hide);
     editor.session.on('changeScrollLeft', hide);
     editor.selection.on('changeCursor', onchange);
+    controls.checkForColor();
 
     updateEnd();
 
