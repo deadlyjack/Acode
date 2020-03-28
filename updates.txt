@@ -1,3 +1,6 @@
+version 0.0.9.91
+☞ Fixed text selection bug
+
 version 0.0.9.90
 ☞ Disabled text context-menu (unrecoverable bug)
 ☞ Added Fira code font

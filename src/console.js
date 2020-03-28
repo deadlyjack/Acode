@@ -33,7 +33,7 @@ import loadPolyFill from "./modules/polyfill";
     clearBtn.style.transform = "translate(-2px, 2px)";
 
     toggler.innerHTML = '&#9888;';
-    toggler.style.transform = "translate(2px, " + (innerHeight / 2) + "px)";
+    toggler.style.transform = "translate(2px, 400px)";
 
     input.onblur = function () {
         setTimeout(() => {

@@ -9,26 +9,19 @@ function textControl(editor, controls, container) {
     const $content = container.querySelector('.ace_scroller');
     let oldPos = editor.getCursorPosition();
     $content.addEventListener('touchstart', ontouchstart);
+    $content.oncontextmenu = oncontextmenu;
 
     function ontouchstart(e) {
         let timeout;
+        if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
 
         document.ontouchmove = document.ontouchcancel = function () {
             if (timeout) clearTimeout(timeout);
             document.ontouchmove = document.ontouchcancel = document.ontouchend = null;
         };
 
-        // timeout = setTimeout(() => {
-        //     preventDefault(e);
-        //     document.ontouchend = null;
-        //     oncontextmenu(e);
-
-        //     setTimeout(editor.focus, 0);
-        // }, 300);
-
         document.ontouchend = function () {
             if (timeout) clearTimeout(timeout);
-            if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
 
             const shiftKey = tag.get('#shift-key');
             if (shiftKey && shiftKey.getAttribute('data-state') === 'on') {
@@ -59,11 +52,13 @@ function textControl(editor, controls, container) {
     }
 
     function oncontextmenu(e) {
+        preventDefault(e);
         const ev = new AceMouseEvent(e, editor);
         const pos = ev.getDocumentPosition();
         editor.gotoLine(parseInt(pos.row + 1), parseInt(pos.column + 1));
 
         Acode.exec("select-word");
+        editor.focus();
     }
 }
 
