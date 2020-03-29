@@ -13,7 +13,6 @@ function textControl(editor, controls, container) {
 
     function ontouchstart(e) {
         let timeout;
-        if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
 
         document.ontouchmove = document.ontouchcancel = function () {
             if (timeout) clearTimeout(timeout);
@@ -64,6 +63,8 @@ function textControl(editor, controls, container) {
 
 
 function enableSingleMode() {
+
+
     const {
         editor,
         controls,
@@ -81,6 +82,7 @@ function enableSingleMode() {
     const lessConent = `<span action="select">${strings.select}</span>${editor.getReadOnly()? '' : `<span action="paste">${strings.paste}</span>`}<span action="select all">${strings["select all"]}<span>`;
     let updateTimeout;
 
+    if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
     $cm.innerHTML = lessConent;
     if (editorManager.activeFile) editorManager.activeFile.controls = true;
     controls.update = updateEnd;

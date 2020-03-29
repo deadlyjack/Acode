@@ -1,3 +1,6 @@
+version 0.0.9.92
+☞ Bugs fix
+
 version 0.0.9.91
 ☞ Fixed text selection bug
 

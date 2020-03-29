@@ -3,6 +3,7 @@ import mustache from 'mustache';
 import $_search from '../views/footer/search.hbs';
 import $_row1 from '../views/footer/row1.hbs';
 import $_row2 from '../views/footer/row2.hbs';
+import searchSettings from '../pages/settings/searchSettings';
 
 function actions(action) {
   const search = mustache.render($_search, strings);

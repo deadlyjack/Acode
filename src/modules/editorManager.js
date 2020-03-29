@@ -129,12 +129,18 @@ function EditorManager($sidebar, $header, $body) {
         setTimeout(() => {
             manager.state = 'focus';
         }, 0);
+
         window.addEventListener('native.keyboardhide', hide);
 
         function hide() {
             editor.blur();
             window.removeEventListener('native.keyboardhide', hide);
         }
+
+        window.onresize = () => {
+            editor.renderer.scrollCursorIntoView();
+            window.onresize = null;
+        };
     });
     editor.on('blur', function () {
         setTimeout(() => {

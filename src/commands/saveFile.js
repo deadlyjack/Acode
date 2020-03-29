@@ -106,7 +106,7 @@ function saveFile(file, as = false, showToast = true) {
      */
     function save(url, filename) {
         const data = file.session.getValue();
-        let createFile = false;
+        let createFile = false || as;
         if (url) {
             file.location = helpers.decodeURL(url);
             file.type = 'regular';
@@ -158,6 +158,7 @@ function saveFile(file, as = false, showToast = true) {
 
         function updateFile() {
             if (window.saveTimeout) clearTimeout(window.saveTimeout);
+            if (file.id === constants.DEFAULT_SESSION) file.id = helpers.uuid();
             window.saveTimeout = setTimeout(() => {
                 file.isUnsaved = false;
                 if (showToast) window.plugins.toast.showShortBottom(strings['file saved']);
