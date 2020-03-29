@@ -38,6 +38,7 @@ If you have installed yarn you can simply run `yarn build-run` to build the apk 
 - [Apache cordova](https://cordova.apache.org/)
 - [babeljs.io](https://babeljs.io/)
 - [Cordova plugin intent](https://github.com/napolitano/cordova-plugin-intent)
+- [Esprima](https://esprima.org/)
 - [Mustache](https://github.com/janl/mustache.js)
 - [Marked](https://marked.js.org/)
 - [Makrdown css](https://github.com/markdowncss)
