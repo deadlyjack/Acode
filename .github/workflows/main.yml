@@ -1,0 +1,55 @@
+name: Build the app
+on: [push]
+
+jobs:
+  build:
+    name: Build the app
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+    - run: npm install
+    - run: webpack 
+    
+    - name: Update package list
+      run: sudo apt update
+    
+    - name: Install gradle
+      run: sudo apt install gradle
+    
+    - name: Install jq
+      run: sudo apt install jq
+      
+    - name: Install cordova
+      run: |
+        sudo npm config set unsafe-perm true && \
+        sudo npm install -g cordova
+    
+    - name: Setup build type
+      run: echo "::set-env name=BUILD_TYPE::$BUILD_TYPE"
+      env:
+        BUILD_TYPE: debug
+    
+    - name: Build with cordova
+      run: |
+        cordova platform add android && \
+        cordova build android --${BUILD_TYPE}
+    
+    - name: Create env variable APP_VERSION
+      run: echo "::set-env name=APP_VERSION::$(cat package.json | jq -r '.version')"
+    
+    - name: Create env variable APP_NAME
+      run: echo "::set-env name=APP_NAME::app-${BUILD_TYPE}.apk"
+      
+    
+    - name: Rename apk to APP_NAME
+      run: mv platforms/android/app/build/outputs/apk/debug/app-${BUILD_TYPE}.apk ${APP_NAME}
+        
+    - name: Upload apk
+      uses: actions/upload-artifact@v1
+      with:
+        name: ${{ env.APP_NAME }}
+        path: ${{ env.APP_NAME }}
