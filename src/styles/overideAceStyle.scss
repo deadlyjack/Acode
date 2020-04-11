@@ -8,14 +8,18 @@
     font-style: normal;
 }
 
+
 .ace_editor,
 .ace_editor * {
-    font-family: monospace;
+    font-family: monospace !important;
+}
 
+.ace_editor.fira-code,
+.ace_editor.fira-code * {
     -webkit-font-feature-settings: "liga"on, "calt"on;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    font-family: 'Fira Code';
+    font-family: 'Fira Code' !important;
 }
 
 main .ace_editor {
@@ -92,16 +96,15 @@ main .ace_editor {
 }
 
 .ace_prompt_wrapper {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    margin: 50px auto 0 auto;
-    z-index: 10;
-    width: 90vw;
-    max-width: 600px;
-    height: fit-content;
-    z-index: 108;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    margin: 50px auto 0 auto !important;
+    width: 90vw !important;
+    max-width: 600px !important;
+    height: fit-content !important;
+    z-index: 108 !important;
 
     .ace_prompt_container {
         position: relative;

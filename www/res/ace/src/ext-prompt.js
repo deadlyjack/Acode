@@ -340,54 +340,54 @@ define("ace/autocomplete/popup", ["require", "exports", "module", "ace/virtual_r
     };
 
     dom.importCssString("\
-.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
-    background-color: #CAD6FA;\
-    z-index: 1;\
-}\
-.ace_dark.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
-    background-color: #3a674e;\
-}\
-.ace_editor.ace_autocomplete .ace_line-hover {\
-    border: 1px solid #abbffe;\
-    margin-top: -1px;\
-    background: rgba(233,233,253,0.4);\
-    position: absolute;\
-    z-index: 2;\
-}\
-.ace_dark.ace_editor.ace_autocomplete .ace_line-hover {\
-    border: 1px solid rgba(109, 150, 13, 0.8);\
-    background: rgba(58, 103, 78, 0.62);\
-}\
-.ace_completion-meta {\
-    opacity: 0.5;\
-    margin: 0.9em;\
-}\
-.ace_completion-message {\
-    color: blue;\
-}\
-.ace_editor.ace_autocomplete .ace_completion-highlight{\
-    color: #2d69c7;\
-}\
-.ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight{\
-    color: #93ca12;\
-}\
-.ace_editor.ace_autocomplete {\
-    width: 300px;\
-    z-index: 200000;\
-    border: 1px lightgray solid;\
-    position: fixed;\
-    box-shadow: 2px 3px 5px rgba(0,0,0,.2);\
-    line-height: 1.4;\
-    background: #fefefe;\
-    color: #111;\
-}\
-.ace_dark.ace_editor.ace_autocomplete {\
-    border: 1px #484747 solid;\
-    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.51);\
-    line-height: 1.4;\
-    background: #25282c;\
-    color: #c1c1c1;\
-}", "autocompletion.css");
+    .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
+        background-color: #CAD6FA;\
+        z-index: 1;\
+    }\
+    .ace_dark.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
+        background-color: #3a674e;\
+    }\
+    .ace_editor.ace_autocomplete .ace_line-hover {\
+        border: 1px solid #abbffe;\
+        margin-top: -1px;\
+        background: rgba(233,233,253,0.4);\
+        position: absolute;\
+        z-index: 2;\
+    }\
+    .ace_dark.ace_editor.ace_autocomplete .ace_line-hover {\
+        border: 1px solid rgba(109, 150, 13, 0.8);\
+        background: rgba(58, 103, 78, 0.62);\
+    }\
+    .ace_completion-meta {\
+        opacity: 0.5;\
+        margin: 0.9em;\
+    }\
+    .ace_completion-message {\
+        color: blue;\
+    }\
+    .ace_editor.ace_autocomplete .ace_completion-highlight{\
+        color: #2d69c7;\
+    }\
+    .ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight{\
+        color: #93ca12;\
+    }\
+    .ace_editor.ace_autocomplete {\
+        width: 300px;\
+        z-index: 200000;\
+        border: 1px lightgray solid;\
+        position: fixed;\
+        box-shadow: 2px 3px 5px rgba(0,0,0,.2);\
+        line-height: 1.4;\
+        background: #fefefe;\
+        color: #111;\
+    }\
+    .ace_dark.ace_editor.ace_autocomplete {\
+        border: 1px #484747 solid;\
+        box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.51);\
+        line-height: 1.4;\
+        background: #25282c;\
+        color: #c1c1c1;\
+    }", "autocompletion.css");
 
     exports.AcePopup = AcePopup;
     exports.$singleLineEditor = $singleLineEditor;
@@ -410,7 +410,7 @@ define("ace/autocomplete/util", ["require", "exports", "module"], function (requ
         }
     };
 
-    var ID_REGEX = /[a-zA-Z_0-9\$\-\u00A2-\uFFFF]/;
+    var ID_REGEX = /[a-zA-Z_0-9\$\-\u00A2-\u2000\u2070-\uFFFF]/;
 
     exports.retrievePrecedingIdentifier = function (text, pos, regex) {
         regex = regex || ID_REGEX;
@@ -1190,6 +1190,12 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                 }
                 snippetMap[scope].push(s);
 
+                if (s.prefix)
+                    s.tabTrigger = s.prefix;
+
+                if (!s.content && s.body)
+                    s.content = Array.isArray(s.body) ? s.body.join("\n") : s.body;
+
                 if (s.tabTrigger && !s.trigger) {
                     if (!s.guard && /^\w/.test(s.tabTrigger))
                         s.guard = "\\b";
@@ -1206,10 +1212,13 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                 s.endTriggerRe = new RegExp(s.endTrigger);
             }
 
-            if (snippets && snippets.content)
-                addSnippet(snippets);
-            else if (Array.isArray(snippets))
+            if (Array.isArray(snippets)) {
                 snippets.forEach(addSnippet);
+            } else {
+                Object.keys(snippets).forEach(function (key) {
+                    addSnippet(snippets[key]);
+                });
+            }
 
             this._signal("registerSnippets", {
                 scope: scope
@@ -1264,7 +1273,7 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                         snippet.tabTrigger = val.match(/^\S*/)[0];
                         if (!snippet.name)
                             snippet.name = val;
-                    } else {
+                    } else if (key) {
                         snippet[key] = val;
                     }
                 }
@@ -1327,15 +1336,16 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
         this.onChange = function (delta) {
             var isRemove = delta.action[0] == "r";
-            var parents = this.selectedTabstop && this.selectedTabstop.parents || {};
+            var selectedTabstop = this.selectedTabstop || {};
+            var parents = selectedTabstop.parents || {};
             var tabstops = (this.tabstops || []).slice();
             for (var i = 0; i < tabstops.length; i++) {
                 var ts = tabstops[i];
-                var active = ts == this.selectedTabstop || parents[ts.index];
+                var active = ts == selectedTabstop || parents[ts.index];
                 ts.rangeList.$bias = active ? 0 : 1;
 
-                if (delta.action == "remove" && ts !== this.selectedTabstop) {
-                    var parentActive = ts.parents && ts.parents[this.selectedTabstop.index];
+                if (delta.action == "remove" && ts !== selectedTabstop) {
+                    var parentActive = ts.parents && ts.parents[selectedTabstop.index];
                     var startIndex = ts.rangeList.pointIndex(delta.start, parentActive);
                     startIndex = startIndex < 0 ? -startIndex - 1 : startIndex + 1;
                     var endIndex = ts.rangeList.pointIndex(delta.end, parentActive);
@@ -1450,8 +1460,6 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
             var ranges = this.ranges;
             tabstops.forEach(function (ts, index) {
                 var dest = this.$openTabstops[index] || ts;
-                ts.rangeList = new RangeList();
-                ts.rangeList.$bias = 0;
 
                 for (var i = 0; i < ts.length; i++) {
                     var p = ts[i];
@@ -1461,7 +1469,6 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                     range.original = p;
                     range.tabstop = dest;
                     ranges.push(range);
-                    ts.rangeList.ranges.push(range);
                     if (dest != ts)
                         dest.unshift(range);
                     else
@@ -1479,6 +1486,9 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                     this.$openTabstops[index] = dest;
                 }
                 this.addTabstopMarkers(dest);
+                dest.rangeList = dest.rangeList || new RangeList();
+                dest.rangeList.$bias = 0;
+                dest.rangeList.addList(dest);
             }, this);
 
             if (arg.length > 2) {
@@ -1521,21 +1531,18 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
         this.keyboardHandler = new HashHandler();
         this.keyboardHandler.bindKeys({
-            "Tab": function (ed) {
-                if (exports.snippetManager && exports.snippetManager.expandWithTab(ed)) {
+            "Tab": function (editor) {
+                if (exports.snippetManager && exports.snippetManager.expandWithTab(editor))
                     return;
-                }
-
-                ed.tabstopManager.tabNext(1);
+                editor.tabstopManager.tabNext(1);
+                editor.renderer.scrollCursorIntoView();
             },
-            "Shift-Tab": function (ed) {
-                ed.tabstopManager.tabNext(-1);
+            "Shift-Tab": function (editor) {
+                editor.tabstopManager.tabNext(-1);
+                editor.renderer.scrollCursorIntoView();
             },
-            "Esc": function (ed) {
-                ed.tabstopManager.detach();
-            },
-            "Return": function (ed) {
-                return false;
+            "Esc": function (editor) {
+                editor.tabstopManager.detach();
             }
         });
     }).call(TabstopManager.prototype);
@@ -1556,13 +1563,13 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
 
     require("./lib/dom").importCssString("\
-.ace_snippet-marker {\
-    -moz-box-sizing: border-box;\
-    box-sizing: border-box;\
-    background: rgba(194, 193, 208, 0.09);\
-    border: 1px dotted rgba(211, 208, 235, 0.62);\
-    position: absolute;\
-}");
+    .ace_snippet-marker {\
+        -moz-box-sizing: border-box;\
+        box-sizing: border-box;\
+        background: rgba(194, 193, 208, 0.09);\
+        border: 1px dotted rgba(211, 208, 235, 0.62);\
+        position: absolute;\
+    }");
 
     exports.snippetManager = new SnippetManager();
 
@@ -2116,65 +2123,65 @@ define("ace/ext/menu_tools/overlay_page", ["require", "exports", "module", "ace/
     'use strict';
     var dom = require("../../lib/dom");
     var cssText = "#ace_settingsmenu, #kbshortcutmenu {\
-background-color: #F7F7F7;\
-color: black;\
-box-shadow: -5px 4px 5px rgba(126, 126, 126, 0.55);\
-padding: 1em 0.5em 2em 1em;\
-overflow: auto;\
-position: absolute;\
-margin: 0;\
-bottom: 0;\
-right: 0;\
-top: 0;\
-z-index: 9991;\
-cursor: default;\
-}\
-.ace_dark #ace_settingsmenu, .ace_dark #kbshortcutmenu {\
-box-shadow: -20px 10px 25px rgba(126, 126, 126, 0.25);\
-background-color: rgba(255, 255, 255, 0.6);\
-color: black;\
-}\
-.ace_optionsMenuEntry:hover {\
-background-color: rgba(100, 100, 100, 0.1);\
-transition: all 0.3s\
-}\
-.ace_closeButton {\
-background: rgba(245, 146, 146, 0.5);\
-border: 1px solid #F48A8A;\
-border-radius: 50%;\
-padding: 7px;\
-position: absolute;\
-right: -8px;\
-top: -8px;\
-z-index: 100000;\
-}\
-.ace_closeButton{\
-background: rgba(245, 146, 146, 0.9);\
-}\
-.ace_optionsMenuKey {\
-color: darkslateblue;\
-font-weight: bold;\
-}\
-.ace_optionsMenuCommand {\
-color: darkcyan;\
-font-weight: normal;\
-}\
-.ace_optionsMenuEntry input, .ace_optionsMenuEntry button {\
-vertical-align: middle;\
-}\
-.ace_optionsMenuEntry button[ace_selected_button=true] {\
-background: #e7e7e7;\
-box-shadow: 1px 0px 2px 0px #adadad inset;\
-border-color: #adadad;\
-}\
-.ace_optionsMenuEntry button {\
-background: white;\
-border: 1px solid lightgray;\
-margin: 0px;\
-}\
-.ace_optionsMenuEntry button:hover{\
-background: #f0f0f0;\
-}";
+    background-color: #F7F7F7;\
+    color: black;\
+    box-shadow: -5px 4px 5px rgba(126, 126, 126, 0.55);\
+    padding: 1em 0.5em 2em 1em;\
+    overflow: auto;\
+    position: absolute;\
+    margin: 0;\
+    bottom: 0;\
+    right: 0;\
+    top: 0;\
+    z-index: 9991;\
+    cursor: default;\
+    }\
+    .ace_dark #ace_settingsmenu, .ace_dark #kbshortcutmenu {\
+    box-shadow: -20px 10px 25px rgba(126, 126, 126, 0.25);\
+    background-color: rgba(255, 255, 255, 0.6);\
+    color: black;\
+    }\
+    .ace_optionsMenuEntry:hover {\
+    background-color: rgba(100, 100, 100, 0.1);\
+    transition: all 0.3s\
+    }\
+    .ace_closeButton {\
+    background: rgba(245, 146, 146, 0.5);\
+    border: 1px solid #F48A8A;\
+    border-radius: 50%;\
+    padding: 7px;\
+    position: absolute;\
+    right: -8px;\
+    top: -8px;\
+    z-index: 100000;\
+    }\
+    .ace_closeButton{\
+    background: rgba(245, 146, 146, 0.9);\
+    }\
+    .ace_optionsMenuKey {\
+    color: darkslateblue;\
+    font-weight: bold;\
+    }\
+    .ace_optionsMenuCommand {\
+    color: darkcyan;\
+    font-weight: normal;\
+    }\
+    .ace_optionsMenuEntry input, .ace_optionsMenuEntry button {\
+    vertical-align: middle;\
+    }\
+    .ace_optionsMenuEntry button[ace_selected_button=true] {\
+    background: #e7e7e7;\
+    box-shadow: 1px 0px 2px 0px #adadad inset;\
+    border-color: #adadad;\
+    }\
+    .ace_optionsMenuEntry button {\
+    background: white;\
+    border: 1px solid lightgray;\
+    margin: 0px;\
+    }\
+    .ace_optionsMenuEntry button:hover{\
+    background: #f0f0f0;\
+    }";
     dom.importCssString(cssText);
 
     module.exports.overlayPage = function overlayPage(editor, contentElement, callback) {
@@ -2188,7 +2195,7 @@ background: #f0f0f0;\
             }
         }
 
-        function close() {
+        function mclose() {
             if (!closer) return;
             document.removeEventListener('keydown', documentEscListener);
             closer.parentNode.removeChild(closer);
@@ -2198,6 +2205,11 @@ background: #f0f0f0;\
             }
             closer = null;
             callback && callback();
+        }
+
+        function close() {
+            actionStack.remove("pallete");
+            mclose();
         }
 
         function setIgnoreFocusOut(ignore) {
@@ -2210,6 +2222,10 @@ background: #f0f0f0;\
 
         closer.className = 'ace_prompt_wrapper';
         mask.className = 'mask ace_prompt_mask';
+        closer.style.cssText = 'margin: 0; padding: 0; ' +
+            'position: fixed; top:0; bottom:0; left:0; right:0;' +
+            'z-index: 9990; ' +
+            (editor ? 'background-color: rgba(0, 0, 0, 0.3);' : '');
         closer.addEventListener('click', function (e) {
             if (!ignoreFocusOut) {
                 close();
@@ -2225,6 +2241,12 @@ background: #f0f0f0;\
         closer.appendChild(contentElement);
         document.body.appendChild(mask);
         document.body.appendChild(closer);
+
+        actionStack.push({
+            id: "pallete",
+            action: mclose
+        });
+
         if (editor) {
             editor.blur();
         }
@@ -2278,22 +2300,23 @@ define("ace/ext/modelist", ["require", "exports", "module"], function (require, 
         ABC: ["abc"],
         ActionScript: ["as"],
         ADA: ["ada|adb"],
+        Alda: ["alda"],
         Apache_Conf: ["^htaccess|^htgroups|^htpasswd|^conf|htaccess|htgroups|htpasswd"],
+        Apex: ["apex|cls|trigger|tgr"],
+        AQL: ["aql"],
         AsciiDoc: ["asciidoc|adoc"],
         ASL: ["dsl|asl"],
         Assembly_x86: ["asm|a"],
         AutoHotKey: ["ahk"],
-        Apex: ["apex|cls|trigger|tgr"],
-        AQL: ["aql"],
         BatchFile: ["bat|cmd"],
         C_Cpp: ["cpp|c|cc|cxx|h|hh|hpp|ino"],
         C9Search: ["c9search_results"],
-        Crystal: ["cr"],
         Cirru: ["cirru|cr"],
         Clojure: ["clj|cljs"],
         Cobol: ["CBL|COB"],
         coffee: ["coffee|cf|cson|^Cakefile"],
         ColdFusion: ["cfm"],
+        Crystal: ["cr"],
         CSharp: ["cs"],
         Csound_Document: ["csd"],
         Csound_Orchestra: ["orc"],
@@ -2341,6 +2364,7 @@ define("ace/ext/modelist", ["require", "exports", "module"], function (require, 
         Java: ["java"],
         JavaScript: ["js|jsm|jsx"],
         JSON: ["json"],
+        JSON5: ["json5"],
         JSONiq: ["jq"],
         JSP: ["jsp"],
         JSSM: ["jssm|jssm_state"],
@@ -2362,30 +2386,34 @@ define("ace/ext/modelist", ["require", "exports", "module"], function (require, 
         Mask: ["mask"],
         MATLAB: ["matlab"],
         Maze: ["mz"],
+        MediaWiki: ["wiki|mediawiki"],
         MEL: ["mel"],
         MIXAL: ["mixal"],
         MUSHCode: ["mc|mush"],
         MySQL: ["mysql"],
         Nginx: ["nginx|conf"],
-        Nix: ["nix"],
         Nim: ["nim"],
+        Nix: ["nix"],
         NSIS: ["nsi|nsh"],
+        Nunjucks: ["nunjucks|nunjs|nj|njk"],
         ObjectiveC: ["m|mm"],
         OCaml: ["ml|mli"],
         Pascal: ["pas|p"],
         Perl: ["pl|pm"],
         Perl6: ["p6|pl6|pm6"],
         pgSQL: ["pgsql"],
-        PHP_Laravel_blade: ["blade.php"],
         PHP: ["php|inc|phtml|shtml|php3|php4|php5|phps|phpt|aw|ctp|module"],
-        Puppet: ["epp|pp"],
+        PHP_Laravel_blade: ["blade.php"],
         Pig: ["pig"],
         Powershell: ["ps1"],
         Praat: ["praat|praatscript|psc|proc"],
+        Prisma: ["prisma"],
         Prolog: ["plg|prolog"],
         Properties: ["properties"],
         Protobuf: ["proto"],
+        Puppet: ["epp|pp"],
         Python: ["py"],
+        QML: ["qml"],
         R: ["r"],
         Razor: ["cshtml|asp"],
         RDoc: ["Rd"],
@@ -2505,7 +2533,6 @@ define("ace/ext/prompt", ["require", "exports", "module", "ace/range", "ace/lib/
         }]);
         var overlay = overlayPage(editor, el, done);
         el.appendChild(cmdLine.container);
-        cmdLine.focus();
 
         if (editor) {
             editor.cmdLine = cmdLine;
@@ -2827,7 +2854,7 @@ define("ace/ext/prompt", ["require", "exports", "module", "ace/range", "ace/lib/
             });
             return commandsByName;
         }
-        var excludeCommandsList = ["insertstring", "inserttext", "setIndentation", "paste", "cut", "copy", 'showSettingsMenu'];
+        var excludeCommandsList = ["insertstring", "inserttext", "setIndentation", "paste"];
         var shortcutsArray = getEditorCommandsByName(excludeCommandsList);
         shortcutsArray = shortcutsArray.map(function (item) {
             return {
@@ -2960,14 +2987,14 @@ define("ace/ext/prompt", ["require", "exports", "module", "ace/range", "ace/lib/
     };
 
     dom.importCssString(".ace_prompt_container {\
-    max-width: 600px;\
-    width: 100%;\
-    margin: 20px auto;\
-    padding: 3px;\
-    background: white;\
-    border-radius: 2px;\
-    box-shadow: 0px 2px 3px 0px #555;\
-}");
+        max-width: 600px;\
+        width: 100%;\
+        margin: 20px auto;\
+        padding: 3px;\
+        background: white;\
+        border-radius: 2px;\
+        box-shadow: 0px 2px 3px 0px #555;\
+    }");
 
 
     exports.prompt = prompt;

@@ -2,6 +2,7 @@ import fs from "./utils/internalFs";
 import dialogs from "../components/dialogs";
 import helpers from "./helpers";
 import GitHub from './utils/GitHubAPI/GitHub';
+import path from "./utils/path";
 
 //Creates new github object
 function gitHub() {
@@ -602,12 +603,12 @@ function getGitFile(record, _path) {
     repo,
     owner,
     branch,
-    path
+    path: p
   } = record;
 
   const repository = gitHub().getRepo(owner, repo);
   return new Promise((resolve, reject) => {
-    repository.getSha(branch, helpers.resolvePath(path, _path))
+    repository.getSha(branch, path.resolve(p, _path))
       .then(res => {
         resolve(atob(res.data.content));
       })

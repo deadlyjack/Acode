@@ -32,7 +32,9 @@ function sidenav(activator, toggler) {
     let scrollPosition = 0,
         width = 250,
         eventAddedFlag = 0,
-        _innerWidth = innerWidth;
+        _innerWidth = innerWidth,
+        isScrolling = false,
+        starty = 0;
     activator = activator || app;
 
     if (toggler)
@@ -127,12 +129,20 @@ function sidenav(activator, toggler) {
      * @param {TouchEvent} e 
      */
     function ontouchstart(e) {
+        if (isScrolling) return;
+
+        const {
+            clientX,
+            clientY
+        } = e.touches[0];
         $el.style.transition = 'none';
-        touch.start = e.touches[0].clientX;
+        touch.start = clientX;
         touch.target = e.target;
 
-        if ($el.activated && e.target !== $el && e.target !== mask) return;
+        if ($el.contains(e.target)) starty = clientY;
+        if ($el.activated && !$el.contains(e.target) && e.target !== mask) return;
         else if (!$el.activated && touch.start > 10 || e.target === toggler) return;
+
         document.ontouchmove = ontouchmove;
         document.ontouchend = ontouchend;
     }
@@ -148,9 +158,21 @@ function sidenav(activator, toggler) {
             activator.style.overflow = 'hidden';
         }
 
-        let width = $el.getwidth();
+        if (isScrolling) return;
 
-        touch.end = e.touches[0].clientX;
+        let width = $el.getwidth();
+        const {
+            clientX,
+            clientY
+        } = e.touches[0];
+
+        if (starty && (Math.abs(clientY - starty) > Math.abs(clientX - touch.start))) {
+            isScrolling = true;
+            starty = 0;
+            return;
+        }
+
+        touch.end = clientX;
         touch.total = touch.end - touch.start;
 
         if (!$el.activated && touch.total < width && touch.start < 10) {
@@ -165,7 +187,11 @@ function sidenav(activator, toggler) {
      * @param {TouchEvent} e 
      */
     function ontouchend(e) {
-        if (e.target === mask && touch.total === 0) return;
+        if (e.target === $el && !$el.textContent && touch.total === 0) {
+            Acode.exec("open-folder");
+            resetState();
+            return hide();
+        } else if (e.target === mask || touch.total === 0) return resetState();
         e.preventDefault();
 
         const threshold = $el.getwidth() / 3;
@@ -192,6 +218,8 @@ function sidenav(activator, toggler) {
     }
 
     function resetState() {
+        starty = 0;
+        isScrolling = false;
         touch.total = 0;
         touch.start = 0;
         touch.end = 0;

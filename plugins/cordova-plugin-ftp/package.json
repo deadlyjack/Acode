@@ -1,35 +1,7 @@
 {
-  "_from": "cordova-plugin-ftp",
-  "_id": "cordova-plugin-ftp@1.1.1",
-  "_inBundle": false,
-  "_integrity": "sha1-mTCOG9GqVJ9M902M8jqvrQbKIXg=",
-  "_location": "/cordova-plugin-ftp",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "cordova-plugin-ftp",
-    "name": "cordova-plugin-ftp",
-    "escapedName": "cordova-plugin-ftp",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-ftp/-/cordova-plugin-ftp-1.1.1.tgz",
-  "_shasum": "99308e1bd1aa549f4cf74d8cf23aafad06ca2178",
-  "_spec": "cordova-plugin-ftp",
-  "_where": "/mnt/sda1/cordova/code editor free",
-  "author": {
-    "name": "pax"
-  },
-  "bugs": {
-    "url": "https://github.com/xfally/cordova-plugin-ftp/issues"
-  },
-  "bundleDependencies": false,
+  "name": "cordova-plugin-ftp",
+  "version": "1.1.1",
+  "description": "This cordova plugin is created to use ftp (client) in web/js.",
   "cordova": {
     "id": "cordova-plugin-ftp",
     "platforms": [
@@ -37,23 +9,23 @@
       "ios"
     ]
   },
-  "deprecated": false,
-  "description": "This cordova plugin is created to use ftp (client) in web/js.",
-  "homepage": "https://github.com/xfally/cordova-plugin-ftp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xfally/cordova-plugin-ftp"
+  },
   "keywords": [
     "cordova",
     "ftp",
     "cordova-android",
     "cordova-ios"
   ],
+  "author": "pax",
   "license": "Apache-2.0",
-  "name": "cordova-plugin-ftp",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/xfally/cordova-plugin-ftp.git"
+  "bugs": {
+    "url": "https://github.com/xfally/cordova-plugin-ftp/issues"
   },
+  "homepage": "https://github.com/xfally/cordova-plugin-ftp",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "version": "1.1.1"
+  }
 }

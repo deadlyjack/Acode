@@ -2,7 +2,7 @@ define("ace/snippets/turtle",["require","exports","module"], function(require, e
 "use strict";
 
 exports.snippetText =undefined;
-exports.scope = "";
+exports.scope = "turtle";
 
 });                (function() {
                     window.require(["ace/snippets/turtle"], function(m) {

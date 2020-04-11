@@ -1,6 +1,7 @@
 /// <reference path="../node_modules/@types/ace/"/>
 /// <reference path="../node_modules/html-tag-js/dist/tag.d.ts"/>
 
+
 interface Acode {
     exec(command: string, value?: any): boolean;
 }
@@ -125,6 +126,18 @@ interface ExternalFs {
     uuid: string;
 }
 
+interface RemoteFs {
+    listDir(path: string): Promise<Array<FsEntry>>
+    readFile(path: string): Promise<ArrayBuffer | string>
+    createFile(parent: string, filename: string): Promise;
+    createDir(path: string): Promise;
+    deleteFile(filename: string): Promise;
+    writeFile(filename: string, content: string): Promise;
+    rename(src: string, newname: string): Promise;
+    copyTo(src: string, dest: string): Promise;
+    origin: string;
+}
+
 interface fileData {
     file: FileEntry;
     data: ArrayBuffer;
@@ -140,7 +153,16 @@ interface InternalFs {
     renameFile(src: string, newname: string): Promise<void>;
 }
 
+interface FsEntry {
+    url: string;
+    isDirectory: boolean;
+    isFile: boolean;
+}
+
 interface FileSystem {
+    lsDir(): Promise<Array<FsEntry>>
+    readFile(): Promise<ArrayBuffer>;
+    readFile(encoding: string): Promise<string>;
     writeFile(content: string): Promise<void>;
     createFile(name: string): Promise<void>,
     createDirectory(name: string): Promise<void>;
@@ -237,14 +259,22 @@ interface Strings {
     [key: string]: string
 }
 
-interface Folders {
-    [key: string]: Folder
+interface Collaspable {
+    $title: HTMLElement;
+    $ul: HTMLElement;
+    ontoggle(): void;
+    collapse(): void;
+    uncollapse(): void;
+    collapsed: boolean
 }
 
 interface Folder {
     reload(): void;
-    name: string;
+    url: string;
+    $node: Collaspable & HTMLElement;
     remove(): void;
+    reloadOnResume: boolean;
+    saveState: boolean;
 }
 
 interface Window {
@@ -277,7 +307,7 @@ declare var strings: Strings;
 declare var actionStack: ActionStack;
 declare var ace: AceAjax;
 declare var fileClipBoard: FileClipBoard;
-declare var addedFolder: Folders;
+declare var addedFolder: Array<Folder>;
 declare var editorManager: Manager;
 declare var saveInterval: Number;
 declare var freeze: Boolean;
@@ -290,6 +320,7 @@ declare var gistRecordURL: string;
 declare var Acode: Acode;
 declare var DATA_STORAGE: string;
 declare var CACHE_STORAGE: string;
+declare var CACHE_STORAGE_REMOTE: string;
 declare var KEYBINDING_FILE: string;
 declare var externalStorage: externalStorage;
 declare var AceMouseEvent: any;

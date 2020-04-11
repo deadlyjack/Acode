@@ -44,15 +44,22 @@ import loadPolyFill from "./modules/polyfill";
     toggler.onclick = toggleConsole;
 
     toggler.ontouchstart = function () {
-        document.ontouchmove = function (e) {
-            toggler.style.transform = "translate(".concat(e.touches[0].clientX - 20, "px, ").concat(e.touches[0].clientY - 20, "px)");
-        };
+        document.addEventListener('touchmove', touchmove, {
+            passive: false
+        });
 
         document.ontouchend = function (e) {
-            document.ontouchmove = null;
+            document.removeEventListener('touchmove', touchmove, {
+                passive: 'false'
+            });
             document.ontouchend = null;
         };
     };
+
+    function touchmove(e) {
+        e.preventDefault();
+        toggler.style.transform = "translate(".concat(e.touches[0].clientX - 20, "px, ").concat(e.touches[0].clientY - 20, "px)");
+    }
 
     const errId = '_c_error' + new Date().getMilliseconds();
     const consoleElement = document.createElement('c-console');
@@ -376,7 +383,7 @@ import loadPolyFill from "./modules/polyfill";
             args.splice(0, 1);
         } else {
             const err = getErrorObject();
-            const caller_line = err.stack.split('\n')[arguments[0] === errId ? 4 : 3];
+            const caller_line = err.stack.split('\n')[arguments[0] === errId ? 4 : 3] || 'at console';
             const index = caller_line.indexOf("at ");
             clean = caller_line.slice(index + 2, caller_line.length);
         }

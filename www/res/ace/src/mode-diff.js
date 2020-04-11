@@ -134,6 +134,7 @@ define("ace/mode/diff", ["require", "exports", "module", "ace/lib/oop", "ace/mod
     (function () {
 
         this.$id = "ace/mode/diff";
+        this.snippetFileId = "ace/snippets/diff";
     }).call(Mode.prototype);
 
     exports.Mode = Mode;

@@ -2,7 +2,7 @@ define("ace/snippets/zeek",["require","exports","module"], function(require, exp
 "use strict";
 
 exports.snippetText =undefined;
-exports.scope = "";
+exports.scope = "zeek";
 
 });                (function() {
                     window.require(["ace/snippets/zeek"], function(m) {

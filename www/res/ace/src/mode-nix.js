@@ -489,6 +489,7 @@ oop.inherits(Mode, TextMode);
     };
 
     this.$id = "ace/mode/c_cpp";
+    this.snippetFileId = "ace/snippets/c_cpp";
 }).call(Mode.prototype);
 
 exports.Mode = Mode;

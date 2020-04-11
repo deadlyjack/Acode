@@ -9,6 +9,7 @@
     "config-build": "node ./utils/config.js",
     "build": "webpack",
     "build-run": "yarn config-build d && webpack && cordova run android",
+    "build-release-free": "yarn config-build p free && webpack && cordova build android --release",
     "build-release": "yarn config-build p && webpack && cordova build android --release"
   },
   "keywords": [
@@ -18,6 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "@babel/runtime": "^7.5.5",
+    "@deadlyjack/ajax": "^1.0.7",
     "autosize": "^4.0.2",
     "axios": "^0.19.2",
     "cordova-android": "^8.1.0",
@@ -28,9 +30,8 @@
     "cordova-plugin-buildinfo": "^4.0.0",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^6.0.2",
-    "cordova-plugin-ftp": "^1.1.1",
+    "cordova-plugin-ftp": "file:../plugins/cordova-plugin-ftp",
     "cordova-plugin-intent": "git+https://github.com/napolitano/cordova-plugin-intent.git",
-    "cordova-plugin-ionic-keyboard": "^2.2.0",
     "cordova-plugin-navigationbar-color": "0.0.9",
     "cordova-plugin-shell-exec": "^1.0.0",
     "cordova-plugin-statusbar": "git+https://github.com/breautek/cordova-plugin-statusbar.git",
@@ -41,7 +42,6 @@
     "core-js": "^3.2.0",
     "crypto-js": "^3.1.9-1",
     "debug": "^4.1.1",
-    "eruda": "^2.2.1",
     "html-tag-js": "^0.2.22",
     "js-base64": "^2.5.1",
     "marked": "^0.8.0",
@@ -83,16 +83,15 @@
       "cordova-plugin-android-permissions": {},
       "cordova-plugin-vibration": {},
       "cordova-clipboard": {},
-      "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-buildinfo": {},
       "cordova-plugin-webserver": {},
-      "cordova-plugin-ftp": {},
       "cordova-plugin-inappbrowser": {},
       "cordova.plugins.diagnostic": {
         "ANDROID_SUPPORT_VERSION": "28.+"
       },
       "cordova-disable-http-cache": {},
-      "cordova-plugin-sdcard": {}
+      "cordova-plugin-sdcard": {},
+      "cordova-plugin-ftp": {}
     },
     "platforms": [
       "android"

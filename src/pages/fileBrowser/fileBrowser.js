@@ -451,11 +451,11 @@ function FileBrowser(type = 'file', option = null) {
         function updateAddedFolder(url) {
             if (cachedDir[url]) delete cachedDir[url];
             if (cachedDir[currentDir.url]) delete cachedDir[currentDir.url];
-            for (let key in addedFolder) {
-                if (key === url) {
-                    addedFolder[key].remove();
+            for (let folder of addedFolder) {
+                if (folder.url === url) {
+                    folder.remove();
                 } else if (new RegExp(key).test(currentDir.url)) {
-                    addedFolder[key].reload();
+                    folder.reload();
                 }
             }
         }

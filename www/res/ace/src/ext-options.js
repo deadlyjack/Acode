@@ -2,65 +2,65 @@ define("ace/ext/menu_tools/overlay_page", ["require", "exports", "module", "ace/
     'use strict';
     var dom = require("../../lib/dom");
     var cssText = "#ace_settingsmenu, #kbshortcutmenu {\
-background-color: #F7F7F7;\
-color: black;\
-box-shadow: -5px 4px 5px rgba(126, 126, 126, 0.55);\
-padding: 1em 0.5em 2em 1em;\
-overflow: auto;\
-position: absolute;\
-margin: 0;\
-bottom: 0;\
-right: 0;\
-top: 0;\
-z-index: 9991;\
-cursor: default;\
-}\
-.ace_dark #ace_settingsmenu, .ace_dark #kbshortcutmenu {\
-box-shadow: -20px 10px 25px rgba(126, 126, 126, 0.25);\
-background-color: rgba(255, 255, 255, 0.6);\
-color: black;\
-}\
-.ace_optionsMenuEntry:hover {\
-background-color: rgba(100, 100, 100, 0.1);\
-transition: all 0.3s\
-}\
-.ace_closeButton {\
-background: rgba(245, 146, 146, 0.5);\
-border: 1px solid #F48A8A;\
-border-radius: 50%;\
-padding: 7px;\
-position: absolute;\
-right: -8px;\
-top: -8px;\
-z-index: 100000;\
-}\
-.ace_closeButton{\
-background: rgba(245, 146, 146, 0.9);\
-}\
-.ace_optionsMenuKey {\
-color: darkslateblue;\
-font-weight: bold;\
-}\
-.ace_optionsMenuCommand {\
-color: darkcyan;\
-font-weight: normal;\
-}\
-.ace_optionsMenuEntry input, .ace_optionsMenuEntry button {\
-vertical-align: middle;\
-}\
-.ace_optionsMenuEntry button[ace_selected_button=true] {\
-background: #e7e7e7;\
-box-shadow: 1px 0px 2px 0px #adadad inset;\
-border-color: #adadad;\
-}\
-.ace_optionsMenuEntry button {\
-background: white;\
-border: 1px solid lightgray;\
-margin: 0px;\
-}\
-.ace_optionsMenuEntry button:hover{\
-background: #f0f0f0;\
-}";
+    background-color: #F7F7F7;\
+    color: black;\
+    box-shadow: -5px 4px 5px rgba(126, 126, 126, 0.55);\
+    padding: 1em 0.5em 2em 1em;\
+    overflow: auto;\
+    position: absolute;\
+    margin: 0;\
+    bottom: 0;\
+    right: 0;\
+    top: 0;\
+    z-index: 9991;\
+    cursor: default;\
+    }\
+    .ace_dark #ace_settingsmenu, .ace_dark #kbshortcutmenu {\
+    box-shadow: -20px 10px 25px rgba(126, 126, 126, 0.25);\
+    background-color: rgba(255, 255, 255, 0.6);\
+    color: black;\
+    }\
+    .ace_optionsMenuEntry:hover {\
+    background-color: rgba(100, 100, 100, 0.1);\
+    transition: all 0.3s\
+    }\
+    .ace_closeButton {\
+    background: rgba(245, 146, 146, 0.5);\
+    border: 1px solid #F48A8A;\
+    border-radius: 50%;\
+    padding: 7px;\
+    position: absolute;\
+    right: -8px;\
+    top: -8px;\
+    z-index: 100000;\
+    }\
+    .ace_closeButton{\
+    background: rgba(245, 146, 146, 0.9);\
+    }\
+    .ace_optionsMenuKey {\
+    color: darkslateblue;\
+    font-weight: bold;\
+    }\
+    .ace_optionsMenuCommand {\
+    color: darkcyan;\
+    font-weight: normal;\
+    }\
+    .ace_optionsMenuEntry input, .ace_optionsMenuEntry button {\
+    vertical-align: middle;\
+    }\
+    .ace_optionsMenuEntry button[ace_selected_button=true] {\
+    background: #e7e7e7;\
+    box-shadow: 1px 0px 2px 0px #adadad inset;\
+    border-color: #adadad;\
+    }\
+    .ace_optionsMenuEntry button {\
+    background: white;\
+    border: 1px solid lightgray;\
+    margin: 0px;\
+    }\
+    .ace_optionsMenuEntry button:hover{\
+    background: #f0f0f0;\
+    }";
     dom.importCssString(cssText);
 
     module.exports.overlayPage = function overlayPage(editor, contentElement, callback) {
@@ -162,22 +162,23 @@ define("ace/ext/modelist", ["require", "exports", "module"], function (require, 
         ABC: ["abc"],
         ActionScript: ["as"],
         ADA: ["ada|adb"],
+        Alda: ["alda"],
         Apache_Conf: ["^htaccess|^htgroups|^htpasswd|^conf|htaccess|htgroups|htpasswd"],
+        Apex: ["apex|cls|trigger|tgr"],
+        AQL: ["aql"],
         AsciiDoc: ["asciidoc|adoc"],
         ASL: ["dsl|asl"],
         Assembly_x86: ["asm|a"],
         AutoHotKey: ["ahk"],
-        Apex: ["apex|cls|trigger|tgr"],
-        AQL: ["aql"],
         BatchFile: ["bat|cmd"],
         C_Cpp: ["cpp|c|cc|cxx|h|hh|hpp|ino"],
         C9Search: ["c9search_results"],
-        Crystal: ["cr"],
         Cirru: ["cirru|cr"],
         Clojure: ["clj|cljs"],
         Cobol: ["CBL|COB"],
         coffee: ["coffee|cf|cson|^Cakefile"],
         ColdFusion: ["cfm"],
+        Crystal: ["cr"],
         CSharp: ["cs"],
         Csound_Document: ["csd"],
         Csound_Orchestra: ["orc"],
@@ -225,6 +226,7 @@ define("ace/ext/modelist", ["require", "exports", "module"], function (require, 
         Java: ["java"],
         JavaScript: ["js|jsm|jsx"],
         JSON: ["json"],
+        JSON5: ["json5"],
         JSONiq: ["jq"],
         JSP: ["jsp"],
         JSSM: ["jssm|jssm_state"],
@@ -246,30 +248,34 @@ define("ace/ext/modelist", ["require", "exports", "module"], function (require, 
         Mask: ["mask"],
         MATLAB: ["matlab"],
         Maze: ["mz"],
+        MediaWiki: ["wiki|mediawiki"],
         MEL: ["mel"],
         MIXAL: ["mixal"],
         MUSHCode: ["mc|mush"],
         MySQL: ["mysql"],
         Nginx: ["nginx|conf"],
-        Nix: ["nix"],
         Nim: ["nim"],
+        Nix: ["nix"],
         NSIS: ["nsi|nsh"],
+        Nunjucks: ["nunjucks|nunjs|nj|njk"],
         ObjectiveC: ["m|mm"],
         OCaml: ["ml|mli"],
         Pascal: ["pas|p"],
         Perl: ["pl|pm"],
         Perl6: ["p6|pl6|pm6"],
         pgSQL: ["pgsql"],
-        PHP_Laravel_blade: ["blade.php"],
         PHP: ["php|inc|phtml|shtml|php3|php4|php5|phps|phpt|aw|ctp|module"],
-        Puppet: ["epp|pp"],
+        PHP_Laravel_blade: ["blade.php"],
         Pig: ["pig"],
         Powershell: ["ps1"],
         Praat: ["praat|praatscript|psc|proc"],
+        Prisma: ["prisma"],
         Prolog: ["plg|prolog"],
         Properties: ["properties"],
         Protobuf: ["proto"],
+        Puppet: ["epp|pp"],
         Python: ["py"],
+        QML: ["qml"],
         R: ["r"],
         Razor: ["cshtml|asp"],
         RDoc: ["Rd"],
@@ -367,7 +373,7 @@ define("ace/ext/themelist", ["require", "exports", "module"], function (require,
         ["Solarized Light"],
         ["TextMate"],
         ["Tomorrow"],
-        ["XCode"],
+        ["Xcode"],
         ["Kuroir"],
         ["KatzenMilch"],
         ["SQL Server", "sqlserver", "light"],
@@ -384,6 +390,7 @@ define("ace/ext/themelist", ["require", "exports", "module"], function (require,
         ["Merbivore Soft", "merbivore_soft", "dark"],
         ["Mono Industrial", "mono_industrial", "dark"],
         ["Monokai", "monokai", "dark"],
+        ["Nord Dark", "nord_dark", "dark"],
         ["Pastel on dark", "pastel_on_dark", "dark"],
         ["Solarized Dark", "solarized_dark", "dark"],
         ["Terminal", "terminal", "dark"],
@@ -413,8 +420,8 @@ define("ace/ext/themelist", ["require", "exports", "module"], function (require,
 
 define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/overlay_page", "ace/lib/dom", "ace/lib/oop", "ace/config", "ace/lib/event_emitter", "ace/ext/modelist", "ace/ext/themelist"], function (require, exports, module) {
     "use strict";
-    var overlayPage = require('./menu_tools/overlay_page').overlayPage;
 
+    require("./menu_tools/overlay_page");
 
     var dom = require("../lib/dom");
     var oop = require("../lib/oop");
@@ -474,6 +481,10 @@ define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/o
                     {
                         caption: "Sublime",
                         value: "ace/keyboard/sublime"
+                    },
+                    {
+                        caption: "VSCode",
+                        value: "ace/keyboard/vscode"
                     }
                 ]
             },
@@ -555,6 +566,7 @@ define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/o
             "Soft Tabs": [{
                 path: "useSoftTabs"
             }, {
+                ariaLabel: "Tab Size",
                 path: "tabSize",
                 type: "number",
                 values: [2, 3, 4, 8, 16]
@@ -584,6 +596,12 @@ define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/o
             "Enable Behaviours": {
                 path: "behavioursEnabled"
             },
+            "Wrap with quotes": {
+                path: "wrapBehavioursEnabled"
+            },
+            "Enable Auto Indent": {
+                path: "enableAutoIndent"
+            },
             "Full Line Selection": {
                 type: "checkbox",
                 values: "text|line",
@@ -598,11 +616,12 @@ define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/o
             "Show Indent Guides": {
                 path: "displayIndentGuides"
             },
-            "Persistent Scrollbar": [{
+            "Persistent HScrollbar": {
                 path: "hScrollBarAlwaysVisible"
-            }, {
+            },
+            "Persistent VScrollbar": {
                 path: "vScrollBarAlwaysVisible"
-            }],
+            },
             "Animate scrolling": {
                 path: "animatedScroll"
             },
@@ -621,6 +640,7 @@ define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/o
             "Show Print Margin": [{
                 path: "showPrintMargin"
             }, {
+                ariaLabel: "Print Margin",
                 type: "number",
                 path: "printMarginColumn"
             }],
@@ -692,6 +712,7 @@ define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/o
         this.render = function () {
             this.container.innerHTML = "";
             buildDom(["table", {
+                    role: "presentation",
                     id: "controls"
                 },
                 this.renderOptionGroup(optionGroups.Main),
@@ -699,6 +720,7 @@ define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/o
                         colspan: 2
                     },
                     ["table", {
+                            role: "presentation",
                             id: "more-controls"
                         },
                         this.renderOptionGroup(optionGroups.More)
@@ -748,17 +770,23 @@ define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/o
             }
 
             if (option.type == "buttonBar") {
-                control = ["div", option.items.map(function (item) {
+                control = ["div", {
+                    role: "group",
+                    "aria-labelledby": option.path + "-label"
+                }, option.items.map(function (item) {
                     return ["button", {
                         value: item.value,
                         ace_selected_button: value == item.value,
+                        'aria-pressed': value == item.value,
                         onclick: function () {
                             self.setOption(option, item.value);
                             var nodes = this.parentNode.querySelectorAll("[ace_selected_button]");
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].removeAttribute("ace_selected_button");
+                                nodes[i].setAttribute("aria-pressed", false);
                             }
                             this.setAttribute("ace_selected_button", true);
+                            this.setAttribute("aria-pressed", true);
                         }
                     }, item.desc || item.caption || item.name];
                 })];
@@ -771,6 +799,11 @@ define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/o
                         self.setOption(option, parseInt(this.value));
                     }
                 }];
+                if (option.ariaLabel) {
+                    control[1]["aria-label"] = option.ariaLabel;
+                } else {
+                    control[1].id = key;
+                }
                 if (option.defaults) {
                     control = [control, option.defaults.map(function (item) {
                         return ["button", {
@@ -829,15 +862,18 @@ define("ace/ext/options", ["require", "exports", "module", "ace/ext/menu_tools/o
         this.renderOption = function (key, option) {
             if (option.path && !option.onchange && !this.editor.$options[option.path])
                 return;
-            this.options[option.path] = option;
-            var safeKey = "-" + option.path;
+            var path = Array.isArray(option) ? option[0].path : option.path;
+            this.options[path] = option;
+            var safeKey = "-" + path;
+            var safeId = path + "-label";
             var control = this.renderOptionControl(safeKey, option);
             return ["tr", {
                     class: "ace_optionsMenuEntry"
                 },
                 ["td",
                     ["label", {
-                        for: safeKey
+                        for: safeKey,
+                        id: safeId
                     }, key]
                 ],
                 ["td", control]

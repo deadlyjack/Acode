@@ -735,6 +735,12 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                 }
                 snippetMap[scope].push(s);
 
+                if (s.prefix)
+                    s.tabTrigger = s.prefix;
+
+                if (!s.content && s.body)
+                    s.content = Array.isArray(s.body) ? s.body.join("\n") : s.body;
+
                 if (s.tabTrigger && !s.trigger) {
                     if (!s.guard && /^\w/.test(s.tabTrigger))
                         s.guard = "\\b";
@@ -751,10 +757,13 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                 s.endTriggerRe = new RegExp(s.endTrigger);
             }
 
-            if (snippets && snippets.content)
-                addSnippet(snippets);
-            else if (Array.isArray(snippets))
+            if (Array.isArray(snippets)) {
                 snippets.forEach(addSnippet);
+            } else {
+                Object.keys(snippets).forEach(function (key) {
+                    addSnippet(snippets[key]);
+                });
+            }
 
             this._signal("registerSnippets", {
                 scope: scope
@@ -809,7 +818,7 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                         snippet.tabTrigger = val.match(/^\S*/)[0];
                         if (!snippet.name)
                             snippet.name = val;
-                    } else {
+                    } else if (key) {
                         snippet[key] = val;
                     }
                 }
@@ -872,15 +881,16 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
         this.onChange = function (delta) {
             var isRemove = delta.action[0] == "r";
-            var parents = this.selectedTabstop && this.selectedTabstop.parents || {};
+            var selectedTabstop = this.selectedTabstop || {};
+            var parents = selectedTabstop.parents || {};
             var tabstops = (this.tabstops || []).slice();
             for (var i = 0; i < tabstops.length; i++) {
                 var ts = tabstops[i];
-                var active = ts == this.selectedTabstop || parents[ts.index];
+                var active = ts == selectedTabstop || parents[ts.index];
                 ts.rangeList.$bias = active ? 0 : 1;
 
-                if (delta.action == "remove" && ts !== this.selectedTabstop) {
-                    var parentActive = ts.parents && ts.parents[this.selectedTabstop.index];
+                if (delta.action == "remove" && ts !== selectedTabstop) {
+                    var parentActive = ts.parents && ts.parents[selectedTabstop.index];
                     var startIndex = ts.rangeList.pointIndex(delta.start, parentActive);
                     startIndex = startIndex < 0 ? -startIndex - 1 : startIndex + 1;
                     var endIndex = ts.rangeList.pointIndex(delta.end, parentActive);
@@ -995,8 +1005,6 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
             var ranges = this.ranges;
             tabstops.forEach(function (ts, index) {
                 var dest = this.$openTabstops[index] || ts;
-                ts.rangeList = new RangeList();
-                ts.rangeList.$bias = 0;
 
                 for (var i = 0; i < ts.length; i++) {
                     var p = ts[i];
@@ -1006,7 +1014,6 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                     range.original = p;
                     range.tabstop = dest;
                     ranges.push(range);
-                    ts.rangeList.ranges.push(range);
                     if (dest != ts)
                         dest.unshift(range);
                     else
@@ -1024,6 +1031,9 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                     this.$openTabstops[index] = dest;
                 }
                 this.addTabstopMarkers(dest);
+                dest.rangeList = dest.rangeList || new RangeList();
+                dest.rangeList.$bias = 0;
+                dest.rangeList.addList(dest);
             }, this);
 
             if (arg.length > 2) {
@@ -1066,21 +1076,18 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
         this.keyboardHandler = new HashHandler();
         this.keyboardHandler.bindKeys({
-            "Tab": function (ed) {
-                if (exports.snippetManager && exports.snippetManager.expandWithTab(ed)) {
+            "Tab": function (editor) {
+                if (exports.snippetManager && exports.snippetManager.expandWithTab(editor))
                     return;
-                }
-
-                ed.tabstopManager.tabNext(1);
+                editor.tabstopManager.tabNext(1);
+                editor.renderer.scrollCursorIntoView();
             },
-            "Shift-Tab": function (ed) {
-                ed.tabstopManager.tabNext(-1);
+            "Shift-Tab": function (editor) {
+                editor.tabstopManager.tabNext(-1);
+                editor.renderer.scrollCursorIntoView();
             },
-            "Esc": function (ed) {
-                ed.tabstopManager.detach();
-            },
-            "Return": function (ed) {
-                return false;
+            "Esc": function (editor) {
+                editor.tabstopManager.detach();
             }
         });
     }).call(TabstopManager.prototype);
@@ -1101,13 +1108,13 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
 
     require("./lib/dom").importCssString("\
-.ace_snippet-marker {\
-    -moz-box-sizing: border-box;\
-    box-sizing: border-box;\
-    background: rgba(194, 193, 208, 0.09);\
-    border: 1px dotted rgba(211, 208, 235, 0.62);\
-    position: absolute;\
-}");
+  .ace_snippet-marker {\
+      -moz-box-sizing: border-box;\
+      box-sizing: border-box;\
+      background: rgba(194, 193, 208, 0.09);\
+      border: 1px dotted rgba(211, 208, 235, 0.62);\
+      position: absolute;\
+  }");
 
     exports.snippetManager = new SnippetManager();
 
@@ -1430,54 +1437,54 @@ define("ace/autocomplete/popup", ["require", "exports", "module", "ace/virtual_r
     };
 
     dom.importCssString("\
-.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
-    background-color: #CAD6FA;\
-    z-index: 1;\
-}\
-.ace_dark.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
-    background-color: #3a674e;\
-}\
-.ace_editor.ace_autocomplete .ace_line-hover {\
-    border: 1px solid #abbffe;\
-    margin-top: -1px;\
-    background: rgba(233,233,253,0.4);\
-    position: absolute;\
-    z-index: 2;\
-}\
-.ace_dark.ace_editor.ace_autocomplete .ace_line-hover {\
-    border: 1px solid rgba(109, 150, 13, 0.8);\
-    background: rgba(58, 103, 78, 0.62);\
-}\
-.ace_completion-meta {\
-    opacity: 0.5;\
-    margin: 0.9em;\
-}\
-.ace_completion-message {\
-    color: blue;\
-}\
-.ace_editor.ace_autocomplete .ace_completion-highlight{\
-    color: #2d69c7;\
-}\
-.ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight{\
-    color: #93ca12;\
-}\
-.ace_editor.ace_autocomplete {\
-    width: 300px;\
-    z-index: 200000;\
-    border: 1px lightgray solid;\
-    position: fixed;\
-    box-shadow: 2px 3px 5px rgba(0,0,0,.2);\
-    line-height: 1.4;\
-    background: #fefefe;\
-    color: #111;\
-}\
-.ace_dark.ace_editor.ace_autocomplete {\
-    border: 1px #484747 solid;\
-    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.51);\
-    line-height: 1.4;\
-    background: #25282c;\
-    color: #c1c1c1;\
-}", "autocompletion.css");
+  .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
+      background-color: #CAD6FA;\
+      z-index: 1;\
+  }\
+  .ace_dark.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
+      background-color: #3a674e;\
+  }\
+  .ace_editor.ace_autocomplete .ace_line-hover {\
+      border: 1px solid #abbffe;\
+      margin-top: -1px;\
+      background: rgba(233,233,253,0.4);\
+      position: absolute;\
+      z-index: 2;\
+  }\
+  .ace_dark.ace_editor.ace_autocomplete .ace_line-hover {\
+      border: 1px solid rgba(109, 150, 13, 0.8);\
+      background: rgba(58, 103, 78, 0.62);\
+  }\
+  .ace_completion-meta {\
+      opacity: 0.5;\
+      margin: 0.9em;\
+  }\
+  .ace_completion-message {\
+      color: blue;\
+  }\
+  .ace_editor.ace_autocomplete .ace_completion-highlight{\
+      color: #2d69c7;\
+  }\
+  .ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight{\
+      color: #93ca12;\
+  }\
+  .ace_editor.ace_autocomplete {\
+      width: 300px;\
+      z-index: 200000;\
+      border: 1px lightgray solid;\
+      position: fixed;\
+      box-shadow: 2px 3px 5px rgba(0,0,0,.2);\
+      line-height: 1.4;\
+      background: #fefefe;\
+      color: #111;\
+  }\
+  .ace_dark.ace_editor.ace_autocomplete {\
+      border: 1px #484747 solid;\
+      box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.51);\
+      line-height: 1.4;\
+      background: #25282c;\
+      color: #c1c1c1;\
+  }", "autocompletion.css");
 
     exports.AcePopup = AcePopup;
     exports.$singleLineEditor = $singleLineEditor;
@@ -1500,7 +1507,7 @@ define("ace/autocomplete/util", ["require", "exports", "module"], function (requ
         }
     };
 
-    var ID_REGEX = /[a-zA-Z_0-9\$\-\u00A2-\uFFFF]/;
+    var ID_REGEX = /[a-zA-Z_0-9\$\-\u00A2-\u2000\u2070-\uFFFF]/;
 
     exports.retrievePrecedingIdentifier = function (text, pos, regex) {
         regex = regex || ID_REGEX;
@@ -1876,11 +1883,6 @@ define("ace/autocomplete", ["require", "exports", "module", "ace/keyboard/hash_h
                 };
             if (!doc || !(doc.docHTML || doc.docText))
                 return this.hideDocTooltip();
-            this.showDocTooltip(doc);
-        };
-
-        this.showDocTooltip = function (item) {
-            return;
         };
 
         this.hideDocTooltip = function () {
@@ -2163,31 +2165,33 @@ define("ace/ext/language_tools", ["require", "exports", "module", "ace/snippets"
     };
 
     var loadSnippetsForMode = function (mode) {
-        var id = mode.$id;
+        if (typeof mode == "string")
+            mode = config.$modes[mode];
+        if (!mode)
+            return;
         if (!snippetManager.files)
             snippetManager.files = {};
-        loadSnippetFile(id);
+
+        loadSnippetFile(mode.$id, mode.snippetFileId);
         if (mode.modes)
             mode.modes.forEach(loadSnippetsForMode);
     };
 
-    var loadSnippetFile = function (id) {
-        if (!id || snippetManager.files[id])
+    var loadSnippetFile = function (id, snippetFilePath) {
+        if (!snippetFilePath || !id || snippetManager.files[id])
             return;
-        var snippetFilePath = id.replace("mode", "snippets");
         snippetManager.files[id] = {};
         config.loadModule(snippetFilePath, function (m) {
-            if (m) {
-                snippetManager.files[id] = m;
-                if (!m.snippets && m.snippetText)
-                    m.snippets = snippetManager.parseSnippetFile(m.snippetText);
-                snippetManager.register(m.snippets || [], m.scope);
-                if (m.includeScopes) {
-                    snippetManager.snippetMap[m.scope].includeScopes = m.includeScopes;
-                    m.includeScopes.forEach(function (x) {
-                        loadSnippetFile("ace/mode/" + x);
-                    });
-                }
+            if (!m) return;
+            snippetManager.files[id] = m;
+            if (!m.snippets && m.snippetText)
+                m.snippets = snippetManager.parseSnippetFile(m.snippetText);
+            snippetManager.register(m.snippets || [], m.scope);
+            if (m.includeScopes) {
+                snippetManager.snippetMap[m.scope].includeScopes = m.includeScopes;
+                m.includeScopes.forEach(function (x) {
+                    loadSnippetsForMode("ace/mode/" + x);
+                });
             }
         });
     };

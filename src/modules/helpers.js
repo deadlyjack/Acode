@@ -5,6 +5,7 @@ import keyBindings from '../keyBindings';
 import fs from './utils/internalFs';
 import tag from 'html-tag-js';
 import ajax from './utils/ajax';
+import path from './utils/path';
 
 /**
  * 
@@ -206,6 +207,7 @@ function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null
         item.type = item.isFile ? getIconForFile(item.name) : 'folder';
         item.readOnly = readOnly;
         item.canWrite = !readOnly;
+        item.name = item.name || getCombination(item.url) || '';
 
         if (origin) item.origin = origin;
         if (uuid) item.uuid = uuid;
@@ -243,7 +245,7 @@ function getIconForFile(filename) {
     let ext = getExt(filename);
 
     if (['mp4', 'm4a', 'mov', '3gp', 'wmv', 'flv', 'avi'].includes(ext)) file = 'movie';
-    if (['png', 'svg', 'jpeg', 'jpg', 'gif', 'ico'].includes(ext)) file = 'image';
+    if (['png', 'jpeg', 'jpg', 'gif', 'ico', 'webp'].includes(ext)) file = 'image';
     if (['wav', 'mp3', 'flac'].includes(ext)) file = 'audiotrack';
     if (['zip', 'rar', 'tar', 'deb'].includes(ext)) file = 'zip';
     if (ext === 'apk') file = 'android';
@@ -338,11 +340,10 @@ function removeLineBreaks(str) {
  * @param {string} url 
  */
 function updateFolders(url) {
-    url = encodeURI(decodeURL(url));
-    for (let key in addedFolder) {
-        if (new RegExp(key).test(url)) {
-            addedFolder[key].reload();
-        }
+    url = decodeURL(url);
+    for (let folder of addedFolder) {
+        const furl = decodeURL(folder.url);
+        if (path.isParent(furl, url)) folder.reload();
     }
 }
 
@@ -390,20 +391,6 @@ function b64toBlob(byteCharacters, contentType, sliceSize) {
 }
 
 /**
- * Get path from full URI. eg.
- * ```js
-    getPath("this/is/a/file.txt", "file.txt"); //'this/is/a/'
-    getPath("this/is/a/file") //'this/is/a/'
- * ```
- * @param {string} fullname native url of the file
- * @param {string} [name] 
- */
-function getPath(fullname, name) {
-    if (name) return fullname.replace(new RegExp(name + '$'), '');
-    return fullname.split('/').slice(0, -1).join('/') + '/';
-}
-
-/**
  * Checks if content is binary
  * @param {any} content 
  * @returns {boolean}
@@ -425,44 +412,31 @@ function decodeURL(url) {
     }
     return url;
 }
+/**
+ * 
+ * @param {Error} e 
+ * @param  {...string} args 
+ */
+function error(e, ...args) {
 
-function error(e) {
+    args.map(arg => {
+
+        try {
+            return new URL(arg).pathname;
+        } catch (error) {
+            return arg;
+        }
+
+    });
+
+    const extra = args.length && ' <br>' + args.join('<br>') || '';
     if (e.code) {
-        dialogs.alert(strings.error, getErrorMessage(e.code));
+        dialogs.alert(strings.error, getErrorMessage(e.code) + extra);
     } else {
         const msg = (e && typeof e === 'string') ? e : (toString in e && e.toString());
-        if (msg) dialogs.alert(strings.error, msg);
+        if (msg) dialogs.alert(strings.error, msg + extra);
         else window.plugins.toast.showShortBottom(strings.error);
     }
-}
-
-/**
- * Subtracts the str2 from str1 if its in leading eg. 
- * ```js
-  subtract("mystring", "my"); //'string'
-  subtract("stringmy", "my"); //'stringmy'
- * ``` 
- *
- * @param {string} str1 string to subtract from
- * @param {string} str2 string to subtract
- */
-function subtract(str1, str2) {
-    return str1.replace(new RegExp("^" + str2), '');
-}
-
-/**
-* Checks if child uri is originated from root uri eg.
-* ```js
- isParent("file:///sdcard/", "file://sdcard/path/to/file") //true 
- isParent("file:///sdcard2/", "file://sdcard1/path/to/file") //false
-* ```
-* @param {string} root 
-* @param {string} child 
-*/
-function isParent(root, child) {
-
-    return new RegExp("^" + root).test(child);
-
 }
 
 /**
@@ -476,14 +450,14 @@ function canWrite(fileUri) {
         cordova.plugins.diagnostic.getExternalSdCardDetails(ls => {
             ls.map(card => {
                 const uuid = card.path.split('/').splice(-1)[0];
-                const path = card.filePath + '/';
+                const _path = card.filePath + '/';
 
-                if (isParent(path, fileUri)) {
+                if (path.isParent(_path, fileUri)) {
                     if (!card.canWrite) {
                         resolve({
                             canWrite: false,
                             uuid,
-                            origin: path
+                            origin: _path
                         });
                     } else {
                         resolve({
@@ -494,7 +468,7 @@ function canWrite(fileUri) {
 
             });
 
-            if (isParent(cordova.file.externalRootDirectory, fileUri)) {
+            if (path.isParent(cordova.file.externalRootDirectory, fileUri)) {
                 resolve({
                     canWrite: true
                 });
@@ -594,31 +568,6 @@ function loadScript(...scripts) {
 }
 
 /**
- * Resolve the path eg.
-```js
-resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
-```
- * @param {string} path1 
- * @param {string} path2 
- */
-function resolvePath(path1, path2) {
-    if (path2[0] === '/') return path2;
-    if (!path1) return path2;
-    const path1Ar = path1.split('/');
-    const path2Ar = path2.split('/');
-
-    for (let dir of path2Ar) {
-        if (dir === '..') {
-            path1Ar.pop();
-        } else {
-            path1Ar.push(dir);
-        }
-    }
-
-    return path1Ar.join('/');
-}
-
-/**
  * 
  * @param {string} string 
  */
@@ -643,6 +592,16 @@ function getCombination(e) {
     return key.toLowerCase();
 }
 
+
+/**
+ * Show short toast at bottom
+ * @param {string} message 
+ * @param {"showLongTop"|"showLongBottom"|"showShortBottom"|"showShortCenter"|"showShortTop"} [type] 
+ */
+function showToast(message, type = "showShortBottom") {
+    window.plugins.toast[type](message);
+}
+
 export default {
     getExt,
     getErrorMessage,
@@ -657,19 +616,16 @@ export default {
     getLangNameFromFileName,
     b64toBlob,
     checkColorType,
-    getPath,
     isBinary,
     decodeURL,
     error,
-    subtract,
     canWrite,
-    isParent,
     getFeedbackBody,
     blob2text,
     uuid,
     resetKeyBindings,
     loadScript,
-    resolvePath,
     parseJSON,
-    getCombination
+    getCombination,
+    showToast
 };

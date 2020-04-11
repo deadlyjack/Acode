@@ -225,10 +225,18 @@
         background-color: inherit;
         border: none;
         color: $dialogText;
-        border-bottom: solid 2px currentColor;
-        margin: auto;
+        border-bottom: solid 1px currentColor;
         text-indent: 0;
         font-size: 1.2em;
+        margin: 2.5px auto;
+
+        &::placeholder {
+            opacity: 0.4;
+        }
+
+        &:focus {
+            border-bottom: solid 1px #39f;
+        }
     }
 
     li {

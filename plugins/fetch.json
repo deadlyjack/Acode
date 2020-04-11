@@ -95,14 +95,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-ionic-keyboard": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-ionic-keyboard"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-badge": {
     "source": {
       "type": "registry",
@@ -133,14 +125,6 @@
       "id": "cordova-plugin-extension"
     },
     "is_top_level": false,
-    "variables": {}
-  },
-  "cordova-plugin-ftp": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-ftp"
-    },
-    "is_top_level": true,
     "variables": {}
   },
   "cordova-facebook-audnet-sdk": {
@@ -187,6 +171,14 @@
     "source": {
       "type": "local",
       "path": "/mnt/sda1/cordova/code editor/node_modules/tree-chooser"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-ftp": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-plugin-ftp"
     },
     "is_top_level": true,
     "variables": {}

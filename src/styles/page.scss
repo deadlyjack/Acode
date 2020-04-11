@@ -12,8 +12,8 @@ body {
 
     &.splash {
       &::before {
-        content: '';
-        background-image: url('../res/logo/logo.png');
+        content: attr(data-version);
+        background-image: url('../res/logo/logo.svg');
         background-position: center;
         background-repeat: no-repeat;
         background-size: 180px;
@@ -24,32 +24,29 @@ body {
         height: 100vh;
         width: 100vw;
         z-index: 999999;
+
+        text-align: center;
+        line-height: 150vh;
+        color: white;
+        letter-spacing: 2.4px;
+        font-size: 1.2rem;
+        font-weight: 600;
       }
 
       &::after {
         position: absolute;
         bottom: 0;
         left: 0;
-        right: 0;
-        content: '';
-        height: 30px;
-        width: 30px;
-        border-radius: 50%;
-        border: solid 4px $primary;
-        border-bottom: solid 4px rgba($color: #000000, $alpha: 0) !important;
+        left: 50%;
+        transform: translate(-50%, 0);
+        content: attr(data-small-msg);
         margin: 15px auto;
-        animation: rotate 1s linear infinite;
         z-index: 999999;
-
-        @keyframes rotate {
-          0% {
-            transform: rotate(0deg) translateZ(0);
-          }
-
-          100% {
-            transform: rotate(360deg) translateZ(0);
-          }
-        }
+        color: white;
+        font-size: 1rem;
+        width: 90vw;
+        text-align: center;
+        color: #bd988a;
       }
     }
   }

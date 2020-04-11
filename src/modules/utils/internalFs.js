@@ -1,5 +1,5 @@
 import ajax from './ajax';
-import helpers from "../helpers";
+import path from './path';
 /**
  * 
  * @param {string} path 
@@ -32,7 +32,7 @@ function listDir(path) {
  */
 function writeFile(filename, data, create = false, exclusive = true) {
     const name = filename.split('/').pop();
-    const path = helpers.getPath(filename, name);
+    const _path = path.parent(filename, name);
     return new Promise((resolve, reject) => {
         if (!create) {
             window.resolveLocalFileSystemURL(filename, fileEntry => {
@@ -44,7 +44,7 @@ function writeFile(filename, data, create = false, exclusive = true) {
                 });
             }, reject);
         } else {
-            window.resolveLocalFileSystemURL(path, fs => {
+            window.resolveLocalFileSystemURL(_path, fs => {
                 fs.getFile(name, {
                     create,
                     exclusive: create ? exclusive : false

@@ -16,12 +16,20 @@ const recents = {
 
     localStorage.recentFiles = JSON.stringify(this.files);
   },
-  addFolder: function addFolder(folder) {
+  addFolder: function addFolder(url, opts) {
 
     if (this.folders.length >= this.MAX) this.folders.pop();
 
-    if (this.folders.includes(folder)) this.folders.splice(this.folders.indexOf(folder), 1);
-    this.folders.unshift(folder);
+    // if (this.folders.includes(folder)) this.folders.splice(this.folders.indexOf(folder), 1);
+
+    this.folders = this.folders.filter(folder => {
+      return url !== folder.url;
+    });
+
+    this.folders.unshift({
+      url,
+      opts
+    });
 
     localStorage.recentFolders = JSON.stringify(this.folders);
   }

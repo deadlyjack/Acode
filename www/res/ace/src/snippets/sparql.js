@@ -2,7 +2,7 @@ define("ace/snippets/sparql",["require","exports","module"], function(require, e
 "use strict";
 
 exports.snippetText =undefined;
-exports.scope = "";
+exports.scope = "sparql";
 
 });                (function() {
                     window.require(["ace/snippets/sparql"], function(m) {

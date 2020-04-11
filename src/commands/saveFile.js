@@ -12,7 +12,6 @@ import fsOperation from '../modules/utils/fsOperation';
  * @param {boolean} [showToast] 
  */
 function saveFile(file, as = false, showToast = true) {
-
     beautifyFile();
 
     let newFile = false;
@@ -122,6 +121,8 @@ function saveFile(file, as = false, showToast = true) {
             beautifyFile();
         }
 
+        const $text = file.assocTile.querySelector('span.text');
+        $text.textContent = strings.saving + '...';
         if (createFile) {
 
             fsOperation(file.location)
@@ -138,11 +139,13 @@ function saveFile(file, as = false, showToast = true) {
                     updateFile();
                 })
                 .catch(err => {
-                    helpers.error(err);
+                    helpers.error(err, file.location);
                     console.error(err);
-                });
+                })
+                .finally(resetText);
 
         } else {
+
             fsOperation(file.fileUri || file.contentUri)
                 .then(fs => {
                     return fs.writeFile(data);
@@ -151,9 +154,15 @@ function saveFile(file, as = false, showToast = true) {
                     updateFile();
                 })
                 .catch(err => {
-                    helpers.error(err);
+                    helpers.error(err, file.fileUri || file.contentUri);
                     console.error(err);
-                });
+                })
+                .finally(resetText);
+
+        }
+
+        function resetText() {
+            $text.textContent = file.filename;
         }
 
         function updateFile() {

@@ -1,8 +1,8 @@
 define("ace/snippets/fsharp",["require","exports","module"], function(require, exports, module) {
-    "use strict";
+"use strict";
 
-    exports.snippetText =undefined;
-    exports.scope = "fsharp";
+exports.snippetText =undefined;
+exports.scope = "fsharp";
 
 });                (function() {
                     window.require(["ace/snippets/fsharp"], function(m) {

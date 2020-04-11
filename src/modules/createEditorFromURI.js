@@ -1,10 +1,11 @@
-import fs from "./utils/internalFs";
 import helpers from "./helpers";
 import {
     lookup
 } from 'mime-types';
 import dialogs from "../components/dialogs";
 import recents from "./recents";
+import path from "./utils/path";
+import fsOperation from "./utils/fsOperation";
 
 export default createEditorFromURI;
 /**
@@ -24,7 +25,7 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
             name = uri.split('/').pop();
 
             if (!isContentUri) {
-                location = helpers.getPath(uri, name);
+                location = path.parent(uri, name);
                 fileUri = uri;
             } else {
                 contentUri = uri;
@@ -38,7 +39,7 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
             if (fileUri) {
                 if (!name)
                     name = name = fileUri.split('/').pop();
-                location = helpers.getPath(fileUri, name);
+                location = path.parent(fileUri, name);
             }
         }
         const settings = appSettings.value;
@@ -73,39 +74,43 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
             return;
         }
 
-        if (!fileUri)
+        const timeout = setTimeout(() => {
             dialogs.loaderShow(strings.loading + "...");
-        fs.readFile(fileUri || contentUri)
+        }, 100);
+
+        fsOperation(fileUri || contentUri)
+            .then(fs => {
+                return fs.readFile();
+            })
             .then(createFile)
             .catch(err => {
 
                 if (fileUri && contentUri) {
                     dialogs.loaderShow(strings.loading + '...');
-                    fs.readFile(contentUri)
-                        .then(createFile)
-                        .then(err => {
-                            resolve(index === undefined ? fileUri || contentUri : index);
+                    return fsOperation(contentUri)
+                        .then(fs => {
+                            return fs.readFile();
                         })
-                        .finally(dialogs.loaderHide);
+                        .then(createFile);
                 } else {
-                    helpers.error(err);
-                    console.log(err);
+                    helpers.error(err, fileUri);
+                    console.error(err);
                 }
-
-                resolve(index === undefined ? fileUri || contentUri : index);
             })
-            .finally(dialogs.loaderHide);
-
+            .finally(() => {
+                if (timeout) clearTimeout(timeout);
+                dialogs.loaderHide();
+                resolve(index === undefined ? fileUri || contentUri : index);
+            });
 
         /**
          * 
-         * @param {object} res 
+         * @param {object} data 
          * @param {ArrayBuffer} res.data 
          */
-        function createFile(res) {
+        function createFile(data) {
 
-            const data = res.data;
-            const size = res.file && res.file.size || data.byteLength;
+            const size = data.byteLength;
 
             if (size * 0.000001 > settings.maxFileSize) {
                 return alert(strings.error.toUpperCase(), `${strings['file too large']} ${settings.maxFileSize}MB`);

@@ -2,7 +2,7 @@ define("ace/snippets/kotlin",["require","exports","module"], function(require, e
 "use strict";
 
 exports.snippetText =undefined;
-exports.scope = "";
+exports.scope = "kotlin";
 
 });                (function() {
                     window.require(["ace/snippets/kotlin"], function(m) {

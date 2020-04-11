@@ -24,7 +24,7 @@ import dialogs from "./components/dialogs";
 import constants from "./constants";
 import HandleIntent from "./modules/handleIntent";
 import createEditorFromURI from "./modules/createEditorFromURI";
-import addFolder from "./modules/addFolder";
+import openFolder from "./modules/addFolder";
 import arrowkeys from "./modules/events/arrowkeys";
 
 import $_menu from './views/menu.hbs';
@@ -36,13 +36,14 @@ import keyBindings from './keyBindings';
 import handleQuickTools from "./modules/handleQuickTools";
 import rateBox from "./components/rateBox";
 import loadPolyFill from "./modules/polyfill";
+import internalFs from "./modules/utils/internalFs";
 //@ts-check
 
 loadPolyFill.apply(window);
 window.onload = Main;
 
 function Main() {
-  let timeout;
+  let timeout, alert = window.alert;
   const oldPreventDefault = TouchEvent.prototype.preventDefault;
   TouchEvent.prototype.preventDefault = function () {
     if (this.cancelable) {
@@ -56,14 +57,27 @@ function Main() {
     lang = language;
   }
 
+  if (!BuildInfo.debug) {
+    setTimeout(() => {
+      if (document.body.classList.contains('loading')) {
+        if (!alert("Something went wrong! Please clear app data and restart the app."))
+          if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
+      }
+    }, 1000 * 30);
+  }
+
+  setTimeout(() => {
+    if (document.body.classList.contains('loading'))
+      document.body.setAttribute('data-small-msg', 'This is taking unexpectedly long time!');
+  }, 1000 * 10);
+
   window.root = tag(window.root);
   window.app = document.body = tag(document.body);
   window.actionStack = ActionStack();
   window.editorCount = 0;
   window.alert = dialogs.alert;
-  window.addedFolder = {};
+  window.addedFolder = [];
   window.fileClipBoard = null;
-  window.isLoading = true;
   window.restoreTheme = restoreTheme;
   window.getCloseMessage = () => {};
   window.beforeClose = null;
@@ -88,9 +102,12 @@ function Main() {
 
     window.DATA_STORAGE = cordova.file.externalDataDirectory || cordova.file.dataDirectory;
     window.CACHE_STORAGE = cordova.file.externalCacheDirectory || cordova.file.cacheDirectory;
+    window.CACHE_STORAGE_REMOTE = CACHE_STORAGE + 'ftp-temp/';
     window.KEYBINDING_FILE = DATA_STORAGE + '.key-bindings.json';
     window.gitRecordURL = DATA_STORAGE + 'git/.gitfiles';
     window.gistRecordURL = DATA_STORAGE + 'git/.gistfiles';
+
+    document.body.setAttribute('data-version', 'v' + BuildInfo.version);
 
     const permissions = cordova.plugins.permissions;
     const requiredPermissions = [
@@ -282,7 +299,7 @@ function App() {
     transformOrigin: 'top right',
     innerHTML: () => {
       return mustache.render($_fileMenu, {
-        string_rename: strings.rename, //TODO: create cli application to add new string
+        string_rename: strings.rename,
         string_syntax: strings["syntax highlighting"],
         string_encoding: strings.encoding,
         string_readOnly: strings["read only"],
@@ -350,39 +367,42 @@ function App() {
   if (appSettings.value.quickTools) handleQuickTools.actions("enable-quick-tools");
   window.beforeClose = saveState;
 
-  setTimeout(() => {
-    loadFiles()
-      .then(loadFolders)
-      .then(() => {
-        setTimeout(() => {
-          app.classList.remove('loading', 'splash');
-          window.isLoading = false;
-        }, 500);
-        //#region event listeners 
-        if (cordova.platformId === 'android') {
-          window.plugins.intent.setNewIntentHandler(HandleIntent);
-          window.plugins.intent.getCordovaIntent(HandleIntent, function (e) {
-            console.log("Error: Cannot handle open with file intent", e);
-          });
-          document.addEventListener('menubutton', $sidebar.toggle);
-          navigator.app.overrideButton("menubutton", true);
-        }
+  loadFolders();
+  loadFiles()
+    .then(() => {
 
-        document.addEventListener('pause', saveState);
-        document.addEventListener('resume', checkFiles);
-        checkFiles();
+      if (!editorManager.files.length) createDefaultFile();
 
-        const autosave = parseInt(appSettings.value.autosave);
-        if (autosave) {
-          saveInterval = setInterval(() => {
-            editorManager.files.map(file => {
-              if (file.isUnsaved && file.location) Acode.exec("save", false);
-              return file;
-            });
-          }, autosave);
-        }
+      setTimeout(() => {
+        app.classList.remove('loading', 'splash');
+      }, 500);
+      //#region event listeners 
+
+      window.plugins.intent.setNewIntentHandler(HandleIntent);
+      window.plugins.intent.getCordovaIntent(HandleIntent, function (e) {
+        console.log("Error: Cannot handle open with file intent", e);
       });
-  }, 100);
+      document.addEventListener('menubutton', $sidebar.toggle);
+      navigator.app.overrideButton("menubutton", true);
+      document.addEventListener('pause', () => {
+        window.resolveLocalFileSystemURL(CACHE_STORAGE_REMOTE, () => {
+          internalFs.deleteFile(CACHE_STORAGE_REMOTE);
+        });
+        saveState();
+      });
+      document.addEventListener('resume', checkFiles);
+      checkFiles();
+
+      const autosave = parseInt(appSettings.value.autosave);
+      if (autosave) {
+        saveInterval = setInterval(() => {
+          editorManager.files.map(file => {
+            if (file.isUnsaved && file.location) Acode.exec("save", false);
+            return file;
+          });
+        }, autosave);
+      }
+    });
 
   editorManager.onupdate = function () {
     /**
@@ -481,10 +501,7 @@ function App() {
   }
 
   function saveState() {
-    if (!editorManager || isLoading) return;
-
     const lsEditor = [];
-    const allFolders = Object.keys(addedFolder);
     const folders = [];
     const activeFile = editorManager.activeFile;
     const unsaved = [];
@@ -518,27 +535,35 @@ function App() {
     }
 
     unsaved.map(file => {
-      window.resolveLocalFileSystemURL(file.fileUri, fs => {
-        window.resolveLocalFileSystemURL(CACHE_STORAGE, parent => {
-          fs.copyTo(parent, file.id);
+      const protocol = new URL(file.fileUri).protocol;
+      if (protocol === 'file:') {
+        window.resolveLocalFileSystemURL(file.fileUri, fs => {
+          window.resolveLocalFileSystemURL(CACHE_STORAGE, parent => {
+            fs.copyTo(parent, file.id);
+          }, err => {
+            console.error(err);
+          });
         }, err => {
           console.error(err);
         });
-      }, err => {
-        console.error(err);
-      });
+      }
       return file;
     });
 
-    allFolders.map(url => {
+    addedFolder.map(folder => {
       const {
-        name
-      } = addedFolder[url];
+        url,
+        reloadOnResume,
+        saveState
+      } = folder;
       folders.push({
         url,
-        name
+        opts: {
+          saveState,
+          reloadOnResume
+        }
       });
-      return url;
+      return folder;
     });
 
     if (activeFile) {
@@ -632,14 +657,12 @@ function App() {
             });
 
           } else {
-            const newFile = editorManager.addNewFile(file.name, {
+            editorManager.addNewFile(file.name, {
               render: xtra.render,
-              isUnsaved: !!file.data
+              isUnsaved: !!file.data,
+              cursorPos: file.cursorPos,
+              text: file.data
             });
-            if (file.data) {
-              newFile.session.insert(file.cursorPos, file.data);
-              newFile.session.setUndoManager(new ace.UndoManager());
-            }
 
             if (i === files.length - 1) resolve();
           }
@@ -650,38 +673,31 @@ function App() {
         resolve();
       }
     });
-
-    function createDefaultFile() {
-      editorManager.addNewFile('untitled.txt', {
-        isUnsaved: false,
-        render: true,
-        id: constants.DEFAULT_SESSION
-      });
-    }
   }
 
-  function loadFolders() {
-    return new Promise(resolve => {
-      if ('folders' in localStorage && localStorage.folders !== '[]') {
-        const folders = JSON.parse(localStorage.getItem('folders'));
-        folders.map((folder, i) => {
-          addFolder(folder, $sidebar, i).then(index => {
-            if (index === folders.length - 1) resolve();
-          });
-          return folder;
-        });
-      } else {
-        resolve();
-      }
+  function createDefaultFile() {
+    editorManager.addNewFile(constants.DEFAULT_FILE_NAME, {
+      isUnsaved: false,
+      render: true,
+      id: constants.DEFAULT_SESSION
     });
   }
 
+  function loadFolders() {
+    try {
+      const folders = JSON.parse(localStorage.getItem('folders'));
+      folders.map(folder => {
+        openFolder(folder.url, folder.opts);
+      });
+    } catch (error) {}
+  }
+
   function checkFiles(e) {
-    if (e) {
-      for (let key in addedFolder) {
-        addedFolder[key].reload();
-      }
-    }
+    if (e)
+      for (let folder of addedFolder)
+        if (folder.reloadOnResume)
+          folder.reload();
+
     const files = editorManager.files;
 
     files.map(file => {
@@ -785,6 +801,8 @@ function App() {
 //#region global funtions
 
 function restoreTheme(darken) {
+  if (darken && document.body.classList.contains('loading')) return;
+
   if (appSettings.value.appTheme === 'default') {
     const hexColor = darken ? '#5c5c99' : '#9999ff';
     app.classList.remove('theme-light');

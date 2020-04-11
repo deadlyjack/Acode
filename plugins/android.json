@@ -31,13 +31,7 @@
     "cordova-plugin-file": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-ftp": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "cordova-plugin-inappbrowser": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
-    "cordova-plugin-ionic-keyboard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-navigationbar-color": {
@@ -63,6 +57,9 @@
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-sdcard": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-ftp": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

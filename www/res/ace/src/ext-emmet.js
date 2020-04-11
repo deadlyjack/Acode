@@ -735,6 +735,12 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                 }
                 snippetMap[scope].push(s);
 
+                if (s.prefix)
+                    s.tabTrigger = s.prefix;
+
+                if (!s.content && s.body)
+                    s.content = Array.isArray(s.body) ? s.body.join("\n") : s.body;
+
                 if (s.tabTrigger && !s.trigger) {
                     if (!s.guard && /^\w/.test(s.tabTrigger))
                         s.guard = "\\b";
@@ -751,10 +757,13 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                 s.endTriggerRe = new RegExp(s.endTrigger);
             }
 
-            if (snippets && snippets.content)
-                addSnippet(snippets);
-            else if (Array.isArray(snippets))
+            if (Array.isArray(snippets)) {
                 snippets.forEach(addSnippet);
+            } else {
+                Object.keys(snippets).forEach(function (key) {
+                    addSnippet(snippets[key]);
+                });
+            }
 
             this._signal("registerSnippets", {
                 scope: scope
@@ -809,7 +818,7 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                         snippet.tabTrigger = val.match(/^\S*/)[0];
                         if (!snippet.name)
                             snippet.name = val;
-                    } else {
+                    } else if (key) {
                         snippet[key] = val;
                     }
                 }
@@ -872,15 +881,16 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
         this.onChange = function (delta) {
             var isRemove = delta.action[0] == "r";
-            var parents = this.selectedTabstop && this.selectedTabstop.parents || {};
+            var selectedTabstop = this.selectedTabstop || {};
+            var parents = selectedTabstop.parents || {};
             var tabstops = (this.tabstops || []).slice();
             for (var i = 0; i < tabstops.length; i++) {
                 var ts = tabstops[i];
-                var active = ts == this.selectedTabstop || parents[ts.index];
+                var active = ts == selectedTabstop || parents[ts.index];
                 ts.rangeList.$bias = active ? 0 : 1;
 
-                if (delta.action == "remove" && ts !== this.selectedTabstop) {
-                    var parentActive = ts.parents && ts.parents[this.selectedTabstop.index];
+                if (delta.action == "remove" && ts !== selectedTabstop) {
+                    var parentActive = ts.parents && ts.parents[selectedTabstop.index];
                     var startIndex = ts.rangeList.pointIndex(delta.start, parentActive);
                     startIndex = startIndex < 0 ? -startIndex - 1 : startIndex + 1;
                     var endIndex = ts.rangeList.pointIndex(delta.end, parentActive);
@@ -995,8 +1005,6 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
             var ranges = this.ranges;
             tabstops.forEach(function (ts, index) {
                 var dest = this.$openTabstops[index] || ts;
-                ts.rangeList = new RangeList();
-                ts.rangeList.$bias = 0;
 
                 for (var i = 0; i < ts.length; i++) {
                     var p = ts[i];
@@ -1006,7 +1014,6 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                     range.original = p;
                     range.tabstop = dest;
                     ranges.push(range);
-                    ts.rangeList.ranges.push(range);
                     if (dest != ts)
                         dest.unshift(range);
                     else
@@ -1024,6 +1031,9 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                     this.$openTabstops[index] = dest;
                 }
                 this.addTabstopMarkers(dest);
+                dest.rangeList = dest.rangeList || new RangeList();
+                dest.rangeList.$bias = 0;
+                dest.rangeList.addList(dest);
             }, this);
 
             if (arg.length > 2) {
@@ -1066,21 +1076,18 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
         this.keyboardHandler = new HashHandler();
         this.keyboardHandler.bindKeys({
-            "Tab": function (ed) {
-                if (exports.snippetManager && exports.snippetManager.expandWithTab(ed)) {
+            "Tab": function (editor) {
+                if (exports.snippetManager && exports.snippetManager.expandWithTab(editor))
                     return;
-                }
-
-                ed.tabstopManager.tabNext(1);
+                editor.tabstopManager.tabNext(1);
+                editor.renderer.scrollCursorIntoView();
             },
-            "Shift-Tab": function (ed) {
-                ed.tabstopManager.tabNext(-1);
+            "Shift-Tab": function (editor) {
+                editor.tabstopManager.tabNext(-1);
+                editor.renderer.scrollCursorIntoView();
             },
-            "Esc": function (ed) {
-                ed.tabstopManager.detach();
-            },
-            "Return": function (ed) {
-                return false;
+            "Esc": function (editor) {
+                editor.tabstopManager.detach();
             }
         });
     }).call(TabstopManager.prototype);
@@ -1101,13 +1108,13 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
 
     require("./lib/dom").importCssString("\
-.ace_snippet-marker {\
-    -moz-box-sizing: border-box;\
-    box-sizing: border-box;\
-    background: rgba(194, 193, 208, 0.09);\
-    border: 1px dotted rgba(211, 208, 235, 0.62);\
-    position: absolute;\
-}");
+    .ace_snippet-marker {\
+        -moz-box-sizing: border-box;\
+        box-sizing: border-box;\
+        background: rgba(194, 193, 208, 0.09);\
+        border: 1px dotted rgba(211, 208, 235, 0.62);\
+        position: absolute;\
+    }");
 
     exports.snippetManager = new SnippetManager();
 

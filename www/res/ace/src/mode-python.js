@@ -494,6 +494,7 @@ oop.inherits(Mode, TextMode);
     };
 
     this.$id = "ace/mode/python";
+    this.snippetFileId = "ace/snippets/python";
 }).call(Mode.prototype);
 
 exports.Mode = Mode;

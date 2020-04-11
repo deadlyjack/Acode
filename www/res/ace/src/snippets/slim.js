@@ -1,8 +1,8 @@
 define("ace/snippets/slim",["require","exports","module"], function(require, exports, module) {
-    "use strict";
+"use strict";
 
-    exports.snippetText =undefined;
-    exports.scope = "slim";
+exports.snippetText =undefined;
+exports.scope = "slim";
 
 });                (function() {
                     window.require(["ace/snippets/slim"], function(m) {

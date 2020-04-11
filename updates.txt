@@ -1,3 +1,10 @@
+version 0.0.9.93
+☞ Now edit remote files using FTP
+☞ Open folder by tapping on sidenav if empty
+☞ Shows error message if editor is unable to open
+☞ Minor UI improvment
+☞ Bugs fixes
+
 version 0.0.9.92
 ☞ Bugs fix
 

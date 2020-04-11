@@ -1,4 +1,3 @@
-import tag from 'html-tag-js';
 import saveFile from "./saveFile";
 import selectword from './selectword';
 import runPreview from "./runPreview";
@@ -6,7 +5,7 @@ import runPreview from "./runPreview";
 import settingsMain from '../pages/settings/mainSettings';
 import dialogs from '../components/dialogs';
 import createEditorFromURI from "../modules/createEditorFromURI";
-import addFolder from "../modules/addFolder";
+import openFolder from "../modules/addFolder";
 import helpers from "../modules/helpers";
 import constants from "../constants";
 import FileBrowser from "../pages/fileBrowser/fileBrowser";
@@ -18,6 +17,7 @@ import fsOperation from '../modules/utils/fsOperation';
 import Modes from '../pages/modes/modes';
 import clipboardAction from '../modules/clipboard';
 import handleQuickTools from '../modules/handleQuickTools';
+import FTPAccounts from "../pages/ftp-accounts/ftp-accounts";
 
 const commands = {
   "console": function () {
@@ -50,6 +50,9 @@ const commands = {
   "find": function () {
     handleQuickTools.actions('search');
   },
+  "ftp": function () {
+    FTPAccounts();
+  },
   "github": function () {
     if ((!localStorage.username || !localStorage.password) && !localStorage.token)
       return GithubLogin();
@@ -68,7 +71,7 @@ const commands = {
       });
   },
   "new-file": function () {
-    dialogs.prompt(strings['enter file name'], strings['new file'], "filename", {
+    dialogs.prompt(strings['enter file name'], constants.DEFAULT_FILE_NAME, "filename", {
         match: constants.FILE_NAME_REGEX,
         required: true
       })
@@ -136,7 +139,7 @@ const commands = {
     editorManager.editor.blur();
     FileBrowser('folder')
       .then(res => {
-        return addFolder(res, editorManager.sidebar);
+        return openFolder(res.url);
       })
       .then(() => {
         window.plugins.toast.showShortBottom(strings['folder added']);
@@ -173,11 +176,13 @@ const commands = {
     let dirs = recents.folders;
     const MAX = 20;
     const shortName = name => name.length > MAX ? '...' + name.substr(-MAX - 3) : name;
-    for (let dir of dirs)
+    for (let dir of dirs) {
+      const url = new URL(dir.url);
       all.push([{
         type: 'dir',
         val: dir
-      }, shortName(decodeURI(dir)), 'icon folder']);
+      }, shortName(`${url.username}@${url.hostname}`), 'icon folder']);
+    }
     for (let file of files)
       all.push([{
         type: 'file',
@@ -193,7 +198,7 @@ const commands = {
         if (res.type === 'file') {
           createEditorFromURI(res.val);
         } else if (res.type === 'dir') {
-          addFolder(res.val, editorManager.sidebar);
+          openFolder(res.val.url, res.val.opts);
         } else if (res === 'clear') {
           delete localStorage.recentFiles;
           delete localStorage.recentFolders;

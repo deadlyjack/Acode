@@ -2,7 +2,7 @@ define("ace/snippets/nsis",["require","exports","module"], function(require, exp
 "use strict";
 
 exports.snippetText =undefined;
-exports.scope = "";
+exports.scope = "nsis";
 
 });                (function() {
                     window.require(["ace/snippets/nsis"], function(m) {

@@ -10,6 +10,7 @@ import git from '../modules/git';
 import PHP from '../modules/php';
 import constants from '../constants';
 import externalFs from '../modules/utils/externalFs';
+import fsOperation from '../modules/utils/fsOperation';
 
 /**
  * Starts the server and run the active file in browser
@@ -27,7 +28,6 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   let rootPath = null;
   let EXECUTING_SCRIPT = uuid + '_script.js';
   const MIMETYPE_HTML = mimeType.lookup('html');
-  const decoder = new TextDecoder('utf-8');
   const CONSOLE_SCRIPT = uuid + '_console.js';
   const ESPRISMA_SCRIPT = uuid + '_esprisma.js';
   const EDITOR_SCRIPT = uuid + '_editor.js';
@@ -66,8 +66,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       start();
     }
   } else if (extension === 'js' && path) {
-    for (let folderpath in addedFolder) {
-      if (new RegExp("^" + encodeURI(path)).test(folderpath)) {
+    for (let folder of addedFolder) {
+      if (new RegExp("^" + encodeURI(path)).test(folder.url)) {
         window.resolveLocalFileSystemURL(path + 'index.html', onsuccess, onerror);
         return;
       }
@@ -348,9 +348,11 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function sendFileContent(url, id, mime, processText) {
-    fs.readFile(url)
-      .then(res => {
-        let text = decoder.decode(res.data);
+    fsOperation(url)
+      .then(fs => {
+        return fs.readFile('utf-8');
+      })
+      .then(text => {
         text = processText ? processText(text) : text;
         if (mime === MIMETYPE_HTML) {
           sendHTML(text, id);

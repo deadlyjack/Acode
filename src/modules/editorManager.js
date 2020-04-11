@@ -1,4 +1,4 @@
-import list from '../components/list';
+import list from '../components/collapsableList';
 import clipboardAction from './clipboard';
 import tag from 'html-tag-js';
 import tile from "../components/tile";
@@ -6,7 +6,6 @@ import dialogs from '../components/dialogs';
 import helpers from '../modules/helpers';
 import textControl from './events/selection';
 import constants from '../constants';
-import fsOperation from './utils/fsOperation';
 import internalFs from './utils/internalFs';
 /**
  * @typedef {object} ActiveEditor
@@ -35,7 +34,9 @@ function EditorManager($sidebar, $header, $body) {
     let $openFileList;
     let checkTimeout = null,
         TIMEOUT_VALUE = 300,
-        ready = false;
+        ready = false,
+        lastHeight = innerHeight,
+        editorState = 'blur';
     const container = tag('div', {
         className: 'editor-container'
     });
@@ -99,11 +100,13 @@ function EditorManager($sidebar, $header, $body) {
         files: [],
         removeFile,
         controls,
-        state: 'blur',
         setSubText,
         moveOpenFileList,
         sidebar: $sidebar,
         container,
+        get state() {
+            return editorState;
+        },
         get TIMEOUT_VALUE() {
             return TIMEOUT_VALUE;
         },
@@ -125,28 +128,20 @@ function EditorManager($sidebar, $header, $body) {
             clipboardAction(action);
         }
     };
-    editor.on('focus', function () {
-        setTimeout(() => {
-            manager.state = 'focus';
-        }, 0);
 
-        window.addEventListener('native.keyboardhide', hide);
-
-        function hide() {
+    window.addEventListener('resize', () => {
+        if (innerHeight > lastHeight) {
             editor.blur();
-            window.removeEventListener('native.keyboardhide', hide);
+            editorState = 'blur';
         }
+        lastHeight = innerHeight;
+        editor.renderer.scrollCursorIntoView();
+    });
 
-        window.onresize = () => {
-            editor.renderer.scrollCursorIntoView();
-            window.onresize = null;
-        };
+    editor.on('focus', () => {
+        editorState = 'focus';
     });
-    editor.on('blur', function () {
-        setTimeout(() => {
-            manager.state = 'blur';
-        }, 0);
-    });
+
     editor.on('change', function (e) {
         if (checkTimeout) clearTimeout(checkTimeout);
         checkTimeout = setTimeout(checkChanges, TIMEOUT_VALUE);
@@ -205,11 +200,13 @@ function EditorManager($sidebar, $header, $body) {
                 filename,
                 options
             });
-            console.log(queue);
             return;
         }
 
         let doesExists = null;
+
+        if (options.fileUri) options.fileUri = helpers.decodeURL(options.fileUri);
+
         if (options.id) doesExists = getFile(options.id, "id");
         else if (options.fileUri) doesExists = getFile(options.fileUri, "fileUri");
         else if (options.contentUri) doesExists = getFile(options.contentUri, "contentUri");
@@ -315,7 +312,11 @@ function EditorManager($sidebar, $header, $body) {
             }
 
             const defaultFile = getFile(constants.DEFAULT_SESSION, "id");
-            if (defaultFile && !defaultFile.session.getValue()) manager.removeFile(defaultFile);
+            if (
+                defaultFile &&
+                !defaultFile.session.getValue() &&
+                defaultFile.filename === constants.DEFAULT_FILE_NAME
+            ) manager.removeFile(defaultFile);
         }
 
         setTimeout(() => {
@@ -437,11 +438,11 @@ function EditorManager($sidebar, $header, $body) {
             root.append($openFileList);
             root.classList.add('top-bar');
         } else {
-            $openFileList = list.collaspable(strings['active files']);
+            $openFileList = list(strings['active files']);
             $openFileList.ontoggle = function (isCollasped) {
                 if (isCollasped) return;
-                for (let key in addedFolder) {
-                    addedFolder[key].rootNode.collasp();
+                for (let folder of addedFolder) {
+                    folder.$node.collapse();
                 }
             };
             if ($list) $openFileList.list.append(...$list);
@@ -575,7 +576,7 @@ function EditorManager($sidebar, $header, $body) {
             manager.files = manager.files.filter(editor => editor.id !== file.id);
 
 
-            if (file.id !== constants.DEFAULT_SESSION) {
+            if (file.id !== constants.DEFAULT_SESSION || manager.activeFile.id === constants.DEFAULT_SESSION) {
                 if (!manager.files.length) {
                     editor.setSession(new ace.EditSession(""));
                     $sidebar.hide();
@@ -602,6 +603,7 @@ function EditorManager($sidebar, $header, $body) {
      * 
      * @param {string|number|Repo|Gist} checkFor 
      * @param {"id"|"name"|"fileUri"|"contentUri"|"git"|"gist"} [type] 
+     * @returns {File}
      */
     function getFile(checkFor, type = "id") {
 

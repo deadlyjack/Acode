@@ -24,10 +24,42 @@
         }
 
         >.tile {
+            position: relative;
             height: 30px;
             font-size: 1em;
 
             background-color: rgba($color: #000000, $alpha: 0.1);
+
+            &.loading::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: 0 auto;
+                width: 30%;
+                height: 2px;
+                background-color: rgba($color: #000000, $alpha: 0.5);
+                animation: move ease 1s infinite;
+                border-radius: 1px;
+
+                @keyframes move {
+                    0% {
+                        background-color: rgba($color: #000000, $alpha: 0.5);
+                        transform: scale3d(0, 1, 1);
+                    }
+
+                    50% {
+                        background-color: rgba($color: #833737, $alpha: 0.5);
+                        transform: scale3d(4, 1, 1);
+                    }
+
+                    100% {
+                        background-color: rgba($color: #000000, $alpha: 0.5);
+                        transform: scale3d(0, 1, 1);
+                    }
+                }
+            }
 
             >.folder::before {
                 content: '\e92d';

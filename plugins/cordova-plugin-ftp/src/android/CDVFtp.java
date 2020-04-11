@@ -136,8 +136,17 @@ public class CDVFtp extends CordovaPlugin {
                     }
                 }
             });
-        } else {
-            // This action/cmd is not found/supported
+        } else if(action.equals("rename")) {
+            cordova.getThreadPool().execute(new Runnable(){
+                public void run(){
+                    try{
+                        rename(args.getString(0), args.getString(1), callbackContext);
+                    }catch (Exception e) {
+                        callbackContext.error(e.toString());
+                    }
+                }
+            });
+        }else{
             return false;
         }
         // This action/cmd is found/supported
@@ -320,6 +329,22 @@ public class CDVFtp extends CordovaPlugin {
                 }
                 // should never reach here!
             } catch (Exception e) {
+                callbackContext.error(e.toString());
+            }
+        }
+    }
+
+    private void rename(String path, String newPath, CallbackContext callbackContext){
+        if(path == null || newPath == null)
+        {
+            callbackContext.error("Expected localFile and remoteFile.");
+        }
+        else
+        {
+            try{
+                this.client.rename(path, newPath);
+                callbackContext.success("Rename OK");
+            }catch (Exception e) {
                 callbackContext.error(e.toString());
             }
         }

@@ -25,7 +25,7 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
 
         const messageSpan = tag('span', {
             textContent: message,
-            className: 'message'
+            className: 'message scroll'
         });
         const input = tag(inputType, {
             value: defaultValue,
@@ -143,13 +143,13 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
  * 
  * @param {string} message 
  * @param {Array<Input>} inputs 
- * @returns {Promise<Array<string>>}
+ * @returns {Promise<Strings>}
  */
 function multiPrompt(message, inputs) {
     return new Promise((resolve) => {
         const messageSpan = tag('span', {
             textContent: message,
-            className: 'message'
+            className: 'message scroll'
         });
         let inputAr = [];
 
@@ -196,10 +196,10 @@ function multiPrompt(message, inputs) {
                 hints
             } = input;
 
-            const inputType = type === 'text' ? 'textarea' : 'input';
+            const inputType = type === 'textarea' ? 'textarea' : 'input';
             let _type = type === 'filename' ? 'text' : type;
 
-            const $input = tag(inputType, {
+            const $input = tag('input', {
                 id,
                 placeholder,
                 value: value,
@@ -320,7 +320,7 @@ function alert(titleText, message, onhide) {
         textContent: titleText
     });
     const messageSpan = tag('span', {
-        className: 'message',
+        className: 'message scroll',
         innerHTML: message
     });
     const okBtn = tag('button', {
@@ -367,6 +367,12 @@ function alert(titleText, message, onhide) {
     }
 }
 
+/**
+ * 
+ * @param {string} titleText 
+ * @param {string} message 
+ * @returns {Promise<void>}
+ */
 function confirm(titleText, message) {
     return new Promise((resolve) => {
         if (!message && titleText) {
@@ -379,7 +385,7 @@ function confirm(titleText, message) {
             textContent: titleText
         });
         const messageSpan = tag('span', {
-            className: 'message',
+            className: 'message scroll',
             textContent: message
         });
         const okBtn = tag('button', {

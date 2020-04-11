@@ -485,6 +485,7 @@ oop.inherits(Mode, TextMode);
     };
 
     this.$id = "ace/mode/ruby";
+    this.snippetFileId = "ace/snippets/ruby";
 }).call(Mode.prototype);
 
 exports.Mode = Mode;

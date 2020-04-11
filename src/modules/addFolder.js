@@ -1,634 +1,547 @@
+import {
+  lookup
+} from 'mime-types';
 import tag from 'html-tag-js';
-import list from "../components/list";
-import fs from "./utils/internalFs";
-import dialogs from "../components/dialogs";
-import helpers from "./helpers";
-import tile from "../components/tile";
-import constants from "../constants";
-import createEditorFromURI from "./createEditorFromURI";
-import recents from './recents';
 import fsOperation from './utils/fsOperation';
-
-export default addFolder;
+import collapsableList from '../components/collapsableList';
+import helpers from './helpers';
+import dialogs from '../components/dialogs';
+import tile from '../components/tile';
+import constants from '../constants';
+import recents from './recents';
+import path from './utils/path';
+import createEditorFromURI from './createEditorFromURI';
 
 /**
  * 
- * @param {any} folder 
- * @param {HTMLElement} sidebar 
- * @param {Number} index 
+ * @param {string} _path
+ * @param {object} [opts]
+ * @param {boolean} [opts.saveState=true]
+ * @param {boolean} [opts.reloadOnResume=true]
  */
-function addFolder(folder, sidebar, index) {
-    return new Promise(resolve => {
+function openFolder(_path, opts = {}) {
+
+  let flag = false;
+  for (let folder of addedFolder) {
+    if (folder.url === _path) {
+      flag = true;
+      break;
+    }
+  }
+  if (flag) return;
+
+  let saveState = true,
+    reloadOnResume = true;
+
+  if ('saveState' in opts) saveState = opts.saveState;
+  if ('reloadOnResume' in opts) reloadOnResume = opts.reloadOnResume;
+
+  const listState = JSON.parse(localStorage.state || '{}');
+  const title = getTitle();
+  const $closeBtn = tag('span', {
+    className: 'icon cancel',
+    attr: {
+      action: 'close'
+    },
+    onclick: remove
+  });
+  let $root = collapsableList(title, !!!listState[_path], "folder", {
+    tail: $closeBtn,
+    allCaps: true,
+    ontoggle: function (state) {
+      if (state === "uncollapsed")
+        for (let folder of addedFolder)
+          if (folder.url !== _path) folder.$node.collapse();
+
+      if (appSettings.value.openFileListPos !== 'header')
+        editorManager.openFileList.collasp();
+
+      expandList.call(this);
+    }
+  });
+  /**
+   * @type {{url: string, $el: HTMLElement, action: "cut"|"copy"}}
+   */
+  let clipBoard = null;
+  const loading = {
+    start() {
+      $root.$title.classList.add('loading');
+    },
+    stop() {
+      $root.$title.classList.remove('loading');
+    }
+  };
+  const $text = $root.$title.querySelector(":scope>span.text");
+  if ($text) {
+    $text.style.overflow = "hidden";
+    $text.style.whiteSpace = "nowrap";
+    $text.style.textOverflow = "ellipsis";
+  }
+  $root.$title.setAttribute('type', 'root');
+  $root.$title.setAttribute('url', _path);
+  $root.$title.setAttribute('name', title);
+
+  $root.$ul.onclick =
+    $root.$ul.oncontextmenu =
+    $root.$title.onclick =
+    $root.$title.oncontextmenu = handleItems;
+
+  addedFolder.push({
+    url: _path,
+    remove,
+    $node: $root,
+    reload: () => {
+      $root.collapse();
+      $root.uncollapse();
+    },
+    reloadOnResume,
+    saveState
+  });
+
+  updateHeight();
+  recents.addFolder(_path, opts);
+  editorManager.sidebar.appendChild($root);
+
+  function getTitle() {
+    try {
+      const {
+        username,
+        hostname
+      } = new URL(_path);
+      if (username && hostname) return `${username}@${hostname}`;
+
+      return path.name(_path);
+    } catch (error) {
+      return path.name(_path);
+    }
+  }
+
+  function remove(e) {
+
+    if (e) e.preventDefault();
+
+    if ($root.isConnected) {
+      $root.remove();
+      $root = null;
+    }
+    const tmpFolders = [];
+    for (let folder of addedFolder)
+      if (folder.url !== _path) tmpFolders.push(folder);
+    addedFolder = tmpFolders;
+    updateHeight();
+  }
+
+  function updateHeight() {
+
+    let totalFolder = addedFolder.length;
+    let activeFiles = appSettings.value.openFileListPos !== 'header';
+    totalFolder -= (totalFolder ? 1 : 0);
+    totalFolder += (activeFiles ? 1 : 0);
+    for (let folder of addedFolder) {
+      folder.$node.style.maxHeight = `calc(100% - ${totalFolder*30}px)`;
+      folder.$node.style.height = `calc(100% - ${totalFolder*30}px)`;
+    }
+
+  }
+
+  /**
+   * 
+   * @param {Event} e 
+   */
+  function handleItems(e) {
+    const mode = e.type;
+    const $target = e.target;
+    if (!($target instanceof HTMLElement)) return;
+    const type = $target.getAttribute('type');
+    if (!type) return;
+    const url = $target.getAttribute('url');
+    const name = $target.getAttribute('name');
+
+    if (mode === 'click') handleClick(type, url, name, $target);
+    else if (mode === 'contextmenu') handleContextmenu(type, url, name, $target);
+  }
+
+  /**
+   * 
+   * @param {"file"|"dir"|"root"} type 
+   * @param {string} url 
+   * @param {string} name 
+   * @param {HTMLElement} $target 
+   */
+  function handleClick(type, url, name, $target) {
+    if (type === 'file') {
+
+      createEditorFromURI(url);
+      editorManager.sidebar.hide();
+
+    }
+  }
 
 
-        const rootUrl = typeof folder === 'string' ? folder : folder.url;
-        let name = folder.name === 'File Browser' ? 'Home' : folder.name;
 
-        if (rootUrl in addedFolder) return resolve();
+  /**
+   * 
+   * @param {"file"|"dir"|"root"} type 
+   * @param {string} url 
+   * @param {string} name 
+   * @param {HTMLElement} $target 
+   */
+  function handleContextmenu(type, url, name, $target) {
 
-        if (!name) {
-            name = decodeURI(rootUrl.slice(0, -1)).split('/').pop();
-        }
+    navigator.vibrate(50);
+    const cancel = strings.cancel + (clipBoard ? ' (' + strings[clipBoard.action] + ')' : '');
+    const COPY = ['copy', strings.copy, 'copy'],
+      CUT = ['cut', strings.cut, 'cut'],
+      REMOVE = ['delete', strings.delete, 'delete'],
+      RENAME = ['rename', strings.rename, 'edit'],
+      PASTE = ['paste', strings.paste, 'paste', !!clipBoard],
+      NEW_FILE = ['new file', strings['new file'], 'document-add'],
+      NEW_FOLDER = ['new folder', strings['new folder'], 'folder-add'],
+      CANCEL = ['cancel', cancel, 'clearclose'];
 
-        const closeFolder = tag('span', {
-            className: 'icon cancel',
-            attr: {
-                action: 'close'
-            }
-        });
-        const uniqueId = () => (new Date().getTime() * Math.random()).toString(16);
-        const state = {};
-        let rootNode = list.collaspable(name, false, 'folder', {
-            tail: closeFolder,
-            allCaps: true
-        });
-        let title = rootNode.titleEl;
+    let options;
 
-        title.setAttribute('name', name);
-        title.setAttribute('type', 'root');
-        title.setAttribute('url', rootUrl);
-        rootNode.addEventListener('click', handleClick);
-        rootNode.addEventListener('contextmenu', handleContextMenu);
-        rootNode.ontoggle = function (isCollasped) {
-            if (isCollasped) return;
-            for (let key in addedFolder) {
-                if (key === rootUrl) continue;
-                addedFolder[key].rootNode.collasp();
-            }
+    if (type === 'file') options = [COPY, CUT, RENAME, REMOVE];
+    else if (type === 'dir') options = [COPY, CUT, REMOVE, RENAME, PASTE, NEW_FILE, NEW_FOLDER];
+    else if (type === 'root') options = [REMOVE, RENAME, PASTE, NEW_FILE, NEW_FOLDER];
 
-            if (appSettings.value.openFileListPos !== 'header') {
-                editorManager.openFileList.collasp();
-            }
+    if (clipBoard) options.push(CANCEL);
+
+    dialogs.select(name, options)
+      .then(res => {
+        loading.start();
+        execOperation(type, res, url, $target, name)
+          .finally(loading.stop);
+      });
+
+  }
+
+  /**
+   * @param {"dir"|"file"|"root"} type
+   * @param {"copy"|"cut"|"delete"|"rename"|"paste"|"new file"|"new folder"|"cancel"} action 
+   * @param {string} url target url
+   * @param {HTMLElement} $target target element
+   * @param {string} name Name of file or folder
+   */
+  function execOperation(type, action, url, $target, name) {
+    let newName, CASE = '',
+      src, srcName, srcType, $src, file, msg, defaultValue;
+
+    const target = $target.getAttribute('state');
+
+    switch (action) {
+      case "copy":
+      case "cut":
+        clipBoard = {
+          url,
+          action,
+          $el: $target
         };
+        if (action === "cut") $target.classList.add('cut');
+        else $target.classList.remove('cut');
+        return Promise.resolve();
 
-        plotFolder(rootUrl, rootNode);
-        sidebar.append(rootNode);
-        addedFolder[rootUrl] = {
-            reload: () => plotFolder(rootUrl, rootNode),
-            name,
-            remove,
-            rootNode
-        };
-        updateHeight();
-        recents.addFolder(rootUrl);
+      case "delete":
+        msg = strings["delete {name}"].replace('{name}', name);
 
-        function updateHeight() {
-            let totalFolder = Object.keys(addedFolder).length;
-            let activeFiles = appSettings.value.openFileListPos !== 'header';
-            totalFolder -= (totalFolder ? 1 : 0);
-            totalFolder += (activeFiles ? 1 : 0);
-            for (let key in addedFolder) {
-                addedFolder[key].rootNode.style.maxHeight = `calc(100% - ${totalFolder*30}px)`;
-                addedFolder[key].rootNode.style.height = `calc(100% - ${totalFolder*30}px)`;
-            }
-        }
+        return dialogs.confirm(strings.warging, msg)
+          .then(res => {
+            return fsOperation(url);
+          })
+          .then(fs => {
+            return fs.deleteFile();
+          })
+          .then(res => {
+            if (type === 'file') $target.remove();
+            else $target.parentElement.remove();
+            helpers.showToast(strings.success);
+          })
+          .catch(err => {
+            console.log(err);
+            helpers.error(err);
+          });
 
-        function plotFolder(url, rootNode) {
-            rootNode.clearList();
-            fs.listDir(url).then(dirList => {
-                dirList = helpers.sortDir(dirList, {
-                    showHiddenFiles: "on",
-                    sortByName: 'on'
+      case "rename":
+
+        return dialogs.prompt(strings.rename, name, "text", {
+            match: constants.FILE_NAME_REGEX,
+            required: true
+          })
+          .then(newname => {
+            newName = newname;
+            if (newName !== name)
+              return fsOperation(url)
+                .then(fs => {
+                  return fs.renameTo(newName);
+                })
+                .then(res => {
+                  $target.querySelector(':scope>.text').textContent = newName;
+                  $target.setAttribute('url', url.replace(new RegExp(name + '\/?$'), newName));
+                  $target.setAttribute('name', newName);
+
+                  if (type === 'file')
+                    $target.querySelector(':scope>span').className = helpers.getIconForFile(newName);
+
+                  file = editorManager.getFile(url, 'fileUri');
+                  if (file) file.filename = newName;
+
+                  helpers.showToast(strings.success);
                 });
-                dirList.map(item => {
-                    if (item.isDirectory) {
-                        createFolderTile(rootNode, item);
-                    } else {
-                        createFileTile(rootNode, item);
-                    }
-                    return item;
-                });
-                resolve(index);
-            }).catch(() => {
-                rootNode.remove();
-                delete addedFolder[rootUrl];
-                resolve(index);
-            });
-            return rootNode;
-        }
+          })
+          .catch(err => {
+            console.log(err);
+            helpers.error(err);
+          });
 
-        function createFileTile(rootNode, item) {
-            const listItem = tile({
-                lead: tag('span', {
-                    className: helpers.getIconForFile(item.name)
-                }),
-                text: item.name
-            });
+      case "paste":
+        $src = clipBoard.$el;
+        srcType = $src.getAttribute('type');
+        src = $src.isConnected ?
+          (srcType === "file" ? $src.parentElement : $src.parentElement.parentElement)
+          .previousElementSibling.getAttribute('state') :
+          "uncollapsed";
+        srcName = $src.getAttribute('name');
 
-            listItem.id = uniqueId();
-            listItem.setAttribute('action', 'open');
-            listItem.setAttribute('type', 'file');
-            listItem.setAttribute('name', item.name);
-            if (rootNode) rootNode.addListTile(listItem);
-            else return listItem;
-        }
+        CASE += srcType === "file" ? 1 : 0;
+        CASE += src === "collapsed" ? 1 : 0;
+        CASE += target === "collapsed" ? 1 : 0;
 
-        function createFolderTile(rootNode, item, isNew) {
-            const name = item.name;
-            const nurl = decodeURI(item.nativeURL);
-            const hidden = state[nurl] === undefined ? true : state[nurl];
-            const $node = list.collaspable(name, hidden, 'folder');
+        return fsOperation(clipBoard.url)
+          .then(fs => {
+            if (clipBoard.action === 'cut') return fs.moveTo(url);
+            else return fs.copyTo(url);
+          })
+          .then(res => {
 
-            $node.textConten = '';
+            /**
+             * CASES:
+             * CASE 111: src is file and parent is collapsed where target is also collapsed
+             * CASE 110: src is file and parent is collapsed where target is uncollapsed
+             * CASE 101: src is file and parent is uncollapsed where target is collapsed
+             * CASE 100: src is file and parent is uncollapsed where target is also uncollapsed
+             * CASE 011: src is directory and parent is collapsed where target is also collapsed
+             * CASE 001: src is directory and parent is uncollapsed where target is also collapsed
+             * CASE 010: src is directory and parent is collapsed where target is also uncollapsed
+             * CASE 000: src is directory and parent is uncollapsed where target is also uncollapsed
+             */
 
-            const title = $node.titleEl;
-            title.id = uniqueId();
-            title.setAttribute('type', 'dir');
-            title.setAttribute('url', nurl);
-            title.setAttribute('name', name);
+            if (clipBoard.action === 'cut') { //move
 
-            $node.ontoggle = function (val) {
-                state[nurl] = val;
-            };
+              switch (CASE) {
+                case '111':
+                case '011':
+                  break;
 
-            const $folder = isNew ? $node : plotFolder(nurl, $node);
-            if (rootNode) rootNode.addListTile($folder);
-            else return $folder;
-        }
+                case '110':
+                  appendTile($target, createFileTile(srcName, join(url, encodeURI(srcName))));
+                  break;
 
-        /**
-         * 
-         * @param {string} selectedOption 
-         * @param {'file'|'dir'} type 
-         * @param {HTMLElement} $node 
-         * @param {string} [nativeURL] 
-         */
-        function exec(selectedOption, type, $node, nativeURL) {
-            const currentName = $node.getAttribute('name');
-            switch (selectedOption) {
+                case '101':
+                  $src.remove();
+                  break;
 
-                case 'delete':
-                    remove();
-                    break;
+                case '100':
+                  appendTile($target, createFileTile(srcName, join(url, encodeURI(srcName))));
+                  $src.remove();
+                  break;
 
-                case 'rename':
-                    rename();
-                    break;
+                case '001':
+                  $src.parentElement.remove();
+                  break;
 
-                case 'copy':
-                    copy();
-                    break;
+                case '010':
+                  appendList($target, createFolderTile(srcName, join(url, encodeURI(srcName))));
+                  break;
 
-                case 'cut':
-                    cut();
-                    break;
-
-                case 'paste':
-                    paste();
-                    break;
-
-                case 'new file':
-                case 'new folder':
-                    create();
-                    break;
+                case '000':
+                  appendList($target, createFolderTile(srcName, join(url, encodeURI(srcName))));
+                  $src.parentElement.remove();
+                  break;
 
                 default:
-                    break;
-            }
+                  break;
+              }
 
-            function remove() {
-                if (!nativeURL) return;
+            } else { //copy
 
-                const msg = strings['delete {name}'].replace('{name}', currentName);
-                dialogs.confirm(strings.warning.toUpperCase(), msg)
-                    .then(() => {
-                        fsOperation(nativeURL)
-                            .then(fs => {
-                                return fs.deleteFile();
-                            }).then(() => {
+              switch (CASE) {
+                case '111':
+                case '101':
+                case '011':
+                case '001':
+                  break;
 
-                                if (type === 'dir') {
+                case '110':
+                case '100':
+                  appendTile($target, createFileTile(srcName, join(url, encodeURI(srcName))));
+                  break;
 
-                                    removeFolder($node, nativeURL);
+                case '010':
+                case '000':
+                  appendList($target, createFolderTile(srcName, join(url, encodeURI(srcName))));
+                  break;
 
-                                } else {
-
-                                    const file = editorManager.getFile(nativeURL, "fileUri");
-                                    if (file)
-                                        editorManager.removeFile(file, true);
-
-                                    $node.remove();
-                                }
-
-                                window.plugins.toast.showShortBottom(strings["file deleted"]);
-
-                            }).catch(err => {
-
-                                helpers.error(err);
-                                console.error(err);
-
-                            });
-
-                    });
-            }
-
-            function rename() {
-
-                dialogs.prompt(type === 'file' ? strings['enter file name'] : strings['enter folder name'], currentName, 'filename', {
-                    required: true,
-                    match: constants.FILE_NAME_REGEX
-                }).then(newname => {
-
-                    const checkId = (type === 'dir' ? nativeURL.slice(0, -1) : nativeURL).split('/').slice(0, -1).join('/') + '/' + newname;
-                    window.resolveLocalFileSystemURL(checkId, exists, error);
-
-                    function exists(entry) {
-                        if (entry) alert(strings.error, helpers.getErrorMessage(12));
-                    }
-
-                    function error(err) {
-                        if (err.code !== 1)
-                            return alert(strings.error, helpers.getErrorMessage(err.code));
-
-                        fsOperation(nativeURL)
-                            .then(fs => {
-                                return fs.renameTo(newname);
-                            }).then((parent) => {
-                                success();
-
-                                let newid = decodeURI(parent.nativeURL) + newname;
-
-                                if (type === 'file') {
-
-                                    const editor = editorManager.getFile(nativeURL, "fileUri");
-                                    if (editor) editor.filename = newname;
-
-                                    $node.replaceChild(tag('i', {
-                                        className: helpers.getIconForFile(newname)
-                                    }), $node.firstChild);
-
-                                } else if (type === 'dir') {
-
-                                    newid += '/';
-
-                                    const files = editorManager.files;
-
-                                    files.map(file => {
-                                        if (file.location === nativeURL)
-                                            editorManager.updateLocation(file, newid);
-                                        return file;
-                                    });
-
-                                    $node.setAttribute('url', newid);
-
-                                }
-
-                                $node.setAttribute('name', newname);
-                                $node.querySelector('.text').textContent = newname;
-                            })
-                            .catch(err => {
-                                helpers.error(err);
-                                console.error(err);
-                            });
-                    }
-
-                });
-            }
-
-            function create() {
-                const ask = selectedOption === 'new file' ? strings['enter file name'] : strings['enter folder name'];
-                dialogs.prompt(ask, strings[selectedOption], 'filename', {
-                    match: constants.FILE_NAME_REGEX,
-                    required: true
-                }).then(filename => {
-                    const $ul = $node.nextElementSibling;
-                    window.resolveLocalFileSystemURL(nativeURL, entry => {
-                        if (selectedOption === 'new folder') {
-                            fsOperation(nativeURL)
-                                .then(fs => {
-                                    return fs.createDirectory(filename);
-                                })
-                                .then(() => {
-                                    window.resolveLocalFileSystemURL(nativeURL + filename, dirEntry => {
-                                        successDir(dirEntry);
-                                    }, err => {
-                                        helpers.error(err);
-                                        console.error(err);
-                                    });
-                                })
-                                .catch(err => {
-                                    helpers.error(err);
-                                    console.error(err);
-                                });
-
-                        } else {
-                            fsOperation(nativeURL)
-                                .then(fs => {
-                                    return fs.createFile(filename);
-                                })
-                                .then(res => {
-                                    window.resolveLocalFileSystemURL(nativeURL + filename, fileEntry => {
-                                        successFile(fileEntry);
-                                    }, err => {
-                                        console.error(err);
-                                        helpers.error(err);
-                                    });
-                                })
-                                .catch(err => {
-                                    console.error(err);
-                                    helpers.error(err);
-                                });
-                        }
-
-                        function successDir(dirEntry) {
-                            const $folder = createFolderTile(null, dirEntry, true);
-                            appendFolder($node, $folder);
-                            success();
-                        }
-
-                        function successFile(fileEntry) {
-                            const $file = createFileTile(null, fileEntry);
-                            $ul.appendChild($file);
-                            success();
-                        }
-                    });
-                });
-            }
-
-            function copy() {
-                updateCut();
-                fileClipBoard = {};
-                fileClipBoard.type = $node.getAttribute('type');
-                fileClipBoard.method = 'copy';
-                fileClipBoard.nodeId = $node.id;
-            }
-
-            function cut() {
-                updateCut();
-                fileClipBoard = {};
-                fileClipBoard.type = $node.getAttribute('type');
-                fileClipBoard.method = 'cut';
-                fileClipBoard.nodeId = $node.id;
-                $node.classList.add('cut');
-            }
-
-            function paste() {
-                if (!fileClipBoard) return;
-
-                const $clipBoardNode = document.getElementById(fileClipBoard.nodeId);
-                if (!$clipBoardNode) return;
-
-                let src;
-                let dest = nativeURL;
-                let name = $clipBoardNode.getAttribute("name");
-                if (fileClipBoard.type === 'dir') {
-                    src = $clipBoardNode.getAttribute('url');
-                } else {
-                    const location = $clipBoardNode.parentElement.previousElementSibling.getAttribute('url');
-                    const name = $clipBoardNode.getAttribute('name');
-                    src = location + name;
-                }
-
-                fsOperation(src)
-                    .then(fs => {
-                        if (fileClipBoard.method === 'copy') {
-                            return fs.copyTo(dest);
-                        } else {
-                            return fs.moveTo(dest);
-                        }
-                    })
-                    .then(() => {
-
-                        window.resolveLocalFileSystemURL(dest + name, res => {
-
-                            if (res.isFile) {
-                                if (fileClipBoard.method === "cut") {
-                                    $clipBoardNode.remove();
-                                }
-                                const $file = createFileTile(null, res);
-                                const $ul = $node.nextElementSibling;
-                                $ul.appendChild($file);
-                                success();
-                            } else {
-                                if (fileClipBoard.method === "cut") $clipBoardNode.parentElement.remove();
-                                const $folder = createFolderTile(null, res);
-                                appendFolder($node, $folder);
-                                success();
-                            }
-
-                            if (fileClipBoard.method === 'cut') {
-                                editorManager.files.map(file => {
-                                    let regex = new RegExp('^' + src);
-                                    if (regex.test(file.fileUri)) {
-                                        const text = file.session.getValue();
-                                        const isUnsaved = file.isUnsaved;
-                                        const cursorPos = editorManager.editor.getCursorPosition();
-                                        let uri;
-
-                                        if (res.isFile)
-                                            regex = new RegExp('^' + file.location);
-                                        uri = file.fileUri.replace(regex, dest);
-
-                                        createEditorFromURI(uri, false, {
-                                            text: isUnsaved ? text : null,
-                                            cursorPos
-                                        });
-
-                                        editorManager.removeFile(file, true);
-                                    }
-
-                                    return file;
-                                });
-                            }
-
-                        }, err => {
-                            helpers.error(err);
-                            console.error(err);
-                        });
-
-                    })
-                    .catch(err => {
-                        helpers.error(err);
-                        console.error(err);
-                    });
+                default:
+                  break;
+              }
 
             }
 
-            function success() {
-                window.plugins.toast.showShortBottom(strings.success);
+            helpers.showToast(strings.success);
+
+          })
+          .catch(err => {
+            console.log(err);
+            helpers.error(err);
+          });
+
+      case "new file":
+      case "new folder":
+        msg = action === "new file" ? strings["enter file name"] : strings["enter folder name"];
+        defaultValue = action === "new file" ? constants.DEFAULT_FILE_NAME : strings['new folder'];
+        return dialogs.prompt(msg, defaultValue, "text", {
+            match: constants.FILE_NAME_REGEX,
+            required: true
+          })
+          .then(res => {
+            newName = res;
+            return fsOperation(url);
+          })
+          .then(fs => {
+            if (action === "new file") return fs.createFile(newName);
+            else return fs.createDirectory(newName);
+          })
+          .then(res => {
+            if (target === "uncollapsed") {
+              if (action === "new file") appendTile($target, createFileTile(newName, url + encodeURI(newName)));
+              else appendList($target, createFolderTile(newName, url + encodeURI(newName)));
             }
 
-            function updateCut() {
-                if (fileClipBoard) {
-                    let el = document.getElementById(fileClipBoard.uri);
-                    if (el) el.classList.remove('cut');
-                }
-            }
+            helpers.showToast(strings.success);
+          })
+          .catch(err => {
+            console.log(err);
+            helpers.error(err);
+          });
 
-            /**
-             * 
-             * @param {HTMLElement} $node 
-             * @param {HTMLElement} $folder 
-             */
-            function appendFolder($node, $folder) {
-                const $ul = $node.nextElementSibling;
-                const $firstFile = $ul.querySelector(':scope>[type=file]');
+      case "cancel":
+        clipBoard.$el.classList.remove('cut');
+        clipBoard = null;
+        return Promise.resolve();
 
-                if ($firstFile) $ul.insertBefore($folder, $firstFile);
-                else $ul.appendChild($folder);
-            }
+    }
 
-            /**
-             * 
-             * @param {HTMLDivElement} $node 
-             * @param {string} nativeURL 
-             */
-            function removeFolder($node, nativeURL) {
+    function join(path1, path2) {
+      if (path1.slice(-1) !== '/' || path2[0] !== '/') return path1 + '/' + path2;
+      return path1 + path2;
+    }
 
-                const children = [...$node.nextElementSibling.children];
+    /**
+     * 
+     * @param {HTMLElement} $target 
+     * @param {HTMLElement} $src 
+     */
+    function appendTile($target, $src) {
+      $target = $target.nextElementSibling;
+      const $firstTile = $target.querySelector(':scope>[type=file]');
+      if ($firstTile) $target.insertBefore($src, $firstTile);
+      else $target.append($src);
 
-                children.map($child => {
-                    const isDir = $child.classList.contains('list');
+    }
 
-                    if (isDir) {
+    /**
+     * 
+     * @param {HTMLElement} $target 
+     * @param {HTMLElement} $src 
+     */
+    function appendList($target, $src) {
+      $target = $target.nextElementSibling;
+      const $firstList = $target.firstElementChild;
+      if ($firstList) $target.insertBefore($src, $firstList);
+      else $target.append($src);
+    }
 
-                        const $folder = $child.firstElementChild;
-                        const url = $folder.getAttribute('url');
-                        removeFolder($folder, url);
 
-                    } else {
+  }
 
-                        const name = $child.getAttribute('name');
-                        const uri = nativeURL + name;
-
-                        const file = editorManager.getFile(uri, "fileUri");
-                        if (file) editorManager.removeFile(file);
-
-                    }
-
-                });
-
-                $node.parentElement.remove();
-            }
-        }
-
-        /**
-         * 
-         * @param {MouseEvent} e
-         * @this HTMLElement 
-         */
-        function handleClick(e) {
-
-            /**
-             * @type {HTMLElement}
-             */
-            const $node = e.target;
-            const action = $node.getAttribute('action');
-
-            if (action === 'open') {
-
-                const type = $node.getAttribute('type');
-
-                if (type === 'file') {
-                    const name = $node.getAttribute('name');
-                    const url = $node.parentElement.previousElementSibling.getAttribute('url');
-                    const nativeURL = url + name;
-
-                    if (appSettings.defaultSettings.filesNotAllowed.includes(helpers.getExt(name))) {
-                        return alert(strings.notice, `'${helpers.getExt(name)}' ${strings['file is not supported']}`);
-                    }
-                    createEditorFromURI(nativeURL).then(() => {
-                        sidebar.hide();
-                    });
-                }
-
-            } else if (action === 'close') {
-
-                remove();
-
-            }
-        }
-
-        /**
-         * 
-         * @param {MouseEvent} e
-         * @this HTMLElement 
-         */
-        function handleContextMenu(e) {
-
-            if (e.cancelable)
-                e.preventDefault();
-
-            const $node = e.target;
-            const type = $node.getAttribute('type');
-            const name = $node.getAttribute('name');
-            const clipBoardEnabled = fileClipBoard;
-
-            const COPY = ['copy', strings.copy, 'copy'],
-                CUT = ['cut', strings.cut, 'cut'],
-                REMOVE = ['delete', strings.delete, 'delete'],
-                RENAME = ['rename', strings.rename, 'edit'],
-                PASTE = ['paste', strings.paste, 'paste', !!clipBoardEnabled],
-                NEW_FILE = ['new file', strings['new file'], 'document-add'],
-                NEW_FOLDER = ['new folder', strings['new folder'], 'folder-add'],
-                RELOAD = ['reload', strings.reload, 'refresh'];
-
-            navigator.vibrate(50);
-
-            if (type === 'file') {
-
-                const url = $node.parentElement.previousElementSibling.getAttribute('url');
-                const nativeURL = url + name;
-
-                dialogs.select(name, [
-                    COPY,
-                    CUT,
-                    RENAME,
-                    REMOVE
-                ]).then(res => {
-
-                    exec(res, 'file', $node, nativeURL);
-
-                });
-
-            } else if (type === 'dir') {
-
-                const url = $node.getAttribute('url');
-
-                dialogs.select(name, [
-                    COPY,
-                    CUT,
-                    NEW_FOLDER,
-                    NEW_FILE,
-                    PASTE,
-                    RENAME,
-                    REMOVE
-                ]).then(res => {
-
-                    exec(res, 'dir', $node, url);
-
-                });
-            } else if (type === 'root') {
-
-                dialogs.select(name, [
-                    NEW_FOLDER,
-                    NEW_FILE,
-                    PASTE,
-                    RELOAD
-                ]).then(res => {
-                    if (res === 'reload') {
-                        plotFolder(rootUrl, rootNode);
-                        return;
-                    }
-                    exec(res, 'dir', $node, rootUrl);
-                });
-            }
-        }
-
-        function remove() {
-            if (rootNode.parentElement) {
-                sidebar.removeChild(rootNode);
-                rootNode.removeEventListener('click', handleClick);
-                rootNode.removeEventListener('contextmenu', handleContextMenu);
-                rootNode = null;
-            }
-            const tmpFolders = {};
-            for (let url in addedFolder) {
-                if (url !== rootUrl) tmpFolders[url] = addedFolder[url];
-            }
-            addedFolder = tmpFolders;
-            updateHeight();
-        }
-
+  function createFileTile(name, url) {
+    const $tile = tile({
+      lead: tag('span', {
+        className: helpers.getIconForFile(name)
+      }),
+      text: name
     });
+    $tile.setAttribute('url', url);
+    $tile.setAttribute('name', name);
+    $tile.setAttribute('type', 'file');
+
+    return $tile;
+  }
+
+  function createFolderTile(name, url) {
+
+    const $list = collapsableList(name, !!!listState[url], "folder", {
+      ontoggle: expandList
+    });
+    $list.$title.setAttribute('url', url);
+    $list.$title.setAttribute('type', 'dir');
+    $list.$title.setAttribute('name', name);
+
+    return $list;
+  }
+
+  /**
+   * 
+   * @this {import('../components/collapsableList').Collaspable}
+   */
+  function expandList() {
+    const $target = this.$title;
+    const $ul = this.$ul;
+    const url = $target.getAttribute("url");
+    const state = $target.getAttribute("state");
+
+    if (!$ul) return;
+    $ul.textContent = null;
+
+    if (saveState) listState[url] = false;
+
+    if (state === 'uncollapsed') {
+      loading.start();
+      if (saveState) listState[url] = true;
+      fsOperation(url)
+        .then(fs => {
+          return fs.lsDir();
+        })
+        .then(entries => {
+          entries = helpers.sortDir(entries, appSettings.value.fileBrowser, true);
+          entries.map(entry => {
+            const name = path.name(entry.url);
+            if (entry.isDirectory) {
+
+              const $list = createFolderTile(name, entry.url);
+              $ul.appendChild($list);
+
+            } else {
+
+              const $item = createFileTile(name, entry.url);
+              $ul.append($item);
+
+            }
+          });
+        })
+        .catch(err => {
+          this.collapse();
+          helpers.error(err);
+          console.error(err);
+        })
+        .finally(() => {
+          loading.stop();
+        });
+    }
+
+    localStorage.setItem('state', JSON.stringify(listState));
+  }
+
 }
+
+export default openFolder;
