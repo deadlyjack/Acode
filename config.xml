@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.foxdebug.acodefree" android-versionCode="93" version="0.0.9.93" 
+<widget id="com.foxdebug.acode" android-versionCode="93" version="0.0.9.93 alpha_2" 
     xmlns="http://www.w3.org/ns/widgets" 
     xmlns:android="http://schemas.android.com/apk/res/android" 
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -40,7 +40,6 @@
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
             <application android:networkSecurityConfig="@xml/network_security_config" />
             <application android:usesCleartextTraffic="true" />
-            <!-- <application android:resizeableActivity="false" /> -->
         </edit-config>
 
         <config-file parent="./application/activity" target="AndroidManifest.xml">

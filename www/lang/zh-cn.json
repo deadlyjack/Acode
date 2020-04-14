@@ -121,5 +121,9 @@
   "color": "颜色",
   "select word": "选择单词",
   "quick tools": "快速工具",
-  "select": "选择"
+  "select": "选择",
+  "editor font": "Editor font",
+  "new project": "新项目",
+  "format": "格式",
+  "project name": "项目名"
 }

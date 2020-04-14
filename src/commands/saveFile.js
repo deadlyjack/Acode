@@ -231,18 +231,11 @@ function saveFile(file, as = false, showToast = true) {
         });
     }
 
-    function beautifyFile(name = null) {
-        const editor = editorManager.editor;
+    function beautifyFile(name) {
         const ext = helpers.getExt(name || file.filename);
         const _beautify = appSettings.value.beautify;
-        if (_beautify[0] !== '*' && _beautify.indexOf(ext) < 0) {
-            let pos = editor.getCursorPosition();
-            const tmp = editorManager.onupdate;
-            editorManager.onupdate = () => {};
-            beautify(file.session);
-            editorManager.onupdate = tmp;
-            editor.selection.moveCursorToPosition(pos);
-        }
+        if (_beautify[0] !== '*' && _beautify.indexOf(ext) < 0)
+            Acode.exec("format");
     }
 }
 

@@ -1,5 +1,5 @@
 import tag from 'html-tag-js';
-import Page from "../../components/page"
+import Page from "../../components/page";
 import git from "../../modules/git";
 import dialogs from "../../components/dialogs";
 
@@ -22,7 +22,7 @@ export default function Info(repo, owner) {
 
         return gitHub.getMarkdown().render({
           text
-        })
+        });
       } else {
         return Promise.reject(res);
       }

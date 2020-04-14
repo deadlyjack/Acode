@@ -8,7 +8,6 @@ import createEditorFromURI from "../modules/createEditorFromURI";
 import openFolder from "../modules/addFolder";
 import helpers from "../modules/helpers";
 import constants from "../constants";
-import FileBrowser from "../pages/fileBrowser/fileBrowser";
 import GithubLogin from "../pages/login/login";
 import gitHub from "../pages/github/gitHub";
 import help from '../pages/help';
@@ -18,6 +17,7 @@ import Modes from '../pages/modes/modes';
 import clipboardAction from '../modules/clipboard';
 import handleQuickTools from '../modules/handleQuickTools';
 import FTPAccounts from "../pages/ftp-accounts/ftp-accounts";
+import FileBrowser from "../pages/fileBrowser/fileBrowser";
 
 const commands = {
   "console": function () {
@@ -49,6 +49,17 @@ const commands = {
   },
   "find": function () {
     handleQuickTools.actions('search');
+  },
+  "format": function () {
+    const file = editorManager.activeFile;
+    const editor = editorManager.editor;
+
+    let pos = editor.getCursorPosition();
+    const tmp = editorManager.onupdate;
+    editorManager.onupdate = () => {};
+    beautify(file.session);
+    editorManager.onupdate = tmp;
+    editor.selection.moveCursorToPosition(pos);
   },
   "ftp": function () {
     FTPAccounts();
@@ -178,10 +189,14 @@ const commands = {
     const shortName = name => name.length > MAX ? '...' + name.substr(-MAX - 3) : name;
     for (let dir of dirs) {
       const url = new URL(dir.url);
+      let title = dir.url;
+      if (url.hostname && url.username) title = `${url.username}@${url.hostname}`;
+      if (url.hostname) title = url.protocol + url.hostname;
       all.push([{
         type: 'dir',
         val: dir
-      }, shortName(`${url.username}@${url.hostname}`), 'icon folder']);
+      }, shortName(title), 'icon folder']);
+
     }
     for (let file of files)
       all.push([{

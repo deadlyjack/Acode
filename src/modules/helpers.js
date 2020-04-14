@@ -158,7 +158,7 @@ function getLangNameFromFileName(filename) {
         sass: /\.sass$/i,
         scss: /\.scss$/i,
         scala: /\.(scala|sbt)$/i,
-        shell: /\.(sh|bash)$|^.bashrc$/i,
+        shell: /\.(sh|bash)$|^..*rc$/i,
         slim: /\.(slim|slim)$/i,
         smarty: /\.(smarty|tpl)$/i,
         sql: /\.sql$/i,
@@ -204,10 +204,10 @@ function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null
 
     list.map(item => {
 
-        item.type = item.isFile ? getIconForFile(item.name) : 'folder';
+        item.type = getType(item);
         item.readOnly = readOnly;
         item.canWrite = !readOnly;
-        item.name = item.name || getCombination(item.url) || '';
+        item.name = item.name || path.name(item.url) || '';
 
         if (origin) item.origin = origin;
         if (uuid) item.uuid = uuid;
@@ -230,6 +230,17 @@ function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null
 
     function compare(a, b) {
         return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+    }
+
+    function getType(item) {
+        const ext = getExt(item.name);
+        if (item.isDirectory || (!ext && item.isLink)) {
+            item.isDirectory = true;
+            return 'folder';
+        } else {
+            item.isFile = true;
+            return getIconForFile(item.name);
+        }
     }
 
     return dir.concat(file);
@@ -539,7 +550,7 @@ function resetKeyBindings() {
  * @param  {...string} scripts 
  * @returns {Promise<void>}
  */
-function loadScript(...scripts) {
+function loadScripts(...scripts) {
 
     return new Promise((resolve, reject) => {
         load();
@@ -559,6 +570,39 @@ function loadScript(...scripts) {
                 })
                 .finally(() => {
                     if (!scripts.length) resolve();
+                    else load();
+                });
+
+        }
+    });
+
+}
+
+/**
+ * 
+ * @param  {...string} styles 
+ * @returns {Promise<void>}
+ */
+function loadStyles(...styles) {
+
+    return new Promise((resolve, reject) => {
+        load();
+
+        function load() {
+
+            const style = styles.splice(0, 1);
+            ajax({
+                    url: style,
+                    responseType: 'text'
+                }).then(res => {
+                    const $style = tag('style', {
+                        id: style,
+                        textContent: res
+                    });
+                    document.head.append($style);
+                })
+                .finally(() => {
+                    if (!styles.length) resolve();
                     else load();
                 });
 
@@ -624,8 +668,9 @@ export default {
     blob2text,
     uuid,
     resetKeyBindings,
-    loadScript,
+    loadScripts,
     parseJSON,
     getCombination,
-    showToast
+    showToast,
+    loadStyles
 };

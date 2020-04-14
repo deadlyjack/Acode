@@ -6,50 +6,6 @@ body {
       font-size: 1.5em !important;
     }
   }
-
-  &.loading {
-    position: relative;
-
-    &.splash {
-      &::before {
-        content: attr(data-version);
-        background-image: url('../res/logo/logo.svg');
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 180px;
-        background-color: #313131;
-        position: fixed;
-        top: 0;
-        right: 0;
-        height: 100vh;
-        width: 100vw;
-        z-index: 999999;
-
-        text-align: center;
-        line-height: 150vh;
-        color: white;
-        letter-spacing: 2.4px;
-        font-size: 1.2rem;
-        font-weight: 600;
-      }
-
-      &::after {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        left: 50%;
-        transform: translate(-50%, 0);
-        content: attr(data-small-msg);
-        margin: 15px auto;
-        z-index: 999999;
-        color: white;
-        font-size: 1rem;
-        width: 90vw;
-        text-align: center;
-        color: #bd988a;
-      }
-    }
-  }
 }
 
 div.page {
@@ -100,7 +56,7 @@ div.page {
           border: solid 1px #333;
           background-color: #999;
           color: white;
-          height: fit-content;
+          /* height: fit-content; */
           box-sizing: border-box;
           white-space: nowrap;
           word-break: keep-all;

@@ -38,6 +38,7 @@ interface Settings {
     showSpaces: boolean;
     openFileListPos: 'sidebar' | 'header';
     quickTools: Boolean;
+    editorFont: "fira code" | "default";
 }
 
 interface AppSettings {
@@ -59,6 +60,7 @@ interface ActionStack {
     push(options: ActionStackOptions): void;
     pop(): ActionStack;
     remove(id: string): void;
+    has(id: string): Boolean;
     length: Number;
 }
 
@@ -116,7 +118,8 @@ interface File {
 }
 
 interface ExternalFs {
-    createFile(parent: string, filename: string): Promise<'SUCCESS'>;
+    readFile(): Promise<fileData>;
+    createFile(parent: string, filename: string, data: string): Promise<'SUCCESS'>;
     createDir(parent: string, path: string): Promise<'SUCCESS'>;
     deleteFile(filename: string): Promise<'SUCCESS'>;
     writeFile(filename: string, content: string): Promise<'SUCCESS'>;
@@ -129,9 +132,10 @@ interface ExternalFs {
 interface RemoteFs {
     listDir(path: string): Promise<Array<FsEntry>>
     readFile(path: string): Promise<ArrayBuffer | string>
-    createFile(parent: string, filename: string): Promise;
+    createFile(filename: string, data: string): Promise;
     createDir(path: string): Promise;
     deleteFile(filename: string): Promise;
+    deleteDir(path: string): Promise;
     writeFile(filename: string, content: string): Promise;
     rename(src: string, newname: string): Promise;
     copyTo(src: string, dest: string): Promise;
@@ -145,7 +149,6 @@ interface fileData {
 
 interface InternalFs {
     listDir(path: string): Promise<Entry[]>;
-    createFile(parent: string, filename: string): Promise<void>;
     createDir(parent: string, dirname: string): Promise<void>;
     deleteFile(filename: string): Promise<void>;
     readFile(filename: string): Promise<fileData>;
@@ -167,6 +170,7 @@ interface FileSystem {
     createFile(name: string): Promise<void>,
     createDirectory(name: string): Promise<void>;
     deleteFile(): Promise<void>;
+    deleteDir(): Promise<void>;
     copyTo(dest: string): Promise<void>;
     moveTo(dset: string): Promise<void>;
     renameTo(newName: string): Promise<void>;

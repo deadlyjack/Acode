@@ -27,7 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ***** END LICENSE BLOCK ***** */
-//jshint ignore:start
+//jshint ignore: start
 /**
  * Define a module along with a payload
  * @param module a name for the payload
@@ -1035,8 +1035,11 @@ define("ace/lib/dom", ["require", "exports", "module", "ace/lib/useragent"], fun
             return txt;
         }
 
-        if (!Array.isArray(arr))
+        if (!Array.isArray(arr)) {
+            if (arr && arr.appendChild && parent)
+                parent.appendChild(arr);
             return arr;
+        }
         if (typeof arr[0] != "string" || !arr[0]) {
             var els = [];
             for (var i = 0; i < arr.length; i++) {
@@ -1058,7 +1061,7 @@ define("ace/lib/dom", ["require", "exports", "module", "ace/lib/useragent"], fun
                 var val = options[n];
                 if (n === "class") {
                     el.className = Array.isArray(val) ? val.join(" ") : val;
-                } else if (typeof val == "function" || n == "value") {
+                } else if (typeof val == "function" || n == "value" || n[0] == "$") {
                     el[n] = val;
                 } else if (n === "ref") {
                     if (refs) refs[val] = el;
@@ -1498,12 +1501,24 @@ define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/li
         return activeListenerOptions;
     }
 
-    exports.addListener = function (elem, type, callback) {
-        return elem.addEventListener(type, callback, getListenerOptions());
+    function EventListener(elem, type, callback) {
+        this.elem = elem;
+        this.type = type;
+        this.callback = callback;
+    }
+    EventListener.prototype.destroy = function () {
+        removeListener(this.elem, this.type, this.callback);
+        this.elem = this.type = this.callback = undefined;
     };
 
-    exports.removeListener = function (elem, type, callback) {
-        return elem.removeEventListener(type, callback, getListenerOptions());
+    var addListener = exports.addListener = function (elem, type, callback, destroyer) {
+        elem.addEventListener(type, callback, getListenerOptions());
+        if (destroyer)
+            destroyer.$toDestroy.push(new EventListener(elem, type, callback));
+    };
+
+    var removeListener = exports.removeListener = function (elem, type, callback) {
+        elem.removeEventListener(type, callback, getListenerOptions());
     };
     exports.stopEvent = function (e) {
         exports.stopPropagation(e);
@@ -1533,21 +1548,21 @@ define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/li
             eventHandler && eventHandler(e);
             releaseCaptureHandler && releaseCaptureHandler(e);
 
-            exports.removeListener(document, "mousemove", eventHandler, true);
-            exports.removeListener(document, "mouseup", onMouseUp, true);
-            exports.removeListener(document, "dragstart", onMouseUp, true);
+            removeListener(document, "mousemove", eventHandler);
+            removeListener(document, "mouseup", onMouseUp);
+            removeListener(document, "dragstart", onMouseUp);
         }
 
-        exports.addListener(document, "mousemove", eventHandler, true);
-        exports.addListener(document, "mouseup", onMouseUp, true);
-        exports.addListener(document, "dragstart", onMouseUp, true);
+        addListener(document, "mousemove", eventHandler);
+        addListener(document, "mouseup", onMouseUp);
+        addListener(document, "dragstart", onMouseUp);
 
         return onMouseUp;
     };
 
-    exports.addMouseWheelListener = function (el, callback) {
+    exports.addMouseWheelListener = function (el, callback, destroyer) {
         if ("onmousewheel" in el) {
-            exports.addListener(el, "mousewheel", function (e) {
+            addListener(el, "mousewheel", function (e) {
                 var factor = 8;
                 if (e.wheelDeltaX !== undefined) {
                     e.wheelX = -e.wheelDeltaX / factor;
@@ -1557,9 +1572,9 @@ define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/li
                     e.wheelY = -e.wheelDelta / factor;
                 }
                 callback(e);
-            });
+            }, destroyer);
         } else if ("onwheel" in el) {
-            exports.addListener(el, "wheel", function (e) {
+            addListener(el, "wheel", function (e) {
                 var factor = 0.35;
                 switch (e.deltaMode) {
                     case e.DOM_DELTA_PIXEL:
@@ -1574,9 +1589,9 @@ define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/li
                 }
 
                 callback(e);
-            });
+            }, destroyer);
         } else {
-            exports.addListener(el, "DOMMouseScroll", function (e) {
+            addListener(el, "DOMMouseScroll", function (e) {
                 if (e.axis && e.axis == e.HORIZONTAL_AXIS) {
                     e.wheelX = (e.detail || 0) * 5;
                     e.wheelY = 0;
@@ -1585,11 +1600,11 @@ define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/li
                     e.wheelY = (e.detail || 0) * 5;
                 }
                 callback(e);
-            });
+            }, destroyer);
         }
     };
 
-    exports.addMultiMouseDownListener = function (elements, timeouts, eventHandler, callbackName) {
+    exports.addMultiMouseDownListener = function (elements, timeouts, eventHandler, callbackName, destroyer) {
         var clicks = 0;
         var startX, startY, timer;
         var eventNames = {
@@ -1633,11 +1648,10 @@ define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/li
             else if (clicks > 1)
                 return eventHandler[callbackName](eventNames[clicks], e);
         }
-
         if (!Array.isArray(elements))
             elements = [elements];
         elements.forEach(function (el) {
-            exports.addListener(el, "mousedown", onMousedown);
+            addListener(el, "mousedown", onMousedown, destroyer);
         });
     };
 
@@ -1702,16 +1716,15 @@ define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/li
     }
 
 
-    exports.addCommandKeyListener = function (el, callback) {
-        var addListener = exports.addListener;
+    exports.addCommandKeyListener = function (el, callback, destroyer) {
         if (useragent.isOldGecko || (useragent.isOpera && !("KeyboardEvent" in window))) {
             var lastKeyDownKeyCode = null;
             addListener(el, "keydown", function (e) {
                 lastKeyDownKeyCode = e.keyCode;
-            });
+            }, destroyer);
             addListener(el, "keypress", function (e) {
                 return normalizeCommandKeys(callback, e, lastKeyDownKeyCode);
-            });
+            }, destroyer);
         } else {
             var lastDefaultPrevented = null;
 
@@ -1720,18 +1733,18 @@ define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/li
                 var result = normalizeCommandKeys(callback, e, e.keyCode);
                 lastDefaultPrevented = e.defaultPrevented;
                 return result;
-            });
+            }, destroyer);
 
             addListener(el, "keypress", function (e) {
                 if (lastDefaultPrevented && (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey)) {
                     exports.stopEvent(e);
                     lastDefaultPrevented = null;
                 }
-            });
+            }, destroyer);
 
             addListener(el, "keyup", function (e) {
                 pressedKeys[e.keyCode] = null;
-            });
+            }, destroyer);
 
             if (!pressedKeys) {
                 resetPressedKeys();
@@ -1753,12 +1766,12 @@ define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/li
             var listener = function (e) {
                 if (e.data == messageName) {
                     exports.stopPropagation(e);
-                    exports.removeListener(win, "message", listener);
+                    removeListener(win, "message", listener);
                     callback();
                 }
             };
 
-            exports.addListener(win, "message", listener);
+            addListener(win, "message", listener);
             win.postMessage(messageName, "*");
         };
     }
@@ -2279,7 +2292,7 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
     var MODS = KEYS.KEY_MODS;
     var isIOS = useragent.isIOS;
     var valueResetRegex = isIOS ? /\s/ : /\n/;
-    var isMobile = useragent.isMobile || 1;
+    var isMobile = useragent.isMobile;
 
     var TextInput = function (parentNode, host) {
         var text = dom.createElement("textarea");
@@ -2317,7 +2330,7 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
             if (ignoreFocusEvents) return;
             host.onBlur(e);
             isFocused = false;
-        });
+        }, host);
         event.addListener(text, "focus", function (e) {
             if (ignoreFocusEvents) return;
             isFocused = true;
@@ -2332,7 +2345,7 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
                 setTimeout(resetSelection);
             else
                 resetSelection();
-        });
+        }, host);
         this.$focusScroll = false;
         this.focus = function () {
             if (tempStyle || HAS_FOCUS_ARGS || this.$focusScroll == "browser")
@@ -2382,9 +2395,12 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
         };
 
         host.on("beforeEndOperation", function () {
-            if (host.curOp && host.curOp.command.name == "insertstring")
+            var curOp = host.curOp;
+            var commandName = curOp && curOp.command && curOp.command.name;
+            if (commandName == "insertstring")
                 return;
-            if (inComposition) {
+            var isUserAction = commandName && (curOp.docChanged || curOp.selectionChanged);
+            if (inComposition && isUserAction) {
                 lastValue = text.value = "";
                 onCompositionEnd();
             }
@@ -2416,36 +2432,42 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
                     return;
                 inComposition = true;
 
-                var selection = host.selection;
-                var range = selection.getRange();
-                var row = selection.cursor.row;
-                var selectionStart = range.start.column;
-                var selectionEnd = range.end.column;
-                var line = host.session.getLine(row);
+                var selectionStart = 0;
+                var selectionEnd = 0;
+                var line = "";
 
-                if (range.start.row != row) {
-                    var prevLine = host.session.getLine(row - 1);
-                    selectionStart = range.start.row < row - 1 ? 0 : selectionStart;
-                    selectionEnd += prevLine.length + 1;
-                    line = prevLine + "\n" + line;
-                } else if (range.end.row != row) {
-                    var nextLine = host.session.getLine(row + 1);
-                    selectionEnd = range.end.row > row + 1 ? nextLine.length : selectionEnd;
-                    selectionEnd += line.length + 1;
-                    line = line + "\n" + nextLine;
-                } else if (isMobile) {
-                    line = "\n" + line;
-                    selectionEnd += 1;
-                    selectionStart += 1;
-                }
+                if (host.session) {
+                    var selection = host.selection;
+                    var range = selection.getRange();
+                    var row = selection.cursor.row;
+                    selectionStart = range.start.column;
+                    selectionEnd = range.end.column;
+                    line = host.session.getLine(row);
 
-                if (line.length > MAX_LINE_LENGTH) {
-                    if (selectionStart < MAX_LINE_LENGTH && selectionEnd < MAX_LINE_LENGTH) {
-                        line = line.slice(0, MAX_LINE_LENGTH);
-                    } else {
-                        line = "\n";
-                        selectionStart = 0;
-                        selectionEnd = 1;
+                    if (range.start.row != row) {
+                        var prevLine = host.session.getLine(row - 1);
+                        selectionStart = range.start.row < row - 1 ? 0 : selectionStart;
+                        selectionEnd += prevLine.length + 1;
+                        line = prevLine + "\n" + line;
+                    } else if (range.end.row != row) {
+                        var nextLine = host.session.getLine(row + 1);
+                        selectionEnd = range.end.row > row + 1 ? nextLine.length : selectionEnd;
+                        selectionEnd += line.length + 1;
+                        line = line + "\n" + nextLine;
+                    } else if (isMobile && row > 0) {
+                        line = "\n" + line;
+                        selectionEnd += 1;
+                        selectionStart += 1;
+                    }
+
+                    if (line.length > MAX_LINE_LENGTH) {
+                        if (selectionStart < MAX_LINE_LENGTH && selectionEnd < MAX_LINE_LENGTH) {
+                            line = line.slice(0, MAX_LINE_LENGTH);
+                        } else {
+                            line = "\n";
+                            selectionStart = 0;
+                            selectionEnd = 1;
+                        }
                     }
                 }
 
@@ -2471,6 +2493,7 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
                 }
                 inComposition = false;
             };
+        this.resetSelection = resetSelection;
 
         if (isFocused)
             host.onFocus();
@@ -2651,14 +2674,14 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
             }
         };
 
-        event.addCommandKeyListener(text, host.onCommandKey.bind(host));
+        event.addCommandKeyListener(text, host.onCommandKey.bind(host), host);
 
-        event.addListener(text, "select", onSelect);
-        event.addListener(text, "input", onInput);
+        event.addListener(text, "select", onSelect, host);
+        event.addListener(text, "input", onInput, host);
 
-        event.addListener(text, "cut", onCut);
-        event.addListener(text, "copy", onCopy);
-        event.addListener(text, "paste", onPaste);
+        event.addListener(text, "cut", onCut, host);
+        event.addListener(text, "copy", onCopy, host);
+        event.addListener(text, "paste", onPaste, host);
         if (!('oncut' in text) || !('oncopy' in text) || !('onpaste' in text)) {
             event.addListener(parentNode, "keydown", function (e) {
                 if ((useragent.isMac && !e.metaKey) || !e.ctrlKey)
@@ -2675,7 +2698,7 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
                         onCut(e);
                         break;
                 }
-            });
+            }, host);
         }
         var onCompositionStart = function (e) {
             if (inComposition || !host.onCompositionStart || host.$readOnly)
@@ -2686,7 +2709,11 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
             if (commandMode)
                 return;
 
+            if (e.data)
+                inComposition.useTextareaForIME = false;
+
             setTimeout(onCompositionUpdate, 0);
+            host._signal("compositionStart");
             host.on("mousedown", cancelComposition);
 
             var range = host.getSelectionRange();
@@ -2697,8 +2724,7 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
             host.onCompositionStart(inComposition);
 
             if (inComposition.useTextareaForIME) {
-                text.value = "";
-                lastValue = "";
+                lastValue = text.value = "";
                 lastSelectionStart = 0;
                 lastSelectionEnd = 0;
             } else {
@@ -2758,11 +2784,11 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
             syncComposition();
         }
 
-        event.addListener(text, "compositionstart", onCompositionStart);
-        event.addListener(text, "compositionupdate", onCompositionUpdate);
-        event.addListener(text, "keyup", onKeyup);
-        event.addListener(text, "keydown", syncComposition);
-        event.addListener(text, "compositionend", onCompositionEnd);
+        event.addListener(text, "compositionstart", onCompositionStart, host);
+        event.addListener(text, "compositionupdate", onCompositionUpdate, host);
+        event.addListener(text, "keyup", onKeyup, host);
+        event.addListener(text, "keydown", syncComposition, host);
+        event.addListener(text, "compositionend", onCompositionEnd, host);
 
         this.getElement = function () {
             return text;
@@ -2784,6 +2810,7 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
 
             afterContextMenu = true;
             resetSelection();
+
             this.moveToMouse(e, true);
         };
 
@@ -2834,13 +2861,13 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
             host.textInput.onContextMenu(e);
             onContextMenuClose();
         };
-        event.addListener(text, "mouseup", onContextMenu);
+        event.addListener(text, "mouseup", onContextMenu, host);
         event.addListener(text, "mousedown", function (e) {
             e.preventDefault();
             onContextMenuClose();
-        });
-        event.addListener(host.renderer.scroller, "contextmenu", onContextMenu);
-        event.addListener(text, "contextmenu", onContextMenu);
+        }, host);
+        event.addListener(host.renderer.scroller, "contextmenu", onContextMenu, host);
+        event.addListener(text, "contextmenu", onContextMenu, host);
 
         if (isIOS)
             addIosSelectionHandler(parentNode, host, text);
@@ -2926,10 +2953,13 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
                 document.removeEventListener("selectionchange", detectArrowKeys);
             });
         }
-
     };
 
     exports.TextInput = TextInput;
+    exports.$setUserAgentForTests = function (_isMobile, _isIOS) {
+        isMobile = _isMobile;
+        isIOS = _isIOS;
+    };
 });
 
 define("ace/mouse/default_handlers", ["require", "exports", "module", "ace/lib/useragent"], function (require, exports, module) {
@@ -3371,7 +3401,7 @@ define("ace/mouse/default_gutter_handler", ["require", "exports", "module", "ace
                 tooltip.hide();
                 tooltipAnnotation = null;
                 editor._signal("hideGutterTooltip", tooltip);
-                editor.removeEventListener("mousewheel", hideTooltip);
+                editor.off("mousewheel", hideTooltip);
             }
         }
 
@@ -3408,7 +3438,7 @@ define("ace/mouse/default_gutter_handler", ["require", "exports", "module", "ace
                 tooltipTimeout = null;
                 hideTooltip();
             }, 50);
-        });
+        }, editor);
 
         editor.on("changeSession", hideTooltip);
     }
@@ -3547,7 +3577,7 @@ define("ace/mouse/dragdrop_handler", ["require", "exports", "module", "ace/lib/d
         exports.forEach(function (x) {
             mouseHandler[x] = this[x];
         }, this);
-        editor.addEventListener("mousedown", this.onMouseDown.bind(mouseHandler));
+        editor.on("mousedown", this.onMouseDown.bind(mouseHandler));
 
 
         var mouseTarget = editor.container;
@@ -3672,12 +3702,12 @@ define("ace/mouse/dragdrop_handler", ["require", "exports", "module", "ace/lib/d
             return event.preventDefault(e);
         };
 
-        event.addListener(mouseTarget, "dragstart", this.onDragStart.bind(mouseHandler));
-        event.addListener(mouseTarget, "dragend", this.onDragEnd.bind(mouseHandler));
-        event.addListener(mouseTarget, "dragenter", this.onDragEnter.bind(mouseHandler));
-        event.addListener(mouseTarget, "dragover", this.onDragOver.bind(mouseHandler));
-        event.addListener(mouseTarget, "dragleave", this.onDragLeave.bind(mouseHandler));
-        event.addListener(mouseTarget, "drop", this.onDrop.bind(mouseHandler));
+        event.addListener(mouseTarget, "dragstart", this.onDragStart.bind(mouseHandler), editor);
+        event.addListener(mouseTarget, "dragend", this.onDragEnd.bind(mouseHandler), editor);
+        event.addListener(mouseTarget, "dragenter", this.onDragEnter.bind(mouseHandler), editor);
+        event.addListener(mouseTarget, "dragover", this.onDragOver.bind(mouseHandler), editor);
+        event.addListener(mouseTarget, "dragleave", this.onDragLeave.bind(mouseHandler), editor);
+        event.addListener(mouseTarget, "drop", this.onDrop.bind(mouseHandler), editor);
 
         function scrollCursorIntoView(cursor, prevCursor) {
             var now = Date.now();
@@ -3926,12 +3956,9 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
             arX = [],
             arY = [];
         el.addEventListener("touchstart", function (e) {
-
             if (e.target.parentElement.className === "clipboard-contextmneu") return;
             if (e.target.classList.contains("cursor-control")) return;
-
             cancelAnimationFrame(animation);
-
             var touches = e.touches;
             if (longTouchTimer || touches.length > 1) {
                 clearTimeout(longTouchTimer);
@@ -3940,7 +3967,6 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                 mode = "zoom";
                 return;
             }
-
             var h = editor.renderer.layerConfig.lineHeight;
             var w = editor.renderer.layerConfig.lineHeight;
             var t = e.timeStamp;
@@ -3949,13 +3975,10 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
             var y = touchObj.clientY;
             if (Math.abs(startX - x) + Math.abs(startY - y) > h)
                 touchStartT = -1;
-
             startX = e.clientX = x;
             startY = e.clientY = y;
-
             var ev = new MouseEvent(e, editor);
             pos = ev.getDocumentPosition();
-
             if (t - touchStartT < 500 && touches.length == 1 && !animationSteps) {
                 clickCount++;
                 e.preventDefault();
@@ -3965,7 +3988,6 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                 clickCount = 0;
                 var cursor = editor.selection.cursor;
                 var anchor = editor.selection.isEmpty() ? cursor : editor.selection.anchor;
-
                 var cursorPos = editor.renderer.$cursorLayer.getPixelPosition(cursor, true);
                 var anchorPos = editor.renderer.$cursorLayer.getPixelPosition(anchor, true);
                 var rect = editor.renderer.scroller.getBoundingClientRect();
@@ -3974,12 +3996,10 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                     y = y / h - 0.75;
                     return x * x + y * y;
                 };
-
                 if (e.clientX < rect.left) {
                     mode = "zoom";
                     return;
                 }
-
                 var diff1 = weightedDistance(
                     e.clientX - rect.left - cursorPos.left,
                     e.clientY - rect.top - cursorPos.top
@@ -3990,7 +4010,6 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                 );
                 if (diff1 < 3.5 && diff2 < 3.5)
                     mode = diff1 > diff2 ? "cursor" : "anchor";
-
                 if (diff2 < 3.5)
                     mode = "anchor";
                 else if (diff1 < 3.5)
@@ -4001,9 +4020,7 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
             }
             touchStartT = t;
         });
-
         el.addEventListener("touchend", function (e) {
-
             if (animationTimer) clearInterval(animationTimer);
             if (mode == "zoom") {
                 mode = "";
@@ -4015,23 +4032,19 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
                 var sum = 0;
                 var tx = parseInt(Math.abs(mvX));
                 var ty = parseInt(Math.abs(mvY));
-
                 tx = tx * Math.sqrt(tx);
                 ty = ty * Math.sqrt(ty);
-
                 arX = [];
                 arY = [];
                 for (var i = 1; sum < tx; ++i) {
                     sum += i;
                     arX.push(i);
                 }
-
                 sum = 0;
                 for (var _i = 1; sum < ty; ++_i) {
                     sum += _i;
                     arY.push(_i);
                 }
-
                 requestAnimationFrame(animate);
                 e.preventDefault();
             }
@@ -4039,40 +4052,31 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
             longTouchTimer = null;
         });
         el.addEventListener("touchmove", function (e) {
-
             if (e.target.parentElement.className === "clipboard-contextmneu") return;
             if (e.target.classList.contains("cursor-control")) return;
-
             if (longTouchTimer) {
                 clearTimeout(longTouchTimer);
                 longTouchTimer = null;
             }
             var touches = e.touches;
             if (touches.length > 1 || mode == "zoom") return;
-
             var touchObj = touches[0];
-
             var wheelX = startX - touchObj.clientX;
             var wheelY = startY - touchObj.clientY;
-
             if (mode == "wait") {
                 if (wheelX * wheelX + wheelY * wheelY > 4)
                     mode = "cursor";
                 else
                     return e.preventDefault();
             }
-
             mvX = startX - touchObj.clientX;
             mvY = startY - touchObj.clientY;
-
             startX = touchObj.clientX;
             startY = touchObj.clientY;
-
             e.clientX = touchObj.clientX;
             e.clientY = touchObj.clientY;
-
             if (mode == "scroll") {
-                // editor.renderer.scrollBy(mvX, mvY);
+                // editor.renderer.scrollBy(mvX, mvY);	
                 ge = e;
                 scroll(e, mvX, mvY);
             } else {
@@ -4083,16 +4087,14 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
         function animate() {
             var xlen = arX.length;
             var ylen = arY.length;
-
             if (xlen === 0 && ylen === 0) {
                 mvX = 0;
                 mvY = 0;
                 return;
             }
-
             var xsign = mvX < 0 ? -1 : 1;
             var ysign = mvY < 0 ? -1 : 1;
-            // editor.renderer.scrollBy(xlen ? xsign * arX.pop() : 0, ylen ? ysign * arY.pop() : 0);
+            // editor.renderer.scrollBy(xlen ? xsign * arX.pop() : 0, ylen ? ysign * arY.pop() : 0);	
             var x = xlen ? xsign * arX.pop() : 0;
             var y = ylen ? ysign * arY.pop() : 0;
             scroll(ge, x, y);
@@ -4120,7 +4122,6 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
             Acode.exec("select-word");
         }
     };
-
 });
 
 define("ace/lib/net", ["require", "exports", "module", "ace/lib/dom"], function (require, exports, module) {
@@ -4215,8 +4216,8 @@ define("ace/lib/event_emitter", ["require", "exports", "module"], function (requ
 
     EventEmitter.once = function (eventName, callback) {
         var _self = this;
-        this.addEventListener(eventName, function newCallback() {
-            _self.removeEventListener(eventName, newCallback);
+        this.on(eventName, function newCallback() {
+            _self.off(eventName, newCallback);
             callback.apply(null, arguments);
         });
         if (!callback) {
@@ -4290,7 +4291,9 @@ define("ace/lib/event_emitter", ["require", "exports", "module"], function (requ
         };
 
     EventEmitter.removeAllListeners = function (eventName) {
-        if (this._eventRegistry) this._eventRegistry[eventName] = [];
+        if (!eventName) this._eventRegistry = this._defaultHandlers = undefined;
+        if (this._eventRegistry) this._eventRegistry[eventName] = undefined;
+        if (this._defaultHandlers) this._defaultHandlers[eventName] = undefined;
     };
 
     exports.EventEmitter = EventEmitter;
@@ -4624,7 +4627,7 @@ define("ace/config", ["require", "exports", "module", "ace/lib/lang", "ace/lib/o
         });
     }
 
-    exports.version = "1.4.7";
+    exports.version = "1.4.9";
 
 });
 
@@ -4657,28 +4660,28 @@ define("ace/mouse/mouse_handler", ["require", "exports", "module", "ace/lib/even
         };
 
         var mouseTarget = editor.renderer.getMouseEventTarget();
-        event.addListener(mouseTarget, "click", this.onMouseEvent.bind(this, "click"));
-        event.addListener(mouseTarget, "mousemove", this.onMouseMove.bind(this, "mousemove"));
+        event.addListener(mouseTarget, "click", this.onMouseEvent.bind(this, "click"), editor);
+        event.addListener(mouseTarget, "mousemove", this.onMouseMove.bind(this, "mousemove"), editor);
         event.addMultiMouseDownListener([
             mouseTarget,
             editor.renderer.scrollBarV && editor.renderer.scrollBarV.inner,
             editor.renderer.scrollBarH && editor.renderer.scrollBarH.inner,
             editor.textInput && editor.textInput.getElement()
-        ].filter(Boolean), [400, 300, 250], this, "onMouseEvent");
-        event.addMouseWheelListener(editor.container, this.onMouseWheel.bind(this, "mousewheel"));
+        ].filter(Boolean), [400, 300, 250], this, "onMouseEvent", editor);
+        event.addMouseWheelListener(editor.container, this.onMouseWheel.bind(this, "mousewheel"), editor);
         addTouchListeners(editor.container, editor);
 
         var gutterEl = editor.renderer.$gutter;
-        event.addListener(gutterEl, "mousedown", this.onMouseEvent.bind(this, "guttermousedown"));
-        event.addListener(gutterEl, "click", this.onMouseEvent.bind(this, "gutterclick"));
-        event.addListener(gutterEl, "dblclick", this.onMouseEvent.bind(this, "gutterdblclick"));
-        event.addListener(gutterEl, "mousemove", this.onMouseEvent.bind(this, "guttermousemove"));
+        event.addListener(gutterEl, "mousedown", this.onMouseEvent.bind(this, "guttermousedown"), editor);
+        event.addListener(gutterEl, "click", this.onMouseEvent.bind(this, "gutterclick"), editor);
+        event.addListener(gutterEl, "dblclick", this.onMouseEvent.bind(this, "gutterdblclick"), editor);
+        event.addListener(gutterEl, "mousemove", this.onMouseEvent.bind(this, "guttermousemove"), editor);
 
-        event.addListener(mouseTarget, "mousedown", focusEditor);
-        event.addListener(gutterEl, "mousedown", focusEditor);
+        event.addListener(mouseTarget, "mousedown", focusEditor, editor);
+        event.addListener(gutterEl, "mousedown", focusEditor, editor);
         if (useragent.isIE && editor.renderer.scrollBarV) {
-            event.addListener(editor.renderer.scrollBarV.element, "mousedown", focusEditor);
-            event.addListener(editor.renderer.scrollBarH.element, "mousedown", focusEditor);
+            event.addListener(editor.renderer.scrollBarV.element, "mousedown", focusEditor, editor);
+            event.addListener(editor.renderer.scrollBarH.element, "mousedown", focusEditor, editor);
         }
 
         editor.on("mousemove", function (e) {
@@ -4694,13 +4697,11 @@ define("ace/mouse/mouse_handler", ["require", "exports", "module", "ace/lib/even
             } else {
                 renderer.setCursorStyle("");
             }
-        });
+        }, editor);
     };
 
     (function () {
         this.onMouseEvent = function (name, e) {
-            if (e.target.parentElement.className === "clipboard-contextmneu") return;
-            if (e.target.classList.contains("cursor-control")) return;
             this.editor._emit(name, new MouseEvent(e, this.editor));
         };
 
@@ -6210,7 +6211,9 @@ define("ace/selection", ["require", "exports", "module", "ace/lib/oop", "ace/lib
 
             var docPos = this.session.screenToDocumentPosition(screenPos.row + rows, screenPos.column, offsetX);
 
-            if (rows !== 0 && chars === 0 && docPos.row === this.lead.row && docPos.column === this.lead.column) {}
+            if (rows !== 0 && chars === 0 && docPos.row === this.lead.row && docPos.column === this.lead.column) {
+
+            }
             this.moveCursorTo(docPos.row, docPos.column + chars, chars === 0);
         };
         this.moveCursorToPosition = function (position) {
@@ -7954,7 +7957,7 @@ define("ace/anchor", ["require", "exports", "module", "ace/lib/oop", "ace/lib/ev
             });
         };
         this.detach = function () {
-            this.document.removeEventListener("change", this.$onChange);
+            this.document.off("change", this.$onChange);
         };
         this.attach = function (doc) {
             this.document = doc || this.document;
@@ -10004,9 +10007,9 @@ define("ace/edit_session/bracket_match", ["require", "exports", "module", "ace/t
 
             return range;
         };
-
         this.getMatchingBracketRanges = function (pos) {
             var line = this.getLine(pos.row);
+
             var chr = line.charAt(pos.column - 1);
             var match = chr && chr.match(/([\(\[\{])|([\)\]\}])/);
             if (!match) {
@@ -10017,14 +10020,17 @@ define("ace/edit_session/bracket_match", ["require", "exports", "module", "ace/t
                 };
                 match = chr && chr.match(/([\(\[\{])|([\)\]\}])/);
             }
+
             if (!match)
                 return null;
+
             var startRange = new Range(pos.row, pos.column - 1, pos.row, pos.column);
             var bracketPos = match[1] ? this.$findClosingBracket(match[1], pos) :
                 this.$findOpeningBracket(match[2], pos);
             if (!bracketPos)
                 return [startRange];
             var endRange = new Range(bracketPos.row, bracketPos.column, bracketPos.row, bracketPos.column + 1);
+
             return [startRange, endRange];
         };
 
@@ -10632,6 +10638,7 @@ define("ace/edit_session", ["require", "exports", "module", "ace/lib/oop", "ace/
             if (this.$mode === mode)
                 return;
 
+            var oldMode = this.$mode;
             this.$mode = mode;
 
             this.$stopWorker();
@@ -10641,15 +10648,15 @@ define("ace/edit_session", ["require", "exports", "module", "ace/lib/oop", "ace/
 
             var tokenizer = mode.getTokenizer();
 
-            if (tokenizer.addEventListener !== undefined) {
+            if (tokenizer.on !== undefined) {
                 var onReloadTokenizer = this.onReloadTokenizer.bind(this);
-                tokenizer.addEventListener("update", onReloadTokenizer);
+                tokenizer.on("update", onReloadTokenizer);
             }
 
             if (!this.bgTokenizer) {
                 this.bgTokenizer = new BackgroundTokenizer(tokenizer);
                 var _self = this;
-                this.bgTokenizer.addEventListener("update", function (e) {
+                this.bgTokenizer.on("update", function (e) {
                     _self._signal("tokenizerUpdate", e);
                 });
             } else {
@@ -10668,7 +10675,10 @@ define("ace/edit_session", ["require", "exports", "module", "ace/lib/oop", "ace/
                 this.$options.wrapMethod.set.call(this, this.$wrapMethod);
                 this.$setFolding(mode.foldingRules);
                 this.bgTokenizer.start(0);
-                this._emit("changeMode");
+                this._emit("changeMode", {
+                    oldMode: oldMode,
+                    mode: mode
+                });
             }
         };
 
@@ -11743,6 +11753,8 @@ define("ace/edit_session", ["require", "exports", "module", "ace/lib/oop", "ace/
                 this.bgTokenizer = null;
             }
             this.$stopWorker();
+            this.removeAllListeners();
+            this.selection.detach();
         };
 
         this.isFullWidth = isFullWidth;
@@ -12529,7 +12541,7 @@ define("ace/commands/command_manager", ["require", "exports", "module", "ace/lib
             editor && editor._emit("changeStatus");
             if (this.recording) {
                 this.macro.pop();
-                this.removeEventListener("exec", this.$addCommandToMacro);
+                this.off("exec", this.$addCommandToMacro);
 
                 if (!this.macro.length)
                     this.macro = this.oldMacro;
@@ -13225,7 +13237,6 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
                 var cutLine = editor.$copyWithEmptySelection && editor.selection.isEmpty();
                 var range = cutLine ? editor.selection.getLineRange() : editor.selection.getRange();
                 editor._emit("cut", range);
-
                 if (!range.isEmpty())
                     editor.session.remove(range);
                 editor.clearSelection();
@@ -13542,7 +13553,6 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
             bindKey: bindKey("expandtoline"),
             exec: function (editor) {
                 var range = editor.selection.getRange();
-
                 range.start.column = range.end.column = 0;
                 range.end.row++;
                 editor.selection.setRange(range, false);
@@ -13562,7 +13572,6 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
                 var selectedText = editor.session.doc.getTextRange(editor.selection.getRange());
                 var selectedCount = selectedText.replace(/\n\s*/, " ").length;
                 var insertLine = editor.session.doc.getLine(selectionStart.row);
-
                 for (var i = selectionStart.row + 1; i <= selectionEnd.row + 1; i++) {
                     var curLine = lang.stringTrimLeft(lang.stringTrimRight(editor.session.doc.getLine(i)));
                     if (curLine.length !== 0) {
@@ -13570,14 +13579,11 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
                     }
                     insertLine += curLine;
                 }
-
                 if (selectionEnd.row + 1 < (editor.session.doc.getLength() - 1)) {
                     insertLine += editor.session.doc.getNewLineCharacter();
                 }
-
                 editor.clearSelection();
                 editor.session.doc.replace(new Range(selectionStart.row, 0, selectionEnd.row + 2, 0), insertLine);
-
                 if (selectedCount > 0) {
                     editor.selection.moveCursorTo(selectionStart.row, selectionStart.column);
                     editor.selection.selectTo(selectionStart.row, selectionStart.column + selectedCount);
@@ -13600,14 +13606,12 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
                 if (ranges.length < 1) {
                     ranges = [editor.selection.getRange()];
                 }
-
                 for (var i = 0; i < ranges.length; i++) {
                     if (i == (ranges.length - 1)) {
                         if (!(ranges[i].end.row === endRow && ranges[i].end.column === endCol)) {
                             newRanges.push(new Range(ranges[i].end.row, ranges[i].end.column, endRow, endCol));
                         }
                     }
-
                     if (i === 0) {
                         if (!(ranges[i].start.row === 0 && ranges[i].start.column === 0)) {
                             newRanges.push(new Range(0, 0, ranges[i].start.row, ranges[i].start.column));
@@ -13616,10 +13620,8 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
                         newRanges.push(new Range(ranges[i - 1].end.row, ranges[i - 1].end.column, ranges[i].start.row, ranges[i].start.column));
                     }
                 }
-
                 editor.exitMultiSelectMode();
                 editor.clearSelection();
-
                 for (var i = 0; i < newRanges.length; i++) {
                     editor.selection.addRange(newRanges[i], false);
                 }
@@ -13666,8 +13668,8 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
             readOnly: true
         }
     ];
-
 });
+
 
 define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", "ace/lib/oop", "ace/lib/dom", "ace/lib/lang", "ace/lib/useragent", "ace/keyboard/textinput", "ace/mouse/mouse_handler", "ace/mouse/fold_handler", "ace/keyboard/keybinding", "ace/edit_session", "ace/search", "ace/range", "ace/lib/event_emitter", "ace/commands/command_manager", "ace/commands/default_commands", "ace/config", "ace/token_iterator", "ace/clipboard"], function (require, exports, module) {
     "use strict";
@@ -13693,6 +13695,7 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
 
     var clipboard = require("./clipboard");
     var Editor = function (renderer, session, options) {
+        this.$toDestroy = [];
         var container = renderer.getContainerElement();
         this.container = container;
         this.renderer = renderer;
@@ -13785,7 +13788,7 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
         };
 
         this.endOperation = function (e) {
-            if (this.curOp) {
+            if (this.curOp && this.session) {
                 if (e && e.returnValue === false || !this.session)
                     return (this.curOp = null);
                 if (e == true && this.curOp.command && this.curOp.command.name == "mouse")
@@ -14059,6 +14062,7 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
                     ranges = session.$mode.getMatching(self.session);
                 if (!ranges)
                     return;
+
                 var markerType = "ace_bracket";
                 if (!Array.isArray(ranges)) {
                     ranges = [ranges];
@@ -14071,6 +14075,7 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
                     else if (Range.comparePoints(ranges[0].start, ranges[1].end) == 0)
                         ranges = [Range.fromPoints(ranges[1].start, ranges[0].end)];
                 }
+
                 session.$bracketHighlight = {
                     ranges: ranges,
                     markerIds: ranges.map(function (range) {
@@ -14192,6 +14197,9 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
 
         this.$cursorChange = function () {
             this.renderer.updateCursor();
+            this.$highlightBrackets();
+            this.$highlightTags();
+            this.$updateHighlightActiveLine();
         };
         this.onDocumentChange = function (delta) {
             var wrap = this.session.$useWrapMode;
@@ -14200,7 +14208,6 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
 
             this._signal("change", delta);
             this.$cursorChange();
-            this.$updateHighlightActiveLine();
         };
 
         this.onTokenizerUpdate = function (e) {
@@ -14218,10 +14225,6 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
         };
         this.onCursorChange = function () {
             this.$cursorChange();
-
-            this.$highlightBrackets();
-            this.$highlightTags();
-            this.$updateHighlightActiveLine();
             this._signal("changeSelection");
         };
 
@@ -14484,10 +14487,10 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
                             transform.selection[3]));
                 }
             }
-
             if (this.$enableAutoIndent) {
                 if (session.getDocument().isNewLine(text)) {
                     var lineIndent = mode.getNextLineIndent(lineState, line.slice(0, cursor.column), session.getTabString());
+
                     session.insert({
                         row: cursor.row + 1,
                         column: 0
@@ -14497,6 +14500,54 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
                     mode.autoOutdent(lineState, session, cursor.row);
             }
         };
+
+        this.autoIndent = function () {
+            var session = this.session;
+            var mode = session.getMode();
+
+            var startRow, endRow;
+            if (this.selection.isEmpty()) {
+                startRow = 0;
+                endRow = session.doc.getLength() - 1;
+            } else {
+                var selectedRange = this.getSelectionRange();
+
+                startRow = selectedRange.start.row;
+                endRow = selectedRange.end.row;
+            }
+
+            var prevLineState = "";
+            var prevLine = "";
+            var lineIndent = "";
+            var line, currIndent, range;
+            var tab = session.getTabString();
+
+            for (var row = startRow; row <= endRow; row++) {
+                if (row > 0) {
+                    prevLineState = session.getState(row - 1);
+                    prevLine = session.getLine(row - 1);
+                    lineIndent = mode.getNextLineIndent(prevLineState, prevLine, tab);
+                }
+
+                line = session.getLine(row);
+                currIndent = mode.$getIndent(line);
+                if (lineIndent !== currIndent) {
+                    if (currIndent.length > 0) {
+                        range = new Range(row, 0, row, currIndent.length);
+                        session.remove(range);
+                    }
+                    if (lineIndent.length > 0) {
+                        session.insert({
+                            row: row,
+                            column: 0
+                        }, lineIndent);
+                    }
+                }
+
+                mode.autoOutdent(prevLineState, session, row);
+            }
+        };
+
 
         this.onTextInput = function (text, composition) {
             if (!composition)
@@ -15536,13 +15587,19 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
             this.renderer.scrollCursorIntoView(null, 0.5);
         };
         this.destroy = function () {
+            if (this.$toDestroy) {
+                this.$toDestroy.forEach(function (el) {
+                    el.destroy();
+                });
+                this.$toDestroy = null;
+            }
             this.renderer.destroy();
             this._signal("destroy", this);
             if (this.session)
                 this.session.destroy();
             if (this._$emitInputEvent)
                 this._$emitInputEvent.cancel();
-            this.session = null;
+            this.removeAllListeners();
         };
         this.setAutoScrollEditorIntoView = function (enable) {
             if (!enable)
@@ -15730,7 +15787,7 @@ define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", 
             set: function (message) {
                 if (!this.$updatePlaceholder) {
                     this.$updatePlaceholder = function () {
-                        var value = this.renderer.$composition || this.getValue();
+                        var value = this.session && (this.renderer.$composition || this.getValue());
                         if (value && this.renderer.placeholderNode) {
                             this.renderer.off("afterRender", this.$updatePlaceholder);
                             dom.removeCssClass(this.container, "ace_hasPlaceholder");
@@ -16476,7 +16533,7 @@ define("ace/layer/gutter", ["require", "exports", "module", "ace/lib/dom", "ace/
 
         this.setSession = function (session) {
             if (this.session)
-                this.session.removeEventListener("change", this.$updateAnnotations);
+                this.session.off("change", this.$updateAnnotations);
             this.session = session;
             if (session)
                 session.on("change", this.$updateAnnotations);
@@ -17227,6 +17284,7 @@ define("ace/layer/text", ["require", "exports", "module", "ace/lib/oop", "ace/li
                     var spaceContent = this.showSpaces ?
                         lang.stringRepeat(this.SPACE_CHAR, this.tabSize) :
                         lang.stringRepeat(" ", this.tabSize);
+
                     var tabClass = this.showTabs ? " ace_invisible ace_invisible_tab" : "";
                     var tabContent = this.showTabs ?
                         lang.stringRepeat(this.TAB_CHAR, this.tabSize) :
@@ -18228,11 +18286,7 @@ define("ace/layer/font_metrics", ["require", "exports", "module", "ace/lib/oop",
         this.$addObserver = function () {
             var self = this;
             this.$observer = new window.ResizeObserver(function (e) {
-                var rect = e[0].contentRect;
-                self.checkForSizeChanges({
-                    height: rect.height,
-                    width: rect.width / CHAR_COUNT
-                });
+                self.checkForSizeChanges();
             });
             this.$observer.observe(this.$measureNode);
         };
@@ -18395,6 +18449,7 @@ define("ace/virtual_renderer", ["require", "exports", "module", "ace/lib/oop", "
 .ace_editor {\
 position: relative;\
 overflow: hidden;\
+padding: 0;\
 font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;\
 direction: ltr;\
 text-align: left;\
@@ -18666,14 +18721,14 @@ z-index: 5;\
 position: absolute;\
 z-index: 6;\
 }\
-.ace_marker-layer .ace_active-line {\
-position: absolute;\
-z-index: 2;\
-}\
 .ace_marker-layer .ace_error_bracket {\
 position: absolute;\
 border-bottom: 1px solid #DE5555;\
 border-radius: 0;\
+}\
+.ace_marker-layer .ace_active-line {\
+position: absolute;\
+z-index: 2;\
 }\
 .ace_marker-layer .ace_selected-word {\
 position: absolute;\
@@ -18824,7 +18879,45 @@ background-color: rgba(255, 255, 0,0.2);\
 position: absolute;\
 z-index: 8;\
 }\
-";
+.ace_mobile-menu {\
+position: absolute;\
+line-height: 1.5;\
+border-radius: 4px;\
+-ms-user-select: none;\
+-moz-user-select: none;\
+-webkit-user-select: none;\
+user-select: none;\
+background: white;\
+box-shadow: 1px 3px 2px grey;\
+border: 1px solid #dcdcdc;\
+color: black;\
+}\
+.ace_dark > .ace_mobile-menu {\
+background: #333;\
+color: #ccc;\
+box-shadow: 1px 3px 2px grey;\
+border: 1px solid #444;\
+}\
+.ace_mobile-button {\
+padding: 2px;\
+cursor: pointer;\
+overflow: hidden;\
+}\
+.ace_mobile-button:hover {\
+background-color: #eee;\
+opacity:1;\
+}\
+.ace_mobile-button:active {\
+background-color: #ddd;\
+}\
+.ace_placeholder {\
+font-family: arial;\
+transform: scale(0.9);\
+transform-origin: left;\
+white-space: pre;\
+opacity: 0.7;\
+margin: 0 10px;\
+}";
 
     var useragent = require("./lib/useragent");
     var HIDE_TEXTAREA = useragent.isIE;
@@ -18872,11 +18965,11 @@ z-index: 8;\
         this.scrollBar =
             this.scrollBarV = new VScrollBar(this.container, this);
         this.scrollBarH = new HScrollBar(this.container, this);
-        this.scrollBarV.addEventListener("scroll", function (e) {
+        this.scrollBarV.on("scroll", function (e) {
             if (!_self.$scrollAnimation)
                 _self.session.setScrollTop(e.data - _self.scrollMargin.top);
         });
-        this.scrollBarH.addEventListener("scroll", function (e) {
+        this.scrollBarH.on("scroll", function (e) {
             if (!_self.$scrollAnimation)
                 _self.session.setScrollLeft(e.data - _self.scrollMargin.left);
         });
@@ -18891,7 +18984,7 @@ z-index: 8;\
 
         this.$fontMetrics = new FontMetrics(this.container);
         this.$textLayer.$setFontMetrics(this.$fontMetrics);
-        this.$textLayer.addEventListener("changeCharacterSize", function (e) {
+        this.$textLayer.on("changeCharacterSize", function (e) {
             _self.updateCharacterSize();
             _self.onResize(true, _self.gutterWidth, _self.$size.width, _self.$size.height);
             _self._signal("changeCharacterSize", e);
@@ -19836,6 +19929,8 @@ z-index: 8;\
             _self.session.setScrollTop(steps.shift());
             _self.session.$scrollTop = toValue;
             this.$timer = setInterval(function () {
+                if (!_self.session)
+                    return clearInterval(_self.$timer);
                 if (steps.length) {
                     _self.session.setScrollTop(steps.shift());
                     _self.session.$scrollTop = toValue;
@@ -19957,7 +20052,8 @@ z-index: 8;\
             if (!composition.cssText) {
                 composition.cssText = this.textarea.style.cssText;
             }
-            composition.useTextareaForIME = this.$useTextareaForIME;
+            if (composition.useTextareaForIME == undefined)
+                composition.useTextareaForIME = this.$useTextareaForIME;
 
             if (this.$useTextareaForIME) {
                 dom.addCssClass(this.textarea, "ace_composition");
@@ -19982,6 +20078,8 @@ z-index: 8;\
 
             dom.removeCssClass(this.textarea, "ace_composition");
             this.textarea.style.cssText = this.$composition.cssText;
+            var cursor = this.session.selection.cursor;
+            this.removeExtraToken(cursor.row, cursor.column);
             this.$composition = null;
             this.$cursorLayer.element.style.display = "";
         };
@@ -20017,6 +20115,10 @@ z-index: 8;\
                     }
                 }
             }
+            this.updateLines(row, row);
+        };
+
+        this.removeExtraToken = function (row, column) {
             this.updateLines(row, row);
         };
         this.setTheme = function (theme, cb) {
@@ -20093,6 +20195,8 @@ z-index: 8;\
             this.freeze();
             this.$fontMetrics.destroy();
             this.$cursorLayer.destroy();
+            this.removeAllListeners();
+            this.container.textContent = "";
         };
 
     }).call(VirtualRenderer.prototype);
@@ -20668,8 +20772,8 @@ define("ace/placeholder", ["require", "exports", "module", "ace/range", "ace/lib
         this.detach = function () {
             this.session.removeMarker(this.pos && this.pos.markerId);
             this.hideOtherMarkers();
-            this.doc.removeEventListener("change", this.$onUpdate);
-            this.session.selection.removeEventListener("changeCursor", this.$onCursorChange);
+            this.doc.off("change", this.$onUpdate);
+            this.session.selection.off("changeCursor", this.$onCursorChange);
             this.session.setUndoSelect(true);
             this.session = null;
         };
@@ -21094,7 +21198,6 @@ define("ace/multi_select", ["require", "exports", "module", "ace/range_list", "a
 
             return $blockChangeEvents || this.fromOrientedRange(range);
         };
-
         this.toSingleRange = function (range) {
             range = range || this.ranges[0];
             var removed = this.rangeList.removeAll();
@@ -21163,7 +21266,6 @@ define("ace/multi_select", ["require", "exports", "module", "ace/range_list", "a
         this.getAllRanges = function () {
             return this.rangeCount ? this.rangeList.ranges.concat() : [this.getRange()];
         };
-
         this.splitIntoLines = function () {
             var ranges = this.ranges.length ? this.ranges : [this.getRange()];
             var newRanges = [];
@@ -21186,10 +21288,12 @@ define("ace/multi_select", ["require", "exports", "module", "ace/range_list", "a
             for (var i = newRanges.length; i--;)
                 this.addRange(newRanges[i]);
         };
+
         this.joinSelections = function () {
             var ranges = this.rangeList.ranges;
             var lastRange = ranges[ranges.length - 1];
             var range = Range.fromPoints(ranges[0].start, lastRange.end);
+
             this.toSingleRange();
             this.setSelectionRange(range, lastRange.cursor == lastRange.start);
         };
@@ -21801,10 +21905,10 @@ define("ace/multi_select", ["require", "exports", "module", "ace/range_list", "a
             } else if (altCursor) {
                 reset();
             }
-        });
+        }, editor);
 
-        event.addListener(el, "keyup", reset);
-        event.addListener(el, "blur", reset);
+        event.addListener(el, "keyup", reset, editor);
+        event.addListener(el, "blur", reset, editor);
 
         function reset(e) {
             if (altCursor) {
@@ -22072,13 +22176,10 @@ background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZ
     dom.importCssString(exports.cssText, exports.cssClass);
 });
 
-define("ace/line_widgets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/range"], function (require, exports, module) {
+define("ace/line_widgets", ["require", "exports", "module", "ace/lib/dom"], function (require, exports, module) {
     "use strict";
 
-    var oop = require("./lib/oop");
     var dom = require("./lib/dom");
-    var Range = require("./range").Range;
-
 
     function LineWidgets(session) {
         this.session = session;
@@ -22264,7 +22365,6 @@ define("ace/line_widgets", ["require", "exports", "module", "ace/lib/oop", "ace/
                 w.el.style.zIndex = 5;
                 renderer.container.appendChild(w.el);
                 w._inDocument = true;
-
 
                 if (!w.coverGutter) {
                     w.el.style.zIndex = 3;
@@ -22729,7 +22829,6 @@ define("ace/ace", ["require", "exports", "module", "ace/lib/fixoldbrowsers", "ac
     exports.VirtualRenderer = Renderer;
     exports.version = exports.config.version;
 });
-
 (function () {
     window.require(["ace/ace"], function (a) {
         if (a) {

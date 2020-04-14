@@ -115,6 +115,7 @@ function EditorManager($sidebar, $header, $body) {
         }
     };
 
+    container.classList.add(appSettings.value.editorFont);
     moveOpenFileList();
     $body.appendChild(container);
     setupEditor();

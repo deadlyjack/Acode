@@ -85,6 +85,8 @@ function deleteFile(filename) {
 function readFile(filename) {
     return new Promise((resolve, reject) => {
 
+        if (!filename) return reject("Invalid valud of fileURL: " + filename);
+
         ajax({
             url: filename,
             responseType: "arraybuffer"

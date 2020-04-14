@@ -115,8 +115,8 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
             promptDiv.classList.add('hide');
             window.restoreTheme();
             setTimeout(() => {
-                app.removeChild(promptDiv);
-                app.removeChild(mask);
+                if (promptDiv.isConnected) promptDiv.remove();
+                if (mask.isConnected) mask.remove();
             }, 300);
         }
 
@@ -181,7 +181,7 @@ function multiPrompt(message, inputs) {
         const $errorMessage = tag("span", {
             className: 'error-msg'
         });
-        const mask = tag('span', {
+        const $mask = tag('span', {
             className: 'mask'
         });
 
@@ -266,15 +266,15 @@ function multiPrompt(message, inputs) {
         });
 
         window.restoreTheme(true);
-        document.body.append($promptDiv, mask);
+        document.body.append($promptDiv, $mask);
         inputAr[0].focus();
 
         function hidePrompt() {
             $promptDiv.classList.add('hide');
             window.restoreTheme();
             setTimeout(() => {
-                document.body.removeChild($promptDiv);
-                document.body.removeChild(mask);
+                if ($promptDiv.isConnected) $promptDiv.remove();
+                if ($mask.isConnected) $mask.remove($mask);
             }, 300);
         }
 
@@ -609,8 +609,8 @@ function loaderHide() {
     window.restoreTheme();
     setTimeout(() => {
         window.freeze = false;
-        if (loaderDiv) loaderDiv.remove();
-        if (mask) mask.remove();
+        if (loaderDiv && loaderDiv.isConnected) loaderDiv.remove();
+        if (mask && mask.isConnected) mask.remove();
     }, 300);
 }
 

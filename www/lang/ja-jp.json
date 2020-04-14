@@ -120,5 +120,9 @@
   "color": "カラー",
   "select word": "単語選択",
   "quick tools": "クイックツール",
-  "select": "選択"
+  "select": "選択",
+  "editor font": "Editor font",
+  "new project": "新プロジェクト",
+  "format": "フォーマット",
+  "project name": "プロジェクト名"
 }

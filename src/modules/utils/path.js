@@ -8,7 +8,7 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
  */
   resolve(...paths) {
 
-    if (!paths.length) throw new Error("resolve(...path) : Arguments missing!")
+    if (!paths.length) throw new Error("resolve(...path) : Arguments missing!");
 
     let resolved = [];
 
@@ -51,6 +51,7 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
  * @param {string} [name] 
  */
   parent(fullname, name) {
+    if (fullname.endsWith("/")) fullname = fullname.slice(0, -1);
     if (name) return fullname.replace(new RegExp(name + '$'), '');
     return fullname.split('/').slice(0, -1).join('/') + '/';
   },
@@ -59,6 +60,9 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
    * @param {string} path 
    */
   name(path) {
+
+    if (path === "" || path === "/") return path;
+
     path = decodeURL(path);
     const ar = path.split('/');
     const last = ar.slice(-1)[0];

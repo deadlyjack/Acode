@@ -7,7 +7,7 @@ import './styles/contextMenu.scss';
 import './styles/dialogs.scss';
 import './styles/themes.scss';
 import './styles/help.scss';
-import './styles/overideAceStyle.scss';
+import './styles/overrideAceStyle.scss';
 
 import "core-js/stable";
 import tag from 'html-tag-js';
@@ -193,6 +193,16 @@ function Main() {
     git.init()
       .then(() => {
         if (timeout) clearTimeout(timeout);
+        return internalFs.listDir(cordova.file.applicationDirectory + 'www/css/build/');
+      })
+      .then(entries => {
+        const styles = [];
+        entries.map(entry => {
+          styles.push(entry.nativeURL);
+        });
+        return helpers.loadStyles(...styles);
+      })
+      .then(res => {
         runApp();
       })
       .catch(err => {
@@ -211,7 +221,7 @@ function loadAceEditor() {
     "./res/ace/src/ext-beautify.js",
     "./res/ace/src/ext-modelist.js"
   ];
-  return helpers.loadScript(...aceScript);
+  return helpers.loadScripts(...aceScript);
 }
 
 function runApp() {
@@ -298,23 +308,12 @@ function App() {
     top: '6px',
     transformOrigin: 'top right',
     innerHTML: () => {
-      return mustache.render($_fileMenu, {
-        string_rename: strings.rename,
-        string_syntax: strings["syntax highlighting"],
-        string_encoding: strings.encoding,
-        string_readOnly: strings["read only"],
-        string_cut: strings.cut,
-        string_copy: strings.copy,
-        string_paste: strings.paste,
-        string_color: strings.color,
-        string_selectWord: strings["select word"],
-        string_selectAll: strings["select all"],
-        string_quickTools: strings["quick tools"],
+      return mustache.render($_fileMenu, Object.assign(strings, {
         file_mode: (editorManager.activeFile.session.getMode().$id || '').split('/').pop(),
         file_encoding: editorManager.activeFile.encoding,
         file_readOnly: editorManager.activeFile.editable ? strings.no : strings.yes,
         setting_quickTools: appSettings.value.quickTools
-      });
+      }));
     }
   });
   const $main = tag('main');
@@ -333,11 +332,10 @@ function App() {
   });
   const fileOptions = {
     save: $mainMenu.querySelector('[action=save]'),
-    saveAs: $mainMenu.querySelector('[action="save-as"]'),
-    goto: $mainMenu.querySelector('[action=goto]')
+    saveAs: $mainMenu.querySelector('[action="save-as"]')
   };
   const actions = ["saveFile", "saveFileAs", "newFile", "nextFile", "prevFile", "openFile", "run", "find", "replace"];
-  let registredKey = '';
+  let registeredKey = '';
 
   $sidebar.setAttribute('empty-msg', strings['open folder']);
   window.editorManager = EditorManager($sidebar, $header, $main);
@@ -393,14 +391,14 @@ function App() {
       document.addEventListener('resume', checkFiles);
       checkFiles();
 
-      const autosave = parseInt(appSettings.value.autosave);
-      if (autosave) {
+      const autoSave = parseInt(appSettings.value.autosave);
+      if (autoSave) {
         saveInterval = setInterval(() => {
           editorManager.files.map(file => {
             if (file.isUnsaved && file.location) Acode.exec("save", false);
             return file;
           });
-        }, autosave);
+        }, autoSave);
       }
     });
 
@@ -417,7 +415,6 @@ function App() {
 
     if (activeFile) {
       fileOptions.saveAs.classList.remove('disabled');
-      fileOptions.goto.classList.remove('disabled');
 
       if (!activeFile.readOnly) {
         fileOptions.save.classList.remove('disabled');
@@ -464,8 +461,8 @@ function App() {
    * @param {KeyboardEvent} e 
    */
   function handleMainKeyDown(e) {
-    registredKey = helpers.getCombination(e);
-    if (registredKey === 'escape') {
+    registeredKey = helpers.getCombination(e);
+    if (registeredKey === 'escape') {
       e.preventDefault();
       e.stopImmediatePropagation();
       e.stopPropagation();
@@ -478,7 +475,7 @@ function App() {
    */
   function handleMainKeyUp(e) {
     let key = helpers.getCombination(e);
-    if (key !== registredKey) return;
+    if (key !== registeredKey) return;
 
     if (key === 'escape') {
       if (actionStack.length) actionStack.pop();
@@ -693,11 +690,6 @@ function App() {
   }
 
   function checkFiles(e) {
-    if (e)
-      for (let folder of addedFolder)
-        if (folder.reloadOnResume)
-          folder.reload();
-
     const files = editorManager.files;
 
     files.map(file => {

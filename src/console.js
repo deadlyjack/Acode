@@ -337,7 +337,7 @@ import loadPolyFill from "./modules/polyfill";
                 str = joinParams(expression.params);
             }
         } else {
-            let string = parsed.id.name + joinParams(parsed.params);
+            let string = parsed.id.name + joinParams(parsed.params || []);
             str = string;
         }
 

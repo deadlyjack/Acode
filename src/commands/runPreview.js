@@ -7,7 +7,6 @@ import fs from '../modules/utils/internalFs';
 import helpers from '../modules/helpers';
 import dialogs from '../components/dialogs';
 import git from '../modules/git';
-import PHP from '../modules/php';
 import constants from '../constants';
 import externalFs from '../modules/utils/externalFs';
 import fsOperation from '../modules/utils/fsOperation';
@@ -152,7 +151,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
       switch (reqPath) {
         case CONSOLE_SCRIPT:
-          url = `${assets}/js/${appSettings.console || 'console'}.build.js`;
+          url = `${assets}/js/build/${appSettings.console || 'console'}.build.js`;
           sendFileContent(url, req.requestId, 'application/javascript');
           break;
 
@@ -198,11 +197,20 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
               sendHTML(text, req.requestId);
             } else {
               const url = path + reqPath;
-              sendFileContent(url.replace('file://', ''), req.requestId, MIMETYPE_HTML, text => {
-                return new PHP(text, {
-                  path
-                }).vm.OUTPUT_BUFFER;
-              });
+
+              //jshint ignore: start
+
+              import( /* webpackChunkName: "vphp" */ '../modules/php')
+                .then(res => {
+                  const PHP = res.default;
+                  sendFileContent(url.replace('file://', ''), req.requestId, MIMETYPE_HTML, text => {
+                    return new PHP(text, {
+                      path
+                    }).vm.OUTPUT_BUFFER;
+                  });
+                });
+
+              //jshint ignore: end
             }
             break;
 
@@ -320,10 +328,10 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
    */
   function sendHTML(text, id) {
     const js = `<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<script src="${EDITOR_SCRIPT}"></script>
-<script src="${CONSOLE_SCRIPT}"></script>
-<script src="${ESPRISMA_SCRIPT}"></script>
-<link rel="stylesheet" href="${CONSOLE_STYLE}">`;
+<script src="/${EDITOR_SCRIPT}"></script>
+<script src="/${CONSOLE_SCRIPT}"></script>
+<script src="/${ESPRISMA_SCRIPT}"></script>
+<link rel="stylesheet" href="/${CONSOLE_STYLE}">`;
     text = text.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
     const part = text.split('<head>');
     if (part.length === 2) {

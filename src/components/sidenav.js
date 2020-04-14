@@ -191,7 +191,8 @@ function sidenav(activator, toggler) {
             Acode.exec("open-folder");
             resetState();
             return hide();
-        } else if (e.target === mask || touch.total === 0) return resetState();
+        } else if (e.target !== mask && touch.total === 0) return resetState();
+        else if (e.target === mask && touch.total === 0) return hide();
         e.preventDefault();
 
         const threshold = $el.getwidth() / 3;

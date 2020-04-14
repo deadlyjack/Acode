@@ -1,7 +1,7 @@
 @import './variables.scss';
 
 #sidenav {
-    z-index: 107;
+    z-index: 109;
     position: fixed;
     left: 0;
     top: 0;
@@ -38,7 +38,7 @@
     flex-direction: column;
 
     &+.mask {
-        z-index: 106;
+        z-index: 108;
     }
 
     >.list {

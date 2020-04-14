@@ -120,5 +120,9 @@
   "color": "اللون",
   "select word": "حدد كلمة",
   "quick tools": "الأدوات السريعة",
-  "select": "أختر"
+  "select": "أختر",
+  "editor font": "Editor font",
+  "new project": "مشروع جديد",
+  "format": "تجميل",
+  "project name": "اسم المشروع"
 }

@@ -4,7 +4,7 @@ import tag from 'html-tag-js';
 import searchSettings from "./searchSettings";
 import gen from "../../components/gen";
 import themeSettings from "./themeSettings";
-import aboutUs from "../about/about";
+import About from "../about/about";
 import editorSettings from "./editorSettings";
 import constants from "../../constants";
 import helpers from "../../modules/helpers";
@@ -102,7 +102,7 @@ export default function settingsMain(demo) {
                 break;
 
             case 'about':
-                aboutUs();
+                About();
                 break;
 
             case 'keybindings':

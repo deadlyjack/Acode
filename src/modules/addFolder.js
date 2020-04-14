@@ -54,7 +54,7 @@ function openFolder(_path, opts = {}) {
           if (folder.url !== _path) folder.$node.collapse();
 
       if (appSettings.value.openFileListPos !== 'header')
-        editorManager.openFileList.collasp();
+        editorManager.openFileList.collapse();
 
       expandList.call(this);
     }
@@ -103,14 +103,21 @@ function openFolder(_path, opts = {}) {
   editorManager.sidebar.appendChild($root);
 
   function getTitle() {
+    let title = '';
     try {
       const {
         username,
-        hostname
+        hostname,
+        port
       } = new URL(_path);
-      if (username && hostname) return `${username}@${hostname}`;
+      if (username && hostname) title = `${username}@${hostname}`;
+      else if (hostname) title = hostname;
 
-      return path.name(_path);
+      if (hostname && port) title += ':' + port;
+
+      if (title) return title;
+      else return path.name(_path);
+
     } catch (error) {
       return path.name(_path);
     }
@@ -118,7 +125,11 @@ function openFolder(_path, opts = {}) {
 
   function remove(e) {
 
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
 
     if ($root.isConnected) {
       $root.remove();
@@ -227,6 +238,8 @@ function openFolder(_path, opts = {}) {
     let newName, CASE = '',
       src, srcName, srcType, $src, file, msg, defaultValue;
 
+    if (type === "dir" && !url.endsWith("/")) url += "/";
+
     const target = $target.getAttribute('state');
 
     switch (action) {
@@ -249,7 +262,8 @@ function openFolder(_path, opts = {}) {
             return fsOperation(url);
           })
           .then(fs => {
-            return fs.deleteFile();
+            if (type === "dir") return fs.deleteDir();
+            else if (type === "file") return fs.deleteFile();
           })
           .then(res => {
             if (type === 'file') $target.remove();
@@ -513,7 +527,10 @@ function openFolder(_path, opts = {}) {
           return fs.lsDir();
         })
         .then(entries => {
-          entries = helpers.sortDir(entries, appSettings.value.fileBrowser, true);
+          entries = helpers.sortDir(entries, {
+            sortByName: "on",
+            showHiddenFiles: "on"
+          }, true);
           entries.map(entry => {
             const name = path.name(entry.url);
             if (entry.isDirectory) {

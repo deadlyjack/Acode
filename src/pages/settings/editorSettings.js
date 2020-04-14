@@ -70,6 +70,11 @@ export default function editorSettings() {
             key: 'activefiles',
             text: strings['active files'],
             subText: value.openFileListPos,
+        },
+        {
+            key: 'editorFont',
+            text: strings['editor font'],
+            subText: value.editorFont,
         }
     ];
 
@@ -244,6 +249,20 @@ export default function editorSettings() {
                         appSettings.value.openFileListPos = res;
                         appSettings.update();
                         editorManager.moveOpenFileList();
+                        this.changeSubText(res);
+                    });
+                break;
+
+            case 'editorFont':
+                dialogs.select(this.text, ['fira-code', 'default'], {
+                        default: value.editorFont
+                    })
+                    .then(res => {
+                        if (res === value.editorFont) return;
+                        editorManager.container.classList.remove(value.editorFont);
+                        editorManager.container.classList.add(res);
+                        appSettings.value.editorFont = res;
+                        appSettings.update();
                         this.changeSubText(res);
                     });
                 break;

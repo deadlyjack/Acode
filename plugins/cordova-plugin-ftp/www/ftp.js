@@ -177,6 +177,15 @@ Ftp.prototype.rename = function (path, newPath, success, error) {
 };
 
 /**
+ * This method asks and returns the current working directory. 
+ * @param {function} success New path
+ * @param {function} error New path
+ */
+Ftp.prototype.currentDirectory = function (success, error) {
+    exec(success, error, "Ftp", "currentDirectory", []);
+};
+
+/**
  * Cancel all requests. Always success.
  *
  * @param {function} successCallback The success callback. If triggered, means `cancel` success.

@@ -41,10 +41,17 @@ function ActionStack() {
         }
     }
 
+    function has(id) {
+        for (let act of stack)
+            if (act.id === id) return true;
+        return false;
+    }
+
     return {
         push,
         pop,
         remove,
+        has,
         get length() {
             return stack.length;
         }

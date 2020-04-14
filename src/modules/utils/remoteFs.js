@@ -7,14 +7,16 @@ import helpers from "../helpers";
  * @param {string} password
  * @param {string} hostname
  * @param {string|number} port
+ * @param {string} [defaultPath]
  * @returns {ExternalFs}
  */
-function remoteFs(username, password, hostname, port) {
+function remoteFs(username, password, hostname, port, defaultPath = '') {
 
   port = port || 21;
   const ftp = window.cordova.plugin.ftp;
   const FILE = 0,
-    DIR = 1;
+    DIR = 1,
+    LINK = 2;
 
   const fs = {
     listDir,
@@ -22,6 +24,7 @@ function remoteFs(username, password, hostname, port) {
     createDir,
     createFile,
     deleteFile,
+    deleteDir,
     readFile,
     rename,
     copyTo,
@@ -70,24 +73,40 @@ function remoteFs(username, password, hostname, port) {
   }
 
   function listDir(_path) {
-    _path = new URL(_path).pathname;
+    if (_path !== fs.origin) _path = new URL(_path).pathname;
+    else _path = defaultPath || '';
     return new Promise((resolve, reject) => {
       connect()
-        .then(res => {
+        .then(wd => {
+
+          if (!_path) _path = wd;
+
           ftp.ls(_path, success, error);
 
           /**
            * 
-           * @param {Array<{name: string, type: number, size: number, modifiedDate: string}>} list 
+           * @param {Array<{name: string, link: string, type: number, size: number, modifiedDate: string}>} list 
            */
           function success(list) {
 
             const ls = [];
             list.map(entry => {
+
+              let {
+                link,
+                name,
+                type
+              } = entry;
+
+              link = link === "null" ? null : link;
+
+              const url = link ? link : path.join(_path, name);
+
               ls.push({
-                url: fs.origin + path.join(_path, entry.name),
-                isDirectory: entry.type === DIR,
-                isFile: entry.type === FILE
+                url: fs.origin + url,
+                isDirectory: type === DIR,
+                isFile: type === FILE,
+                isLink: type === LINK
               });
             });
             resolve(ls);
@@ -157,8 +176,9 @@ function remoteFs(username, password, hostname, port) {
     }
   }
 
-  function createFile(_path) {
-    return writeFile(_path, '');
+  function createFile(_path, data) {
+    data = data || '';
+    return writeFile(_path, data);
   }
 
   function deleteFile(_path) {
@@ -179,7 +199,7 @@ function remoteFs(username, password, hostname, port) {
                 const code = getCode(err);
                 if (code === 421) return connect()
                   .then(res => {
-                    ftp.rm(cacheFile, _path, success, error);
+                    ftp.rm(_path, success, error);
                   })
                   .catch(err => {
                     reject(err);
@@ -187,6 +207,33 @@ function remoteFs(username, password, hostname, port) {
                 reject(err);
               }
             });
+        })
+        .catch(reject);
+    });
+  }
+
+  function deleteDir(_path) {
+    _path = new URL(_path).pathname;
+    return new Promise((resolve, reject) => {
+      connect()
+        .then(res => {
+          ftp.rmdir(_path, success, error);
+
+          function success(res) {
+            resolve(res);
+          }
+
+          function error(err) {
+            const code = getCode(err);
+            if (code === 421) return connect()
+              .then(res => {
+                ftp.rmdir(_path, success, error);
+              })
+              .catch(err => {
+                reject(err);
+              });
+            reject(err);
+          }
         })
         .catch(reject);
     });

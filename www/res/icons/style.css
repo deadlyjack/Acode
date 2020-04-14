@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'code-editor-icon';
-  src: url('fonts/code-editor-icon.eot?ssr7zy');
-  src: url('fonts/code-editor-icon.eot?ssr7zy#iefix') format('embedded-opentype'),
-    url('fonts/code-editor-icon.ttf?ssr7zy') format('truetype'),
-    url('fonts/code-editor-icon.woff?ssr7zy') format('woff'),
-    url('fonts/code-editor-icon.svg?ssr7zy#code-editor-icon') format('svg');
+  src: url('fonts/code-editor-icon.eot?9sf1qw');
+  src: url('fonts/code-editor-icon.eot?9sf1qw#iefix') format('embedded-opentype'),
+    url('fonts/code-editor-icon.ttf?9sf1qw') format('truetype'),
+    url('fonts/code-editor-icon.woff?9sf1qw') format('woff'),
+    url('fonts/code-editor-icon.svg?9sf1qw#code-editor-icon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -326,6 +326,11 @@
 .icon.visualstudiocode:before {
   content: "\e947";
   color: #007acc;
+}
+
+.icon.vue:before {
+  content: "\e9fe";
+  color: #4fc08d;
 }
 
 .icon.webpack:before {

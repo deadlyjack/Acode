@@ -1,8 +1,11 @@
 version 0.0.9.93
+☞ Create and run Vue, Angular, AngularJS and React projects
 ☞ Now edit remote files using FTP
 ☞ Open folder by tapping on sidenav if empty
 ☞ Shows error message if editor is unable to open
-☞ Minor UI improvment
+☞ Minor UI improvement
+☞ Performance improvement
+☞ Fixed bug (deleting character from backwards)
 ☞ Bugs fixes
 
 version 0.0.9.92

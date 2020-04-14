@@ -14,6 +14,8 @@
     max-width: 320px;
     background-color: $primary;
     box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
+    border-radius: 2px !important;
+    overflow: hidden;
 
     display: flex;
     flex-direction: column;

@@ -1,5 +1,6 @@
 import helpers from "../helpers";
 import dialogs from "../../components/dialogs";
+import internalFs from "./internalFs";
 
 /**
  * 
@@ -13,6 +14,7 @@ function externalFs(uuid, uri) {
 
   let rootPath = uuid ? (externalStorage.get(uuid) || {}).path : uri;
   const fs = {
+    readFile,
     writeFile,
     move,
     copy,
@@ -47,6 +49,9 @@ function externalFs(uuid, uri) {
     }
 
     function next() {
+      setTimeout(() => {
+        dialogs.loaderHide();
+      }, 100);
       SDcard.open(uuid, result => {
         rootPath = result;
         externalStorage.savePath(uuid, result);
@@ -57,6 +62,10 @@ function externalFs(uuid, uri) {
     }
 
   });
+
+  function readFile(url) {
+    return internalFs.readFile(url);
+  }
 
   function writeFile(filename, content) {
     filename = helpers.decodeURL(filename);
@@ -91,12 +100,18 @@ function externalFs(uuid, uri) {
     });
   }
 
-  function createFile(parent, filename) {
+  function createFile(parent, filename, data) {
     parent = helpers.decodeURL(parent);
     filename = helpers.decodeURL(filename);
 
     return new Promise((resolve, reject) => {
-      SDcard.touch(rootPath, parent, filename, res => resolve(res), err => reject(err));
+      SDcard.touch(rootPath, parent, filename, res => {
+        if (data) {
+          if (!parent.endsWith("/")) parent += '/';
+          return SDcard.write(rootPath, parent + filename, data, res => resolve(res), err => reject(err));
+        }
+        resolve(res);
+      }, err => reject(err));
     });
   }
 

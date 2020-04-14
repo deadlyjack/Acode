@@ -30,7 +30,7 @@ function fsOperation(fileUri) {
             const _path = path.subtract(fileUri, res.origin);
             externalFs(res.uuid)
               .then(fs => {
-                createExternalFsOperation(fs, _path, resolve);
+                createExternalFsOperation(fs, _path, resolve, fileUri);
               })
               .catch(reject);
           } else {
@@ -59,7 +59,7 @@ function fsOperation(fileUri) {
 
                 externalFs(undefined, fileUri)
                   .then(fs => {
-                    createExternalFsOperation(fs, undefined, resolve);
+                    createExternalFsOperation(fs, fileUri, resolve);
                   })
                   .catch(reject);
               });
@@ -99,10 +99,11 @@ function fsOperation(fileUri) {
       writeFile: content => {
         return fs.writeFile(url, content);
       },
-      createFile: name => {
+      createFile: (name, data) => {
         const pathname = new URL(url).pathname;
+        data = data || '';
         name = fs.origin + path.join(pathname, name);
-        return fs.createFile(name);
+        return fs.createFile(name, data);
       },
       createDirectory: name => {
         const pathname = new URL(url).pathname;
@@ -111,6 +112,9 @@ function fsOperation(fileUri) {
       },
       deleteFile: () => {
         return fs.deleteFile(url);
+      },
+      deleteDir: () => {
+        return fs.deleteDir(url);
       },
       copyTo: dest => {
         return fs.copyTo(url, dest);
@@ -157,21 +161,7 @@ function fsOperation(fileUri) {
     resolve({
 
       lsDir: () => {
-        return new Promise((resolve, reject) => {
-          const files = [];
-          fs.listDir(url)
-            .then(entries => {
-              entries.map(entry => {
-                files.push({
-                  url: entry.nativeURL,
-                  isDirectory: entry.isDirectory,
-                  isFile: entry.isFile
-                });
-              });
-              resolve(files);
-            })
-            .catch(reject);
-        });
+        return listDir(url);
       },
       readFile: encoding => {
         return readFile(fs, url, encoding);
@@ -179,13 +169,17 @@ function fsOperation(fileUri) {
       writeFile: content => {
         return fs.writeFile(url, content, false, false);
       },
-      createFile: name => {
-        return fs.writeFile(url + name, '', true, true);
+      createFile: (name, data) => {
+        data = data || '';
+        return fs.writeFile(url + name, data, true, true);
       },
       createDirectory: name => {
         return fs.createDir(url, name);
       },
       deleteFile: () => {
+        return fs.deleteFile(url);
+      },
+      deleteDir: () => {
         return fs.deleteFile(url);
       },
       copyTo: dest => {
@@ -206,8 +200,9 @@ function fsOperation(fileUri) {
    * @param {ExternalFs} fs 
    * @param {string} url 
    * @param {CallableFunction} resolve 
+   * @param {string} fullPath
    */
-  function createExternalFsOperation(fs, url, resolve) {
+  function createExternalFsOperation(fs, url, resolve, fullPath) {
 
     function moveOrCopy(action, dest) {
       const origin = externalStorage.get(fs.uuid).origin;
@@ -235,23 +230,25 @@ function fsOperation(fileUri) {
     resolve({
 
       lsDir: () => {
-        return new Promise((resolve, reject) => {
-          resolve([]);
-        });
+        return listDir(fullPath);
       },
       readFile: encoding => {
-        return readFile(fs, url, encoding);
+        return readFile(fs, fullPath, encoding);
       },
       writeFile: content => {
         return fs.writeFile(url, content);
       },
-      createFile: name => {
-        return fs.createFile(url, name);
+      createFile: (name, data) => {
+        data = data || '';
+        return fs.createFile(url, name, data);
       },
       createDirectory: name => {
         return fs.createDir(url, name);
       },
       deleteFile: () => {
+        return fs.deleteFile(url);
+      },
+      deleteDir: () => {
         return fs.deleteFile(url);
       },
       copyTo: dest => {
@@ -304,8 +301,6 @@ function fsOperation(fileUri) {
   function readFile(fs, url, encoding) {
     return new Promise((resolve, reject) => {
 
-      fs = fs.readFile ? fs : internalFs;
-
       fs.readFile(url)
         .then(res => {
           const data = res.data;
@@ -318,6 +313,24 @@ function fsOperation(fileUri) {
         })
         .catch(reject);
 
+    });
+  }
+
+  function listDir(url) {
+    return new Promise((resolve, reject) => {
+      const files = [];
+      internalFs.listDir(url)
+        .then(entries => {
+          entries.map(entry => {
+            files.push({
+              url: entry.nativeURL,
+              isDirectory: entry.isDirectory,
+              isFile: entry.isFile
+            });
+          });
+          resolve(files);
+        })
+        .catch(reject);
     });
   }
 

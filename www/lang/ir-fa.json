@@ -121,5 +121,9 @@
   "color": "رنگ",
   "select word": "کلمه را انتخاب کنید",
   "quick tools": "ابزار سریع",
-  "select": "سره"
+  "select": "سره",
+  "editor font": "Editor font",
+  "new project": "پروژه جدید",
+  "format": "قالب",
+  "project name": "نام پروژه"
 }

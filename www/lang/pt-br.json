@@ -121,5 +121,9 @@
   "color": "Cor",
   "select word": "Selecionar palavra",
   "quick tools": "Ferramentas rápidas",
-  "select": "selecionar"
+  "select": "selecionar",
+  "editor font": "Editor font",
+  "new project": "Novo projeto",
+  "format": "formato",
+  "project name": "Nome do Projeto"
 }

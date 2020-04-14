@@ -31,7 +31,7 @@ class Settings {
             autosave: 0,
             fileBrowser: {
                 showHiddenFiles: 'off',
-                sortByName: 'off'
+                sortByName: 'on'
             },
             maxFileSize: 5,
             filesNotAllowed: ['zip', 'apk', 'doc', 'docx', 'mp3', 'mp4', 'avi', 'flac', 'mov', 'rar', 'pdf', 'gif'],
@@ -55,7 +55,8 @@ class Settings {
             previewMode: 'none',
             showSpaces: false,
             openFileListPos: 'header',
-            quickTools: true
+            quickTools: true,
+            editorFont: "default"
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;

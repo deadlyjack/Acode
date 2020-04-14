@@ -121,5 +121,9 @@
   "color": "колір",
   "select word": "Виберіть слово",
   "quick tools": "Швидкі інструменти",
-  "select": "виберіть"
+  "select": "виберіть",
+  "editor font": "Editor font",
+  "new project": "Новий проект",
+  "format": "формат",
+  "project name": "Назва проекту"
 }

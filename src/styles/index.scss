@@ -265,9 +265,9 @@ body {
     }
 
     &.app-logo {
-        background-image: url(../res/logo/logo.png);
+        background-image: url(./res/logo/logo.png);
         background-position: center;
-        background-size: 28px;
+        background-size: 24px;
         background-repeat: no-repeat;
     }
 
@@ -307,6 +307,16 @@ body {
         }
     }
 
+    &.angularjs::before {
+        content: "\e92f";
+        color: #dd0031;
+    }
+
+    &.html::before {
+        content: "\e939";
+        color: #e34f26;
+    }
+
     &:focus {
         border: solid 1px rgba(255, 238, 0, 0.5);
         box-sizing: border-box;
@@ -331,7 +341,7 @@ body {
     }
 
     &.foxdebug {
-        background-image: url(../res/logo/favicon.ico);
+        background-image: url(./res/logo/favicon.ico);
         background-repeat: no-repeat;
         background-position: center;
         background-size: 18px;
@@ -437,7 +447,7 @@ input {
     color: black;
 
     &:focus {
-        border-bottom-width: 2px !important;
+        border-bottom-color: #39f !important;
     }
 }
 

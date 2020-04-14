@@ -121,5 +121,9 @@
   "color": "warna",
   "select word": "Pilih kata",
   "quick tools": "Alat cepat",
-  "select": "Pilih"
+  "select": "Pilih",
+  "editor font": "Editor font",
+  "new project": "Proyek baru",
+  "format": "format",
+  "project name": "Nama Proyek"
 }

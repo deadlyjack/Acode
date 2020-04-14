@@ -121,5 +121,9 @@
   "color": "रंग",
   "select word": "शब्द का चयन करें",
   "quick tools": "त्वरित उपकरण",
-  "select": "चयन"
+  "select": "चयन",
+  "editor font": "Editor font",
+  "new project": "नया प्रोजेक्ट",
+  "format": "फॉर्मेट",
+  "project name": "प्रोजेक्ट का नाम"
 }
