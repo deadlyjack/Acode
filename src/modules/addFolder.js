@@ -220,7 +220,6 @@ function openFolder(_path, opts = {}) {
 
     dialogs.select(name, options)
       .then(res => {
-        loading.start();
         execOperation(type, res, url, $target, name)
           .finally(loading.stop);
       });
@@ -259,6 +258,7 @@ function openFolder(_path, opts = {}) {
 
         return dialogs.confirm(strings.warging, msg)
           .then(res => {
+            loading.start();
             return fsOperation(url);
           })
           .then(fs => {
@@ -282,6 +282,7 @@ function openFolder(_path, opts = {}) {
             required: true
           })
           .then(newname => {
+            loading.start();
             newName = newname;
             if (newName !== name)
               return fsOperation(url)
@@ -418,6 +419,7 @@ function openFolder(_path, opts = {}) {
             required: true
           })
           .then(res => {
+            loading.start();
             newName = res;
             return fsOperation(url);
           })

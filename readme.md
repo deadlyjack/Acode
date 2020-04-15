@@ -1,8 +1,8 @@
 # Acode editor (Code editor for android)
 
-This is a hybrid app using Apache Cordova. This app is published on play store. Check it out from [here](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree).
+This is a hybrid app using Apache Cordova. This app is published on play store. Check it out from [here](https://acode.foxdebug.com).
 
-Warning, this project is not organised and it is very hard understand the project structure. I'll try to make it clear as possible.
+Note: This project is not organised and it is very hard understand the project structure. I'll try to make it clear as possible.
 
 ## Project structure
 
@@ -12,7 +12,7 @@ Warning, this project is not organised and it is very hard understand the projec
 
 ## Multi language support
 
-To add new language, create a new file with language code for android (eg. en-us for english) in `www/lang/` direcotry.
+To add new language, create a new file with language code for android (eg. en-us for english) in [`www/lang/`](https://github.com/deadlyjack/code-editor/tree/master/www/lang) direcotry. After adding new laguage also add it to [`src/constants.js -> langList`](https://github.com/deadlyjack/code-editor/blob/master/src/constants.js#L12).
 
 Here are few utility tools to add, remove or search a string in all added languages.
 

@@ -33,8 +33,9 @@ function sidenav(activator, toggler) {
         width = 250,
         eventAddedFlag = 0,
         _innerWidth = innerWidth,
-        isScrolling = false,
-        starty = 0;
+        isScrolling = true,
+        $$ = [],
+        timeout, flag = false;
     activator = activator || app;
 
     if (toggler)
@@ -71,6 +72,7 @@ function sidenav(activator, toggler) {
     }
 
     function show() {
+        $$ = [...$el.getAll(':scope>div>ul')];
         $el.activated = true;
 
         if (mode === 'phone') {
@@ -94,6 +96,13 @@ function sidenav(activator, toggler) {
             editorManager.editor.resize(true);
             editorManager.controls.update();
         }
+
+        $$.map($ => {
+            $.onscroll = () => {
+                if (timeout) clearTimeout(timeout);
+                isScrolling = true;
+            };
+        });
     }
 
     function hide(hideIfTab = false) {
@@ -122,6 +131,13 @@ function sidenav(activator, toggler) {
         }, 300);
         document.ontouchstart = null;
         resetState();
+
+        $$.map($ => {
+            isScrolling = false;
+            timeout = null;
+            $.onscroll = null;
+        });
+        $$ = [];
     }
 
     /**
@@ -129,17 +145,13 @@ function sidenav(activator, toggler) {
      * @param {TouchEvent} e 
      */
     function ontouchstart(e) {
-        if (isScrolling) return;
-
         const {
-            clientX,
-            clientY
+            clientX
         } = e.touches[0];
         $el.style.transition = 'none';
         touch.start = clientX;
         touch.target = e.target;
 
-        if ($el.contains(e.target)) starty = clientY;
         if ($el.activated && !$el.contains(e.target) && e.target !== mask) return;
         else if (!$el.activated && touch.start > 10 || e.target === toggler) return;
 
@@ -152,25 +164,27 @@ function sidenav(activator, toggler) {
      * @param {TouchEvent} e 
      */
     function ontouchmove(e) {
+
+        if (!flag) {
+            flag = true;
+            timeout = setTimeout(() => {
+                timeout = null;
+                isScrolling = false;
+            }, 50);
+        }
+
+        if (isScrolling) return;
+
         if (!$el.isConnected) {
             app.append($el, mask);
             $el.scrollTop = scrollPosition;
             activator.style.overflow = 'hidden';
         }
 
-        if (isScrolling) return;
-
         let width = $el.getwidth();
         const {
-            clientX,
-            clientY
+            clientX
         } = e.touches[0];
-
-        if (starty && (Math.abs(clientY - starty) > Math.abs(clientX - touch.start))) {
-            isScrolling = true;
-            starty = 0;
-            return;
-        }
 
         touch.end = clientX;
         touch.total = touch.end - touch.start;
@@ -187,6 +201,10 @@ function sidenav(activator, toggler) {
      * @param {TouchEvent} e 
      */
     function ontouchend(e) {
+
+        flag = false;
+        isScrolling = true;
+
         if (e.target === $el && !$el.textContent && touch.total === 0) {
             Acode.exec("open-folder");
             resetState();
@@ -219,8 +237,6 @@ function sidenav(activator, toggler) {
     }
 
     function resetState() {
-        starty = 0;
-        isScrolling = false;
         touch.total = 0;
         touch.start = 0;
         touch.end = 0;
@@ -228,6 +244,7 @@ function sidenav(activator, toggler) {
         document.ontouchmove = null;
         document.ontouchend = null;
         $el.style.transition = null;
+        document.onscroll = null;
     }
 
     $el.getwidth = function () {
