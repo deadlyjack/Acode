@@ -350,6 +350,13 @@ body {
     &.no-icon {
         max-width: 10px;
     }
+
+    &.patreon {
+        background-image: url(./res/logo/patreon.png);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 18px;
+    }
 }
 
 .mask {

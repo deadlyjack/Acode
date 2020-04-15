@@ -29,6 +29,12 @@ export default function help(opts) {
             text: strings.help,
             type: 'a',
             href: 'https://t.me/foxdebug_acode',
+        },
+        {
+            key: 'help',
+            text: 'FAQs',
+            type: 'a',
+            href: 'https://acode.foxdebug.com/faqs',
         }
     ];
 

@@ -295,6 +295,12 @@ body {
   .octicon.no-icon,
   .icon.no-icon {
     max-width: 10px; }
+  .octicon.patreon,
+  .icon.patreon {
+    background-image: url(./res/logo/patreon.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 18px; }
 
 .mask {
   position: fixed;
@@ -879,7 +885,7 @@ ul {
   top: 0;
   width: 70vw;
   height: 100vh;
-  background-color: #8f8fff;
+  background-color: #99f;
   overflow: hidden;
   box-sizing: border-box;
   display: flex;
@@ -888,7 +894,7 @@ ul {
     max-width: 400px;
     transition: all 300ms ease;
     transform: translate(-100%, 0);
-    box-shadow: 4px 0 8px #0002; }
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.07); }
   #sidenav.tab {
     max-width: 250px; }
   #sidenav:empty {

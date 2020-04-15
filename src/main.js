@@ -29,6 +29,7 @@ import arrowkeys from "./modules/events/arrowkeys";
 
 import $_menu from './views/menu.hbs';
 import $_fileMenu from './views/file-menu.hbs';
+import $_suportUs from './views/supportus.hbs';
 import git from "./modules/git";
 import commands from "./commands/commands";
 import externalStorage from "./modules/externalStorage";
@@ -134,6 +135,11 @@ function Main() {
   });
 
   function ondeviceready() {
+
+    if (/free/.test(BuildInfo.packageName) && appSettings.value.appTheme === "dark") {
+      appSettings.value.appTheme = "default";
+      appSettings.update();
+    }
 
     if (!('files' in localStorage)) {
       localStorage.setItem('files', '[]');
@@ -348,6 +354,7 @@ function App() {
   //Asks for rating if used more than 5 times
   let count = parseInt(localStorage.count) || 0;
   if (count === constants.RATING_TIME) rateBox();
+  else if (count === constants.RATING_TIME - 1) supportUsButton();
   else localStorage.count = ++count;
 
   //#region rendering
@@ -820,5 +827,25 @@ function restoreTheme(darken) {
     StatusBar.backgroundColorByHexString(hexColor);
     StatusBar.styleLightContent();
   }
+}
+
+function supportUsButton() {
+
+  if (app.classList.contains('loading')) return setTimeout(supportUsButton, 1000);
+
+  const $supportUsContainer = tag.parse(mustache.render($_suportUs, strings));
+  const $supportUs = $supportUsContainer.get('#supportus');
+  app.append($supportUsContainer);
+  const client = ($supportUs.getBoundingClientRect().height / 2) + 'px';
+  $supportUs.style.borderRadius = client;
+  $supportUs.style.padding = `${10}px ${client}`;
+
+  setTimeout(() => {
+    $supportUs.style.opacity = '0';
+
+    setTimeout(() => {
+      $supportUsContainer.remove();
+    }, 300);
+  }, 2500);
 }
 //#endregion

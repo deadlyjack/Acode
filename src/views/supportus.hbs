@@ -1,0 +1,43 @@
+<div>
+  <style>
+    #supportus {
+      position: fixed;
+      border-radius: 4px;
+      bottom: 42px;
+      left: 50%;
+      width: fit-content;
+      transform: translate(-50%, 0);
+      animation: appear 300ms ease 1;
+      background-color: #292929;
+      color: white;
+      padding: 10px;
+      font-size: 0.9rem;
+      text-decoration: none;
+      padding: 10px 5px;
+      opacity: 0.8;
+      transition: all 300ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #supportus:active,
+    #supportus:focus {
+      -webkit-tap-highlight-color: transparent;
+      opacity: 1;
+    }
+
+    #supportus.hide {
+      opacity: 0;
+    }
+
+    @keyframes appear {
+      0% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 0.6;
+      }
+    }
+  </style>
+  <a href="https://patreon.com/foxdebug" id="supportus">{{support us}}</a>
+</div>

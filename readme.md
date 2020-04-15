@@ -1,5 +1,7 @@
 # Acode editor (Code editor for android)
 
+![logo](./res/icon/android/ic_launcher-web.png)
+
 This is a hybrid app using Apache Cordova. This app is published on play store. Check it out from [here](https://acode.foxdebug.com).
 
 Note: This project is not organised and it is very hard understand the project structure. I'll try to make it clear as possible.

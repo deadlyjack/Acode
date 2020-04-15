@@ -20,10 +20,12 @@ if (arg === 'd') {
   babelrc.compact = true;
 }
 
-if (arg2 === 'free') {
-  config = config.replace(/id="([a-z.]+")/, 'id="com.foxdebug.acodefree"');
-} else {
-  config = config.replace(/id="([a-z.]+")/, 'id="com.foxdebug.acode"');
+if (arg !== 'd') {
+  if (arg2 === 'free') {
+    config = config.replace(/id="([a-z.]+")/, 'id="com.foxdebug.acodefree"');
+  } else {
+    config = config.replace(/id="([a-z.]+")/, 'id="com.foxdebug.acode"');
+  }
 }
 
 fs.writeFileSync(configpath, config, 'utf8');

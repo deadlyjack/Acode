@@ -51,7 +51,7 @@ function fsOperation(fileUri) {
                   externalStorage.saveOrigin(uuid, origin);
                   externalFs(uuid)
                     .then(fs => {
-                      createExternalFsOperation(fs, path, resolve);
+                      createExternalFsOperation(fs, path, resolve, fileUri);
                     })
                     .catch(reject);
                   return;
@@ -59,7 +59,7 @@ function fsOperation(fileUri) {
 
                 externalFs(undefined, fileUri)
                   .then(fs => {
-                    createExternalFsOperation(fs, fileUri, resolve);
+                    createExternalFsOperation(fs, undefined, resolve, fileUri);
                   })
                   .catch(reject);
               });

@@ -19,7 +19,7 @@ eval("function _defineProperty(obj, key, value) {\n  if (key in obj) {\n    Obje
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n//jshint ignore:start\nfunction Gists() {\n  for (var _len = arguments.length, agrs = new Array(_len), _key = 0; _key < _len; _key++) {\n    agrs[_key] = arguments[_key];\n  }\n\n  __webpack_require__.e(/*! import() | gists */ \"gists\").then(__webpack_require__.bind(null, /*! ./gists.include */ \"./src/pages/gists/gists.include.js\")).then(function (res) {\n    var Gists = res;\n    Gists.apply(void 0, agrs);\n  });\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (Gists);\n\n//# sourceURL=webpack:///./src/pages/gists/gists.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n//jshint ignore:start\nfunction Gists() {\n  for (var _len = arguments.length, agrs = new Array(_len), _key = 0; _key < _len; _key++) {\n    agrs[_key] = arguments[_key];\n  }\n\n  __webpack_require__.e(/*! import() | gists */ \"gists\").then(__webpack_require__.bind(null, /*! ./gists.include */ \"./src/pages/gists/gists.include.js\")).then(function (res) {\n    var Gists = res[\"default\"];\n    Gists.apply(void 0, agrs);\n  });\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (Gists);\n\n//# sourceURL=webpack:///./src/pages/gists/gists.js?");
 
 /***/ }),
 
