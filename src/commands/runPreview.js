@@ -56,7 +56,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     }
   }
 
-  if (extension === 'js' && pathName) {
+  if (filename !== 'index.html' && pathName) {
     for (let folder of addedFolder) {
       if (path.isParent(folder.url, pathName)) {
         addedFolderUrl = folder.url;
