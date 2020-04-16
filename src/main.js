@@ -303,11 +303,14 @@ function App() {
     tabIndex: -1,
     onclick: handleQuickTools.clickListener
   });
-  const $mainMenu = contextMenu(mustache.render($_menu, strings), {
+  const $mainMenu = contextMenu({
     top: '6px',
     right: '6px',
     toggle: $menuToggler,
-    transformOrigin: 'top right'
+    transformOrigin: 'top right',
+    innerHTML: () => {
+      return mustache.render($_menu, strings);
+    }
   });
   const $fileMenu = contextMenu({
     toggle: $edit,
@@ -337,8 +340,8 @@ function App() {
     }
   });
   const fileOptions = {
-    save: $mainMenu.querySelector('[action=save]'),
-    saveAs: $mainMenu.querySelector('[action="save-as"]')
+    save: () => $mainMenu.querySelector('[action=save]'),
+    saveAs: () => $mainMenu.querySelector('[action="save-as"]')
   };
   const actions = ["saveFile", "saveFileAs", "newFile", "nextFile", "prevFile", "openFile", "run", "find", "replace"];
   let registeredKey = '';
@@ -354,8 +357,10 @@ function App() {
   //Asks for rating if used more than 5 times
   let count = parseInt(localStorage.count) || 0;
   if (count === constants.RATING_TIME) rateBox();
-  else if (count === constants.RATING_TIME - 1) supportUsButton();
-  else localStorage.count = ++count;
+  else {
+    if (count === constants.RATING_TIME - 1) supportUsButton();
+    localStorage.count = ++count;
+  }
 
   //#region rendering
   $header.classList.add('light');
@@ -421,16 +426,6 @@ function App() {
     }
 
     if (activeFile) {
-      fileOptions.saveAs.classList.remove('disabled');
-
-      if (!activeFile.readOnly) {
-        fileOptions.save.classList.remove('disabled');
-        if ($save) $save.classList.remove('disabled');
-      } else {
-        fileOptions.save.classList.add('disabled');
-        if ($save) $save.classList.add('disabled');
-      }
-
       if (activeFile.isUnsaved) {
         activeFile.assocTile.classList.add('notice');
         if ($save) $save.classList.add('notice');
@@ -441,7 +436,7 @@ function App() {
 
       this.editor.setReadOnly(!activeFile.editable);
 
-      if (['html', 'htm', 'xhtml', 'md', 'js', 'php'].includes(helpers.getExt(activeFile.filename))) {
+      if (['html', 'htm', 'xhtml', 'md', 'js'].includes(helpers.getExt(activeFile.filename))) {
         $header.insertBefore($runBtn, $header.lastChild);
       } else {
         $runBtn.remove();

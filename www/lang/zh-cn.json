@@ -67,7 +67,6 @@
   "ok": "确认",
   "overwrite": "覆盖",
   "paste": "粘贴",
-  "phpwarnging": "这个PHP实现不是真实的，它只是一个仿真，例如，许多功能将不起作用。 phpinfo() ，$_POST 等将不起作用。 我正在实现真正的PHP。",
   "preview mode": "预览模式",
   "read only file": "无法保存只读文件. 请尝试另存为",
   "redo defination": "重做",

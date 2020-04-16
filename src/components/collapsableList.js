@@ -24,7 +24,9 @@ import tile from "./tile";
  * @returns {HTMLElement & Collaspable}
  */
 function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
-    const $ul = tag('ul');
+    const $ul = tag('ul', {
+        className: "scroll"
+    });
     const $collaspeIndicator = tag('span', {
         className: `icon ${type}`
     });

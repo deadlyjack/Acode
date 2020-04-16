@@ -1,6 +1,12 @@
 .list {
     width: 100%;
 
+    .scroll {
+        &::-webkit-scrollbar-thumb {
+            background: white;
+        }
+    }
+
     &:not(.collaspable) {
         overflow-y: auto;
     }

@@ -74,7 +74,6 @@
   "rename": "Renomear",
   "replace": "Substituir",
   "required": "Este campo é obrigatório",
-  "phpwarning": "Esta implementação do PHP não é real, é apenas uma emulação; muitos recursos não funcionam, como por exemplo phpinfo(), $_POST, etc. Estou trabalhando na implementação de PHP real.",
   "run your web app": "Execute seu aplicativo web",
   "save": "Salvar",
   "saving": "Salvando",

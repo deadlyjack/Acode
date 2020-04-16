@@ -9,6 +9,7 @@ import editorSettings from "./editorSettings";
 import constants from "../../constants";
 import helpers from "../../modules/helpers";
 import createEditorFromURI from "../../modules/createEditorFromURI";
+import internalFs from "../../modules/utils/internalFs";
 
 export default function settingsMain(demo) {
     const $page = Page(strings.settings);
@@ -82,10 +83,13 @@ export default function settingsMain(demo) {
                         if (res === value.lang) return;
                         appSettings.value.lang = res;
                         appSettings.update();
-                        appSettings.onsave = function () {
-                            window.beforeClose();
-                            location.reload();
-                        };
+                        internalFs.readFile(`${cordova.file.applicationDirectory}www/lang/${res}.json`)
+                            .then(res => {
+                                const decoder = new TextDecoder('utf-8');
+                                const text = decoder.decode(res.data);
+                                window.strings = JSON.parse(text);
+                                if (actionStack.has("settings-main")) actionStack.pop();
+                            });
                     });
                 break;
 

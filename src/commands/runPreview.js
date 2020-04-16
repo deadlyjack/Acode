@@ -10,6 +10,7 @@ import git from '../modules/git';
 import constants from '../constants';
 import externalFs from '../modules/utils/externalFs';
 import fsOperation from '../modules/utils/fsOperation';
+import path from '../modules/utils/path';
 
 /**
  * Starts the server and run the active file in browser
@@ -20,7 +21,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   const activeFile = isConsole ? null : editorManager.activeFile;
   const uuid = helpers.uuid();
 
-  let filename, path, extension;
+  let filename, pathName, extension, addedFolderUrl;
   let port = constants.PORT;
   let useExternalFs = false;
   let relPath = null;
@@ -36,7 +37,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
   if (activeFile) {
     filename = activeFile.filename;
-    path = activeFile.location;
+    pathName = activeFile.location;
     extension = helpers.getExt(filename);
 
     if (!activeFile.fileUri && activeFile.contentUri) {
@@ -45,7 +46,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
         const [uuid, docpath] = decodeURIComponent(activeFile.contentUri.split('/').pop()).split(':');
 
         if (uuid === 'primary') {
-          path = helpers.getPath(cordova.file.externalRootDirectory + docpath);
+          pathName = helpers.getPath(cordova.file.externalRootDirectory + docpath);
         } else {
           relPath = helpers.getPath(docpath);
           useExternalFs = uuid;
@@ -55,19 +56,11 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     }
   }
 
-  if (extension === 'php') {
-    if (!window.phpwarning) {
-      dialogs.alert(strings.warning, strings.phpwarning, () => {
-        start();
-      });
-      window.phpwarning = true;
-    } else {
-      start();
-    }
-  } else if (extension === 'js' && path) {
+  if (extension === 'js' && pathName) {
     for (let folder of addedFolder) {
-      if (new RegExp("^" + encodeURI(path)).test(folder.url)) {
-        window.resolveLocalFileSystemURL(path + 'index.html', onsuccess, onerror);
+      if (path.isParent(folder.url, pathName)) {
+        addedFolderUrl = folder.url;
+        window.resolveLocalFileSystemURL(addedFolderUrl + 'index.html', onsuccess, onerror);
         return;
       }
     }
@@ -91,6 +84,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       } else {
         filename = 'index.html';
         extension = 'html';
+        pathName = addedFolderUrl;
         start();
       }
     });
@@ -107,7 +101,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     isConsole = true;
     target = '_blank';
     filename = 'console.html';
-    path = `${cordova.file.applicationDirectory}www/`;
+    pathName = `${cordova.file.applicationDirectory}www/`;
     port = constants.CONSOLE_PORT;
   }
 
@@ -189,31 +183,6 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
       function sendAccToExt() {
         switch (ext) {
-          case 'php':
-            if (checkFile(reqPath)) { //is active file, unsaved or git
-              const text = new PHP(activeFile.session.getValue(), {
-                path
-              }).vm.OUTPUT_BUFFER;
-              sendHTML(text, req.requestId);
-            } else {
-              const url = path + reqPath;
-
-              //jshint ignore: start
-
-              import( /* webpackChunkName: "vphp" */ '../modules/php')
-                .then(res => {
-                  const PHP = res.default;
-                  sendFileContent(url.replace('file://', ''), req.requestId, MIMETYPE_HTML, text => {
-                    return new PHP(text, {
-                      path
-                    }).vm.OUTPUT_BUFFER;
-                  });
-                });
-
-              //jshint ignore: end
-            }
-            break;
-
           case 'html':
             if (isConsole) {
               const doc = mustache.render($_console, {
@@ -227,7 +196,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
             } else if (checkFile(reqPath)) {
               sendHTML(activeFile.session.getValue(), req.requestId);
             } else {
-              sendFileContent(path + reqPath, req.requestId, MIMETYPE_HTML);
+              sendFileContent(pathName + reqPath, req.requestId, MIMETYPE_HTML);
             }
             break;
 
@@ -270,8 +239,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
                 }
               });
             } else {
-              if (path) {
-                const url = path + reqPath;
+              if (pathName) {
+                const url = pathName + reqPath;
                 const file = editorManager.getFile(url, "fileUri");
                 if (file && file.isUnsaved) {
                   sendText(file.session.getValue(), req.requestId, mimeType.lookup(file.filename));

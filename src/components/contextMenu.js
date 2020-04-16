@@ -7,35 +7,41 @@ import tag from 'html-tag-js';
  */
 
 /**
+ * @typedef {object} contextMenuOptions
+ * @property {number} left
+ * @property {number} top
+ * @property {number} bottom
+ * @property {number} right
+ * @property {string} transformOrigin
+ * @property {HTMLElement} toggle
+ * @property {function} onshow
+ * @property {function} onhide
+ * @property {function(this:HTMLElement):string} innerHTML
+ */
+
+/**
  * 
- * @param {object} [opts]
- * @param {number} [opts.left] 
- * @param {number} [opts.top] 
- * @param {number} [opts.bottom] 
- * @param {number} [opts.right] 
- * @param {string} [opts.transformOrigin] 
- * @param {HTMLElement} [opts.toggle] 
- * @param {function():void} [opts.onshow] 
- * @param {function():void} [opts.onhide] 
+ * @param {string|contextMenuOptions} arg1
+ * @param {contextMenuOptions} [arg2] 
  * @returns {HTMLElement & contextMenuObj}
  */
-function contextMenu(innerHTML, opts) {
-    if (!opts && typeof innerHTML === 'object') {
-        opts = innerHTML;
-        innerHTML = null;
-    } else if (!opts) {
-        opts = {};
+function contextMenu(arg1, arg2) {
+    if (!arg2 && typeof arg1 === 'object') {
+        arg2 = arg1;
+        arg1 = null;
+    } else if (!arg2) {
+        arg2 = {};
     }
 
     const $el = tag('ul', {
         className: 'context-menu scroll',
-        innerHTML: innerHTML || '',
+        innerHTML: arg1 || '',
         style: {
-            top: opts.top || 'auto',
-            left: opts.left || 'auto',
-            right: opts.right || 'auto',
-            bottom: opts.bottom || 'auto',
-            transformOrigin: opts.transformOrigin || null
+            top: arg2.top || 'auto',
+            left: arg2.left || 'auto',
+            right: arg2.right || 'auto',
+            bottom: arg2.bottom || 'auto',
+            transformOrigin: arg2.transformOrigin || null
         }
     });
     const mask = tag('span', {
@@ -51,15 +57,15 @@ function contextMenu(innerHTML, opts) {
         $el.onshow();
         $el.classList.remove('hide');
 
-        if (opts.innerHTML) {
-            $el.innerHTML = opts.innerHTML();
+        if (arg2.innerHTML) {
+            $el.innerHTML = arg2.innerHTML.call($el);
         }
 
-        if (opts.toggle) {
+        if (arg2.toggle) {
 
-            const client = opts.toggle.getBoundingClientRect();
-            if (!opts.top && !opts.bottom) $el.style.top = client.top + 'px';
-            if (!opts.left && !opts.right) $el.style.right = (innerWidth - client.right) + 'px';
+            const client = arg2.toggle.getBoundingClientRect();
+            if (!arg2.top && !arg2.bottom) $el.style.top = client.top + 'px';
+            if (!arg2.left && !arg2.right) $el.style.right = (innerWidth - client.right) + 'px';
 
         }
 
@@ -81,12 +87,12 @@ function contextMenu(innerHTML, opts) {
         show();
     }
 
-    if (opts.toggle) opts.toggle.addEventListener('click', toggle);
+    if (arg2.toggle) arg2.toggle.addEventListener('click', toggle);
 
     $el.hide = hide;
     $el.show = show;
-    $el.onshow = opts.onshow || (() => {});
-    $el.onhide = opts.onhide || (() => {});
+    $el.onshow = arg2.onshow || (() => {});
+    $el.onhide = arg2.onhide || (() => {});
 
     return $el;
 }

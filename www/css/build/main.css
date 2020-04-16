@@ -721,6 +721,8 @@ div.page {
 
 .list {
   width: 100%; }
+  .list .scroll::-webkit-scrollbar-thumb {
+    background: white; }
   .list:not(.collaspable) {
     overflow-y: auto; }
   .list.collaspable.hidden ul {
@@ -929,7 +931,8 @@ ul {
     #sidenav > .list > ul {
       overflow: auto;
       max-width: 100%;
-      max-height: calc(100% - 30px); }
+      max-height: calc(100% - 30px);
+      height: calc(100% - 30px); }
       #sidenav > .list > ul .tile:active > *:nth-child(2) {
         color: gold; }
       #sidenav > .list > ul li > *:nth-child(2) {
@@ -1188,7 +1191,6 @@ header.tile {
     align-items: center;
     font-size: 1.25em;
     color: white;
-    word-break: break-all;
     word-wrap: break-word; }
     .prompt .title:not(:empty) {
       min-height: 40px;

@@ -67,7 +67,6 @@
   "ok": "ok",
   "overwrite": "overwrite",
   "paste": "Paste",
-  "phpwarning": "This PHP implementation is not real, it is just an emulation, so many features will not work, for example. phpinfo(), $_POST, etc. will not work. I'm working on implementing real PHP.",
   "preview mode": "Preview mode",
   "read only file": "Cannot save read only file. Please try save as",
   "reload": "reload",

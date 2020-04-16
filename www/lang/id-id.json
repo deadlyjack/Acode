@@ -67,7 +67,6 @@
   "ok": "baik",
   "overwrite": "timpa",
   "paste": "pasta",
-  "phpwarning": "Implementasi PHP ini tidak nyata, itu hanya emulasi, jadi banyak fitur tidak akan berfungsi, misalnya. PHPinfo(), $_POST, dll. Tidak akan berfungsi. Saya sedang mengerjakan implementasi PHP nyata.",
   "preview mode": "Mode pratinjau",
   "read only file": "Tidak dapat menyimpan file hanya baca. Silakan coba simpan sebagai",
   "redo defination": "mengulangi",

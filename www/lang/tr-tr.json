@@ -67,7 +67,6 @@
   "ok": "tamam",
   "overwrite": "üzerine yaz",
   "paste": "Yapıştır",
-  "phpwarning": "Bu PHP uygulaması gerçek değil, sadece bir emülasyon, bu nedenle birçok özellik çalışmaz. Örneğin: phpinfo (), $ _POST vb. çalışmaz. Ben gerçek PHP uygulaması üzerinde çalışıyorum.",
   "preview mode": "Önizleme modu",
   "read only file": "Salt okunur dosya kaydedilemiyor. Lütfen farklı kaydetmeyi deneyin",
   "reload": "tekrar yükle",

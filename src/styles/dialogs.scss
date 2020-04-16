@@ -112,7 +112,6 @@
         align-items: center;
         font-size: 1.25em;
         color: $dialogText;
-        word-break: break-all;
         word-wrap: break-word;
 
         &:not(:empty) {

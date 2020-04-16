@@ -1,4 +1,6 @@
-version 0.0.9.94
+version 0.0.9.95
+☞ Added O'zbekcha language support (Thanks to TILON)
+☞ Removed PHP support
 ☞ Create and run Vue, Angular, AngularJS and React projects
 ☞ Now edit remote files using FTP
 ☞ Open folder by tapping on sidenav if empty

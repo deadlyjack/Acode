@@ -17,7 +17,7 @@ function sidenav(activator, toggler) {
     let mode = innerWidth > 750 ? 'tab' : 'phone';
     const $el = tag('div', {
         id: 'sidenav',
-        className: mode + ' scroll'
+        className: mode
     });
     const mask = tag('span', {
         className: 'mask',
@@ -98,9 +98,12 @@ function sidenav(activator, toggler) {
         }
 
         $$.map($ => {
-            $.onscroll = () => {
+            const scrollTop = $.getAttribute('scroll-pos');
+            if (scrollTop) $.scrollTop = scrollTop;
+            $.onscroll = function () {
                 if (timeout) clearTimeout(timeout);
                 isScrolling = true;
+                this.setAttribute('scroll-pos', this.scrollTop);
             };
         });
     }

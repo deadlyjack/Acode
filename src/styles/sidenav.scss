@@ -78,6 +78,7 @@
             overflow: auto;
             max-width: 100%;
             max-height: calc(100% - 30px);
+            height: calc(100% - 30px);
 
             .tile:active {
                 >*:nth-child(2) {
