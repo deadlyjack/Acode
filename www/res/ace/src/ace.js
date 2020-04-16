@@ -12698,7 +12698,7 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
             readOnly: true
         }, {
             name: "run",
-            description: "Preview HTML, PHP and MarkDown",
+            description: "Preview HTML and MarkDown",
             bindKey: bindKey("run"),
             exec: function () {
                 if (Acode) {

@@ -48,7 +48,7 @@ export default {
     "action": "rename"
   },
   "run": {
-    "description": "Preview HTML, PHP and MarkDownOpen previous file tab",
+    "description": "Preview HTML and MarkDownOpen previous file tab",
     "key": "F5",
     "readOnly": false,
     "action": "rename"

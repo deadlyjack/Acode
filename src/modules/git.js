@@ -608,7 +608,7 @@ function getGitFile(record, _path) {
 
   const repository = gitHub().getRepo(owner, repo);
   return new Promise((resolve, reject) => {
-    repository.getSha(branch, path.resolve(p, _path))
+    repository.getSha(branch, path.resolve(p, _path).slice(1))
       .then(res => {
         resolve(atob(res.data.content));
       })
