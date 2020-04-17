@@ -182,12 +182,12 @@ function FTPAccountsInclude() {
         required: true,
         value: hostname
       },
-      {
-        id: "path",
-        placeholder: "path (optional)",
-        type: "text",
-        value: path
-      },
+      // {
+      //   id: "path",
+      //   placeholder: "path (optional)",
+      //   type: "text",
+      //   value: path
+      // },
       {
         id: "port",
         placeholder: "port (optional)",

@@ -34,7 +34,7 @@ const appThemeList = {
   "default": scheme("default", "light", true, "#5c5c99", "#9999ff"),
   "light": scheme("light", "light", true, "#999999", "#ffffff"),
   "atticus": scheme("atticus", "dark", false, "#201e1e", "#363333"),
-  "bump": scheme("bump", "dark", false, "#14181d", "#222831"),
+  "bump": scheme("bump", "dark", false, "#1c2126", "#303841"),
   "bling": scheme("bling", "dark", false, "#131326", "#202040"),
   "dark": scheme("dark", "dark", false, "#1d1d1d", "#313131"),
   "moon": scheme("moon", "dark", false, "#14181d", "#222831"),

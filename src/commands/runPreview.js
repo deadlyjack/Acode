@@ -60,28 +60,27 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     for (let folder of addedFolder) {
       if (path.isParent(folder.url, pathName)) {
         addedFolderUrl = folder.url;
-        window.resolveLocalFileSystemURL(addedFolderUrl + 'index.html', onsuccess, onerror);
+        window.resolveLocalFileSystemURL(addedFolderUrl + 'index.html', select, next);
         return;
       }
     }
-    if (extension === 'js') onerror();
-    else start();
-  } else {
-
-    if (extension === 'js' || isConsole) {
-      runConsole();
-    }
-
-    start();
   }
 
-  function onsuccess() {
+  next();
+
+  function next() {
+    if (extension === 'js') startConsole();
+    else start();
+  }
+
+
+  function select() {
     dialogs.select('', [
-      ['js', filename],
+      ['other', filename],
       ['html', 'index.html']
     ]).then(res => {
-      if (res === 'js') {
-        onerror();
+      if (res === 'other') {
+        next();
       } else {
         filename = 'index.html';
         extension = 'html';
@@ -91,7 +90,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     });
   }
 
-  function onerror() {
+  function startConsole() {
     runConsole();
     start();
   }
