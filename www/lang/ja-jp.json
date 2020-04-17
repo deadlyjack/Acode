@@ -124,5 +124,6 @@
   "new project": "新プロジェクト",
   "format": "フォーマット",
   "project name": "プロジェクト名",
-  "support us": "サポートACODE開発、patreonなります。"
+  "support us": "サポートACODE開発、patreonなります。",
+  "unsupported device": "お使いのデバイスはテーマをサポートしていません。"
 }

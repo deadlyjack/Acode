@@ -29,8 +29,7 @@ function sidenav(activator, toggler) {
         end: 0,
         target: null
     };
-    let scrollPosition = 0,
-        width = 250,
+    let width = 250,
         eventAddedFlag = 0,
         _innerWidth = innerWidth,
         isScrolling = true,
@@ -72,7 +71,6 @@ function sidenav(activator, toggler) {
     }
 
     function show() {
-        $$ = [...$el.getAll(':scope>div>ul')];
         $el.activated = true;
 
         if (mode === 'phone') {
@@ -81,8 +79,6 @@ function sidenav(activator, toggler) {
             app.append($el, mask);
             $el.classList.add('show');
             document.ontouchstart = ontouchstart;
-
-            $el.scrollTop = scrollPosition;
 
             actionStack.push({
                 id: 'sidenav',
@@ -97,9 +93,20 @@ function sidenav(activator, toggler) {
             editorManager.controls.update();
         }
 
+        restoreScrollPos();
+        attachListner();
+    }
+
+    function restoreScrollPos() {
+        $$ = [...$el.getAll(':scope>div>ul')];
         $$.map($ => {
             const scrollTop = $.getAttribute('scroll-pos');
             if (scrollTop) $.scrollTop = scrollTop;
+        });
+    }
+
+    function attachListner() {
+        $$.map($ => {
             $.onscroll = function () {
                 if (timeout) clearTimeout(timeout);
                 isScrolling = true;
@@ -123,7 +130,6 @@ function sidenav(activator, toggler) {
     }
 
     function hideMaster() {
-        scrollPosition = $el.scrollTop;
         $el.style.transform = null;
         $el.classList.remove('show');
         setTimeout(() => {
@@ -178,12 +184,6 @@ function sidenav(activator, toggler) {
 
         if (isScrolling) return;
 
-        if (!$el.isConnected) {
-            app.append($el, mask);
-            $el.scrollTop = scrollPosition;
-            activator.style.overflow = 'hidden';
-        }
-
         let width = $el.getwidth();
         const {
             clientX
@@ -193,6 +193,13 @@ function sidenav(activator, toggler) {
         touch.total = touch.end - touch.start;
 
         if (!$el.activated && touch.total < width && touch.start < 10) {
+
+            if (!$el.isConnected) {
+                app.append($el, mask);
+                activator.style.overflow = 'hidden';
+                restoreScrollPos();
+            }
+
             $el.style.transform = `translate3d(${-(width - touch.total)}px, 0, 0)`;
         } else if (touch.total < 0 && $el.activated) {
             $el.style.transform = `translate3d(${touch.total}px, 0, 0)`;
@@ -226,6 +233,7 @@ function sidenav(activator, toggler) {
 
 
         function lclShow() {
+            attachListner();
             $el.onshow();
             $el.activated = true;
             $el.style.transform = `translate3d(0, 0, 0)`;
@@ -251,8 +259,7 @@ function sidenav(activator, toggler) {
     }
 
     $el.getwidth = function () {
-        $el.width = $el.width || $el.getBoundingClientRect().width;
-        return $el.width;
+        return mode === "phone" ? innerWidth * 0.7 : 250;
     };
 
     $el.hide = hide;

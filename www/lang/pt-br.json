@@ -125,5 +125,6 @@
   "new project": "Novo projeto",
   "format": "formato",
   "project name": "Nome do Projeto",
-  "support us": "Suporte ao desenvolvimento de códigos, torne-se patreon."
+  "support us": "Suporte ao desenvolvimento de códigos, torne-se patreon.",
+  "unsupported device": "O seu dispositivo não suporta o tema."
 }

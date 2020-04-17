@@ -176,7 +176,7 @@ function gitHubInclude(options = {}) {
       .then(() => {
         return fs.deleteFile(gitProfile);
       })
-      .then(() => {
+      .finally(() => {
         if (onlogout) onlogout();
       });
   }

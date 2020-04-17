@@ -125,5 +125,6 @@
   "new project": "新项目",
   "format": "格式",
   "project name": "项目名",
-  "support us": "支持ACODE发展，成为patreon。"
+  "support us": "支持ACODE发展，成为patreon。",
+  "unsupported device": "您的设备不支持主题。"
 }

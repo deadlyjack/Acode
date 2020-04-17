@@ -43,7 +43,7 @@ class Settings {
             },
             lang,
             fontSize: "12px",
-            editorTheme: /free/.test(BuildInfo.packageName) ? "ace/theme/textmate" : "ace/theme/pastel_on_dark",
+            editorTheme: /free/.test(BuildInfo.packageName) ? "ace/theme/nord_dark" : "ace/theme/pastel_on_dark",
             appTheme: /free/.test(BuildInfo.packageName) ? "default" : "dark",
             textWrap: true,
             softTab: true,

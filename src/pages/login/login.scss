@@ -7,10 +7,6 @@
 
     input {
       margin-bottom: 15px;
-
-      &::placeholder {
-        color: rgb(24, 19, 19);
-      }
     }
 
     #error-msg:not(:empty) {

@@ -1,30 +1,21 @@
-@import './variables.scss';
-
 .prompt {
     position: fixed;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%) scale(1) translateZ(0);
-
-    z-index: 110;
-
+    z-index: 112;
     height: fit-content;
     max-height: 80vh;
     width: 100vw;
     max-width: 320px;
-    background-color: $primary;
+    background-color: white;
+    background-color: var(--dialogbox-background-color);
     box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
     border-radius: 2px !important;
     overflow: hidden;
 
     display: flex;
     flex-direction: column;
-
-    .scroll {
-        &::-webkit-scrollbar-thumb {
-            background: white;
-        }
-    }
 
     &.multi {
         textarea:not(:first-of-type) {
@@ -74,11 +65,13 @@
         li {
 
             &.selected span {
-                color: $textSecondry !important;
+                color: gold !important;
+                color: var(--dialogbox-selected-option-color) !important;
             }
 
             &:not(:last-child) {
-                border-bottom: 0.02rem solid rgba(238, 238, 238, 0.251);
+                border-bottom: 0.02rem solid rgba(122, 122, 122, 0.227);
+                border-bottom: 0.02rem solid var(--border-color);
             }
 
             height: 40px;
@@ -87,12 +80,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: $dialogText;
+            color: #252525;
+            color: var(--dialogbox-text-color);
         }
     }
 
     &+.mask {
-        z-index: 109;
+        z-index: 111;
         background-color: black;
         opacity: 0.4;
     }
@@ -111,7 +105,8 @@
         display: flex;
         align-items: center;
         font-size: 1.25em;
-        color: $dialogText;
+        color: #252525;
+        color: var(--text-color);
         word-wrap: break-word;
 
         &:not(:empty) {
@@ -136,7 +131,8 @@
             margin: auto;
 
             .picker_selector {
-                border: solid 1px white;
+                border: solid 1px #252525;
+                border: solid 1px var(--dialogbox-text-color);
                 box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
             }
 
@@ -186,7 +182,8 @@
                 height: 30px;
                 width: 30px;
                 border-radius: 50%;
-                border: solid 4px white;
+                border: solid 4px #252525;
+                border: solid 4px var(--dialogbox-text-color);
                 border-bottom: solid 4px rgba($color: #000000, $alpha: 0) !important;
                 margin: 15px;
                 animation: rotate 1s linear infinite;
@@ -212,7 +209,8 @@
 
         .message,
         &:not(.loader) {
-            color: $dialogText;
+            color: #252525;
+            color: var(--dialogbox-text-color);
             padding: 10px;
             min-height: 40px;
             font-size: 1.2em;
@@ -225,7 +223,8 @@
         max-width: 300px;
         background-color: inherit;
         border: none;
-        color: $dialogText;
+        color: #252525;
+        color: var(--dialogbox-text-color);
         border-bottom: solid 1px currentColor;
         text-indent: 0;
         font-size: 1.2em;
@@ -236,7 +235,7 @@
         }
 
         &:focus {
-            border-bottom: solid 1px #39f;
+            border-bottom: solid 1px #3399ff;
         }
     }
 
@@ -247,7 +246,8 @@
     }
 
     .error-msg {
-        color: $errorText !important;
+        color: #ffb95c !important;
+        color: var(--error-text-color) !important;
         height: fit-content;
 
         &:not(:empty) {

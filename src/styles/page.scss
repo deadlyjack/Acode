@@ -1,5 +1,3 @@
-@import './variables.scss';
-
 body {
   header {
     .icon {
@@ -16,8 +14,13 @@ div.page {
   overflow-x: hidden;
   overflow-y: auto;
   background-color: white;
+  background-color: var(--secondary-color);
   animation: page-transition 200ms ease 1;
-  z-index: 107;
+  z-index: 108;
+
+  &:not(#root) {
+    z-index: 110;
+  }
 
   &.primary {
     z-index: unset;
@@ -30,7 +33,8 @@ div.page {
     .navigation {
       display: flex;
       height: 30px;
-      border-bottom: solid 1px rgba(204, 204, 204, 0.1);
+      border-bottom: solid 1px rgba(122, 122, 122, 0.227);
+      border-bottom: solid 1px var(--border-color);
       box-sizing: border-box;
       overflow-x: auto;
 
@@ -53,10 +57,9 @@ div.page {
           border-radius: 4px;
           padding: 2.5px;
           box-sizing: border-box;
-          border: solid 1px #333;
-          background-color: #999;
+          border: solid 1px #333333;
+          background-color: #999999;
           color: white;
-          /* height: fit-content; */
           box-sizing: border-box;
           white-space: nowrap;
           word-break: keep-all;
@@ -84,8 +87,10 @@ div.page {
     }
 
     main {
-      height: calc(100vh - #{$headerHeight + 30}) !important;
-      min-height: calc(100vh - #{$headerHeight + 30}) !important;
+      height: calc(100vh - 75px) !important;
+      height: calc(100vh - (var(--header-height) + 30px)) !important;
+      min-height: calc(100vh - 75px) !important;
+      min-height: calc(100vh - (var(--header-height) + 30px)) !important;
     }
   }
 
@@ -93,14 +98,18 @@ div.page {
 
     &.top-bar {
       main {
-        height: calc(100vh - #{$footerHeight * 2 + $headerHeight + 30}) !important;
-        min-height: calc(100vh - #{$footerHeight * 2 + $headerHeight + 30}) !important;
+        height: calc(100vh - 155px) !important;
+        height: calc(100vh - (var(--footer-height) * 2 + var(--header-height) + 30px)) !important;
+        min-height: calc(100vh - 155px) !important;
+        min-height: calc(100vh - (var(--footer-height) * 2 + var(--header-height) + 30px)) !important;
       }
     }
 
     main {
-      height: calc(100vh - #{$footerHeight * 2 + $headerHeight}) !important;
-      min-height: calc(100vh - #{$footerHeight * 2 + $headerHeight}) !important;
+      height: calc(100vh - 125px) !important;
+      height: calc(100vh - (var(--footer-height) * 2 + var(--header-height))) !important;
+      min-height: calc(100vh - 125px) !important;
+      min-height: calc(100vh - (var(--footer-height) * 2 + var(--header-height))) !important;
     }
   }
 
@@ -108,29 +117,35 @@ div.page {
 
     &.top-bar {
       main {
-        height: calc(100vh - #{$footerHeight * 3 + $headerHeight + 30}) !important;
-        min-height: calc(100vh - #{$footerHeight * 3 + $headerHeight + 30}) !important;
+        height: calc(100vh - 195px) !important;
+        height: calc(100vh - (var(--footer-height) * 3 + var(--header-height) + 30px)) !important;
+        min-height: calc(100vh - 195px) !important;
+        min-height: calc(100vh - (var(--footer-height) * 3 + var(--header-height) + 30px)) !important;
       }
     }
 
     main {
-      height: calc(100vh - #{$footerHeight * 3 + $headerHeight}) !important;
-      min-height: calc(100vh - #{$footerHeight * 3 + $headerHeight}) !important;
+      height: calc(100vh - 165px) !important;
+      height: calc(100vh - (var(--footer-height) * 3 + var(--header-height))) !important;
+      min-height: calc(100vh - 165px) !important;
+      min-height: calc(100vh - (var(--footer-height) * 3 + var(--header-height))) !important;
     }
   }
 
   main {
     &:empty {
       position: fixed;
-      top: $headerHeight;
-      height: calc(100% - #{$headerHeight});
+      top: 45px;
+      top: var(--header-height);
+      height: calc(100% - 45px);
+      height: calc(100% - var(--header-height));
       width: 100%;
       display: flex;
 
       &::after {
         content: attr(data-empty-msg);
         font-weight: 900;
-        color: #999;
+        color: #999999;
         height: fit-content;
         max-width: 60vw;
         margin: auto;
@@ -153,7 +168,8 @@ div.page {
     left: 0;
     width: 100%;
     z-index: 98;
-    background-color: $primary;
+    background-color: #9999ff;
+    background-color: var(--primary-color);
 
     .icon {
       border-radius: unset;
@@ -169,16 +185,24 @@ div.page {
 
       >main,
       >.main {
-        height: calc(100vh - #{$footerHeight + $headerHeight + 30}) !important;
-        min-height: calc(100vh - #{$footerHeight + $headerHeight + 30}) !important;
+        height: calc(100vh - 115px) !important;
+        height: calc(100vh - (var(--footer-height) + var(--header-height) + 30px)) !important;
+        min-height: calc(100vh - 115px) !important;
+        min-height: calc(100vh - (var(--footer-height) + var(--header-height) + 30px)) !important;
       }
     }
 
     >main,
     >.main {
-      height: calc(100vh - #{$footerHeight + $headerHeight}) !important;
-      min-height: calc(100vh - #{$footerHeight + $headerHeight}) !important;
+      height: calc(100vh - 85px) !important;
+      height: calc(100vh - (var(--footer-height) + var(--header-height))) !important;
+      min-height: calc(100vh - 85px) !important;
+      min-height: calc(100vh - (var(--footer-height) + var(--header-height))) !important;
     }
+  }
+
+  footer {
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -196,8 +220,10 @@ div.page {
 
   main,
   .main {
-    height: calc(100vh - #{$headerHeight});
-    min-height: calc(100vh - #{$headerHeight});
+    height: calc(100vh - 45px);
+    height: calc(100vh - var(--header-height));
+    min-height: calc(100vh - 45px);
+    min-height: calc(100vh - var(--header-height));
   }
 
   .editor-container {

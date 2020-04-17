@@ -140,9 +140,9 @@ function saveFile(file, as = false, showToast = true) {
                 })
                 .catch(err => {
                     helpers.error(err, file.location);
+                    resetText();
                     console.error(err);
-                })
-                .finally(resetText);
+                });
 
         } else {
 
@@ -155,9 +155,9 @@ function saveFile(file, as = false, showToast = true) {
                 })
                 .catch(err => {
                     helpers.error(err, file.fileUri || file.contentUri);
+                    resetText();
                     console.error(err);
-                })
-                .finally(resetText);
+                });
 
         }
 
@@ -176,6 +176,7 @@ function saveFile(file, as = false, showToast = true) {
                     recents.addFile(file.fileUri);
                 }
                 editorManager.onupdate();
+                resetText();
             }, editorManager.TIMEOUT_VALUE + 100);
         }
     }

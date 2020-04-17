@@ -1,7 +1,7 @@
-define("ace/snippets/javascript", ["require", "exports", "module"], function (require, exports, module) {
-	"use strict";
+define("ace/snippets/javascript",["require","exports","module"], function(require, exports, module) {
+"use strict";
 
-	exports.snippetText = "# Prototype\n\
+exports.snippetText = "# Prototype\n\
 snippet proto\n\
 	${1:class_name}.prototype.${2:method_name} = function(${3:first_argument}) {\n\
 		${4:// body...}\n\
@@ -197,13 +197,13 @@ guard ^\\s*\n\
 	var ${1/.*\\/(.)/\\u$1/} = require(\"${1}\").${1/.*\\/(.)/\\u$1/};\n\
 	$0\n\
 ";
-	exports.scope = "javascript";
+exports.scope = "javascript";
 
-});
-(function () {
-	window.require(["ace/snippets/javascript"], function (m) {
-		if (typeof module == "object" && typeof exports == "object" && module) {
-			module.exports = m;
-		}
-	});
-})();
+});                (function() {
+                    window.require(["ace/snippets/javascript"], function(m) {
+                        if (typeof module == "object" && typeof exports == "object" && module) {
+                            module.exports = m;
+                        }
+                    });
+                })();
+            

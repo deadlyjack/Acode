@@ -303,7 +303,7 @@ var PrismaHighlightRules = function() {
                 defaultToken: "source.tag.embedded.source.prisma"
             }]
         }]
-    }
+    };
     
     this.normalizeRules();
 };
@@ -311,7 +311,7 @@ var PrismaHighlightRules = function() {
 PrismaHighlightRules.metaData = {
     name: "Prisma",
     scopeName: "source.prisma"
-}
+};
 
 
 oop.inherits(PrismaHighlightRules, TextHighlightRules);
@@ -475,7 +475,7 @@ oop.inherits(Mode, TextMode);
 
 (function() {
     this.lineCommentStart = "//";
-    this.$id = "ace/mode/prisma"
+    this.$id = "ace/mode/prisma";
 }).call(Mode.prototype);
 
 exports.Mode = Mode;

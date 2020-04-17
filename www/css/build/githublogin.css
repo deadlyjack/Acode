@@ -5,16 +5,6 @@
   box-sizing: border-box; }
   #github-login .form input {
     margin-bottom: 15px; }
-    #github-login .form input::-webkit-input-placeholder {
-      color: #181313; }
-    #github-login .form input::-moz-placeholder {
-      color: #181313; }
-    #github-login .form input:-ms-input-placeholder {
-      color: #181313; }
-    #github-login .form input::-ms-input-placeholder {
-      color: #181313; }
-    #github-login .form input::placeholder {
-      color: #181313; }
   #github-login .form #error-msg:not(:empty) {
     height: 20px;
     font-size: 1em;

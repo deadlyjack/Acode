@@ -1,4 +1,5 @@
 version 0.0.9.95
+☞ Added new app themes (atticus, bump, bling, moon, ocean, tomyris)
 ☞ Added O'zbekcha language support (Thanks to TILON)
 ☞ Removed PHP support
 ☞ Create and run Vue, Angular, AngularJS and React projects

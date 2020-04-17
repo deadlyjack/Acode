@@ -1,5 +1,3 @@
-@import './variables.scss';
-
 #sidenav {
     z-index: 109;
     position: fixed;
@@ -7,7 +5,10 @@
     top: 0;
     width: 70vw;
     height: 100vh;
-    background-color: $primary;
+    background-color: #9999ff;
+    background-color: var(--primary-color);
+    color: white;
+    color: var(--text-main-color);
     overflow: hidden;
     box-sizing: border-box;
 
@@ -30,7 +31,9 @@
         &::after {
             content: attr(empty-msg);
             color: white;
+            color: var(--text-main-color);
             font-weight: 900;
+            opacity: 0.5;
         }
     }
 
@@ -70,7 +73,7 @@
         .icon {
             height: 30px;
             width: 30px;
-            color: white;
+            color: currentColor;
             font-size: 1em;
         }
 
@@ -88,7 +91,7 @@
 
             li {
                 >*:nth-child(2) {
-                    color: white;
+                    color: currentColor;
                     display: unset;
                     line-height: 30px;
                     white-space: nowrap;

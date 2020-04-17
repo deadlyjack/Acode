@@ -340,54 +340,54 @@ define("ace/autocomplete/popup", ["require", "exports", "module", "ace/virtual_r
     };
 
     dom.importCssString("\
-    .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
-        background-color: #CAD6FA;\
-        z-index: 1;\
-    }\
-    .ace_dark.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
-        background-color: #3a674e;\
-    }\
-    .ace_editor.ace_autocomplete .ace_line-hover {\
-        border: 1px solid #abbffe;\
-        margin-top: -1px;\
-        background: rgba(233,233,253,0.4);\
-        position: absolute;\
-        z-index: 2;\
-    }\
-    .ace_dark.ace_editor.ace_autocomplete .ace_line-hover {\
-        border: 1px solid rgba(109, 150, 13, 0.8);\
-        background: rgba(58, 103, 78, 0.62);\
-    }\
-    .ace_completion-meta {\
-        opacity: 0.5;\
-        margin: 0.9em;\
-    }\
-    .ace_completion-message {\
-        color: blue;\
-    }\
-    .ace_editor.ace_autocomplete .ace_completion-highlight{\
-        color: #2d69c7;\
-    }\
-    .ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight{\
-        color: #93ca12;\
-    }\
-    .ace_editor.ace_autocomplete {\
-        width: 300px;\
-        z-index: 200000;\
-        border: 1px lightgray solid;\
-        position: fixed;\
-        box-shadow: 2px 3px 5px rgba(0,0,0,.2);\
-        line-height: 1.4;\
-        background: #fefefe;\
-        color: #111;\
-    }\
-    .ace_dark.ace_editor.ace_autocomplete {\
-        border: 1px #484747 solid;\
-        box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.51);\
-        line-height: 1.4;\
-        background: #25282c;\
-        color: #c1c1c1;\
-    }", "autocompletion.css");
+.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
+    background-color: #CAD6FA;\
+    z-index: 1;\
+}\
+.ace_dark.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {\
+    background-color: #3a674e;\
+}\
+.ace_editor.ace_autocomplete .ace_line-hover {\
+    border: 1px solid #abbffe;\
+    margin-top: -1px;\
+    background: rgba(233,233,253,0.4);\
+    position: absolute;\
+    z-index: 2;\
+}\
+.ace_dark.ace_editor.ace_autocomplete .ace_line-hover {\
+    border: 1px solid rgba(109, 150, 13, 0.8);\
+    background: rgba(58, 103, 78, 0.62);\
+}\
+.ace_completion-meta {\
+    opacity: 0.5;\
+    margin: 0.9em;\
+}\
+.ace_completion-message {\
+    color: blue;\
+}\
+.ace_editor.ace_autocomplete .ace_completion-highlight{\
+    color: #2d69c7;\
+}\
+.ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight{\
+    color: #93ca12;\
+}\
+.ace_editor.ace_autocomplete {\
+    width: 300px;\
+    z-index: 200000;\
+    border: 1px lightgray solid;\
+    position: fixed;\
+    box-shadow: 2px 3px 5px rgba(0,0,0,.2);\
+    line-height: 1.4;\
+    background: #fefefe;\
+    color: #111;\
+}\
+.ace_dark.ace_editor.ace_autocomplete {\
+    border: 1px #484747 solid;\
+    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.51);\
+    line-height: 1.4;\
+    background: #25282c;\
+    color: #c1c1c1;\
+}", "autocompletion.css");
 
     exports.AcePopup = AcePopup;
     exports.$singleLineEditor = $singleLineEditor;
@@ -1563,13 +1563,13 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
 
     require("./lib/dom").importCssString("\
-    .ace_snippet-marker {\
-        -moz-box-sizing: border-box;\
-        box-sizing: border-box;\
-        background: rgba(194, 193, 208, 0.09);\
-        border: 1px dotted rgba(211, 208, 235, 0.62);\
-        position: absolute;\
-    }");
+.ace_snippet-marker {\
+    -moz-box-sizing: border-box;\
+    box-sizing: border-box;\
+    background: rgba(194, 193, 208, 0.09);\
+    border: 1px dotted rgba(211, 208, 235, 0.62);\
+    position: absolute;\
+}");
 
     exports.snippetManager = new SnippetManager();
 
@@ -1728,6 +1728,11 @@ define("ace/autocomplete", ["require", "exports", "module", "ace/keyboard/hash_h
             if (!data)
                 return false;
 
+            this.editor.startOperation({
+                command: {
+                    name: "insertMatch"
+                }
+            });
             if (data.completer && data.completer.insertMatch) {
                 data.completer.insertMatch(this.editor, data);
             } else {
@@ -1744,6 +1749,7 @@ define("ace/autocomplete", ["require", "exports", "module", "ace/keyboard/hash_h
                     this.editor.execCommand("insertstring", data.value || data);
             }
             this.detach();
+            this.editor.endOperation();
         };
 
 
@@ -2123,65 +2129,65 @@ define("ace/ext/menu_tools/overlay_page", ["require", "exports", "module", "ace/
     'use strict';
     var dom = require("../../lib/dom");
     var cssText = "#ace_settingsmenu, #kbshortcutmenu {\
-    background-color: #F7F7F7;\
-    color: black;\
-    box-shadow: -5px 4px 5px rgba(126, 126, 126, 0.55);\
-    padding: 1em 0.5em 2em 1em;\
-    overflow: auto;\
-    position: absolute;\
-    margin: 0;\
-    bottom: 0;\
-    right: 0;\
-    top: 0;\
-    z-index: 9991;\
-    cursor: default;\
-    }\
-    .ace_dark #ace_settingsmenu, .ace_dark #kbshortcutmenu {\
-    box-shadow: -20px 10px 25px rgba(126, 126, 126, 0.25);\
-    background-color: rgba(255, 255, 255, 0.6);\
-    color: black;\
-    }\
-    .ace_optionsMenuEntry:hover {\
-    background-color: rgba(100, 100, 100, 0.1);\
-    transition: all 0.3s\
-    }\
-    .ace_closeButton {\
-    background: rgba(245, 146, 146, 0.5);\
-    border: 1px solid #F48A8A;\
-    border-radius: 50%;\
-    padding: 7px;\
-    position: absolute;\
-    right: -8px;\
-    top: -8px;\
-    z-index: 100000;\
-    }\
-    .ace_closeButton{\
-    background: rgba(245, 146, 146, 0.9);\
-    }\
-    .ace_optionsMenuKey {\
-    color: darkslateblue;\
-    font-weight: bold;\
-    }\
-    .ace_optionsMenuCommand {\
-    color: darkcyan;\
-    font-weight: normal;\
-    }\
-    .ace_optionsMenuEntry input, .ace_optionsMenuEntry button {\
-    vertical-align: middle;\
-    }\
-    .ace_optionsMenuEntry button[ace_selected_button=true] {\
-    background: #e7e7e7;\
-    box-shadow: 1px 0px 2px 0px #adadad inset;\
-    border-color: #adadad;\
-    }\
-    .ace_optionsMenuEntry button {\
-    background: white;\
-    border: 1px solid lightgray;\
-    margin: 0px;\
-    }\
-    .ace_optionsMenuEntry button:hover{\
-    background: #f0f0f0;\
-    }";
+background-color: #F7F7F7;\
+color: black;\
+box-shadow: -5px 4px 5px rgba(126, 126, 126, 0.55);\
+padding: 1em 0.5em 2em 1em;\
+overflow: auto;\
+position: absolute;\
+margin: 0;\
+bottom: 0;\
+right: 0;\
+top: 0;\
+z-index: 9991;\
+cursor: default;\
+}\
+.ace_dark #ace_settingsmenu, .ace_dark #kbshortcutmenu {\
+box-shadow: -20px 10px 25px rgba(126, 126, 126, 0.25);\
+background-color: rgba(255, 255, 255, 0.6);\
+color: black;\
+}\
+.ace_optionsMenuEntry:hover {\
+background-color: rgba(100, 100, 100, 0.1);\
+transition: all 0.3s\
+}\
+.ace_closeButton {\
+background: rgba(245, 146, 146, 0.5);\
+border: 1px solid #F48A8A;\
+border-radius: 50%;\
+padding: 7px;\
+position: absolute;\
+right: -8px;\
+top: -8px;\
+z-index: 100000;\
+}\
+.ace_closeButton{\
+background: rgba(245, 146, 146, 0.9);\
+}\
+.ace_optionsMenuKey {\
+color: darkslateblue;\
+font-weight: bold;\
+}\
+.ace_optionsMenuCommand {\
+color: darkcyan;\
+font-weight: normal;\
+}\
+.ace_optionsMenuEntry input, .ace_optionsMenuEntry button {\
+vertical-align: middle;\
+}\
+.ace_optionsMenuEntry button[ace_selected_button=true] {\
+background: #e7e7e7;\
+box-shadow: 1px 0px 2px 0px #adadad inset;\
+border-color: #adadad;\
+}\
+.ace_optionsMenuEntry button {\
+background: white;\
+border: 1px solid lightgray;\
+margin: 0px;\
+}\
+.ace_optionsMenuEntry button:hover{\
+background: #f0f0f0;\
+}";
     dom.importCssString(cssText);
 
     module.exports.overlayPage = function overlayPage(editor, contentElement, callback) {
@@ -2205,6 +2211,7 @@ define("ace/ext/menu_tools/overlay_page", ["require", "exports", "module", "ace/
             }
             closer = null;
             callback && callback();
+            window.restoreTheme();
         }
 
         function close() {
@@ -2241,6 +2248,7 @@ define("ace/ext/menu_tools/overlay_page", ["require", "exports", "module", "ace/
         closer.appendChild(contentElement);
         document.body.appendChild(mask);
         document.body.appendChild(closer);
+        window.restoreTheme(true);
 
         actionStack.push({
             id: "pallete",
@@ -2987,14 +2995,14 @@ define("ace/ext/prompt", ["require", "exports", "module", "ace/range", "ace/lib/
     };
 
     dom.importCssString(".ace_prompt_container {\
-        max-width: 600px;\
-        width: 100%;\
-        margin: 20px auto;\
-        padding: 3px;\
-        background: white;\
-        border-radius: 2px;\
-        box-shadow: 0px 2px 3px 0px #555;\
-    }");
+    max-width: 600px;\
+    width: 100%;\
+    margin: 20px auto;\
+    padding: 3px;\
+    background: white;\
+    border-radius: 2px;\
+    box-shadow: 0px 2px 3px 0px #555;\
+}");
 
 
     exports.prompt = prompt;

@@ -599,8 +599,8 @@ EventEmitter._signal = function(eventName, e) {
 
 EventEmitter.once = function(eventName, callback) {
     var _self = this;
-    this.addEventListener(eventName, function newCallback() {
-        _self.removeEventListener(eventName, newCallback);
+    this.on(eventName, function newCallback() {
+        _self.off(eventName, newCallback);
         callback.apply(null, arguments);
     });
     if (!callback) {
@@ -672,7 +672,9 @@ EventEmitter.removeEventListener = function(eventName, callback) {
 };
 
 EventEmitter.removeAllListeners = function(eventName) {
-    if (this._eventRegistry) this._eventRegistry[eventName] = [];
+    if (!eventName) this._eventRegistry = this._defaultHandlers = undefined;
+    if (this._eventRegistry) this._eventRegistry[eventName] = undefined;
+    if (this._defaultHandlers) this._defaultHandlers[eventName] = undefined;
 };
 
 exports.EventEmitter = EventEmitter;
@@ -772,7 +774,7 @@ var Anchor = exports.Anchor = function(doc, row, column) {
         });
     };
     this.detach = function() {
-        this.document.removeEventListener("change", this.$onChange);
+        this.document.off("change", this.$onChange);
     };
     this.attach = function(doc) {
         this.document = doc || this.document;

@@ -125,5 +125,6 @@
   "new project": "پروژه جدید",
   "format": "قالب",
   "project name": "نام پروژه",
-  "support us": "حمایت از توسعه Acode، تبدیل patreon."
+  "support us": "حمایت از توسعه Acode، تبدیل patreon.",
+  "unsupported device": "دستگاه شما از موضوع پشتیبانی نمی کند."
 }

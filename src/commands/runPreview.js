@@ -42,7 +42,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
     if (!activeFile.fileUri && activeFile.contentUri) {
 
-      if (helpers.isParent(DOC_PROVIDER, activeFile.contentUri)) {
+      if (path.isParent(DOC_PROVIDER, activeFile.contentUri)) {
         const [uuid, docpath] = decodeURIComponent(activeFile.contentUri.split('/').pop()).split(':');
 
         if (uuid === 'primary') {
@@ -64,7 +64,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
         return;
       }
     }
-    onerror();
+    if (extension === 'js') onerror();
+    else start();
   } else {
 
     if (extension === 'js' || isConsole) {
@@ -361,8 +362,9 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     }
 
     const theme = appSettings.value.appTheme;
-    const themeColor = theme === 'default' ? '#9999ff' : theme === 'dark' ? '#313131' : '#ffffff';
-    const color = theme === 'light' ? '#9999ff' : '#ffffff';
+    const themeData = constants.appThemeList[theme];
+    const themeColor = themeData.primary;
+    const color = (themeData.type === "dark" || theme === "default") ? "#ffffff" : "#313131";
     const options = `background=${isConsole?'#313131':'#ffffff'},location=${isConsole?'no':'yes'},hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
     cordova.InAppBrowser.open(`http://localhost:${port}/` + filename, target, options);
 

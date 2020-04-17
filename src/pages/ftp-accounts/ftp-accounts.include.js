@@ -133,6 +133,7 @@ function FTPAccountsInclude() {
         password,
         hostname,
         port,
+        path,
         id
       } = account;
       temp.push({
@@ -162,7 +163,7 @@ function FTPAccountsInclude() {
   }
 
   function prompt(username, password, hostname, path, port = 21) {
-    return dialogs.multiPrompt('FTP/SFTP login', [{
+    return dialogs.multiPrompt('FTP login', [{
         id: "username",
         placeholder: "username (optional)",
         type: "text",

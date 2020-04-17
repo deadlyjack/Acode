@@ -1,12 +1,6 @@
 .list {
     width: 100%;
 
-    .scroll {
-        &::-webkit-scrollbar-thumb {
-            background: white;
-        }
-    }
-
     &:not(.collaspable) {
         overflow-y: auto;
     }
@@ -110,7 +104,8 @@
             padding-right: 5px;
             font-family: "Roboto", sans-serif;
             font-weight: bolder;
-            color: #08ff9c;
+            color: #252525;
+            color: var(--text-color);
             font-weight: 900;
             text-transform: uppercase;
         }
@@ -215,11 +210,13 @@ ul {
 
             &.tile:active {
                 transition: all 300ms ease;
-                background-color: #bbb;
+                background-color: gold;
+                background-color: var(--accent-color);
             }
 
             &:last-child {
-                border-bottom: solid 4px rgb(109, 122, 240);
+                border-bottom: solid 4px rgba(122, 122, 122, 0.227);
+                border-bottom: solid 4px var(--border-color);
             }
         }
 
@@ -241,7 +238,8 @@ ul {
 
         &::after {
             content: attr(empty-msg);
-            color: #999;
+            color: #252525;
+            color: var(--text-color);
             text-align: center;
             font-weight: 900;
             background: transparent;

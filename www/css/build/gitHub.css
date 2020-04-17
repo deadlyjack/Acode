@@ -43,8 +43,10 @@
         align-items: center;
         padding: 0 6px;
         font-size: 0.8em;
-        background-color: #99f;
-        color: white;
+        background-color: white;
+        background-color: var(--text-main-color);
+        color: #9999ff;
+        color: var(--primary-color);
         border-radius: 4px;
         margin-left: 4px; }
   #github .profile .button-container {

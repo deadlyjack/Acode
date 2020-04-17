@@ -124,5 +124,6 @@
   "new project": "مشروع جديد",
   "format": "تجميل",
   "project name": "اسم المشروع",
-  "support us": "دعم تطوير Acode ، تصبح patreon."
+  "support us": "دعم تطوير Acode ، تصبح patreon.",
+  "unsupported device": "جهازك لا يدعم السمة."
 }

@@ -27,6 +27,40 @@ const themeList = {
   light: ["chrome", "clouds", "crimson_editor", "dawn", "dreamweaver", "eclipse", "github", "iplastic", "katzenmilch", "solarized_light", "sqlserver", "textmate", "tomorrow", "xcode"]
 };
 
+/**
+ * @type {AppThemeList}
+ */
+const appThemeList = {
+  "default": scheme("default", "light", true, "#5c5c99", "#9999ff"),
+  "light": scheme("light", "light", true, "#999999", "#ffffff"),
+  "atticus": scheme("atticus", "dark", false, "#201e1e", "#363333"),
+  "bump": scheme("bump", "dark", false, "#14181d", "#222831"),
+  "bling": scheme("bling", "dark", false, "#131326", "#202040"),
+  "dark": scheme("dark", "dark", false, "#1d1d1d", "#313131"),
+  "moon": scheme("moon", "dark", false, "#14181d", "#222831"),
+  "ocean": scheme("ocean", "dark", false, "#13131a", "#20202c"),
+  "tomyris": scheme("tomyris", "dark", false, "#230528", "#3b0944")
+};
+
+/**
+ * 
+ * @param {string} type 
+ * @param {"light"|"dark"} type 
+ * @param {boolean} isFree 
+ * @param {string} darkenMode 
+ * @param {string} primary 
+ * @returns {ThemeData}
+ */
+function scheme(name, type, isFree, darkenMode, primary) {
+  return {
+    name,
+    type,
+    isFree,
+    darken: darkenMode,
+    primary
+  };
+}
+
 export default {
   FILE_NAME_REGEX,
   FONT_SIZE,
@@ -39,6 +73,7 @@ export default {
   PORT,
   DEFAULT_FILE_NAME,
   themeList,
+  appThemeList,
   langList,
   encodings
 };

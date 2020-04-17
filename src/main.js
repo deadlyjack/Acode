@@ -1,3 +1,4 @@
+import "./styles/themes.scss";
 import "./styles/index.scss";
 import "./styles/page.scss";
 import './styles/list.scss';
@@ -5,7 +6,6 @@ import './styles/sidenav.scss';
 import './styles/tile.scss';
 import './styles/contextMenu.scss';
 import './styles/dialogs.scss';
-import './styles/themes.scss';
 import './styles/help.scss';
 import './styles/overrideAceStyle.scss';
 
@@ -58,20 +58,6 @@ function Main() {
     lang = language;
   }
 
-  if (!BuildInfo.debug) {
-    setTimeout(() => {
-      if (document.body.classList.contains('loading')) {
-        if (!alert("Something went wrong! Please clear app data and restart the app."))
-          if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
-      }
-    }, 1000 * 30);
-  }
-
-  setTimeout(() => {
-    if (document.body.classList.contains('loading'))
-      document.body.setAttribute('data-small-msg', 'This is taking unexpectedly long time!');
-  }, 1000 * 10);
-
   window.root = tag(window.root);
   window.app = document.body = tag(document.body);
   window.actionStack = ActionStack();
@@ -101,6 +87,36 @@ function Main() {
 
   document.addEventListener("deviceready", () => {
 
+    if (!BuildInfo.debug) {
+      setTimeout(() => {
+        if (document.body.classList.contains('loading')) {
+          if (!alert("Something went wrong! Please clear app data and restart the app."))
+            if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
+        }
+      }, 1000 * 30);
+    }
+
+    setTimeout(() => {
+      if (document.body.classList.contains('loading'))
+        document.body.setAttribute('data-small-msg', 'This is taking unexpectedly long time!');
+    }, 1000 * 10);
+
+    window.DOES_SUPPORT_THEME = (() => {
+      const $testEl = tag('div', {
+        style: {
+          height: `var(--test-height)`,
+          width: `var(--test-height)`
+        }
+      });
+      document.body.append($testEl);
+      const client = $testEl.getBoundingClientRect();
+
+      $testEl.remove();
+
+      if (client.height === 0) return false;
+      else return true;
+    })();
+    window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
     window.DATA_STORAGE = cordova.file.externalDataDirectory || cordova.file.dataDirectory;
     window.CACHE_STORAGE = cordova.file.externalCacheDirectory || cordova.file.cacheDirectory;
     window.CACHE_STORAGE_REMOTE = CACHE_STORAGE + 'ftp-temp/';
@@ -223,6 +239,7 @@ function loadAceEditor() {
     "./res/ace/src/ace.js",
     "./res/ace/emmet-core.js",
     "./res/ace/src/ext-language_tools.js",
+    "./res/ace/src/ext-code_lens.js",
     "./res/ace/src/ext-emmet.js",
     "./res/ace/src/ext-beautify.js",
     "./res/ace/src/ext-modelist.js"
@@ -363,7 +380,6 @@ function App() {
   }
 
   //#region rendering
-  $header.classList.add('light');
   root.append($header, $main, $footer);
   //#endregion
 
@@ -795,32 +811,43 @@ function App() {
 //#region global funtions
 
 function restoreTheme(darken) {
+
   if (darken && document.body.classList.contains('loading')) return;
 
-  if (appSettings.value.appTheme === 'default') {
-    const hexColor = darken ? '#5c5c99' : '#9999ff';
-    app.classList.remove('theme-light');
-    app.classList.remove('theme-dark');
-    app.classList.add('theme-default');
-    NavigationBar.backgroundColorByHexString(hexColor, false);
-    StatusBar.backgroundColorByHexString(hexColor);
-    StatusBar.styleLightContent();
-  } else if (appSettings.value.appTheme === 'light') {
-    const hexColor = darken ? '#999999' : '#ffffff';
-    app.classList.remove('theme-default');
-    app.classList.remove('theme-dark');
-    app.classList.add('theme-light');
-    NavigationBar.backgroundColorByHexString(hexColor, !!darken);
-    StatusBar.backgroundColorByHexString(hexColor);
-    StatusBar.styleDefault();
-  } else {
-    const hexColor = darken ? '#1d1d1d' : '#313131';
-    app.classList.remove('theme-default');
-    app.classList.remove('theme-light');
-    app.classList.add('theme-dark');
+  let theme = DOES_SUPPORT_THEME ? appSettings.value.appTheme : "default";
+  let themeList = constants.appThemeList;
+  let themeData = themeList[theme];
+
+  if (
+    !themeData ||
+    (!themeData.isFree && IS_FREE_VERSION)
+  ) {
+    theme = "default";
+    themeData = themeList[theme];
+    appSettings.value.appTheme = theme;
+    appSettings.update();
+  }
+
+  let hexColor = darken ? themeData.darken : themeData.primary;
+
+  app.setAttribute('theme', theme);
+
+  if (themeData.type === "dark") {
     NavigationBar.backgroundColorByHexString(hexColor, true);
     StatusBar.backgroundColorByHexString(hexColor);
     StatusBar.styleLightContent();
+  } else {
+
+    StatusBar.backgroundColorByHexString(hexColor);
+
+    if (theme === "default") {
+      NavigationBar.backgroundColorByHexString(hexColor, false);
+      StatusBar.styleLightContent();
+    } else {
+      NavigationBar.backgroundColorByHexString(hexColor, true);
+      StatusBar.styleDefault();
+    }
+
   }
 }
 

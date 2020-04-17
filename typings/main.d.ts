@@ -27,7 +27,7 @@ interface Settings {
     lang: string;
     fontSize: string;
     editorTheme: string;
-    appTheme: "light" | "default" | "dark",
+    appTheme: string,
     textWrap: boolean;
     softTab: boolean;
     tabSize: number;
@@ -293,6 +293,18 @@ interface FileClipBoard {
     nodeId: string
 }
 
+interface ThemeData {
+    name: string;
+    type: "light" | "dark";
+    isFree: boolean;
+    darken: string;
+    primary: string;
+}
+
+interface AppThemeList {
+    [theme: string]: ThemeData
+}
+
 /**
  * App settings
  */
@@ -326,6 +338,8 @@ declare var DATA_STORAGE: string;
 declare var CACHE_STORAGE: string;
 declare var CACHE_STORAGE_REMOTE: string;
 declare var KEYBINDING_FILE: string;
+declare var IS_FREE_VERSION: boolean;
+declare var DOES_SUPPORT_THEME: boolean;
 declare var externalStorage: externalStorage;
 declare var AceMouseEvent: any;
 /**

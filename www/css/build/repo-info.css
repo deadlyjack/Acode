@@ -403,12 +403,12 @@
     border: 1px solid #dfe2e5;
     padding: 6px 13px; }
   #info-page table tr {
-    background-color: #fff;
+    background-color: #ffffff;
     border-top: 1px solid #c6cbd1; }
   #info-page table tr:nth-child(2n) {
     background-color: #f6f8fa; }
   #info-page img {
-    background-color: #fff;
+    background-color: #ffffff;
     box-sizing: content-box;
     max-width: 100%; }
   #info-page img[align=right] {
@@ -577,7 +577,7 @@
     margin: 0 .2em .25em -1.6em;
     vertical-align: middle; }
   #info-page hr {
-    border-bottom-color: #eee; }
+    border-bottom-color: #eeeeee; }
   #info-page .pl-0 {
     padding-left: 0 !important; }
   #info-page .pl-1 {

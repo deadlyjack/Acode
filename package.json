@@ -8,6 +8,7 @@
     "lang": "node ./utils/lang.js",
     "config-build": "node ./utils/config.js",
     "build": "webpack",
+    "build-run-free": "yarn config-build d free && webpack && cordova run android",
     "build-run": "yarn config-build d && webpack && cordova run android",
     "build-release-free": "yarn config-build p free && webpack && cordova build android --release",
     "build-release": "yarn config-build p && webpack && cordova build android --release"

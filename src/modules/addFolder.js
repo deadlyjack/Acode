@@ -91,6 +91,7 @@ function openFolder(_path, opts = {}) {
     remove,
     $node: $root,
     reload: () => {
+      if (!reloadOnResume) return;
       $root.collapse();
       $root.uncollapse();
     },
