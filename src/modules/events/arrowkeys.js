@@ -13,10 +13,15 @@ export default {
         const $textarea = editor.textInput.getElement();
         const shiftKey = footer.querySelector('#shift-key').getAttribute('data-state') === 'on' ? true : false;
         const controls = editorManager.controls;
-        document.ontouchend = () => {
-            this.onTouchEnd();
-            document.ontouchend = null;
-        };
+
+        document.ontouchend =
+            document.ontouchcancel =
+            document.ontouchstart = () => {
+                this.onTouchEnd();
+                document.ontouchend =
+                    document.ontouchcancel =
+                    document.ontouchstart = null;
+            };
 
         if (!shiftKey && controls.callBeforeContextMenu) controls.callBeforeContextMenu();
 

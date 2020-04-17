@@ -107,9 +107,9 @@ function saveFile(file, as = false, showToast = true) {
         const data = file.session.getValue();
         let createFile = false || as;
         if (url) {
-            file.location = helpers.decodeURL(url);
             file.type = 'regular';
             file.record = null;
+            file.location = helpers.decodeURL(url);
         }
         if (filename) {
             if (filename.overwrite) {
