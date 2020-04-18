@@ -36,7 +36,7 @@ c-console {
     background-color: #313131;
     z-index: 99998;
     animation: --page-transition .1s ease 1;
-    color: #eee;
+    color: #eeeeee;
     font-family: "Roboto", sans-serif;
 }
 
@@ -44,9 +44,9 @@ c-console br:last-of-type {
     display: none;
 }
 
-c-console .codeflask,
 c-console textarea {
-    caret-color: white !important;
+    color: white;
+    caret-color: currentColor !important;
     background-color: inherit;
 }
 
@@ -118,7 +118,7 @@ c-message {
 
 c-code {
     position: relative;
-    color: rgb(202, 166, 166);
+    color: rgb(214, 211, 211);
     font-size: 1em;
     font-family: 'Courier New', Courier, monospace;
     overflow-x: auto;
@@ -142,7 +142,7 @@ c-code::before {
 
 c-key {
     font-size: 0.9rem;
-    color: #c6f;
+    color: #cc66ff;
 }
 
 c-message.error {
@@ -208,7 +208,7 @@ c-text.__c-function::before {
     content: 'ƒ';
     margin: 0 2px;
     font-style: italic;
-    color: #99f;
+    color: #9999ff;
 }
 
 c-text.__c-undefined {

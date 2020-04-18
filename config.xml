@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.foxdebug.acodefree" android-versionCode="97" version="0.0.9.97" 
+<widget id="com.foxdebug.acodefree" android-versionCode="98" version="0.0.9.98" 
     xmlns="http://www.w3.org/ns/widgets" 
     xmlns:android="http://schemas.android.com/apk/res/android" 
     xmlns:cdv="http://cordova.apache.org/ns/1.0">

@@ -1,4 +1,4 @@
-version 0.0.9.97
+version 0.0.9.98
 ☞ Added new app themes (atticus, bump, bling, moon, ocean, tomyris)
 ☞ Added O'zbekcha language support (Thanks to TILON)
 ☞ Removed PHP support

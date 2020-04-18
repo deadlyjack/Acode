@@ -12,7 +12,7 @@ import loadPolyFill from "./modules/polyfill";
 
     if (window.consoleLoaded) return;
     const inputContainer = document.createElement('c-input');
-    const input = document.createElement('div');
+    const input = document.createElement('textarea');
     const toggler = document.createElement('c-toggler');
     const clearBtn = document.createElement('c-toggler');
     const tagsToReplace = {
@@ -21,7 +21,7 @@ import loadPolyFill from "./modules/polyfill";
         '>': '&gt;'
     };
     let isFocused = false;
-    let flag, flask;
+    let flag;
     const _console = console;
 
     input.id = '__c-input';
@@ -74,8 +74,8 @@ import loadPolyFill from "./modules/polyfill";
             case 'use code':
                 const value = el.getAttribute('data-code');
 
-                flask.updateCode(value);
-                flask.elTextarea.focus();
+                input.value = value;
+                input.focus();
                 break;
 
             default:
@@ -147,10 +147,6 @@ import loadPolyFill from "./modules/polyfill";
             document.body.appendChild(clearBtn);
             document.body.appendChild(consoleElement);
             if (!flag) {
-                flask = new CodeFlask('#__c-input', {
-                    language: 'js'
-                });
-                const input = flask.elTextarea;
                 input.addEventListener('keydown', function (e) {
                     const key = e.keyCode || e.which;
                     isFocused = true;
@@ -166,16 +162,10 @@ import loadPolyFill from "./modules/polyfill";
 
                         const $code = document.createElement('c-code');
 
-                        // const curPos = this.selectionStart;
-                        // const char = code.substr(curPos - 1, 1);
-                        // if (char === '\n' || char === '\r') {
-                        //     code = code.substr(0, curPos - 1) + code.substr(curPos);
-                        // }
-
                         $code.textContent = code.length > 50 ? code.substr(0, 50) + '...' : code;
                         $code.setAttribute('data-code', code);
                         $code.setAttribute('action', 'use code');
-                        flask.updateCode('');
+                        input.value = '';
                         console.log(errId + 'code', $code.outerHTML);
                         execute(code);
                     }
@@ -194,7 +184,6 @@ import loadPolyFill from "./modules/polyfill";
             obj = getPromiseStatus(obj);
 
         toggler.onclick = function () {
-            // let data = '';
             if (this.classList.contains("__show-data")) {
                 this.classList.remove("__show-data");
                 group.textContent = null;

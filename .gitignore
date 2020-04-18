@@ -2,5 +2,5 @@ node_modules
 platforms
 .vscode
 release-signing.properties
-www/js/build/
-www/css/build/
+www/js/build
+www/css/build

@@ -30,7 +30,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   const MIMETYPE_HTML = mimeType.lookup('html');
   const CONSOLE_SCRIPT = uuid + '_console.js';
   const ESPRISMA_SCRIPT = uuid + '_esprisma.js';
-  const EDITOR_SCRIPT = uuid + '_editor.js';
+  // const EDITOR_SCRIPT = uuid + '_editor.js';
+  const EDITOR_SCRIPT = '';
   const CONSOLE_STYLE = uuid + '_console.css';
   const MARKDOWN_STYLE = uuid + '_md.css';
   const DOC_PROVIDER = "content://com.android.externalstorage.documents/document/";
@@ -69,7 +70,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   next();
 
   function next() {
-    if (extension === 'js') startConsole();
+    if (extension === 'js' || isConsole) startConsole();
     else start();
   }
 
@@ -362,9 +363,9 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
     const theme = appSettings.value.appTheme;
     const themeData = constants.appThemeList[theme];
-    const themeColor = themeData.primary;
+    const themeColor = themeData.primary.toUpperCase();
     const color = (themeData.type === "dark" || theme === "default") ? "#ffffff" : "#313131";
-    const options = `background=${isConsole?'#313131':'#ffffff'},location=${isConsole?'no':'yes'},hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
+    const options = `background=${isConsole?"#313131":'#ffffff'},location=${isConsole?'no':'yes'},hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
     cordova.InAppBrowser.open(`http://localhost:${port}/` + filename, target, options);
 
   }
