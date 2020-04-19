@@ -1542,6 +1542,10 @@
   background-image: url('./icons/file_type_sln.svg');
 }
 
+.file.file_type_smali {
+  background-image: url('./icons/file_type_smali.svg');
+}
+
 .file.file_type_smarty {
   background-image: url('./icons/file_type_smarty.svg');
 }

@@ -63,16 +63,19 @@ export default function themeSettings() {
                         if (!themeData.isFree && IS_FREE_VERSION) extra = ` (paid)`;
 
                         themeList.push([
-                            themeData,
+                            JSON.stringify(themeData),
                             theme + extra,
                             'color ' + themeData.type
                         ]);
                     }
 
+                    const defaultTheme = JSON.stringify(appThemeList[appSettings.value.appTheme] || '{}');
+
                     dialogs.select(this.text, themeList, {
-                            default: appSettings.value.appTheme
+                            default: defaultTheme
                         })
                         .then(res => {
+                            res = JSON.parse(res);
                             if (!res.isFree && IS_FREE_VERSION) {
                                 window.open('https://play.google.com/store/apps/details?id=com.foxdebug.acode', '_system');
                                 return;

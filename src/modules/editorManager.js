@@ -7,6 +7,7 @@ import helpers from '../modules/helpers';
 import textControl from './events/selection';
 import constants from '../constants';
 import internalFs from './utils/internalFs';
+import openFolder from './addFolder';
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -301,7 +302,7 @@ function EditorManager($sidebar, $header, $body) {
         if (appSettings.value.openFileListPos === 'header') {
             $openFileList.append(file.assocTile);
         } else {
-            $openFileList.addListTile(file.assocTile);
+            $openFileList.$ul.append(file.assocTile);
         }
 
         setupSession(file);
@@ -440,11 +441,8 @@ function EditorManager($sidebar, $header, $body) {
             root.classList.add('top-bar');
         } else {
             $openFileList = list(strings['active files']);
-            $openFileList.ontoggle = function (isCollasped) {
-                if (isCollasped) return;
-                for (let folder of addedFolder) {
-                    folder.$node.collapse();
-                }
+            $openFileList.ontoggle = function () {
+                openFolder.updateHeight();
             };
             if ($list) $openFileList.list.append(...$list);
             $sidebar.insertBefore($openFileList, $sidebar.firstElementChild);

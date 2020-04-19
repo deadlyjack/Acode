@@ -1,4 +1,5 @@
 import tag from 'html-tag-js';
+import openFolder from '../modules/addFolder';
 
 /**
  * @typedef {object} SideBar
@@ -95,6 +96,13 @@ function sidenav(activator, toggler) {
 
         restoreScrollPos();
         attachListner();
+
+        onshow();
+    }
+
+    function onshow() {
+        if ($el.onshow) $el.onshow.call($el);
+        openFolder.updateHeight();
     }
 
     function restoreScrollPos() {
@@ -234,7 +242,7 @@ function sidenav(activator, toggler) {
 
         function lclShow() {
             attachListner();
-            $el.onshow();
+            onshow();
             $el.activated = true;
             $el.style.transform = `translate3d(0, 0, 0)`;
             document.ontouchstart = ontouchstart;

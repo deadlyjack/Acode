@@ -53,9 +53,6 @@ function openFolder(_path, opts = {}) {
         for (let folder of addedFolder)
           if (folder.url !== _path) folder.$node.collapse();
 
-      if (appSettings.value.openFileListPos !== 'header')
-        editorManager.openFileList.collapse();
-
       expandList.call(this);
     }
   });
@@ -145,14 +142,7 @@ function openFolder(_path, opts = {}) {
 
   function updateHeight() {
 
-    let totalFolder = addedFolder.length;
-    let activeFiles = appSettings.value.openFileListPos !== 'header';
-    totalFolder -= (totalFolder ? 1 : 0);
-    totalFolder += (activeFiles ? 1 : 0);
-    for (let folder of addedFolder) {
-      folder.$node.style.maxHeight = `calc(100% - ${totalFolder*30}px)`;
-      folder.$node.style.height = `calc(100% - ${totalFolder*30}px)`;
-    }
+    openFolder.updateHeight();
 
   }
 
@@ -562,6 +552,15 @@ function openFolder(_path, opts = {}) {
     localStorage.setItem('state', JSON.stringify(listState));
   }
 
+}
+
+openFolder.updateHeight = function () {
+  const client = editorManager.openFileList.getBoundingClientRect();
+  let totalFolder = addedFolder.length - 1;
+  for (let folder of addedFolder) {
+    folder.$node.style.maxHeight = `calc(100% - ${(totalFolder*30) + client.height}px)`;
+    folder.$node.style.height = `calc(100% - ${(totalFolder*30) + client.height}px)`;
+  }
 }
 
 export default openFolder;
