@@ -82,7 +82,9 @@ jobs:
         chat_id: ${{ secrets.CHAT_ID }}
         bot_token: ${{ secrets.BOT_TOKEN }}
       run: |-
-        curl -F "chat_id=${chat_id}" -F 'parse_mode=Markdown' -F caption="$(TZ=UTC git log -1 --format='Commit [%h](https://github.com/deadlyjack/code-editor/commit/%H) #'${BRANCH}'
+        curl -F "chat_id=${chat_id}" -F 'parse_mode=Markdown' -F caption="$(TZ=UTC git log -1 --format='%s
+
+        Commit [%h](https://github.com/deadlyjack/code-editor/commit/%H) #'${BRANCH}'
         Date: %cd
         
-        %B' --date='format-local:%a %b %d %Y %T (%z)' | sed 's/[*_`]/\\\0/g')" -F document="@${APP_NAME}" -X POST https://api.telegram.org/bot${bot_token}/sendDocument
+        %b' --date='format-local:%a %b %d %Y %T (%z)' | sed 's/[*_`]/\\\0/g')" -F document="@${APP_NAME}" -X POST https://api.telegram.org/bot${bot_token}/sendDocument
