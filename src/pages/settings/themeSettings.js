@@ -60,7 +60,7 @@ export default function themeSettings() {
                     for (let theme in appThemeList) {
                         const themeData = appThemeList[theme];
                         let extra = '';
-                        if (!themeData.isFree && IS_FREE_VERSION) extra = ` (paid)`;
+                        if (!themeData.isFree && IS_FREE_VERSION) extra = '<sup>*</sup>';
 
                         themeList.push([
                             JSON.stringify(themeData),
@@ -69,7 +69,10 @@ export default function themeSettings() {
                         ]);
                     }
 
+                    themeList.push(['', '<sup>*</sup> contribution required', false]);
+
                     const defaultTheme = JSON.stringify(appThemeList[appSettings.value.appTheme] || '{}');
+                    const link = 'https://play.google.com/store/apps/details?id=com.foxdebug.acode';
 
                     dialogs.select(this.text, themeList, {
                             default: defaultTheme
@@ -77,7 +80,16 @@ export default function themeSettings() {
                         .then(res => {
                             res = JSON.parse(res);
                             if (!res.isFree && IS_FREE_VERSION) {
-                                window.open('https://play.google.com/store/apps/details?id=com.foxdebug.acode', '_system');
+                                dialogs.box(
+                                        strings.info.toUpperCase(),
+                                        "Hi dear user, dark modes are available in paid version of the app. " +
+                                        "<strong>DO NOT PANIC!</strong> The project is open source, you can build your own apk with all " +
+                                        "the features you need. Please support this project by " +
+                                        "buying the paid version."
+                                    )
+                                    .onhide(() => {
+                                        window.open(link, '_system');
+                                    });
                                 return;
                             }
                             appSettings.value.appTheme = res.name;

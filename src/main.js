@@ -253,12 +253,25 @@ function runApp() {
   else return;
 
   app.addEventListener('click', function (e) {
-    const el = e.target;
-    if (el instanceof HTMLAnchorElement) {
+    let el = e.target;
+    if (el instanceof HTMLAnchorElement || checkIfInsideAncher()) {
       e.preventDefault();
       e.stopPropagation();
 
       window.open(el.href, '_system');
+    }
+
+    function checkIfInsideAncher() {
+      const allAs = [...tag.getAll('a')];
+
+      for (let a of allAs) {
+        if (a.contains(el)) {
+          el = a;
+          return true;
+        }
+      }
+
+      return false;
     }
   });
 
@@ -481,11 +494,12 @@ function App() {
           strings.info.toUpperCase(),
           "If editor is not working properly, try there suggestions:<br><br>" +
           "1. Turn off keyboard <strong>Autocorrect</strong> settings.<br>" +
-          "<img src='./res/imgs/autocorrect.jpg'><br>" +
+          "<img src='./res/imgs/autocorrect/autocorrect-" + appSettings.value.lang + ".jpg'><br>" +
           "2. Use <a href='https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin'>" +
           "<strong>Gboard</strong></a> or " +
           "<a href='https://play.google.com/store/apps/details?id=org.pocketworkstation.pckeyboard'> <strong>" +
-          "Hacker's Keyboard</strong></a><br>"
+          "Hacker's Keyboard</strong></a><br><br>" +
+          "3. Please read <a href='https://acode.foxdebug.com/faqs'><strong>faqs</strong></a>"
         )
         .wait(12000)
         .onhide(() => {

@@ -483,7 +483,7 @@ function select(title, options, opts = {}) {
                 value = option[0];
                 text = option[1];
 
-                if (option.length > 2) {
+                if (option.length > 2 && typeof option[2] === 'string') {
                     lead = tag('i', {
                         className: `icon ${option[2]}`
                     });
@@ -500,7 +500,10 @@ function select(title, options, opts = {}) {
 
             const item = tile({
                 lead,
-                text
+                text: tag('span', {
+                    className: 'text',
+                    innerHTML: text
+                })
             });
 
             if (opts.default === value) {
@@ -509,8 +512,10 @@ function select(title, options, opts = {}) {
             }
 
             item.onclick = function () {
-                resolve(value);
-                hide();
+                if (value) {
+                    resolve(value);
+                    hide();
+                }
             };
 
             if (disabled) item.classList.add('disabled');
