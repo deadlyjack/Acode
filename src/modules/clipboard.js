@@ -67,6 +67,7 @@ function clipboardAction(action) {
             break;
 
         case 'color':
+            editor.blur();
             dialogs.color(color.style.color)
                 .then(color => {
                     editor.insert(color);
@@ -76,7 +77,7 @@ function clipboardAction(action) {
                 });
             break;
     }
-    editor.focus();
+    if (action !== 'color') editor.focus();
 }
 
 export default clipboardAction;

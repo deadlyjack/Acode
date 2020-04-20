@@ -449,6 +449,7 @@ function confirm(titleText, message) {
  * @param {string[]} options 
  * @param {object} opts 
  * @param {string} opts.default 
+ * @param {boolean} opts.hideOnSelect
  * @param {boolean} opts.textTransform 
  */
 function select(title, options, opts = {}) {
@@ -472,6 +473,8 @@ function select(title, options, opts = {}) {
             onclick: hide
         });
         let defaultVal;
+
+        if (opts.hideOnSelect === undefined) opts.hideOnSelect = true;
 
         options.map(option => {
 
@@ -512,9 +515,9 @@ function select(title, options, opts = {}) {
             }
 
             item.onclick = function () {
-                if (value) {
+                if (value !== undefined) {
                     resolve(value);
-                    hide();
+                    if (opts.hideOnSelect) hide();
                 }
             };
 
@@ -624,24 +627,50 @@ function loaderHide() {
  * @param {string} titleText 
  * @param {string} html
  * @param {string} [hideButtonText]
+ * @param {string} [cancelButtonText]
  */
-function box(titleText, html, hideButtonText) {
+function box(titleText, html, hideButtonText, cancelButtonText) {
     let waitFor = 0,
         strOK = hideButtonText || strings.ok,
         _onclick = () => {},
-        _onhide = () => {};
+        _onhide = () => {},
+        _then = () => {},
+        _onOk = _hide,
+        _onCancel = () => {};
 
     const promiseLike = {
         hide,
         wait,
         onclick,
-        onhide
+        onhide,
+        then,
+        ok,
+        cancle
     };
+
+    let cancelBtn;
+
+    if (cancelButtonText) {
+        cancelBtn = tag('button', {
+            className: 'disabled',
+            textContent: strOK,
+            onclick: () => {
+                _onCancel();
+            }
+        });
+    }
 
     const okBtn = tag('button', {
         className: 'disabled',
         textContent: strOK,
-        onclick: hide
+        onclick: () => {
+            _onOk();
+        }
+    });
+    const body = tag('div', {
+        className: 'message',
+        innerHTML: html,
+        onclick: __onclick
     });
     const box = tag('div', {
         className: 'prompt box',
@@ -650,32 +679,30 @@ function box(titleText, html, hideButtonText) {
                 className: 'title',
                 textContent: titleText
             }),
-            tag('div', {
-                className: 'message',
-                innerHTML: html,
-                onclick: __onclick
-            }),
+            body,
             tag('div', {
                 className: 'button-container',
-                child: okBtn
+                children: cancelBtn ? [cancelBtn, okBtn] : [okBtn]
             })
         ]
     });
     const mask = tag('span', {
         className: 'mask',
-        onclick: hide
+        onclick: _hide
     });
 
-    setTimeout(decTime, 0);
+    setTimeout(() => {
+        decTime();
+        actionStack.push({
+            id: 'box',
+            action: hideSelect
+        });
 
-    actionStack.push({
-        id: 'box',
-        action: hideSelect
-    });
+        document.body.append(box, mask);
+        __then();
 
-    document.body.append(box, mask);
-
-    window.restoreTheme(true);
+        window.restoreTheme(true);
+    }, 0);
 
     function decTime() {
         if (waitFor >= 1000) {
@@ -707,7 +734,11 @@ function box(titleText, html, hideButtonText) {
         }
         actionStack.remove('box');
         hideSelect();
-        if (_onhide) _onhide();
+    }
+
+    function _hide() {
+        hide();
+        if (_onhide) _onhide.call(promiseLike);
     }
 
     function wait(time) {
@@ -716,8 +747,21 @@ function box(titleText, html, hideButtonText) {
         return promiseLike;
     }
 
-    function __onclick() {
-        if (_onclick) _onclick();
+    function __onclick(e) {
+        if (_onclick) _onclick.call(this, e);
+    }
+
+    function __then() {
+        if (_then) _then(body.children);
+    }
+
+    /**
+     * 
+     * @param {function(HTMLCollection)} callback 
+     */
+    function then(callback) {
+        _then = callback;
+        return promiseLike;
     }
 
     /**
@@ -735,6 +779,24 @@ function box(titleText, html, hideButtonText) {
      */
     function onhide(onhide) {
         _onhide = onhide;
+        return promiseLike;
+    }
+
+    /**
+     * 
+     * @param {function():void} onOk
+     */
+    function ok(onOk) {
+        _onOk = onOk;
+        return promiseLike;
+    }
+
+    /**
+     * 
+     * @param {function():void} onCancel 
+     */
+    function cancle(onCancel) {
+        _onCancel = oncancel;
         return promiseLike;
     }
 

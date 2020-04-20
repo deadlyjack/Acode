@@ -6,15 +6,32 @@ import tag from 'html-tag-js';
  * @param {HTMLElement} container 
  */
 function textControl(editor, controls, container) {
-    const $content = container.querySelector('.ace_scroller');
-    let oldPos = editor.getCursorPosition();
+    const $content = container.querySelector('.ace_scroller'),
+        threshold = 200;
+
+    let oldPos = editor.getCursorPosition(),
+        count = 0,
+        counterTimeout, touch = false,
+        cmFlag = false;
+
     $content.addEventListener('touchstart', ontouchstart);
     $content.oncontextmenu = oncontextmenu;
 
     function ontouchstart(e) {
+
+        if (count) preventDefault(e);
+
         let timeout;
+        touch = true;
+
+        if (cmFlag) {
+            count = 0;
+            cmFlag = false;
+            return;
+        }
 
         document.ontouchmove = document.ontouchcancel = function () {
+            count = 0;
             if (timeout) clearTimeout(timeout);
             document.ontouchmove = document.ontouchcancel = document.ontouchend = null;
         };
@@ -23,7 +40,16 @@ function textControl(editor, controls, container) {
             if (timeout) clearTimeout(timeout);
 
             const shiftKey = tag.get('#shift-key');
-            if (shiftKey && shiftKey.getAttribute('data-state') === 'on') {
+            if (count) {
+
+                if (count === 1) setTimeout(() => {
+                    if (touch) return;
+                    preventDefault(e);
+                    setTimeout(Acode.exec, 0, "select-word");
+                    editor.focus();
+                }, 0);
+
+            } else if (shiftKey && shiftKey.getAttribute('data-state') === 'on') {
                 preventDefault(e);
                 const me = new AceMouseEvent(e, editor);
                 const pos = me.getDocumentPosition();
@@ -41,6 +67,19 @@ function textControl(editor, controls, container) {
             }
 
             document.ontouchmove = document.ontouchcancel = document.ontouchend = null;
+
+            if (counterTimeout) {
+                clearTimeout(counterTimeout);
+                counterTimeout = null;
+            }
+
+            counterTimeout = setTimeout(() => {
+                count = 0;
+                counterTimeout = null;
+            }, threshold);
+
+            ++count;
+            touch = false;
         };
     }
 
@@ -51,6 +90,7 @@ function textControl(editor, controls, container) {
     }
 
     function oncontextmenu(e) {
+        cmFlag = true;
         preventDefault(e);
         const ev = new AceMouseEvent(e, editor);
         const pos = ev.getDocumentPosition();
@@ -58,6 +98,11 @@ function textControl(editor, controls, container) {
 
         Acode.exec("select-word");
         editor.focus();
+
+        document.ontouchend = function () {
+            count = 0;
+            cmFlag = false;
+        };
     }
 }
 

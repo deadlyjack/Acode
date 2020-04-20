@@ -1,5 +1,5 @@
 import saveFile from "./saveFile";
-import selectword from './selectword';
+import select from './selectword';
 import runPreview from "./runPreview";
 
 import settingsMain from '../pages/settings/mainSettings';
@@ -268,7 +268,8 @@ const commands = {
   "select-all": function () {
     clipboardAction('select all');
   },
-  "select-word": selectword,
+  "select-word": select,
+  "select-line": () => select('line'),
   "syntax": function () {
     editorManager.editor.blur();
     Modes()

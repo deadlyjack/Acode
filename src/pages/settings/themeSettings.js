@@ -69,7 +69,7 @@ export default function themeSettings() {
                         ]);
                     }
 
-                    themeList.push(['', '<sup>*</sup> contribution required', false]);
+                    themeList.push([undefined, '<sup>*</sup> contribution required', false]);
 
                     const defaultTheme = JSON.stringify(appThemeList[appSettings.value.appTheme] || '{}');
                     const link = 'https://play.google.com/store/apps/details?id=com.foxdebug.acode';

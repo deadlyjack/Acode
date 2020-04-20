@@ -1,4 +1,5 @@
-version 0.0.9.99
+version 0.1.10.100
+☞ Added Spanish language by DouZerr
 ☞ New Smali language support
 ☞ Show suggestions when app first opens
 ☞ Bugs fixes

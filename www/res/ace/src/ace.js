@@ -3951,7 +3951,6 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
         var animationTimer;
         var animationSteps = 0;
         var pos;
-        var clickCount = 0;
         var mvY, mvX, animation, ge,
             arX = [],
             arY = [];
@@ -3980,12 +3979,9 @@ define("ace/mouse/touch_handler", ["require", "exports", "module", "ace/mouse/mo
             var ev = new MouseEvent(e, editor);
             pos = ev.getDocumentPosition();
             if (t - touchStartT < 500 && touches.length == 1 && !animationSteps) {
-                clickCount++;
                 e.preventDefault();
                 e.button = 0;
-                switchToSelectionMode();
             } else {
-                clickCount = 0;
                 var cursor = editor.selection.cursor;
                 var anchor = editor.selection.isEmpty() ? cursor : editor.selection.anchor;
                 var cursorPos = editor.renderer.$cursorLayer.getPixelPosition(cursor, true);

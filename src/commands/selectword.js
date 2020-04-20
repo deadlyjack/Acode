@@ -1,4 +1,11 @@
-function selectword() {
+/**
+ * 
+ * @param {"word"|"line"} type 
+ */
+function select(type) {
+
+  type = type || "word";
+
   const {
     editor,
     controls,
@@ -23,7 +30,9 @@ function selectword() {
     }
   };
 
-  editor.selectMore(1, false, true);
+  if (type === "word") editor.selectMore(1, false, true);
+  else if (type === "line") editor.selection.selectLine();
+
   if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
   controls.update = updateControls;
   controls.callBeforeContextMenu = disable;
@@ -230,4 +239,4 @@ function selectword() {
   }
 }
 
-export default selectword;
+export default select;

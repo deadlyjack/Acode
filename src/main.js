@@ -499,7 +499,7 @@ function App() {
           "<strong>Gboard</strong></a> or " +
           "<a href='https://play.google.com/store/apps/details?id=org.pocketworkstation.pckeyboard'> <strong>" +
           "Hacker's Keyboard</strong></a><br><br>" +
-          "3. Please read <a href='https://acode.foxdebug.com/faqs'><strong>faqs</strong></a>"
+          "3. Please read <a href='https://acode.foxdebug.com/faqs'>FAQs</a>"
         )
         .wait(12000)
         .onhide(() => {

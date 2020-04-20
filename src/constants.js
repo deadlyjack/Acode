@@ -20,7 +20,8 @@ const langList = {
   "ir-fa": "فارسی",
   "ar-ye": "العربية",
   "ja-jp": "日本語",
-  "uz-uz": "O'zbekcha"
+  "uz-uz": "O'zbekcha",
+  "es-sv": "Español"
 };
 const themeList = {
   dark: ["ambiance", "chaos", "clouds_midnight", "cobalt", "dracula", "gob", "gruvbox", "idle_fingers", "kr_theme", "kurior", "merbivore", "merbivore_soft", "mono_industrial", "monokai", "nord_dark", "pastel_on_dark", "solarized_dark", "terminal", "tomorrow_night", "tomorrow_night_blue", "tomorrow_night_bright", "tomorrow_night_eighties", "twilight", "vibrant_ink"],
