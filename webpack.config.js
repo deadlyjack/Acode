@@ -3,7 +3,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: {
     main: "./src/main.js",
     // eruda: "./src/eruda.js",
