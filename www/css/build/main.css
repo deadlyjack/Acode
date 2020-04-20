@@ -516,6 +516,9 @@ footer .button-container {
     text-transform: uppercase;
     background-color: inherit;
     color: inherit; }
+    .button-container > button.disabled {
+      pointer-events: none;
+      opacity: 0.6; }
     .button-container > button:active {
       transition: all 100ms ease;
       box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2); }

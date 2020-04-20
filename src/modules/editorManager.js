@@ -423,7 +423,7 @@ function EditorManager($sidebar, $header, $body) {
 
         if ($openFileList) {
             if ($openFileList.classList.contains('collaspable')) {
-                $list = [...$openFileList.list.children];
+                $list = [...$openFileList.$ul.children];
             } else {
                 $list = [...$openFileList.children];
             }
@@ -444,7 +444,7 @@ function EditorManager($sidebar, $header, $body) {
             $openFileList.ontoggle = function () {
                 openFolder.updateHeight();
             };
-            if ($list) $openFileList.list.append(...$list);
+            if ($list) $openFileList.$ul.append(...$list);
             $sidebar.insertBefore($openFileList, $sidebar.firstElementChild);
             root.classList.remove('top-bar');
         }

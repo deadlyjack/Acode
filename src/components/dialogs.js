@@ -617,14 +617,25 @@ function loaderHide() {
 /**
  * 
  * @param {string} titleText 
- * @param {string} html 
- * @param {function(Event):void} onclick
- * @param {function():void} onhide
+ * @param {string} html
  * @param {string} [hideButtonText]
  */
-function box(titleText, html, onclick, onhide, hideButtonText) {
+function box(titleText, html, hideButtonText) {
+    let waitFor = 0,
+        strOK = hideButtonText || strings.ok,
+        _onclick = () => {},
+        _onhide = () => {};
+
+    const promiseLike = {
+        hide,
+        wait,
+        onclick,
+        onhide
+    };
+
     const okBtn = tag('button', {
-        textContent: hideButtonText || strings.ok,
+        className: 'disabled',
+        textContent: strOK,
         onclick: hide
     });
     const box = tag('div', {
@@ -637,7 +648,7 @@ function box(titleText, html, onclick, onhide, hideButtonText) {
             tag('div', {
                 className: 'message',
                 innerHTML: html,
-                onclick
+                onclick: __onclick
             }),
             tag('div', {
                 className: 'button-container',
@@ -650,6 +661,8 @@ function box(titleText, html, onclick, onhide, hideButtonText) {
         onclick: hide
     });
 
+    setTimeout(decTime, 0);
+
     actionStack.push({
         id: 'box',
         action: hideSelect
@@ -658,6 +671,17 @@ function box(titleText, html, onclick, onhide, hideButtonText) {
     document.body.append(box, mask);
 
     window.restoreTheme(true);
+
+    function decTime() {
+        if (waitFor >= 1000) {
+            okBtn.textContent = `${strOK} (${parseInt(waitFor/1000)}sec)`;
+            waitFor -= 1000;
+            setTimeout(decTime, 1000);
+        } else {
+            okBtn.textContent = strOK;
+            okBtn.classList.remove("disabled");
+        }
+    }
 
     function hideSelect() {
         box.classList.add('hide');
@@ -669,6 +693,7 @@ function box(titleText, html, onclick, onhide, hideButtonText) {
     }
 
     function hide() {
+        if (waitFor) return;
         const imgs = box.getAll('img');
         if (imgs) {
             for (let img of imgs) {
@@ -677,12 +702,38 @@ function box(titleText, html, onclick, onhide, hideButtonText) {
         }
         actionStack.remove('box');
         hideSelect();
-        if (onhide) onhide();
+        if (_onhide) _onhide();
     }
 
-    return {
-        hide
-    };
+    function wait(time) {
+        time -= time % 1000;
+        waitFor = time;
+        return promiseLike;
+    }
+
+    function __onclick() {
+        if (_onclick) _onclick();
+    }
+
+    /**
+     * 
+     * @param {function(this:HTMLElement, Event):void} onclick 
+     */
+    function onclick(onclick) {
+        _onclick = onclick;
+        return promiseLike;
+    }
+
+    /**
+     * 
+     * @param {function():void} onhide 
+     */
+    function onhide(onhide) {
+        _onhide = onhide;
+        return promiseLike;
+    }
+
+    return promiseLike;
 }
 
 /**

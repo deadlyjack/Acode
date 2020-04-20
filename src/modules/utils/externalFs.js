@@ -34,7 +34,12 @@ function externalFs(uuid, uri) {
       const versionAlpha = typeof device.version === 'string' ? device.version.toLocaleLowerCase() : "";
       if (version < 7 || version > 9 || ['q', 'r'].includes(versionAlpha)) {
 
-        dialogs.box('INFO', '<p>Follow below steps to allow Acode to modify sdcard data.<p><br><img src="./res/imgs/steps.jpg">', () => {}, next);
+        dialogs.box(
+            'INFO',
+            '<p>Follow below steps to allow Acode to modify sdcard data.<p><br>' +
+            '<img src="./res/imgs/steps.jpg">'
+          )
+          .onhide(next);
 
       } else {
 

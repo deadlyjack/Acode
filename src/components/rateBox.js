@@ -4,10 +4,9 @@ import constants from '../constants';
 import helpers from '../modules/helpers';
 
 function rateBox() {
-  if (app.classList.contains("loading"))
-    return setTimeout(rateBox, 1000);
-
-  const box = dialogs.box('Did you like the app?', template, onInteract, onhide, strings.cancel);
+  const box = dialogs.box('Did you like the app?', template, strings.cancel)
+    .onclick(onInteract)
+    .onhide(onhide);
 
   function onInteract(e) {
     /**

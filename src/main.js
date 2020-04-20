@@ -98,7 +98,7 @@ function Main() {
 
     setTimeout(() => {
       if (document.body.classList.contains('loading'))
-        document.body.setAttribute('data-small-msg', 'This is taking unexpectedly long time!');
+        document.body.setAttribute('data-small-msg', "This is taking unexpectedly long time!");
     }, 1000 * 10);
 
     window.DOES_SUPPORT_THEME = (() => {
@@ -371,14 +371,6 @@ function App() {
   window.restoreTheme();
   $main.setAttribute("data-empty-msg", strings['no editor message']);
 
-  //Asks for rating if used more than 5 times
-  let count = parseInt(localStorage.count) || 0;
-  if (count === constants.RATING_TIME) rateBox();
-  else {
-    if (count === constants.RATING_TIME - 1) supportUsButton();
-    localStorage.count = ++count;
-  }
-
   //#region rendering
   root.append($header, $main, $footer);
   //#endregion
@@ -401,6 +393,7 @@ function App() {
 
       setTimeout(() => {
         app.classList.remove('loading', 'splash');
+        onAppLoad();
       }, 500);
       //#region event listeners 
 
@@ -473,6 +466,34 @@ function App() {
     const activeFile = editorManager.activeFile;
     if (activeFile) editor.blur();
   };
+
+  function onAppLoad() {
+
+    let count = parseInt(localStorage.count) || 0;
+    if (count === constants.RATING_TIME) rateBox();
+    else {
+      if (count === constants.RATING_TIME - 1) supportUsButton();
+      localStorage.count = ++count;
+    }
+
+    if (!localStorage.init) {
+      dialogs.box(
+          strings.info.toUpperCase(),
+          "If editor is not working properly, try there suggestions:<br><br>" +
+          "1. Turn off keyboard <strong>Autocorrect</strong> settings.<br>" +
+          "<img src='./res/imgs/autocorrect.jpg'><br>" +
+          "2. Use <a href='https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin'>" +
+          "<strong>Gboard</strong></a> or " +
+          "<a href='https://play.google.com/store/apps/details?id=org.pocketworkstation.pckeyboard'> <strong>" +
+          "Hacker's Keyboard</strong></a><br>"
+        )
+        .wait(12000)
+        .onhide(() => {
+          localStorage.init = true;
+        });
+    }
+
+  }
 
   /**
    * 
@@ -852,9 +873,6 @@ function restoreTheme(darken) {
 }
 
 function supportUsButton() {
-
-  if (app.classList.contains('loading')) return setTimeout(supportUsButton, 1000);
-
   const $supportUsContainer = tag.parse(mustache.render($_suportUs, strings));
   const $supportUs = $supportUsContainer.get('#supportus');
   app.append($supportUsContainer);
