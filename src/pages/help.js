@@ -2,7 +2,7 @@ import tag from 'html-tag-js';
 
 import Page from "../components/page";
 import gen from "../components/gen";
-import helpers from '../modules/helpers';
+import helpers from '../lib/helpers';
 
 export default function help(opts) {
     const page = Page(strings.help);

@@ -217,6 +217,28 @@
         }
     }
 
+    .input-group {
+        display: flex;
+        min-height: 40px;
+        margin: 2.5px auto;
+        width: 100%;
+        flex-wrap: wrap;
+        max-width: 300px;
+
+        .hero {
+            display: flex;
+            align-items: center;
+            height: 40px;
+            width: 100%;
+            font-size: 1.2em;
+        }
+
+        .input-checkbox {
+            height: 40px;
+            width: 50%;
+        }
+    }
+
     .input {
         max-height: calc(100vh - 80px);
         width: 100%;

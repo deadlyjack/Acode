@@ -1,10 +1,10 @@
 {{#accounts}}
-<div class="list-item" action="ftp-account" path="{{path}}" username="{{username}}" password="{{password}}"
-  hostname="{{hostname}}" port="{{port}}" id="{{id}}">
+<div class="list-item" action="ftp-account" name="{{name}}" security="{{security}}" mode="{{mode}}" path="{{path}}"
+  username="{{username}}" password="{{password}}" hostname="{{hostname}}" port="{{port}}" id="{{id}}">
   <span class="icon person"></span>
   <div class="container">
     <div class="text">
-      <span>{{username}}@{{hostname}}</span>
+      <span>{{name}}</span>
     </div>
   </div>
   <span class="icon edit" action="edit"></span>

@@ -1,3 +1,11 @@
+version 0.1.10.101
+☞ UI improvment
+☞ Bugs fixes
+
+version 0.1.10.100
+☞ Added Turkish language by ibrahim
+☞ Bugs fixes
+
 version 0.1.10.100
 ☞ Added Spanish language by DouZerr
 ☞ New Smali language support

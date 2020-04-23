@@ -1,6 +1,6 @@
 import tag from 'html-tag-js';
 import mustache from 'mustache';
-import helpers from '../../modules/helpers';
+import helpers from '../../lib/helpers';
 import Page from '../../components/page';
 
 import _template from './ftp-accounts.hbs';
@@ -9,8 +9,8 @@ import './ftp-accounts.scss';
 
 import SearchBar from '../../components/searchbar';
 import dialogs from '../../components/dialogs';
-import remoteFs from '../../modules/utils/remoteFs';
-import openFolder from '../../modules/addFolder';
+import remoteFs from '../../lib/fileSystem/remoteFs';
+import openFolder from '../../lib/addFolder';
 
 function FTPAccountsInclude() {
   let accounts = JSON.parse(localStorage.ftpaccounts || '[]');
@@ -77,16 +77,19 @@ function FTPAccountsInclude() {
       const password = $target.getAttribute("password");
       const hostname = $target.getAttribute("hostname");
       const port = $target.getAttribute("port");
-      const path = $target.getAttribute("path");
+      const name = $target.getAttribute("name");
+      const security = $target.getAttribute("security");
+      const mode = $target.getAttribute("mode");
       const id = $target.id;
 
       if (action === 'edit') {
-        addAccount(username, password, hostname, path, port, id);
+        addAccount(username, password, hostname, name, port, id, security, mode);
       } else {
-        const fs = remoteFs(username, password, hostname, port, path);
+        const fs = remoteFs(username, password, hostname, port);
         openFolder(fs.origin, {
           saveState: false,
-          reloadOnResume: false
+          reloadOnResume: false,
+          name
         });
 
         actionStack.pop();
@@ -95,15 +98,19 @@ function FTPAccountsInclude() {
     }
   }
 
-  function addAccount(username, password, hostname, path, port, id) {
+  function addAccount(username, password, hostname, name, port, id, security, mode) {
 
-    prompt(username, password, hostname, path, port, id).then(values => {
+    prompt(username, password, hostname, name, port, security, mode).then(values => {
       const {
         username,
         password,
         hostname,
         port,
-        path
+        ftp,
+        ftps,
+        active,
+        passive,
+        name
       } = values;
 
       if (id) remove(id);
@@ -113,8 +120,10 @@ function FTPAccountsInclude() {
         password: credentials.encrypt(password),
         hostname: credentials.encrypt(hostname),
         port: credentials.encrypt(port),
-        path: path && credentials.encrypt(path),
-        id: id || helpers.uuid()
+        id: id || helpers.uuid(),
+        security: ftps ? "ftps" : "ftp",
+        mode: active ? "active" : "passive",
+        name,
       });
 
       localStorage.setItem('ftpaccounts', JSON.stringify(accounts));
@@ -128,21 +137,31 @@ function FTPAccountsInclude() {
   function decryptAccounts() {
     const temp = [];
     if (Array.isArray(accounts)) accounts.map(account => {
-      const {
+      let {
+        name,
         username,
         password,
         hostname,
         port,
-        path,
-        id
+        id,
+        security,
+        mode
       } = account;
+
+      username = credentials.decrypt(username);
+      password = credentials.decrypt(password);
+      hostname = credentials.decrypt(hostname);
+      port = credentials.decrypt(port);
+
       temp.push({
-        username: credentials.decrypt(username),
-        password: credentials.decrypt(password),
-        hostname: credentials.decrypt(hostname),
-        path: path && credentials.decrypt(path),
-        port: credentials.decrypt(port),
-        id
+        username,
+        password,
+        hostname,
+        port,
+        name: name ? name : `${username}@${hostname}`,
+        id,
+        security,
+        mode
       });
       return account;
     });
@@ -162,35 +181,72 @@ function FTPAccountsInclude() {
     localStorage.setItem('ftpaccounts', JSON.stringify(accounts));
   }
 
-  function prompt(username, password, hostname, path, port = 21) {
+  function prompt(username, password, hostname, name, port, security, mode) {
+    port = port || 21;
+    security = security || "ftp";
+    mode = mode || "passive";
     return dialogs.multiPrompt('FTP login', [{
+        id: "name",
+        placeholder: "Name (optional)",
+        type: "text",
+        value: name ? name : ''
+      },
+      {
         id: "username",
-        placeholder: "username (optional)",
+        placeholder: "Username (optional)",
         type: "text",
         value: username
       },
       {
         id: "password",
-        placeholder: "password (optional)",
+        placeholder: "Password (optional)",
         type: "password",
         value: password
       },
       {
         id: "hostname",
-        placeholder: "hostname",
+        placeholder: "Hostname",
         type: "text",
         required: true,
         value: hostname
       },
-      // {
-      //   id: "path",
-      //   placeholder: "path (optional)",
-      //   type: "text",
-      //   value: path
-      // },
+      [
+        "Security type: ",
+        {
+          id: "ftp",
+          placeholder: "FTP",
+          name: "type",
+          type: "radio",
+          value: security === "ftp" ? true : false
+        },
+        {
+          id: "ftps",
+          placeholder: "FTPS",
+          name: "type",
+          type: "radio",
+          value: security === "ftps" ? true : false
+        }
+      ],
+      [
+        "Connection mode: ",
+        {
+          id: "active",
+          placeholder: "Active",
+          name: "mode",
+          type: "radio",
+          value: mode === "active" ? true : false
+        },
+        {
+          id: "passive",
+          placeholder: "Passive",
+          name: "mode",
+          type: "radio",
+          value: mode === "passive" ? true : false
+        }
+      ],
       {
         id: "port",
-        placeholder: "port (optional)",
+        placeholder: "Port (optional)",
         type: "number",
         value: port
       }

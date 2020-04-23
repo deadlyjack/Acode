@@ -3,11 +3,10 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: {
-    main: "./src/main.js",
-    // eruda: "./src/eruda.js",
-    console: "./src/console.js",
+    main: "./src/lib/main.js",
+    console: "./src/lib/console.js",
   },
   output: {
     path: path.resolve(__dirname, "www/js/build/"),

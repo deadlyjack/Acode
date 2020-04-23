@@ -31,14 +31,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "com.napolitano.cordova.plugin.intent": {
-    "source": {
-      "type": "registry",
-      "id": "https://github.com/napolitano/cordova-plugin-intent"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-custom-config": {
     "source": {
       "type": "registry",
@@ -167,10 +159,10 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-sdcard": {
+  "cordova-plugin-intent": {
     "source": {
       "type": "local",
-      "path": "/mnt/sda1/cordova/code editor/node_modules/tree-chooser"
+      "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-plugin-intent"
     },
     "is_top_level": true,
     "variables": {}
@@ -179,6 +171,22 @@
     "source": {
       "type": "local",
       "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-plugin-ftp"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-sdcard": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-plugin-sytem"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-system": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-plugin-system"
     },
     "is_top_level": true,
     "variables": {}

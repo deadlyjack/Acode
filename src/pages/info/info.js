@@ -1,6 +1,6 @@
 import tag from 'html-tag-js';
 import Page from "../../components/page";
-import git from "../../modules/git";
+import git from "../../lib/git";
 import dialogs from "../../components/dialogs";
 
 import './info.scss';

@@ -1,6 +1,6 @@
 import tag from 'html-tag-js';
 import mustache from 'mustache';
-import helpers from '../../modules/helpers';
+import helpers from '../../lib/helpers';
 import GithubLogin from '../login/login';
 import Page from '../../components/page';
 
@@ -8,9 +8,9 @@ import _template from './gitHub.hbs';
 import _menu from './menu.hbs';
 import './gitHub.scss';
 import contextMenu from '../../components/contextMenu';
-import fs from '../../modules/utils/internalFs';
+import fs from '../../lib/fileSystem/internalFs';
 import dialogs from '../../components/dialogs';
-import git from '../../modules/git';
+import git from '../../lib/git';
 import Repos from '../repos/repos';
 import Gists from '../gists/gists';
 

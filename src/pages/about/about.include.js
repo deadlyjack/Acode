@@ -3,39 +3,47 @@ import mustache from 'mustache';
 import Page from "../../components/page";
 import _template from './about.hbs';
 import './about.scss';
-import rateBox from '../../components/rateBox';
+import rateBox from '../../components/dialogboxes/rateBox';
 
 export default function AboutInclude() {
     const $page = Page(strings.about);
-    const $content = tag.parse(mustache.render(_template, BuildInfo));
-    actionStack.push({
-        id: 'about',
-        action: $page.hide
-    });
 
-    $content.onclick = e => {
-        const $el = e.target;
-        if (!($el instanceof HTMLElement)) return;
-        const action = $el.getAttribute('action');
-        if (!action) return;
+    system.getWebviewInfo(res => render(res), err => render());
 
-        switch (action) {
-            case "rate-box":
-                rateBox();
-                break;
+    function render(webview) {
+        const $content = tag.parse(mustache.render(_template, {
+            ...BuildInfo,
+            webview
+        }));
+        actionStack.push({
+            id: 'about',
+            action: $page.hide
+        });
 
-            default:
-                break;
-        }
-    };
+        $content.onclick = e => {
+            const $el = e.target;
+            if (!($el instanceof HTMLElement)) return;
+            const action = $el.getAttribute('action');
+            if (!action) return;
 
-    $page.onhide = function () {
-        actionStack.remove('about');
-    };
+            switch (action) {
+                case "rate-box":
+                    rateBox();
+                    break;
 
-    $page.classList.add('about-us');
+                default:
+                    break;
+            }
+        };
 
-    $page.append($content);
+        $page.onhide = function () {
+            actionStack.remove('about');
+        };
+
+        $page.classList.add('about-us');
+
+        $page.append($content);
+    }
 
     document.body.append($page);
 }

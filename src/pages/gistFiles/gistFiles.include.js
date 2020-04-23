@@ -5,12 +5,12 @@ import _template from './gistFiles.hbs';
 import _menu from './menu.hbs';
 import './gistFiles.scss';
 import Page from '../../components/page';
-import helpers from '../../modules/helpers';
+import helpers from '../../lib/helpers';
 import contextMenu from '../../components/contextMenu';
 import dialogs from '../../components/dialogs';
 import Gists from '../gists/gists';
-import git from '../../modules/git';
-import constants from '../../constants';
+import git from '../../lib/git';
+import constants from '../../lib/constants';
 import SearchBar from '../../components/searchbar';
 
 /**

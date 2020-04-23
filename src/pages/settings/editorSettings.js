@@ -1,7 +1,7 @@
 import Page from "../../components/page";
 import gen from "../../components/gen";
 import dialogs from "../../components/dialogs";
-import constants from "../../constants";
+import constants from "../../lib/constants";
 import tag from 'html-tag-js';
 
 export default function editorSettings() {
@@ -19,62 +19,62 @@ export default function editorSettings() {
     };
 
 
-    const value = appSettings.value;
+    const values = appSettings.value;
 
     const settingsOptions = [{
             key: 'autosave',
             text: strings.autosave,
-            subText: value.autosave ? value.autosave + '' : strings.no,
+            subText: values.autosave ? values.autosave + '' : strings.no,
         },
         {
             key: 'font size',
             text: strings['font size'],
-            subText: value.fontSize,
+            subText: values.fontSize,
         },
         {
             key: 'text wrap',
             text: strings['text wrap'],
-            subText: value.textWrap ? strings.yes : strings.no,
+            checkbox: values.textWrap,
         },
         {
             key: 'soft tab',
             text: strings['soft tab'],
-            subText: value.softTab ? strings.yes : strings.no,
+            checkbox: values.softTab,
         },
         {
             key: 'tab size',
             text: strings['tab size'],
-            subText: value.tabSize,
+            subText: values.tabSize,
         },
         {
             key: 'linenumbers',
             text: strings['show line numbers'],
-            subText: value.linenumbers ? strings.yes : strings.no,
+            checkbox: values.linenumbers,
         },
         {
             key: 'beautify',
             text: strings['beautify on save'],
-            subText: strings.except + ': ' + value.beautify.join(','),
+            subText: strings.except + ': ' + values.beautify.join(','),
         },
         {
             key: 'linting',
             text: strings.linting,
-            subText: value.linting ? strings.yes : strings.no,
+            checkbox: values.linting,
         },
         {
             key: 'showSpaces',
             text: strings['show spaces'],
-            subText: value.showSpaces ? strings.yes : strings.no,
+            checkbox: values.showSpaces,
         },
         {
             key: 'activefiles',
             text: strings['active files'],
-            subText: value.openFileListPos,
+            subText: values.openFileListPos,
         },
         {
             key: 'editorFont',
             text: strings['editor font'],
-            subText: value.editorFont,
+            subText: values.editorFont,
         }
     ];
 
@@ -84,11 +84,11 @@ export default function editorSettings() {
         const files = editorManager.files;
         switch (this.key) {
             case 'autosave':
-                dialogs.prompt(strings.delay + ' (>1000)', value.autosave, 'number')
+                dialogs.prompt(strings.delay + ' (>1000)', values.autosave, 'number')
                     .then(res => {
                         res = parseInt(res);
                         if (isNaN(res) || res < 1000 && res !== 0) return alert(strings.info, strings['invalid value']);
-                        appSettings.value.autosave = res;
+                        values.autosave = res;
                         appSettings.update();
                         this.changeSubText(res ? res + '' : strings.no);
 
@@ -105,13 +105,13 @@ export default function editorSettings() {
                     });
                 break;
             case 'font size':
-                dialogs.prompt(this.text, appSettings.value.fontSize, 'text', {
+                dialogs.prompt(this.text, values.fontSize, 'text', {
                     required: true,
                     match: constants.FONT_SIZE
                 }).then(res => {
-                    if (res === value.fontSize) return;
+                    if (res === values.fontSize) return;
                     editorManager.editor.setFontSize(res);
-                    appSettings.value.fontSize = res;
+                    values.fontSize = res;
                     appSettings.update();
                     this.changeSubText(res);
                 });
@@ -121,8 +121,8 @@ export default function editorSettings() {
                 dialogs.prompt(this.text, appSettings.value.tabSize, 'numeric', {
                     required: true
                 }).then(res => {
-                    if (res === value.tabSize) return;
-                    appSettings.value.tabSize = res;
+                    if (res === values.tabSize) return;
+                    values.tabSize = res;
                     files.map(file => {
                         file.session.setOption('tabSize', res);
                     });
@@ -132,69 +132,42 @@ export default function editorSettings() {
                 break;
 
             case 'text wrap':
-                dialogs.select(this.text, [
-                        [true, strings.yes],
-                        [false, strings.no]
-                    ], {
-                        default: value.textWrap
-                    })
-                    .then(res => {
-                        if (res === value.textWrap) return;
-                        files.map(file => {
-                            file.session.setOption('wrap', res);
-                            return file;
-                        });
-                        appSettings.value.textWrap = res;
-                        appSettings.update();
-                        this.changeSubText(res ? strings.yes : strings.no);
-                    });
+                values.textWrap = !values.textWrap;
+                files.map(file => {
+                    file.session.setOption('wrap', values.textWrap);
+                    return file;
+                });
+                values.textWrap = values.textWrap;
+                appSettings.update();
+                this.value = values.textWrap;
                 break;
 
             case 'soft tab':
-                dialogs.select(this.text, [
-                        [true, strings.yes],
-                        [false, strings.no]
-                    ], {
-                        default: value.softTab
-                    })
-                    .then(res => {
-                        if (res === value.softTab) return;
-                        files.map(file => {
-                            file.session.setOption('useSoftTabs', res);
-                        });
-                        appSettings.value.softTab = res;
-                        appSettings.update();
-                        this.changeSubText(res ? strings.yes : strings.no);
-                    });
+                values.softTab = !values.softTab;
+                files.map(file => {
+                    file.session.setOption('useSoftTabs', values.softTab);
+                });
+                appSettings.update();
+                this.value = values.softTab;
                 break;
 
             case 'linenumbers':
-                dialogs.select(this.text, [
-                        [true, strings.yes],
-                        [false, strings.no]
-                    ], {
-                        default: value.linenumbers
-                    })
-                    .then(res => {
-                        if (res === value.linenumbers) return;
-                        editorManager.editor.setOptions({
-                            showGutter: res,
-                            showLineNumbers: res
-                        });
-                        if (res) {
-                            editorManager.editor.renderer.setMargin(0, 0, -16, 0);
-                        } else {
-                            editorManager.editor.renderer.setMargin(0, 0, 0, 0);
-                        }
-                        appSettings.value.linenumbers = res;
-                        appSettings.update();
-                        this.changeSubText(res ? strings.yes : strings.no);
-                        editorManager.editor.resize(true);
-                    });
+                values.linenumbers = !values.linenumbers;
+                editorManager.editor.setOptions({
+                    showGutter: values.linenumbers,
+                    showLineNumbers: values.linenumbers
+                });
+                if (values.linenumbers)
+                    editorManager.editor.renderer.setMargin(0, 0, -16, 0);
+                else
+                    editorManager.editor.renderer.setMargin(0, 0, 0, 0);
+                appSettings.update();
+                editorManager.editor.resize(true);
+                this.value = values.linenumbers;
                 break;
 
             case 'beautify':
-                dialogs.prompt(strings.except + ' (eg. php,py)', value.beautify.join(','))
+                dialogs.prompt(strings.except + ' (eg. php,py)', values.beautify.join(','))
                     .then(res => {
                         const files = res.split(',');
                         files.map((file, i) => {
@@ -207,46 +180,28 @@ export default function editorSettings() {
                 break;
 
             case 'linting':
-                dialogs.select(this.text, [
-                        [true, strings.yes],
-                        [false, strings.no]
-                    ], {
-                        default: value.linting
-                    })
-                    .then(res => {
-                        if (res === value.linting) return;
-                        files.map(file => {
-                            file.session.setUseWorker(res);
-                        });
-                        appSettings.value.linting = res;
-                        appSettings.update();
-                        this.changeSubText(res ? strings.yes : strings.no);
-                    });
+                values.linting = !values.linting;
+                files.map(file => {
+                    file.session.setUseWorker(values.linting);
+                });
+                appSettings.update();
+                this.value = values.linting;
                 break;
 
             case 'showSpaces':
-                dialogs.select(this.text, [
-                        [true, strings.yes],
-                        [false, strings.no]
-                    ], {
-                        default: value.showSpaces
-                    })
-                    .then(res => {
-                        if (res === value.showSpaces) return;
-                        appSettings.value.showSpaces = res;
-                        appSettings.update();
-                        editorManager.editor.setOption('showInvisibles', res);
-                        this.changeSubText(res ? strings.yes : strings.no);
-                    });
+                values.showSpaces = !values.showSpaces;
+                appSettings.update();
+                editorManager.editor.setOption('showInvisibles', values.showSpaces);
+                this.value = values.showSpaces;
                 break;
 
             case 'activefiles':
                 dialogs.select(this.text, ['sidebar', 'header'], {
-                        default: value.openFileListPos
+                        default: values.openFileListPos
                     })
                     .then(res => {
-                        if (res === value.openFileListPos) return;
-                        appSettings.value.openFileListPos = res;
+                        if (res === values.openFileListPos) return;
+                        values.openFileListPos = res;
                         appSettings.update();
                         editorManager.moveOpenFileList();
                         this.changeSubText(res);
@@ -255,13 +210,13 @@ export default function editorSettings() {
 
             case 'editorFont':
                 dialogs.select(this.text, ['fira-code', 'default'], {
-                        default: value.editorFont
+                        default: values.editorFont
                     })
                     .then(res => {
-                        if (res === value.editorFont) return;
-                        editorManager.container.classList.remove(value.editorFont);
+                        if (res === values.editorFont) return;
+                        editorManager.container.classList.remove(values.editorFont);
                         editorManager.container.classList.add(res);
-                        appSettings.value.editorFont = res;
+                        values.editorFont = res;
                         appSettings.update();
                         this.changeSubText(res);
                     });

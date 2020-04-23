@@ -16,13 +16,16 @@
 <li action="read-only">
   <div class="text">
     <span>{{read only}}</span>
-    <span class="value">{{file_readOnly}}</span>
   </div>
+  <label class="input-checkbox">
+    <input type="checkbox" {{#file_read_only}}checked{{/file_read_only}}>
+    <span class="box"></span>
+  </label>
 </li>
 <li action="toggle-quick-tools">
   <div class="text">
     <span>{{quick tools}}</span>
-    <span class="value">{{setting_quickTools}}</span>
+    <span class="value">{{quick_tools}}</span>
   </div>
 </li>
 <li action="format">

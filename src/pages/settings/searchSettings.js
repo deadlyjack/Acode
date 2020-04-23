@@ -17,22 +17,22 @@ export default function searchSettings() {
         actionStack.remove('settings-search');
     };
 
-    const values = appSettings.value;
+    const values = appSettings.value.search;
 
     const settingsOptions = [{
             key: 'case sensitive',
             text: 'Case sensitive',
-            subText: values.search.caseSensitive + ''
+            checkbox: values.caseSensitive
         },
         {
             key: 'regexp',
             text: 'RegExp',
-            subText: values.search.regExp + ''
+            checkbox: values.regExp
         },
         {
             key: 'wholeWord',
             text: 'Whole word',
-            subText: values.search.wholeWord + ''
+            checkbox: values.wholeWord
         }
     ];
 
@@ -42,45 +42,21 @@ export default function searchSettings() {
 
         switch (this.key) {
             case 'case sensitive':
-                dialogs.select(this.text, [
-                        'true', 'false'
-                    ], {
-                        default: values.search.caseSensitive + ''
-                    })
-                    .then(res => {
-                        if (res === 'false') appSettings.value.search.caseSensitive = false;
-                        else appSettings.value.search.caseSensitive = true;
-                        appSettings.update();
-                        this.changeSubText(res);
-                    });
+                values.caseSensitive = !values.caseSensitive;
+                appSettings.update();
+                this.value = values.caseSensitive;
                 break;
 
             case 'regexp':
-                dialogs.select(this.text, [
-                        'true', 'false'
-                    ], {
-                        default: values.search.regExp + ''
-                    })
-                    .then(res => {
-                        if (res === 'false') appSettings.value.search.regExp = false;
-                        else appSettings.value.search.regExp = true;
-                        appSettings.update();
-                        this.changeSubText(res);
-                    });
+                values.regExp = !values.regExp;
+                appSettings.update();
+                this.value = values.regExp;
                 break;
 
             case 'wholeWord':
-                dialogs.select(this.text, [
-                        'true', 'false'
-                    ], {
-                        default: values.search.wholeWord + ''
-                    })
-                    .then(res => {
-                        if (res === 'false') appSettings.value.search.wholeWord = false;
-                        else appSettings.value.search.wholeWord = true;
-                        appSettings.update();
-                        this.changeSubText(res);
-                    });
+                values.wholeWord = !values.wholeWord;
+                appSettings.update();
+                this.value = values.wholeWord;
                 break;
 
             default:

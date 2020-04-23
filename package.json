@@ -31,7 +31,6 @@
     "cordova-plugin-buildinfo": "^4.0.0",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^6.0.2",
-    "cordova-plugin-intent": "git+https://github.com/napolitano/cordova-plugin-intent.git",
     "cordova-plugin-navigationbar-color": "0.0.9",
     "cordova-plugin-shell-exec": "^1.0.0",
     "cordova-plugin-statusbar": "git+https://github.com/breautek/cordova-plugin-statusbar.git",
@@ -78,7 +77,6 @@
       "cordova-plugin-statusbar": {},
       "cordova-plugin-file": {},
       "cordova-plugin-navigationbar-color": {},
-      "com.napolitano.cordova.plugin.intent": {},
       "cordova-custom-config": {},
       "cordova-plugin-x-toast": {},
       "cordova-plugin-android-permissions": {},
@@ -91,8 +89,10 @@
         "ANDROID_SUPPORT_VERSION": "28.+"
       },
       "cordova-disable-http-cache": {},
+      "cordova-plugin-intent": {},
+      "cordova-plugin-ftp": {},
       "cordova-plugin-sdcard": {},
-      "cordova-plugin-ftp": {}
+      "cordova-plugin-system": {}
     },
     "platforms": [
       "android"

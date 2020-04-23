@@ -279,6 +279,7 @@ interface Folder {
     remove(): void;
     reloadOnResume: boolean;
     saveState: boolean;
+    title: string;
 }
 
 interface Window {
@@ -303,6 +304,26 @@ interface ThemeData {
 
 interface AppThemeList {
     [theme: string]: ThemeData
+}
+
+interface Input {
+    id: string;
+    type: "text" | "numberic" | "tel" | "search" | "email" | "url" | "checkbox" | "radio" | "group";
+    match: RegExp;
+    value: string;
+    name: string;
+    required: boolean;
+    hints(options: Array<string>): void;
+    placeholder: string
+}
+
+interface FTPFile {
+    name: string;
+    link: string;
+    type: number;
+    size: number;
+    modifiedDate: string;
+    absolutePath: string
 }
 
 /**

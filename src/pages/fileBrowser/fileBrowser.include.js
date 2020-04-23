@@ -1,20 +1,22 @@
 //#region Imports
-import tag from 'html-tag-js';
+import tag, {
+  getAll
+} from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
-import fs from '../../modules/utils/internalFs';
-import helpers from '../../modules/helpers';
+import fs from '../../lib/fileSystem/internalFs';
+import helpers from '../../lib/helpers';
 import contextMenu from '../../components/contextMenu';
 import dialogs from '../../components/dialogs';
-import constants from "../../constants";
+import constants from "../../lib/constants";
 import filesSettings from '../settings/filesSettings';
 
 import _template from './fileBrowser.hbs';
 import _list from './list.hbs';
 import _addMenu from './add-menu.hbs';
 import './fileBrowser.scss';
-import externalFs from '../../modules/utils/externalFs';
-import fsOperation from '../../modules/utils/fsOperation';
+import externalFs from '../../lib/fileSystem/externalFs';
+import fsOperation from '../../lib/fileSystem/fsOperation';
 import SearchBar from '../../components/searchbar';
 import projects from './projects';
 //#endregion
@@ -71,10 +73,10 @@ function FileBrowserInclude(type, option, defaultPath) {
     const root = 'file:///storage/';
     let cachedDir = {};
     let currentDir = {
-      url: root,
+      url: "/",
       name: 'File browser'
     };
-    let folderOption;
+    let folderOption, externalList;
     //#endregion
 
     $content.addEventListener('click', handleClick);
@@ -166,7 +168,8 @@ function FileBrowserInclude(type, option, defaultPath) {
     } else {
       externalFs.listExternalStorages()
         .then(res => {
-          genList(res);
+          externalList = res;
+          genList();
         });
     }
 
@@ -175,7 +178,7 @@ function FileBrowserInclude(type, option, defaultPath) {
       _resolve(data);
     }
 
-    function genList(res) {
+    function genList() {
       cordova.plugins.diagnostic.getExternalSdCardDetails(ls => {
         const list = [];
         if (ls.length > 0) {
@@ -184,7 +187,7 @@ function FileBrowserInclude(type, option, defaultPath) {
             const path = card.filePath + '/';
             if (name === "files") return card;
             list.push({
-              name: res && res[name] ? res[name] : name,
+              name: externalList && externalList[name] ? externalList[name] : name,
               nativeURL: path,
               origin: path,
               isDirectory: true,
@@ -213,12 +216,12 @@ function FileBrowserInclude(type, option, defaultPath) {
           });
         }
 
-        cachedDir[root] = {
+        cachedDir["/"] = {
           name,
           list
         };
 
-        navigate('/', root);
+        navigate("/", "/");
         render(list);
 
         if (type === 'folder') {
@@ -227,7 +230,9 @@ function FileBrowserInclude(type, option, defaultPath) {
       });
     }
 
-    function loadDir(path = root, name = 'File Browser') {
+    function loadDir(path = "/", name = 'File Browser') {
+
+      if (path === "/") return genList();
 
       let url = path;
 

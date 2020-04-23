@@ -39,6 +39,7 @@ import it.sauronsoftware.ftp4j.FTPClient;
 import it.sauronsoftware.ftp4j.FTPDataTransferListener;
 import it.sauronsoftware.ftp4j.FTPFile;
 import it.sauronsoftware.ftp4j.FTPReply;
+import it.sauronsoftware.ftp4j.FTPConnector;
 
 public class CDVFtp extends CordovaPlugin {
     public static final String TAG = CDVFtp.class.getSimpleName();
@@ -52,7 +53,8 @@ public class CDVFtp extends CordovaPlugin {
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     try {
-                        connect(args.getString(0), args.getString(1), args.getString(2), callbackContext);
+                        connect(args.getString(0), args.getString(1), args.getString(2), args.getString(3),
+                                args.getString(4), callbackContext);
                     } catch (Exception e) {
                         callbackContext.error(e.toString());
                     }
@@ -165,7 +167,8 @@ public class CDVFtp extends CordovaPlugin {
         return true;
     }
 
-    private void connect(String hostname, String username, String password, CallbackContext callbackContext) {
+    private void connect(String hostname, String username, String password, String mode, String type,
+            CallbackContext callbackContext) {
         if (hostname == null || hostname.length() <= 0) {
             callbackContext.error("Expected hostname.");
         } else {
@@ -175,17 +178,51 @@ public class CDVFtp extends CordovaPlugin {
             }
 
             try {
-                this.client = new FTPClient();
+
                 String[] address = hostname.split(":");
+                int port = 21;
+                String host = null;
+
                 if (address.length == 2) {
-                    String host = address[0];
-                    int port = Integer.parseInt(address[1]);
-                    this.client.connect(host, port);
+                    port = Integer.parseInt(address[1]);
+                    host = address[0];
                 } else {
-                    this.client.connect(hostname);
+                    host = hostname;
                 }
+
+                if (this.client != null) {
+                    String cUserName = this.client.getUsername();
+                    String cHost = this.client.getHost();
+                    String cPass = this.client.getPassword();
+                    int cPort = this.client.getPort();
+
+                    if (hostname.equals(cHost) && username.equals(cUserName) && password.equals(cPass)
+                            && port == cPort) {
+                        callbackContext.success("Connected");
+                        return;
+                    }
+
+                    this.client = new FTPClient();
+                    this.client.setAutoNoopTimeout(30000);
+                } else {
+                    this.client = new FTPClient();
+                    this.client.setAutoNoopTimeout(30000);
+                }
+
+                if (type.equals("ftps"))
+                    this.client.setSecurity(FTPClient.SECURITY_FTPS);
+                else if (type.equals("ftpes"))
+                    this.client.setSecurity(FTPClient.SECURITY_FTPES);
+
+                if (mode.equals("active"))
+                    this.client.setPassive(false);
+                else if (mode.equals("passive"))
+                    this.client.setPassive(true);
+
+                this.client.connect(host, port);
                 this.client.login(username, password);
-                callbackContext.success(this.client.currentDirectory());
+
+                callbackContext.success("Connected");
             } catch (Exception e) {
                 callbackContext.error(e.toString());
             }
@@ -194,32 +231,35 @@ public class CDVFtp extends CordovaPlugin {
 
     private void list(String path, CallbackContext callbackContext) {
         try {
-            if (path.equals("") || path == null)
-                path = "";
-            if (!path.endsWith("/"))
-                path = path.concat("/");
+            String currentDirectory = this.client.currentDirectory();
 
-            this.client.changeDirectory(path);
+            if (path.equals("") || path == null)
+                path = currentDirectory;
+
+            if (!currentDirectory.equals(path)) {
+                if (!path.endsWith("/"))
+                    path = path.concat("/");
+                this.client.changeDirectory(path);
+            }
+
             FTPFile[] list = client.list();
             JSONArray fileList = new JSONArray();
             for (FTPFile file : list) {
                 String name = file.getName();
                 Number type = file.getType();
                 String link = file.getLink();
-
-                // if (link == null) {
-                // String wd = this.client.currentDirectory();
-                // wd = wd.endsWith("/") ? wd : wd + "/";
-                // link += wd + name;
-                // }
-
                 Number size = file.getSize();
                 Date modifiedDate = file.getModifiedDate();
                 String modifiedDateString = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz")).format(modifiedDate);
-                String jsonStr = "{" + "name:\"" + name + "\",type:" + type + ",link:\"" + link + "\",size:" + size
-                        + ",modifiedDate:\"" + modifiedDateString + "\"}";
-                JSONObject jsonObj = new JSONObject(jsonStr);
-                fileList.put(jsonObj);
+
+                JSONObject fileData = new JSONObject();
+                fileData.put("name", name);
+                fileData.put("type", type);
+                fileData.put("link", link);
+                fileData.put("size", size);
+                fileData.put("modifiedDate", modifiedDateString);
+                fileData.put("absolutePath", path + (path.endsWith("/") ? "" : "/") + name);
+                fileList.put(fileData);
             }
             callbackContext.success(fileList);
         } catch (Exception e) {
@@ -369,6 +409,7 @@ public class CDVFtp extends CordovaPlugin {
             // the server),
             // `false` to break the connection without advice.
             this.client.disconnect(true);
+            this.client.setAutoNoopTimeout(0);
             callbackContext.success("Disconnect OK.");
         } catch (Exception e) {
             callbackContext.error(e.toString());

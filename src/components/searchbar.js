@@ -1,5 +1,5 @@
 import tag from 'html-tag-js';
-import helpers from '../modules/helpers';
+import helpers from '../lib/helpers';
 
 /**
  * 

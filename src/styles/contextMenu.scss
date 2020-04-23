@@ -38,9 +38,12 @@
         padding: 0 10px;
         user-select: none;
 
+        :not([action]) {
+            pointer-events: none;
+        }
+
         .text {
             flex: 1;
-            pointer-events: none;
             text-transform: capitalize;
             color: #252525;
             color: var(--menu-text-color);
@@ -53,7 +56,6 @@
         }
 
         .icon {
-            pointer-events: none;
             color: #9999ff;
             color: var(--menu-icon-color);
         }

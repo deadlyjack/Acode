@@ -7,9 +7,6 @@
     "files": {}
   },
   "installed_plugins": {
-    "com.napolitano.cordova.plugin.intent": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "cordova-clipboard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
@@ -31,16 +28,10 @@
     "cordova-plugin-file": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-ftp": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "cordova-plugin-inappbrowser": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-navigationbar-color": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
-    "cordova-plugin-sdcard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-statusbar": {
@@ -60,6 +51,18 @@
     },
     "cordova.plugins.diagnostic": {
       "ANDROID_SUPPORT_VERSION": "28.+",
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-intent": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-ftp": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-sdcard": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-system": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

@@ -17,17 +17,17 @@ export default function filesSettings(callback) {
         actionStack.remove('settings-theme');
     };
 
-    const values = appSettings.value;
+    const values = appSettings.value.fileBrowser;
 
     const settingsOptions = [{
             key: 'sort',
             text: strings['sort by name'],
-            subText: values.fileBrowser.sortByName === 'on' ? strings.yes : strings.no
+            checkbox: values.sortByName
         },
         {
             key: 'show',
             text: strings['show hidden files'],
-            subText: values.fileBrowser.showHiddenFiles === 'on' ? strings.yes : strings.no
+            checkbox: values.showHiddenFiles
         }
     ];
 
@@ -36,31 +36,17 @@ export default function filesSettings(callback) {
     function changeSetting() {
         switch (this.key) {
             case 'sort':
-                dialogs.select(strings['sort by name'], [
-                    ['on', strings.yes],
-                    ['off', strings.no]
-                ], {
-                    default: values.fileBrowser.sortByName
-                }).then(res => {
-                    appSettings.value.fileBrowser.sortByName = res;
-                    appSettings.update();
-                    this.changeSubText(values.fileBrowser.sortByName === 'on' ? strings.yes : strings.no);
-                    if (callback) callback();
-                });
+                values.sortByName = !values.sortByName;
+                appSettings.update();
+                this.value = values.sortByName;
+                if (callback) callback();
                 break;
 
             case 'show':
-                dialogs.select(strings['show hidden files'], [
-                    ['on', strings.yes],
-                    ['off', strings.no]
-                ], {
-                    default: values.fileBrowser.showHiddenFiles
-                }).then(res => {
-                    appSettings.value.fileBrowser.showHiddenFiles = res;
-                    appSettings.update();
-                    this.changeSubText(values.fileBrowser.showHiddenFiles === 'on' ? strings.yes : strings.no);
-                    if (callback) callback();
-                });
+                values.showHiddenFiles = !values.showHiddenFiles;
+                appSettings.update();
+                this.value = values.showHiddenFiles;
+                if (callback) callback();
                 break;
         }
     }

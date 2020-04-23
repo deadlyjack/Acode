@@ -6,10 +6,10 @@ import gen from "../../components/gen";
 import themeSettings from "./themeSettings";
 import About from "../about/about";
 import editorSettings from "./editorSettings";
-import constants from "../../constants";
-import helpers from "../../modules/helpers";
-import createEditorFromURI from "../../modules/createEditorFromURI";
-import internalFs from "../../modules/utils/internalFs";
+import constants from "../../lib/constants";
+import helpers from "../../lib/helpers";
+import createEditorFromURI from "../../lib/createEditorFromURI";
+import internalFs from "../../lib/fileSystem/internalFs";
 
 export default function settingsMain(demo) {
     const $page = Page(strings.settings);

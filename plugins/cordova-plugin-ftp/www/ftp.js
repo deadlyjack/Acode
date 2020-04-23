@@ -49,15 +49,19 @@ function Ftp() {}
  *                          Notice: address port is only supported for Android, if not given, default port 21 will be used.
  * @param {string} username The ftp login username. If both `username` and `password` are empty, the default username "anonymous" will be used.
  * @param {string} password The ftp login password. If both `username` and `password` are empty, the default password "anonymous@" will be used.
+ * @param {"active"|"passive"} mode FTP connect mode
+ * @param {"ftps"|"ftpes"} type FTP security type
  * @param {function} successCallback The success callback.
  *                                   Notice: For iOS, if triggered, means `init` success. But NOT means the later action, e.g. `ls`... `download` will success!
  * @param {function} errorCallback The error callback. If triggered, means init fail.
  */
-Ftp.prototype.connect = function (hostname, username, password, successCallback, errorCallback) {
+Ftp.prototype.connect = function (hostname, username, password, mode, type, successCallback, errorCallback) {
+    if (typeof mode === "function") successCallback = mode;
+    if (typeof type === "function") errorCallback = type;
     exec(successCallback,
         errorCallback,
         "Ftp",
-        "connect", [hostname, username, password]);
+        "connect", [hostname, username, password, mode, type]);
 };
 
 /**

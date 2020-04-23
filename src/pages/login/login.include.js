@@ -4,9 +4,9 @@ import mustache from 'mustache';
 import Page from "../../components/page";
 import _template from './login.hbs';
 import './login.scss';
-import helpers from '../../modules/helpers';
+import helpers from '../../lib/helpers';
 import gitHub from '../github/gitHub';
-import fs from '../../modules/utils/internalFs';
+import fs from '../../lib/fileSystem/internalFs';
 
 export default function GithubLoginInclude() {
   const $page = Page('Github Login');

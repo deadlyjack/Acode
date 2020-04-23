@@ -1,4 +1,5 @@
 import tag from 'html-tag-js';
+import Checkbox from './checkbox';
 
 /**
  * 
@@ -72,48 +73,66 @@ function listItems(settingsList, settingsOptions, changeSetting) {
     });
 
     for (let setting of settingsOptions) {
-        const text = tag('span', {
+        const $text = tag('span', {
             className: 'text',
             textContent: setting.text
         });
-        const container = tag('div', {
+        const $container = tag('div', {
             className: 'container',
-            child: text
+            child: $text
         });
-        const tmp = tag(setting.type || 'div', {
+        const $tmp = tag(setting.type || 'div', {
             className: 'list-item',
             children: [
                 tag('i', {
                     className: `icon ${setting.icon || 'no-icon'}`
                 }),
-                container
+                $container
             ],
             href: setting.href || undefined
         });
-        const subText = tag('small', {
-            className: 'value',
-            textContent: setting.subText || ''
-        });
+
+        let $checkbox, $subText;
 
         if (setting.subText) {
-            container.appendChild(subText);
-        }
-
-        if (setting.type !== 'a') {
-            tmp.onclick = changeSetting.bind({
-                key: setting.key,
-                text: setting.text,
-                changeSubText: function (str) {
-                    subText.textContent = str;
-                },
-                changeText: function (str) {
-                    text.textContent = str;
-                }
+            $subText = tag('small', {
+                className: 'value',
+                textContent: setting.subText || ''
             });
+            $container.appendChild($subText);
+        } else if (setting.checkbox !== undefined) {
+            $checkbox = Checkbox('', setting.checkbox);
+            $tmp.appendChild($checkbox);
+            $tmp.style.paddingRight = '10px';
         }
 
-        settings[setting.key] = tmp;
-        settingsList.appendChild(tmp);
+        if (setting.type !== 'a')
+            addListerner($tmp, $checkbox, $text, $subText, setting);
+
+
+        settings[setting.key] = $tmp;
+        settingsList.appendChild($tmp);
+    }
+
+    function addListerner($tmp, $checkbox, $text, $subText, setting) {
+        $tmp.onclick = changeSetting.bind({
+            key: setting.key,
+            text: setting.text,
+            changeSubText: function (str) {
+                $subText.textContent = str;
+            },
+            changeText: function (str) {
+                $text.textContent = str;
+            },
+            set value(value) {
+                if ($subText) $subText.textContent = value;
+                else if ($checkbox) $checkbox.checked = value;
+            },
+            get value() {
+                if ($subText) return $subText.textContent;
+                else if ($checkbox) return $checkbox.checked;
+            }
+        });
     }
 }
 

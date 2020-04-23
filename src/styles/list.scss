@@ -116,6 +116,12 @@
         min-height: 60px;
         text-decoration: none;
 
+        &.no-transform {
+            .value {
+                text-transform: none !important;
+            }
+        }
+
         &:not(:last-child) {
             border-bottom: solid 1px rgba(243, 233, 233, 0.3);
         }

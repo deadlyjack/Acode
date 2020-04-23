@@ -7,6 +7,15 @@
         <h2 class="text">Acode editor {{version}}</h2>
       </div>
     </span>
+    {{#webview}}
+    <a class="list-item no-transform" href="https://play.google.com/store/apps/details?id={{packageName}}">
+      <span class="icon googlechrome"></span>
+      <div class="container">
+        <span class="text">Webview {{versionName}}</span>
+        <span class="value">{{packageName}}</span>
+      </div>
+    </a>
+    {{/webview}}
     <div class="list-item" action="rate-box">
       <span class="icon googleplay"></span>
       <div class="container">

@@ -8,9 +8,9 @@ import tag from 'html-tag-js';
 import mustache from 'mustache';
 import mimeType from 'mime-types';
 import Page from '../../components/page';
-import helpers from '../../modules/helpers';
+import helpers from '../../lib/helpers';
 import dialogs from '../../components/dialogs';
-import git from '../../modules/git';
+import git from '../../lib/git';
 import contextMenu from '../../components/contextMenu';
 import SearchBar from '../../components/searchbar';
 
