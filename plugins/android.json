@@ -61,6 +61,9 @@
     },
     "cordova-plugin-sdcard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-system": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },
   "dependent_plugins": {}
