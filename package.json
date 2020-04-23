@@ -91,8 +91,7 @@
       "cordova-disable-http-cache": {},
       "cordova-plugin-intent": {},
       "cordova-plugin-ftp": {},
-      "cordova-plugin-sdcard": {},
-      "cordova-plugin-system": {}
+      "cordova-plugin-sdcard": {}
     },
     "platforms": [
       "android"
