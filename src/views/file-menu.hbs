@@ -25,8 +25,11 @@
 <li action="toggle-quick-tools">
   <div class="text">
     <span>{{quick tools}}</span>
-    <span class="value">{{quick_tools}}</span>
   </div>
+  <label class="input-checkbox">
+    <input type="checkbox" {{#quick_tools}}checked{{/quick_tools}}>
+    <span class="box"></span>
+  </label>
 </li>
 <li action="format">
   <div class="text">
