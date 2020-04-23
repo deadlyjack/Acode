@@ -393,7 +393,8 @@ function EditorManager($sidebar, $header, $body) {
             enableSnippets: true,
             enableLiveAutocompletion: true,
             showInvisibles: settings.showSpaces,
-            indentedSoftWrap: false
+            indentedSoftWrap: false,
+            scrollPastEnd: 0.5
         });
 
         if (!appSettings.value.linting && appSettings.value.linenumbers) {
