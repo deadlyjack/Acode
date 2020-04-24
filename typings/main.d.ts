@@ -129,6 +129,16 @@ interface ExternalFs {
     uuid: string;
 }
 
+interface OriginObject {
+    origin: string;
+    query: string;
+}
+
+interface URLObject {
+    url: string;
+    query: string;
+}
+
 interface RemoteFs {
     listDir(path: string): Promise<Array<FsEntry>>
     readFile(path: string): Promise<ArrayBuffer | string>
@@ -139,7 +149,10 @@ interface RemoteFs {
     writeFile(filename: string, content: string): Promise;
     rename(src: string, newname: string): Promise;
     copyTo(src: string, dest: string): Promise;
+    currentDirectory(): Promise<string>;
+    homeDirectory(): Promise<string>;
     origin: string;
+    originObjec: OriginObject;
 }
 
 interface fileData {
@@ -280,6 +293,7 @@ interface Folder {
     reloadOnResume: boolean;
     saveState: boolean;
     title: string;
+    id: string;
 }
 
 interface Window {
@@ -341,28 +355,30 @@ declare var strings: Strings;
 /**
  * Handles back button click
  */
-declare var actionStack: ActionStack;
+declare var Acode: Acode;
+declare var AceMouseEvent: any;
+
+declare var CACHE_STORAGE: string;
+declare var CACHE_STORAGE_REMOTE: string;
+declare var DATA_STORAGE: string;
+declare var DOES_SUPPORT_THEME: boolean;
+declare var IS_FREE_VERSION: boolean;
+declare var KEYBINDING_FILE: string;
+
 declare var ace: AceAjax;
-declare var fileClipBoard: FileClipBoard;
+declare var actionStack: ActionStack;
 declare var addedFolder: Array<Folder>;
-declare var editorManager: Manager;
-declare var saveInterval: Number;
-declare var freeze: Boolean;
 declare var app: HTMLBodyElement;
-declare var root: HTMLDivElement;
+declare var editorManager: Manager;
+declare var externalStorage: externalStorage;
+declare var fileClipBoard: FileClipBoard;
+declare var freeze: Boolean;
 declare var gitRecord: GitRecord;
 declare var gistRecord: GistRecord;
 declare var gitRecordURL: string;
 declare var gistRecordURL: string;
-declare var Acode: Acode;
-declare var DATA_STORAGE: string;
-declare var CACHE_STORAGE: string;
-declare var CACHE_STORAGE_REMOTE: string;
-declare var KEYBINDING_FILE: string;
-declare var IS_FREE_VERSION: boolean;
-declare var DOES_SUPPORT_THEME: boolean;
-declare var externalStorage: externalStorage;
-declare var AceMouseEvent: any;
+declare var root: HTMLDivElement;
+declare var saveInterval: Number;
 /**
  * A custom alert box to show alert notification
  * @param title 

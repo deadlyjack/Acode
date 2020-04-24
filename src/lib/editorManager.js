@@ -3,11 +3,12 @@ import clipboardAction from './clipboard';
 import tag from 'html-tag-js';
 import tile from "../components/tile";
 import dialogs from '../components/dialogs';
-import helpers from './helpers';
-import textControl from './events/selection';
+import helpers from './utils/helpers';
+import textControl from './handlers/selection';
 import constants from './constants';
 import internalFs from './fileSystem/internalFs';
 import openFolder from './addFolder';
+import Url from './utils/Url';
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -340,7 +341,7 @@ function EditorManager($sidebar, $header, $body) {
             const id = file.record.id;
             text = 'gist • ' + (id.length > 10 ? '...' + id.substring(id.length - 7) : id);
         } else if (file.location || file.contentUri) {
-            text = file.location || file.contentUri;
+            text = Url.parse(file.location || file.contentUri).url;
             if (text.length > 30) {
                 text = '...' + text.slice(text.length - 27);
             }

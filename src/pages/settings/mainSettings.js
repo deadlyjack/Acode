@@ -7,7 +7,7 @@ import themeSettings from "./themeSettings";
 import About from "../about/about";
 import editorSettings from "./editorSettings";
 import constants from "../../lib/constants";
-import helpers from "../../lib/helpers";
+import helpers from "../../lib/utils/helpers";
 import createEditorFromURI from "../../lib/createEditorFromURI";
 import internalFs from "../../lib/fileSystem/internalFs";
 

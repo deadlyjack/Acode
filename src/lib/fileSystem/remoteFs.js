@@ -1,7 +1,6 @@
-import path from "../path";
 import internalFs from "./internalFs";
-import helpers from "../helpers";
 import ftpCodes from "../ftpCodes";
+import Url from "../utils/Url";
 
 /**
  * @param {string} username
@@ -10,7 +9,7 @@ import ftpCodes from "../ftpCodes";
  * @param {string|number} port
  * @param {"ftp"|"ftps"} [security]
  * @param {"active"|"passive"} [mode]
- * @returns {ExternalFs}
+ * @returns {RemoteFs}
  */
 function remoteFs(username, password, hostname, port, security, mode) {
 
@@ -30,13 +29,32 @@ function remoteFs(username, password, hostname, port, security, mode) {
     readFile,
     rename,
     copyTo,
+    currentDirectory,
+    homeDirectory,
     get origin() {
+      let url;
+
       if (username && password)
-        return `ftp://${username}:${password}@${hostname}:${port}`;
+        url = `ftp://${username}:${password}@${hostname}:${port}`;
       else if (username)
-        return `ftp://${username}@${hostname}:${port}`;
+        url = `ftp://${username}@${hostname}:${port}`;
       else
-        return `ftp://${hostname}:${port}`;
+        url = `ftp://${hostname}:${port}`;
+
+      if (security && mode)
+        url += `?security=${security}&mode=${mode}`;
+      else if (security)
+        url += `?security=${security}`;
+
+      return url;
+
+    },
+    get originObject() {
+      const [origin, query = ""] = this.origin.split(/(?=\?)/);
+      return {
+        origin,
+        query
+      };
     }
   };
 
@@ -59,30 +77,22 @@ function remoteFs(username, password, hostname, port, security, mode) {
         document.removeEventListener('remotewriteend', next);
         internalFs.createDir(CACHE_STORAGE, 'ftp-temp')
           .finally(() => {
-            ftp.disconnect(next, next);
-
-            function next() {
-              ftp.connect(
-                hostname + ':' + port,
-                username,
-                password,
-                security,
-                mode,
-                res => {
-                  resolve(res);
-                },
-                err => {
-                  reject("cannot connect to ftp: " + err);
-                }
-              );
-            }
+            ftp.connect(
+              hostname + ':' + port,
+              username || 'anonymous',
+              password || 'anonymous',
+              security,
+              mode,
+              res => resolve(res),
+              err => reject("cannot connect to ftp: " + err)
+            );
           });
       }
     });
   }
 
   function listDir(_path) {
-    if (_path !== fs.origin) _path = new URL(_path).pathname;
+    if (_path !== fs.origin) _path = Url.pathname(_path);
     else _path = '';
     return new Promise((resolve, reject) => {
       connect()
@@ -107,9 +117,13 @@ function remoteFs(username, password, hostname, port, security, mode) {
               link = link === "null" ? null : link;
 
               const url = link ? link : absolutePath;
+              const {
+                origin,
+                query
+              } = fs.originObject;
 
               ls.push({
-                url: fs.origin + url,
+                url: origin + url + query,
                 isDirectory: type === DIR,
                 isFile: type === FILE,
                 isLink: type === LINK
@@ -130,8 +144,8 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function writeFile(_path, data) {
-    const cacheFile = CACHE_STORAGE_REMOTE + btoa(_path);
-    _path = new URL(_path).pathname;
+    const cacheFile = CACHE_STORAGE_REMOTE + _path.hashCode();
+    _path = Url.pathname(_path);
     return new Promise((resolve, reject) => {
 
       connect("write")
@@ -174,8 +188,8 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function deleteFile(_path) {
-    const cacheFile = CACHE_STORAGE_REMOTE + btoa(_path);
-    _path = new URL(_path).pathname;
+    const cacheFile = CACHE_STORAGE_REMOTE + _path.hashCode();
+    _path = Url.pathname(_path);
     return new Promise((resolve, reject) => {
       connect()
         .then(res => {
@@ -199,7 +213,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function deleteDir(_path) {
-    _path = new URL(_path).pathname;
+    _path = Url.pathname(_path);
     return new Promise((resolve, reject) => {
       connect()
         .then(res => {
@@ -220,8 +234,8 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function readFile(_path) {
-    const cacheFile = CACHE_STORAGE_REMOTE + btoa(_path);
-    _path = new URL(_path).pathname;
+    const cacheFile = CACHE_STORAGE_REMOTE + _path.hashCode();
+    _path = Url.pathname(_path);
     return new Promise((resolve, reject) => {
       connect("read")
         .then(res => {
@@ -259,8 +273,8 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function rename(_path, _newpath) {
-    _path = new URL(_path).pathname;
-    _newpath = new URL(_newpath).pathname;
+    _path = Url.pathname(_path);
+    _newpath = Url.pathname(_newpath);
 
     return new Promise((resolve, reject) => {
       connect()
@@ -282,7 +296,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function createDir(_path) {
-    _path = new URL(_path).pathname;
+    _path = Url.pathname(_path);
     return new Promise((resolve, reject) => {
 
       connect()
@@ -318,6 +332,38 @@ function remoteFs(username, password, hostname, port, security, mode) {
         return null;
       }
     return null;
+  }
+
+  function currentDirectory() {
+    return new Promise((resolve, reject) => {
+      connect()
+        .then(() => {
+          return ftp.currentDirectory(resolve, err => {
+            throw new Error(err);
+          });
+        })
+        .catch(err => {
+          const code = getCode(err);
+          if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+          else reject(err);
+        });
+    });
+  }
+
+  function homeDirectory() {
+    return new Promise((resolve, reject) => {
+      connect()
+        .then(() => {
+          return ftp.homeDirectory(resolve, err => {
+            throw new Error(err);
+          });
+        })
+        .catch(err => {
+          const code = getCode(err);
+          if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+          else reject(err);
+        });
+    });
   }
 }
 

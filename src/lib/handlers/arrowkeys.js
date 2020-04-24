@@ -9,6 +9,8 @@ export default {
 
         if (!action || ['left', 'right', 'up', 'down'].indexOf(action) < 0) return;
 
+        navigator.vibrate(50);
+
         const editor = editorManager.editor;
         const $textarea = editor.textInput.getElement();
         const shiftKey = footer.querySelector('#shift-key').getAttribute('data-state') === 'on' ? true : false;

@@ -1,11 +1,9 @@
 //#region Imports
-import tag, {
-  getAll
-} from 'html-tag-js';
+import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
 import fs from '../../lib/fileSystem/internalFs';
-import helpers from '../../lib/helpers';
+import helpers from '../../lib/utils/helpers';
 import contextMenu from '../../components/contextMenu';
 import dialogs from '../../components/dialogs';
 import constants from "../../lib/constants";

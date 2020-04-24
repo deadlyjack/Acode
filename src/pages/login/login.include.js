@@ -4,7 +4,7 @@ import mustache from 'mustache';
 import Page from "../../components/page";
 import _template from './login.hbs';
 import './login.scss';
-import helpers from '../../lib/helpers';
+import helpers from '../../lib/utils/helpers';
 import gitHub from '../github/gitHub';
 import fs from '../../lib/fileSystem/internalFs';
 

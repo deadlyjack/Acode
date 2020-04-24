@@ -1,11 +1,12 @@
 import Cryptojs from 'crypto-js';
-import constants from './constants';
-import dialogs from '../components/dialogs';
-import keyBindings from './keyBindings';
-import fs from './fileSystem/internalFs';
+import constants from '../constants';
+import dialogs from '../../components/dialogs';
+import keyBindings from '../keyBindings';
+import fs from '../fileSystem/internalFs';
 import tag from 'html-tag-js';
-import ajax from './ajax';
+import ajax from '../ajax';
 import path from './path';
+import Url from './Url';
 
 /**
  * 
@@ -434,7 +435,7 @@ function error(e, ...args) {
     args.map(arg => {
 
         try {
-            return new URL(arg).pathname;
+            return Url.pathname(arg);
         } catch (error) {
             return arg;
         }
@@ -648,22 +649,18 @@ function showToast(message, type = "showShortBottom") {
 }
 
 /**
- * Make url safe by encoding url components
- * @param {string} url 
+ * Parse search query
+ * @param {string} query 
  */
-function safeURL(url) {
-    const protocol = (/^[a-z]+:\/\/\/?/i.exec(url) || [])[0];
-    if (protocol) url = url.replace(new RegExp('^' + protocol), '');
-    const parts = url.split('/').map(part => {
-        return fixedEncodeURIComponent(part);
+function parseQuery(query) {
+    if (query.startsWith('?')) query = query.substr(1);
+    query = query.split('&');
+    let queries = {};
+    query.map(get => {
+        get = get.split('=');
+        queries[get[0]] = get[1];
     });
-    return (protocol ? protocol : '') + parts.join('/');
-}
-
-function fixedEncodeURIComponent(str) {
-    return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
-        return '%' + c.charCodeAt(0).toString(16);
-    });
+    return queries;
 }
 
 export default {
@@ -693,6 +690,5 @@ export default {
     getCombination,
     showToast,
     loadStyles,
-    safeURL,
-    fixedEncodeURIComponent
+    parseQuery
 };

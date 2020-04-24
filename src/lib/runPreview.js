@@ -4,13 +4,13 @@ import mustache from 'mustache';
 import $_console from '../views/console.hbs';
 import $_markdown from '../views/markdown.hbs';
 import fs from './fileSystem/internalFs';
-import helpers from './helpers';
+import helpers from './utils/helpers';
 import dialogs from '../components/dialogs';
 import git from './git';
 import constants from './constants';
 import externalFs from './fileSystem/externalFs';
 import fsOperation from './fileSystem/fsOperation';
-import path from './path';
+import path from './utils/path';
 
 /**
  * Starts the server and run the active file in browser

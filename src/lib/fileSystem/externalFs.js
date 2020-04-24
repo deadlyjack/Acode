@@ -1,4 +1,4 @@
-import helpers from "../helpers";
+import helpers from "../utils/helpers";
 import dialogs from "../../components/dialogs";
 import internalFs from "./internalFs";
 

@@ -1,6 +1,6 @@
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import dialogs from '../components/dialogs';
-import helpers from "../lib/helpers";
+import helpers from "../lib/utils/helpers";
 import constants from "./constants";
 import recents from '../lib/recents';
 import fsOperation from '../lib/fileSystem/fsOperation';

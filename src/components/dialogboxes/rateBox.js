@@ -1,7 +1,7 @@
 import dialogs from '../dialogs';
 import template from '../../views/rating.hbs';
 import constants from '../../lib/constants';
-import helpers from '../../lib/helpers';
+import helpers from '../../lib/utils/helpers';
 
 function rateBox() {
   const box = dialogs.box('Did you like the app?', template, strings.cancel)

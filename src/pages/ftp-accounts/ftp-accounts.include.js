@@ -1,6 +1,6 @@
 import tag from 'html-tag-js';
 import mustache from 'mustache';
-import helpers from '../../lib/helpers';
+import helpers from '../../lib/utils/helpers';
 import Page from '../../components/page';
 
 import _template from './ftp-accounts.hbs';
@@ -64,44 +64,77 @@ function FTPAccountsInclude() {
     } else if (action === 'remove') {
 
       const $parent = $target.parentElement;
-      if (!$parent) return;
       const id = $parent.id;
-      if (!id) return;
-      remove(id);
+      const name = $parent.getAttribute('name');
+      dialogs.confirm(strings.warning, strings["delete {name}"].replace('{name}', name))
+        .then(res => {
+          if (!$parent || !id) return;
+          remove(id);
+        });
 
     } else if (action === 'ftp-account' || action === "edit") {
 
       if (action === "edit") $target = $target.parentElement;
 
-      const username = $target.getAttribute("username");
-      const password = $target.getAttribute("password");
+      let username = $target.getAttribute("username");
+      let password = $target.getAttribute("password");
       const hostname = $target.getAttribute("hostname");
+      const security = $target.getAttribute("security");
       const port = $target.getAttribute("port");
       const name = $target.getAttribute("name");
-      const security = $target.getAttribute("security");
       const mode = $target.getAttribute("mode");
       const id = $target.id;
 
       if (action === 'edit') {
         addAccount(username, password, hostname, name, port, id, security, mode);
       } else {
-        const fs = remoteFs(username, password, hostname, port);
-        openFolder(fs.origin, {
-          saveState: false,
-          reloadOnResume: false,
-          name
-        });
 
-        actionStack.pop();
+        for (let folder of addedFolder)
+          if (folder.id && folder.id === id) return actionStack.pop();
+
+        username = username || null;
+        password = password || null;
+        addFTPFolder(username, password, hostname, port, security, mode, id, name);
       }
 
     }
   }
 
+  function addFTPFolder(username, password, hostname, port, security, mode, id, name) {
+    const fs = remoteFs(username, password, hostname, port, security, mode);
+    dialogs.loaderShow('', strings.loading + '...');
+    fs.homeDirectory()
+      .then(res => {
+        const {
+          origin,
+          query
+        } = fs.originObject;
+
+        const url = origin + res + query;
+
+        openFolder(url, {
+          saveState: false,
+          reloadOnResume: false,
+          name,
+          id
+        });
+        window.freeze = false;
+        actionStack.pop();
+        window.freeze = true;
+      })
+      .catch(err => {
+        helpers.error(err);
+        console.error(err);
+      })
+      .finally(() => {
+        dialogs.loaderHide();
+      });
+  }
+
   function addAccount(username, password, hostname, name, port, id, security, mode) {
 
     prompt(username, password, hostname, name, port, security, mode).then(values => {
-      const {
+      let {
         username,
         password,
         hostname,
@@ -113,7 +146,17 @@ function FTPAccountsInclude() {
         name
       } = values;
 
-      if (id) remove(id);
+      const security = ftps ? "ftps" : "ftp";
+      const mode = active ? "active" : "passive";
+
+      if (id) {
+        for (let folder of addedFolder)
+          if (folder.id && folder.id === id) {
+            folder.remove();
+            addFTPFolder(username, password, hostname, port, security, mode, id, name);
+          }
+        remove(id);
+      }
 
       if (Array.isArray(accounts)) accounts.push({
         username: credentials.encrypt(username),
@@ -121,9 +164,9 @@ function FTPAccountsInclude() {
         hostname: credentials.encrypt(hostname),
         port: credentials.encrypt(port),
         id: id || helpers.uuid(),
-        security: ftps ? "ftps" : "ftp",
-        mode: active ? "active" : "passive",
-        name,
+        security,
+        mode,
+        name
       });
 
       localStorage.setItem('ftpaccounts', JSON.stringify(accounts));

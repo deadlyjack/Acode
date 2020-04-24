@@ -5,7 +5,7 @@ import _template from './gistFiles.hbs';
 import _menu from './menu.hbs';
 import './gistFiles.scss';
 import Page from '../../components/page';
-import helpers from '../../lib/helpers';
+import helpers from '../../lib/utils/helpers';
 import contextMenu from '../../components/contextMenu';
 import dialogs from '../../components/dialogs';
 import Gists from '../gists/gists';

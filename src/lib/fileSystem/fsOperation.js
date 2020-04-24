@@ -1,8 +1,9 @@
-import helpers from "../helpers";
+import helpers from "../utils/helpers";
 import internalFs from "./internalFs";
 import externalFs from "./externalFs";
-import path from "../path";
+import path from "../utils/path";
 import remoteFs from "./remoteFs";
+import Url from "../utils/Url";
 
 /**
  * 
@@ -74,7 +75,15 @@ function fsOperation(fileUri) {
         port
       } = url;
 
-      const fs = remoteFs(decodeURIComponent(username), decodeURIComponent(password), decodeURIComponent(hostname), port);
+      let security, mode;
+
+      if (url.search) {
+        const parsedQuery = helpers.parseQuery(url.search);
+        security = parsedQuery.security;
+        mode = parsedQuery.mode;
+      }
+
+      const fs = remoteFs(decodeURIComponent(username), decodeURIComponent(password), decodeURIComponent(hostname), port, security, mode);
       createRemoteFsOperation(fs, fileUri, resolve);
 
     }
@@ -89,6 +98,11 @@ function fsOperation(fileUri) {
    */
   function createRemoteFsOperation(fs, url, resolve) {
 
+    const {
+      origin,
+      query
+    } = fs.originObject;
+
     resolve({
       lsDir: () => {
         return fs.listDir(url);
@@ -100,14 +114,15 @@ function fsOperation(fileUri) {
         return fs.writeFile(url, content);
       },
       createFile: (name, data) => {
-        const pathname = new URL(url).pathname;
+        let pathname = Url.pathname(url);
+
         data = data || '';
-        name = fs.origin + path.join(pathname, name);
+        name = origin + path.join(pathname, name) + query;
         return fs.createFile(name, data);
       },
       createDirectory: name => {
-        const pathname = new URL(url).pathname;
-        name = fs.origin + path.join(pathname, name);
+        let pathname = Url.pathname(url);
+        name = origin + path.join(pathname, name) + query;
         return fs.createDir(name);
       },
       deleteFile: () => {
@@ -120,15 +135,16 @@ function fsOperation(fileUri) {
         return fs.copyTo(url, dest);
       },
       moveTo: dest => {
+        let pathname = Url.pathname(dest);
+
         const name = path.name(url);
-        const pathname = new URL(dest).pathname;
-        dest = fs.origin + path.join(pathname, name);
+        dest = origin + path.join(pathname, name) + query;
         return fs.rename(url, dest);
       },
       renameTo: newname => {
-        const pathname = new URL(url).pathname;
+        let pathname = Url.pathname(url);
         const parent = path.parent(pathname);
-        newname = fs.origin + path.join(parent, newname);
+        newname = origin + path.join(parent, newname) + query;
         return fs.rename(url, newname);
       }
     });

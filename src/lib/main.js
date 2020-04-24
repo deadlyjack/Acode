@@ -18,14 +18,14 @@ import contextMenu from '../components/contextMenu';
 import EditorManager from './editorManager';
 import fs from './fileSystem/internalFs';
 import ActionStack from "./actionStack";
-import helpers from "./helpers";
+import helpers from "./utils/helpers";
 import Settings from "./settings";
 import dialogs from "../components/dialogs";
 import constants from "./constants";
-import HandleIntent from "./handleIntent";
+import intentHandler from "./handlers/intent";
 import createEditorFromURI from "./createEditorFromURI";
 import openFolder from "./addFolder";
-import arrowkeys from "./events/arrowkeys";
+import arrowkeys from "./handlers/arrowkeys";
 
 import $_menu from '../views/menu.hbs';
 import $_fileMenu from '../views/file-menu.hbs';
@@ -34,10 +34,11 @@ import git from "./git";
 import commands from "./commands";
 import externalStorage from "./externalStorage";
 import keyBindings from './keyBindings';
-import handleQuickTools from "./handleQuickTools";
+import quickTools from "./handlers/quickTools";
 import rateBox from "../components/dialogboxes/rateBox";
 import loadPolyFill from "./polyfill";
 import internalFs from "./fileSystem/internalFs";
+import Url from "./utils/Url";
 //@ts-check
 
 loadPolyFill.apply(window);
@@ -61,7 +62,6 @@ function Main() {
   window.root = tag(window.root);
   window.app = document.body = tag(document.body);
   window.actionStack = ActionStack();
-  window.editorCount = 0;
   window.alert = dialogs.alert;
   window.addedFolder = [];
   window.fileClipBoard = null;
@@ -92,7 +92,7 @@ function Main() {
     const oldRURL = window.resolveLocalFileSystemURL;
 
     window.resolveLocalFileSystemURL = function (url, ...args) {
-      oldRURL.call(this, helpers.safeURL(url), ...args);
+      oldRURL.call(this, Url.safe(url), ...args);
     };
 
     if (!BuildInfo.debug) {
@@ -339,7 +339,7 @@ function App() {
   const $footer = tag('footer', {
     id: "quick-tools",
     tabIndex: -1,
-    onclick: handleQuickTools.clickListener
+    onclick: quickTools.clickListener
   });
   const $mainMenu = contextMenu({
     top: '6px',
@@ -377,10 +377,6 @@ function App() {
       fontSize: '1.2em'
     }
   });
-  const fileOptions = {
-    save: () => $mainMenu.querySelector('[action=save]'),
-    saveAs: () => $mainMenu.querySelector('[action="save-as"]')
-  };
   const actions = ["saveFile", "saveFileAs", "newFile", "nextFile", "prevFile", "openFile", "run", "find", "replace"];
   let registeredKey = '';
 
@@ -403,7 +399,7 @@ function App() {
   document.addEventListener('keydown', handleMainKeyDown);
   document.addEventListener('keyup', handleMainKeyUp);
 
-  if (appSettings.value.quickTools) handleQuickTools.actions("enable-quick-tools");
+  if (appSettings.value.quickTools) quickTools.actions("enable-quick-tools");
   window.beforeClose = saveState;
 
   loadFolders();
@@ -418,8 +414,8 @@ function App() {
       }, 500);
       //#region event listeners 
 
-      window.plugins.intent.setNewIntentHandler(HandleIntent);
-      window.plugins.intent.getCordovaIntent(HandleIntent, function (e) {
+      window.plugins.intent.setNewIntentHandler(intentHandler);
+      window.plugins.intent.getCordovaIntent(intentHandler, function (e) {
         console.log("Error: Cannot handle open with file intent", e);
       });
       document.addEventListener('menubutton', $sidebar.toggle);

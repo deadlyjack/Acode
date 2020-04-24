@@ -1,3 +1,5 @@
+import Url from "./utils/Url";
+
 export default function loadPolyFill() {
 
   if (!('isConnected' in Node.prototype)) {
@@ -27,4 +29,16 @@ export default function loadPolyFill() {
       this.parentElement.removeChild(this);
     };
   }
+
+  Object.defineProperty(String.prototype, 'hashCode', {
+    value: function () {
+      let hash = 0;
+      for (let i = 0; i < this.length; i++) {
+        const chr = this.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+      }
+      return Math.abs(hash) + (hash < 0 ? 'N' : '');
+    }
+  });
 }

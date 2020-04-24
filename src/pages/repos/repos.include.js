@@ -1,6 +1,6 @@
 import tag from 'html-tag-js';
 import mustache from 'mustache';
-import helpers from '../../lib/helpers';
+import helpers from '../../lib/utils/helpers';
 import GithubLogin from '../login/login';
 import Page from '../../components/page';
 

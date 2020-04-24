@@ -45,6 +45,7 @@ public class CDVFtp extends CordovaPlugin {
     public static final String TAG = CDVFtp.class.getSimpleName();
     private String rootPath = "/";
     private FTPClient client = null;
+    private String homeDirectoryPath = null;
 
     @Override
     public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext)
@@ -160,6 +161,16 @@ public class CDVFtp extends CordovaPlugin {
                     }
                 }
             });
+        } else if (action.equals("homeDirectory")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    try {
+                        homeDirectory(callbackContext);
+                    } catch (Exception e) {
+                        callbackContext.error(e.toString());
+                    }
+                }
+            });
         } else {
             return false;
         }
@@ -190,24 +201,27 @@ public class CDVFtp extends CordovaPlugin {
                     host = hostname;
                 }
 
-                if (this.client != null) {
-                    String cUserName = this.client.getUsername();
+                if (this.client != null && this.client.isConnected()) {
+                    String cUsername = this.client.getUsername();
                     String cHost = this.client.getHost();
                     String cPass = this.client.getPassword();
                     int cPort = this.client.getPort();
 
-                    if (hostname.equals(cHost) && username.equals(cUserName) && password.equals(cPass)
-                            && port == cPort) {
-                        callbackContext.success("Connected");
+                    Boolean isAlreadyConnected = host.equals(cHost) && username.equals(cUsername)
+                            && password.equals(cPass) && port == cPort;
+
+                    if (isAlreadyConnected) {
+                        callbackContext.success("OK");
                         return;
+                    } else {
+                        this.client.disconnect(true);
+                        this.client.setAutoNoopTimeout(0);
                     }
 
-                    this.client = new FTPClient();
-                    this.client.setAutoNoopTimeout(30000);
-                } else {
-                    this.client = new FTPClient();
-                    this.client.setAutoNoopTimeout(30000);
                 }
+
+                this.client = new FTPClient();
+                this.client.setAutoNoopTimeout(30000);
 
                 if (type.equals("ftps"))
                     this.client.setSecurity(FTPClient.SECURITY_FTPS);
@@ -222,7 +236,9 @@ public class CDVFtp extends CordovaPlugin {
                 this.client.connect(host, port);
                 this.client.login(username, password);
 
-                callbackContext.success("Connected");
+                this.homeDirectoryPath = this.client.currentDirectory();
+
+                callbackContext.success("OK");
             } catch (Exception e) {
                 callbackContext.error(e.toString());
             }
@@ -385,6 +401,16 @@ public class CDVFtp extends CordovaPlugin {
 
             String dir = this.client.currentDirectory();
             callbackContext.success(dir);
+
+        } catch (Exception e) {
+            callbackContext.error(e.toString());
+        }
+    }
+
+    private void homeDirectory(CallbackContext callbackContext) {
+        try {
+
+            callbackContext.success(this.homeDirectoryPath);
 
         } catch (Exception e) {
             callbackContext.error(e.toString());

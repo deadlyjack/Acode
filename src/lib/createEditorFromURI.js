@@ -1,11 +1,12 @@
-import helpers from "./helpers";
+import helpers from "./utils/helpers";
 import {
     lookup
 } from 'mime-types';
 import dialogs from "../components/dialogs";
 import recents from "./recents";
-import path from "./path";
+import path from "./utils/path";
 import fsOperation from "./fileSystem/fsOperation";
+import Url from "./utils/Url";
 
 export default createEditorFromURI;
 /**
@@ -21,8 +22,7 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
 
         if (typeof uri === 'string') {
             uri = helpers.decodeURL(uri);
-
-            name = uri.split('/').pop();
+            name = Url.pathname(uri).split("/").pop();
 
             if (!isContentUri) {
                 location = path.parent(uri, name);
@@ -38,7 +38,7 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
 
             if (fileUri) {
                 if (!name)
-                    name = name = fileUri.split('/').pop();
+                    name = name = Url.pathname(fileUri).split('/').pop();
                 location = path.parent(fileUri, name);
             }
         }

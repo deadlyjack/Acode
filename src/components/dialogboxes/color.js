@@ -1,6 +1,6 @@
 import tag from 'html-tag-js';
 import Picker from 'vanilla-picker';
-import helpers from '../../lib/helpers';
+import helpers from '../../lib/utils/helpers';
 
 /**
  * Choose color

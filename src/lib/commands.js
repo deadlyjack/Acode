@@ -1,12 +1,12 @@
 import saveFile from "./saveFile";
-import select from './selectword';
+import select from './handlers/selectword';
 import runPreview from "./runPreview";
 
 import settingsMain from '../pages/settings/mainSettings';
 import dialogs from '../components/dialogs';
 import createEditorFromURI from "../lib/createEditorFromURI";
 import openFolder from "../lib/addFolder";
-import helpers from "../lib/helpers";
+import helpers from "../lib/utils/helpers";
 import constants from "./constants";
 import GithubLogin from "../pages/login/login";
 import gitHub from "../pages/github/gitHub";
@@ -15,7 +15,7 @@ import recents from '../lib/recents';
 import fsOperation from '../lib/fileSystem/fsOperation';
 import Modes from '../pages/modes/modes';
 import clipboardAction from '../lib/clipboard';
-import handleQuickTools from '../lib/handleQuickTools';
+import quickTools from './handlers/quickTools';
 import FTPAccounts from "../pages/ftp-accounts/ftp-accounts";
 import FileBrowser from "../pages/fileBrowser/fileBrowser";
 
@@ -48,7 +48,7 @@ const commands = {
       });
   },
   "find": function () {
-    handleQuickTools.actions('search');
+    quickTools.actions('search');
   },
   "format": function () {
     const file = editorManager.activeFile;
@@ -282,7 +282,7 @@ const commands = {
       });
   },
   "toggle-quick-tools": function () {
-    handleQuickTools.actions("toggle-quick-tools");
+    quickTools.actions("toggle-quick-tools");
   }
 };
 

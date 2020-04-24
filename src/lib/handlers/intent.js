@@ -1,6 +1,6 @@
-import createEditorFromURI from './createEditorFromURI';
-import helpers from "./helpers";
-import dialogs from '../components/dialogs';
+import createEditorFromURI from '../createEditorFromURI';
+import helpers from "../utils/helpers";
+import dialogs from '../../components/dialogs';
 
 export default HandleIntent;
 

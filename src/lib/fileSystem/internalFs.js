@@ -1,5 +1,5 @@
 import ajax from '../ajax';
-import path from '../path';
+import path from '../utils/path';
 /**
  * 
  * @param {string} path 

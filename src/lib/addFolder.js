@@ -1,19 +1,21 @@
 import tag from 'html-tag-js';
 import fsOperation from './fileSystem/fsOperation';
 import collapsableList from '../components/collapsableList';
-import helpers from './helpers';
+import helpers from './utils/helpers';
 import dialogs from '../components/dialogs';
 import tile from '../components/tile';
 import constants from './constants';
 import recents from './recents';
-import path from './path';
+import path from './utils/path';
 import createEditorFromURI from './createEditorFromURI';
+import Url from './utils/Url';
 
 /**
  * 
  * @param {string} _path
  * @param {object} [opts]
  * @param {string} [opts.name]
+ * @param {string} [opts.id]
  * @param {boolean} [opts.saveState=true]
  * @param {boolean} [opts.reloadOnResume=true]
  */
@@ -92,7 +94,8 @@ function openFolder(_path, opts = {}) {
     },
     reloadOnResume,
     saveState,
-    title
+    title,
+    id: opts.id
   });
 
   updateHeight();
@@ -128,7 +131,7 @@ function openFolder(_path, opts = {}) {
       e.stopImmediatePropagation();
     }
 
-    if ($root.isConnected) {
+    if ($root.parentElement) {
       $root.remove();
       $root = null;
     }
@@ -227,7 +230,9 @@ function openFolder(_path, opts = {}) {
     let newName, CASE = '',
       src, srcName, srcType, $src, file, msg, defaultValue;
 
-    if (type === "dir" && !url.endsWith("/")) url += "/";
+    if (type === "dir") {
+      Url.join(url, "/");
+    }
 
     const target = $target.getAttribute('state');
 
@@ -261,8 +266,8 @@ function openFolder(_path, opts = {}) {
             helpers.showToast(strings.success);
           })
           .catch(err => {
-            console.log(err);
             helpers.error(err);
+            console.error(err);
           });
 
       case "rename":
@@ -280,8 +285,16 @@ function openFolder(_path, opts = {}) {
                   return fs.renameTo(newName);
                 })
                 .then(res => {
+
+
+                  let {
+                    url: _url,
+                    query
+                  } = Url.parse(url);
+                  let newURL = _url.replace(new RegExp(name + '\/?$'), newName) + query;
+
                   $target.querySelector(':scope>.text').textContent = newName;
-                  $target.setAttribute('url', url.replace(new RegExp(name + '\/?$'), newName));
+                  $target.setAttribute('url', newURL);
                   $target.setAttribute('name', newName);
 
                   if (type === 'file')
@@ -294,8 +307,8 @@ function openFolder(_path, opts = {}) {
                 });
           })
           .catch(err => {
-            console.log(err);
             helpers.error(err);
+            console.error(err);
           });
 
       case "paste":
@@ -332,13 +345,15 @@ function openFolder(_path, opts = {}) {
 
             if (clipBoard.action === 'cut') { //move
 
+              const newUrl = Url.join(url, srcName);
+
               switch (CASE) {
                 case '111':
                 case '011':
                   break;
 
                 case '110':
-                  appendTile($target, createFileTile(srcName, join(url, srcName)));
+                  appendTile($target, createFileTile(srcName, newUrl));
                   break;
 
                 case '101':
@@ -346,7 +361,7 @@ function openFolder(_path, opts = {}) {
                   break;
 
                 case '100':
-                  appendTile($target, createFileTile(srcName, join(url, srcName)));
+                  appendTile($target, createFileTile(srcName, newUrl));
                   $src.remove();
                   break;
 
@@ -355,11 +370,11 @@ function openFolder(_path, opts = {}) {
                   break;
 
                 case '010':
-                  appendList($target, createFolderTile(srcName, join(url, srcName)));
+                  appendList($target, createFolderTile(srcName, newUrl));
                   break;
 
                 case '000':
-                  appendList($target, createFolderTile(srcName, join(url, srcName)));
+                  appendList($target, createFolderTile(srcName, newUrl));
                   $src.parentElement.remove();
                   break;
 
@@ -378,12 +393,12 @@ function openFolder(_path, opts = {}) {
 
                 case '110':
                 case '100':
-                  appendTile($target, createFileTile(srcName, join(url, srcName)));
+                  appendTile($target, createFileTile(srcName, newUrl));
                   break;
 
                 case '010':
                 case '000':
-                  appendList($target, createFolderTile(srcName, join(url, srcName)));
+                  appendList($target, createFolderTile(srcName, newUrl));
                   break;
 
                 default:
@@ -393,11 +408,12 @@ function openFolder(_path, opts = {}) {
             }
 
             helpers.showToast(strings.success);
+            clipBoard = null;
 
           })
           .catch(err => {
-            console.log(err);
             helpers.error(err);
+            console.error(err);
           });
 
       case "new file":
@@ -419,15 +435,16 @@ function openFolder(_path, opts = {}) {
           })
           .then(res => {
             if (target === "uncollapsed") {
-              if (action === "new file") appendTile($target, createFileTile(newName, url + newName));
-              else appendList($target, createFolderTile(newName, url + newName));
+              const newUrl = Url.join(url, newName);
+              if (action === "new file") appendTile($target, createFileTile(newName, newUrl));
+              else appendList($target, createFolderTile(newName, newUrl));
             }
 
             helpers.showToast(strings.success);
           })
           .catch(err => {
-            console.log(err);
             helpers.error(err);
+            console.error(err);
           });
 
       case "cancel":
@@ -524,7 +541,7 @@ function openFolder(_path, opts = {}) {
             showHiddenFiles: true
           }, true);
           entries.map(entry => {
-            const name = path.name(entry.url);
+            const name = entry.name || path.name(entry.url);
             if (entry.isDirectory) {
 
               const $list = createFolderTile(name, entry.url);
@@ -554,11 +571,18 @@ function openFolder(_path, opts = {}) {
 }
 
 openFolder.updateHeight = function () {
-  const client = editorManager.openFileList.getBoundingClientRect();
+  if (!addedFolder.length) return;
+  let activeFileListHeight = 0;
+
+  if (appSettings.value.openFileListPos === "sidebar") {
+    const client = editorManager.openFileList.getBoundingClientRect();
+    activeFileListHeight = client.height;
+  }
+
   let totalFolder = addedFolder.length - 1;
   for (let folder of addedFolder) {
-    folder.$node.style.maxHeight = `calc(100% - ${(totalFolder*30) + client.height}px)`;
-    folder.$node.style.height = `calc(100% - ${(totalFolder*30) + client.height}px)`;
+    folder.$node.style.maxHeight = `calc(100% - ${(totalFolder*30) + activeFileListHeight}px)`;
+    folder.$node.style.height = `calc(100% - ${(totalFolder*30) + activeFileListHeight}px)`;
   }
 };
 

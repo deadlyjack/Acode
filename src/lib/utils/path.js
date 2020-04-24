@@ -67,7 +67,7 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
     const ar = path.split('/');
     const last = ar.slice(-1)[0];
     if (!last) return ar.slice(-2)[0];
-    return last;
+    return last.split("?")[0];
 
     function decodeURL(url) {
       if (/%[0-9a-f]{2}/i.test(url)) {

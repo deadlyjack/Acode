@@ -1,8 +1,8 @@
 import fs from "./fileSystem/internalFs";
 import dialogs from "../components/dialogs";
-import helpers from "./helpers";
+import helpers from "./utils/helpers";
 import GitHub from './GitHubAPI/GitHub';
-import path from "./path";
+import path from "./utils/path";
 
 //Creates new github object
 function gitHub() {
