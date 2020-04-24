@@ -17,7 +17,7 @@ export default {
 
     pathnames[0] = url;
 
-    return protocol + path.join(...pathnames) + query;
+    return protocol + path.join(...pathnames).slice(1) + query;
   },
   /**
    * Make url safe by encoding url components

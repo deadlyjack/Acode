@@ -1,5 +1,5 @@
-version 0.1.11.101
-☞ UI improvment
+version 0.1.11.102
+☞ UI improvement
 ☞ Bugs fixes
 
 version 0.1.10.100
