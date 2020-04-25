@@ -240,6 +240,7 @@ public class CDVFtp extends CordovaPlugin {
 
                 callbackContext.success("OK");
             } catch (Exception e) {
+                this.client = null;
                 callbackContext.error(e.toString());
             }
         }
@@ -438,6 +439,7 @@ public class CDVFtp extends CordovaPlugin {
             this.client.setAutoNoopTimeout(0);
             callbackContext.success("Disconnect OK.");
         } catch (Exception e) {
+            this.client = null;
             callbackContext.error(e.toString());
         }
     }

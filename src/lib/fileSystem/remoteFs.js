@@ -84,7 +84,10 @@ function remoteFs(username, password, hostname, port, security, mode) {
               security,
               mode,
               res => resolve(res),
-              err => reject("cannot connect to ftp: " + err)
+              err => {
+                ftp.disconnect();
+                reject("cannot connect to ftp: " + err);
+              }
             );
           });
       }
@@ -134,6 +137,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
           }
 
           function error(err) {
+            ftp.disconnect();
             const code = getCode(err);
             if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
             else reject(err);
@@ -164,6 +168,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
 
           function error(err) {
             finish();
+            ftp.disconnect();
             const code = getCode(err);
             if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
             else reject(err);
@@ -202,6 +207,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
               }
 
               function error(err) {
+                ftp.disconnect();
                 const code = getCode(err);
                 if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
                 else reject(err);
@@ -224,6 +230,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
           }
 
           function error(err) {
+            ftp.disconnect();
             const code = getCode(err);
             if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
             else reject(err);
@@ -254,6 +261,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
 
           function error(err) {
             finish();
+            ftp.disconnect();
             if (err === 'Error') err = 'Unkown error';
             const code = getCode(err);
             if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
@@ -286,6 +294,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
           }
 
           function error(err) {
+            ftp.disconnect();
             const code = getCode(err);
             if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
             else reject(err);
@@ -308,6 +317,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
           }
 
           function error(err) {
+            ftp.disconnect();
             const code = getCode(err);
             if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
             else reject(err);
@@ -343,6 +353,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
           });
         })
         .catch(err => {
+          ftp.disconnect();
           const code = getCode(err);
           if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
           else reject(err);
@@ -359,6 +370,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
           });
         })
         .catch(err => {
+          ftp.disconnect();
           const code = getCode(err);
           if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
           else reject(err);

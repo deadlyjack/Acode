@@ -496,7 +496,7 @@ function App() {
     if (!localStorage.init) {
       dialogs.box(
           strings.info.toUpperCase(),
-          "If editor is not working properly, try there suggestions:<br><br>" +
+          "If editor is not working properly, try these suggestions:<br><br>" +
           "1. Turn off keyboard <strong>Autocorrect</strong> settings.<br>" +
           "<img src='./res/imgs/autocorrect/autocorrect-" + appSettings.value.lang + ".jpg'><br>" +
           "2. Use <a href='https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin'>" +
@@ -510,7 +510,6 @@ function App() {
           localStorage.init = true;
         });
     }
-
   }
 
   /**

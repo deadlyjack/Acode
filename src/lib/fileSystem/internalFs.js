@@ -1,21 +1,21 @@
 import ajax from '../ajax';
 import path from '../utils/path';
+import helpers from '../utils/helpers';
 /**
  * 
- * @param {string} path 
+ * @param {string} url 
  * @returns {Promise}
  */
-function listDir(path) {
-
+function listDir(url) {
+    url = helpers.decodeURL(url);
     return new Promise((resolve, reject) => {
-        window.resolveLocalFileSystemURL(path, success, reject);
+        window.resolveLocalFileSystemURL(url, success, reject);
 
         function success(fs) {
             const reader = fs.createReader();
             reader.readEntries(resolve, reject);
         }
     });
-
 }
 
 /**
@@ -31,6 +31,7 @@ function listDir(path) {
  * @returns {Promise} 
  */
 function writeFile(filename, data, create = false, exclusive = true) {
+    filename = helpers.decodeURL(filename);
     const name = filename.split('/').pop();
     const _path = path.parent(filename, name);
     return new Promise((resolve, reject) => {
@@ -66,6 +67,7 @@ function writeFile(filename, data, create = false, exclusive = true) {
  * @returns {Promise} 
  */
 function deleteFile(filename) {
+    filename = helpers.decodeURL(filename);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(filename, entry => {
             if (entry.isFile) {
@@ -83,6 +85,7 @@ function deleteFile(filename) {
  * @returns {Promise} 
  */
 function readFile(filename) {
+    filename = helpers.decodeURL(filename);
     return new Promise((resolve, reject) => {
 
         if (!filename) return reject("Invalid valud of fileURL: " + filename);
@@ -121,13 +124,14 @@ function readFile(filename) {
 
 /**
  * 
- * @param {string} uri 
+ * @param {string} url 
  * @param {string} newname
  * @returns {Promise} 
  */
-function renameFile(uri, newname) {
+function renameFile(url, newname) {
+    url = helpers.decodeURL(url);
     return new Promise((resolve, reject) => {
-        window.resolveLocalFileSystemURL(uri, fs => {
+        window.resolveLocalFileSystemURL(url, fs => {
             fs.getParent(parent => {
                 fs.moveTo(parent, newname, () => resolve(parent), reject);
             }, reject);
@@ -142,6 +146,7 @@ function renameFile(uri, newname) {
  * @returns {Promise} 
  */
 function createDir(path, dirname) {
+    path = helpers.decodeURL(path);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(path, fs => {
             fs.getDirectory(dirname, {
