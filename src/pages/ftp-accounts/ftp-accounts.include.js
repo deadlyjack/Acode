@@ -11,6 +11,8 @@ import SearchBar from '../../components/searchbar';
 import dialogs from '../../components/dialogs';
 import remoteFs from '../../lib/fileSystem/remoteFs';
 import openFolder from '../../lib/addFolder';
+import _decryptAccounts from './decryptAccounts';
+import Url from '../../lib/utils/Url';
 
 function FTPAccountsInclude() {
   let accounts = JSON.parse(localStorage.ftpaccounts || '[]');
@@ -76,62 +78,80 @@ function FTPAccountsInclude() {
 
       if (action === "edit") $target = $target.parentElement;
 
-      let username = $target.getAttribute("username");
-      let password = $target.getAttribute("password");
-      const hostname = $target.getAttribute("hostname");
-      const security = $target.getAttribute("security");
-      const port = $target.getAttribute("port");
-      const name = $target.getAttribute("name");
-      const mode = $target.getAttribute("mode");
-      const id = $target.id;
+      /**@type {FTPAccount} */
+      const account = {};
+
+      account.username = $target.getAttribute("username");
+      account.password = $target.getAttribute("password");
+      account.hostname = $target.getAttribute("hostname");
+      account.security = $target.getAttribute("security");
+      account.port = $target.getAttribute("port");
+      account.name = $target.getAttribute("name");
+      account.mode = $target.getAttribute("mode");
+      account.id = $target.id;
 
       if (action === 'edit') {
-        addAccount(username, password, hostname, name, port, id, security, mode);
+        addAccount(account);
       } else {
 
         for (let folder of addedFolder)
           if (folder.id && folder.id === id) return actionStack.pop();
 
-        username = username || null;
-        password = password || null;
-        addFTPFolder(username, password, hostname, port, security, mode, id, name);
+        account.username = account.username || null;
+        account.password = account.password || null;
+        addFTPFolder(account);
       }
 
     }
   }
 
-  function addFTPFolder(username, password, hostname, port, security, mode, id, name) {
-    const fs = remoteFs(username, password, hostname, port, security, mode);
-    dialogs.loaderShow('', strings.loading + '...');
-    fs.homeDirectory()
-      .then(res => {
-        const {
-          origin,
-          query
-        } = fs.originObject;
+  /**
+   * 
+   * @param {FTPAccount} account 
+   */
+  function addFTPFolder(account) {
+    const url = Url.formate({
+      protocol: "ftp:",
+      ...account,
+      query: {
+        mode: account.mode,
+        security: account.security
+      }
+    });
 
-        const url = origin + res + query;
-
-        openFolder(url, {
-          saveState: false,
-          reloadOnResume: false,
-          name,
-          id
-        });
-        window.freeze = false;
-        actionStack.pop();
-        window.freeze = true;
-      })
-      .catch(err => {
-        helpers.error(err);
-        console.error(err);
-      })
-      .finally(() => {
-        dialogs.loaderHide();
-      });
+    openFolder(url, {
+      saveState: false,
+      reloadOnResume: false,
+      name,
+      id
+    });
+    actionStack.pop();
   }
 
-  function addAccount(username, password, hostname, name, port, id, security, mode) {
+  /**
+   * 
+   * @param {FTPAccount} account 
+   */
+  function addAccount(account) {
+
+    let username, password, hostname, name, port, id, security, mode;
+
+    if (typeof account === "object") {
+
+      ({
+        username,
+        password,
+        hostname,
+        name,
+        port,
+        id,
+        security,
+        mode
+      } = account);
+
+    } else {
+      [username, password, hostname, name, port, id, security, mode] = arguments;
+    }
 
     prompt(username, password, hostname, name, port, security, mode).then(values => {
       let {
@@ -149,67 +169,54 @@ function FTPAccountsInclude() {
       const security = ftps ? "ftps" : "ftp";
       const mode = active ? "active" : "passive";
 
-      if (id) {
-        for (let folder of addedFolder)
-          if (folder.id && folder.id === id) {
-            folder.remove();
-            addFTPFolder(username, password, hostname, port, security, mode, id, name);
+
+      const fs = remoteFs(username, password, hostname, port, security, mode);
+      dialogs.loaderShow('', strings.loading + '...');
+      fs.homeDirectory()
+        .then(res => {
+          const path = res;
+
+          if (id) {
+            for (let folder of addedFolder)
+              if (folder.id && folder.id === id) {
+                folder.remove();
+                addFTPFolder(username, password, hostname, port, security, mode, id, name);
+              }
+            remove(id);
           }
-        remove(id);
-      }
 
-      if (Array.isArray(accounts)) accounts.push({
-        username: credentials.encrypt(username),
-        password: credentials.encrypt(password),
-        hostname: credentials.encrypt(hostname),
-        port: credentials.encrypt(port),
-        id: id || helpers.uuid(),
-        security,
-        mode,
-        name
-      });
+          if (Array.isArray(accounts)) accounts.push({
+            username: credentials.encrypt(username),
+            password: credentials.encrypt(password),
+            hostname: credentials.encrypt(hostname),
+            port: credentials.encrypt(port),
+            id: id || helpers.uuid(),
+            security,
+            mode,
+            name,
+            path
+          });
 
-      localStorage.setItem('ftpaccounts', JSON.stringify(accounts));
-      $content.innerHTML = mustache.render(_list, {
-        accounts: decryptAccounts()
-      });
+          localStorage.setItem('ftpaccounts', JSON.stringify(accounts));
+          $content.innerHTML = mustache.render(_list, {
+            accounts: decryptAccounts()
+          });
+
+        })
+        .catch(err => {
+          helpers.error(err)
+            .then(() => addAccount(username, password, hostname, name, port, id, security, mode));
+          console.error(err);
+        })
+        .finally(() => {
+          dialogs.loaderHide();
+        });
 
     });
   }
 
   function decryptAccounts() {
-    const temp = [];
-    if (Array.isArray(accounts)) accounts.map(account => {
-      let {
-        name,
-        username,
-        password,
-        hostname,
-        port,
-        id,
-        security,
-        mode
-      } = account;
-
-      username = credentials.decrypt(username);
-      password = credentials.decrypt(password);
-      hostname = credentials.decrypt(hostname);
-      port = credentials.decrypt(port);
-
-      temp.push({
-        username,
-        password,
-        hostname,
-        port,
-        name: name ? name : `${username}@${hostname}`,
-        id,
-        security,
-        mode
-      });
-      return account;
-    });
-
-    return temp;
+    return _decryptAccounts(accounts);
   }
 
   function remove(id) {

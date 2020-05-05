@@ -125,5 +125,7 @@
   "format": "تجميل",
   "project name": "اسم المشروع",
   "support us": "دعم تطوير Acode ، تصبح patreon.",
-  "unsupported device": "جهازك لا يدعم السمة."
+  "unsupported device": "جهازك لا يدعم السمة.",
+  "vibrate on tap": "يهتز على الصنبور",
+  "copy command is not supported by ftp.": "Copy command is not supported by FTP."
 }

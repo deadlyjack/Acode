@@ -21,11 +21,11 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
         let name, location, fileUri, contentUri;
 
         if (typeof uri === 'string') {
-            uri = helpers.decodeURL(uri);
-            name = Url.pathname(uri).split("/").pop();
+            uri = decodeURL(uri);
+            name = Url.basename(uri);
 
             if (!isContentUri) {
-                location = path.parent(uri, name);
+                location = path.dirname(uri);
                 fileUri = uri;
             } else {
                 contentUri = uri;
@@ -33,13 +33,13 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
 
         } else {
             name = uri.name;
-            fileUri = helpers.decodeURL(uri.fileUri);
+            fileUri = decodeURL(uri.fileUri);
             contentUri = uri.contentUri;
 
             if (fileUri) {
                 if (!name)
-                    name = name = Url.pathname(fileUri).split('/').pop();
-                location = path.parent(fileUri, name);
+                    name = Url.basename(fileUri);
+                location = Url.dirname(fileUri);
             }
         }
         const settings = appSettings.value;

@@ -18,6 +18,7 @@ import clipboardAction from '../lib/clipboard';
 import quickTools from './handlers/quickTools';
 import FTPAccounts from "../pages/ftp-accounts/ftp-accounts";
 import FileBrowser from "../pages/fileBrowser/fileBrowser";
+import Url from "./utils/Url";
 
 const commands = {
   "console": function () {
@@ -115,7 +116,7 @@ const commands = {
   "open-file": function () {
     editorManager.editor.blur();
     FileBrowser('file', function (uri) {
-        const ext = helpers.getExt(uri);
+        const ext = helpers.extname(uri);
 
         if (appSettings.defaultSettings.filesNotAllowed.includes((ext || '').toLowerCase())) {
           alert(strings.notice.toUpperCase(), `'${ext}' ${strings['file is not supported']}`);
@@ -150,7 +151,21 @@ const commands = {
     editorManager.editor.blur();
     FileBrowser('folder')
       .then(res => {
-        return openFolder(res.url);
+        const url = res.url;
+        const protocol = Url.getProtocol(url);
+
+        if (protocol === "ftp:") {
+          return openFolder(res.url, {
+            name: res.name,
+            reloadOnResume: false,
+            saveState: false
+          });
+        } else {
+          return openFolder(res.url, {
+            name: res.name
+          });
+        }
+
       })
       .then(() => {
         window.plugins.toast.showShortBottom(strings['folder added']);
@@ -283,6 +298,10 @@ const commands = {
   },
   "toggle-quick-tools": function () {
     quickTools.actions("toggle-quick-tools");
+  },
+  "toggle-fullscreen": () => {
+    app.classList.toggle("fullscreen-mode");
+    editorManager.editor.resize(true);
   }
 };
 

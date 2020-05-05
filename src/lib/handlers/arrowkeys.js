@@ -1,3 +1,5 @@
+import constants from "../constants";
+
 export default {
     interval: null,
     onTouchStart: function (e, footer) {
@@ -9,16 +11,13 @@ export default {
 
         if (!action || ['left', 'right', 'up', 'down'].indexOf(action) < 0) return;
 
-        navigator.vibrate(50);
-
         const editor = editorManager.editor;
         const $textarea = editor.textInput.getElement();
         const shiftKey = footer.querySelector('#shift-key').getAttribute('data-state') === 'on' ? true : false;
         const controls = editorManager.controls;
 
         document.ontouchend =
-            document.ontouchcancel =
-            document.ontouchstart = () => {
+            document.ontouchcancel = e => {
                 this.onTouchEnd();
                 document.ontouchend =
                     document.ontouchcancel =
@@ -46,7 +45,6 @@ export default {
         }
 
         e.preventDefault();
-        e.stopPropagation();
     },
     onTouchEnd: function () {
         if (this.interval) clearInterval(this.interval);

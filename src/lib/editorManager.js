@@ -9,6 +9,7 @@ import constants from './constants';
 import internalFs from './fileSystem/internalFs';
 import openFolder from './addFolder';
 import Url from './utils/Url';
+import path from './utils/path';
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -86,7 +87,8 @@ function EditorManager($sidebar, $header, $body) {
             }
         }
     };
-    const SESSION_PATH = cordova.file.cacheDirectory + 'session/';
+    const SESSION_DIRNAME = 'sessions';
+    const SESSION_PATH = cordova.file.cacheDirectory + SESSION_DIRNAME + '/';
 
     /**
      * @type {Manager}
@@ -154,7 +156,7 @@ function EditorManager($sidebar, $header, $body) {
         const file = SESSION_PATH + manager.activeFile.id;
         const text = manager.activeFile.session.getValue();
         const activeFile = manager.activeFile;
-        if (activeFile && !activeFile.isUnsaved & activeFile.sesstionCreated) {
+        if (activeFile && !activeFile.isUnsaved & activeFile.sessionCreated) {
             internalFs.readFile(file)
                 .then(res => {
                     const decoder = new TextDecoder("utf-8");
@@ -175,7 +177,7 @@ function EditorManager($sidebar, $header, $body) {
         ready = true;
         emptyQueue();
     }, () => {
-        internalFs.createDir(cordova.file.cacheDirectory, 'session')
+        internalFs.createDir(cordova.file.cacheDirectory, SESSION_DIRNAME)
             .then(() => {
                 ready = true;
                 emptyQueue();
@@ -208,7 +210,7 @@ function EditorManager($sidebar, $header, $body) {
 
         let doesExists = null;
 
-        if (options.fileUri) options.fileUri = helpers.decodeURL(options.fileUri);
+        if (options.fileUri) options.fileUri = decodeURL(options.fileUri);
 
         if (options.id) doesExists = getFile(options.id, "id");
         else if (options.fileUri) doesExists = getFile(options.fileUri, "fileUri");
@@ -244,7 +246,7 @@ function EditorManager($sidebar, $header, $body) {
 
         let file = {
             id,
-            sesstionCreated: false,
+            sessionCreated: false,
             controls: false,
             session: ace.createEditSession(text),
             fileUri: options.fileUri,
@@ -283,7 +285,10 @@ function EditorManager($sidebar, $header, $body) {
 
         internalFs.writeFile(SESSION_PATH + id, text, true, false)
             .then(() => {
-                file.sesstionCreated = true;
+                file.sessionCreated = true;
+            })
+            .catch(err => {
+                console.log(err);
             });
 
         if (options.isUnsaved && !options.readOnly) {
@@ -328,7 +333,6 @@ function EditorManager($sidebar, $header, $body) {
 
         return file;
     }
-
     /**
      * 
      * @param {File} file 
@@ -488,7 +492,7 @@ function EditorManager($sidebar, $header, $body) {
             let classFlag = false;
 
             $placeholder.style.opacity = '0';
-            navigator.vibrate(10);
+            navigator.vibrate(constants.VIBRATION_TIME);
             document.ontouchmove = document.onmousemove = null;
             document.addEventListener(type, drag, opts);
             console.log("Adding listener", e.type);
@@ -609,7 +613,7 @@ function EditorManager($sidebar, $header, $body) {
     function getFile(checkFor, type = "id") {
 
         if (typeof type !== "string") return null;
-        if (typeof checkFor === 'string' && !["id" | "name"].includes(type)) checkFor = helpers.decodeURL(checkFor);
+        if (typeof checkFor === 'string' && !["id" | "name"].includes(type)) checkFor = decodeURL(checkFor);
 
         let result = null;
         for (let file of manager.files) {
@@ -657,7 +661,7 @@ function EditorManager($sidebar, $header, $body) {
         if (editorManager.activeFile.id === this.id) $header.text(name);
 
         this.assocTile.text(name);
-        if (helpers.getExt(this.name) !== helpers.getExt(name)) {
+        if (helpers.extname(this.name) !== helpers.extname(name)) {
             setupSession({
                 session: this.session,
                 filename: name

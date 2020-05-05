@@ -41,4 +41,24 @@ export default function loadPolyFill() {
       return Math.abs(hash) + (hash < 0 ? 'N' : '');
     }
   });
+
+  Object.defineProperty(String.prototype, 'subtract', {
+    value: function (str) {
+      return this.replace(new RegExp("^" + str), '');
+    }
+  });
+
+  /**
+   * Decode any url recursively until its fully decoded
+   * @param {string} url URL string
+   * @returns {string}
+   */
+  window.decodeURL = url => {
+    if (/%[0-9a-f]{2}/i.test(url)) {
+      const newurl = decodeURI(url);
+      if (url === newurl) return url;
+      return decodeURL(newurl);
+    }
+    return url;
+  };
 }

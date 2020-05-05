@@ -125,5 +125,7 @@
   "format": "format",
   "project name": "Proyekt nomi",
   "support us": "Acode-ni qo'llab-quvvatlang, patreonga qo'shiling",
-  "unsupported device": "Sizning qurilmangiz ushbu mavzuni qo'llab quvvatlamaydi"
+  "unsupported device": "Sizning qurilmangiz ushbu mavzuni qo'llab quvvatlamaydi",
+  "vibrate on tap": "Vibrate on tap",
+  "copy command is not supported by ftp.": "Copy command is not supported by FTP."
 }

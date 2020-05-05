@@ -1,12 +1,15 @@
+version 0.1.12.103
+☞ Now you can browse FTP and open specific directory using file browser
+☞ Full screen mode
+☞ Option disable vibration
+☞ Bugs fixes
+
 version 0.1.11.103
 ☞ UI improvement
 ☞ Bugs fixes
 
 version 0.1.10.100
 ☞ Added Turkish language by ibrahim
-☞ Bugs fixes
-
-version 0.1.10.100
 ☞ Added Spanish language by DouZerr
 ☞ New Smali language support
 ☞ Show suggestions when app first opens

@@ -39,7 +39,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   if (activeFile) {
     filename = activeFile.filename;
     pathName = activeFile.location;
-    extension = helpers.getExt(filename);
+    extension = helpers.extname(filename);
 
     if (!activeFile.fileUri && activeFile.contentUri) {
 
@@ -141,7 +141,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       }
 
       const assets = `${cordova.file.applicationDirectory}www`;
-      const ext = helpers.getExt(reqPath);
+      const ext = helpers.extname(reqPath);
       let url = null;
 
       switch (reqPath) {

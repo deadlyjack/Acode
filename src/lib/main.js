@@ -39,6 +39,7 @@ import rateBox from "../components/dialogboxes/rateBox";
 import loadPolyFill from "./polyfill";
 import internalFs from "./fileSystem/internalFs";
 import Url from "./utils/Url";
+import path from "./utils/path";
 //@ts-check
 
 loadPolyFill.apply(window);
@@ -283,6 +284,13 @@ function runApp() {
     }
   });
 
+  app.addEventListener('touchstart', function (e) {
+    const el = e.target;
+
+    if (el instanceof HTMLElement && el.hasAttribute('vibrate')) {
+      if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
+    }
+  });
   const version = localStorage.getItem('version');
   if (version !== BuildInfo.version) {
     localStorage.clear();
@@ -462,7 +470,7 @@ function App() {
 
       this.editor.setReadOnly(!activeFile.editable);
 
-      if (['html', 'htm', 'xhtml', 'md', 'js'].includes(helpers.getExt(activeFile.filename))) {
+      if (['html', 'htm', 'xhtml', 'md', 'js'].includes(helpers.extname(activeFile.filename))) {
         $header.insertBefore($runBtn, $header.lastChild);
       } else {
         $runBtn.remove();

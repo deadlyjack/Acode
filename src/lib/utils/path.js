@@ -1,5 +1,145 @@
 const path = {
   /**
+   * The path.dirname() method returns the directory name of a path, 
+   * similar to the Unix dirname command.
+   * Trailing directory separators are ignored.
+   * @param {string} path 
+   * @returns {string}
+   */
+  dirname(path) {
+    if (path.endsWith("/")) path = path.slice(0, -1);
+    const parts = path.split('/').slice(0, -1);
+    if (!/^(\.|\.\.|)$/.test(parts[0])) parts.unshift('.');
+    const res = parts.join('/');
+
+    if (!res) return "/";
+    else return res;
+  },
+
+  /**
+   * The path.basename() methods returns the last portion of a path, 
+   * similar to the Unix basename command. 
+   * Trailing directory separators are ignored, see path.sep.
+   * @param {string} path 
+   * @returns {string}
+   */
+  basename(path, ext = "") {
+    ext = ext || "";
+    if (path === "" || path === "/") return path;
+    const ar = path.split('/');
+    const last = ar.slice(-1)[0];
+    if (!last) return ar.slice(-2)[0];
+    let res = decodeURI(last.split("?")[0] || "");
+    if (this.extname(res) === ext) res = res.replace(new RegExp(ext + "$"), "");
+    return decodeURL(res);
+  },
+
+  /**
+   * returns the extension of the path, from the last occurrence of the . (period) 
+   * character to end of string in the last portion of the path. 
+   * If there is no . in the last portion of the path, or if there are no . characters 
+   * other than the first character of the basename of path (see path.basename()) , an 
+   * empty string is returned.
+   * @param {string} path 
+   */
+  extname(path) {
+    const filename = path.split('/').slice(-1)[0];
+    if (/.+\..*$/.test(filename))
+      return /(?:\.([^.]*))?$/.exec(filename)[0] || "";
+    return "";
+  },
+
+  /**
+   * returns a path string from an object.
+   * @param {PathObject} pathObject 
+   */
+  format(pathObject) {
+
+    let {
+      root,
+      dir,
+      ext,
+      name,
+      base
+    } = pathObject;
+
+    if (base || !ext.startsWith('.')) {
+      ext = '';
+      if (base) name = '';
+    }
+
+    dir = (dir || root);
+
+    if (!dir.endsWith("/")) dir += "/";
+
+    return dir + (base || name) + ext;
+
+  },
+
+  /**
+   * The path.isAbsolute() method determines if path is an absolute path.
+   * @param {string} path
+   */
+  isAbsolute(path) {
+    return path.startsWith("/");
+  },
+
+  /**
+   * Joins the given number of paths
+   * @param  {...string} paths 
+   */
+  join(...paths) {
+    paths = paths.map(path => {
+      return this.normalize(path);
+    });
+    let res = paths.join('/');
+    return this.normalize(res);
+  },
+
+  /**
+   * Normalizes the given path, resolving '..' and '.' segments.
+   * @param {string} path 
+   */
+  normalize(path) {
+
+    path = path.replace(/\.\/+/g, './');
+    path = path.replace(/\/+/g, '/');
+
+    const resolved = [];
+    const pathAr = path.split('/');
+
+    for (let dir of pathAr) {
+      if (dir === '..') {
+        if (resolved.length) resolved.pop();
+      } else if (dir === '.') continue;
+      else resolved.push(dir);
+    }
+
+    return resolved.join('/');
+  },
+
+  /**
+   * 
+   * @param {string} path 
+   * @returns {PathObject}
+   */
+  parse(path) {
+    const root = path.startsWith("/") ? "/" : "";
+    const dir = this.dirname(path);
+    const ext = this.extname(path);
+    const name = this.basename(path, ext);
+    const base = this.basename(path);
+
+    return {
+      root,
+      dir,
+      base,
+      ext,
+      name
+    };
+  },
+
+  /**
  * Resolve the path eg.
 ```js
 resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
@@ -10,87 +150,21 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
 
     if (!paths.length) throw new Error("resolve(...path) : Arguments missing!");
 
-    let resolved = [];
+    let result = '';
 
-    paths.map(path => {
-
-      const pathAr = path.split('/');
-      if (!pathAr[0]) resolved = [];
-
-      for (let dir of pathAr) {
-        if (dir === '..') {
-          if (resolved.length) resolved.pop();
-        } else if (dir === '.') continue;
-        else if (dir) resolved.push(dir);
+    for (let path of paths) {
+      if (path.startsWith("/")) {
+        result = path;
+        continue;
       }
 
-    });
-
-    resolved.unshift('');
-
-    return resolved.join('/');
-  },
-  /**
-   * Joins the given number of paths
-   * @param  {...string} paths 
-   */
-  join(...paths) {
-    let res = paths.join('/');
-    paths.map(path => {
-      return this.resolve(path);
-    });
-    return this.resolve(res);
-  },
-  /**
- * Get path from full URI. eg.
- * ```js
-    getPath("this/is/a/file.txt", "file.txt"); //'this/is/a/'
-    getPath("this/is/a/file") //'this/is/a/'
- * ```
- * @param {string} fullname native url of the file
- * @param {string} [name] 
- */
-  parent(fullname, name) {
-    if (fullname.endsWith("/")) fullname = fullname.slice(0, -1);
-    if (name) return fullname.replace(new RegExp(name + '$'), '');
-    return fullname.split('/').slice(0, -1).join('/') + '/';
-  },
-  /**
-   * Gets path name from path
-   * @param {string} path 
-   */
-  name(path) {
-
-    if (path === "" || path === "/") return path;
-
-    path = decodeURL(path);
-    const ar = path.split('/');
-    const last = ar.slice(-1)[0];
-    if (!last) return ar.slice(-2)[0];
-    return last.split("?")[0];
-
-    function decodeURL(url) {
-      if (/%[0-9a-f]{2}/i.test(url)) {
-        const newurl = decodeURI(url);
-        if (url === newurl) return url;
-        return decodeURL(newurl);
-      }
-      return url;
+      result = this.normalize(this.join(result, path));
     }
+
+    if (result.startsWith("/")) return result;
+    else return "/" + result;
   },
-  /**
- * Subtracts the str2 from str1 if its in leading eg. 
- * ```js
-  subtract("mystring", "my"); //'string'
-  subtract("stringmy", "my"); //'stringmy'
- * ``` 
- *
- * @param {string} str1 string to subtract from
- * @param {string} str2 string to subtract
- */
-  subtract(str1, str2) {
-    return str1.replace(new RegExp("^" + str2), '');
-  },
+
   /**
   * Checks if child uri is originated from root uri eg.
   * ```js

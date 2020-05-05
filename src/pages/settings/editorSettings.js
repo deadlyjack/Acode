@@ -75,6 +75,11 @@ export default function editorSettings() {
             key: 'editorFont',
             text: strings['editor font'],
             subText: values.editorFont,
+        },
+        {
+            key: 'vibrateOnTap',
+            text: strings['vibrate on tap'],
+            checkbox: values.vibrateOnTap,
         }
     ];
 
@@ -220,6 +225,12 @@ export default function editorSettings() {
                         appSettings.update();
                         this.changeSubText(res);
                     });
+                break;
+
+            case 'vibrateOnTap':
+                values.vibrateOnTap = !values.vibrateOnTap;
+                appSettings.update();
+                this.value = values.vibrateOnTap;
                 break;
         }
     }

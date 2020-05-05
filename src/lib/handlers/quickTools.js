@@ -22,9 +22,6 @@ function actions(action) {
   if (!['pallete', 'search', 'search-settings'].includes(action) &&
     editorManager.state === 'focus') editor.focus();
 
-  navigator.vibrate(50);
-
-
   switch (action) {
     case 'pallete':
       editor.execCommand('openCommandPallete');
@@ -270,8 +267,6 @@ function clickListener(e) {
   if (!action) return;
 
   e.preventDefault();
-  e.stopPropagation();
-  e.stopImmediatePropagation();
   actions(action);
 }
 

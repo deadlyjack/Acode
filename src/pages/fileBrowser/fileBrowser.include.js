@@ -2,7 +2,6 @@
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
-import fs from '../../lib/fileSystem/internalFs';
 import helpers from '../../lib/utils/helpers';
 import contextMenu from '../../components/contextMenu';
 import dialogs from '../../components/dialogs';
@@ -17,6 +16,8 @@ import externalFs from '../../lib/fileSystem/externalFs';
 import fsOperation from '../../lib/fileSystem/fsOperation';
 import SearchBar from '../../components/searchbar';
 import projects from './projects';
+import decryptAccounts from '../ftp-accounts/decryptAccounts';
+import Url from '../../lib/utils/Url';
 //#endregion
 /**
  * 
@@ -186,7 +187,7 @@ function FileBrowserInclude(type, option, defaultPath) {
             if (name === "files") return card;
             list.push({
               name: externalList && externalList[name] ? externalList[name] : name,
-              nativeURL: path,
+              url: path,
               origin: path,
               isDirectory: true,
               parent: true,
@@ -198,12 +199,49 @@ function FileBrowserInclude(type, option, defaultPath) {
 
         const path = cordova.file.externalRootDirectory;
         list.push({
-          nativeURL: path,
+          url: path,
           name: 'Internal storage',
           isDirectory: true,
           parent: true,
           type: 'folder',
         });
+
+        let ftpaccounts;
+
+        try {
+          ftpaccounts = JSON.parse(localStorage.ftpaccounts);
+          if (Array.isArray(ftpaccounts)) {
+            ftpaccounts = decryptAccounts(ftpaccounts);
+            ftpaccounts.map(account => {
+
+              const {
+                mode,
+                security,
+                name
+              } = account;
+
+              let url = Url.formate({
+                protocol: "ftp:",
+                ...account,
+                query: {
+                  mode,
+                  security
+                }
+              });
+
+              list.push({
+                url: url,
+                name: name,
+                isDirectory: true,
+                parent: true,
+                type: 'folder'
+              });
+
+            });
+          }
+        } catch (error) {
+          console.log(error);
+        }
 
         if (type === "file") {
           list.push({
@@ -247,7 +285,13 @@ function FileBrowserInclude(type, option, defaultPath) {
         $list.scrollTop = item.scroll;
         name = item.name;
       } else {
-        fs.listDir(url)
+        const timeout = setTimeout(() => {
+          dialogs.loaderShow('', strings.loading + '...');
+        }, 100);
+        fsOperation(url)
+          .then(fs => {
+            return fs.lsDir();
+          })
           .then(list => {
             update();
             list = helpers.sortDir(list,
@@ -263,6 +307,10 @@ function FileBrowserInclude(type, option, defaultPath) {
             actionStack.remove(currentDir.url);
             helpers.error(err, url);
             console.error(err);
+          })
+          .finally(() => {
+            clearTimeout(timeout);
+            dialogs.loaderHide();
           });
       }
 
@@ -351,7 +399,7 @@ function FileBrowserInclude(type, option, defaultPath) {
       }
 
       function cmhandle() {
-        navigator.vibrate(50);
+        navigator.vibrate(constants.VIBRATION_TIME);
         dialogs.select('', [
             ['delete', strings.delete, 'delete'],
             ['rename', strings.rename, 'edit']

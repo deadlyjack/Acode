@@ -64,6 +64,11 @@ export default {
     "description": "Show settings menu",
     "readOnly": false
   },
+  "toggleFullscreen": {
+    "key": "F11",
+    "description": "Toggle full screen mode",
+    "readOnly": false
+  },
   "goToNextError": {
     "key": "Alt-E",
     "description": "Go to next error",

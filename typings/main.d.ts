@@ -39,6 +39,7 @@ interface Settings {
     openFileListPos: 'sidebar' | 'header';
     quickTools: Boolean;
     editorFont: "fira code" | "default";
+    vibrateOnTap: boolean;
 }
 
 interface AppSettings {
@@ -339,6 +340,31 @@ interface FTPFile {
     modifiedDate: string;
     absolutePath: string
 }
+
+interface PathObject {
+    dir: string;
+    root: string;
+    base: string;
+    name: string;
+    ext: string;
+}
+
+interface FTPAccount {
+    username: string;
+    password: string;
+    port: string | number;
+    hostname: string;
+    path: string;
+    mode: "active" | "passive";
+    security: "ftp" | "ftps";
+    id: string;
+}
+
+/**
+ * Returns fully decoded url
+ * @param url 
+ */
+declare function decodeURL(url: string): string;
 
 /**
  * App settings

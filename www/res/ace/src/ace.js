@@ -12713,6 +12713,15 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
             },
             readOnly: true
         }, {
+            name: "toggleFullscreen",
+            description: "Toggle full screen mode",
+            bindKey: bindKey("toggleFullscreen"),
+            exec: function () {
+                if (Acode) {
+                    Acode.exec("toggle-fullscreen")
+                }
+            }
+        }, {
             name: "goToNextError",
             description: "Go to next error",
             bindKey: bindKey("goToNextError"),

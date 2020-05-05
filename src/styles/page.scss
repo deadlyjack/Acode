@@ -4,6 +4,33 @@ body {
       font-size: 1.5em !important;
     }
   }
+
+  &.fullscreen-mode {
+    #root {
+      >header {
+        z-index: -1;
+      }
+
+      &.top-bar {
+        .open-file-list {
+          top: 0 !important;
+        }
+      }
+
+      &.page {
+        main {
+          height: calc(100vh - 30px) !important;
+          top: 30px !important;
+          position: fixed;
+          width: 100vw;
+        }
+      }
+    }
+
+    #quick-tools {
+      position: fixed;
+    }
+  }
 }
 
 div.page {

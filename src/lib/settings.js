@@ -56,7 +56,8 @@ class Settings {
             showSpaces: false,
             openFileListPos: 'header',
             quickTools: true,
-            editorFont: "default"
+            editorFont: "default",
+            vibrateOnTap: true
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;

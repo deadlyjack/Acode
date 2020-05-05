@@ -32,22 +32,17 @@ function remoteFs(username, password, hostname, port, security, mode) {
     currentDirectory,
     homeDirectory,
     get origin() {
-      let url;
-
-      if (username && password)
-        url = `ftp://${username}:${password}@${hostname}:${port}`;
-      else if (username)
-        url = `ftp://${username}@${hostname}:${port}`;
-      else
-        url = `ftp://${hostname}:${port}`;
-
-      if (security && mode)
-        url += `?security=${security}&mode=${mode}`;
-      else if (security)
-        url += `?security=${security}`;
-
-      return url;
-
+      return Url.formate({
+        protocol: "ftp:",
+        hostname,
+        password,
+        username,
+        port,
+        query: {
+          security,
+          mode
+        }
+      });
     },
     get originObject() {
       const [origin, query = ""] = this.origin.split(/(?=\?)/);
@@ -114,7 +109,9 @@ function remoteFs(username, password, hostname, port, security, mode) {
               let {
                 link,
                 type,
-                absolutePath
+                absolutePath,
+                name,
+                size
               } = entry;
 
               link = link === "null" ? null : link;
@@ -126,6 +123,8 @@ function remoteFs(username, password, hostname, port, security, mode) {
               } = fs.originObject;
 
               ls.push({
+                size,
+                name,
                 url: origin + url + query,
                 isDirectory: type === DIR,
                 isFile: type === FILE,
@@ -329,7 +328,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function copyTo(path, newPath) {
-    return Promise.reject("Copy command is supported by FTP.");
+    return Promise.reject(strings["copy command is not supported by ftp"]);
   }
 
   function getCode(err) {

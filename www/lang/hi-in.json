@@ -126,5 +126,7 @@
   "format": "फॉर्मेट",
   "project name": "प्रोजेक्ट का नाम",
   "support us": "एकोड विकास का समर्थन करें, पेट्रोन बनें।",
-  "unsupported device": "आपका डिवाइस थीम का समर्थन नहीं करता है।"
+  "unsupported device": "आपका डिवाइस थीम का समर्थन नहीं करता है।",
+  "vibrate on tap": "Vibrate on tap",
+  "copy command is not supported by ftp.": "Copy command is not supported by FTP."
 }

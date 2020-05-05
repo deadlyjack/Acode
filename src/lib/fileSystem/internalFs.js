@@ -1,13 +1,12 @@
 import ajax from '../ajax';
-import path from '../utils/path';
-import helpers from '../utils/helpers';
+import Url from '../utils/Url';
 /**
  * 
  * @param {string} url 
  * @returns {Promise}
  */
 function listDir(url) {
-    url = helpers.decodeURL(url);
+    url = decodeURL(url);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(url, success, reject);
 
@@ -31,9 +30,9 @@ function listDir(url) {
  * @returns {Promise} 
  */
 function writeFile(filename, data, create = false, exclusive = true) {
-    filename = helpers.decodeURL(filename);
+    filename = decodeURL(filename);
     const name = filename.split('/').pop();
-    const _path = path.parent(filename, name);
+    const _path = Url.dirname(filename);
     return new Promise((resolve, reject) => {
         if (!create) {
             window.resolveLocalFileSystemURL(filename, fileEntry => {
@@ -67,7 +66,7 @@ function writeFile(filename, data, create = false, exclusive = true) {
  * @returns {Promise} 
  */
 function deleteFile(filename) {
-    filename = helpers.decodeURL(filename);
+    filename = decodeURL(filename);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(filename, entry => {
             if (entry.isFile) {
@@ -85,7 +84,7 @@ function deleteFile(filename) {
  * @returns {Promise} 
  */
 function readFile(filename) {
-    filename = helpers.decodeURL(filename);
+    filename = decodeURL(filename);
     return new Promise((resolve, reject) => {
 
         if (!filename) return reject("Invalid valud of fileURL: " + filename);
@@ -129,7 +128,7 @@ function readFile(filename) {
  * @returns {Promise} 
  */
 function renameFile(url, newname) {
-    url = helpers.decodeURL(url);
+    url = decodeURL(url);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(url, fs => {
             fs.getParent(parent => {
@@ -146,7 +145,7 @@ function renameFile(url, newname) {
  * @returns {Promise} 
  */
 function createDir(path, dirname) {
-    path = helpers.decodeURL(path);
+    path = decodeURL(path);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(path, fs => {
             fs.getDirectory(dirname, {

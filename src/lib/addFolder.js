@@ -116,10 +116,10 @@ function openFolder(_path, opts = {}) {
       if (hostname && port) title += ':' + port;
 
       if (title) return title;
-      else return path.name(_path);
+      else return path.basename(_path);
 
     } catch (error) {
-      return path.name(_path);
+      return path.basename(_path);
     }
   }
 
@@ -192,7 +192,7 @@ function openFolder(_path, opts = {}) {
    */
   function handleContextmenu(type, url, name, $target) {
 
-    navigator.vibrate(50);
+    navigator.vibrate(constants.VIBRATION_TIME);
     const cancel = strings.cancel + (clipBoard ? ' (' + strings[clipBoard.action] + ')' : '');
     const COPY = ['copy', strings.copy, 'copy'],
       CUT = ['cut', strings.cut, 'cut'],
@@ -454,11 +454,6 @@ function openFolder(_path, opts = {}) {
 
     }
 
-    function join(path1, path2) {
-      if (path1.slice(-1) !== '/' || path2[0] !== '/') return path1 + '/' + path2;
-      return path1 + path2;
-    }
-
     /**
      * 
      * @param {HTMLElement} $target 
@@ -541,7 +536,7 @@ function openFolder(_path, opts = {}) {
             showHiddenFiles: true
           }, true);
           entries.map(entry => {
-            const name = entry.name || path.name(entry.url);
+            const name = entry.name || path.basename(entry.url);
             if (entry.isDirectory) {
 
               const $list = createFolderTile(name, entry.url);

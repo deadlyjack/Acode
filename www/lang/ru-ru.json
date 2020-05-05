@@ -10,7 +10,7 @@
   "cancel": "Отмена",
   "change language": "Изменить язык",
   "choose color": "Выберите цвет",
-  "clear": "ясно",
+  "clear": "очистить",
   "close app": "Закрыть приложение?",
   "commit message": "Commit message",
   "console": "Консоль",
@@ -126,5 +126,7 @@
   "format": "формат",
   "project name": "Название проекта",
   "support us": "Поддержка развития Acode, стать patreon.",
-  "unsupported device": "Ваше устройство не поддерживает тему."
+  "unsupported device": "Ваше устройство не поддерживает тему.",
+  "vibrate on tap": "Vibrate on tap",
+  "copy command is not supported by ftp.": "Copy command is not supported by FTP."
 }

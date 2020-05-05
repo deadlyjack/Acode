@@ -8,15 +8,10 @@ import ajax from '../ajax';
 import path from './path';
 import Url from './Url';
 
-/**
- * 
- * @param {string} fileName 
- * @returns {string}
- */
-function getExt(fileName) {
-    const res = /(?:\.([^.]+))?$/.exec(fileName);
-
-    return (res[1] || '').toLowerCase();
+function extname(pathname) {
+    const res = path.extname(pathname);
+    if (res) return res.slice(1).toLowerCase();
+    return res;
 }
 
 /**
@@ -186,7 +181,7 @@ function getLangNameFromFileName(filename) {
         if (regex[type].test(filename)) return type;
     }
 
-    const ext = getExt(filename);
+    const ext = extname(filename);
     return getLangNameFromExt(ext);
 }
 
@@ -206,10 +201,10 @@ function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null
 
     list.map(item => {
 
-        item.type = getType(item);
+        item.name = decodeURL(item.name || path.basename(item.url)) || '';
         item.readOnly = readOnly;
         item.canWrite = !readOnly;
-        item.name = item.name || path.name(item.url) || '';
+        item.type = getType(item);
 
         if (origin) item.origin = origin;
         if (uuid) item.uuid = uuid;
@@ -235,7 +230,7 @@ function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null
     }
 
     function getType(item) {
-        const ext = getExt(item.name);
+        const ext = extname(item.name);
         if (item.isDirectory || (!ext && item.isLink)) {
             item.isDirectory = true;
             return 'folder';
@@ -255,7 +250,7 @@ function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null
 
 function getIconForFile(filename) {
     let file;
-    let ext = getExt(filename);
+    let ext = extname(filename);
 
     if (['mp4', 'm4a', 'mov', '3gp', 'wmv', 'flv', 'avi'].includes(ext)) file = 'movie';
     if (['png', 'jpeg', 'jpg', 'gif', 'ico', 'webp'].includes(ext)) file = 'image';
@@ -413,24 +408,17 @@ function isBinary(content) {
 }
 
 /**
- * Decode any url recursively until its fully decoded
- * @param {string} url URL string
- * @returns {string}
- */
-function decodeURL(url) {
-    if (/%[0-9a-f]{2}/i.test(url)) {
-        const newurl = decodeURI(url);
-        if (url === newurl) return url;
-        return decodeURL(newurl);
-    }
-    return url;
-}
-/**
  * 
  * @param {Error} e 
  * @param  {...string} args 
+ * @returns {Promise<function():void>}
  */
 function error(e, ...args) {
+
+    let hide = () => {};
+    const promise = {
+        then: fun => hide = fun
+    };
 
     args.map(arg => {
 
@@ -444,12 +432,21 @@ function error(e, ...args) {
 
     const extra = args.length && ' <br>' + args.join('<br>') || '';
     if (e.code) {
-        dialogs.alert(strings.error, getErrorMessage(e.code) + extra);
+        dialogs.alert(strings.error, getErrorMessage(e.code) + extra, () => {
+            hide();
+        });
     } else {
         const msg = (e && typeof e === 'string') ? e : (toString in e && e.toString());
-        if (msg) dialogs.alert(strings.error, msg + extra);
-        else window.plugins.toast.showShortBottom(strings.error);
+        if (msg) dialogs.alert(strings.error, msg + extra, () => {
+            hide();
+        });
+        else {
+            window.plugins.toast.showShortBottom(strings.error);
+            hide();
+        }
     }
+
+    return promise;
 }
 
 /**
@@ -664,7 +661,7 @@ function parseQuery(query) {
 }
 
 export default {
-    getExt,
+    extname,
     getErrorMessage,
     sortDir,
     getLangNameFromExt,
@@ -678,7 +675,6 @@ export default {
     b64toBlob,
     checkColorType,
     isBinary,
-    decodeURL,
     error,
     canWrite,
     getFeedbackBody,

@@ -125,5 +125,7 @@
   "format": "format",
   "project name": "Project name",
   "support us": "Support Acode development, become patreon.",
-  "unsupported device": "Your device does not support theme."
+  "unsupported device": "Your device does not support theme.",
+  "vibrate on tap": "Vibrate on tap",
+  "copy command is not supported by ftp.": "Copy command is not supported by FTP."
 }

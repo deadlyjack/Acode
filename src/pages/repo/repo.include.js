@@ -168,7 +168,7 @@ export default function RepoInclude(owner, repoName) {
         if (!entry.name && entry.path) entry.name = entry.path;
         entry.isDirectory = type === 'dir' || type === 'tree';
         entry.isFile = !entry.isDirectory;
-        entry.type = entry.isDir ? 'folder' : helpers.getIconForFile(name);
+        entry.type = entry.isDirectory ? 'folder' : helpers.getIconForFile(entry.name);
       });
     }
 
@@ -301,7 +301,7 @@ export default function RepoInclude(owner, repoName) {
 
     function file() {
       dialogs.loaderShow(name, strings.loading + '...');
-      const ext = helpers.getExt(name);
+      const ext = helpers.extname(name);
       const mime = mimeType.lookup(ext);
       const type = /image/i.test(mime) ? 'blob' : null;
       repo.getBlob(sha, 'blob')

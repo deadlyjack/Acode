@@ -28,7 +28,7 @@ function fsOperation(fileUri) {
             createInternalFsOperation(internalFs, fileUri, resolve);
           } else if (res.uuid) {
             externalStorage.saveOrigin(res.uuid, res.origin);
-            const _path = path.subtract(fileUri, res.origin);
+            const _path = fileUri.subtract(res.origin);
             externalFs(res.uuid)
               .then(fs => {
                 createExternalFsOperation(fs, _path, resolve, fileUri);
@@ -137,13 +137,13 @@ function fsOperation(fileUri) {
       moveTo: dest => {
         let pathname = Url.pathname(dest);
 
-        const name = path.name(url);
+        const name = path.basename(url);
         dest = origin + path.join(pathname, name) + query;
         return fs.rename(url, dest);
       },
       renameTo: newname => {
         let pathname = Url.pathname(url);
-        const parent = path.parent(pathname);
+        const parent = path.dirname(pathname);
         newname = origin + path.join(parent, newname) + query;
         return fs.rename(url, newname);
       }
@@ -228,7 +228,7 @@ function fsOperation(fileUri) {
 
             if (origin && !path.isParent(origin, dest))
               return Promise.reject("Copying file/directory to different drive is not supported yet.");
-            dest = path.subtract(dest, origin);
+            dest = dest.subtract(origin);
             const res = fs[action](url, dest);
 
             if (res) {

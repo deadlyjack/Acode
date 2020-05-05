@@ -109,7 +109,7 @@ function saveFile(file, as = false, showToast = true) {
         if (url) {
             file.type = 'regular';
             file.record = null;
-            file.location = helpers.decodeURL(url);
+            file.location = decodeURL(url);
         }
         if (filename) {
             if (filename.overwrite) {
@@ -240,7 +240,7 @@ function saveFile(file, as = false, showToast = true) {
     }
 
     function beautifyFile(name) {
-        const ext = helpers.getExt(name || file.filename);
+        const ext = helpers.extname(name || file.filename);
         const _beautify = appSettings.value.beautify;
         if (_beautify[0] !== '*' && _beautify.indexOf(ext) < 0)
             Acode.exec("format");
