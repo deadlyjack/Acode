@@ -11,6 +11,7 @@ import constants from './constants';
 import externalFs from './fileSystem/externalFs';
 import fsOperation from './fileSystem/fsOperation';
 import path from './utils/path';
+import Url from './utils/Url';
 
 /**
  * Starts the server and run the active file in browser
@@ -30,8 +31,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   const MIMETYPE_HTML = mimeType.lookup('html');
   const CONSOLE_SCRIPT = uuid + '_console.js';
   const ESPRISMA_SCRIPT = uuid + '_esprisma.js';
-  // const EDITOR_SCRIPT = uuid + '_editor.js';
-  const EDITOR_SCRIPT = '';
+  const EDITOR_SCRIPT = uuid + '_editor.js';
   const CONSOLE_STYLE = uuid + '_console.css';
   const MARKDOWN_STYLE = uuid + '_md.css';
   const DOC_PROVIDER = "content://com.android.externalstorage.documents/document/";
@@ -156,8 +156,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
           break;
 
         case EDITOR_SCRIPT:
-          url = `${assets}/js/codeflask.min.js`;
-          sendFileContent(url, req.requestId, 'application/javascript');
+          sendText('', req.requestId, 'application/javascript');
           break;
 
         case EXECUTING_SCRIPT:
@@ -197,7 +196,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
             } else if (checkFile(reqPath)) {
               sendHTML(activeFile.session.getValue(), req.requestId);
             } else {
-              sendFileContent(pathName + reqPath, req.requestId, MIMETYPE_HTML);
+              const url = Url.join(pathName, reqPath);
+              sendFileContent(url, req.requestId, MIMETYPE_HTML);
             }
             break;
 
@@ -241,7 +241,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
               });
             } else {
               if (pathName) {
-                const url = pathName + reqPath;
+                const url = Url.join(pathName, reqPath);
                 const file = editorManager.getFile(url, "fileUri");
                 if (file && file.isUnsaved) {
                   sendText(file.session.getValue(), req.requestId, mimeType.lookup(file.filename));
@@ -316,13 +316,34 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function sendFile(path, id) {
-    path = path.replace(/^file:\/\//, '');
-    const type = mimeType.lookup(path);
-    webserver.sendResponse(id, {
-      status: 200,
-      path,
-      headers: {}
-    });
+    const protocol = Url.getProtocol(path);
+    if (protocol === "ftp:") {
+      const cacheFile = CACHE_STORAGE_REMOTE + path.hashCode();
+      fsOperation(path)
+        .then(fs => {
+          return fs.readFile();
+        })
+        .then(() => {
+          path = Url.pathname(cacheFile);
+          webserver.sendResponse(id, {
+            status: 200,
+            path,
+            headers: {}
+          });
+        })
+        .catch(err => {
+          webserver.sendResponse(id, {
+            status: 404
+          });
+        });
+    } else {
+      path = Url.pathname(path);
+      webserver.sendResponse(id, {
+        status: 200,
+        path,
+        headers: {}
+      });
+    }
   }
 
   function sendFileContent(url, id, mime, processText) {

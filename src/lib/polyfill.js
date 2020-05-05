@@ -55,7 +55,7 @@ export default function loadPolyFill() {
    */
   window.decodeURL = url => {
     if (/%[0-9a-f]{2}/i.test(url)) {
-      const newurl = decodeURI(url);
+      const newurl = decodeURIComponent(url);
       if (url === newurl) return url;
       return decodeURL(newurl);
     }

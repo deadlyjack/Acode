@@ -93,7 +93,7 @@ function Main() {
     const oldRURL = window.resolveLocalFileSystemURL;
 
     window.resolveLocalFileSystemURL = function (url, ...args) {
-      oldRURL.call(this, Url.safe(url), ...args);
+      oldRURL.call(this, decodeURL(Url.safe(url)), ...args);
     };
 
     if (!BuildInfo.debug) {

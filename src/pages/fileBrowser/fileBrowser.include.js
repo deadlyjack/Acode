@@ -18,6 +18,7 @@ import SearchBar from '../../components/searchbar';
 import projects from './projects';
 import decryptAccounts from '../ftp-accounts/decryptAccounts';
 import Url from '../../lib/utils/Url';
+import path from '../../lib/utils/path';
 //#endregion
 /**
  * 
@@ -145,31 +146,32 @@ function FileBrowserInclude(type, option, defaultPath) {
       };
     }
 
-    // if (defaultPath) {
+    if (defaultPath) {
 
-    //     navigate('/', root);
-    //     actionStack.push({
-    //         id: defaultPath,
-    //         action: () => {
-    //             navigate.pop();
-    //             genList();
-    //         }
-    //     });
-    //     loadDir(defaultPath, path.name(defaultPath));
+      actionStack.push({
+        id: defaultPath,
+        action: () => {
+          navigate.pop();
+          start();
+        }
+      });
+      loadDir(defaultPath, path.basename(defaultPath));
 
-    // } else {
-
-    // }
-
-    const version = parseInt(device.version);
-    if (version < 7) {
-      genList();
     } else {
-      externalFs.listExternalStorages()
-        .then(res => {
-          externalList = res;
-          genList();
-        });
+      start();
+    }
+
+    function start() {
+      const version = parseInt(device.version);
+      if (version < 7) {
+        genList();
+      } else {
+        externalFs.listExternalStorages()
+          .then(res => {
+            externalList = res;
+            genList();
+          });
+      }
     }
 
     function resolve(data) {
@@ -257,10 +259,15 @@ function FileBrowserInclude(type, option, defaultPath) {
           list
         };
 
+        delete localStorage.lastDir;
         navigate("/", "/");
+        currentDir.url = "/";
+        currentDir.name = "File Browser";
+        $page.settitle('File Browser');
         render(list);
 
         if (type === 'folder') {
+          $addMenuToggler.classList.add('disabled');
           folderOption.classList.add('disabled');
         }
       });
@@ -268,14 +275,14 @@ function FileBrowserInclude(type, option, defaultPath) {
 
     function loadDir(path = "/", name = 'File Browser') {
 
-      if (path === "/") return genList();
-
       let url = path;
 
       if (typeof path === 'object') {
         url = path.url;
         name = path.name;
       }
+
+      if (url === "/") return genList();
 
       if (url in cachedDir) {
         update();
@@ -324,6 +331,7 @@ function FileBrowserInclude(type, option, defaultPath) {
             folderOption.classList.remove('disabled');
           }
 
+        localStorage.lastDir = url;
         currentDir.url = url;
         currentDir.name = name;
         const $list = tag.get('#list');
@@ -442,7 +450,8 @@ function FileBrowserInclude(type, option, defaultPath) {
       function remove() {
         fsOperation(url)
           .then(fs => {
-            return fs.deleteFile();
+            if (action === "file") return fs.deleteFile();
+            if (action === "folder") return fs.deleteDir();
           })
           .then(() => {
             updateAddedFolder(url);
@@ -604,7 +613,7 @@ function FileBrowserInclude(type, option, defaultPath) {
             return fs.createDirectory(projectName);
           })
           .then(res => {
-            newUrl = url + projectName + '/';
+            newUrl = Url.join(url, projectName, "/");
             const files = Object.keys(project);
 
             return new Promise((resolve, reject) => {
@@ -618,8 +627,8 @@ function FileBrowserInclude(type, option, defaultPath) {
                 loadDir(url, name);
                 resolve();
               }
+              cturl = '';
               const file = files.pop();
-              cturl = [];
               createFile(file)
                 .then(() => {
                   createProject(resolve, reject);
@@ -635,7 +644,7 @@ function FileBrowserInclude(type, option, defaultPath) {
                 createDir();
 
                 function createDir() {
-                  const lclUrl = newUrl + cturl;
+                  const lclUrl = Url.join(newUrl, cturl);
 
                   if (paths.length === 0) {
                     return fsOperation(lclUrl)
@@ -648,7 +657,7 @@ function FileBrowserInclude(type, option, defaultPath) {
                   }
 
                   const name = paths.splice(0, 1)[0];
-                  const toCreate = lclUrl + name;
+                  const toCreate = Url.join(lclUrl, name);
 
                   fsOperation(lclUrl)
                     .then(fs => {
@@ -656,7 +665,8 @@ function FileBrowserInclude(type, option, defaultPath) {
                       return fs.createDirectory(name);
                     })
                     .then(res => {
-                      if (!alreadyCreated.includes(toCreate)) alreadyCreated.push(toCreate);
+                      if (!alreadyCreated.includes(toCreate))
+                        alreadyCreated.push(toCreate);
                       cturl += name + '/';
                       return createDir(paths);
                     })

@@ -377,6 +377,7 @@ public class CDVFtp extends CordovaPlugin {
                         return;
                     }
                 }
+                callbackContext.error("File not found");
                 // should never reach here!
             } catch (Exception e) {
                 callbackContext.error(e.toString());

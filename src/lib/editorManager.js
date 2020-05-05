@@ -267,7 +267,7 @@ function EditorManager($sidebar, $header, $body) {
             },
             get location() {
                 if (this.fileUri)
-                    return this.fileUri.replace(new RegExp(this.filename + '$'), '');
+                    return Url.dirname(this.fileUri);
                 return null;
             },
             set location(url) {
@@ -655,7 +655,7 @@ function EditorManager($sidebar, $header, $body) {
                 return error(err);
             }
         } else if (this.fileUri) {
-            this.fileUri = this.location + name;
+            this.fileUri = Url.join(this.location, name);
         }
 
         if (editorManager.activeFile.id === this.id) $header.text(name);

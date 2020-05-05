@@ -76,8 +76,12 @@ export default {
    */
   dirname(url) {
     if (typeof url !== "string") throw new Error("URL must be string");
+
+    const urlObj = this.parse(url);
+    url = urlObj.url;
+
     if (url.endsWith('/')) url = url.slice(0, -1);
-    return [...url.split('/').slice(0, -1), ''].join('/');
+    return [...url.split('/').slice(0, -1), ''].join('/') + urlObj.query;
   },
 
   /**
@@ -96,7 +100,7 @@ export default {
   /**
    * Formate Url object to string
    * @param {object} urlObj 
-   * @param {"ftp:"|"sftp:"|"http:"|"https:"|string} urlObj.protocol
+   * @param {"ftp:"|"sftp:"|"http:"|"https:"} urlObj.protocol
    * @param {string|number} urlObj.hostname 
    * @param {string} [urlObj.path] 
    * @param {string} [urlObj.username] 
@@ -147,9 +151,9 @@ export default {
     return string;
   },
   /**
-   * 
+   * Returns protocol of a url e.g. 'ftp:' from 'ftp://localhost/foo/bar'
    * @param {string} url 
-   * @returns {"ftp:"|"sftp:"|"http:"|"https:"|string}
+   * @returns {"ftp:"|"sftp:"|"http:"|"https:"}
    */
   getProtocol(url) {
     return (/^([a-z]+:)\/\/\/?/i.exec(url) || [])[1] || "";

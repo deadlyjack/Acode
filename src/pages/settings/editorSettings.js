@@ -189,6 +189,10 @@ export default function editorSettings() {
                 files.map(file => {
                     file.session.setUseWorker(values.linting);
                 });
+                if (values.linting)
+                    editorManager.editor.renderer.setMargin(0, 0, 0, 0);
+                else
+                    editorManager.editor.renderer.setMargin(0, 0, -16, 0);
                 appSettings.update();
                 this.value = values.linting;
                 break;

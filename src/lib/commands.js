@@ -210,18 +210,20 @@ const commands = {
       } else {
         if (url.hostname && url.username) title = `${url.username}@${url.hostname}`;
         if (url.hostname) title = url.protocol + url.hostname;
+
+        title += Url.pathname(dir.url);
       }
       all.push([{
         type: 'dir',
         val: dir
-      }, shortName(title), 'icon folder']);
+      }, shortName(decodeURL(title)), 'icon folder']);
 
     }
     for (let file of files)
       all.push([{
         type: 'file',
         val: file
-      }, shortName(decodeURI(file)), helpers.getIconForFile(file)]);
+      }, shortName(decodeURL(file)), helpers.getIconForFile(file)]);
 
     all.push(['clear', strings.clear, 'icon clearclose']);
 
