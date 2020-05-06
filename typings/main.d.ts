@@ -4,6 +4,8 @@
 
 interface Acode {
     exec(command: string, value?: any): boolean;
+    $menuToggler: HTMLElement;
+    $editMenuToggler: HTMLElement;
 }
 
 interface fileBrowserSettings {
@@ -69,6 +71,7 @@ interface storedFiles {
     name: string;
     data?: string;
     url?: string;
+    fileUri?: string;
 }
 
 interface fileOptions {

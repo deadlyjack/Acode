@@ -15,21 +15,21 @@ function select(title, options, opts = {}) {
       className: 'title',
       textContent: title
     });
-    const list = tag('ul', {
+    const $list = tag('ul', {
       className: 'scroll' + (opts.textTransform === false ? ' no-text-transform' : '')
     });
     const selectDiv = tag('div', {
       className: 'prompt select',
       children: titleSpan ? [
         titleSpan,
-        list
-      ] : [list]
+        $list
+      ] : [$list]
     });
     const mask = tag('span', {
       className: 'mask',
       onclick: hide
     });
-    let defaultVal;
+    let $defaultVal;
 
     if (opts.hideOnSelect === undefined) opts.hideOnSelect = true;
 
@@ -58,7 +58,7 @@ function select(title, options, opts = {}) {
         value = text = option;
       }
 
-      const item = tile({
+      const $item = tile({
         lead,
         text: tag('span', {
           className: 'text',
@@ -67,20 +67,22 @@ function select(title, options, opts = {}) {
       });
 
       if (opts.default === value) {
-        item.classList.add('selected');
-        defaultVal = item;
+        $item.classList.add('selected');
+        $defaultVal = $item;
       }
 
-      item.onclick = function () {
+      $item.tabIndex = "0";
+
+      $item.onclick = function () {
         if (value !== undefined) {
           resolve(value);
           if (opts.hideOnSelect) hide();
         }
       };
 
-      if (disabled) item.classList.add('disabled');
+      if (disabled) $item.classList.add('disabled');
 
-      list.append(item);
+      $list.append($item);
 
       return option;
     });
@@ -91,7 +93,10 @@ function select(title, options, opts = {}) {
     });
 
     document.body.append(selectDiv, mask);
-    if (defaultVal) defaultVal.scrollIntoView();
+    if ($defaultVal) $defaultVal.scrollIntoView();
+
+    const $firstChild = $defaultVal || $list.firstChild;
+    if ($firstChild && $firstChild.focus) $firstChild.focus();
 
     window.restoreTheme(true);
 
@@ -107,7 +112,7 @@ function select(title, options, opts = {}) {
     function hide() {
       actionStack.remove('select');
       hideSelect();
-      let listItems = [...list.children];
+      let listItems = [...$list.children];
       listItems.map(item => {
         item.onclick = null;
       });

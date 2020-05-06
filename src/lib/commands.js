@@ -216,14 +216,14 @@ const commands = {
       all.push([{
         type: 'dir',
         val: dir
-      }, shortName(decodeURL(title)), 'icon folder']);
+      }, shortName(title), 'icon folder']);
 
     }
     for (let file of files)
       all.push([{
         type: 'file',
         val: file
-      }, shortName(decodeURL(file)), helpers.getIconForFile(file)]);
+      }, shortName(file), helpers.getIconForFile(file)]);
 
     all.push(['clear', strings.clear, 'icon clearclose']);
 
@@ -304,6 +304,16 @@ const commands = {
   "toggle-fullscreen": () => {
     app.classList.toggle("fullscreen-mode");
     editorManager.editor.resize(true);
+    editorManager.controls.update();
+  },
+  "toggle-sidebar": () => {
+    editorManager.sidebar.toggle();
+  },
+  "toggle-menu": () => {
+    Acode.$menuToggler.click();
+  },
+  "toggle-editmenu": () => {
+    Acode.$editMenuToggler.click();
   }
 };
 

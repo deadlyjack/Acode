@@ -158,6 +158,9 @@ export default {
   getProtocol(url) {
     return (/^([a-z]+:)\/\/\/?/i.exec(url) || [])[1] || "";
   },
-
+  hidePassword(url) {
+    const urlObj = new URL(url);
+    return `${urlObj.origin}${urlObj.pathname}`;
+  },
   PROTOCOL_PATTERN: /^[a-z]+:\/\/\/?/i
 };

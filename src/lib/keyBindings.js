@@ -51,7 +51,7 @@ export default {
     "description": "Preview HTML and MarkDownOpen previous file tab",
     "key": "F5",
     "readOnly": false,
-    "action": "rename"
+    "action": "run"
   },
   "selectWord": {
     "description": "Open previous file tab",
@@ -67,7 +67,26 @@ export default {
   "toggleFullscreen": {
     "key": "F11",
     "description": "Toggle full screen mode",
-    "readOnly": false
+    "readOnly": false,
+    "action": "toggle-fullscreen"
+  },
+  "toggleSidebar": {
+    "key": "Ctrl-B",
+    "description": "Toggle sidebar",
+    "readOnly": true,
+    "action": "toggle-sidebar"
+  },
+  "toggleMenu": {
+    "key": "F3",
+    "description": "Toggle edit menu",
+    "readOnly": true,
+    "action": "toggle-menu"
+  },
+  "toggleEditMenu": {
+    "key": "F4",
+    "description": "Toggle sidebar",
+    "readOnly": true,
+    "action": "toggle-editmenu"
   },
   "goToNextError": {
     "key": "Alt-E",

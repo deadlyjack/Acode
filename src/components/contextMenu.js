@@ -49,6 +49,8 @@ function contextMenu(arg1, arg2) {
         ontouchstart: hide
     });
 
+    if (!arg2.innerHTML) addTabindex();
+
     function show() {
         actionStack.push({
             id: 'main-menu',
@@ -59,6 +61,7 @@ function contextMenu(arg1, arg2) {
 
         if (arg2.innerHTML) {
             $el.innerHTML = arg2.innerHTML.call($el);
+            addTabindex();
         }
 
         if (arg2.toggle) {
@@ -70,6 +73,9 @@ function contextMenu(arg1, arg2) {
         }
 
         document.body.append($el, mask);
+
+        const $firstChild = $el.firstChild;
+        if ($firstChild && $firstChild.focus) $firstChild.focus();
     }
 
     function hide() {
@@ -85,6 +91,13 @@ function contextMenu(arg1, arg2) {
     function toggle() {
         if ($el.parentElement) return hide();
         show();
+    }
+
+    function addTabindex() {
+        /**@type {Array<HTMLLIElement>} */
+        const children = [...$el.children];
+        for (let $el of children)
+            $el.tabIndex = "0";
     }
 
     if (arg2.toggle) arg2.toggle.addEventListener('click', toggle);

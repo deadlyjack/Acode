@@ -73,15 +73,15 @@ function externalFs(uuid, uri) {
   }
 
   function writeFile(filename, content) {
-    filename = decodeURL(filename);
+    // filename = decodeURL(filename);
     return new Promise((resolve, reject) => {
       SDcard.write(rootPath, filename, content, res => resolve(res), err => reject(err));
     });
   }
 
   function copy(src, dest) {
-    src = decodeURL(src);
-    dest = decodeURL(dest);
+    // src = decodeURL(src);
+    // dest = decodeURL(dest);
 
     return new Promise((resolve, reject) => {
       SDcard.copy(rootPath, src, dest, res => resolve(res), err => reject(err));
@@ -89,8 +89,8 @@ function externalFs(uuid, uri) {
   }
 
   function move(src, dest) {
-    src = decodeURL(src);
-    dest = decodeURL(dest);
+    // src = decodeURL(src);
+    // dest = decodeURL(dest);
 
     return new Promise((resolve, reject) => {
       SDcard.move(rootPath, src, dest, res => resolve(res), err => reject(err));
@@ -98,7 +98,7 @@ function externalFs(uuid, uri) {
   }
 
   function deleteFile(filename) {
-    filename = decodeURL(filename);
+    // filename = decodeURL(filename);
 
     return new Promise((resolve, reject) => {
       SDcard.delete(rootPath, filename, res => resolve(res), err => reject(err));
@@ -106,8 +106,8 @@ function externalFs(uuid, uri) {
   }
 
   function createFile(parent, filename, data) {
-    parent = decodeURL(parent);
-    filename = decodeURL(filename);
+    // parent = decodeURL(parent);
+    // filename = decodeURL(filename);
 
     return new Promise((resolve, reject) => {
       SDcard.touch(rootPath, parent, filename, res => {
@@ -121,8 +121,8 @@ function externalFs(uuid, uri) {
   }
 
   function createDir(parent, dirname) {
-    parent = decodeURL(parent);
-    dirname = decodeURL(dirname);
+    // parent = decodeURL(parent);
+    // dirname = decodeURL(dirname);
 
     return new Promise((resolve, reject) => {
       SDcard.mkdir(rootPath, parent, dirname, res => resolve(res), err => reject(err));
@@ -130,8 +130,8 @@ function externalFs(uuid, uri) {
   }
 
   function renameFile(src, newname) {
-    src = decodeURL(src);
-    newname = decodeURL(newname);
+    // src = decodeURL(src);
+    // newname = decodeURL(newname);
 
     return new Promise((resolve, reject) => {
       SDcard.rename(rootPath, src, newname, res => resolve(res), err => reject(err));

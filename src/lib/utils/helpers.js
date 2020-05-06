@@ -348,9 +348,10 @@ function removeLineBreaks(str) {
  * @param {string} url 
  */
 function updateFolders(url) {
-    url = decodeURL(url);
+    // url = decodeURL(url);
     for (let folder of addedFolder) {
-        const furl = decodeURL(folder.url);
+        // const furl = decodeURL(folder.url);
+        const furl = folder.url;
         if (path.isParent(furl, url)) folder.reload();
     }
 }

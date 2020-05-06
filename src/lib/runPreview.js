@@ -47,9 +47,9 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
         const [uuid, docpath] = decodeURIComponent(activeFile.contentUri.split('/').pop()).split(':');
 
         if (uuid === 'primary') {
-          pathName = helpers.getPath(cordova.file.externalRootDirectory + docpath);
+          pathName = path.dirname(cordova.file.externalRootDirectory + docpath);
         } else {
-          relPath = helpers.getPath(docpath);
+          relPath = path.dirname(docpath);
           useExternalFs = uuid;
         }
       }
@@ -276,7 +276,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function sendExternalFile(file, id) {
-    SDcard.getPath(rootPath, relPath + file, res => {
+    SDcard.getPath(rootPath, path.join(relPath, file), res => {
       sendFileContent(res, id, mimeType.lookup(file));
     }, err => {
       console.log(err);

@@ -6,7 +6,7 @@ import Url from '../utils/Url';
  * @returns {Promise}
  */
 function listDir(url) {
-    url = decodeURL(url);
+    // url = decodeURL(url);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(url, success, reject);
 
@@ -30,7 +30,7 @@ function listDir(url) {
  * @returns {Promise} 
  */
 function writeFile(filename, data, create = false, exclusive = true) {
-    filename = decodeURL(filename);
+    // filename = decodeURL(filename);
     const name = filename.split('/').pop();
     const _path = Url.dirname(filename);
     return new Promise((resolve, reject) => {
@@ -66,7 +66,7 @@ function writeFile(filename, data, create = false, exclusive = true) {
  * @returns {Promise} 
  */
 function deleteFile(filename) {
-    filename = decodeURL(filename);
+    // filename = decodeURL(filename);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(filename, entry => {
             if (entry.isFile) {
@@ -84,7 +84,7 @@ function deleteFile(filename) {
  * @returns {Promise} 
  */
 function readFile(filename) {
-    filename = decodeURL(filename);
+    // filename = decodeURL(filename);
     return new Promise((resolve, reject) => {
 
         if (!filename) return reject("Invalid valud of fileURL: " + filename);
@@ -128,7 +128,7 @@ function readFile(filename) {
  * @returns {Promise} 
  */
 function renameFile(url, newname) {
-    url = decodeURL(url);
+    // url = decodeURL(url);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(url, fs => {
             fs.getParent(parent => {
@@ -145,7 +145,7 @@ function renameFile(url, newname) {
  * @returns {Promise} 
  */
 function createDir(path, dirname) {
-    path = decodeURL(path);
+    // path = decodeURL(path);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(path, fs => {
             fs.getDirectory(dirname, {

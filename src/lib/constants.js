@@ -9,6 +9,7 @@ const RATING_TIME = 5;
 const CONSOLE_PORT = 8159;
 const PORT = 8158;
 const VIBRATION_TIME = 30;
+const COMMANDS = ["saveFile", "saveFileAs", "newFile", "nextFile", "prevFile", "openFile", "run", "find", "replace", "toggleSidebar", "toggleFullscreen", "toggleMenu", "toggleEditMenu"];
 const encodings = ["big5", "euc-jp", "euc-kr", "gb18030", "hz-gb-2312", "ibm866", "iso-2022-jp", "iso-8859-10", "iso-8859-13", "iso-8859-14", "iso-8859-15", "iso-8859-16", "iso-8859-2", "iso-8859-3", "iso-8859-4", "iso-8859-5", "iso-8859-6", "iso-8859-7", "iso-8859-8", "iso-8859-8-i", "koi8-r", "koi8-u", "macintosh", "shift_jis", "utf-16be", "utf-16le", "utf-8", "windows-1250", "windows-1251", "windows-1252", "windows-1253", "windows-1254", "windows-1255", "windows-1256", "windows-1257", "windows-1258", "windows-874", "x-mac-cyrillic"];
 const langList = {
   "hi-in": "हिंदी",
@@ -76,6 +77,7 @@ export default {
   PORT,
   DEFAULT_FILE_NAME,
   VIBRATION_TIME,
+  COMMANDS,
   themeList,
   appThemeList,
   langList,

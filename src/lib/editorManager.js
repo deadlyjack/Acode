@@ -210,7 +210,7 @@ function EditorManager($sidebar, $header, $body) {
 
         let doesExists = null;
 
-        if (options.fileUri) options.fileUri = decodeURL(options.fileUri);
+        if (options.fileUri) options.fileUri = options.fileUri;
 
         if (options.id) doesExists = getFile(options.id, "id");
         else if (options.fileUri) doesExists = getFile(options.fileUri, "fileUri");
@@ -352,7 +352,7 @@ function EditorManager($sidebar, $header, $body) {
         } else if (!file.readOnly) {
             text = strings['new file'];
         }
-        $header.subText(decodeURI(text));
+        $header.subText(text);
     }
 
     function switchFile(id) {
@@ -613,7 +613,7 @@ function EditorManager($sidebar, $header, $body) {
     function getFile(checkFor, type = "id") {
 
         if (typeof type !== "string") return null;
-        if (typeof checkFor === 'string' && !["id" | "name"].includes(type)) checkFor = decodeURL(checkFor);
+        // if (typeof checkFor === 'string' && !["id" | "name"].includes(type)) checkFor = decodeURL(checkFor);
 
         let result = null;
         for (let file of manager.files) {

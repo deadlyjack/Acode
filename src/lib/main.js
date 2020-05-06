@@ -93,15 +93,13 @@ function Main() {
     const oldRURL = window.resolveLocalFileSystemURL;
 
     window.resolveLocalFileSystemURL = function (url, ...args) {
-      oldRURL.call(this, decodeURL(Url.safe(url)), ...args);
+      oldRURL.call(this, Url.safe(url), ...args);
     };
 
     if (!BuildInfo.debug) {
       setTimeout(() => {
-        if (document.body.classList.contains('loading')) {
-          if (!alert("Something went wrong! Please clear app data and restart the app."))
-            if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
-        }
+        if (document.body.classList.contains('loading'))
+          alert("Something went wrong! Please clear app data and restart the app or wait.");
       }, 1000 * 30);
     }
 
@@ -151,6 +149,7 @@ function Main() {
       }
     }
 
+    document.body.setAttribute('data-small-msg', "Loading settings...");
     window.appSettings = new Settings(lang);
     if (appSettings.loaded) {
       ondeviceready();
@@ -179,6 +178,7 @@ function Main() {
 
     const languageFile = `${cordova.file.applicationDirectory}www/lang/${appSettings.value.lang}.json`;
 
+    document.body.setAttribute('data-small-msg', "Loading modules...");
     fs.readFile(KEYBINDING_FILE)
       .then(res => {
         const decoder = new TextDecoder('utf-8');
@@ -197,6 +197,7 @@ function Main() {
       })
       .catch(helpers.resetKeyBindings)
       .finally(() => {
+        document.body.setAttribute('data-small-msg', "Loading editor...");
         loadAceEditor()
           .then(() => {
             ace.config.set('basePath', './res/ace/src/');
@@ -298,14 +299,21 @@ function runApp() {
   }
 
   const Acode = {
-    exec: function (key, val) {
+    /**
+     * 
+     * @param {string} key 
+     * @param {string} val 
+     */
+    exec(key, val) {
       if (key in commands) {
         commands[key](val);
         return true;
       } else {
         return false;
       }
-    }
+    },
+    $menuToggler: null,
+    $editMenuToggler: null
   };
 
   window.Acode = Acode;
@@ -319,11 +327,11 @@ function App() {
   if (!window.appInitialized) window.appInitialized = true;
   else return;
   //#region declaration
-  const $edit = tag('span', {
+  const $editMenuToggler = tag('span', {
     className: 'icon edit',
     attr: {
       style: 'font-size: 1.2em !important;',
-      action: 'toggle-readonly'
+      action: ''
     }
   });
   const $toggler = tag('span', {
@@ -359,7 +367,7 @@ function App() {
     }
   });
   const $fileMenu = contextMenu({
-    toggle: $edit,
+    toggle: $editMenuToggler,
     top: '6px',
     transformOrigin: 'top right',
     innerHTML: () => {
@@ -385,9 +393,11 @@ function App() {
       fontSize: '1.2em'
     }
   });
-  const actions = ["saveFile", "saveFileAs", "newFile", "nextFile", "prevFile", "openFile", "run", "find", "replace"];
+  const actions = constants.COMMANDS;
   let registeredKey = '';
 
+  Acode.$menuToggler = $menuToggler;
+  Acode.$editMenuToggler = $editMenuToggler;
   $sidebar.setAttribute('empty-msg', strings['open folder']);
   window.editorManager = EditorManager($sidebar, $header, $main);
   const editor = editorManager.editor;
@@ -411,9 +421,11 @@ function App() {
   window.beforeClose = saveState;
 
   loadFolders();
+  document.body.setAttribute('data-small-msg', "Loading files...");
   loadFiles()
     .then(() => {
 
+      document.body.removeAttribute('data-small-msg');
       if (!editorManager.files.length) createDefaultFile();
 
       setTimeout(() => {
@@ -455,8 +467,8 @@ function App() {
     const activeFile = this.activeFile;
     const $save = $footer.querySelector('[action=save]');
 
-    if (!$edit.isConnected) {
-      $header.insertBefore($edit, $header.lastChild);
+    if (!$editMenuToggler.isConnected) {
+      $header.insertBefore($editMenuToggler, $header.lastChild);
     }
 
     if (activeFile) {
@@ -539,17 +551,18 @@ function App() {
    */
   function handleMainKeyUp(e) {
     let key = helpers.getCombination(e);
-    if (key !== registeredKey) return;
+    if (registeredKey && key !== registeredKey) return;
 
     if (key === 'escape') {
       if (actionStack.length) actionStack.pop();
+      else editor.focus();
       e.preventDefault();
       e.stopImmediatePropagation();
       e.stopPropagation();
       return;
     }
-
-    if (actionStack.length || editorManager.editor.isFocused()) return;
+    const isFocused = editor.textInput.getElement() === document.activeElement;
+    if (actionStack.length || isFocused) return;
     for (let name in keyBindings) {
       const obj = keyBindings[name];
       const binding = (obj.key || '').toLowerCase();
@@ -559,6 +572,8 @@ function App() {
         'action' in obj
       ) Acode.exec(obj.action);
     }
+
+    registeredKey = null;
   }
 
   function saveState() {
@@ -591,7 +606,7 @@ function App() {
       if (file.isUnsaved) {
         edit.data = file.session.getValue();
       }
-      edit.cursorPos = editorManager.editor.getCursorPosition();
+      edit.cursorPos = editor.getCursorPosition();
       lsEditor.push(edit);
     }
 
@@ -661,6 +676,9 @@ function App() {
             render: (files.length === 1 || (file.id + '') === lastfile) ? true : false,
             index: i
           };
+
+          const showName = file.fileUri ? Url.hidePassword(file.fileUri) : file.name;
+          document.body.setAttribute('data-small-msg', `Loading files... (${showName})`);
 
           if (file.type === 'git') {
             gitRecord.get(file.sha)
@@ -815,11 +833,11 @@ function App() {
      * @param {string} text 
      */
     function update(file, text) {
-      const cursorPos = editorManager.editor.getCursorPosition();
+      const cursorPos = editor.getCursorPosition();
       file.session.setValue(text);
       file.isUnsaved = false;
-      editorManager.editor.gotoLine(cursorPos.row, cursorPos.column);
-      editorManager.editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
+      editor.gotoLine(cursorPos.row, cursorPos.column);
+      editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
       file.assocTile.classList.remove('notice');
     }
   }

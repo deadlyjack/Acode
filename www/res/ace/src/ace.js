@@ -12722,6 +12722,33 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
                 }
             }
         }, {
+            name: "toggleSidebar",
+            description: "Toggle sidebar",
+            bindKey: bindKey("toggleSidebar"),
+            exec: function () {
+                if (Acode) {
+                    Acode.exec("toggle-sidebar")
+                }
+            }
+        }, {
+            name: "toggleMenu",
+            description: "Toggle main menu",
+            bindKey: bindKey("toggleMenu"),
+            exec: function () {
+                if (Acode) {
+                    Acode.exec("toggle-menu")
+                }
+            }
+        }, {
+            name: "toggleEditMenu",
+            description: "Toggle edit menu",
+            bindKey: bindKey("toggleEditMenu"),
+            exec: function () {
+                if (Acode) {
+                    Acode.exec("toggle-edit-menu")
+                }
+            }
+        }, {
             name: "goToNextError",
             description: "Go to next error",
             bindKey: bindKey("goToNextError"),

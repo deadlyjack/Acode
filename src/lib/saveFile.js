@@ -109,7 +109,8 @@ function saveFile(file, as = false, showToast = true) {
         if (url) {
             file.type = 'regular';
             file.record = null;
-            file.location = decodeURL(url);
+            // file.location = decodeURL(url);
+            file.location = url;
         }
         if (filename) {
             if (filename.overwrite) {

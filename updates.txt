@@ -1,6 +1,10 @@
 version 0.1.12.103
 ☞ Now you can browse FTP and open specific directory using file browser
-☞ Full screen mode
+☞ Toggle full screen mode (F11)
+☞ Toggle main menu (F3)
+☞ Toggle edit menu (F4)
+☞ Toggle sidebar (Ctrl-B)
+☞ Improved accessibility using physical keyboard
 ☞ Option disable vibration
 ☞ Bugs fixes
 

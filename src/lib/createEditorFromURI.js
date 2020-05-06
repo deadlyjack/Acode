@@ -4,7 +4,6 @@ import {
 } from 'mime-types';
 import dialogs from "../components/dialogs";
 import recents from "./recents";
-import path from "./utils/path";
 import fsOperation from "./fileSystem/fsOperation";
 import Url from "./utils/Url";
 
@@ -21,11 +20,11 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
         let name, location, fileUri, contentUri;
 
         if (typeof uri === 'string') {
-            uri = decodeURL(uri);
+            uri = uri;
             name = Url.basename(uri);
 
             if (!isContentUri) {
-                location = path.dirname(uri);
+                location = Url.dirname(uri);
                 fileUri = uri;
             } else {
                 contentUri = uri;
@@ -33,7 +32,7 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
 
         } else {
             name = uri.name;
-            fileUri = decodeURL(uri.fileUri);
+            fileUri = uri.fileUri;
             contentUri = uri.contentUri;
 
             if (fileUri) {
