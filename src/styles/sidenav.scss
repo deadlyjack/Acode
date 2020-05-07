@@ -4,6 +4,7 @@
     left: 0;
     top: 0;
     width: 70vw;
+    max-width: 350px;
     height: 100vh;
     background-color: #9999ff;
     background-color: var(--primary-color);
@@ -13,7 +14,6 @@
     box-sizing: border-box;
 
     &.phone {
-        max-width: 400px;
         transition: all 300ms ease;
         transform: translate(-100%, 0);
         box-shadow: 2px 0 4px rgba(0, 0, 0, 0.07);

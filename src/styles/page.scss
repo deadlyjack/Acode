@@ -8,12 +8,40 @@ body {
   &.fullscreen-mode {
     #root {
       >header {
-        z-index: -1;
+        display: none;
       }
 
       &.top-bar {
         .open-file-list {
           top: 0 !important;
+          width: calc(100% - 100px);
+        }
+
+        >header {
+          display: flex;
+          height: 30px;
+
+          .text {
+            display: none;
+          }
+
+          .icon {
+            height: 28px;
+            width: 28px;
+            margin: auto;
+
+            &.menu {
+              display: none;
+            }
+          }
+
+          position: fixed;
+          top: 0;
+          right: 0;
+          left: auto;
+          width: 100px;
+          margin: 0;
+          box-shadow: none;
         }
       }
 

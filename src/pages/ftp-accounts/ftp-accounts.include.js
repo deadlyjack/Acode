@@ -110,6 +110,10 @@ function FTPAccountsInclude() {
    * @param {FTPAccount} account 
    */
   function addFTPFolder(account) {
+    const {
+      name,
+      id
+    } = account;
     const url = Url.formate({
       protocol: "ftp:",
       ...account,

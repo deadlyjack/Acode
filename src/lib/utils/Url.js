@@ -160,7 +160,11 @@ export default {
   },
   hidePassword(url) {
     const urlObj = new URL(url);
-    return `${urlObj.origin}${urlObj.pathname}`;
+    if (urlObj.protocol === "file:") {
+      return url;
+    } else {
+      return `${urlObj.origin}${urlObj.pathname}`;
+    }
   },
   PROTOCOL_PATTERN: /^[a-z]+:\/\/\/?/i
 };

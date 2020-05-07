@@ -361,6 +361,7 @@ interface FTPAccount {
     mode: "active" | "passive";
     security: "ftp" | "ftps";
     id: string;
+    name: string;
 }
 
 /**
