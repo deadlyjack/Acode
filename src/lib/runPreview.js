@@ -318,17 +318,21 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   function sendFile(path, id) {
     const protocol = Url.getProtocol(path);
     if (protocol === "ftp:") {
+      const ext = Url.extname(path);
       const cacheFile = CACHE_STORAGE_REMOTE + path.hashCode();
       fsOperation(path)
         .then(fs => {
           return fs.readFile();
         })
-        .then(() => {
+        .then(data => {
           path = Url.pathname(cacheFile);
+          const mimetype = mimeType.lookup(ext);
           webserver.sendResponse(id, {
             status: 200,
             path,
-            headers: {}
+            headers: {
+              "Content-Type": mimetype
+            }
           });
         })
         .catch(err => {

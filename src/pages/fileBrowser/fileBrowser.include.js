@@ -146,7 +146,7 @@ function FileBrowserInclude(type, option, defaultPath) {
       };
     }
 
-    if (defaultPath) {
+    if (false) {
 
       actionStack.push({
         id: defaultPath,
@@ -158,7 +158,9 @@ function FileBrowserInclude(type, option, defaultPath) {
       loadDir(defaultPath, path.basename(defaultPath));
 
     } else {
+
       start();
+
     }
 
     function start() {

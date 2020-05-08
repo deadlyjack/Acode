@@ -10,6 +10,16 @@ export default {
     if (url.endsWith("/")) url = url.slice(0, -1);
     return this.pathname(url).split('/').pop();
   },
+  extname(url) {
+    let {
+      url: uri,
+      query
+    } = this.parse(url);
+    url = uri;
+    const protocol = (this.PROTOCOL_PATTERN.exec(url) || [])[0] || "";
+    if (protocol) url = url.replace(new RegExp('^' + protocol), '');
+    return path.extname(url);
+  },
   /**
    * 
    * @param  {...string} pathnames 

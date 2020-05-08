@@ -1,3 +1,8 @@
+version 0.1.12.105
+☞ Fixed intent handler
+☞ Fixed FTP preview
+☞ Other minor bugs fixes
+
 version 0.1.12.104
 ☞ Now you can browse FTP and open specific directory using file browser
 ☞ Toggle full screen mode (F11)

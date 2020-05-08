@@ -364,6 +364,18 @@ interface FTPAccount {
     name: string;
 }
 
+interface String extends String {
+    /**
+     * Returns hashcode of the string
+     */
+    hashCode(): String;
+    /**
+     * Subtract the string passed in argument from the given string,
+     * For e.g. ```"myname".subtract("my") //"name"```
+     */
+    subtract(str: String): String;
+}
+
 /**
  * Returns fully decoded url
  * @param url 

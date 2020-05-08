@@ -39,7 +39,6 @@ import rateBox from "../components/dialogboxes/rateBox";
 import loadPolyFill from "./polyfill";
 import internalFs from "./fileSystem/internalFs";
 import Url from "./utils/Url";
-import path from "./utils/path";
 //@ts-check
 
 loadPolyFill.apply(window);
@@ -292,11 +291,6 @@ function runApp() {
       if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
     }
   });
-  const version = localStorage.getItem('version');
-  if (version !== BuildInfo.version) {
-    localStorage.clear();
-    localStorage.setItem('version', BuildInfo.version);
-  }
 
   const Acode = {
     /**

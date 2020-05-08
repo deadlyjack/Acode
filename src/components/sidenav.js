@@ -267,7 +267,8 @@ function sidenav(activator, toggler) {
     }
 
     $el.getwidth = function () {
-        return mode === "phone" ? innerWidth * 0.7 : 250;
+        const width = innerWidth * 0.7;
+        return mode === "phone" ? (width >= 350 ? 350 : width) : 250;
     };
 
     $el.hide = hide;

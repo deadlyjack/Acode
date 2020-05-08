@@ -1,2 +1,6 @@
-#gistFiles .list-item .icon{font-size:1em}#gistFiles .list-item .icon.file{background-position:center;background-size:26px}
+#gistFiles .list-item .icon {
+  font-size: 1em; }
+  #gistFiles .list-item .icon.file {
+    background-position: center;
+    background-size: 26px; }
 

@@ -24,6 +24,8 @@ function HandleIntent(intent = {}) {
         dialogs.loaderShow(strings.loading + '...');
     }, 300);
 
+    if (intent.fileUri) intent.fileUri = decodeURL(intent.fileUri);
+
     if (type === 'VIEW') {
 
         if (intent.fileUri) {
