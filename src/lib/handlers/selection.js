@@ -109,7 +109,6 @@ function textControl(editor, controls, container) {
 
 function enableSingleMode() {
 
-
     const {
         editor,
         controls,
@@ -187,19 +186,23 @@ function enableSingleMode() {
             document.ontouchend = null;
             el.touchStart = null;
             if (showCm) {
-                if (editor.getCopyText()) {
-                    $cm.innerHTML = controlscontrols[editor.getReadOnly() ? 'readOnlyContent' : 'fullContent'];
-                } else {
-                    $cm.innerHTML = lessConent;
-                }
-                container.appendChild($cm);
-                updateCm();
+                showContextMenu();
             } else if (!move) {
                 container.appendChild($cm);
                 controls.checkForColor();
                 updateCm();
             }
         };
+    }
+
+    function showContextMenu() {
+        if (editor.getCopyText()) {
+            $cm.innerHTML = controlscontrols[editor.getReadOnly() ? 'readOnlyContent' : 'fullContent'];
+        } else {
+            $cm.innerHTML = lessConent;
+        }
+        container.appendChild($cm);
+        updateCm();
     }
 
     function onchange() {
@@ -271,6 +274,16 @@ function enableSingleMode() {
         if ($end.isConnected) $end.remove();
         if ($cm.isConnected) $cm.remove();
     }
+
+    return {
+        hide,
+        update,
+        updateCm,
+        showContextMenu,
+        callBeforeContextMenu
+    };
 }
+
+textControl.enableSingleMode = enableSingleMode;
 
 export default textControl;

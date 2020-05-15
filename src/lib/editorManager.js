@@ -9,7 +9,6 @@ import constants from './constants';
 import internalFs from './fileSystem/internalFs';
 import openFolder from './addFolder';
 import Url from './utils/Url';
-import path from './utils/path';
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -89,7 +88,6 @@ function EditorManager($sidebar, $header, $body) {
     };
     const SESSION_DIRNAME = 'sessions';
     const SESSION_PATH = cordova.file.cacheDirectory + SESSION_DIRNAME + '/';
-
     /**
      * @type {Manager}
      */
@@ -386,7 +384,7 @@ function EditorManager($sidebar, $header, $body) {
 
         editor.setFontSize(settings.fontSize);
         editor.setHighlightSelectedWord(true);
-        // editor.setKeyboardHandler("ace/keyboard/sublime");
+
         editor.setOptions({
             animatedScroll: false,
             tooltipFollowsMouse: false,
@@ -495,16 +493,15 @@ function EditorManager($sidebar, $header, $body) {
             navigator.vibrate(constants.VIBRATION_TIME);
             document.ontouchmove = document.onmousemove = null;
             document.addEventListener(type, drag, opts);
-            console.log("Adding listener", e.type);
 
             document.ontouchend = document.onmouseup = document.ontouchcancel = document.onmouseleave = function (e) {
                 $el.classList.remove('select');
                 $el.style.removeProperty('transform');
                 document.removeEventListener(type, drag, opts);
-                console.log("Remove listener", e.type);
                 document.ontouchend = document.onmouseup = null;
                 if ($placeholder.isConnected) $parent.replaceChild($el, $placeholder);
                 $el.eventAdded = false;
+                document.ontouchend = document.onmouseup = document.ontouchcancel = document.onmouseleave = null;
             };
 
             function drag(e) {
@@ -539,12 +536,10 @@ function EditorManager($sidebar, $header, $body) {
                 }
 
             }
-
         }, 300);
 
 
         document.ontouchend = document.onmouseup = document.ontouchmove = document.onmousemove = function (e) {
-            console.log("Touch end without tiggering drag");
             document.ontouchend = document.onmouseup = document.ontouchmove = document.onmousemove = null;
             if (timeout) clearTimeout(timeout);
             $el.eventAdded = false;

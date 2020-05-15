@@ -10,7 +10,7 @@ export default function Info(repo, owner) {
   const gitHub = git.GitHub();
   const repository = gitHub.getRepo(owner, repo);
 
-  dialogs.loaderShow(repo, strings.loading + '...');
+  dialogs.loader.create(repo, strings.loading + '...');
   repository.getReadme('master', false)
     .then(res => {
       if (res.statusText === 'OK') {
@@ -45,7 +45,7 @@ export default function Info(repo, owner) {
       $page.hide();
     })
     .finally(() => {
-      dialogs.loaderHide();
+      dialogs.loader.destroy();
     });
 
   actionStack.push({

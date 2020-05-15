@@ -42,6 +42,8 @@ interface Settings {
     quickTools: Boolean;
     editorFont: "fira code" | "default";
     vibrateOnTap: boolean;
+    fullscreen: boolean;
+    smartCompletion: boolean;
 }
 
 interface AppSettings {
@@ -362,6 +364,14 @@ interface FTPAccount {
     security: "ftp" | "ftps";
     id: string;
     name: string;
+}
+
+interface PathData {
+    url: string;
+    name: string;
+    isDirectory: Boolean;
+    type: string;
+    parent: Boolean;
 }
 
 interface String extends String {

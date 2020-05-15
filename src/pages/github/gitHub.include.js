@@ -118,7 +118,7 @@ function gitHubInclude(options = {}) {
   }
 
   function loadProfile(onload) {
-    dialogs.loaderShow('GitHub', strings.loading + '...');
+    dialogs.loader.create('GitHub', strings.loading + '...');
     user.getProfile()
       .then(res => {
         if (options.$loginPage)
@@ -148,7 +148,7 @@ function gitHubInclude(options = {}) {
         }
       })
       .finally(() => {
-        dialogs.loaderHide();
+        dialogs.loader.destroy();
       });
   }
 

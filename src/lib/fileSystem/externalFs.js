@@ -29,11 +29,11 @@ function externalFs(uuid, uri) {
   return new Promise((res, rej) => {
 
     if (!rootPath) {
-
       const version = parseInt(device.version);
       const versionAlpha = typeof device.version === 'string' ? device.version.toLocaleLowerCase() : "";
       if (version < 7 || version > 9 || ['q', 'r'].includes(versionAlpha)) {
 
+        dialogs.loader.destroy();
         dialogs.box(
             'INFO',
             '<p>Follow below steps to allow Acode to modify sdcard data.<p><br>' +
@@ -55,7 +55,7 @@ function externalFs(uuid, uri) {
 
     function next() {
       setTimeout(() => {
-        dialogs.loaderHide();
+        dialogs.loader.destroy();
       }, 100);
       SDcard.open(uuid, result => {
         rootPath = result;

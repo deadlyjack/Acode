@@ -27,6 +27,11 @@ main .ace_editor {
 }
 
 
+.ace_editor.ace_autocomplete {
+    width: 80vw !important;
+    max-width: 400px !important;
+}
+
 .ace_prompt_wrapper {
     position: fixed !important;
     top: 0 !important;

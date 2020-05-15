@@ -24,7 +24,8 @@ const langList = {
   "ja-jp": "日本語",
   "uz-uz": "O'zbekcha",
   "es-sv": "Español",
-  "tr-tr": "Türkçe"
+  "tr-tr": "Türkçe",
+  "fr-fr": "Francais"
 };
 const themeList = {
   dark: ["ambiance", "chaos", "clouds_midnight", "cobalt", "dracula", "gob", "gruvbox", "idle_fingers", "kr_theme", "merbivore", "merbivore_soft", "mono_industrial", "monokai", "nord_dark", "pastel_on_dark", "solarized_dark", "terminal", "tomorrow_night", "tomorrow_night_blue", "tomorrow_night_bright", "tomorrow_night_eighties", "twilight", "vibrant_ink"],
@@ -36,7 +37,7 @@ const themeList = {
  */
 const appThemeList = {
   "default": scheme("default", "light", true, "#5c5c99", "#9999ff"),
-  "light": scheme("light", "light", true, "#999999", "#ffffff"),
+  "light": scheme("light", "light", false, "#999999", "#ffffff"),
   "atticus": scheme("atticus", "dark", false, "#201e1e", "#363333"),
   "bump": scheme("bump", "dark", false, "#1c2126", "#303841"),
   "bling": scheme("bling", "dark", false, "#131326", "#202040"),

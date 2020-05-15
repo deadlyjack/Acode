@@ -106,6 +106,9 @@ a {
     margin: 0;
     border-radius: 0 0 4px 4px;
     background-color: white;
+    background-color: var(--secondary-color);
+    color: #252525;
+    color: var(--text-color);
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
     height: fit-content;
     min-height: 30px;
@@ -291,7 +294,7 @@ a {
             content: '';
             height: 16px;
             width: 16px;
-            border: solid 1px gold;
+            border: solid 1px #a90000;
             border: solid 1px var(--accent-color);
             background-color: currentColor;
             color: inherit !important;
@@ -503,7 +506,7 @@ input {
     }
 
     &:focus {
-        border-bottom-color: gold !important;
+        border-bottom-color: #a90000 !important;
         border-bottom-color: var(--accent-color) !important;
     }
 }
@@ -559,8 +562,8 @@ textarea {
     position: fixed;
     top: 0;
     left: 0;
-    background-color: #9999ff;
-    background-color: var(--primary-color);
+    background-color: #ffffff;
+    background-color: var(--secondary-color);
     display: flex;
     border-radius: 4px;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);

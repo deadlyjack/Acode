@@ -131,7 +131,7 @@ function GistFilesInclude(gist) {
       dialogs.confirm(strings.warning, strings['delete {name}'].replace('{name}', filename))
         .then(() => {
           if (filename) {
-            dialogs.loaderShow(filename, strings.loading + '...');
+            dialogs.loader.create(filename, strings.loading + '...');
             gist.removeFile(filename)
               .then(() => {
                 $el.parentElement.remove();
@@ -141,7 +141,7 @@ function GistFilesInclude(gist) {
                 if (err) dialogs.alert(strings.error, err.toString());
               })
               .finally(() => {
-                dialogs.loaderHide();
+                dialogs.loader.destroy();
               });
           }
         });
@@ -152,7 +152,7 @@ function GistFilesInclude(gist) {
         .then(() => {
 
           const Gist = git.GitHub().getGist(gist.id);
-          dialogs.loaderShow('', strings.loading + '...');
+          dialogs.loader.create('', strings.loading + '...');
           Gist.delete()
             .then(res => {
               if (res.status === 204) {
@@ -185,7 +185,7 @@ function GistFilesInclude(gist) {
               }
             })
             .finally(() => {
-              dialogs.loaderHide();
+              dialogs.loader.destroy();
             });
 
         });

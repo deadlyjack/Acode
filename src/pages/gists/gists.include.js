@@ -60,7 +60,7 @@ function GistsInclude(callbackGists) {
       render(repos);
     })
     .catch(err => {
-      dialogs.loaderShow('GitHub', strings.loading + '...');
+      dialogs.loader.create('GitHub', strings.loading + '...');
       loadRepos();
     });
 
@@ -182,7 +182,7 @@ function GistsInclude(callbackGists) {
 
       let gist = gistRecord.get(id);
       if (!gist) {
-        dialogs.loaderShow('', strings.loading + '...');
+        dialogs.loader.create('', strings.loading + '...');
         github.getGist(id).read()
           .then(res => {
             const data = res.data;
@@ -195,7 +195,7 @@ function GistsInclude(callbackGists) {
             }
           })
           .finally(() => {
-            dialogs.loaderHide();
+            dialogs.loader.destroy();
           });
       } else {
         GistFiles(gist);
@@ -205,7 +205,7 @@ function GistsInclude(callbackGists) {
   }
 
   function loadRepos() {
-    dialogs.loaderShow('Gists', strings.loading + '...');
+    dialogs.loader.create('Gists', strings.loading + '...');
     user.listGists()
       .then(res => {
         const repos = res.data;
@@ -226,7 +226,7 @@ function GistsInclude(callbackGists) {
         }
       })
       .finally(() => {
-        dialogs.loaderHide();
+        dialogs.loader.destroy();
       });
   }
 }

@@ -160,7 +160,7 @@ function Record(owner, sha, name, data, repo, path, branch) {
           data
         } = _record;
         let _path = getPath(name);
-        dialogs.loaderShow(name, strings.loading + '...');
+        dialogs.loader.create(name, strings.loading + '...');
         repository.deleteFile(branch, _path)
           .then(res => {
             if (res.statusText === 'OK') {
@@ -185,7 +185,7 @@ function Record(owner, sha, name, data, repo, path, branch) {
             error(err);
             reject();
           })
-          .finally(dialogs.loaderHide);
+          .finally(dialogs.loader.destroy);
       });
     },
     get data() {
@@ -209,7 +209,7 @@ function Record(owner, sha, name, data, repo, path, branch) {
           commitMessage,
         } = _record;
         let _path = path ? path + '/' + name : name;
-        dialogs.loaderShow(name, strings.saving + '...');
+        dialogs.loader.create(name, strings.saving + '...');
         repository.writeFile(branch, _path, txt, commitMessage, {})
           .then(res => {
             if (res.statusText === 'OK') {
@@ -224,7 +224,7 @@ function Record(owner, sha, name, data, repo, path, branch) {
             error(err);
             reject();
           })
-          .finally(dialogs.loaderHide);
+          .finally(dialogs.loader.destroy);
       });
     }
   };
@@ -380,7 +380,7 @@ function Gist(id, files, isNew, _public) {
       };
       update.files[name] = _this.files[name];
 
-      dialogs.loaderShow(name, strings.saving + '...');
+      dialogs.loader.create(name, strings.saving + '...');
       if (_this.isNew) {
         update.public = _this.public;
         gist.create(update)
@@ -397,7 +397,7 @@ function Gist(id, files, isNew, _public) {
             error(err);
             reject();
           })
-          .finally(dialogs.loaderHide);
+          .finally(dialogs.loader.destroy);
 
         return;
       }
@@ -423,7 +423,7 @@ function Gist(id, files, isNew, _public) {
           error(err);
           reject();
         })
-        .finally(dialogs.loaderHide);
+        .finally(dialogs.loader.destroy);
     });
   }
 
@@ -442,7 +442,7 @@ function Gist(id, files, isNew, _public) {
       };
       update.files[name] = {};
       update.files[name].filename = newName;
-      dialogs.loaderShow(name, strings.loading + '...');
+      dialogs.loader.create(name, strings.loading + '...');
       gist.update(update)
         .then(res => {
           if (res.status === 200 || res.statusText === 'OK') {
@@ -457,7 +457,7 @@ function Gist(id, files, isNew, _public) {
           error(err);
           reject();
         })
-        .finally(dialogs.loaderHide);
+        .finally(dialogs.loader.destroy);
     });
 
     function changeName() {

@@ -1,3 +1,15 @@
+version 0.1.13.106
+
+NOTE: This build is highly unstable and untested.
+Please check for bugs with accessing SD Card.
+SFTP, JavaScript smart completion and GIT implementation will take more time than expected
+☞ Added french language
+☞ Toggling full screen form settings will save full screen state
+☞ Option to toggle quick tools is moved to settings
+☞ Long tap will enable context menu if no text is selected
+☞ Fixed GitHub preview
+☞ Bugs fixes
+
 version 0.1.12.105
 ☞ Fixed intent handler
 ☞ Fixed FTP preview

@@ -161,9 +161,6 @@ function actions(action) {
     const settings = appSettings.value;
     let quickTools = settings.quickTools;
 
-    appSettings.value.quickTools = quickTools = !quickTools;
-    appSettings.update();
-
     if (quickTools) {
       enableQuickTools();
     } else {

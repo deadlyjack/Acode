@@ -128,5 +128,6 @@
   "support us": "حمایت از توسعه Acode، تبدیل patreon.",
   "unsupported device": "دستگاه شما از موضوع پشتیبانی نمی کند.",
   "vibrate on tap": "Vibrate on tap",
-  "copy command is not supported by ftp.": "Copy command is not supported by FTP."
+  "copy command is not supported by ftp.": "Copy command is not supported by FTP.",
+  "full screen": "Full screen"
 }

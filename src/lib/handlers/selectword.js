@@ -1,3 +1,5 @@
+import textControl from "./selection";
+
 /**
  * 
  * @param {"word"|"line"} type 
@@ -33,7 +35,10 @@ function select(type) {
   const $end = controls.end;
 
   if (type === "word") editor.selectMore(1, false, true);
-  else if (type === "line") editor.selection.selectLine();
+
+  const copyText = editor.getCopyText();
+
+  if (!copyText) return textControl.enableSingleMode().showContextMenu();
 
   if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
   $end.style.marginLeft = '-4px';

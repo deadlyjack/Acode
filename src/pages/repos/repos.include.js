@@ -51,7 +51,7 @@ function ReposInclude() {
     SearchBar($page.querySelector('#repos'));
   };
 
-  dialogs.loaderShow('GitHub', strings.loading + '...');
+  dialogs.loader.create('GitHub', strings.loading + '...');
   fs.readFile(githubFile)
     .then(res => {
       const decoder = new TextDecoder('utf-8');
@@ -96,7 +96,7 @@ function ReposInclude() {
       actionStack.remove('repos');
     };
 
-    dialogs.loaderHide();
+    dialogs.loader.destroy();
   }
 
   /**
@@ -119,7 +119,7 @@ function ReposInclude() {
         break;
       case 'reload':
         $page.querySelector('#repos').remove();
-        dialogs.loaderShow('Repositories', strings.loading + '...');
+        dialogs.loader.create('Repositories', strings.loading + '...');
         loadRepos();
         break;
       case 'open':
@@ -149,7 +149,7 @@ function ReposInclude() {
         }
       })
       .finally(() => {
-        dialogs.loaderHide();
+        dialogs.loader.destroy();
       });
   }
 }

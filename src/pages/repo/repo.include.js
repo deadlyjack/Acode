@@ -58,10 +58,10 @@ export default function RepoInclude(owner, repoName) {
     transformOrigin: 'top right'
   });
 
-  dialogs.loaderShow(repoName, strings.loading + '...');
+  dialogs.loader.create(repoName, strings.loading + '...');
   repo.listBranches()
     .then(res => {
-      dialogs.loaderHide();
+      dialogs.loader.destroy();
       const data = res.data;
       data.map(branch => {
         branches.push(branch.name);
@@ -82,7 +82,7 @@ export default function RepoInclude(owner, repoName) {
       console.error(err);
     })
     .finally(res => {
-      dialogs.loaderHide();
+      dialogs.loader.destroy();
     });
 
   function addBranch() {
@@ -90,7 +90,7 @@ export default function RepoInclude(owner, repoName) {
       .then(res => {
         const from = res.from;
         branch = res.branch;
-        dialogs.loaderShow('', strings.loading + '...');
+        dialogs.loader.create('', strings.loading + '...');
         return repo.createBranch(from, branch);
       })
       .then(getRepo)
@@ -99,12 +99,12 @@ export default function RepoInclude(owner, repoName) {
         console.error(err);
       })
       .finally(() => {
-        dialogs.loaderHide();
+        dialogs.loader.destroy();
       });
   }
 
   function getRepo() {
-    dialogs.loaderShow(repoName, strings.loading + '...');
+    dialogs.loader.create(repoName, strings.loading + '...');
     repo.getSha(branch, '')
       .then(res => {
         const list = res.data;
@@ -128,7 +128,7 @@ export default function RepoInclude(owner, repoName) {
         console.error(err);
       })
       .finally(() => {
-        dialogs.loaderHide();
+        dialogs.loader.destroy();
       });
     $cm.addEventListener('click', handleClick);
     $page.addEventListener('click', handleClick);
@@ -271,14 +271,14 @@ export default function RepoInclude(owner, repoName) {
       if (sha in cachedTree) {
         render(cachedTree[sha].list, name, sha);
       } else {
-        dialogs.loaderShow(repoName, strings.loading + '...');
+        dialogs.loader.create(repoName, strings.loading + '...');
         repo.getTree(sha)
           .then(res => {
             const data = res.data;
             render(data.tree, name, sha);
           })
           .catch(error)
-          .finally(dialogs.loaderHide);
+          .finally(dialogs.loader.destroy);
       }
 
       actionStack.push({
@@ -300,7 +300,7 @@ export default function RepoInclude(owner, repoName) {
     }
 
     function file() {
-      dialogs.loaderShow(name, strings.loading + '...');
+      dialogs.loader.create(name, strings.loading + '...');
       const ext = helpers.extname(name);
       const mime = mimeType.lookup(ext);
       const type = /image/i.test(mime) ? 'blob' : null;
@@ -350,7 +350,7 @@ export default function RepoInclude(owner, repoName) {
 
         })
         .finally(() => {
-          dialogs.loaderHide();
+          dialogs.loader.destroy();
         });
     }
   }

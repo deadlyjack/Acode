@@ -74,7 +74,7 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
         }
 
         const timeout = setTimeout(() => {
-            dialogs.loaderShow(strings.loading + "...");
+            dialogs.loader.create(strings.loading + "...");
         }, 100);
 
         fsOperation(fileUri || contentUri)
@@ -85,7 +85,7 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
             .catch(err => {
 
                 if (fileUri && contentUri) {
-                    dialogs.loaderShow(strings.loading + '...');
+                    dialogs.loader.create(strings.loading + '...');
                     return fsOperation(contentUri)
                         .then(fs => {
                             return fs.readFile();
@@ -98,7 +98,7 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
             })
             .finally(() => {
                 if (timeout) clearTimeout(timeout);
-                dialogs.loaderHide();
+                dialogs.loader.destroy();
                 resolve(index === undefined ? fileUri || contentUri : index);
             });
 

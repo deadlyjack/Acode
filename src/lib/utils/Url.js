@@ -68,7 +68,8 @@ export default {
    */
   pathname(url) {
 
-    if (typeof url !== "string" || !this.PROTOCOL_PATTERN.test(url)) throw new Error("Invalid URL string");
+    if (typeof url !== "string" || !this.PROTOCOL_PATTERN.test(url))
+      return url;
 
     url = url.split('?')[0];
     const protocol = (this.PROTOCOL_PATTERN.exec(url) || [])[0] || "";

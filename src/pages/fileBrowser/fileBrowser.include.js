@@ -25,9 +25,8 @@ import path from '../../lib/utils/path';
  * @param {"file"|"dir"} [type='file']
  * @param {string|function(string):boolean} option button text or function to check extension
  */
-function FileBrowserInclude(type, option, defaultPath) {
+function FileBrowserInclude(type, option) {
   if (!type) type = 'file';
-  if (!defaultPath && localStorage.lastDir) defaultPath = localStorage.lastDir;
   const actionStack = window.actionStack;
   const prompt = dialogs.prompt;
   return new Promise((_resolve, reject) => {
@@ -146,34 +145,15 @@ function FileBrowserInclude(type, option, defaultPath) {
       };
     }
 
-    if (false) {
-
-      actionStack.push({
-        id: defaultPath,
-        action: () => {
-          navigate.pop();
-          start();
-        }
-      });
-      loadDir(defaultPath, path.basename(defaultPath));
-
+    const version = parseInt(device.version);
+    if (version < 7) {
+      renderStorageList();
     } else {
-
-      start();
-
-    }
-
-    function start() {
-      const version = parseInt(device.version);
-      if (version < 7) {
-        genList();
-      } else {
-        externalFs.listExternalStorages()
-          .then(res => {
-            externalList = res;
-            genList();
-          });
-      }
+      externalFs.listExternalStorages()
+        .then(res => {
+          externalList = res;
+          renderStorageList();
+        });
     }
 
     function resolve(data) {
@@ -181,97 +161,112 @@ function FileBrowserInclude(type, option, defaultPath) {
       _resolve(data);
     }
 
-    function genList() {
-      cordova.plugins.diagnostic.getExternalSdCardDetails(ls => {
-        const list = [];
-        if (ls.length > 0) {
-          ls.map(card => {
-            const name = card.path.split('/').splice(-1)[0];
-            const path = card.filePath + '/';
-            if (name === "files") return card;
-            list.push({
-              name: externalList && externalList[name] ? externalList[name] : name,
-              url: path,
-              origin: path,
-              isDirectory: true,
-              parent: true,
-              type: 'folder'
-            });
-            return card;
-          });
-        }
-
-        const path = cordova.file.externalRootDirectory;
-        list.push({
-          url: path,
-          name: 'Internal storage',
-          isDirectory: true,
-          parent: true,
-          type: 'folder',
+    function renderStorageList() {
+      getStorageList()
+        .then(list => {
+          delete localStorage.lastDir;
+          navigate("/", "/");
+          currentDir.url = "/";
+          currentDir.name = "File Browser";
+          $page.settitle('File Browser');
+          render(list);
+          if (type === 'folder') {
+            $addMenuToggler.classList.add('disabled');
+            folderOption.classList.add('disabled');
+          }
+        })
+        .catch(err => {
+          helpers.error(err);
+          console.error(err);
         });
+    }
 
-        let ftpaccounts;
-
-        try {
-          ftpaccounts = JSON.parse(localStorage.ftpaccounts);
-          if (Array.isArray(ftpaccounts)) {
-            ftpaccounts = decryptAccounts(ftpaccounts);
-            ftpaccounts.map(account => {
-
-              const {
-                mode,
-                security,
-                name
-              } = account;
-
-              let url = Url.formate({
-                protocol: "ftp:",
-                ...account,
-                query: {
-                  mode,
-                  security
-                }
-              });
-
+    /**
+     * @returns {Promise<Array<PathData>>}
+     */
+    function getStorageList() {
+      return new Promise((resolve, reject) => {
+        cordova.plugins.diagnostic.getExternalSdCardDetails(ls => {
+          const list = [];
+          if (ls.length > 0) {
+            ls.map(card => {
+              const name = card.path.split('/').splice(-1)[0];
+              const path = card.filePath + '/';
+              if (name === "files") return card;
               list.push({
-                url: url,
-                name: name,
+                name: externalList && externalList[name] ? externalList[name] : name,
+                url: path,
+                origin: path,
                 isDirectory: true,
                 parent: true,
                 type: 'folder'
               });
-
+              return card;
             });
           }
-        } catch (error) {
-          console.log(error);
-        }
 
-        if (type === "file") {
+          const path = cordova.file.externalRootDirectory;
           list.push({
-            name: "Select document",
+            url: path,
+            name: 'Internal storage',
             isDirectory: true,
+            parent: true,
             type: 'folder',
-            "open-doc": true
           });
-        }
 
-        cachedDir["/"] = {
-          name,
-          list
-        };
+          let ftpaccounts;
 
-        delete localStorage.lastDir;
-        navigate("/", "/");
-        currentDir.url = "/";
-        currentDir.name = "File Browser";
-        $page.settitle('File Browser');
-        render(list);
+          try {
+            ftpaccounts = JSON.parse(localStorage.ftpaccounts);
+            if (Array.isArray(ftpaccounts)) {
+              ftpaccounts = decryptAccounts(ftpaccounts);
+              ftpaccounts.map(account => {
 
-        if (type === 'folder') {
-          $addMenuToggler.classList.add('disabled');
-          folderOption.classList.add('disabled');
-        }
+                const {
+                  mode,
+                  security,
+                  name
+                } = account;
+
+                let url = Url.formate({
+                  protocol: "ftp:",
+                  ...account,
+                  query: {
+                    mode,
+                    security
+                  }
+                });
+
+                list.push({
+                  url: url,
+                  name: name,
+                  isDirectory: true,
+                  parent: true,
+                  type: 'folder'
+                });
+
+              });
+            }
+          } catch (error) {
+            console.log(error);
+          }
+
+          if (type === "file") {
+            list.push({
+              name: "Select document",
+              isDirectory: true,
+              type: 'folder',
+              "open-doc": true
+            });
+          }
+
+          cachedDir["/"] = {
+            name,
+            list
+          };
+
+          resolve(list);
+        }, reject);
       });
     }
 
@@ -284,7 +279,7 @@ function FileBrowserInclude(type, option, defaultPath) {
         name = path.name;
       }
 
-      if (url === "/") return genList();
+      if (url === "/") return renderStorageList();
 
       if (url in cachedDir) {
         update();
@@ -295,7 +290,7 @@ function FileBrowserInclude(type, option, defaultPath) {
         name = item.name;
       } else {
         const timeout = setTimeout(() => {
-          dialogs.loaderShow('', strings.loading + '...');
+          dialogs.loader.create('', strings.loading + '...');
         }, 100);
         fsOperation(url)
           .then(fs => {
@@ -319,7 +314,7 @@ function FileBrowserInclude(type, option, defaultPath) {
           })
           .finally(() => {
             clearTimeout(timeout);
-            dialogs.loaderHide();
+            dialogs.loader.destroy();
           });
       }
 
@@ -595,11 +590,11 @@ function FileBrowserInclude(type, option, defaultPath) {
         dialogs.select(strings["new project"], options)
           .then(res => {
             framework = res;
-            dialogs.loaderShow(res, strings.loading + '...');
+            dialogs.loader.create(res, strings.loading + '...');
             return projects[res]();
           })
           .then(res => {
-            dialogs.loaderHide();
+            dialogs.loader.destroy();
             project = res.default;
             return dialogs.prompt(strings["project name"], framework, "text", {
               required: true,
@@ -611,7 +606,7 @@ function FileBrowserInclude(type, option, defaultPath) {
             return fsOperation(url);
           })
           .then(fs => {
-            dialogs.loaderShow(projectName, strings.loading + '...');
+            dialogs.loader.create(projectName, strings.loading + '...');
             return fs.createDirectory(projectName);
           })
           .then(res => {
@@ -683,7 +678,7 @@ function FileBrowserInclude(type, option, defaultPath) {
             console.error(err);
           })
           .finally(() => {
-            dialogs.loaderHide();
+            dialogs.loader.destroy();
           });
 
       }

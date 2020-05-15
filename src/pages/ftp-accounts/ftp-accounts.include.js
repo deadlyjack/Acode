@@ -123,6 +123,7 @@ function FTPAccountsInclude() {
       }
     });
 
+    /**TODO: open file browser here */
     openFolder(url, {
       saveState: false,
       reloadOnResume: false,
@@ -175,7 +176,7 @@ function FTPAccountsInclude() {
 
 
       const fs = remoteFs(username, password, hostname, port, security, mode);
-      dialogs.loaderShow('', strings.loading + '...');
+      dialogs.loader.create('', strings.loading + '...');
       fs.homeDirectory()
         .then(res => {
           const path = res;
@@ -213,7 +214,7 @@ function FTPAccountsInclude() {
           console.error(err);
         })
         .finally(() => {
-          dialogs.loaderHide();
+          dialogs.loader.destroy();
         });
 
     });

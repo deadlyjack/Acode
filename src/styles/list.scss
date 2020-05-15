@@ -216,8 +216,7 @@ ul {
 
             &.tile:active {
                 transition: all 300ms ease;
-                background-color: gold;
-                background-color: var(--accent-color);
+                background-color: rgba($color: #000000, $alpha: 0.2);
             }
 
             &:last-child {

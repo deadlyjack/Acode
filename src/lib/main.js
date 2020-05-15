@@ -368,8 +368,7 @@ function App() {
       return mustache.render($_fileMenu, Object.assign(strings, {
         file_mode: (editorManager.activeFile.session.getMode().$id || '').split('/').pop(),
         file_encoding: editorManager.activeFile.encoding,
-        file_read_only: !editorManager.activeFile.editable,
-        quick_tools: appSettings.value.quickTools
+        file_read_only: !editorManager.activeFile.editable
       }));
     }
   });
@@ -410,6 +409,7 @@ function App() {
   $footer.addEventListener('contextmenu', footerOnContextMenu);
   document.addEventListener('keydown', handleMainKeyDown);
   document.addEventListener('keyup', handleMainKeyUp);
+  if (appSettings.value.fullscreen) Acode.exec("toggle-fullscreen");
 
   if (appSettings.value.quickTools) quickTools.actions("enable-quick-tools");
   window.beforeClose = saveState;

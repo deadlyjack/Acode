@@ -234,18 +234,24 @@ public class SDcard extends CordovaPlugin {
         return;
       }
 
-      Uri uri = data.getData();
-      if (uri == null) {
-        this.error("Empty uri");
-      } else {
-
-        this.takePermission(uri);
-        DocumentFile file = DocumentFile.fromTreeUri(this.context, uri);
-        if (file != null && file.canWrite()) {
-          this.cb.success(uri.toString());
+      try {
+        Uri uri = data.getData();
+        if (uri == null) {
+          this.error("Empty uri");
         } else {
-          this.error("No write permisson: " + uri.toString());
+
+          this.takePermission(uri);
+          DocumentFile file = DocumentFile.fromTreeUri(this.context, uri);
+          if (file != null && file.canWrite()) {
+            this.cb.success(uri.toString());
+          } else {
+            this.error("No write permisson: " + uri.toString());
+          }
+
         }
+      } catch (Exception e) {
+
+        this.error(e.toString());
 
       }
 

@@ -127,5 +127,6 @@
   "support us": "Patreonになり、Acodeの開発をサポートします。",
   "unsupported device": "お使いのデバイスはテーマをサポートしていません。",
   "vibrate on tap": "Vibrate on tap",
-  "copy command is not supported by ftp.": "Copy command is not supported by FTP."
+  "copy command is not supported by ftp.": "Copy command is not supported by FTP.",
+  "full screen": "Full screen"
 }

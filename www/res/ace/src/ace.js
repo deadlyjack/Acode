@@ -16587,6 +16587,10 @@ define("ace/layer/gutter", ["require", "exports", "module", "ace/lib/dom", "ace/
             this.$annotations = [];
             for (var i = 0; i < annotations.length; i++) {
                 var annotation = annotations[i];
+
+                var type = annotation.type;
+                if (type !== "error") continue;
+
                 var row = annotation.row;
                 var rowInfo = this.$annotations[row];
                 if (!rowInfo)
@@ -16600,7 +16604,6 @@ define("ace/layer/gutter", ["require", "exports", "module", "ace/lib/dom", "ace/
                 if (rowInfo.text.indexOf(annoText) === -1)
                     rowInfo.text.push(annoText);
 
-                var type = annotation.type;
                 if (type == "error")
                     rowInfo.className = " ace_error";
                 else if (type == "warning" && rowInfo.className != " ace_error")

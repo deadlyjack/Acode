@@ -80,6 +80,16 @@ export default function editorSettings() {
             key: 'vibrateOnTap',
             text: strings['vibrate on tap'],
             checkbox: values.vibrateOnTap,
+        },
+        {
+            key: 'quickTools',
+            text: strings['quick tools'],
+            checkbox: values.quickTools
+        },
+        {
+            key: 'fullscreen',
+            text: strings['full screen'],
+            checkbox: values.fullscreen
         }
     ];
 
@@ -123,7 +133,7 @@ export default function editorSettings() {
                 break;
 
             case 'tab size':
-                dialogs.prompt(this.text, appSettings.value.tabSize, 'numeric', {
+                dialogs.prompt(this.text, appSettings.value.tabSize, 'number', {
                     required: true
                 }).then(res => {
                     if (res === values.tabSize) return;
@@ -235,6 +245,20 @@ export default function editorSettings() {
                 values.vibrateOnTap = !values.vibrateOnTap;
                 appSettings.update();
                 this.value = values.vibrateOnTap;
+                break;
+
+            case 'quickTools':
+                values.quickTools = !values.quickTools;
+                appSettings.update();
+                Acode.exec("toggle-quick-tools");
+                this.value = values.quickTools;
+                break;
+
+            case 'fullscreen':
+                values.fullscreen = !values.fullscreen;
+                appSettings.update();
+                Acode.exec("toggle-fullscreen");
+                this.value = values.fullscreen;
                 break;
         }
     }

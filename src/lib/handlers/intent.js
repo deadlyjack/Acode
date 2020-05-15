@@ -21,7 +21,7 @@ function HandleIntent(intent = {}) {
     let timeout = null;
 
     timeout = setTimeout(() => {
-        dialogs.loaderShow(strings.loading + '...');
+        dialogs.loader.create(strings.loading + '...');
     }, 300);
 
     if (intent.fileUri) intent.fileUri = decodeURL(intent.fileUri);
@@ -95,6 +95,6 @@ function HandleIntent(intent = {}) {
         if (timeout) {
             clearTimeout(timeout);
         }
-        dialogs.loaderHide();
+        dialogs.loader.destroy();
     }
 }
