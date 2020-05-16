@@ -568,8 +568,8 @@ textarea {
     border-radius: 4px;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
     z-index: 99;
-    color: white;
-    color: var(--text-main-color);
+    color: #252525;
+    color: var(--text-color);
 
     >span {
         display: inline-block;
@@ -585,7 +585,7 @@ textarea {
         white-space: nowrap;
 
         &:not(:last-child) {
-            border-right: solid 1px currentColor;
+            border-right: solid 0.5px currentColor;
         }
 
         &.disabled {
