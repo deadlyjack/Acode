@@ -1,5 +1,4 @@
 version 0.1.13.106
-
 NOTE: This build is highly unstable and untested.
 Please check for bugs with accessing SD Card.
 SFTP, JavaScript smart completion and GIT implementation will take more time than expected
