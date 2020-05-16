@@ -36,7 +36,8 @@ function openFolder(_path, opts = {}) {
   if ('saveState' in opts) saveState = opts.saveState;
   if ('reloadOnResume' in opts) reloadOnResume = opts.reloadOnResume;
 
-  const listState = JSON.parse(localStorage.state || '{}');
+  // const listState = JSON.parse(localStorage.state || '{}');
+  const listState = {};
   const title = opts.name || getTitle();
   const $closeBtn = tag('span', {
     className: 'icon cancel',
@@ -201,12 +202,13 @@ function openFolder(_path, opts = {}) {
       PASTE = ['paste', strings.paste, 'paste', !!clipBoard],
       NEW_FILE = ['new file', strings['new file'], 'document-add'],
       NEW_FOLDER = ['new folder', strings['new folder'], 'folder-add'],
-      CANCEL = ['cancel', cancel, 'clearclose'];
+      CANCEL = ['cancel', cancel, 'clearclose'],
+      OPEN_FOLDER = ['open-folder', strings['open folder'], 'folder'];
 
     let options;
 
     if (type === 'file') options = [COPY, CUT, RENAME, REMOVE];
-    else if (type === 'dir') options = [COPY, CUT, REMOVE, RENAME, PASTE, NEW_FILE, NEW_FOLDER];
+    else if (type === 'dir') options = [COPY, CUT, REMOVE, RENAME, PASTE, NEW_FILE, NEW_FOLDER, OPEN_FOLDER];
     else if (type === 'root') options = [REMOVE, RENAME, PASTE, NEW_FILE, NEW_FOLDER];
 
     if (clipBoard) options.push(CANCEL);
@@ -221,7 +223,7 @@ function openFolder(_path, opts = {}) {
 
   /**
    * @param {"dir"|"file"|"root"} type
-   * @param {"copy"|"cut"|"delete"|"rename"|"paste"|"new file"|"new folder"|"cancel"} action 
+   * @param {"copy"|"cut"|"delete"|"rename"|"paste"|"new file"|"new folder"|"cancel"|"open-folder"} action 
    * @param {string} url target url
    * @param {HTMLElement} $target target element
    * @param {string} name Name of file or folder
@@ -452,6 +454,12 @@ function openFolder(_path, opts = {}) {
         clipBoard = null;
         return Promise.resolve();
 
+      case "open-folder":
+        const obj = JSON.parse(JSON.stringify(opts));
+        obj.name = name;
+        openFolder(url, obj);
+        return Promise.resolve();
+
     }
 
     /**
@@ -560,7 +568,7 @@ function openFolder(_path, opts = {}) {
         });
     }
 
-    localStorage.setItem('state', JSON.stringify(listState));
+    // localStorage.setItem('state', JSON.stringify(listState));
   }
 
 }

@@ -4,6 +4,7 @@ import helpers from "../lib/utils/helpers";
 import constants from "./constants";
 import recents from '../lib/recents';
 import fsOperation from '../lib/fileSystem/fsOperation';
+import Url from './utils/Url';
 
 /**
  * 
@@ -76,6 +77,21 @@ function saveFile(file, as = false, showToast = true) {
 
     } else {
 
+        recents.select([
+                ["select-folder", strings["select folder"], "folder"]
+            ], "dir", strings["select folder"])
+            .then(res => {
+                if (res === "select-folder") return selectFolder();
+                const url = res.val.url;
+                checkFile(url, file.filename)
+                    .then(filename => {
+                        save(url, filename);
+                    })
+                    .catch(error);
+            });
+    }
+
+    function selectFolder() {
         editorManager.editor.blur();
         FileBrowser('folder', strings['save here'])
             .then(res => {
@@ -84,14 +100,21 @@ function saveFile(file, as = false, showToast = true) {
                     newfilename(res.url, file.filename)
                         .then(filename => {
                             save(url, filename);
-                        });
+                        })
+                        .catch(error);
                 } else {
                     checkFile(url, file.filename)
                         .then((filename) => {
                             save(url, filename);
-                        });
+                        })
+                        .catch(error);
                 }
             });
+    }
+
+    function error(err) {
+        helpers.error(err);
+        console.error(err);
     }
 
     /**
@@ -108,8 +131,6 @@ function saveFile(file, as = false, showToast = true) {
         let createFile = false || as;
         if (url) {
             file.type = 'regular';
-            file.record = null;
-            // file.location = decodeURL(url);
             file.location = url;
         }
         if (filename) {
@@ -140,10 +161,7 @@ function saveFile(file, as = false, showToast = true) {
                 .then(() => {
                     return updateFile();
                 })
-                .catch(err => {
-                    helpers.error(err);
-                    console.error(err);
-                })
+                .catch(error)
                 .finally(() => {
                     resetText();
                     file.isSaving = false;
@@ -158,15 +176,18 @@ function saveFile(file, as = false, showToast = true) {
                 .then(() => {
                     return updateFile();
                 })
-                .catch(err => {
-                    helpers.error(err);
-                    console.error(err);
-                })
+                .catch(error)
                 .finally(() => {
                     resetText();
                     file.isSaving = false;
                 });
 
+        }
+
+        function error(err) {
+            if (url) file.location = null;
+            helpers.error(err);
+            console.error(err);
         }
 
         function resetText() {
@@ -212,32 +233,49 @@ function saveFile(file, as = false, showToast = true) {
     }
 
     function checkFile(url, filename) {
-        return new Promise(resolve => {
-            check(url, filename, resolve);
+        return new Promise((resolve, reject) => {
+            check(url, filename, resolve, reject);
         });
     }
 
 
-    function check(url, filename, resolve) {
-        window.resolveLocalFileSystemURL(url + filename, function (entry) {
-            dialogs.select(strings["file already exists"], [
-                    ['overwrite', strings.overwrite],
-                    ['newname', strings['enter file name']]
-                ])
-                .then(res => {
-                    if (res === 'overwrite') {
-                        resolve({
-                            overwrite: true,
-                            filename
+    function check(url, filename, resolve, reject) {
+        const pathname = Url.join(url, filename);
+        const timeout = setTimeout(() => {
+            dialogs.loader.create("", strings.loading + "...");
+        }, 50);
+        fsOperation(pathname)
+            .then(fs => {
+                return fs.exists();
+            })
+            .then(res => {
+                if (res) {
+                    dialogs.select(strings["file already exists"], [
+                            ['overwrite', strings.overwrite],
+                            ['newname', strings['enter file name']]
+                        ])
+                        .then(res => {
+                            if (res === 'overwrite') {
+                                resolve({
+                                    overwrite: true,
+                                    filename
+                                });
+                            } else {
+                                getfilename(resolve, url, filename);
+                            }
                         });
-                    } else {
-                        getfilename(resolve, url, filename);
-                    }
-                });
-            return;
-        }, function (err) {
-            if (err.code === 1) resolve(filename);
-        });
+                    return;
+                } else {
+                    resolve(filename);
+                }
+            })
+            .catch(err => {
+                reject(err);
+            })
+            .finally(() => {
+                if (timeout) clearTimeout(timeout);
+                dialogs.loader.destroy();
+            });
     }
 
     function beautifyFile(name) {

@@ -31,6 +31,7 @@
     "cordova-plugin-buildinfo": "^4.0.0",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^6.0.2",
+    "cordova-plugin-ftp": "file:../plugins/cordova-plugin-ftp",
     "cordova-plugin-navigationbar-color": "0.0.9",
     "cordova-plugin-shell-exec": "^1.0.0",
     "cordova-plugin-statusbar": "git+https://github.com/breautek/cordova-plugin-statusbar.git",
@@ -91,8 +92,8 @@
       "cordova-disable-http-cache": {},
       "cordova-plugin-intent": {},
       "cordova-plugin-system": {},
-      "cordova-plugin-ftp": {},
-      "cordova-plugin-sdcard": {}
+      "cordova-plugin-sdcard": {},
+      "cordova-plugin-ftp": {}
     },
     "platforms": [
       "android"

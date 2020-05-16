@@ -171,6 +171,16 @@ public class CDVFtp extends CordovaPlugin {
                     }
                 }
             });
+        } else if (action.equals("exists")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    try {
+                        exists(args.getString(0), callbackContext);
+                    } catch (Exception e) {
+                        callbackContext.error(e.toString());
+                    }
+                }
+            });
         } else {
             return false;
         }
@@ -378,6 +388,31 @@ public class CDVFtp extends CordovaPlugin {
                     }
                 }
                 callbackContext.error("File not found");
+                // should never reach here!
+            } catch (Exception e) {
+                callbackContext.error(e.toString());
+            }
+        }
+    }
+
+    private void exists(String remoteFile, CallbackContext callbackContext) {
+        if (remoteFile == null) {
+            callbackContext.error("Expected remoteFile path.");
+        } else {
+            try {
+                String remoteFilePath = remoteFile.substring(0, remoteFile.lastIndexOf('/') + 1);
+                String remoteFileName = remoteFile.substring(remoteFile.lastIndexOf('/') + 1);
+                this.client.changeDirectory(remoteFilePath);
+                FTPFile[] list = client.list();
+                JSONArray fileList = new JSONArray();
+                for (FTPFile file : list) {
+                    String name = file.getName();
+                    if (remoteFileName.equals(name)) {
+                        callbackContext.success(1);
+                        return;
+                    }
+                }
+                callbackContext.success(0);
                 // should never reach here!
             } catch (Exception e) {
                 callbackContext.error(e.toString());

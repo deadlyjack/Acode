@@ -29,6 +29,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
     readFile,
     rename,
     copyTo,
+    exists,
     currentDirectory,
     homeDirectory,
     get origin() {
@@ -329,6 +330,24 @@ function remoteFs(username, password, hostname, port, security, mode) {
 
   function copyTo(path, newPath) {
     return Promise.reject(strings["copy command is not supported by ftp"]);
+  }
+
+  function exists(_path) {
+    _path = Url.pathname(_path);
+    return new Promise((resolve, reject) => {
+      connect()
+        .then(res => {
+          ftp.exists(_path, resolve, error);
+
+          function error(err) {
+            ftp.disconnect();
+            const code = getCode(err);
+            if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+            else reject(err);
+          }
+        })
+        .catch(reject);
+    });
   }
 
   function getCode(err) {

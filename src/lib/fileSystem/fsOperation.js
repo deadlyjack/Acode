@@ -104,15 +104,9 @@ function fsOperation(fileUri) {
     } = fs.originObject;
 
     resolve({
-      lsDir: () => {
-        return fs.listDir(url);
-      },
-      readFile: encoding => {
-        return readFile(fs, url, encoding);
-      },
-      writeFile: content => {
-        return fs.writeFile(url, content);
-      },
+      lsDir: () => fs.listDir(url),
+      readFile: encoding => readFile(fs, url, encoding),
+      writeFile: content => fs.writeFile(url, content),
       createFile: (name, data) => {
         let pathname = Url.pathname(url);
 
@@ -125,15 +119,9 @@ function fsOperation(fileUri) {
         name = origin + path.join(pathname, name) + query;
         return fs.createDir(name);
       },
-      deleteFile: () => {
-        return fs.deleteFile(url);
-      },
-      deleteDir: () => {
-        return fs.deleteDir(url);
-      },
-      copyTo: dest => {
-        return fs.copyTo(url, dest);
-      },
+      deleteFile: () => fs.deleteFile(url),
+      deleteDir: () => fs.deleteDir(url),
+      copyTo: dest => fs.copyTo(url, dest),
       moveTo: dest => {
         let pathname = Url.pathname(dest);
 
@@ -146,7 +134,8 @@ function fsOperation(fileUri) {
         const parent = path.dirname(pathname);
         newname = origin + path.join(parent, newname) + query;
         return fs.rename(url, newname);
-      }
+      },
+      exists: () => fs.exists(url)
     });
 
   }
@@ -175,39 +164,17 @@ function fsOperation(fileUri) {
     }
 
     resolve({
-
-      lsDir: () => {
-        return listDir(url);
-      },
-      readFile: encoding => {
-        return readFile(fs, url, encoding);
-      },
-      writeFile: content => {
-        return fs.writeFile(url, content, false, false);
-      },
-      createFile: (name, data) => {
-        data = data || '';
-        return fs.writeFile(url + name, data, true, true);
-      },
-      createDirectory: name => {
-        return fs.createDir(url, name);
-      },
-      deleteFile: () => {
-        return fs.deleteFile(url);
-      },
-      deleteDir: () => {
-        return fs.deleteFile(url);
-      },
-      copyTo: dest => {
-        return moveOrCopy("copyTo", dest);
-      },
-      moveTo: dest => {
-        return moveOrCopy("moveTo", dest);
-      },
-      renameTo: newname => {
-        return fs.renameFile(url, newname);
-      }
-
+      lsDir: () => listDir(url),
+      readFile: encoding => readFile(fs, url, encoding),
+      writeFile: content => fs.writeFile(url, content, false, false),
+      createFile: (name, data) => fs.writeFile(url + name, data || "", true, true),
+      createDirectory: name => fs.createDir(url, name),
+      deleteFile: () => fs.deleteFile(url),
+      deleteDir: () => fs.deleteFile(url),
+      copyTo: dest => moveOrCopy("copyTo", dest),
+      moveTo: dest => moveOrCopy("moveTo", dest),
+      renameTo: newname => fs.renameFile(url, newname),
+      exists: () => pathExist(url)
     });
 
   }
@@ -275,7 +242,8 @@ function fsOperation(fileUri) {
       },
       renameTo: newname => {
         return fs.renameFile(url, newname);
-      }
+      },
+      exists: () => pathExist(url)
 
     });
 
@@ -347,6 +315,21 @@ function fsOperation(fileUri) {
           resolve(files);
         })
         .catch(reject);
+    });
+  }
+
+  /**
+   * 
+   * @param {Promise<Boolean>} url 
+   */
+  function pathExist(url) {
+    return new Promise((resolve, reject) => {
+      window.resolveLocalFileSystemURL(url, entry => {
+        resolve(true);
+      }, err => {
+        if (err.code === 1) resolve(false);
+        reject(err);
+      });
     });
   }
 

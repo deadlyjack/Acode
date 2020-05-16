@@ -197,39 +197,7 @@ const commands = {
     editorManager.onupdate();
   },
   "recent": function () {
-    const all = [];
-    let files = recents.files;
-    let dirs = recents.folders;
-    const MAX = 20;
-    const shortName = name => name.length > MAX ? '...' + name.substr(-MAX - 3) : name;
-    for (let dir of dirs) {
-      const url = new URL(dir.url);
-      let title = dir.url;
-      if (dir.name) {
-        title = dir.name;
-      } else {
-        if (url.hostname && url.username) title = `${url.username}@${url.hostname}`;
-        if (url.hostname) title = url.protocol + url.hostname;
-
-        title += Url.pathname(dir.url);
-      }
-      all.push([{
-        type: 'dir',
-        val: dir
-      }, shortName(title), 'icon folder']);
-
-    }
-    for (let file of files)
-      all.push([{
-        type: 'file',
-        val: file
-      }, shortName(file), helpers.getIconForFile(file)]);
-
-    all.push(['clear', strings.clear, 'icon clearclose']);
-
-    dialogs.select(strings['open recent'], all, {
-        textTransform: false
-      })
+    recents.select()
       .then(res => {
         if (res.type === 'file') {
           createEditorFromURI(res.val);

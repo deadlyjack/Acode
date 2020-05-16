@@ -193,6 +193,7 @@ interface FileSystem {
     copyTo(dest: string): Promise<void>;
     moveTo(dset: string): Promise<void>;
     renameTo(newName: string): Promise<void>;
+    exists(): Promise<Boolean>;
 }
 
 interface externalStorageData {
@@ -384,6 +385,16 @@ interface String extends String {
      * For e.g. ```"myname".subtract("my") //"name"```
      */
     subtract(str: String): String;
+}
+
+interface RecentPathData {
+    type: "file" | "dir";
+    val: RecentPathDataValue;
+}
+
+interface RecentPathDataValue {
+    opts: Object;
+    url: String;
 }
 
 /**

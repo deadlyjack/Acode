@@ -269,14 +269,18 @@ function EditorManager($sidebar, $header, $body) {
                 return null;
             },
             set location(url) {
-                if (!url) return;
                 if (this.readOnly) {
                     this.readOnly = false;
                     this.contentUri = null;
                 }
-                this.fileUri = url + this.filename;
+
+                if (url) {
+                    this.fileUri = Url.join(url, this.filename);
+                    helpers.updateFolders(this.location);
+                } else {
+                    this.fileUri = null;
+                }
                 setSubText(this);
-                helpers.updateFolders(this.location);
                 manager.onupdate();
             }
         };

@@ -59,10 +59,10 @@
     "cordova-plugin-system": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-ftp": {
+    "cordova-plugin-sdcard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-sdcard": {
+    "cordova-plugin-ftp": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

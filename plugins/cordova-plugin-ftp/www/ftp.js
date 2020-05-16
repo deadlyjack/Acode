@@ -224,4 +224,18 @@ Ftp.prototype.disconnect = function (successCallback, errorCallback) {
         "disconnect", []);
 };
 
+/**
+ * Check if file exists
+ *
+ * @param {string} path file or directory path.
+ * @param {function} successCallback The success callback. If triggered, means `disconnect` success.
+ * @param {function} errorCallback The error callback. If triggered, means disconnect fail.
+ */
+Ftp.prototype.exists = function (path, successCallback, errorCallback) {
+    exec(successCallback,
+        errorCallback,
+        "Ftp",
+        "exists", [path]);
+};
+
 module.exports = new Ftp();
