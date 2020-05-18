@@ -37,7 +37,7 @@
   "file deleted": "檔案已刪除",
   "file is not supported": "檔案不支持",
   "file not supported": "不支持此檔案格式",
-  "file too large": "檔案過大，無法處理，最大的檔案大小為",
+  "file too large": "檔案過大，無法處理，最大的檔案大小為 ",
   "file renamed": "檔案重命名",
   "file saved": "檔案已儲存",
   "folder added": "資料夾已建立",
