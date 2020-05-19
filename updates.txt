@@ -1,4 +1,9 @@
-version 0.1.13.106
+version 0.1.13.108
+☞ Added Bangla language
+☞ Fixed file not saving to external file
+☞ Bugs fixes
+
+version 0.1.13.107
 SFTP, JavaScript smart completion and GIT implementation will take more time than expected
 ☞ Added french language
 ☞ Toggling full screen form settings will save full screen state

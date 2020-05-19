@@ -125,5 +125,8 @@
   "format": "সাজান",
   "project name": "প্রোজেক্ট এর নাম ",
   "support us": "Acode ডেভেলপমেন্ট সহায়তা করুন , পৃষ্ঠপোষক হয়ে যান",
-  "unsupported device": "আপনার ডিভাসটি এই থিম সাপোর্ট করেনা।"
+  "unsupported device": "আপনার ডিভাসটি এই থিম সাপোর্ট করেনা।",
+  "vibrate on tap": "Vibrate on tap",
+  "copy command is not supported by ftp.": "Copy command is not supported by FTP.",
+  "full screen": "Full screen"
 }

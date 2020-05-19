@@ -12,20 +12,22 @@ const VIBRATION_TIME = 30;
 const COMMANDS = ["saveFile", "saveFileAs", "newFile", "nextFile", "prevFile", "openFile", "run", "find", "replace", "toggleSidebar", "toggleFullscreen", "toggleMenu", "toggleEditMenu"];
 const encodings = ["big5", "euc-jp", "euc-kr", "gb18030", "hz-gb-2312", "ibm866", "iso-2022-jp", "iso-8859-10", "iso-8859-13", "iso-8859-14", "iso-8859-15", "iso-8859-16", "iso-8859-2", "iso-8859-3", "iso-8859-4", "iso-8859-5", "iso-8859-6", "iso-8859-7", "iso-8859-8", "iso-8859-8-i", "koi8-r", "koi8-u", "macintosh", "shift_jis", "utf-16be", "utf-16le", "utf-8", "windows-1250", "windows-1251", "windows-1252", "windows-1253", "windows-1254", "windows-1255", "windows-1256", "windows-1257", "windows-1258", "windows-874", "x-mac-cyrillic"];
 const langList = {
-  "hi-in": "हिंदी",
   "en-us": "English",
+  "es-sv": "Español",
+  "fr-fr": "Francais",
   "id-id": "Indonesian",
+  "uz-uz": "O'zbekcha",
   "ru-ru": "Русский",
   "pt-br": "Português",
+  "tr-tr": "Türkçe",
   "uk-ua": "Українська",
+  "hi-in": "हिंदी",
   "zh-cn": "中文简体",
+  "zh-hant": "中文繁體",
   "ir-fa": "فارسی",
   "ar-ye": "العربية",
   "ja-jp": "日本語",
-  "uz-uz": "O'zbekcha",
-  "es-sv": "Español",
-  "tr-tr": "Türkçe",
-  "fr-fr": "Francais"
+  "bn-bd": "বাংলা"
 };
 const themeList = {
   dark: ["ambiance", "chaos", "clouds_midnight", "cobalt", "dracula", "gob", "gruvbox", "idle_fingers", "kr_theme", "merbivore", "merbivore_soft", "mono_industrial", "monokai", "nord_dark", "pastel_on_dark", "solarized_dark", "terminal", "tomorrow_night", "tomorrow_night_blue", "tomorrow_night_bright", "tomorrow_night_eighties", "twilight", "vibrant_ink"],
@@ -44,7 +46,8 @@ const appThemeList = {
   "dark": scheme("dark", "dark", false, "#1d1d1d", "#313131"),
   "moon": scheme("moon", "dark", false, "#14181d", "#222831"),
   "ocean": scheme("ocean", "dark", false, "#13131a", "#20202c"),
-  "tomyris": scheme("tomyris", "dark", false, "#230528", "#3b0944")
+  "tomyris": scheme("tomyris", "dark", false, "#230528", "#3b0944"),
+  "menes": scheme("menes", "dark", false, "#1f2226", "#353941")
 };
 
 /**

@@ -243,7 +243,7 @@ function fsOperation(fileUri) {
       renameTo: newname => {
         return fs.renameFile(url, newname);
       },
-      exists: () => pathExist(url)
+      exists: () => pathExist(fullPath)
 
     });
 

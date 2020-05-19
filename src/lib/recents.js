@@ -1,5 +1,6 @@
 import Url from "./utils/Url";
 import dialogs from "../components/dialogs";
+import helpers from "./utils/helpers";
 
 const recents = {
   files: JSON.parse(localStorage.recentFiles || '[]'),
@@ -45,7 +46,7 @@ const recents = {
    */
   select(extra, type = "all", title = strings['open recent']) {
     const all = [];
-    const MAX = this.MAX;
+    const MAX = 20;
     const shortName = name => name.length > MAX ? '...' + name.substr(-MAX - 3) : name;
     if (type === "dir" || type === "all") {
       let dirs = recents.folders;

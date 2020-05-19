@@ -153,7 +153,7 @@ body {
   &[theme=tomyris] {
     --primary-color: #3b0944;
     --secondary-color: #5f1854;
-    --text-color: #f1bbd5;
+    --text-color: #90b8f8;
     --text-main-color: #f1bbd5;
     --accent-color: #a12559;
     --a-color: #b5b4e9;
@@ -170,6 +170,28 @@ body {
     --primary-button-background-color: #a12559;
     --primary-button-active-color: #009199;
     --primary-button-text-color: #f1bbd5;
+  }
+
+  &[theme=menes] {
+    --primary-color: #353941;
+    --secondary-color: #26282b;
+    --text-color: #90b8f8;
+    --text-main-color: #90b8f8;
+    --accent-color: #5f85db;
+    --a-color: #b5b4e9;
+    --border-color: rgba(255, 255, 255, 0.133);
+
+    --menu-background-color: #363b4e;
+    --menu-text-color: #90b8f8;
+    --menu-icon-color: #90b8f8;
+
+    --dialogbox-background-color: #363b4e;
+    --dialogbox-text-color: #90b8f8;
+    --dialogbox-selected-option-color: #3399ff;
+
+    --primary-button-background-color: #5f85db;
+    --primary-button-active-color: #009199;
+    --primary-button-text-color: #90b8f8;
   }
 
   &[theme=light] {

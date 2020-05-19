@@ -23,12 +23,12 @@ export default function themeSettings() {
     const settingsOptions = [{
             key: 'editor',
             text: strings['editor theme'],
-            subText: values.editorTheme.split('/').slice(-1)[0].replace(/_/g, ' '),
+            subText: values.editorTheme.split('/').slice(-1)[0].replace(/_/g, ' ').toUpperCase(),
         },
         {
             key: 'app',
             text: strings['app theme'],
-            subText: values.appTheme
+            subText: values.appTheme.toUpperCase()
         }
     ];
 
@@ -51,7 +51,7 @@ export default function themeSettings() {
                     if (editor) editor.setTheme(theme);
                     appSettings.value.editorTheme = theme;
                     appSettings.update();
-                    this.changeSubText(res.replace(/_/g, ' '));
+                    this.changeSubText(res.replace(/_/g, ' ').toUpperCase());
                 });
                 break;
 
@@ -95,7 +95,7 @@ export default function themeSettings() {
                             appSettings.value.appTheme = res.name;
                             appSettings.update();
                             window.restoreTheme();
-                            this.changeSubText(res.name);
+                            this.changeSubText(res.name.toUpperCase());
                         });
                 } else {
                     dialogs.alert(strings.info, strings["unsupported device"]);
