@@ -129,5 +129,14 @@
   "unsupported device": "你的裝置不支援",
   "vibrate on tap": "點擊時震動",
   "copy command is not supported by ftp.": "FTP 目前不支援複製指令",
-  "full screen": "全螢幕"
+  "support title": "Support Acode",
+  "support text": "Acode needs your support! Show your support by donating a small amount as $3.",
+  "exit fullscreen": "Exit fullscreen",
+  "fullscreen": "fullscreen",
+  "animation": "animation",
+  "backup": "backup",
+  "restore": "restore",
+  "backup successful": "Backup successful",
+  "invalid backup file": "Invalid backup file",
+  "backup file found": "Backup file found, do you want to restore settings, key-bindings and ftp-accounts from backup file?"
 }

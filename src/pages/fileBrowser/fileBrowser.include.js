@@ -18,7 +18,6 @@ import SearchBar from '../../components/searchbar';
 import projects from './projects';
 import decryptAccounts from '../ftp-accounts/decryptAccounts';
 import Url from '../../lib/utils/Url';
-import path from '../../lib/utils/path';
 //#endregion
 /**
  * 
@@ -62,7 +61,8 @@ function FileBrowserInclude(type, option) {
       transformOrigin: 'top right'
     };
     const $fbMenu = contextMenu(
-      `<li action="settings">${strings.settings}</li>`,
+      `<li action="settings">${strings.settings}</li>
+      <li action="reload">${strings.reload}</li>`,
       menuOption
     );
     const $addMenu = contextMenu(
@@ -98,8 +98,15 @@ function FileBrowserInclude(type, option) {
     $fbMenu.onclick = function (e) {
       $fbMenu.hide();
       const action = e.target.getAttribute('action');
-      if (action && action === 'settings') {
+      if (action === 'settings') {
         filesSettings(refresh);
+      } else if (action === 'reload') {
+        const {
+          url,
+          name
+        } = currentDir;
+        if (url in cachedDir) delete cachedDir[url];
+        loadDir(url, name);
       }
     };
 
@@ -170,10 +177,9 @@ function FileBrowserInclude(type, option) {
           currentDir.name = "File Browser";
           $page.settitle('File Browser');
           render(list);
-          if (type === 'folder') {
-            $addMenuToggler.classList.add('disabled');
+          if (type === 'folder')
             folderOption.classList.add('disabled');
-          }
+          $addMenuToggler.classList.add('disabled');
         })
         .catch(err => {
           helpers.error(err);
@@ -247,9 +253,7 @@ function FileBrowserInclude(type, option) {
 
               });
             }
-          } catch (error) {
-            console.log(error);
-          }
+          } catch (error) {}
 
           if (type === "file") {
             list.push({
@@ -564,7 +568,8 @@ function FileBrowserInclude(type, option) {
               if (arg === "folder") return fs.createDirectory(entryName);
               if (arg === "file") return fs.createFile(entryName);
             })
-            .then(() => {
+            .then((res) => {
+              console.log(res);
               updateAddedFolder(url);
               window.plugins.toast.showLongBottom(strings.success);
               loadDir(url, name);

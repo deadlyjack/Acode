@@ -9,6 +9,7 @@ import constants from './constants';
 import internalFs from './fileSystem/internalFs';
 import openFolder from './addFolder';
 import Url from './utils/Url';
+import fsOperation from './fileSystem/fsOperation';
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -106,6 +107,8 @@ function EditorManager($sidebar, $header, $body) {
         moveOpenFileList,
         sidebar: $sidebar,
         container,
+        checkChanges,
+        onFileSave,
         get state() {
             return editorState;
         },
@@ -147,29 +150,15 @@ function EditorManager($sidebar, $header, $body) {
 
     editor.on('change', function (e) {
         if (checkTimeout) clearTimeout(checkTimeout);
-        checkTimeout = setTimeout(checkChanges, TIMEOUT_VALUE);
-    });
-
-    function checkChanges() {
-        const file = SESSION_PATH + manager.activeFile.id;
-        const text = manager.activeFile.session.getValue();
-        const activeFile = manager.activeFile;
-        if (activeFile && !activeFile.isUnsaved & activeFile.sessionCreated) {
-            internalFs.readFile(file)
+        checkTimeout = setTimeout(() => {
+            checkChanges()
                 .then(res => {
-                    const decoder = new TextDecoder("utf-8");
-                    const old_text = decoder.decode(res.data);
-                    if (old_text !== text) {
-                        manager.activeFile.assocTile.classList.add('notice');
-                        manager.activeFile.isUnsaved = true;
-                        manager.onupdate();
-                    }
-                })
-                .finally(() => {
-                    internalFs.writeFile(file, text, true, false);
+                    if (!res) manager.activeFile.isUnsaved = true;
+                    else manager.activeFile.isUnsaved = false;
+                    manager.onupdate();
                 });
-        }
-    }
+        }, TIMEOUT_VALUE);
+    });
 
     window.resolveLocalFileSystemURL(SESSION_PATH, () => {
         ready = true;
@@ -181,6 +170,48 @@ function EditorManager($sidebar, $header, $body) {
                 emptyQueue();
             });
     });
+
+    addNewFile(constants.DEFAULT_FILE_NAME, {
+        isUnsaved: false,
+        render: true,
+        id: constants.DEFAULT_SESSION
+    });
+
+    /**
+     * 
+     * @param {File} file 
+     */
+    function onFileSave(file) {
+        internalFs.writeFile(SESSION_PATH + file.id, file.session.getValue(), true, false);
+    }
+
+    /**
+     * 
+     * @param {boolean} [write]
+     * @returns {Promise<boolean>} 
+     */
+    function checkChanges(write) {
+        const file = SESSION_PATH + manager.activeFile.id;
+        const text = manager.activeFile.session.getValue();
+        const activeFile = manager.activeFile;
+        return new Promise((resolve, reject) => {
+            if (activeFile && activeFile.sessionCreated) {
+                internalFs.readFile(file)
+                    .then(res => {
+                        const decoder = new TextDecoder("utf-8");
+                        const old_text = decoder.decode(res.data);
+                        if (old_text !== text)
+                            resolve(false);
+                        else
+                            resolve(true);
+                    })
+                    .catch(reject)
+                    .finally(() => {
+                        if (write) internalFs.writeFile(file, text, true, false);
+                    });
+            }
+        });
+    }
 
     function emptyQueue() {
         if (!queue.length) return;
@@ -285,13 +316,19 @@ function EditorManager($sidebar, $header, $body) {
             }
         };
 
-        internalFs.writeFile(SESSION_PATH + id, text, true, false)
-            .then(() => {
-                file.sessionCreated = true;
-            })
-            .catch(err => {
-                console.log(err);
-            });
+        if (file.fileUri || file.contentUri) {
+            fsOperation(file.fileUri || file.contentUri)
+                .then(fs => {
+                    return fs.readFile("utf8");
+                })
+                .then(text => {
+                    createSession(text);
+                });
+        } else if (file.type === "regular") {
+            createSession("");
+        } else {
+            createSession(text);
+        }
 
         if (options.isUnsaved && !options.readOnly) {
             file.assocTile.classList.add('notice');
@@ -321,17 +358,29 @@ function EditorManager($sidebar, $header, $body) {
                 editor.moveCursorToPosition(options.cursorPos);
             }
 
-            const defaultFile = getFile(constants.DEFAULT_SESSION, "id");
-            if (
-                defaultFile &&
-                !defaultFile.session.getValue() &&
-                defaultFile.filename === constants.DEFAULT_FILE_NAME
-            ) manager.removeFile(defaultFile);
+            if (file.id !== constants.DEFAULT_SESSION) {
+                const defaultFile = getFile(constants.DEFAULT_SESSION, "id");
+                if (
+                    defaultFile &&
+                    (!defaultFile.session.getValue() &&
+                        defaultFile.filename === constants.DEFAULT_FILE_NAME)
+                ) manager.removeFile(defaultFile);
+            }
         }
 
         setTimeout(() => {
             editor.resize(true);
         }, 0);
+
+        function createSession(text) {
+            internalFs.writeFile(SESSION_PATH + id, text, true, false)
+                .then(() => {
+                    file.sessionCreated = true;
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
 
         return file;
     }
@@ -565,7 +614,7 @@ function EditorManager($sidebar, $header, $body) {
          */
         const file = typeof id === "string" ? getFile(id, "id") : id;
 
-        if (!file || (manager.files.length === 1 && file.id === constants.DEFAULT_SESSION)) return;
+        if (!file) return;
 
         if (file.isUnsaved && !force) {
             dialogs.confirm(strings.warning.toUpperCase(), strings['unsaved file']).then(closeFile);
@@ -579,20 +628,17 @@ function EditorManager($sidebar, $header, $body) {
         function closeFile() {
             manager.files = manager.files.filter(editor => editor.id !== file.id);
 
-
-            if (file.id !== constants.DEFAULT_SESSION || manager.activeFile.id === constants.DEFAULT_SESSION) {
-                if (!manager.files.length) {
-                    editor.setSession(new ace.EditSession(""));
-                    $sidebar.hide();
-                    addNewFile('untitled.txt', {
-                        isUnsaved: false,
-                        render: true,
-                        id: constants.DEFAULT_SESSION
-                    });
-                } else {
-                    if (file.id === manager.activeFile.id) {
-                        switchFile(manager.files[manager.files.length - 1].id);
-                    }
+            if (!manager.files.length) {
+                editor.setSession(new ace.EditSession(""));
+                $sidebar.hide();
+                addNewFile('untitled.txt', {
+                    isUnsaved: false,
+                    render: true,
+                    id: constants.DEFAULT_SESSION
+                });
+            } else {
+                if (file.id === manager.activeFile.id) {
+                    switchFile(manager.files[manager.files.length - 1].id);
                 }
             }
 
@@ -632,7 +678,6 @@ function EditorManager($sidebar, $header, $body) {
 
         return result;
     }
-
 
     async function changeName(name) {
         if (!name) return;

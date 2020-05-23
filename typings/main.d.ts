@@ -377,6 +377,17 @@ interface PathData {
 
 interface String extends String {
     /**
+     * Capitalize the string for e.g. converts "this is a string" to "This Is A String"
+     */
+    capitalize(): String;
+    /**
+     * Capitalize a character at given index for e.g.
+     * ```js
+     * "this is a string".capitalize(0) //"This is a string"
+     * ```
+     */
+    capitalize(index): String;
+    /**
      * Returns hashcode of the string
      */
     hashCode(): String;

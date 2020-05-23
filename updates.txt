@@ -1,3 +1,9 @@
+version 0.1.14.108
+☞ Backup and restore settings, key bindings and ftp accounts
+☞ Fixed file showing unsaved even file has no changes
+☞ Exit full screen mode using notifcation
+☞ Bugs fixes
+
 version 0.1.13.108
 ☞ Added Bangla language
 ☞ Fixed file not saving to external file

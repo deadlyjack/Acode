@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'code-editor-icon';
-  src: url('fonts/code-editor-icon.eot?9sf1qw');
-  src: url('fonts/code-editor-icon.eot?9sf1qw#iefix') format('embedded-opentype'),
-    url('fonts/code-editor-icon.ttf?9sf1qw') format('truetype'),
-    url('fonts/code-editor-icon.woff?9sf1qw') format('woff'),
-    url('fonts/code-editor-icon.svg?9sf1qw#code-editor-icon') format('svg');
+  src: url('fonts/code-editor-icon.eot?r1lwvj');
+  src: url('fonts/code-editor-icon.eot?r1lwvj#iefix') format('embedded-opentype'),
+    url('fonts/code-editor-icon.ttf?r1lwvj') format('truetype'),
+    url('fonts/code-editor-icon.woff?r1lwvj') format('woff'),
+    url('fonts/code-editor-icon.svg?r1lwvj#code-editor-icon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -23,6 +23,206 @@
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon.acode:before {
+  content: "\ea0d";
+  color: #3499fe;
+}
+
+.icon.shift:before {
+  content: "\ea06";
+}
+
+.icon.replace:before {
+  content: "\ea07";
+}
+
+.icon.replace_all:before {
+  content: "\ea08";
+}
+
+.icon.moveline-up:before {
+  content: "\ea09";
+}
+
+.icon.moveline-down:before {
+  content: "\ea0a";
+}
+
+.icon.copyline-up:before {
+  content: "\ea0b";
+}
+
+.icon.copyline-down:before {
+  content: "\ea0c";
+}
+
+.icon.android:before {
+  content: "\e92e";
+  color: #a4c639;
+}
+
+.icon.angular:before {
+  content: "\e92f";
+  color: #dd0031;
+}
+
+.icon.angularuniversal:before {
+  content: "\e9ff";
+  color: #00acc1;
+}
+
+.icon.css3:before {
+  content: "\e930";
+  color: #1572b6;
+}
+
+.icon.dev-dot-to:before {
+  content: "\e931";
+}
+
+.icon.facebook:before {
+  content: "\e932";
+  color: #4172b8;
+}
+
+.icon.git:before {
+  content: "\e933";
+  color: #f05032;
+}
+
+.icon.github:before {
+  content: "\e934";
+}
+
+.icon.gmail:before {
+  content: "\e935";
+  color: #d14836;
+}
+
+.icon.googlechrome:before {
+  content: "\e936";
+  color: #4285f4;
+}
+
+.icon.googledrive:before {
+  content: "\e937";
+  color: #4285f4;
+}
+
+.icon.googleplay:before {
+  content: "\e938";
+  color: #607d8b;
+}
+
+.icon.html5:before {
+  content: "\e939";
+  color: #e34f26;
+}
+
+.icon.instagram:before {
+  content: "\e93a";
+  color: #e4405f;
+}
+
+.icon.ionic:before {
+  content: "\e93b";
+  color: #3880ff;
+}
+
+.icon.javascript:before {
+  content: "\e93c";
+  color: #f7df1e;
+}
+
+.icon.jekyll:before {
+  content: "\e93d";
+  color: #c00;
+}
+
+.icon.linkedin:before {
+  content: "\e93e";
+  color: #0077b5;
+}
+
+.icon.markdown:before {
+  content: "\e93f";
+}
+
+.icon.npm:before {
+  content: "\e940";
+  color: #cb3837;
+}
+
+.icon.patreon:before {
+  content: "\ea0f";
+  color: #f96854;
+}
+
+.icon.paypal:before {
+  content: "\ea10";
+  color: #00457c;
+}
+
+.icon.python:before {
+  content: "\e941";
+  color: #3776ab;
+}
+
+.icon.react:before {
+  content: "\e942";
+  color: #61dafb;
+}
+
+.icon.ruby:before {
+  content: "\ea11";
+  color: #cc342d;
+}
+
+.icon.stackexchange:before {
+  content: "\e943";
+  color: #1e5397;
+}
+
+.icon.stackoverflow:before {
+  content: "\e944";
+  color: #fe7a16;
+}
+
+.icon.telegram:before {
+  content: "\e945";
+  color: #2ca5e0;
+}
+
+.icon.twitter:before {
+  content: "\e946";
+  color: #1da1f2;
+}
+
+.icon.visualstudiocode:before {
+  content: "\e947";
+  color: #007acc;
+}
+
+.icon.vue:before {
+  content: "\e9fe";
+  color: #4fc08d;
+}
+
+.icon.webpack:before {
+  content: "\e948";
+  color: #8dd6f9;
+}
+
+.icon.yarn:before {
+  content: "\e949";
+  color: #2c8ebb;
+}
+
+.icon.youtube:before {
+  content: "\e94a";
+  color: #f00;
 }
 
 .icon.zip:before {
@@ -121,6 +321,22 @@
   content: "\e915";
 }
 
+.icon.document-text2:before {
+  content: "\ea01";
+}
+
+.icon.document-text2-outline:before {
+  content: "\ea02";
+}
+
+.icon.document-text4:before {
+  content: "\ea03";
+}
+
+.icon.document-text5:before {
+  content: "\ea04";
+}
+
 .icon.document-add:before {
   content: "\e91a";
 }
@@ -199,153 +415,6 @@
 
 .icon.folder2-outline:before {
   content: "\e92d";
-}
-
-.icon.android:before {
-  content: "\e92e";
-  color: #a4c639;
-}
-
-.icon.angular:before {
-  content: "\e92f";
-  color: #dd0031;
-}
-
-.icon.css3:before {
-  content: "\e930";
-  color: #1572b6;
-}
-
-.icon.dev-dot-to:before {
-  content: "\e931";
-}
-
-.icon.facebook:before {
-  content: "\e932";
-  color: #4172b8;
-}
-
-.icon.git:before {
-  content: "\e933";
-  color: #f05032;
-}
-
-.icon.github:before {
-  content: "\e934";
-}
-
-.icon.gmail:before {
-  content: "\e935";
-  color: #d14836;
-}
-
-.icon.googlechrome:before {
-  content: "\e936";
-  color: #4285f4;
-}
-
-.icon.googledrive:before {
-  content: "\e937";
-  color: #4285f4;
-}
-
-.icon.googleplay:before {
-  content: "\e938";
-  color: #607d8b;
-}
-
-.icon.html5:before {
-  content: "\e939";
-  color: #e34f26;
-}
-
-.icon.instagram:before {
-  content: "\e93a";
-  color: #e4405f;
-}
-
-.icon.ionic:before {
-  content: "\e93b";
-  color: #3880ff;
-}
-
-.icon.javascript:before {
-  content: "\e93c";
-  color: #f7df1e;
-}
-
-.icon.jekyll:before {
-  content: "\e93d";
-  color: #c00;
-}
-
-.icon.linkedin:before {
-  content: "\e93e";
-  color: #0077b5;
-}
-
-.icon.markdown:before {
-  content: "\e93f";
-}
-
-.icon.npm:before {
-  content: "\e940";
-  color: #cb3837;
-}
-
-.icon.python:before {
-  content: "\e941";
-  color: #3776ab;
-}
-
-.icon.react:before {
-  content: "\e942";
-  color: #61dafb;
-}
-
-.icon.stackexchange:before {
-  content: "\e943";
-  color: #1e5397;
-}
-
-.icon.stackoverflow:before {
-  content: "\e944";
-  color: #fe7a16;
-}
-
-.icon.telegram:before {
-  content: "\e945";
-  color: #2ca5e0;
-}
-
-.icon.twitter:before {
-  content: "\e946";
-  color: #1da1f2;
-}
-
-.icon.visualstudiocode:before {
-  content: "\e947";
-  color: #007acc;
-}
-
-.icon.vue:before {
-  content: "\e9fe";
-  color: #4fc08d;
-}
-
-.icon.webpack:before {
-  content: "\e948";
-  color: #8dd6f9;
-}
-
-.icon.yarn:before {
-  content: "\e949";
-  color: #2c8ebb;
-}
-
-.icon.youtube:before {
-  content: "\e94a";
-  color: #f00;
 }
 
 .icon.error:before {
@@ -496,6 +565,10 @@
   content: "\e96b";
 }
 
+.icon.linkinsert_link:before {
+  content: "\ea00";
+}
+
 .icon.redo:before {
   content: "\e9f6";
 }
@@ -526,6 +599,10 @@
 
 .icon.undo:before {
   content: "\e970";
+}
+
+.icon.font_download:before {
+  content: "\ea12";
 }
 
 .icon.save_alt:before {
@@ -596,6 +673,10 @@
   content: "\e982";
 }
 
+.icon.notes:before {
+  content: "\ea13";
+}
+
 .icon.cloud:before {
   content: "\e983";
 }
@@ -618,6 +699,10 @@
 
 .icon.file_upload:before {
   content: "\e988";
+}
+
+.icon.folder4:before {
+  content: "\ea05";
 }
 
 .icon.folder_open:before {
@@ -1040,6 +1125,14 @@
   content: "\e9ee";
 }
 
+.icon.http:before {
+  content: "\ea14";
+}
+
+.icon.compare_arrows:before {
+  content: "\ea15";
+}
+
 .icon.update:before {
   content: "\e9ef";
 }
@@ -1060,6 +1153,10 @@
   content: "\e9f3";
 }
 
+.icon.home_filled:before {
+  content: "\ea16";
+}
+
 .icon.library_add_check:before {
   content: "\e9f4";
 }
@@ -1070,4 +1167,12 @@
 
 .icon.replay_circle_filled:before {
   content: "\e9f5";
+}
+
+.icon.height:before {
+  content: "\ea17";
+}
+
+.icon.all_inclusive:before {
+  content: "\ea18";
 }

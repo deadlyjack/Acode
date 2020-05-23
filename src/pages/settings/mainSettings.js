@@ -10,6 +10,7 @@ import constants from "../../lib/constants";
 import helpers from "../../lib/utils/helpers";
 import createEditorFromURI from "../../lib/createEditorFromURI";
 import internalFs from "../../lib/fileSystem/internalFs";
+import backupRestore from "./backup-restore";
 
 export default function settingsMain(demo) {
     const $page = Page(strings.settings);
@@ -58,11 +59,15 @@ export default function settingsMain(demo) {
         }, {
             key: 'about',
             text: strings.about,
-            icon: 'app-logo'
+            icon: 'acode'
         }, {
             key: 'keybindings',
             text: strings['key bindings'],
             icon: 'keyboard_hide'
+        }, {
+            key: 'backup-restore',
+            text: strings.backup.capitalize() + '/' + strings.restore.capitalize(),
+            icon: 'cached'
         });
     }
 
@@ -107,6 +112,10 @@ export default function settingsMain(demo) {
 
             case 'about':
                 About();
+                break;
+
+            case 'backup-restore':
+                backupRestore();
                 break;
 
             case 'keybindings':

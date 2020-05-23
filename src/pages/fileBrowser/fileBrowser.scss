@@ -13,13 +13,13 @@
     }
   }
 
-  &[type=folder] {
+  /*&[type=folder] {
     [type=file] {
       pointer-events: none;
       overflow: hidden;
       opacity: 0.5;
     }
-  }
+  }*/
 
   #list {
     height: calc(100% - 30px);

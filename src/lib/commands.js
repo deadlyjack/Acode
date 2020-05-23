@@ -273,6 +273,17 @@ const commands = {
     app.classList.toggle("fullscreen-mode");
     editorManager.editor.resize(true);
     editorManager.controls.update();
+
+    if (app.classList.contains("fullscreen-mode")) {
+      cordova.plugins.notification.local.schedule({
+        id: constants.notification.EXIT_FULL_SCREEN,
+        text: strings["exit fullscreen"],
+        sound: null,
+        vibrate: true,
+        ongoing: true,
+        smallIcon: 'res://logo'
+      });
+    }
   },
   "toggle-sidebar": () => {
     editorManager.sidebar.toggle();

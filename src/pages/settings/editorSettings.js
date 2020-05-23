@@ -22,8 +22,12 @@ export default function editorSettings() {
     const values = appSettings.value;
 
     const settingsOptions = [{
+            key: 'animation',
+            text: strings.animation.capitalize(),
+            checkbox: values.animation,
+        }, {
             key: 'autosave',
-            text: strings.autosave,
+            text: strings.autosave.capitalize(),
             subText: values.autosave ? values.autosave + '' : strings.no,
         },
         {
@@ -88,7 +92,7 @@ export default function editorSettings() {
         },
         {
             key: 'fullscreen',
-            text: strings['full screen'],
+            text: strings.fullscreen.capitalize(),
             checkbox: values.fullscreen
         }
     ];
@@ -259,6 +263,13 @@ export default function editorSettings() {
                 appSettings.update();
                 Acode.exec("toggle-fullscreen");
                 this.value = values.fullscreen;
+                break;
+
+            case 'animation':
+                values.animation = !values.animation;
+                app.classList.toggle("no-animation");
+                appSettings.update();
+                this.value = values.animation;
                 break;
         }
     }

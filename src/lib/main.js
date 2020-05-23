@@ -29,7 +29,6 @@ import arrowkeys from "./handlers/arrowkeys";
 
 import $_menu from '../views/menu.hbs';
 import $_fileMenu from '../views/file-menu.hbs';
-import $_suportUs from '../views/supportus.hbs';
 import git from "./git";
 import commands from "./commands";
 import externalStorage from "./externalStorage";
@@ -39,6 +38,8 @@ import rateBox from "../components/dialogboxes/rateBox";
 import loadPolyFill from "./polyfill";
 import internalFs from "./fileSystem/internalFs";
 import Url from "./utils/Url";
+import notification from "./handlers/notification";
+import backupRestore from "../pages/settings/backup-restore";
 //@ts-check
 
 loadPolyFill.apply(window);
@@ -86,6 +87,7 @@ function Main() {
   };
 
   document.addEventListener("deviceready", () => {
+    notification();
 
     system.clearCache(res => console.log("clear cache", res), err => console.error(err));
 
@@ -420,10 +422,10 @@ function App() {
     .then(() => {
 
       document.body.removeAttribute('data-small-msg');
-      if (!editorManager.files.length) createDefaultFile();
 
       setTimeout(() => {
         app.classList.remove('loading', 'splash');
+        if (!appSettings.value.animation) app.classList.add('no-animation');
         onAppLoad();
       }, 500);
       //#region event listeners 
@@ -503,26 +505,39 @@ function App() {
     let count = parseInt(localStorage.count) || 0;
     if (count === constants.RATING_TIME) rateBox();
     else {
-      if (count === constants.RATING_TIME - 1) supportUsButton();
+      if (count === constants.RATING_TIME - 1) {
+        cordova.plugins.notification.local.schedule({
+          id: constants.notification.SUPPORT_ACODE,
+          title: strings["support title"],
+          text: strings["support text"],
+          smallIcon: 'res://logo'
+        });
+      }
       localStorage.count = ++count;
     }
 
     if (!localStorage.init) {
-      dialogs.box(
-          strings.info.toUpperCase(),
-          "If editor is not working properly, try these suggestions:<br><br>" +
-          "1. Turn off keyboard <strong>Autocorrect</strong> settings.<br>" +
-          "<img src='./res/imgs/autocorrect/autocorrect-" + appSettings.value.lang + ".jpg'><br>" +
-          "2. Use <a href='https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin'>" +
-          "<strong>Gboard</strong></a> or " +
-          "<a href='https://play.google.com/store/apps/details?id=org.pocketworkstation.pckeyboard'> <strong>" +
-          "Hacker's Keyboard</strong></a><br><br>" +
-          "3. Please read <a href='https://acode.foxdebug.com/faqs'>FAQs</a>"
-        )
-        .wait(12000)
-        .onhide(() => {
-          localStorage.init = true;
-        });
+      localStorage.init = true;
+      const backup = cordova.file.externalRootDirectory + constants.BACKUP_FILE;
+      window.resolveLocalFileSystemURL(backup, fs => {
+        dialogs.confirm(strings.notice.toUpperCase(), strings['backup file found'])
+          .then(() => {
+            backupRestore.restore(backup);
+          });
+      }, err => {
+        dialogs.box(
+            strings.info.toUpperCase(),
+            "If editor is not working properly, try these suggestions:<br><br>" +
+            "1. Turn off keyboard <strong>Autocorrect</strong> settings.<br>" +
+            "<img src='./res/imgs/autocorrect/autocorrect-" + appSettings.value.lang + ".jpg'><br>" +
+            "2. Use <a href='https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin'>" +
+            "<strong>Gboard</strong></a> or " +
+            "<a href='https://play.google.com/store/apps/details?id=org.pocketworkstation.pckeyboard'> <strong>" +
+            "Hacker's Keyboard</strong></a><br><br>" +
+            "3. Please read <a href='https://acode.foxdebug.com/faqs'>FAQs</a>"
+          )
+          .wait(12000);
+      });
     }
   }
 
@@ -655,7 +670,6 @@ function App() {
         const files = helpers.parseJSON(localStorage.getItem('files'));
 
         if (!files || !files.length) {
-          createDefaultFile();
           resolve();
           return;
         }
@@ -744,17 +758,8 @@ function App() {
           return file;
         });
       } else {
-        createDefaultFile();
         resolve();
       }
-    });
-  }
-
-  function createDefaultFile() {
-    editorManager.addNewFile(constants.DEFAULT_FILE_NAME, {
-      isUnsaved: false,
-      render: true,
-      id: constants.DEFAULT_SESSION
     });
   }
 
@@ -909,22 +914,5 @@ function restoreTheme(darken) {
     }
 
   }
-}
-
-function supportUsButton() {
-  const $supportUsContainer = tag.parse(mustache.render($_suportUs, strings));
-  const $supportUs = $supportUsContainer.get('#supportus');
-  app.append($supportUsContainer);
-  const client = ($supportUs.getBoundingClientRect().height / 2) + 'px';
-  $supportUs.style.borderRadius = client;
-  $supportUs.style.padding = `${10}px ${client}`;
-
-  setTimeout(() => {
-    $supportUs.style.opacity = '0';
-
-    setTimeout(() => {
-      $supportUsContainer.remove();
-    }, 300);
-  }, 2500);
 }
 //#endregion

@@ -51,11 +51,11 @@ function actions(action) {
       break;
 
     case 'undo':
-      editor.undo();
+      editor.undo(true);
       break;
 
     case 'redo':
-      editor.redo();
+      editor.redo(true);
       break;
 
     case 'search':

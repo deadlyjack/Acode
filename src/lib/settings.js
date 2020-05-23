@@ -28,6 +28,7 @@ class Settings {
          * @type {settingsValue}
          */
         this.defaultSettings = {
+            animation: true,
             autosave: 0,
             fileBrowser: {
                 showHiddenFiles: false,

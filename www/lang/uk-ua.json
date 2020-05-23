@@ -129,5 +129,14 @@
   "unsupported device": "Ваш пристрій не підтримує тему.",
   "vibrate on tap": "Vibrate on tap",
   "copy command is not supported by ftp.": "Copy command is not supported by FTP.",
-  "full screen": "Full screen"
+  "support title": "Support Acode",
+  "support text": "Acode needs your support! Show your support by donating a small amount as $3.",
+  "exit fullscreen": "Exit fullscreen",
+  "fullscreen": "fullscreen",
+  "animation": "animation",
+  "backup": "backup",
+  "restore": "restore",
+  "backup successful": "Backup successful",
+  "invalid backup file": "Invalid backup file",
+  "backup file found": "Backup file found, do you want to restore settings, key-bindings and ftp-accounts from backup file?"
 }

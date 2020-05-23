@@ -54,7 +54,7 @@ function rateBox() {
   }
 
   function onhide() {
-    localStorage.count = -3;
+    localStorage.count = 0;
   }
 }
 

@@ -56,15 +56,22 @@
     "cordova-plugin-intent": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-system": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "cordova-plugin-sdcard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-ftp": {
       "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-local-notification": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-system": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },
-  "dependent_plugins": {}
+  "dependent_plugins": {
+    "cordova-plugin-badge": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    }
+  }
 }

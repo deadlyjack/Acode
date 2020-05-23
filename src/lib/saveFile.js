@@ -76,8 +76,25 @@ function saveFile(file, as = false, showToast = true) {
         }
 
     } else {
+        let locations;
+
+        try {
+            locations = JSON.parse(localStorage.recentlySavedLocations);
+        } catch (error) {
+            locations = [];
+        }
 
         recents.select([
+                ...(locations.map(location => {
+                    return [{
+                            val: {
+                                url: location
+                            }
+                        },
+                        Url.hidePassword(location),
+                        "folder"
+                    ];
+                })),
                 ["select-folder", strings["select folder"], "folder"]
             ], "dir", strings["select folder"])
             .then(res => {
@@ -195,6 +212,28 @@ function saveFile(file, as = false, showToast = true) {
         }
 
         function updateFile() {
+            if (url) {
+                /**
+                 * @type {Array<String>}
+                 */
+                let recentlySavedLocations;
+                try {
+                    recentlySavedLocations = JSON.parse(localStorage.recentlySavedLocations);
+                } catch (e) {
+                    recentlySavedLocations = [];
+                }
+
+                if (recentlySavedLocations.includes(url))
+                    recentlySavedLocations = recentlySavedLocations.filter(location => {
+                        return location !== url;
+                    });
+                if (recentlySavedLocations.length > 4)
+                    recentlySavedLocations.pop();
+
+                recentlySavedLocations.unshift(url);
+                localStorage.recentlySavedLocations = JSON.stringify(recentlySavedLocations);
+            }
+
             if (window.saveTimeout) clearTimeout(window.saveTimeout);
             if (file.id === constants.DEFAULT_SESSION) file.id = helpers.uuid();
             window.saveTimeout = setTimeout(() => {
@@ -204,6 +243,7 @@ function saveFile(file, as = false, showToast = true) {
                     helpers.updateFolders(file.location);
                     recents.addFile(file.fileUri);
                 }
+                editorManager.onFileSave(file);
                 editorManager.onupdate();
                 resetText();
             }, editorManager.TIMEOUT_VALUE + 100);

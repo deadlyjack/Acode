@@ -172,8 +172,11 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
           break;
 
         case MARKDOWN_STYLE:
-          url = `${assets}/css/md.css`;
-          sendFileContent(url, req.requestId, 'text/css');
+          url = appSettings.value.markdownStyle;
+          if (url)
+            sendFileContent(url, req.requestId, 'text/css');
+          else
+            sendText('img {max-width: 100%;}', req.requestId, 'text/css');
           break;
 
         default:

@@ -48,6 +48,22 @@ export default function loadPolyFill() {
     }
   });
 
+  Object.defineProperty(String.prototype, 'capitalize', {
+    value: function (index) {
+      if (typeof index === "number" && index >= 0) {
+        const strs = [this.slice(0, index), this.slice(index, index + 1), this.slice(index + 1)];
+        return strs[0] + (strs[1] ? strs[1].toUpperCase() : '') + strs[2];
+      } else {
+        let strs = this.split(' ');
+        strs = strs.map(str => {
+          if (str.length > 0) return (str[0].toUpperCase() + str.slice(1));
+          return '';
+        });
+        return strs.join(' ');
+      }
+    }
+  });
+
   /**
    * Decode any url recursively until its fully decoded
    * @param {string} url URL string

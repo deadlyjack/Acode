@@ -169,6 +169,11 @@ export default {
   getProtocol(url) {
     return (/^([a-z]+:)\/\/\/?/i.exec(url) || [])[1] || "";
   },
+  /**
+   * 
+   * @param {string} url 
+   * @returns {string}
+   */
   hidePassword(url) {
     const urlObj = new URL(url);
     if (urlObj.protocol === "file:") {

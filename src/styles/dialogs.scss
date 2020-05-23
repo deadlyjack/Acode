@@ -194,7 +194,7 @@
                 border: solid 4px var(--dialogbox-text-color);
                 border-bottom: solid 4px rgba($color: #000000, $alpha: 0) !important;
                 margin: 15px;
-                animation: rotate 1s linear infinite;
+                animation: rotate 1s linear infinite !important;
 
                 @keyframes rotate {
                     0% {

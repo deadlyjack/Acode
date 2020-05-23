@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+ * This file contains Original Code and/or Modifications of Original Code
+ * as defined in and that are subject to the Apache License
+ * Version 2.0 (the 'License'). You may not use this file except in
+ * compliance with the License. Please obtain a copy of the License at
+ * http://opensource.org/licenses/Apache-2.0/ and read it before using this
+ * file.
+ *
+ * The Original Code and all software distributed under the License are
+ * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+ * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
+ * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
+ * Please see the License for the specific language governing rights and
+ * limitations under the License.
+ */
+-->
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-badge"
+        version="0.8.8">
+
+    <name>Badge</name>
+
+    <description>Shows the count of unread messages as a badge on the app icon.</description>
+
+    <repo>https://github.com/katzer/cordova-plugin-badge.git</repo>
+
+    <issue>https://github.com/katzer/cordova-plugin-badge/issues</issue>
+
+    <keywords>appplant, badge, shortcutbadger</keywords>
+
+    <license>Apache 2.0</license>
+
+    <author>Sebastián Katzer</author>
+
+    <!-- cordova -->
+    <engines>
+        <engine name="cordova" version=">=6.0.0" />
+        <engine name="apple-ios" version=">=10.0.0" />
+        <engine name="cordova-android" version=">=4"/>
+        <engine name="cordova-plugman" version=">=4.2.0"/><!-- needed for gradleReference support -->
+    </engines>
+
+    <!-- js -->
+    <js-module src="www/badge.js" name="Badge">
+        <clobbers target="cordova.plugins.notification.badge" />
+    </js-module>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Badge">
+                <param name="ios-package" value="APPBadge"/>
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/APPBadge.h" />
+        <source-file src="src/ios/APPBadge.m" />
+    </platform>
+
+    <!-- osx -->
+    <platform name="osx">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Badge">
+                <param name="osx-package" value="APPBadge"/>
+            </feature>
+        </config-file>
+
+        <header-file src="src/osx/APPBadge.h" />
+        <source-file src="src/osx/APPBadge.m" />
+
+        <header-file src="src/osx/DockCircularProgressBar.h" />
+        <source-file src="src/osx/DockCircularProgressBar.mm" />
+
+        <header-file src="src/osx/DockDownloadProgressBar.h" />
+        <source-file src="src/osx/DockDownloadProgressBar.mm" />
+    </platform>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Badge">
+                <param name="android-package" value="de.appplant.cordova.plugin.badge.Badge"/>
+            </feature>
+        </config-file>
+
+        <framework src="src/android/badge.gradle" custom="true" type="gradleReference"/>
+
+        <source-file
+            src="src/android/Badge.java"
+            target-dir="src/de/appplant/cordova/plugin/badge" />
+
+        <source-file
+            src="src/android/BadgeImpl.java"
+            target-dir="src/de/appplant/cordova/plugin/badge" />
+    </platform>
+
+    <!-- browser -->
+    <platform name="browser">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Badge">
+                <param name="browser-package" value="Badge"/>
+            </feature>
+        </config-file>
+
+        <js-module src="src/browser/favico.min.js" name="Badge.Favico">
+            <clobbers target="cordova.plugins.notification.badge.Favico" />
+        </js-module>
+
+        <js-module src="src/browser/BadgeProxy.js" name="Badge.Proxy">
+            <runs />
+        </js-module>
+    </platform>
+
+    <!-- windows -->
+    <platform name="windows">
+        <js-module src="src/windows/BadgeProxy.js" name="Badge.Proxy" >
+            <runs />
+        </js-module>
+    </platform>
+
+</plugin>

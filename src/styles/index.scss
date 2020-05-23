@@ -23,6 +23,12 @@ body {
     background-color: var(--primary-color);
     color: #252525;
     color: var(--text-color);
+
+    &.no-animation * {
+        animation: none !important;
+        transition: none !important;
+        box-shadow: none !important;
+    }
 }
 
 a {
@@ -157,7 +163,7 @@ a {
             border: solid 4px var(--text-color);
             border-bottom: solid 4px rgba($color: #000000, $alpha: 0) !important;
             margin: auto;
-            animation: rotate 1s linear infinite;
+            animation: rotate 1s linear infinite !important;
 
             @keyframes rotate {
                 0% {
