@@ -19,6 +19,7 @@ import quickTools from './handlers/quickTools';
 import FTPAccounts from "../pages/ftp-accounts/ftp-accounts";
 import FileBrowser from "../pages/fileBrowser/fileBrowser";
 import Url from "./utils/Url";
+import path from "./utils/path";
 
 const commands = {
   "console": function () {
@@ -263,7 +264,23 @@ const commands = {
     editorManager.editor.blur();
     Modes()
       .then(mode => {
-        editorManager.activeFile.session.setMode(mode);
+        const activefile = editorManager.activeFile;
+        const ext = path.extname(activefile.filename);
+
+        const defaultmode = modelist.getModeForPath(activefile.filename).mode;
+        if (ext !== '.txt' && defaultmode === "ace/mode/text") {
+          let modeAssociated;
+          try {
+            modeAssociated = JSON.parse(localStorage.modeassoc || '{}');
+          } catch (error) {
+            modeAssociated = {};
+          }
+
+          modeAssociated[ext] = mode;
+          localStorage.modeassoc = JSON.stringify(modeAssociated);
+        }
+
+        activefile.setMode(mode);
       });
   },
   "toggle-quick-tools": function () {

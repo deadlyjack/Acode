@@ -60,11 +60,13 @@ export default function backupRestore() {
         const settings = appSettings.value;
         const keyBindings = window.customKeyBindings;
         const ftpaccounts = JSON.parse(localStorage.ftpaccounts || '[]');
+        const modes = JSON.parse(localStorage.modeassoc || '{}');
 
         const backupString = JSON.stringify({
             settings,
             keyBindings,
-            ftpaccounts
+            ftpaccounts,
+            modes
         });
         const encrypted = helpers.credentials.encrypt(backupString);
 
@@ -120,6 +122,7 @@ backupRestore.restore = function (url) {
                         return fs.writeFile(JSON.stringify(backup.keyBindings));
                     })
                     .then(() => {
+                        localStorage.modeassoc = JSON.stringify(backup.modes || {});
                         localStorage.ftpaccounts = JSON.stringify(backup.ftpaccounts);
                         return internalFs.writeFile(appSettings.settingsFile, JSON.stringify(backup.settings), true, false);
                     })

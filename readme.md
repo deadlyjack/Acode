@@ -14,7 +14,7 @@ Note: This project is not organised and it is very hard understand the project s
 
 ## Multi language support
 
-To add new language, create a new file with language code for android (eg. en-us for english) in [`www/lang/`](https://github.com/deadlyjack/code-editor/tree/master/www/lang) direcotry. After adding new laguage also add it to [`src/constants.js -> langList`](https://github.com/deadlyjack/code-editor/blob/master/src/constants.js#L12).
+To add new language, create a new file with language code for android (eg. en-us for english) in [`www/lang/`](https://github.com/deadlyjack/code-editor/tree/master/www/lang) direcotry. After adding new laguage also add it to [`src/constants.js -> langList`](https://github.com/deadlyjack/code-editor/blob/master/src/lib/constants.js#L22).
 
 Here are few utility tools to add, remove or search a string in all added languages.
 
@@ -43,7 +43,6 @@ If you have installed yarn you can simply run `yarn build-run` to build the apk 
 - [Esprima](https://esprima.org/)
 - [Mustache](https://github.com/janl/mustache.js)
 - [Marked](https://marked.js.org/)
-- [Makrdown css](https://github.com/markdowncss)
 - [Mime types](https://www.npmjs.com/package/mime-types)
 - [Webpack](https://webpack.js.org/)
 - [Vanilla picker](https://vanilla-picker.js.org/)

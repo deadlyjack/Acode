@@ -1,4 +1,4 @@
-version 0.1.14.108
+version 0.1.14.109
 ☞ Backup and restore settings, key bindings and ftp accounts
 ☞ Fixed file showing unsaved even file has no changes
 ☞ Exit full screen mode using notifcation

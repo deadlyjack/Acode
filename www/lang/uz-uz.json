@@ -137,5 +137,6 @@
   "restore": "restore",
   "backup successful": "Backup successful",
   "invalid backup file": "Invalid backup file",
-  "backup file found": "Backup file found, do you want to restore settings, key-bindings and ftp-accounts from backup file?"
+  "backup file found": "Backup file found, do you want to restore settings, key-bindings and ftp-accounts from backup file?",
+  "welcome back": "Welcome back"
 }

@@ -520,7 +520,7 @@ function App() {
       localStorage.init = true;
       const backup = cordova.file.externalRootDirectory + constants.BACKUP_FILE;
       window.resolveLocalFileSystemURL(backup, fs => {
-        dialogs.confirm(strings.notice.toUpperCase(), strings['backup file found'])
+        dialogs.confirm(strings["welcome back"].toUpperCase(), strings['backup file found'])
           .then(() => {
             backupRestore.restore(backup);
           });

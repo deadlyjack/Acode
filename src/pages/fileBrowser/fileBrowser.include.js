@@ -172,14 +172,16 @@ function FileBrowserInclude(type, option) {
       getStorageList()
         .then(list => {
           delete localStorage.lastDir;
+
+          if (type === 'folder')
+            folderOption.classList.add('disabled');
+          $addMenuToggler.classList.add('disabled');
+
           navigate("/", "/");
           currentDir.url = "/";
           currentDir.name = "File Browser";
           $page.settitle('File Browser');
           render(list);
-          if (type === 'folder')
-            folderOption.classList.add('disabled');
-          $addMenuToggler.classList.add('disabled');
         })
         .catch(err => {
           helpers.error(err);
@@ -323,14 +325,13 @@ function FileBrowserInclude(type, option) {
       }
 
       function update() {
-        if (type === 'folder')
-          if (url === root) {
-            $addMenuToggler.classList.add('disabled');
-            folderOption.classList.add('disabled');
-          } else {
-            $addMenuToggler.classList.remove('disabled');
-            folderOption.classList.remove('disabled');
-          }
+        if (url === root) {
+          $addMenuToggler.classList.add('disabled');
+          if (type === 'folder') folderOption.classList.add('disabled');
+        } else {
+          $addMenuToggler.classList.remove('disabled');
+          if (type === 'folder') folderOption.classList.remove('disabled');
+        }
 
         localStorage.lastDir = url;
         currentDir.url = url;
@@ -460,7 +461,7 @@ function FileBrowserInclude(type, option) {
             loadDir(currentDir);
           })
           .catch(err => {
-            console.log(err);
+            console.error(err);
             helpers.error(err);
           });
       }
@@ -569,7 +570,6 @@ function FileBrowserInclude(type, option) {
               if (arg === "file") return fs.createFile(entryName);
             })
             .then((res) => {
-              console.log(res);
               updateAddedFolder(url);
               window.plugins.toast.showLongBottom(strings.success);
               loadDir(url, name);

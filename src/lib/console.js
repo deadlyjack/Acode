@@ -105,8 +105,9 @@ import loadPolyFill from "./polyfill";
         if (sessionStorage.getItem('__mode') === 'console') {
             toggleConsole();
         } else {
-            if (!toggler.isConnected)
+            if (!toggler.isConnected) {
                 document.body.appendChild(toggler);
+            }
             setInterval(() => {
                 if (!toggler.isConnected)
                     document.body.appendChild(toggler);
@@ -143,7 +144,12 @@ import loadPolyFill from "./polyfill";
         if (consoleElement.isConnected) {
             document.body.removeChild(clearBtn);
             document.body.removeChild(consoleElement);
+            if (sessionStorage.getItem('__mode') !== 'console') window.removeEventListener("hashchange", toggleConsole);
         } else {
+            if (sessionStorage.getItem('__mode') !== 'console') {
+                location.hash = "console";
+                window.addEventListener("hashchange", toggleConsole);
+            }
             document.body.appendChild(clearBtn);
             document.body.appendChild(consoleElement);
             if (!flag) {
@@ -250,8 +256,9 @@ import loadPolyFill from "./polyfill";
         let result = obj.then(val => {
             status = "resolved";
             value = val;
-        }, () => {
+        }, val => {
             status = "rejected";
+            value = val;
         });
 
         Object.defineProperties(result, {

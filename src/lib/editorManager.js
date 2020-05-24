@@ -10,6 +10,7 @@ import internalFs from './fileSystem/internalFs';
 import openFolder from './addFolder';
 import Url from './utils/Url';
 import fsOperation from './fileSystem/fsOperation';
+import path from './utils/path';
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -280,16 +281,46 @@ function EditorManager($sidebar, $header, $body) {
             session: ace.createEditSession(text),
             fileUri: options.fileUri,
             contentUri: options.contentUri,
-            name: filename,
+            _name: filename,
             editable: true,
             type: options.type || 'regular',
             isUnsaved: options.isUnsaved,
             record: options.record,
             encoding: 'utf-8',
             assocTile,
+            setMode(mode) {
+                this.session.setMode(mode);
+                const filemode = modelist.getModeForPath(this.filename).mode;
+                let tmpFileName;
+
+                if (mode !== filemode) {
+
+                    const modeName = mode.split('/').slice(-1)[0];
+                    const exts = modelist.modesByName[modeName].extensions.split("|");
+                    const filename = path.parse(this.filename).name;
+
+                    for (let ext of exts) {
+                        if (/[a-z0-9]/.test(ext)) {
+                            tmpFileName = filename + "." + ext;
+                            break;
+                        }
+                    }
+                    if (!tmpFileName) tmpFileName = filename + '.txt';
+
+                } else {
+                    tmpFileName = this.filename;
+                }
+
+                this.assocTile.lead(tag('i', {
+                    className: helpers.getIconForFile(tmpFileName),
+                    style: {
+                        paddingRight: '5px'
+                    }
+                }));
+            },
             get filename() {
                 if (this.type === 'git') return this.record.name;
-                else return this.name;
+                else return this._name;
             },
             set filename(name) {
                 changeName.call(this, name);
@@ -462,15 +493,28 @@ function EditorManager($sidebar, $header, $body) {
         const session = file.session;
         const filename = file.filename;
         const settings = appSettings.value;
-        const mode = modelist.getModeForPath(filename).mode;
+        let mode;
+
+        try {
+
+            const modes = JSON.parse(localStorage.modeassoc);
+            const ext = path.extname(filename);
+            if (ext in modes) mode = modes[ext];
+            else throw new Error("Mode not found");
+
+        } catch (error) {
+
+            mode = modelist.getModeForPath(filename).mode;
+
+        }
+
         if (file.session.$modeId !== mode) {
             session.setOptions({
-                mode,
-                // wrap: settings.textWrap,
                 tabSize: settings.tabSize,
                 useSoftTabs: settings.softTab,
                 useWorker: appSettings.value.linting
             });
+            file.setMode(mode);
         }
         file.session.setOption('wrap', settings.textWrap);
     }
@@ -705,20 +749,8 @@ function EditorManager($sidebar, $header, $body) {
         if (editorManager.activeFile.id === this.id) $header.text(name);
 
         this.assocTile.text(name);
-        if (helpers.extname(this.name) !== helpers.extname(name)) {
-            setupSession({
-                session: this.session,
-                filename: name
-            });
-            this.assocTile.lead(tag('i', {
-                className: helpers.getIconForFile(name),
-                style: {
-                    paddingRight: '5px'
-                }
-            }));
-        }
-
         this.name = name;
+        setupSession(this);
         manager.onupdate();
 
         function error(err) {

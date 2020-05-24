@@ -167,7 +167,7 @@ function fsOperation(fileUri) {
       lsDir: () => listDir(url),
       readFile: encoding => readFile(fs, url, encoding),
       writeFile: content => fs.writeFile(url, content, false, false),
-      createFile: (name, data) => fs.writeFile(url + name, data || "", true, true),
+      createFile: (name, data) => fs.writeFile(Url.join(url, name), data || "", true, true),
       createDirectory: name => fs.createDir(url, name),
       deleteFile: () => fs.deleteFile(url),
       deleteDir: () => fs.deleteFile(url),

@@ -26,7 +26,7 @@ function HandleIntent(intent = {}) {
 
     if (intent.fileUri) intent.fileUri = decodeURL(intent.fileUri);
 
-    if (type === 'VIEW') {
+    if (["SEND", "VIEW", "EDIT"].includes(type)) {
 
         if (intent.fileUri) {
 
@@ -48,26 +48,6 @@ function HandleIntent(intent = {}) {
 
             checkAndCreate();
 
-        }
-    } else if (type === 'SEND') {
-        if (intent.fileUri) {
-            createEditorFromURI(intent.fileUri);
-        } else if (intent.clipItems) {
-            const clipItems = intent.clipItems;
-            for (let obj of clipItems) {
-                if (obj.uri) {
-                    const url = obj.uri;
-                    let uri = helpers.convertToFile(url);
-                    let isContentUri = false;
-                    if (!uri) {
-                        uri = url;
-                        isContentUri = true;
-                    }
-
-                    createEditorFromURI(uri, isContentUri);
-                    break;
-                }
-            }
         }
     } else {
         stopLoading();
