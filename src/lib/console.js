@@ -144,12 +144,14 @@ import loadPolyFill from "./polyfill";
         if (consoleElement.isConnected) {
             document.body.removeChild(clearBtn);
             document.body.removeChild(consoleElement);
-            if (sessionStorage.getItem('__mode') !== 'console') window.removeEventListener("hashchange", toggleConsole);
+            // if (sessionStorage.getItem('__mode') !== 'console') window.removeEventListener("hashchange", toggleConsole);
         } else {
-            if (sessionStorage.getItem('__mode') !== 'console') {
-                location.hash = "console";
-                window.addEventListener("hashchange", toggleConsole);
-            }
+            // if (sessionStorage.getItem('__mode') !== 'console') {
+            //     location.hash = "console";
+            //     setTimeout(() => {
+            //         window.addEventListener("hashchange", toggleConsole);
+            //     }, 0);
+            // }
             document.body.appendChild(clearBtn);
             document.body.appendChild(consoleElement);
             if (!flag) {

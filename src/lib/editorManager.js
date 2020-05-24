@@ -281,7 +281,7 @@ function EditorManager($sidebar, $header, $body) {
             session: ace.createEditSession(text),
             fileUri: options.fileUri,
             contentUri: options.contentUri,
-            _name: filename,
+            name: filename,
             editable: true,
             type: options.type || 'regular',
             isUnsaved: options.isUnsaved,
@@ -320,7 +320,7 @@ function EditorManager($sidebar, $header, $body) {
             },
             get filename() {
                 if (this.type === 'git') return this.record.name;
-                else return this._name;
+                else return this.name;
             },
             set filename(name) {
                 changeName.call(this, name);

@@ -1,26 +1,2 @@
-#file-browser {
-  /*&[type=folder] {
-    [type=file] {
-      pointer-events: none;
-      overflow: hidden;
-      opacity: 0.5;
-    }
-  }*/ }
-  #file-browser .tile .icon {
-    color: #415585; }
-    #file-browser .tile .icon.folder {
-      color: #cece35; }
-    #file-browser .tile .icon.code {
-      color: #4f9b4f; }
-  #file-browser #list {
-    height: calc(100% - 30px);
-    overflow-y: auto; }
-    #file-browser #list .tile[read-only] .text::after {
-      content: 'Read only';
-      font-size: 0.6em;
-      color: white;
-      background-color: #3e648a;
-      border-radius: 4px;
-      padding: 5px;
-      margin: auto 15px; }
+#file-browser .tile .icon{color:#415585}#file-browser .tile .icon.folder{color:#cece35}#file-browser .tile .icon.code{color:#4f9b4f}#file-browser #list{height:calc(100% - 30px);overflow-y:auto}#file-browser #list .tile[read-only] .text::after{content:'Read only';font-size:0.6em;color:white;background-color:#3e648a;border-radius:4px;padding:5px;margin:auto 15px}
 
