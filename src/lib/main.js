@@ -411,7 +411,15 @@ function App() {
   $footer.addEventListener('contextmenu', footerOnContextMenu);
   document.addEventListener('keydown', handleMainKeyDown);
   document.addEventListener('keyup', handleMainKeyUp);
-  if (appSettings.value.fullscreen) Acode.exec("toggle-fullscreen");
+  if (appSettings.value.fullscreen) {
+    cordova.plugins.notification.local.schedule({
+      id: constants.notification.EXIT_FULL_SCREEN,
+      text: strings["exit fullscreen"],
+      sound: null,
+      smallIcon: 'res://logo'
+    });
+    Acode.exec("enable-fullscreen");
+  }
 
   if (appSettings.value.quickTools) quickTools.actions("enable-quick-tools");
   window.beforeClose = saveState;

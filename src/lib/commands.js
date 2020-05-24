@@ -34,6 +34,14 @@ const commands = {
   "cut": function () {
     clipboardAction('cut');
   },
+  "disable-fullscreen": function () {
+    app.classList.remove("fullscreen-mode");
+    this["resize-editor"]();
+  },
+  "enable-fullscreen": function () {
+    app.classList.add("fullscreen-mode");
+    this["resize-editor"]();
+  },
   "encoding": function () {
     dialogs.select(strings.encoding, constants.encodings, {
         default: editorManager.activeFile.encoding
@@ -246,6 +254,10 @@ const commands = {
   "replace": function () {
     this.find();
   },
+  "resize-editor": function () {
+    editorManager.editor.resize(true);
+    editorManager.controls.update();
+  },
   "run": function () {
     runPreview();
   },
@@ -286,21 +298,9 @@ const commands = {
   "toggle-quick-tools": function () {
     quickTools.actions("toggle-quick-tools");
   },
-  "toggle-fullscreen": () => {
+  "toggle-fullscreen": function () {
     app.classList.toggle("fullscreen-mode");
-    editorManager.editor.resize(true);
-    editorManager.controls.update();
-
-    if (app.classList.contains("fullscreen-mode")) {
-      cordova.plugins.notification.local.schedule({
-        id: constants.notification.EXIT_FULL_SCREEN,
-        text: strings["exit fullscreen"],
-        sound: null,
-        vibrate: true,
-        ongoing: true,
-        smallIcon: 'res://logo'
-      });
-    }
+    this["resize-editor"]();
   },
   "toggle-sidebar": () => {
     editorManager.sidebar.toggle();

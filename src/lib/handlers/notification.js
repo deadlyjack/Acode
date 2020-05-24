@@ -7,7 +7,7 @@ export default function notification() {
     const ids = constants.notification;
     switch (id) {
       case ids.EXIT_FULL_SCREEN:
-        Acode.exec("toggle-fullscreen");
+        Acode.exec("disable-fullscreen");
         appSettings.value.fullscreen = false;
         appSettings.update();
         cordova.plugins.notification.local.clear(id);

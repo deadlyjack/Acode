@@ -5,6 +5,20 @@ body {
     }
   }
 
+  &.no-animation {
+    footer {
+      border-top: solid 1px rgba(0, 0, 0, 0.2);
+    }
+
+    .header,
+    header {
+      &.tile {
+        border-bottom: solid 1px rgba(0, 0, 0, 0.2);
+        box-sizing: border-box;
+      }
+    }
+  }
+
   &.fullscreen-mode {
     #root {
       >header {

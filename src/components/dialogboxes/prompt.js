@@ -5,7 +5,7 @@ import autosize from 'autosize';
  * 
  * @param {string} message 
  * @param {string} defaultValue 
- * @param {"text"|"numberic"|"tel"|"search"|"email"|"url"} type 
+ * @param {"textarea"|"text"|"numberic"|"tel"|"search"|"email"|"url"} type 
  * @param {object} options
  * @param {RegExp} options.match
  * @param {boolean} options.required
@@ -13,7 +13,7 @@ import autosize from 'autosize';
 function prompt(message, defaultValue, type = 'text', options = {}) {
   return new Promise((resolve) => {
 
-    const inputType = type === 'text' ? 'textarea' : 'input';
+    const inputType = type === 'textarea' ? 'textarea' : 'input';
     type = type === 'filename' ? 'text' : type;
 
     const messageSpan = tag('span', {
@@ -102,7 +102,7 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
     window.restoreTheme(true);
     app.append(promptDiv, mask);
     input.focus();
-    autosize(input);
+    if (inputType === "textarea") autosize(input);
 
     function hidePrompt() {
       promptDiv.classList.add('hide');

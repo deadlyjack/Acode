@@ -1,3 +1,9 @@
+body.no-animation {
+    .context-menu {
+        border: solid 1px rgba($color: #000000, $alpha: 0.2);
+    }
+}
+
 .context-menu {
     z-index: 111;
     box-sizing: border-box;

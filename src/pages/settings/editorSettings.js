@@ -260,8 +260,26 @@ export default function editorSettings() {
 
             case 'fullscreen':
                 values.fullscreen = !values.fullscreen;
+                const id = constants.notification.EXIT_FULL_SCREEN;
+
+                if (values.fullscreen) {
+
+                    cordova.plugins.notification.local.schedule({
+                        id,
+                        text: strings["exit fullscreen"],
+                        sound: null,
+                        smallIcon: 'res://logo'
+                    });
+                    Acode.exec("enable-fullscreen");
+
+                } else {
+
+                    cordova.plugins.notification.local.clear(id);
+                    Acode.exec("disable-fullscreen");
+
+                }
+
                 appSettings.update();
-                Acode.exec("toggle-fullscreen");
                 this.value = values.fullscreen;
                 break;
 

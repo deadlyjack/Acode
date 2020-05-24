@@ -493,6 +493,7 @@ function EditorManager($sidebar, $header, $body) {
         const session = file.session;
         const filename = file.filename;
         const settings = appSettings.value;
+        const ext = path.extname(filename);
         let mode;
 
         try {
@@ -508,11 +509,17 @@ function EditorManager($sidebar, $header, $body) {
 
         }
 
+        let useWorker = appSettings.value.linting;
+
+        if (ext === ".jsx")
+            useWorker = false;
+
+        session.setOption("useWorker", useWorker);
+
         if (file.session.$modeId !== mode) {
             session.setOptions({
                 tabSize: settings.tabSize,
-                useSoftTabs: settings.softTab,
-                useWorker: appSettings.value.linting
+                useSoftTabs: settings.softTab
             });
             file.setMode(mode);
         }
