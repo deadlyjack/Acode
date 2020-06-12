@@ -1,0 +1,74 @@
+#github {
+  .list-item {
+    .octicon {
+      font-size: 1.8em;
+      color: #6a737d !important;
+    }
+  }
+
+  .profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 16px;
+    border-bottom: solid 1px rgba(204, 204, 204, 0.4);
+
+    img {
+      height: 150px;
+      width: 150px;
+      border-radius: 50%;
+      margin: 16px;
+      background-color: rgba($color: #000000, $alpha: 0.2);
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+
+      small {
+        opacity: 0.8;
+      }
+    }
+
+    .tags {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      padding: 0 0 8px 16px;
+      box-sizing: border-box;
+
+      .tag {
+        display: flex;
+        align-items: center;
+        height: 32px;
+        margin: 8px 16px 0 8px;
+        text-transform: capitalize;
+
+        &::after {
+          content: attr(data-value);
+          height: 1.4em;
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          padding: 0 6px;
+          font-size: 0.8em;
+          background-color: white;
+          background-color: var(--text-main-color);
+          color: #9999ff;
+          color: var(--primary-color);
+          border-radius: 4px;
+          margin-left: 4px;
+        }
+      }
+    }
+
+    .button-container {
+      width: calc(100% - 32px);
+      max-width: 450px;
+    }
+  }
+}

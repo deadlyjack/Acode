@@ -1,0 +1,32 @@
+<div class="main" id="github">
+  <div class="profile">
+    <img src="{{avatar_url}}" alt="avatar">
+    <h2 class="info">
+      <span class="name">{{name}}</span>
+      <small class="login">{{login}}</small>
+    </h2>
+    <div class="tags">
+      <span class="tag" data-value="{{followers}}">followers</span>
+      <span class="tag" data-value="{{following}}">following</span>
+      <span class="tag" data-value="{{total_repos}}">repositories</span>
+      <span class="tag" data-value="{{total_gists}}">gists</span>
+    </div>
+    <div class="button-container primary">
+      <button action="open" data-value="{{html_url}}">open in browser</button>
+    </div>
+  </div>
+  <div class="list">
+    <div class="list-item" action="gist">
+      <span class="octicon octicon-gist"></span>
+      <div class="container">
+        <span class="text">Gists</span>
+      </div>
+    </div>
+    <div class="list-item" action="repos">
+      <div class="octicon octicon-repo"></div>
+      <div class="container">
+        <span class="text">Repositories</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,78 @@
+{
+  "_from": "git+https://github.com/breautek/cordova-plugin-statusbar.git",
+  "_id": "cordova-plugin-statusbar@2.4.3-dev",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/cordova-plugin-statusbar",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "https://github.com/breautek/cordova-plugin-statusbar.git",
+    "rawSpec": "https://github.com/breautek/cordova-plugin-statusbar.git",
+    "saveSpec": "git+https://github.com/breautek/cordova-plugin-statusbar.git",
+    "fetchSpec": "https://github.com/breautek/cordova-plugin-statusbar.git",
+    "gitCommittish": null
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "git+https://github.com/breautek/cordova-plugin-statusbar.git#adcee9f66f01f95eaa286f956105bbccf62b14df",
+  "_spec": "https://github.com/breautek/cordova-plugin-statusbar.git",
+  "_where": "/media/dellevenjack/Projects/git/Acode",
+  "author": {
+    "name": "Apache Software Foundation"
+  },
+  "bugs": {
+    "url": "https://issues.apache.org/jira/browse/CB"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova-plugin-statusbar",
+    "platforms": [
+      "android",
+      "ios",
+      "wp7",
+      "wp8",
+      "windows"
+    ]
+  },
+  "deprecated": false,
+  "description": "Cordova StatusBar Plugin",
+  "devDependencies": {
+    "jshint": "^2.6.0"
+  },
+  "engines": {
+    "cordovaDependencies": {
+      "0.1.0": {
+        "cordova": ">=3.0.0"
+      },
+      "3.0.0": {
+        "cordova": ">100"
+      }
+    }
+  },
+  "homepage": "https://github.com/apache/cordova-plugin-statusbar#readme",
+  "keywords": [
+    "cordova",
+    "statusbar",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+    "cordova-wp7",
+    "cordova-wp8",
+    "cordova-windows"
+  ],
+  "license": "Apache-2.0",
+  "name": "cordova-plugin-statusbar",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apache/cordova-plugin-statusbar.git"
+  },
+  "scripts": {
+    "jshint": "node node_modules/jshint/bin/jshint www && node node_modules/jshint/bin/jshint src && node node_modules/jshint/bin/jshint tests",
+    "test": "npm run jshint"
+  },
+  "types": "./types/index.d.ts",
+  "version": "2.4.3-dev"
+}

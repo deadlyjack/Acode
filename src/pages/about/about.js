@@ -1,0 +1,9 @@
+//jshint ignore:start
+
+function About() {
+  import( /* webpackChunkName: "about" */ './about.include')
+    .then(res => {
+      res.default();
+    })
+}
+export default About;

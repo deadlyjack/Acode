@@ -1,0 +1,17 @@
+.main.grid {
+    .icon {
+        display: inline-block;
+        border: none;
+        background-color: inherit;
+        font-size: 1.3em;
+    }
+
+    .undo,
+    .redo {
+        font-size: 0.8em;
+    }
+
+    .save {
+        font-size: 1em;
+    }
+}

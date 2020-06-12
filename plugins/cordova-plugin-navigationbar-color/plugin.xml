@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2016 by Vinicius Fagundes. All rights reserved.
+
+  This file contains Original Code and/or Modifications of Original Code
+  as defined in and that are subject to the Apache License
+  Version 2.0 (the 'License'). You may not use this file except in
+  compliance with the License. Please obtain a copy of the License at
+  http://opensource.org/licenses/Apache-2.0/ and read it before using this
+  file.
+
+  The Original Code and all software distributed under the License are
+  distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+  EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
+  INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
+  Please see the License for the specific language governing rights and
+  limitations under the License.
+-->
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-navigationbar-color"
+        version="0.0.8">
+
+    <name>NavigationBar</name>
+
+    <description>Cordova NavigationBar Plugin</description>
+
+    <repo>https://github.com/fagundes/cordova-plugin-navigationbar.git</repo>
+
+    <keywords>cordova,navigationbar</keywords>
+
+    <license>Apache 2.0</license>
+
+    <author>Vinícius Fagundes</author>
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
+
+    <js-module src="www/navigationbar.js" name="navigationbar">
+        <clobbers target="window.NavigationBar" />
+    </js-module>
+
+    <platform name="android">
+        <source-file src="src/android/NavigationBar.java" target-dir="src/com/viniciusfagundes/cordova/plugin/navigationbar" />
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="NavigationBar">
+                <param name="android-package" value="com.viniciusfagundes.cordova.plugin.navigationbar.NavigationBar" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+    </platform>
+
+    <platform name="browser">
+        <js-module src="src/browser/NavigationBarProxy.js" name="NavigationBarProxy">
+            <runs />
+        </js-module>
+    </platform>
+</plugin>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" 
+  xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-system" version="0.0.1">
+  <name>cordova-plugin-system</name>
+  <description>Utility methos for Android.</description>
+  <license>Apache 2.0</license>
+  <keywords>cordova,plugin,system</keywords>
+
+  <js-module src="www/plugin.js" name="system">
+    <clobbers target="cordova.plugins.system" />
+  </js-module>
+  <platform name="android">
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="System">
+        <param name="android-package" value="com.foxdebug.System"/>
+      </feature>
+    </config-file>
+    <source-file src="src/android/System.java" target-dir="src/com/foxdebug/system"/>
+    <config-file target="AndroidManifest.xml" parent="/manifest"></config-file>
+  </platform>
+</plugin>

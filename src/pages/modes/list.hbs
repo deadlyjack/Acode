@@ -1,0 +1,10 @@
+<ul class="list" id="mode-list">{{#modes}}
+  {{#.}}
+  <li tabindex="1" class="tile" action="select" mode="{{mode}}">
+    <span class="icon no-icon"></span>
+    <div class="text">
+      <span>{{name}}</span>
+    </div>
+  </li>
+  {{/.}}
+  {{/modes}}</ul>

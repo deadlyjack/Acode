@@ -1,0 +1,115 @@
+sudo: false
+
+addons:
+  jwt:
+    # sauce labs key
+    secure: jVSvu9mlFqqifMcAQpEg+rWYDG43wzTovyptz097PQk/JXGX7TKd90aBWyE3ef/Qbjq+OV7PDxSRTUQwuMXhE9+FUYQs6PiW62CmDMwumForaV2NVbmoTREl1gQIgenx++bdWSN+V5ebh6iLj58ZUxZeSAZBsfM6a+G++w5QptU=
+
+env:
+  global:
+    - SAUCE_USERNAME=snay
+    - TRAVIS_NODE_VERSION=6
+    - ANDROID_API_LEVEL=28
+    - ANDROID_BUILD_TOOLS_VERSION=28.0.3
+
+language: node_js
+node_js: 6
+
+# yaml anchor/alias: https://medium.com/@tommyvn/travis-yml-dry-with-anchors-8b6a3ac1b027
+
+_ios: &_ios
+  os: osx
+  osx_image: xcode10.2
+
+_android: &_android
+  language: android
+  os: linux
+  jdk: oraclejdk8
+  android:
+    components:
+      - tools
+      - build-tools-$ANDROID_BUILD_TOOLS_VERSION
+      - android-$ANDROID_API_LEVEL
+    licenses:
+      - 'android-sdk-preview-license-.+'
+      - 'android-sdk-license-.+'
+      - 'google-gdk-license-.+'
+
+matrix:
+  include:    
+    # local tests, without saucelabs
+    - env: PLATFORM=local/browser
+      <<: *_ios
+    - env: PLATFORM=local/ios-10.0
+      <<: *_ios
+
+    # many tests with saucelabs
+    - env: PLATFORM=browser-chrome
+    - env: PLATFORM=browser-firefox
+    - env: PLATFORM=browser-safari
+    - env: PLATFORM=browser-edge
+
+    - env: PLATFORM=ios-11.3
+      <<: *_ios
+    - env: PLATFORM=ios-12.0
+      <<: *_ios
+    - env: PLATFORM=ios-12.2
+      <<: *_ios
+
+    - env: PLATFORM=android-4.4
+      <<: *_android
+    - env: PLATFORM=android-5.1
+      <<: *_android
+    - env: PLATFORM=android-6.0
+      <<: *_android
+    - env: PLATFORM=android-7.0
+      <<: *_android
+    - env: PLATFORM=android-7.1
+      <<: *_android
+    - env: PLATFORM=android-8.0
+      <<: *_android
+    - env: PLATFORM=android-8.1
+      <<: *_android
+
+before_install:
+  # manually install Node for `language: android`
+  - if [[ "$PLATFORM" =~ android ]]; then nvm install $TRAVIS_NODE_VERSION; fi 
+  - node --version
+  - if [[ "$PLATFORM" =~ android ]]; then gradle --version; fi
+  - if [[ "$PLATFORM" =~ ios ]]; then npm install -g ios-deploy; fi
+  - npm install -g cordova
+  # install paramedic if not running on paramedic repo
+  - if ! [[ "$TRAVIS_REPO_SLUG" =~ cordova-paramedic ]]; then npm install -g github:apache/cordova-paramedic; fi 
+
+install:
+  - npm install
+
+before_script:
+  - |
+    if [[ "$TRAVIS_REPO_SLUG" =~ cordova-paramedic ]]; then 
+      # when used in the cordova-paramedic repo
+      TEST_COMMAND="npm run eslint"
+      PARAMEDIC_PLUGIN_TO_TEST="./spec/testable-plugin/"
+      PARAMEDIC_COMMAND="node main.js"
+    else 
+      # when used in any other (plugin) repo
+      TEST_COMMAND="npm test"
+      PARAMEDIC_PLUGIN_TO_TEST=$(pwd)
+      PARAMEDIC_COMMAND="cordova-paramedic"
+    fi
+  - PARAMEDIC_BUILDNAME=travis-$TRAVIS_REPO_SLUG-$TRAVIS_JOB_NUMBER
+  - |
+    echo "Variables now are set to:"
+    echo "TEST_COMMAND=$TEST_COMMAND"
+    echo "ADDITIONAL_TESTS=$ADDITIONAL_TESTS"
+    echo "PARAMEDIC_COMMAND=$PARAMEDIC_COMMAND"
+    echo "PLATFORM=$PLATFORM"
+    echo "PARAMEDIC_PLUGIN_TO_TEST=$PARAMEDIC_PLUGIN_TO_TEST"
+    echo "PARAMEDIC_BUILDNAME=$PARAMEDIC_BUILDNAME"
+script:
+  - $TEST_COMMAND
+  - if [[ "$ADDITIONAL_TESTS_DIR" != "" ]]; then
+      cd $ADDITIONAL_TESTS_DIR && npm install && npm test;
+    else 
+      $PARAMEDIC_COMMAND --config ./pr/$PLATFORM --plugin $PARAMEDIC_PLUGIN_TO_TEST --buildName $PARAMEDIC_BUILDNAME; 
+    fi

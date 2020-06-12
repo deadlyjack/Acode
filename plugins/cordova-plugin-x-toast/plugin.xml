@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-x-toast"
+        version="2.7.2">
+
+  <name>Toast</name>
+
+  <description>
+    This plugin allows you to show a Toast.
+    A Toast is a little non intrusive buttonless popup which automatically disappears.
+  </description>
+
+  <author>Eddy Verbruggen</author>
+
+  <license>MIT</license>
+
+  <keywords>Toast, Notification, Message, Alert</keywords>
+
+  <repo>https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git</repo>
+
+  <issue>https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin/issues</issue>
+
+  <engines>
+    <engine name="cordova" version=">=3.0.0"/>
+  </engines>
+
+  <js-module src="www/Toast.js" name="Toast">
+    <clobbers target="window.plugins.toast" />
+  </js-module>
+
+  <!-- ios -->
+  <platform name="ios">
+
+    <config-file target="config.xml" parent="/*">
+      <feature name="Toast">
+        <param name="ios-package" value="Toast"/>
+      </feature>
+    </config-file>
+
+    <header-file src="src/ios/Toast+UIView.h"/>
+    <source-file src="src/ios/Toast+UIView.m"/>
+    <header-file src="src/ios/Toast.h"/>
+    <source-file src="src/ios/Toast.m"/>
+
+    <framework src="QuartzCore.framework" />
+  </platform>
+
+  <!-- android -->
+  <platform name="android">
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="Toast">
+        <param name="android-package" value="nl.xservices.plugins.Toast" />
+      </feature>
+    </config-file>
+
+    <source-file src="src/android/nl/xservices/plugins/Toast.java" target-dir="src/nl/xservices/plugins"/>
+  </platform>
+
+  <!-- wp8 -->
+  <platform name="wp8">
+    <config-file target="config.xml" parent="/*">
+      <feature name="Toast">
+        <param name="wp-package" value="Toast"/>
+      </feature>
+    </config-file>
+
+    <source-file src="src/wp8/Toast.cs" />
+  </platform>
+
+  <platform name="blackberry10">
+    <source-file src="src/blackberry10/index.js" target-dir="Toast"/>
+      <lib-file src="src/blackberry10/native/device/libToast.so" arch="device"/>
+      <lib-file src="src/blackberry10/native/simulator/libToast.so" arch="simulator"/>
+      <config-file target="www/config.xml" parent="/widget">
+        <feature name="Toast" value="Toast" />
+      </config-file>
+  </platform>
+
+  <!-- windows -->
+  <platform name="windows">
+    <js-module src="src/windows/toastProxy.js" name="ToastProxy">
+      <merges target="" />
+    </js-module>
+    <config-file target="config.xml" parent="/*">
+      <feature name="Toast" value="Toast" />
+    </config-file>
+  </platform>
+
+</plugin>
