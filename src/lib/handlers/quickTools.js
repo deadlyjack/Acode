@@ -158,10 +158,10 @@ function actions(action) {
   }
 
   function toggleQuickTools() {
-    const settings = appSettings.value;
-    let quickTools = settings.quickTools;
+    appSettings.value.quickTools = !appSettings.value.quickTools;
+    appSettings.update(false);
 
-    if (quickTools) {
+    if (appSettings.value.quickTools) {
       enableQuickTools();
     } else {
       disableQuickTools();
@@ -269,7 +269,9 @@ function clickListener(e) {
 
 function incFooterHeightBy(factor) {
   const footerHeight = parseInt(root.getAttribute('footer-height')) || 0;
-  root.setAttribute('footer-height', footerHeight + factor);
+  const height = footerHeight + factor;
+  if (height) root.setAttribute('footer-height', height);
+  else root.removeAttribute('footer-height');
 }
 
 export default {

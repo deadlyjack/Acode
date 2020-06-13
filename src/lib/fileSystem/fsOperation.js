@@ -162,10 +162,9 @@ function fsOperation(fileUri) {
       },
       exists: () => {
         return new Promise((resolve, reject) => {
-          SDcard.formatUri(url, uri => {
-            pathExist(fullPath)
-              .then(resolve)
-              .catch(reject);
+          SDcard.exists(url, res => {
+            if (res === "TRUE") resolve(true);
+            else resolve(false);
           }, reject);
         });
       }

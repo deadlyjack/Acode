@@ -239,6 +239,9 @@ public class SDcard extends CordovaPlugin {
 
     super.onActivityResult(requestCode, resultCode, data);
 
+    if (data == null)
+      return;
+
     if (requestCode == this.OPEN_DOCUMENT) {
 
       if (resultCode == Activity.RESULT_OK) {
@@ -616,7 +619,7 @@ public class SDcard extends CordovaPlugin {
   }
 
   private void exists(String path) {
-    DocumentFile file = DocumentFile.fromTreeUri(this.context, Uri.parse(path));
+    DocumentFile file = DocumentFile.fromSingleUri(this.context, Uri.parse(path));
 
     if (file == null) {
       this.error("Unable to get file");

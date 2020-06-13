@@ -1,4 +1,6 @@
 //#region Imports
+import './fileBrowser.scss';
+
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
@@ -7,17 +9,16 @@ import contextMenu from '../../components/contextMenu';
 import dialogs from '../../components/dialogs';
 import constants from "../../lib/constants";
 import filesSettings from '../settings/filesSettings';
-
 import _template from './fileBrowser.hbs';
 import _list from './list.hbs';
 import _addMenu from './add-menu.hbs';
-import './fileBrowser.scss';
 import externalFs from '../../lib/fileSystem/externalFs';
 import fsOperation from '../../lib/fileSystem/fsOperation';
 import SearchBar from '../../components/searchbar';
 import projects from './projects';
 import decryptAccounts from '../ftp-accounts/decryptAccounts';
 import Url from '../../lib/utils/Url';
+import util from './util';
 //#endregion
 /**
  * 
@@ -136,6 +137,7 @@ function FileBrowserInclude(type, option) {
             id: "uri",
             placeholder: "path",
             type: "text",
+            required: true,
             onclick: function () {
               SDcard.getStorageAccessPermission("", res => {
                 this.value = res;
@@ -198,50 +200,35 @@ function FileBrowserInclude(type, option) {
     renderStorages();
 
     function renderStorages() {
-      const list = [];
-      const version = parseInt(device.version);
-      if (version < 7) {
-        renderList(getStorageList());
-      } else {
-        let storages;
+      // const list = [];
+      // const version = parseInt(device.version);
+      // if (version < 7) {
+      //   renderList(getStorageList());
+      // } else {
+      //   let storages;
 
-        externalFs.listStorages()
-          .then(res => {
-            storages = res;
-            if (!Array.isArray(res))
-              storages = [];
+      //   externalFs.listStorages()
+      //     .then(res => {
+      //       storages = res;
+      //       if (!Array.isArray(res))
+      //         storages = [];
 
-            return getPermission([...storages]);
-          })
-          .then(res => {
-            storages.map(storage => {
-              pushFolder(storage.name, res[storage.uuid]);
-            });
+      //       return getPermission([...storages]);
+      //     })
+      //     .then(res => {
+      //       storages.map(storage => {
+      //         util.pushFolder(list, storage.name, res[storage.uuid]);
+      //       });
 
-            customUuid.map(storage => {
-              pushFolder(storage.name, storage.uri, {
-                uuid: storage.uuid
-              });
-            });
+      //       list.push(...getStorageList());
+      //       renderList(list);
+      //     })
+      //     .catch(err => {
+      //       console.error(err);
+      //     });
+      // }
 
-            list.push(...getStorageList());
-            renderList(list);
-          })
-          .catch(err => {
-            console.error(err);
-          });
-      }
-
-      function pushFolder(name, url, closeable) {
-        list.push({
-          url: url,
-          name: name,
-          isDirectory: true,
-          parent: true,
-          type: 'folder',
-          closeable
-        });
-      }
+      renderList(getStorageList());
     }
 
     function renderList(list) {
@@ -256,34 +243,34 @@ function FileBrowserInclude(type, option) {
       render(list);
     }
 
-    function getPermission(uuidDataAr) {
-      const uuidUri = JSON.parse(localStorage.uuidUri || '{}');
+    // function getPermission(uuidDataAr) {
+    //   const uuidUri = JSON.parse(localStorage.uuidUri || '{}');
 
-      return new Promise((resolve, reject) => {
-        (function get() {
-          const uuidData = uuidDataAr.pop();
-          if (uuidData) {
-            const {
-              uuid,
-              name
-            } = uuidData;
-            if (uuid in uuidUri) {
-              get(uuidDataAr);
-            } else {
-              externalFs.getStorageAccessPermission(uuid, name)
-                .then(res => {
-                  uuidUri[uuid] = res;
-                  get(uuidDataAr, resolve);
-                });
-            }
-          } else {
-            localStorage.uuidUri = JSON.stringify(uuidUri);
-            resolve(uuidUri);
-          }
-        })();
-      });
+    //   return new Promise((resolve, reject) => {
+    //     (function get() {
+    //       const uuidData = uuidDataAr.pop();
+    //       if (uuidData) {
+    //         const {
+    //           uuid,
+    //           name
+    //         } = uuidData;
+    //         if (uuid in uuidUri) {
+    //           get(uuidDataAr);
+    //         } else {
+    //           externalFs.getStorageAccessPermission(uuid, name)
+    //             .then(res => {
+    //               uuidUri[uuid] = res;
+    //               get(uuidDataAr, resolve);
+    //             });
+    //         }
+    //       } else {
+    //         localStorage.uuidUri = JSON.stringify(uuidUri);
+    //         resolve(uuidUri);
+    //       }
+    //     })();
+    //   });
 
-    }
+    // }
 
     function resolve(data) {
       localStorage.setItem("lastDir", currentDir.url);
@@ -297,16 +284,16 @@ function FileBrowserInclude(type, option) {
       const list = [];
 
       const path = cordova.file.externalRootDirectory;
-      list.push({
-        url: path,
-        name: 'Internal storage',
-        isDirectory: true,
-        parent: true,
-        type: 'folder',
+      util.pushFolder(list, 'Internal storage', path);
+      customUuid.map(storage => {
+        util.pushFolder(list, storage.name, storage.uri, {
+          closeable: {
+            uuid: storage.uuid
+          }
+        });
       });
 
       let ftpaccounts;
-
       try {
         ftpaccounts = JSON.parse(localStorage.ftpaccounts);
         if (Array.isArray(ftpaccounts)) {
@@ -327,24 +314,14 @@ function FileBrowserInclude(type, option) {
                 security
               }
             });
-
-            list.push({
-              url: url,
-              name: name,
-              isDirectory: true,
-              parent: true,
-              type: 'folder'
-            });
+            util.pushFolder(list, name, url);
 
           });
         }
       } catch (error) {}
 
       if (type === "file") {
-        list.push({
-          name: "Select document",
-          isDirectory: true,
-          type: 'folder',
+        util.pushFolder(list, "Select document", null, {
           "open-doc": true
         });
       }

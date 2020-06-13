@@ -39,6 +39,7 @@ const commands = {
     this["resize-editor"]();
   },
   "enable-fullscreen": function () {
+    system.enableFullScreen();
     app.classList.add("fullscreen-mode");
     this["resize-editor"]();
   },

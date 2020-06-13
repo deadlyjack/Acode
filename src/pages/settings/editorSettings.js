@@ -85,11 +85,11 @@ export default function editorSettings() {
             text: strings['vibrate on tap'],
             checkbox: values.vibrateOnTap,
         },
-        {
-            key: 'quickTools',
-            text: strings['quick tools'],
-            checkbox: values.quickTools
-        },
+        // {
+        //     key: 'quickTools',
+        //     text: strings['quick tools'],
+        //     checkbox: values.quickTools
+        // },
         {
             key: 'fullscreen',
             text: strings.fullscreen.capitalize(),
@@ -252,8 +252,6 @@ export default function editorSettings() {
                 break;
 
             case 'quickTools':
-                values.quickTools = !values.quickTools;
-                appSettings.update();
                 Acode.exec("toggle-quick-tools");
                 this.value = values.quickTools;
                 break;
@@ -262,13 +260,10 @@ export default function editorSettings() {
                 values.fullscreen = !values.fullscreen;
                 const id = constants.notification.EXIT_FULL_SCREEN;
 
-                if (values.fullscreen) {
-                    //TODO: provide a way to disable full screen
+                if (values.fullscreen)
                     Acode.exec("enable-fullscreen");
-                } else {
-                    //TODO: remove option to disable fullscreen
+                else
                     Acode.exec("disable-fullscreen");
-                }
 
                 appSettings.update();
                 this.value = values.fullscreen;

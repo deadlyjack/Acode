@@ -87,8 +87,8 @@
       "cordova-disable-http-cache": {},
       "cordova-plugin-intent": {},
       "cordova-plugin-ftp": {},
-      "cordova-plugin-system": {},
       "cordova-plugin-webserver": {},
+      "cordova-plugin-system": {},
       "cordova-plugin-sdcard": {
         "ANDROID_SUPPORT_VERSION": "28.+"
       }

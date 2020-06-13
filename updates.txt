@@ -1,4 +1,5 @@
-version 1.1.14.111 ALPHA 
+version 1.1.14.111 ALPHA II
+☞ UI improvement
 ☞ Add any directory to explorer using SAF
 ☞ Performance improvement
 ☞ Bugs fixes

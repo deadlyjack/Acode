@@ -60,7 +60,8 @@ class Settings {
             quickTools: true,
             editorFont: "default",
             vibrateOnTap: true,
-            fullscreen: false
+            fullscreen: false,
+            floatingButtonActivation: "long tap"
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;
@@ -69,7 +70,7 @@ class Settings {
         let interval;
         const save = () => {
             interval = setInterval(() => {
-                fs.writeFile(this.settingsFile, JSON.stringify(this.value), true, false)
+                fs.writeFile(this.settingsFile, JSON.stringify(this.value, undefined, 4), true, false)
                     .then(() => {
                         this.value = this.defaultSettings;
                         this.loaded = true;
@@ -94,7 +95,7 @@ class Settings {
             }).catch(save);
     }
     update(showToast = true) {
-        fs.writeFile(this.settingsFile, JSON.stringify(this.value), true, false)
+        fs.writeFile(this.settingsFile, JSON.stringify(this.value, undefined, 4), true, false)
             .then(() => {
                 if (this.onsave) this.onsave();
                 if (showToast)

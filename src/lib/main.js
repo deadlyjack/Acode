@@ -380,6 +380,14 @@ function App() {
       fontSize: '1.2em'
     }
   });
+  const $headerToggler = tag('span', {
+    className: 'floating icon keyboard_arrow_left',
+    id: "header-toggler"
+  });
+  const $quickToolToggler = tag('span', {
+    className: 'floating icon keyboard_arrow_up',
+    id: "quicktool-toggler"
+  });
   const actions = constants.COMMANDS;
   let registeredKey = '';
 
@@ -390,11 +398,22 @@ function App() {
   const editor = editorManager.editor;
   //#endregion
 
+  const fmode = appSettings.value.floatingButtonActivation;
+  const activationMode = fmode === "long tap" ? "oncontextmenu" : "onclick";
+  $headerToggler[activationMode] = function () {
+    root.classList.toggle("show-header");
+    this.classList.toggle("keyboard_arrow_left");
+    this.classList.toggle("keyboard_arrow_right");
+  };
+  $quickToolToggler[activationMode] = function () {
+    Acode.exec("toggle-quick-tools");
+  };
+
   window.restoreTheme();
   $main.setAttribute("data-empty-msg", strings['no editor message']);
 
   //#region rendering
-  root.append($header, $main, $footer);
+  root.append($header, $main, $footer, $headerToggler, $quickToolToggler);
   //#endregion
 
   $fileMenu.addEventListener('click', handleMenu);
@@ -445,7 +464,12 @@ function App() {
       if (autoSave) {
         saveInterval = setInterval(() => {
           editorManager.files.map(file => {
-            if (file.isUnsaved && !file.isSaving) Acode.exec("save", false);
+            if (
+              !file.readOnly &&
+              (file.fileUri || file.contentUri) &&
+              file.isUnsaved &&
+              !file.isSaving
+            ) Acode.exec("save", false);
             return file;
           });
         }, autoSave);

@@ -36,7 +36,7 @@ interface Settings {
     linenumbers: boolean;
     beautify: Array<string>;
     linting: boolean;
-    previewMode: 'browser' | 'in app' | 'none';
+    previewMode: "browser" | "in app" | "none";
     showSpaces: boolean;
     openFileListPos: 'sidebar' | 'header';
     quickTools: Boolean;
@@ -44,6 +44,7 @@ interface Settings {
     vibrateOnTap: boolean;
     fullscreen: boolean;
     smartCompletion: boolean;
+    floatingButtonActivation: "click" | "long tap"
 }
 
 interface AppSettings {
@@ -92,6 +93,7 @@ interface newFileOptions {
     cursorPos?: AceAjax.Position;
     type: 'regular' | 'git' | 'gist';
     record: Repo | Gist;
+    onsave(): void;
 }
 
 interface Controls {
@@ -121,6 +123,7 @@ interface File {
     canWrite: boolean;
     origin: string;
     uuid: string;
+    onsave(this: File): void;
 }
 
 interface ExternalFs {

@@ -21,8 +21,54 @@ body {
 
   &.fullscreen-mode {
     #root {
+      &:not(.top-bar) {
+        &.show-header {
+          #header-toggler {
+            opacity: 1;
+            transform: translate3d(-110px, 0, 0);
+          }
+
+          >header {
+            top: 10px;
+            right: 10px;
+            height: 40px;
+            display: flex;
+            border-radius: 20px;
+            border: solid 1px white;
+            border: solid 1px var(--text-main-color);
+          }
+        }
+
+        #header-toggler {
+          display: flex;
+        }
+      }
+
       >header {
         display: none;
+        height: 30px;
+
+        .text {
+          display: none;
+        }
+
+        .icon {
+          height: 28px;
+          width: 28px;
+          margin: auto;
+
+          &.menu {
+            display: none;
+          }
+        }
+
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: auto;
+        width: 100px;
+        margin: 0;
+        box-shadow: none;
       }
 
       &.top-bar {
@@ -33,29 +79,6 @@ body {
 
         >header {
           display: flex;
-          height: 30px;
-
-          .text {
-            display: none;
-          }
-
-          .icon {
-            height: 28px;
-            width: 28px;
-            margin: auto;
-
-            &.menu {
-              display: none;
-            }
-          }
-
-          position: fixed;
-          top: 0;
-          right: 0;
-          left: auto;
-          width: 100px;
-          margin: 0;
-          box-shadow: none;
         }
       }
 
@@ -170,7 +193,21 @@ div.page {
     }
   }
 
+  &[footer-height] {
+    #quicktool-toggler {
+      &::before {
+        content: "\e98d";
+      }
+
+      opacity: 1;
+    }
+  }
+
   &[footer-height='2'] {
+
+    #quicktool-toggler {
+      transform: translate3d(0, -80px, 0);
+    }
 
     &.top-bar {
       main {
@@ -190,6 +227,10 @@ div.page {
   }
 
   &[footer-height='3'] {
+
+    #quicktool-toggler {
+      transform: translate3d(0, -120px, 0);
+    }
 
     &.top-bar {
       main {
@@ -256,6 +297,10 @@ div.page {
 .page,
 #root {
   &[footer-height='1'] {
+
+    #quicktool-toggler {
+      transform: translate3d(0, -40px, 0);
+    }
 
     &.top-bar {
 

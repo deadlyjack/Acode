@@ -13,6 +13,7 @@ import internalFs from "../../lib/fileSystem/internalFs";
 import backupRestore from "./backup-restore";
 
 export default function settingsMain(demo) {
+    const value = appSettings.value;
     const $page = Page(strings.settings);
     const settingsList = tag('div', {
         className: 'main list',
@@ -20,6 +21,18 @@ export default function settingsMain(demo) {
             textTransform: "capitalize"
         }
     });
+    const $editSettings = tag('span', {
+        className: 'icon edit',
+        attr: {
+            style: 'font-size: 1.2em !important;',
+            action: 'edit-settings'
+        },
+        onclick: () => {
+            createEditorFromURI(appSettings.settingsFile);
+            actionStack.pop();
+        }
+    });
+
 
     actionStack.push({
         id: 'settings-main',
@@ -28,8 +41,8 @@ export default function settingsMain(demo) {
     $page.onhide = function () {
         actionStack.remove('settings-main');
     };
+    $page.querySelector('header').append($editSettings);
 
-    const value = appSettings.value;
 
     const settingsOptions = [{
         key: 'language',

@@ -45,7 +45,8 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
         const {
             cursorPos,
             render,
-            index
+            index,
+            onsave
         } = data;
 
         let existingFile;
@@ -67,7 +68,8 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
                 render,
                 text: data.text,
                 cursorPos: data.cursorPos,
-                isUnsaved: true
+                isUnsaved: true,
+                onsave
             });
             resolve(index === undefined ? fileUri : index);
             return;
@@ -131,7 +133,8 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
                 cursorPos,
                 text,
                 isUnsaved: false,
-                render
+                render,
+                onsave
             });
 
             recents.addFile(fileUri);

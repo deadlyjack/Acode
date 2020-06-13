@@ -43,9 +43,6 @@
     "cordova-plugin-statusbar": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-system": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "cordova-plugin-vibration": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
@@ -56,6 +53,9 @@
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-webserver": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-system": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-sdcard": {

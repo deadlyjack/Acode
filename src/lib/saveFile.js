@@ -239,6 +239,7 @@ function saveFile(file, as = false, showToast = true) {
             window.saveTimeout = setTimeout(() => {
                 file.isSaving = false;
                 file.isUnsaved = false;
+                file.onsave();
                 if (showToast) window.plugins.toast.showShortBottom(strings['file saved']);
                 if (url) recents.addFile(file.fileUri);
                 editorManager.onFileSave(file);

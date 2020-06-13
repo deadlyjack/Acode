@@ -31,8 +31,11 @@ function multiPrompt(message, inputs) {
 
         for (let $input of inputAr) {
           if ($input.isRequired && !$input.value) {
-            $errorMessage.textContent = strings.required;
-            $promptDiv.insertBefore($errorMessage, $input.nextElementSibling);
+            $errorMessage.textContent = strings.required.capitalize();
+            const $sibling = $input.nextElementSibling;
+            const $parent = $input.parentElement;
+            if ($sibling) $parent.insertBefore($errorMessage, $sibling);
+            else $parent.append($errorMessage);
             return;
           }
         }

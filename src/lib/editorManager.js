@@ -342,6 +342,11 @@ function EditorManager($sidebar, $header, $body) {
 
                 setSubText(this);
                 manager.onupdate();
+            },
+            onsave: () => {
+                const onsave = options.onsave;
+                if (onsave && typeof onsave === "function")
+                    onsave.call(this);
             }
         };
 
