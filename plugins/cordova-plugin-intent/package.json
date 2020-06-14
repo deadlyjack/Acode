@@ -1,0 +1,54 @@
+{
+  "_from": "git+https://github.com/napolitano/cordova-plugin-intent.git",
+  "_id": "cordova-plugin-intent@0.1.3",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/cordova-plugin-intent",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "https://github.com/napolitano/cordova-plugin-intent",
+    "rawSpec": "https://github.com/napolitano/cordova-plugin-intent",
+    "saveSpec": "git+https://github.com/napolitano/cordova-plugin-intent.git",
+    "fetchSpec": "https://github.com/napolitano/cordova-plugin-intent.git",
+    "gitCommittish": null
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "git+https://github.com/napolitano/cordova-plugin-intent.git#0a47226e64da1e349e2ab2f5e9e0cc2a4e1c5555",
+  "_spec": "https://github.com/napolitano/cordova-plugin-intent",
+  "_where": "/media/dellevenjack/Projects/git/Acode",
+  "author": {
+    "name": "Axel Naolitano, Napolitano Business Solutions"
+  },
+  "bugs": {
+    "url": "https://github.com/napolitano/cordova-plugin-intent/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "com.napolitano.cordova.plugin.intent",
+    "platforms": [
+      "android"
+    ]
+  },
+  "deprecated": false,
+  "description": "Cordova Plugin for Android to access intent",
+  "homepage": "https://github.com/napolitano/cordova-plugin-intent#readme",
+  "keywords": [
+    "cordova",
+    "intent",
+    "share",
+    "send",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "license": "MIT",
+  "name": "cordova-plugin-intent",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/napolitano/cordova-plugin-intent.git"
+  },
+  "version": "0.1.3"
+}

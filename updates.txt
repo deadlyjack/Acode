@@ -1,0 +1,160 @@
+version 1.1.14.111
+☞ Bugs fixes
+☞ UI improvement
+☞ Add any directory to explorer using SAF
+☞ Performance improvement
+☞ Smaller APK size
+
+version 1.1.14.111 BETA
+☞ Bugs fixes
+☞ UI improvement
+☞ Add any directory to explorer using SAF
+☞ Performance improvement
+☞ Smaller APK size
+
+version 1.1.14.111 ALPHA II
+☞ UI improvement
+☞ Add any directory to explorer using SAF
+☞ Performance improvement
+☞ Bugs fixes
+☞ Smaller APK size
+
+version 1.1.14.111 ALPHA I
+☞ Add any directory to explorer using SAF
+☞ Performance improvement
+☞ Bugs fixes
+☞ Smaller APK size
+
+version 0.1.14.110
+☞ Backup and restore settings, key bindings and ftp accounts
+☞ Fixed file showing unsaved even file has no changes
+☞ Exit full screen mode using notification
+☞ Bugs fixes
+
+version 0.1.13.108
+☞ Added Bangla language
+☞ Fixed file not saving to external file
+☞ Bugs fixes
+
+version 0.1.13.107
+SFTP, JavaScript smart completion and GIT implementation will take more time than expected
+☞ Added french language
+☞ Toggling full screen form settings will save full screen state
+☞ Option to toggle quick tools is moved to settings
+☞ Long tap will enable context menu if no text is selected
+☞ Fixed GitHub preview
+☞ Bugs fixes
+
+version 0.1.12.105
+☞ Fixed intent handler
+☞ Fixed FTP preview
+☞ Other minor bugs fixes
+
+version 0.1.12.104
+☞ Now you can browse FTP and open specific directory using file browser
+☞ Toggle full screen mode (F11)
+☞ Toggle main menu (F3)
+☞ Toggle edit menu (F4)
+☞ Toggle sidebar (Ctrl-B)
+☞ Improved accessibility using physical keyboard
+☞ Option disable vibration
+☞ Bugs fixes
+
+version 0.1.11.103
+☞ UI improvement
+☞ Bugs fixes
+
+version 0.1.10.100
+☞ Added Turkish language by ibrahim
+☞ Added Spanish language by DouZerr
+☞ New Smali language support
+☞ Show suggestions when app first opens
+☞ Bugs fixes
+
+version 0.0.9.98
+☞ Added new app themes (atticus, bump, bling, moon, ocean, tomyris)
+☞ Added O'zbekcha language support (Thanks to TILON)
+☞ Removed PHP support
+☞ Create and run Vue, Angular, AngularJS and React projects
+☞ Now edit remote files using FTP
+☞ Open folder by tapping on sidenav if empty
+☞ Shows error message if editor is unable to open
+☞ Minor UI improvement
+☞ Performance improvement
+☞ Fixed bug (deleting character from backwards)
+☞ Bugs fixes
+
+version 0.0.9.92
+☞ Bugs fix
+
+version 0.0.9.91
+☞ Fixed text selection bug
+
+version 0.0.9.90
+☞ Disabled text context-menu (unrecoverable bug)
+☞ Added Fira code font
+☞ Updated Ace editor to 1.4.8
+☞ You can now see Promise result in console
+☞ Soft keyboard backspace issue solved
+☞ Disabled native cursor controller
+☞ Bugs fix
+
+version 0.0.8.89
+☞ Fixed issue #9
+☞ Added new language 'Arabian' (thanks to Basel Al_hajeri)
+☞ Fixed shift button not working
+☞ Bugs fix
+
+version 0.0.8.88
+☞ Fix cannot edit file opened from termux
+☞ Bugs fix
+
+version 0.0.8.87
+☞ Bugs fix
+
+version 0.0.8.86
+☞ Added Japanese language (thanks to wappo56)
+☞ Reorder tabs by dragging themes
+☞ Improved UI for sidenav
+☞ Keyboard shortcut works even if editor is not focused
+☞ Improved JS console
+☞ Hide quick tools
+
+version 0.0.8.85
+☞ Fixed key bindings
+☞ Added key binding for action "run" - F5
+☞ Added key binding for action "rename" - F2
+☞ Added key binding for selecting word - Ctrl-D
+☞ Bugs fixes
+
+version 0.0.8.84
+☞ Bugs fixes
+
+version 0.0.8.82
+☞ Categorised themes into light and dark mode (thanks to biraj795)
+☞ Fixed unable to move console toggler
+☞ Fixed font not loading
+☞ Fixed files not loading when previewing git Project
+
+version 0.0.8.81
+☞ Project is now open source - https://github.com/deadlyjack/code-editor
+☞ Fixed tab and arrow keys (quick tool) not working
+☞ Fixed issue with linking css and js file
+☞ Bugs fixes
+
+version 0.0.8.80
+☞ Select GitHub-branch to edit
+☞ Add new branch to repository
+☞ Edit keybindings
+☞ Bugs fixes
+
+version 0.0.7.78
+☞ Select syntax highlighter for specific file
+☞ Select file encoding
+☞ New file menu (cut, copy, paste and rename)
+☞ Bugs fixes
+
+version 0.0.7.77
+☞ Added option to search file-folder
+☞ Added new language 'Português' (Thanks to ryan869h)
+☞ Bugs fixes

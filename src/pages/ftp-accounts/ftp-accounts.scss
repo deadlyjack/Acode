@@ -1,0 +1,60 @@
+#gists {
+  .list-item {
+    .icon {
+      &.file {
+        background-size: 16px;
+        background-position: center;
+      }
+    }
+
+    .octicon {
+      &.main-icon {
+        font-size: 1.8em;
+        color: #6a737d !important;
+
+        &::before {
+          content: "\f00e"
+        }
+
+        &[private] {
+          color: #dbab09 !important;
+
+          &::before {
+            content: '\f08c';
+          }
+        }
+      }
+    }
+
+    .value {
+      text-transform: unset;
+      display: flex;
+
+      .group {
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+
+        .octicon,
+        .icon {
+          height: 30px;
+          width: 30px;
+          font-size: 1em;
+        }
+      }
+    }
+
+    .private {
+      >.text::after {
+        content: 'private';
+        font-size: 0.6em;
+        border-radius: 4px;
+        background-color: #cccccc;
+        color: #333333;
+        border: solid 1px #333333;
+        margin: auto 5px;
+        padding: 0 2.5px;
+      }
+    }
+  }
+}

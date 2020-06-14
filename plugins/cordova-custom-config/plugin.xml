@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="cordova-custom-config"
+    version="5.1.0">
+
+    <name>cordova-custom-config</name>
+    <description>Cordova/Phonegap plugin to update platform configuration files based on preferences and config-file data defined in config.xml</description>
+    <author>Dave Alden</author>
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
+
+    <repo>https://github.com/dpa99c/cordova-custom-config.git</repo>
+    <issue>https://github.com/dpa99c/cordova-custom-config/issues</issue>
+
+    <keywords>ecosystem:cordova,cordova,phonegap,ios,android,config,configuration,plist,manifest</keywords>
+
+    <license>MIT</license>
+
+    <hook src="hooks/restoreBackups.js" type="before_prepare" />
+    <hook src="hooks/restoreBackups.js" type="before_plugin_uninstall" />
+    <hook src="hooks/applyCustomConfig.js" type="after_prepare" />
+    <hook src="hooks/applyCustomConfig.js" type="before_prepare" />
+    <hook src="hooks/applyCustomConfig.js" type="before_compile" />
+</plugin>

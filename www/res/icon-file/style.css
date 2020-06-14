@@ -1,0 +1,1947 @@
+.file {
+  background-image: url('./icons/default_file.svg');
+}
+
+.file.file_type_access {
+  background-image: url('./icons/file_type_access.svg');
+}
+
+.file.file_type_actionscript {
+  background-image: url('./icons/file_type_actionscript.svg');
+}
+
+.file.file_type_ada {
+  background-image: url('./icons/file_type_ada.svg');
+}
+
+.file.file_type_ai {
+  background-image: url('./icons/file_type_ai.svg');
+}
+
+.file.file_type_al {
+  background-image: url('./icons/file_type_al.svg');
+}
+
+.file.file_type_anyscript {
+  background-image: url('./icons/file_type_anyscript.svg');
+}
+
+.file.file_type_antlr {
+  background-image: url('./icons/file_type_antlr.svg');
+}
+
+.file.file_type_apache {
+  background-image: url('./icons/file_type_apache.svg');
+}
+
+.file.file_type_apex {
+  background-image: url('./icons/file_type_apex.svg');
+}
+
+.file.file_type_apib {
+  background-image: url('./icons/file_type_apib.svg');
+}
+
+.file.file_type_apl {
+  background-image: url('./icons/file_type_apl.svg');
+}
+
+.file.file_type_applescript {
+  background-image: url('./icons/file_type_applescript.svg');
+}
+
+.file.file_type_appveyor {
+  background-image: url('./icons/file_type_appveyor.svg');
+}
+
+.file.file_type_arduino {
+  background-image: url('./icons/file_type_arduino.svg');
+}
+
+.file.file_type_asciidoc {
+  background-image: url('./icons/file_type_asciidoc.svg');
+}
+
+.file.file_type_asp {
+  background-image: url('./icons/file_type_asp.svg');
+}
+
+.file.file_type_aspx {
+  background-image: url('./icons/file_type_aspx.svg');
+}
+
+.file.file_type_assembly {
+  background-image: url('./icons/file_type_assembly.svg');
+}
+
+.file.file_type_ats {
+  background-image: url('./icons/file_type_ats.svg');
+}
+
+.file.file_type_audio {
+  background-image: url('./icons/file_type_audio.svg');
+}
+
+.file.file_type_aurelia {
+  background-image: url('./icons/file_type_aurelia.svg');
+}
+
+.file.file_type_autohotkey {
+  background-image: url('./icons/file_type_autohotkey.svg');
+}
+
+.file.file_type_autoit {
+  background-image: url('./icons/file_type_autoit.svg');
+}
+
+.file.file_type_avro {
+  background-image: url('./icons/file_type_avro.svg');
+}
+
+.file.file_type_aws {
+  background-image: url('./icons/file_type_aws.svg');
+}
+
+.file.file_type_azure {
+  background-image: url('./icons/file_type_azure.svg');
+}
+
+.file.file_type_azurepipelines {
+  background-image: url('./icons/file_type_azurepipelines.svg');
+}
+
+.file.file_type_ballerina {
+  background-image: url('./icons/file_type_ballerina.svg');
+}
+
+.file.file_type_babel {
+  background-image: url('./icons/file_type_babel.svg');
+}
+
+.file.file_type_bazaar {
+  background-image: url('./icons/file_type_bazaar.svg');
+}
+
+.file.file_type_bat {
+  background-image: url('./icons/file_type_bat.svg');
+}
+
+.file.file_type_bazel {
+  background-image: url('./icons/file_type_bazel.svg');
+}
+
+.file.file_type_biml {
+  background-image: url('./icons/file_type_biml.svg');
+}
+
+.file.file_type_binary {
+  background-image: url('./icons/file_type_binary.svg');
+}
+
+.file.file_type_bitbucketpipeline {
+  background-image: url('./icons/file_type_bitbucketpipeline.svg');
+}
+
+.file.file_type_bithound {
+  background-image: url('./icons/file_type_bithound.svg');
+}
+
+.file.file_type_blade {
+  background-image: url('./icons/file_type_blade.svg');
+}
+
+.file.file_type_bolt {
+  background-image: url('./icons/file_type_bolt.svg');
+}
+
+.file.file_type_bower {
+  background-image: url('./icons/file_type_bower.svg');
+}
+
+.file.file_type_browserslist {
+  background-image: url('./icons/file_type_browserslist.svg');
+}
+
+.file.file_type_buckbuild {
+  background-image: url('./icons/file_type_buckbuild.svg');
+}
+
+.file.file_type_c {
+  background-image: url('./icons/file_type_c.svg');
+}
+
+.file.file_type_bundler {
+  background-image: url('./icons/file_type_bundler.svg');
+}
+
+.file.file_type_cabal {
+  background-image: url('./icons/file_type_cabal.svg');
+}
+
+.file.file_type_caddy {
+  background-image: url('./icons/file_type_caddy.svg');
+}
+
+.file.file_type_cake {
+  background-image: url('./icons/file_type_cake.svg');
+}
+
+.file.file_type_cakephp {
+  background-image: url('./icons/file_type_cakephp.svg');
+}
+
+.file.file_type_capacitor {
+  background-image: url('./icons/file_type_capacitor.svg');
+}
+
+.file.file_type_cargo {
+  background-image: url('./icons/file_type_cargo.svg');
+}
+
+.file.file_type_cert {
+  background-image: url('./icons/file_type_cert.svg');
+}
+
+.file.file_type_ceylon {
+  background-image: url('./icons/file_type_ceylon.svg');
+}
+
+.file.file_type_cf {
+  background-image: url('./icons/file_type_cf.svg');
+}
+
+.file.file_type_cfc {
+  background-image: url('./icons/file_type_cfc.svg');
+}
+
+.file.file_type_cfm {
+  background-image: url('./icons/file_type_cfm.svg');
+}
+
+.file.file_type_cheader {
+  background-image: url('./icons/file_type_cheader.svg');
+}
+
+.file.file_type_chef {
+  background-image: url('./icons/file_type_chef.svg');
+}
+
+.file.file_type_circleci {
+  background-image: url('./icons/file_type_circleci.svg');
+}
+
+.file.file_type_class {
+  background-image: url('./icons/file_type_class.svg');
+}
+
+.file.file_type_clojure {
+  background-image: url('./icons/file_type_clojure.svg');
+}
+
+.file.file_type_clojurescript {
+  background-image: url('./icons/file_type_clojurescript.svg');
+}
+
+.file.file_type_cloudfoundry {
+  background-image: url('./icons/file_type_cloudfoundry.svg');
+}
+
+.file.file_type_cmake {
+  background-image: url('./icons/file_type_cmake.svg');
+}
+
+.file.file_type_cobol {
+  background-image: url('./icons/file_type_cobol.svg');
+}
+
+.file.file_type_codacy {
+  background-image: url('./icons/file_type_codacy.svg');
+}
+
+.file.file_type_codeclimate {
+  background-image: url('./icons/file_type_codeclimate.svg');
+}
+
+.file.file_type_codecov {
+  background-image: url('./icons/file_type_codecov.svg');
+}
+
+.file.file_type_codekit {
+  background-image: url('./icons/file_type_codekit.svg');
+}
+
+.file.file_type_coffeelint {
+  background-image: url('./icons/file_type_coffeelint.svg');
+}
+
+.file.file_type_coffeescript {
+  background-image: url('./icons/file_type_coffeescript.svg');
+}
+
+.file.file_type_compass {
+  background-image: url('./icons/file_type_compass.svg');
+}
+
+.file.file_type_conan {
+  background-image: url('./icons/file_type_conan.svg');
+}
+
+.file.file_type_config {
+  background-image: url('./icons/file_type_config.svg');
+}
+
+.file.file_type_confluence {
+  background-image: url('./icons/file_type_confluence.svg');
+}
+
+.file.file_type_composer {
+  background-image: url('./icons/file_type_composer.svg');
+}
+
+.file.file_type_coveralls {
+  background-image: url('./icons/file_type_coveralls.svg');
+}
+
+.file.file_type_cpp {
+  background-image: url('./icons/file_type_cpp.svg');
+}
+
+.file.file_type_cppheader {
+  background-image: url('./icons/file_type_cppheader.svg');
+}
+
+.file.file_type_crowdin {
+  background-image: url('./icons/file_type_crowdin.svg');
+}
+
+.file.file_type_crystal {
+  background-image: url('./icons/file_type_crystal.svg');
+}
+
+.file.file_type_csharp {
+  background-image: url('./icons/file_type_csharp.svg');
+}
+
+.file.file_type_csproj {
+  background-image: url('./icons/file_type_csproj.svg');
+}
+
+.file.file_type_css {
+  background-image: url('./icons/file_type_css.svg');
+}
+
+.file.file_type_csscomb {
+  background-image: url('./icons/file_type_csscomb.svg');
+}
+
+.file.file_type_csslint {
+  background-image: url('./icons/file_type_csslint.svg');
+}
+
+.file.file_type_cssmap {
+  background-image: url('./icons/file_type_cssmap.svg');
+}
+
+.file.file_type_cucumber {
+  background-image: url('./icons/file_type_cucumber.svg');
+}
+
+.file.file_type_cuda {
+  background-image: url('./icons/file_type_cuda.svg');
+}
+
+.file.file_type_cvs {
+  background-image: url('./icons/file_type_cvs.svg');
+}
+
+.file.file_type_cypress {
+  background-image: url('./icons/file_type_cypress.svg');
+}
+
+.file.file_type_cython {
+  background-image: url('./icons/file_type_cython.svg');
+}
+
+.file.file_type_dal {
+  background-image: url('./icons/file_type_dal.svg');
+}
+
+.file.file_type_darcs {
+  background-image: url('./icons/file_type_darcs.svg');
+}
+
+.file.file_type_dartlang {
+  background-image: url('./icons/file_type_dartlang.svg');
+}
+
+.file.file_type_db {
+  background-image: url('./icons/file_type_db.svg');
+}
+
+.file.file_type_delphi {
+  background-image: url('./icons/file_type_delphi.svg');
+}
+
+.file.file_type_dependencies {
+  background-image: url('./icons/file_type_dependencies.svg');
+}
+
+.file.file_type_diff {
+  background-image: url('./icons/file_type_diff.svg');
+}
+
+.file.file_type_django {
+  background-image: url('./icons/file_type_django.svg');
+}
+
+.file.file_type_dlang {
+  background-image: url('./icons/file_type_dlang.svg');
+}
+
+.file.file_type_docker {
+  background-image: url('./icons/file_type_docker.svg');
+}
+
+.file.file_type_dockertest {
+  background-image: url('./icons/file_type_dockertest.svg');
+}
+
+.file.file_type_docpad {
+  background-image: url('./icons/file_type_docpad.svg');
+}
+
+.file.file_type_docz {
+  background-image: url('./icons/file_type_docz.svg');
+}
+
+.file.file_type_dojo {
+  background-image: url('./icons/file_type_dojo.svg');
+}
+
+.file.file_type_dotjs {
+  background-image: url('./icons/file_type_dotjs.svg');
+}
+
+.file.file_type_doxygen {
+  background-image: url('./icons/file_type_doxygen.svg');
+}
+
+.file.file_type_drone {
+  background-image: url('./icons/file_type_drone.svg');
+}
+
+.file.file_type_drools {
+  background-image: url('./icons/file_type_drools.svg');
+}
+
+.file.file_type_dustjs {
+  background-image: url('./icons/file_type_dustjs.svg');
+}
+
+.file.file_type_dylan {
+  background-image: url('./icons/file_type_dylan.svg');
+}
+
+.file.file_type_edge {
+  background-image: url('./icons/file_type_edge.svg');
+}
+
+.file.file_type_editorconfig {
+  background-image: url('./icons/file_type_editorconfig.svg');
+}
+
+.file.file_type_eex {
+  background-image: url('./icons/file_type_eex.svg');
+}
+
+.file.file_type_ejs {
+  background-image: url('./icons/file_type_ejs.svg');
+}
+
+.file.file_type_elastic {
+  background-image: url('./icons/file_type_elastic.svg');
+}
+
+.file.file_type_elasticbeanstalk {
+  background-image: url('./icons/file_type_elasticbeanstalk.svg');
+}
+
+.file.file_type_elixir {
+  background-image: url('./icons/file_type_elixir.svg');
+}
+
+.file.file_type_elm {
+  background-image: url('./icons/file_type_elm.svg');
+}
+
+.file.file_type_emacs {
+  background-image: url('./icons/file_type_emacs.svg');
+}
+
+.file.file_type_ensime {
+  background-image: url('./icons/file_type_ensime.svg');
+}
+
+.file.file_type_ember {
+  background-image: url('./icons/file_type_ember.svg');
+}
+
+.file.file_type_eps {
+  background-image: url('./icons/file_type_eps.svg');
+}
+
+.file.file_type_erb {
+  background-image: url('./icons/file_type_erb.svg');
+}
+
+.file.file_type_erlang {
+  background-image: url('./icons/file_type_erlang.svg');
+}
+
+.file.file_type_eslint {
+  background-image: url('./icons/file_type_eslint.svg');
+}
+
+.file.file_type_excel {
+  background-image: url('./icons/file_type_excel.svg');
+}
+
+.file.file_type_falcon {
+  background-image: url('./icons/file_type_falcon.svg');
+}
+
+.file.file_type_favicon {
+  background-image: url('./icons/file_type_favicon.svg');
+}
+
+.file.file_type_fbx {
+  background-image: url('./icons/file_type_fbx.svg');
+}
+
+.file.file_type_firebase {
+  background-image: url('./icons/file_type_firebase.svg');
+}
+
+.file.file_type_firebasehosting {
+  background-image: url('./icons/file_type_firebasehosting.svg');
+}
+
+.file.file_type_firestore {
+  background-image: url('./icons/file_type_firestore.svg');
+}
+
+.file.file_type_fla {
+  background-image: url('./icons/file_type_fla.svg');
+}
+
+.file.file_type_flash {
+  background-image: url('./icons/file_type_flash.svg');
+}
+
+.file.file_type_floobits {
+  background-image: url('./icons/file_type_floobits.svg');
+}
+
+.file.file_type_flow {
+  background-image: url('./icons/file_type_flow.svg');
+}
+
+.file.file_type_flutter {
+  background-image: url('./icons/file_type_flutter.svg');
+}
+
+.file.file_type_font {
+  background-image: url('./icons/file_type_font.svg');
+}
+
+.file.file_type_fortran {
+  background-image: url('./icons/file_type_fortran.svg');
+}
+
+.file.file_type_fossa {
+  background-image: url('./icons/file_type_fossa.svg');
+}
+
+.file.file_type_fossil {
+  background-image: url('./icons/file_type_fossil.svg');
+}
+
+.file.file_type_freemarker {
+  background-image: url('./icons/file_type_freemarker.svg');
+}
+
+.file.file_type_fsharp {
+  background-image: url('./icons/file_type_fsharp.svg');
+}
+
+.file.file_type_fsproj {
+  background-image: url('./icons/file_type_fsproj.svg');
+}
+
+.file.file_type_fusebox {
+  background-image: url('./icons/file_type_fusebox.svg');
+}
+
+.file.file_type_galen {
+  background-image: url('./icons/file_type_galen.svg');
+}
+
+.file.file_type_gamemaker {
+  background-image: url('./icons/file_type_gamemaker.svg');
+}
+
+.file.file_type_gatsby {
+  background-image: url('./icons/file_type_gatsby.svg');
+}
+
+.file.file_type_gcode {
+  background-image: url('./icons/file_type_gcode.svg');
+}
+
+.file.file_type_git {
+  background-image: url('./icons/file_type_git.svg');
+}
+
+.file.file_type_gitlab {
+  background-image: url('./icons/file_type_gitlab.svg');
+}
+
+.file.file_type_glsl {
+  background-image: url('./icons/file_type_glsl.svg');
+}
+
+.file.file_type_glide {
+  background-image: url('./icons/file_type_glide.svg');
+}
+
+.file.file_type_go {
+  background-image: url('./icons/file_type_go.svg');
+}
+
+.file.file_type_godot {
+  background-image: url('./icons/file_type_godot.svg');
+}
+
+.file.file_type_gradle {
+  background-image: url('./icons/file_type_gradle.svg');
+}
+
+.file.file_type_graphql {
+  background-image: url('./icons/file_type_graphql.svg');
+}
+
+.file.file_type_graphviz {
+  background-image: url('./icons/file_type_graphviz.svg');
+}
+
+.file.file_type_greenkeeper {
+  background-image: url('./icons/file_type_greenkeeper.svg');
+}
+
+.file.file_type_gridsome {
+  background-image: url('./icons/file_type_gridsome.svg');
+}
+
+.file.file_type_groovy {
+  background-image: url('./icons/file_type_groovy.svg');
+}
+
+.file.file_type_grunt {
+  background-image: url('./icons/file_type_grunt.svg');
+}
+
+.file.file_type_gulp {
+  background-image: url('./icons/file_type_gulp.svg');
+}
+
+.file.file_type_haml {
+  background-image: url('./icons/file_type_haml.svg');
+}
+
+.file.file_type_handlebars {
+  background-image: url('./icons/file_type_handlebars.svg');
+}
+
+.file.file_type_harbour {
+  background-image: url('./icons/file_type_harbour.svg');
+}
+
+.file.file_type_haskell {
+  background-image: url('./icons/file_type_haskell.svg');
+}
+
+.file.file_type_haxe {
+  background-image: url('./icons/file_type_haxe.svg');
+}
+
+.file.file_type_haxecheckstyle {
+  background-image: url('./icons/file_type_haxecheckstyle.svg');
+}
+
+.file.file_type_helix {
+  background-image: url('./icons/file_type_helix.svg');
+}
+
+.file.file_type_helm {
+  background-image: url('./icons/file_type_helm.svg');
+}
+
+.file.file_type_haxedevelop {
+  background-image: url('./icons/file_type_haxedevelop.svg');
+}
+
+.file.file_type_hjson {
+  background-image: url('./icons/file_type_hjson.svg');
+}
+
+.file.file_type_hlsl {
+  background-image: url('./icons/file_type_hlsl.svg');
+}
+
+.file.file_type_homeassistant {
+  background-image: url('./icons/file_type_homeassistant.svg');
+}
+
+.file.file_type_host {
+  background-image: url('./icons/file_type_host.svg');
+}
+
+.file.file_type_html {
+  background-image: url('./icons/file_type_html.svg');
+}
+
+.file.file_type_htmlhint {
+  background-image: url('./icons/file_type_htmlhint.svg');
+}
+
+.file.file_type_http {
+  background-image: url('./icons/file_type_http.svg');
+}
+
+.file.file_type_husky {
+  background-image: url('./icons/file_type_husky.svg');
+}
+
+.file.file_type_icl {
+  background-image: url('./icons/file_type_icl.svg');
+}
+
+.file.file_type_idris {
+  background-image: url('./icons/file_type_idris.svg');
+}
+
+.file.file_type_idrisbin {
+  background-image: url('./icons/file_type_idrisbin.svg');
+}
+
+.file.file_type_idrispkg {
+  background-image: url('./icons/file_type_idrispkg.svg');
+}
+
+.file.file_type_image {
+  background-image: url('./icons/file_type_image.svg');
+}
+
+.file.file_type_imba {
+  background-image: url('./icons/file_type_imba.svg');
+}
+
+.file.file_type_infopath {
+  background-image: url('./icons/file_type_infopath.svg');
+}
+
+.file.file_type_informix {
+  background-image: url('./icons/file_type_informix.svg');
+}
+
+.file.file_type_ini {
+  background-image: url('./icons/file_type_ini.svg');
+}
+
+.file.file_type_ink {
+  background-image: url('./icons/file_type_ink.svg');
+}
+
+.file.file_type_innosetup {
+  background-image: url('./icons/file_type_innosetup.svg');
+}
+
+.file.file_type_io {
+  background-image: url('./icons/file_type_io.svg');
+}
+
+.file.file_type_iodine {
+  background-image: url('./icons/file_type_iodine.svg');
+}
+
+.file.file_type_ionic {
+  background-image: url('./icons/file_type_ionic.svg');
+}
+
+.file.file_type_jake {
+  background-image: url('./icons/file_type_jake.svg');
+}
+
+.file.file_type_janet {
+  background-image: url('./icons/file_type_janet.svg');
+}
+
+.file.file_type_jar {
+  background-image: url('./icons/file_type_jar.svg');
+}
+
+.file.file_type_java {
+  background-image: url('./icons/file_type_java.svg');
+}
+
+.file.file_type_jbuilder {
+  background-image: url('./icons/file_type_jbuilder.svg');
+}
+
+.file.file_type_jekyll {
+  background-image: url('./icons/file_type_jekyll.svg');
+}
+
+.file.file_type_jenkins {
+  background-image: url('./icons/file_type_jenkins.svg');
+}
+
+.file.file_type_jest {
+  background-image: url('./icons/file_type_jest.svg');
+}
+
+.file.file_type_jinja {
+  background-image: url('./icons/file_type_jinja.svg');
+}
+
+.file.file_type_jpm {
+  background-image: url('./icons/file_type_jpm.svg');
+}
+
+.file.file_type_javascript {
+  background-image: url('./icons/file_type_js.svg');
+}
+
+.file.file_type_jsbeautify {
+  background-image: url('./icons/file_type_jsbeautify.svg');
+}
+
+.file.file_type_jsconfig {
+  background-image: url('./icons/file_type_jsconfig.svg');
+}
+
+.file.file_type_jshint {
+  background-image: url('./icons/file_type_jshint.svg');
+}
+
+.file.file_type_jsmap {
+  background-image: url('./icons/file_type_jsmap.svg');
+}
+
+.file.file_type_json {
+  background-image: url('./icons/file_type_json.svg');
+}
+
+.file.file_type_jsonld {
+  background-image: url('./icons/file_type_jsonld.svg');
+}
+
+.file.file_type_jsonnet {
+  background-image: url('./icons/file_type_jsonnet.svg');
+}
+
+.file.file_type_jsp {
+  background-image: url('./icons/file_type_jsp.svg');
+}
+
+.file.file_type_jss {
+  background-image: url('./icons/file_type_jss.svg');
+}
+
+.file.file_type_julia {
+  background-image: url('./icons/file_type_julia.svg');
+}
+
+.file.file_type_jupyter {
+  background-image: url('./icons/file_type_jupyter.svg');
+}
+
+.file.file_type_karma {
+  background-image: url('./icons/file_type_karma.svg');
+}
+
+.file.file_type_kitchenci {
+  background-image: url('./icons/file_type_kitchenci.svg');
+}
+
+.file.file_type_key {
+  background-image: url('./icons/file_type_key.svg');
+}
+
+.file.file_type_kite {
+  background-image: url('./icons/file_type_kite.svg');
+}
+
+.file.file_type_kivy {
+  background-image: url('./icons/file_type_kivy.svg');
+}
+
+.file.file_type_kos {
+  background-image: url('./icons/file_type_kos.svg');
+}
+
+.file.file_type_kotlin {
+  background-image: url('./icons/file_type_kotlin.svg');
+}
+
+.file.file_type_layout {
+  background-image: url('./icons/file_type_layout.svg');
+}
+
+.file.file_type_less {
+  background-image: url('./icons/file_type_less.svg');
+}
+
+.file.file_type_license {
+  background-image: url('./icons/file_type_license.svg');
+}
+
+.file.file_type_lime {
+  background-image: url('./icons/file_type_lime.svg');
+}
+
+.file.file_type_lintstagedrc {
+  background-image: url('./icons/file_type_lintstagedrc.svg');
+}
+
+.file.file_type_liquid {
+  background-image: url('./icons/file_type_liquid.svg');
+}
+
+.file.file_type_lisp {
+  background-image: url('./icons/file_type_lisp.svg');
+}
+
+.file.file_type_lerna {
+  background-image: url('./icons/file_type_lerna.svg');
+}
+
+.file.file_type_livescript {
+  background-image: url('./icons/file_type_livescript.svg');
+}
+
+.file.file_type_locale {
+  background-image: url('./icons/file_type_locale.svg');
+}
+
+.file.file_type_log {
+  background-image: url('./icons/file_type_log.svg');
+}
+
+.file.file_type_lolcode {
+  background-image: url('./icons/file_type_lolcode.svg');
+}
+
+.file.file_type_lsl {
+  background-image: url('./icons/file_type_lsl.svg');
+}
+
+.file.file_type_lua {
+  background-image: url('./icons/file_type_lua.svg');
+}
+
+.file.file_type_lync {
+  background-image: url('./icons/file_type_lync.svg');
+}
+
+.file.file_type_makefile {
+  background-image: url('./icons/file_type_makefile.svg');
+}
+
+.file.file_type_manifest {
+  background-image: url('./icons/file_type_manifest.svg');
+}
+
+.file.file_type_map {
+  background-image: url('./icons/file_type_map.svg');
+}
+
+.file.file_type_mariadb {
+  background-image: url('./icons/file_type_mariadb.svg');
+}
+
+.file.file_type_markdown {
+  background-image: url('./icons/file_type_markdown.svg');
+}
+
+.file.file_type_markdownlint {
+  background-image: url('./icons/file_type_markdownlint.svg');
+}
+
+.file.file_type_marko {
+  background-image: url('./icons/file_type_marko.svg');
+}
+
+.file.file_type_markojs {
+  background-image: url('./icons/file_type_markojs.svg');
+}
+
+.file.file_type_matlab {
+  background-image: url('./icons/file_type_matlab.png');
+}
+
+.file.file_type_maven {
+  background-image: url('./icons/file_type_maven.svg');
+}
+
+.file.file_type_maxscript {
+  background-image: url('./icons/file_type_maxscript.svg');
+}
+
+.file.file_type_maya {
+  background-image: url('./icons/file_type_maya.svg');
+}
+
+.file.file_type_mdx {
+  background-image: url('./icons/file_type_mdx.svg');
+}
+
+.file.file_type_mediawiki {
+  background-image: url('./icons/file_type_mediawiki.svg');
+}
+
+.file.file_type_mercurial {
+  background-image: url('./icons/file_type_mercurial.svg');
+}
+
+.file.file_type_meson {
+  background-image: url('./icons/file_type_meson.svg');
+}
+
+.file.file_type_meteor {
+  background-image: url('./icons/file_type_meteor.svg');
+}
+
+.file.file_type_mjml {
+  background-image: url('./icons/file_type_mjml.svg');
+}
+
+.file.file_type_mlang {
+  background-image: url('./icons/file_type_mlang.svg');
+}
+
+.file.file_type_mocha {
+  background-image: url('./icons/file_type_mocha.svg');
+}
+
+.file.file_type_mojolicious {
+  background-image: url('./icons/file_type_mojolicious.svg');
+}
+
+.file.file_type_moleculer {
+  background-image: url('./icons/file_type_moleculer.svg');
+}
+
+.file.file_type_mongo {
+  background-image: url('./icons/file_type_mongo.svg');
+}
+
+.file.file_type_monotone {
+  background-image: url('./icons/file_type_monotone.svg');
+}
+
+.file.file_type_mson {
+  background-image: url('./icons/file_type_mson.svg');
+}
+
+.file.file_type_mustache {
+  background-image: url('./icons/file_type_mustache.svg');
+}
+
+.file.file_type_mysql {
+  background-image: url('./icons/file_type_mysql.svg');
+}
+
+.file.file_type_nearly {
+  background-image: url('./icons/file_type_nearly.svg');
+}
+
+.file.file_type_nestjs {
+  background-image: url('./icons/file_type_nestjs.svg');
+}
+
+.file.file_type_netlify {
+  background-image: url('./icons/file_type_netlify.svg');
+}
+
+.file.file_type_nginx {
+  background-image: url('./icons/file_type_nginx.svg');
+}
+
+.file.file_type_nim {
+  background-image: url('./icons/file_type_nim.svg');
+}
+
+.file.file_type_ninja {
+  background-image: url('./icons/file_type_ninja.svg');
+}
+
+.file.file_type_njsproj {
+  background-image: url('./icons/file_type_njsproj.svg');
+}
+
+.file.file_type_node {
+  background-image: url('./icons/file_type_node.svg');
+}
+
+.file.file_type_nodemon {
+  background-image: url('./icons/file_type_nodemon.svg');
+}
+
+.file.file_type_npm {
+  background-image: url('./icons/file_type_npm.svg');
+}
+
+.file.file_type_nsi {
+  background-image: url('./icons/file_type_nsi.svg');
+}
+
+.file.file_type_nsri-integrity {
+  background-image: url('./icons/file_type_nsri-integrity.svg');
+}
+
+.file.file_type_nsri {
+  background-image: url('./icons/file_type_nsri.svg');
+}
+
+.file.file_type_nuget {
+  background-image: url('./icons/file_type_nuget.svg');
+}
+
+.file.file_type_nunjucks {
+  background-image: url('./icons/file_type_nunjucks.svg');
+}
+
+.file.file_type_nuxt {
+  background-image: url('./icons/file_type_nuxt.svg');
+}
+
+.file.file_type_nyc {
+  background-image: url('./icons/file_type_nyc.svg');
+}
+
+.file.file_type_objectivec {
+  background-image: url('./icons/file_type_objectivec.svg');
+}
+
+.file.file_type_objectivecpp {
+  background-image: url('./icons/file_type_objectivecpp.svg');
+}
+
+.file.file_type_ocaml {
+  background-image: url('./icons/file_type_ocaml.svg');
+}
+
+.file.file_type_onenote {
+  background-image: url('./icons/file_type_onenote.svg');
+}
+
+.file.file_type_openHAB {
+  background-image: url('./icons/file_type_openHAB.svg');
+}
+
+.file.file_type_opencl {
+  background-image: url('./icons/file_type_opencl.svg');
+}
+
+.file.file_type_org {
+  background-image: url('./icons/file_type_org.svg');
+}
+
+.file.file_type_outlook {
+  background-image: url('./icons/file_type_outlook.svg');
+}
+
+.file.file_type_ovpn {
+  background-image: url('./icons/file_type_ovpn.svg');
+}
+
+.file.file_type_package {
+  background-image: url('./icons/file_type_package.svg');
+}
+
+.file.file_type_paket {
+  background-image: url('./icons/file_type_paket.svg');
+}
+
+.file.file_type_patch {
+  background-image: url('./icons/file_type_patch.svg');
+}
+
+.file.file_type_pcl {
+  background-image: url('./icons/file_type_pcl.svg');
+}
+
+.file.file_type_pddl {
+  background-image: url('./icons/file_type_pddl.svg');
+}
+
+.file.file_type_perl {
+  background-image: url('./icons/file_type_perl.svg');
+}
+
+.file.file_type_pdf {
+  background-image: url('./icons/file_type_pdf.svg');
+}
+
+.file.file_type_pgsql {
+  background-image: url('./icons/file_type_pgsql.svg');
+}
+
+.file.file_type_photoshop {
+  background-image: url('./icons/file_type_photoshop.svg');
+}
+
+.file.file_type_php {
+  background-image: url('./icons/file_type_php.svg');
+}
+
+.file.file_type_phpcsfixer {
+  background-image: url('./icons/file_type_phpcsfixer.svg');
+}
+
+.file.file_type_phpunit {
+  background-image: url('./icons/file_type_phpunit.svg');
+}
+
+.file.file_type_phraseapp {
+  background-image: url('./icons/file_type_phraseapp.svg');
+}
+
+.file.file_type_pip {
+  background-image: url('./icons/file_type_pip.svg');
+}
+
+.file.file_type_plantuml {
+  background-image: url('./icons/file_type_plantuml.svg');
+}
+
+.file.file_type_platformio {
+  background-image: url('./icons/file_type_platformio.svg');
+}
+
+.file.file_type_plsql {
+  background-image: url('./icons/file_type_plsql.svg');
+}
+
+.file.file_type_polymer {
+  background-image: url('./icons/file_type_polymer.svg');
+}
+
+.file.file_type_poedit {
+  background-image: url('./icons/file_type_poedit.svg');
+}
+
+.file.file_type_pony {
+  background-image: url('./icons/file_type_pony.svg');
+}
+
+.file.file_type_postcss {
+  background-image: url('./icons/file_type_postcss.svg');
+}
+
+.file.file_type_postcssconfig {
+  background-image: url('./icons/file_type_postcssconfig.svg');
+}
+
+.file.file_type_powerpoint {
+  background-image: url('./icons/file_type_powerpoint.svg');
+}
+
+.file.file_type_powershell {
+  background-image: url('./icons/file_type_powershell.svg');
+}
+
+.file.file_type_precommit {
+  background-image: url('./icons/file_type_precommit.svg');
+}
+
+.file.file_type_prisma {
+  background-image: url('./icons/file_type_prisma.svg');
+}
+
+.file.file_type_prettier {
+  background-image: url('./icons/file_type_prettier.svg');
+}
+
+.file.file_type_processinglang {
+  background-image: url('./icons/file_type_processinglang.svg');
+}
+
+.file.file_type_procfile {
+  background-image: url('./icons/file_type_procfile.svg');
+}
+
+.file.file_type_progress {
+  background-image: url('./icons/file_type_progress.svg');
+}
+
+.file.file_type_prolog {
+  background-image: url('./icons/file_type_prolog.svg');
+}
+
+.file.file_type_prometheus {
+  background-image: url('./icons/file_type_prometheus.svg');
+}
+
+.file.file_type_protobuf {
+  background-image: url('./icons/file_type_protobuf.svg');
+}
+
+.file.file_type_protractor {
+  background-image: url('./icons/file_type_protractor.svg');
+}
+
+.file.file_type_publisher {
+  background-image: url('./icons/file_type_publisher.svg');
+}
+
+.file.file_type_pug {
+  background-image: url('./icons/file_type_pug.svg');
+}
+
+.file.file_type_puppet {
+  background-image: url('./icons/file_type_puppet.svg');
+}
+
+.file.file_type_purescript {
+  background-image: url('./icons/file_type_purescript.svg');
+}
+
+.file.file_type_pyret {
+  background-image: url('./icons/file_type_pyret.svg');
+}
+
+.file.file_type_python {
+  background-image: url('./icons/file_type_python.svg');
+}
+
+.file.file_type_pyup {
+  background-image: url('./icons/file_type_pyup.svg');
+}
+
+.file.file_type_q {
+  background-image: url('./icons/file_type_q.svg');
+}
+
+.file.file_type_qbs {
+  background-image: url('./icons/file_type_qbs.svg');
+}
+
+.file.file_type_qlikview {
+  background-image: url('./icons/file_type_qlikview.svg');
+}
+
+.file.file_type_qml {
+  background-image: url('./icons/file_type_qml.svg');
+}
+
+.file.file_type_qmldir {
+  background-image: url('./icons/file_type_qmldir.svg');
+}
+
+.file.file_type_qsharp {
+  background-image: url('./icons/file_type_qsharp.svg');
+}
+
+.file.file_type_quasar {
+  background-image: url('./icons/file_type_quasar.svg');
+}
+
+.file.file_type_r {
+  background-image: url('./icons/file_type_r.svg');
+}
+
+.file.file_type_racket {
+  background-image: url('./icons/file_type_racket.svg');
+}
+
+.file.file_type_rails {
+  background-image: url('./icons/file_type_rails.svg');
+}
+
+.file.file_type_rake {
+  background-image: url('./icons/file_type_rake.svg');
+}
+
+.file.file_type_raml {
+  background-image: url('./icons/file_type_raml.svg');
+}
+
+.file.file_type_razor {
+  background-image: url('./icons/file_type_razor.svg');
+}
+
+.file.file_type_reactjs {
+  background-image: url('./icons/file_type_reactjs.svg');
+}
+
+.file.file_type_reacttemplate {
+  background-image: url('./icons/file_type_reacttemplate.svg');
+}
+
+.file.file_type_reactts {
+  background-image: url('./icons/file_type_reactts.svg');
+}
+
+.file.file_type_reason {
+  background-image: url('./icons/file_type_reason.svg');
+}
+
+.file.file_type_red {
+  background-image: url('./icons/file_type_red.svg');
+}
+
+.file.file_type_registry {
+  background-image: url('./icons/file_type_registry.svg');
+}
+
+.file.file_type_rehype {
+  background-image: url('./icons/file_type_rehype.svg');
+}
+
+.file.file_type_remark {
+  background-image: url('./icons/file_type_remark.svg');
+}
+
+.file.file_type_renovate {
+  background-image: url('./icons/file_type_renovate.svg');
+}
+
+.file.file_type_rest {
+  background-image: url('./icons/file_type_rest.svg');
+}
+
+.file.file_type_retext {
+  background-image: url('./icons/file_type_retext.svg');
+}
+
+.file.file_type_riot {
+  background-image: url('./icons/file_type_riot.svg');
+}
+
+.file.file_type_robotframework {
+  background-image: url('./icons/file_type_robotframework.svg');
+}
+
+.file.file_type_robots {
+  background-image: url('./icons/file_type_robots.svg');
+}
+
+.file.file_type_rollup {
+  background-image: url('./icons/file_type_rollup.svg');
+}
+
+.file.file_type_rproj {
+  background-image: url('./icons/file_type_rproj.svg');
+}
+
+.file.file_type_rspec {
+  background-image: url('./icons/file_type_rspec.svg');
+}
+
+.file.file_type_rubocop {
+  background-image: url('./icons/file_type_rubocop.svg');
+}
+
+.file.file_type_ruby {
+  background-image: url('./icons/file_type_ruby.svg');
+}
+
+.file.file_type_rust {
+  background-image: url('./icons/file_type_rust.svg');
+}
+
+.file.file_type_saltstack {
+  background-image: url('./icons/file_type_saltstack.svg');
+}
+
+.file.file_type_san {
+  background-image: url('./icons/file_type_san.svg');
+}
+
+.file.file_type_sass {
+  background-image: url('./icons/file_type_sass.svg');
+}
+
+.file.file_type_sbt {
+  background-image: url('./icons/file_type_sbt.svg');
+}
+
+.file.file_type_scala {
+  background-image: url('./icons/file_type_scala.svg');
+}
+
+.file.file_type_scilab {
+  background-image: url('./icons/file_type_scilab.svg');
+}
+
+.file.file_type_script {
+  background-image: url('./icons/file_type_script.svg');
+}
+
+.file.file_type_scss {
+  background-image: url('./icons/file_type_scss.svg');
+}
+
+.file.file_type_sdlang {
+  background-image: url('./icons/file_type_sdlang.svg');
+}
+
+.file.file_type_sentry {
+  background-image: url('./icons/file_type_sentry.svg');
+}
+
+.file.file_type_sequelize {
+  background-image: url('./icons/file_type_sequelize.svg');
+}
+
+.file.file_type_serverless {
+  background-image: url('./icons/file_type_serverless.svg');
+}
+
+.file.file_type_shaderlab {
+  background-image: url('./icons/file_type_shaderlab.svg');
+}
+
+.file.file_type_shell {
+  background-image: url('./icons/file_type_shell.svg');
+}
+
+.file.file_type_silverstripe {
+  background-image: url('./icons/file_type_silverstripe.svg');
+}
+
+.file.file_type_sketch {
+  background-image: url('./icons/file_type_sketch.svg');
+}
+
+.file.file_type_skipper {
+  background-image: url('./icons/file_type_skipper.svg');
+}
+
+.file.file_type_slang {
+  background-image: url('./icons/file_type_slang.svg');
+}
+
+.file.file_type_slice {
+  background-image: url('./icons/file_type_slice.svg');
+}
+
+.file.file_type_sln {
+  background-image: url('./icons/file_type_sln.svg');
+}
+
+.file.file_type_smali {
+  background-image: url('./icons/file_type_smali.svg');
+}
+
+.file.file_type_smarty {
+  background-image: url('./icons/file_type_smarty.svg');
+}
+
+.file.file_type_slim {
+  background-image: url('./icons/file_type_slim.svg');
+}
+
+.file.file_type_snapcraft {
+  background-image: url('./icons/file_type_snapcraft.svg');
+}
+
+.file.file_type_snort {
+  background-image: url('./icons/file_type_snort.svg');
+}
+
+.file.file_type_snyk {
+  background-image: url('./icons/file_type_snyk.svg');
+}
+
+.file.file_type_solidarity {
+  background-image: url('./icons/file_type_solidarity.svg');
+}
+
+.file.file_type_solidity {
+  background-image: url('./icons/file_type_solidity.svg');
+}
+
+.file.file_type_source {
+  background-image: url('./icons/file_type_source.svg');
+}
+
+.file.file_type_sqf {
+  background-image: url('./icons/file_type_sqf.svg');
+}
+
+.file.file_type_sql {
+  background-image: url('./icons/file_type_sql.svg');
+}
+
+.file.file_type_sqlite {
+  background-image: url('./icons/file_type_sqlite.svg');
+}
+
+.file.file_type_squirrel {
+  background-image: url('./icons/file_type_squirrel.svg');
+}
+
+.file.file_type_stata {
+  background-image: url('./icons/file_type_stata.svg');
+}
+
+.file.file_type_stencil {
+  background-image: url('./icons/file_type_stencil.svg');
+}
+
+.file.file_type_storyboard {
+  background-image: url('./icons/file_type_storyboard.svg');
+}
+
+.file.file_type_sss {
+  background-image: url('./icons/file_type_sss.svg');
+}
+
+.file.file_type_storybook {
+  background-image: url('./icons/file_type_storybook.svg');
+}
+
+.file.file_type_stylable {
+  background-image: url('./icons/file_type_stylable.svg');
+}
+
+.file.file_type_style {
+  background-image: url('./icons/file_type_style.svg');
+}
+
+.file.file_type_stylelint {
+  background-image: url('./icons/file_type_stylelint.svg');
+}
+
+.file.file_type_stylus {
+  background-image: url('./icons/file_type_stylus.svg');
+}
+
+.file.file_type_subversion {
+  background-image: url('./icons/file_type_subversion.svg');
+}
+
+.file.file_type_svelte {
+  background-image: url('./icons/file_type_svelte.svg');
+}
+
+.file.file_type_svg {
+  background-image: url('./icons/file_type_svg.svg');
+}
+
+.file.file_type_swagger {
+  background-image: url('./icons/file_type_swagger.svg');
+}
+
+.file.file_type_swift {
+  background-image: url('./icons/file_type_swift.svg');
+}
+
+.file.file_type_swig {
+  background-image: url('./icons/file_type_swig.svg');
+}
+
+.file.file_type_symfony {
+  background-image: url('./icons/file_type_symfony.svg');
+}
+
+.file.file_type_systemverilog {
+  background-image: url('./icons/file_type_systemverilog.svg');
+}
+
+.file.file_type_t4tt {
+  background-image: url('./icons/file_type_t4tt.svg');
+}
+
+.file.file_type_tailwind {
+  background-image: url('./icons/file_type_tailwind.svg');
+}
+
+.file.file_type_tcl {
+  background-image: url('./icons/file_type_tcl.svg');
+}
+
+.file.file_type_tera {
+  background-image: url('./icons/file_type_tera.svg');
+}
+
+.file.file_type_terraform {
+  background-image: url('./icons/file_type_terraform.svg');
+}
+
+.file.file_type_test {
+  background-image: url('./icons/file_type_test.svg');
+}
+
+.file.file_type_testjs {
+  background-image: url('./icons/file_type_testjs.svg');
+}
+
+.file.file_type_testts {
+  background-image: url('./icons/file_type_testts.svg');
+}
+
+.file.file_type_tex {
+  background-image: url('./icons/file_type_tex.svg');
+}
+
+.file.file_type_text {
+  background-image: url('./icons/file_type_text.svg');
+}
+
+.file.file_type_textile {
+  background-image: url('./icons/file_type_textile.svg');
+}
+
+.file.file_type_tfs {
+  background-image: url('./icons/file_type_tfs.svg');
+}
+
+.file.file_type_todo {
+  background-image: url('./icons/file_type_todo.svg');
+}
+
+.file.file_type_toml {
+  background-image: url('./icons/file_type_toml.svg');
+}
+
+.file.file_type_tox {
+  background-image: url('./icons/file_type_tox.svg');
+}
+
+.file.file_type_tsconfig {
+  background-image: url('./icons/file_type_tsconfig.svg');
+}
+
+.file.file_type_travis {
+  background-image: url('./icons/file_type_travis.svg');
+}
+
+.file.file_type_tslint {
+  background-image: url('./icons/file_type_tslint.svg');
+}
+
+.file.file_type_tt {
+  background-image: url('./icons/file_type_tt.svg');
+}
+
+.file.file_type_ttcn {
+  background-image: url('./icons/file_type_ttcn.svg');
+}
+
+.file.file_type_twig {
+  background-image: url('./icons/file_type_twig.svg');
+}
+
+.file.file_type_typescript {
+  background-image: url('./icons/file_type_typescript.svg');
+}
+
+.file.file_type_typescriptdef {
+  background-image: url('./icons/file_type_typescriptdef.svg');
+}
+
+.file.file_type_unibeautify {
+  background-image: url('./icons/file_type_unibeautify.svg');
+}
+
+.file.file_type_vagrant {
+  background-image: url('./icons/file_type_vagrant.svg');
+}
+
+.file.file_type_vala {
+  background-image: url('./icons/file_type_vala.svg');
+}
+
+.file.file_type_vapi {
+  background-image: url('./icons/file_type_vapi.svg');
+}
+
+.file.file_type_vash {
+  background-image: url('./icons/file_type_vash.svg');
+}
+
+.file.file_type_vb {
+  background-image: url('./icons/file_type_vb.svg');
+}
+
+.file.file_type_vba {
+  background-image: url('./icons/file_type_vba.svg');
+}
+
+.file.file_type_vbhtml {
+  background-image: url('./icons/file_type_vbhtml.svg');
+}
+
+.file.file_type_vbproj {
+  background-image: url('./icons/file_type_vbproj.svg');
+}
+
+.file.file_type_vcxproj {
+  background-image: url('./icons/file_type_vcxproj.svg');
+}
+
+.file.file_type_velocity {
+  background-image: url('./icons/file_type_velocity.svg');
+}
+
+.file.file_type_verilog {
+  background-image: url('./icons/file_type_verilog.svg');
+}
+
+.file.file_type_vhdl {
+  background-image: url('./icons/file_type_vhdl.svg');
+}
+
+.file.file_type_video {
+  background-image: url('./icons/file_type_video.svg');
+}
+
+.file.file_type_view {
+  background-image: url('./icons/file_type_view.svg');
+}
+
+.file.file_type_vim {
+  background-image: url('./icons/file_type_vim.svg');
+}
+
+.file.file_type_volt {
+  background-image: url('./icons/file_type_volt.svg');
+}
+
+.file.file_type_vscode-insiders {
+  background-image: url('./icons/file_type_vscode-insiders.svg');
+}
+
+.file.file_type_vscode {
+  background-image: url('./icons/file_type_vscode.svg');
+}
+
+.file.file_type_vsix {
+  background-image: url('./icons/file_type_vsix.svg');
+}
+
+.file.file_type_vsixmanifest {
+  background-image: url('./icons/file_type_vsixmanifest.svg');
+}
+
+.file.file_type_vue {
+  background-image: url('./icons/file_type_vue.svg');
+}
+
+.file.file_type_wallaby {
+  background-image: url('./icons/file_type_wallaby.svg');
+}
+
+.file.file_type_wasm {
+  background-image: url('./icons/file_type_wasm.svg');
+}
+
+.file.file_type_watchmanconfig {
+  background-image: url('./icons/file_type_watchmanconfig.svg');
+}
+
+.file.file_type_webp {
+  background-image: url('./icons/file_type_webp.svg');
+}
+
+.file.file_type_webpack {
+  background-image: url('./icons/file_type_webpack.svg');
+}
+
+.file.file_type_wercker {
+  background-image: url('./icons/file_type_wercker.svg');
+}
+
+.file.file_type_wolfram {
+  background-image: url('./icons/file_type_wolfram.svg');
+}
+
+.file.file_type_word {
+  background-image: url('./icons/file_type_word.svg');
+}
+
+.file.file_type_wpml {
+  background-image: url('./icons/file_type_wpml.svg');
+}
+
+.file.file_type_wurst {
+  background-image: url('./icons/file_type_wurst.svg');
+}
+
+.file.file_type_wxml {
+  background-image: url('./icons/file_type_wxml.svg');
+}
+
+.file.file_type_wxss {
+  background-image: url('./icons/file_type_wxss.svg');
+}
+
+.file.file_type_xcode {
+  background-image: url('./icons/file_type_xcode.svg');
+}
+
+.file.file_type_xfl {
+  background-image: url('./icons/file_type_xfl.svg');
+}
+
+.file.file_type_xib {
+  background-image: url('./icons/file_type_xib.svg');
+}
+
+.file.file_type_xliff {
+  background-image: url('./icons/file_type_xliff.svg');
+}
+
+.file.file_type_xml {
+  background-image: url('./icons/file_type_xml.svg');
+}
+
+.file.file_type_xquery {
+  background-image: url('./icons/file_type_xquery.svg');
+}
+
+.file.file_type_xsl {
+  background-image: url('./icons/file_type_xsl.svg');
+}
+
+.file.file_type_yaml {
+  background-image: url('./icons/file_type_yaml.svg');
+}
+
+.file.file_type_yamllint {
+  background-image: url('./icons/file_type_yamllint.svg');
+}
+
+.file.file_type_yandex {
+  background-image: url('./icons/file_type_yandex.svg');
+}
+
+.file.file_type_yang {
+  background-image: url('./icons/file_type_yang.svg');
+}
+
+.file.file_type_yarn {
+  background-image: url('./icons/file_type_yarn.svg');
+}
+
+.file.file_type_yeoman {
+  background-image: url('./icons/file_type_yeoman.svg');
+}
+
+.file.file_type_zip {
+  background-image: url('./icons/file_type_zip.svg');
+}

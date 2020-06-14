@@ -1,0 +1,112 @@
+{
+  "name": "com.foxdebug.acode",
+  "displayName": "Acode",
+  "version": "0.8.83",
+  "description": "Acode is android and IOS code editor app",
+  "main": "index.js",
+  "scripts": {
+    "lang": "node ./utils/lang.js",
+    "config-build": "node ./utils/config.js",
+    "build": "webpack",
+    "build-run-free": "yarn config-build d free && webpack && cordova run android",
+    "build-run": "yarn config-build d && webpack && cordova run android",
+    "build-release-free": "yarn config-build p free && webpack && cordova build android --release",
+    "build-release": "yarn config-build p && webpack && cordova build android --release",
+    "test": "jest"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Foxdebug (Ajit Kumar)",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/runtime": "^7.5.5",
+    "@deadlyjack/ajax": "^1.0.7",
+    "autosize": "^4.0.2",
+    "axios": "^0.19.2",
+    "cordova-android": "^8.1.0",
+    "cordova-clipboard": "^1.3.0",
+    "cordova-custom-config": "^5.1.0",
+    "cordova-disable-http-cache": "^1.0.0",
+    "cordova-plugin-android-permissions": "^1.0.0",
+    "cordova-plugin-buildinfo": "^4.0.0",
+    "cordova-plugin-device": "^2.0.3",
+    "cordova-plugin-file": "^6.0.2",
+    "cordova-plugin-navigationbar-color": "0.0.9",
+    "cordova-plugin-shell-exec": "^1.0.0",
+    "cordova-plugin-statusbar": "git+https://github.com/breautek/cordova-plugin-statusbar.git",
+    "cordova-plugin-vibration": "^3.1.1",
+    "cordova-plugin-x-toast": "^2.7.2",
+    "core-js": "^3.2.0",
+    "crypto-js": "^3.1.9-1",
+    "debug": "^4.1.1",
+    "html-tag-js": "^0.2.22",
+    "js-base64": "^2.5.1",
+    "marked": "^0.8.0",
+    "mime-types": "^2.1.26",
+    "mustache": "^3.1.0",
+    "utf8": "^3.0.0",
+    "vanilla-picker": "^2.10.1",
+    "yargs": "^15.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-transform-runtime": "^7.5.5",
+    "@babel/preset-env": "^7.4.5",
+    "@types/ace": "0.0.42",
+    "autoprefixer": "^9.6.1",
+    "babel-loader": "^8.0.6",
+    "cordova-plugin-whitelist": "^1.3.3",
+    "css-loader": "^3.0.0",
+    "jest": "^26.0.1",
+    "mini-css-extract-plugin": "^0.7.0",
+    "node-sass": "^4.13.1",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "postcss-loader": "^3.0.0",
+    "raw-loader": "^4.0.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.34.0",
+    "webpack-bundle-analyzer": "^3.7.0",
+    "webpack-cli": "^3.3.4"
+  },
+  "cordova": {
+    "plugins": {
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-device": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-file": {},
+      "cordova-plugin-navigationbar-color": {},
+      "cordova-custom-config": {},
+      "cordova-plugin-x-toast": {},
+      "cordova-plugin-android-permissions": {},
+      "cordova-plugin-vibration": {},
+      "cordova-clipboard": {},
+      "cordova-plugin-buildinfo": {},
+      "cordova-plugin-inappbrowser": {},
+      "cordova-disable-http-cache": {},
+      "cordova-plugin-intent": {},
+      "cordova-plugin-ftp": {},
+      "cordova-plugin-webserver": {},
+      "cordova-plugin-system": {},
+      "cordova-plugin-sdcard": {
+        "ANDROID_SUPPORT_VERSION": "28.+"
+      }
+    },
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deadlyjack/acode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/deadlyjack/acode/issues"
+  },
+  "homepage": "https://github.com/deadlyjack/acode#readme",
+  "resolutions": {
+    "acorn": ">=6.4.1",
+    "minimist": ">=1.2.2"
+  }
+}

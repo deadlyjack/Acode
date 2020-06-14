@@ -1,0 +1,14 @@
+{
+  "name": "cordova-plugin-vibration-tests",
+  "version": "3.1.1",
+  "description": "",
+  "cordova": {
+    "id": "cordova-plugin-vibration-tests",
+    "platforms": []
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "",
+  "license": "Apache 2.0"
+}

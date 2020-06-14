@@ -1,0 +1,21 @@
+#repo-tree {
+  #repo-list {
+    height: calc(100% - 30px);
+    overflow-y: auto;
+
+    .icon {
+      background-position: center;
+      background-size: 32px;
+      font-size: 2em;
+      color: rgb(65, 85, 133);
+
+      &.code {
+        color: rgb(79, 155, 79);
+      }
+
+      &.folder {
+        color: rgb(206, 206, 53);
+      }
+    }
+  }
+}

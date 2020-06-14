@@ -1,0 +1,48 @@
+#file-browser {
+  .tile {
+    .icon {
+      color: rgb(65, 85, 133);
+
+      &.clearclose {
+        color: currentColor;
+        font-size: 1.2rem;
+      }
+
+      &.folder {
+        color: rgb(206, 206, 53);
+      }
+
+      &.code {
+        color: rgb(79, 155, 79);
+      }
+    }
+  }
+
+  /*&[type=folder] {
+    [type=file] {
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0.5;
+    }
+  }*/
+
+  #list {
+    height: calc(100% - 30px);
+    overflow-y: auto;
+
+    .tile {
+
+      &[read-only] {
+        .text::after {
+          content: 'Read only';
+          font-size: 0.6em;
+          color: white;
+          background-color: rgb(62, 100, 138);
+          border-radius: 4px;
+          padding: 5px;
+          margin: auto 15px;
+        }
+      }
+    }
+  }
+}

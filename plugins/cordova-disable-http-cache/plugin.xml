@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-disable-http-cache" version="1.0.0">
+  <name>Cordova HTTP cache disabler</name>
+  <description>Cordova plugin to disable caching of HTTP requests and responses.</description>
+  <repo>https://github.com/koenoe/cordova-disable-http-cache.git</repo>
+  <issue>https://github.com/koenoe/cordova-disable-http-cache/issues</issue>
+
+  <!-- android -->
+  <platform name="android">
+    <config-file target="config.xml" parent="/*">
+      <feature name="DisableHttpCachePlugin">
+        <param name="android-package" value="com.koenromers.cordova.DisableHttpCachePlugin"/>
+        <param name="onload" value="true" />
+      </feature>
+    </config-file>
+    <source-file src="src/android/DisableHttpCachePlugin.java" target-dir="src/com/koenromers/cordova"/>
+  </platform>
+
+  <!-- ios -->
+  <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+      <feature name="DisableHttpCachePlugin">
+        <param name="ios-package" value="DisableHttpCachePlugin"/>
+        <param name="onload" value="true" />
+      </feature>
+    </config-file>
+    <header-file src="src/ios/DisableHttpCachePlugin.h" target-dir="DisableHttpCachePlugin"/>
+    <source-file src="src/ios/DisableHttpCachePlugin.m" target-dir="DisableHttpCachePlugin"/>
+  </platform>
+
+</plugin>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-android-permissions"
+        version="1.0.0">
+
+  <name>Permissions</name>
+
+  <description>Android permissions support library.</description>
+
+  <author>Jason Yang</author>
+
+  <engines>
+    <engine name="cordova" version=">=5.0.0"/>
+  </engines>
+
+  <!-- android -->
+  <platform name="android">
+    <js-module src="www/permissions.js" name="Permissions">
+      <clobbers target="cordova.plugins.permissions" />
+    </js-module>
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="Permissions">
+        <param name="android-package" value="com.android.plugins.Permissions" />
+      </feature>
+    </config-file>
+
+    <source-file src="src/android/com/android/plugins/Permissions.java" target-dir="src/com/android/plugins"/>
+  </platform>
+
+  <!-- browser -->
+  <platform name="browser">
+    <js-module src="www/permissions-dummy.js" name="Permissions">
+      <clobbers target="cordova.plugins.permissions" />
+    </js-module>
+  </platform>
+
+  <!-- ios -->
+  <platform name="ios">
+    <js-module src="www/permissions-dummy.js" name="Permissions">
+      <clobbers target="cordova.plugins.permissions" />
+    </js-module>
+  </platform>
+
+</plugin>

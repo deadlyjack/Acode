@@ -1,0 +1,15 @@
+<ul class="list" id="list" empty-msg="{{msg}}">{{#list}}
+  {{#.}}
+  <li tabindex="1" class="tile" url="{{url}}" origin="{{origin}}" {{#isDirectory}} action="folder" type="folder"
+    {{/isDirectory}} {{#canWrite}} can-write="true" {{/canWrite}} uuid="{{uuid}}" {{#isFile}} action="file" type="file"
+    {{/isFile}} name="{{name}}" {{#open-doc}} open-doc="true" {{/open-doc}}>
+    <span class="icon {{type}}"></span>
+    <div class="text">
+      <span>{{name}}</span>
+    </div>
+    {{#closeable}}
+    <span class="icon clearclose" action="remove-path" uuid="{{uuid}}""></span>
+    {{/closeable}}
+  </li>
+  {{/.}}
+  {{/list}}</ul>

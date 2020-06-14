@@ -1,0 +1,20 @@
+#github-login {
+  .form {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
+
+    input {
+      margin-bottom: 15px;
+    }
+
+    #error-msg:not(:empty) {
+      height: 20px;
+      font-size: 1em;
+      color: orangered;
+      text-align: center;
+      margin: 15px auto;
+    }
+  }
+}

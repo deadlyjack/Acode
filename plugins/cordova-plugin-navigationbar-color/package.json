@@ -1,0 +1,72 @@
+{
+  "_from": "cordova-plugin-navigationbar-color",
+  "_id": "cordova-plugin-navigationbar-color@0.0.9",
+  "_inBundle": false,
+  "_integrity": "sha512-1s9gegohlJvAO6WAdYwyhygnWebW0FKSap+3GLoNS/dI6yQLlnwyeiF8XgVvYfb47Ef6F7BiwxAu9jM4i+EIPg==",
+  "_location": "/cordova-plugin-navigationbar-color",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cordova-plugin-navigationbar-color",
+    "name": "cordova-plugin-navigationbar-color",
+    "escapedName": "cordova-plugin-navigationbar-color",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-navigationbar-color/-/cordova-plugin-navigationbar-color-0.0.9.tgz",
+  "_shasum": "0d78317a7a458addbac15c3d6b6d739f22eeed2d",
+  "_spec": "cordova-plugin-navigationbar-color",
+  "_where": "/media/dellevenjack/Projects/git/Acode",
+  "author": {
+    "name": "Vinicius Fagundes"
+  },
+  "bugs": {
+    "url": "https://github.com/fagundes/cordova-plugin-navigationbar/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova-plugin-navigationbar-color",
+    "platforms": [
+      "android"
+    ]
+  },
+  "deprecated": false,
+  "description": "Cordova NavigationBar Plugin",
+  "devDependencies": {
+    "jshint": "^2.6.0"
+  },
+  "engines": {
+    "cordovaDependencies": {
+      "0.1.0": {
+        "cordova": ">=3.0.0"
+      },
+      "3.0.0": {
+        "cordova": ">100"
+      }
+    }
+  },
+  "homepage": "https://github.com/fagundes/cordova-plugin-navigationbar#readme",
+  "keywords": [
+    "cordova",
+    "navigationbar",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "license": "Apache-2.0",
+  "name": "cordova-plugin-navigationbar-color",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fagundes/cordova-plugin-navigationbar.git"
+  },
+  "scripts": {
+    "jshint": "node node_modules/jshint/bin/jshint www && node node_modules/jshint/bin/jshint src && node node_modules/jshint/bin/jshint tests",
+    "test": "npm run jshint"
+  },
+  "version": "0.0.9"
+}

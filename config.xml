@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<widget id="com.foxdebug.acode" android-versionCode="111" version="1.1.14.111" 
+    xmlns="http://www.w3.org/ns/widgets" 
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Acode</name>
+    <description>
+        Light weight code editor and web IDE for android.
+    </description>
+    <author email="dellevenjack@gmail.com" href="https://foxdebug.com">
+       Ajit Kumar (dellevenjack)
+    </author>
+    <content src="index.html" />
+    <access launch-external="yes" origin="*" />
+    <allow-navigation href="https://*/*" />
+    <allow-navigation href="http://*/*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+
+    <preference name="cordova.plugins.diagnostic.modules" value="EXTERNAL_STORAGE " />
+
+    <platform name="android">
+        <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/colors.xml" />
+        <resource-file src="/res/network_security_config.xml" target="/app/src/main/res/xml/network_security_config.xml" />
+        <allow-intent href="market:*" />
+        <preference name="fullscreen" value="false"/>
+        <preference name="SplashScreen" value="none"/>
+        <preference name="ShowTitle" value="true"/>
+        <preference name="DisallowOverscroll" value="true" />
+        <preference name="BackgroundColor" value="0xFF313131" />
+        <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+        <preference name="android-minSdkVersion" value="22" />
+        <preference name="AndroidLaunchMode" value="singleTask" />
+        <preference name="prerendered-icon" value="false" />
+
+        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+            <application android:networkSecurityConfig="@xml/network_security_config" />
+            <application android:usesCleartextTraffic="true" />
+        </edit-config>
+
+        <config-file parent="./application/activity" target="AndroidManifest.xml">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/*"/>
+                <data android:mimeType="xml/*" />
+            </intent-filter>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
+            <uses-permission android:name="android.permission.INTERNET"/>
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.VIBRATE" />
+        </config-file>
+
+        <resource-file src="res/logo.png" target="app/src/main/res/drawable/logo.png" />
+        <icon background="@color/ic_launcher_background" density="mdpi" foreground="res/icon/android/mipmap-mdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="hdpi" foreground="res/icon/android/mipmap-hdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="xhdpi" foreground="res/icon/android/mipmap-xhdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="xxhdpi" foreground="res/icon/android/mipmap-xxhdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="xxxhdpi" foreground="res/icon/android/mipmap-xxxhdpi/ic_launcher_foreground.png" />
+    </platform>
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+    </platform>
+</widget>
