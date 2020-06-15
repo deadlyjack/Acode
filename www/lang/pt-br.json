@@ -140,5 +140,6 @@
   "invalid backup file": "Arquivo de backup inválido",
   "backup file found": "Arquivo de backup encontrado, você deseja restaurar as configurações, combinações de teclas e contas FTP do arquivo de backup?",
   "welcome back": "Bem vindo de volta",
-  "add path": "Adicionar caminho"
+  "add path": "Adicionar caminho",
+  "disable floating button": "Disable floating button"
 }

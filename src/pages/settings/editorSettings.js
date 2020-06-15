@@ -85,11 +85,16 @@ export default function editorSettings() {
             text: strings['vibrate on tap'],
             checkbox: values.vibrateOnTap,
         },
-        // {
-        //     key: 'quickTools',
-        //     text: strings['quick tools'],
-        //     checkbox: values.quickTools
-        // },
+        {
+            key: 'disableFloatingButton',
+            text: strings["disable floating button"],
+            checkbox: values.disableFloatingButton
+        },
+        {
+            key: 'quickTools',
+            text: strings['quick tools'],
+            checkbox: values.quickTools
+        },
         {
             key: 'fullscreen',
             text: strings.fullscreen.capitalize(),
@@ -274,6 +279,13 @@ export default function editorSettings() {
                 app.classList.toggle("no-animation");
                 appSettings.update();
                 this.value = values.animation;
+                break;
+
+            case 'disableFloatingButton':
+                values.disableFloatingButton = !values.disableFloatingButton;
+                root.classList.toggle("disable-floating-button");
+                appSettings.update();
+                this.value = values.disableFloatingButton;
                 break;
         }
     }

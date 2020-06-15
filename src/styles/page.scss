@@ -20,7 +20,10 @@ body {
   }
 
   &.fullscreen-mode {
+
     #root {
+      --header-height: 0px;
+
       &:not(.top-bar) {
         &.show-header {
           #header-toggler {
@@ -103,6 +106,64 @@ body {
       position: fixed;
     }
   }
+
+  #root.page.primary {
+    &[footer-height] {
+      #quicktool-toggler {
+        &::before {
+          content: "\e98d";
+        }
+
+        opacity: 1;
+      }
+    }
+
+    &[footer-height='2'] {
+
+      #quicktool-toggler {
+        transform: translate3d(0, -80px, 0);
+      }
+
+      &.top-bar {
+        main {
+          height: calc(100vh - 155px);
+          height: calc(100vh - (var(--footer-height) * 2 + var(--header-height) + 30px));
+          min-height: calc(100vh - 155px);
+          min-height: calc(100vh - (var(--footer-height) * 2 + var(--header-height) + 30px));
+        }
+      }
+
+      main {
+        height: calc(100vh - 125px);
+        height: calc(100vh - (var(--footer-height) * 2 + var(--header-height)));
+        min-height: calc(100vh - 125px);
+        min-height: calc(100vh - (var(--footer-height) * 2 + var(--header-height)));
+      }
+    }
+
+    &[footer-height='3'] {
+
+      #quicktool-toggler {
+        transform: translate3d(0, -120px, 0);
+      }
+
+      &.top-bar {
+        main {
+          height: calc(100vh - 195px);
+          height: calc(100vh - (var(--footer-height) * 3 + var(--header-height) + 30px));
+          min-height: calc(100vh - 195px);
+          min-height: calc(100vh - (var(--footer-height) * 3 + var(--header-height) + 30px));
+        }
+      }
+
+      main {
+        height: calc(100vh - 165px);
+        height: calc(100vh - (var(--footer-height) * 3 + var(--header-height)));
+        min-height: calc(100vh - 165px);
+        min-height: calc(100vh - (var(--footer-height) * 3 + var(--header-height)));
+      }
+    }
+  }
 }
 
 div.page {
@@ -180,6 +241,12 @@ div.page {
 }
 
 #root {
+  &.disable-floating-button {
+    #quicktool-toggler {
+      display: none;
+    }
+  }
+
   &.top-bar {
     >header {
       margin-bottom: 30px;
@@ -190,62 +257,6 @@ div.page {
       height: calc(100vh - (var(--header-height) + 30px));
       min-height: calc(100vh - 75px);
       min-height: calc(100vh - (var(--header-height) + 30px));
-    }
-  }
-
-  &[footer-height] {
-    #quicktool-toggler {
-      &::before {
-        content: "\e98d";
-      }
-
-      opacity: 1;
-    }
-  }
-
-  &[footer-height='2'] {
-
-    #quicktool-toggler {
-      transform: translate3d(0, -80px, 0);
-    }
-
-    &.top-bar {
-      main {
-        height: calc(100vh - 155px);
-        height: calc(100vh - (var(--footer-height) * 2 + var(--header-height) + 30px));
-        min-height: calc(100vh - 155px);
-        min-height: calc(100vh - (var(--footer-height) * 2 + var(--header-height) + 30px));
-      }
-    }
-
-    main {
-      height: calc(100vh - 125px);
-      height: calc(100vh - (var(--footer-height) * 2 + var(--header-height)));
-      min-height: calc(100vh - 125px);
-      min-height: calc(100vh - (var(--footer-height) * 2 + var(--header-height)));
-    }
-  }
-
-  &[footer-height='3'] {
-
-    #quicktool-toggler {
-      transform: translate3d(0, -120px, 0);
-    }
-
-    &.top-bar {
-      main {
-        height: calc(100vh - 195px);
-        height: calc(100vh - (var(--footer-height) * 3 + var(--header-height) + 30px));
-        min-height: calc(100vh - 195px);
-        min-height: calc(100vh - (var(--footer-height) * 3 + var(--header-height) + 30px));
-      }
-    }
-
-    main {
-      height: calc(100vh - 165px);
-      height: calc(100vh - (var(--footer-height) * 3 + var(--header-height)));
-      min-height: calc(100vh - 165px);
-      min-height: calc(100vh - (var(--footer-height) * 3 + var(--header-height)));
     }
   }
 
@@ -287,6 +298,8 @@ div.page {
     z-index: 98;
     background-color: #9999ff;
     background-color: var(--primary-color);
+    padding: 0 1px;
+    box-sizing: border-box;
 
     .icon {
       border-radius: unset;

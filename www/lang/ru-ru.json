@@ -140,5 +140,6 @@
   "invalid backup file": "Не получилось создать резервную копию",
   "backup file found": "Резервная копия найдена, восстановить?",
   "welcome back": "С возвращением!",
-  "add path": "Добавить путь"
+  "add path": "Добавить путь",
+  "disable floating button": "Disable floating button"
 }

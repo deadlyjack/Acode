@@ -36,7 +36,7 @@ class Settings {
                 sortByName: true
             },
             maxFileSize: 5,
-            filesNotAllowed: ['zip', 'apk', 'doc', 'docx', 'mp3', 'mp4', 'avi', 'flac', 'mov', 'rar', 'pdf', 'gif'],
+            filesNotAllowed: ['zip', 'apk', 'doc', 'docx', 'mp3', 'mp4', 'avi', 'flac', 'mov', 'rar', 'pdf', 'gif', 'flv'],
             search: {
                 caseSensitive: false,
                 regExp: false,
@@ -61,7 +61,8 @@ class Settings {
             editorFont: "default",
             vibrateOnTap: true,
             fullscreen: false,
-            floatingButtonActivation: "click"
+            floatingButtonActivation: "click",
+            disableFloatingButton: false
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;

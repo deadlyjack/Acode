@@ -38,6 +38,7 @@ import loadPolyFill from "./polyfill";
 import internalFs from "./fileSystem/internalFs";
 import Url from "./utils/Url";
 import backupRestore from "../pages/settings/backup-restore";
+import applySettings from "./applySettings";
 //@ts-check
 
 loadPolyFill.apply(window);
@@ -156,11 +157,6 @@ function Main() {
 
   function ondeviceready() {
 
-    if (/free/.test(BuildInfo.packageName) && appSettings.value.appTheme === "dark") {
-      appSettings.value.appTheme = "default";
-      appSettings.update();
-    }
-
     if (!('files' in localStorage)) {
       localStorage.setItem('files', '[]');
     }
@@ -275,14 +271,6 @@ function runApp() {
       }
 
       return false;
-    }
-  });
-
-  app.addEventListener('touchstart', function (e) {
-    const el = e.target;
-
-    if (el instanceof HTMLElement && el.hasAttribute('vibrate')) {
-      if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
     }
   });
 
@@ -409,11 +397,11 @@ function App() {
     Acode.exec("toggle-quick-tools");
   };
 
-  window.restoreTheme();
-  $main.setAttribute("data-empty-msg", strings['no editor message']);
-
   //#region rendering
+  applySettings.beforeRender();
+  window.restoreTheme();
   root.append($header, $main, $footer, $headerToggler, $quickToolToggler);
+  applySettings.afterRender();
   //#endregion
 
   $fileMenu.addEventListener('click', handleMenu);
@@ -423,10 +411,6 @@ function App() {
   document.addEventListener('keydown', handleMainKeyDown);
   document.addEventListener('keyup', handleMainKeyUp);
 
-  if (appSettings.value.fullscreen)
-    Acode.exec("enable-fullscreen");
-
-  if (appSettings.value.quickTools) quickTools.actions("enable-quick-tools");
   window.beforeClose = saveState;
 
   loadFolders();
@@ -438,7 +422,6 @@ function App() {
 
       setTimeout(() => {
         app.classList.remove('loading', 'splash');
-        if (!appSettings.value.animation) app.classList.add('no-animation');
         onAppLoad();
       }, 500);
       //#region event listeners 
@@ -457,21 +440,6 @@ function App() {
       });
       document.addEventListener('resume', checkFiles);
       checkFiles();
-
-      const autoSave = parseInt(appSettings.value.autosave);
-      if (autoSave) {
-        saveInterval = setInterval(() => {
-          editorManager.files.map(file => {
-            if (
-              !file.readOnly &&
-              (file.fileUri || file.contentUri) &&
-              file.isUnsaved &&
-              !file.isSaving
-            ) Acode.exec("save", false);
-            return file;
-          });
-        }, autoSave);
-      }
     });
 
   editorManager.onupdate = function () {

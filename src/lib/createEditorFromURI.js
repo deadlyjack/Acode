@@ -44,6 +44,12 @@ function createEditorFromURI(uri, isContentUri, data = {}) {
                 location = Url.dirname(fileUri);
             }
         }
+
+        if (!fileUri && !contentUri) return;
+        const ext = helpers.extname(name);
+        if (appSettings.defaultSettings.filesNotAllowed.includes((ext || '').toLowerCase()))
+            return alert(strings.notice.toUpperCase(), `'${ext}' ${strings['file is not supported']}`);
+
         const settings = appSettings.value;
         const {
             cursorPos,

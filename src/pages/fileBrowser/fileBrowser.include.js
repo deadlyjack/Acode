@@ -128,38 +128,16 @@ function FileBrowserInclude(type, option) {
         const value = e.target.getAttribute('value');
         create(value);
       } else if (action === "add-path") {
-        dialogs.multiPrompt(strings["add path"], [{
-            id: "name",
-            placeholder: "Name",
-            type: "text",
-            required: true
-          }, {
-            id: "uri",
-            placeholder: "path",
-            type: "text",
-            required: true,
-            onclick: function () {
-              SDcard.getStorageAccessPermission("", res => {
-                this.value = res;
-              }, err => {
-                helpers.error(err);
-              });
-            }
-          }])
-          .then(values => {
-            const {
-              name,
-              uri
-            } = values;
-
-            customUuid.push({
-              name,
-              uri,
-              uuid: helpers.uuid()
-            });
+        util.addPath()
+          .then(res => {
+            customUuid.push(res);
             localStorage.customUuid = JSON.stringify(customUuid);
             navigate.pop();
             renderStorages();
+          })
+          .catch(err => {
+            helpers.error(err);
+            console.error(err);
           });
       }
     };
@@ -200,35 +178,26 @@ function FileBrowserInclude(type, option) {
     renderStorages();
 
     function renderStorages() {
-      // const list = [];
-      // const version = parseInt(device.version);
-      // if (version < 7) {
-      //   renderList(getStorageList());
-      // } else {
-      //   let storages;
-
-      //   externalFs.listStorages()
-      //     .then(res => {
-      //       storages = res;
-      //       if (!Array.isArray(res))
-      //         storages = [];
-
-      //       return getPermission([...storages]);
-      //     })
-      //     .then(res => {
-      //       storages.map(storage => {
-      //         util.pushFolder(list, storage.name, res[storage.uuid]);
-      //       });
-
-      //       list.push(...getStorageList());
-      //       renderList(list);
-      //     })
-      //     .catch(err => {
-      //       console.error(err);
-      //     });
-      // }
-
       renderList(getStorageList());
+
+      if (!localStorage.fileBrowserInit) {
+        externalFs.listStorages()
+          .then(res => {
+            if (Array.isArray(res))
+              util.addPath(res[0].name)
+              .then(res => {
+                customUuid.push(res);
+                localStorage.customUuid = JSON.stringify(customUuid);
+                navigate.pop();
+                renderStorages();
+              })
+              .catch(err => {
+                helpers.error(err);
+                console.error(err);
+              });
+          });
+        localStorage.fileBrowserInit = true;
+      }
     }
 
     function renderList(list) {
@@ -242,35 +211,6 @@ function FileBrowserInclude(type, option) {
       $page.settitle('File Browser');
       render(list);
     }
-
-    // function getPermission(uuidDataAr) {
-    //   const uuidUri = JSON.parse(localStorage.uuidUri || '{}');
-
-    //   return new Promise((resolve, reject) => {
-    //     (function get() {
-    //       const uuidData = uuidDataAr.pop();
-    //       if (uuidData) {
-    //         const {
-    //           uuid,
-    //           name
-    //         } = uuidData;
-    //         if (uuid in uuidUri) {
-    //           get(uuidDataAr);
-    //         } else {
-    //           externalFs.getStorageAccessPermission(uuid, name)
-    //             .then(res => {
-    //               uuidUri[uuid] = res;
-    //               get(uuidDataAr, resolve);
-    //             });
-    //         }
-    //       } else {
-    //         localStorage.uuidUri = JSON.stringify(uuidUri);
-    //         resolve(uuidUri);
-    //       }
-    //     })();
-    //   });
-
-    // }
 
     function resolve(data) {
       localStorage.setItem("lastDir", currentDir.url);

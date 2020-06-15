@@ -171,20 +171,29 @@ function actions(action) {
   }
 
   function enableQuickTools() {
-    let $row1 = $footer.querySelector('#row1');
-    if ($row1) return;
-    $row1 = tag.parse($_row1);
-    if ($footer.firstElementChild)
-      $footer.insertBefore($row1, $footer.firstElementChild);
+    if (root.hasAttribute('quicktools')) return; //Quicktools is already enabled
+
+    const quickToolsState = (parseInt(localStorage.quickToolsState) || 1);
+    const $row1 = tag.parse($_row1);
+    const $row2 = tag.parse($_row2);
+
+    if (quickToolsState == 2)
+      $footer.append($row1, $row2);
     else
       $footer.append($row1);
 
-    incFooterHeightBy(1);
+    root.setAttribute("quicktools", "enabled");
+    incFooterHeightBy(quickToolsState);
+    if (editorManager.activeFile && editorManager.activeFile.isUnsaved)
+      $row1.querySelector("[action='save']").classList.add('notice');
+
   }
 
   function disableQuickTools() {
+    const height = root.getAttribute('footer-height');
     let $row1 = $footer.querySelector('#row1');
     let $row2 = $footer.querySelector('#row2');
+    localStorage.quickToolsState = height;
     if ($row1) {
       $row1.remove();
       incFooterHeightBy(-1);
@@ -193,6 +202,8 @@ function actions(action) {
       $row2.remove();
       incFooterHeightBy(-1);
     }
+
+    root.removeAttribute("quicktools");
   }
 
   function removeRow2() {

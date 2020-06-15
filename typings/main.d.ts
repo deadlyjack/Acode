@@ -44,7 +44,8 @@ interface Settings {
     vibrateOnTap: boolean;
     fullscreen: boolean;
     smartCompletion: boolean;
-    floatingButtonActivation: "click" | "long tap"
+    floatingButtonActivation: "click" | "long tap",
+    disableFloatingButton: boolean
 }
 
 interface AppSettings {

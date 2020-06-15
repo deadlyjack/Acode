@@ -1,3 +1,12 @@
+version 1.1.14.112
+☞ Option to disable floating button
+☞ Remebers state of quicktools
+☞ Bugs fixes
+☞ UI improvement
+☞ Add any directory to explorer using SAF
+☞ Performance improvement
+☞ Smaller APK size
+
 version 1.1.14.111
 ☞ Bugs fixes
 ☞ UI improvement
