@@ -65,7 +65,7 @@
   "open folder": "Открыть папку",
   "open recent": "Открыть недавние",
   "ok": "Ок",
-  "overwrite": "затирать",
+  "overwrite": "затереть",
   "paste": "Вставить",
   "preview mode": "Режим предварительного просмотра",
   "read only file": "Файл открыт только для чтения",
@@ -79,7 +79,7 @@
   "saving": "Сохранение",
   "save as": "Сохранить как",
   "save file to run": "Сохраните файл для запуска в браузере",
-  "save here": "Сохранить здесь",
+  "save here": "Сохранить тут",
   "search": "Поиск",
   "see logs and errors": "Смотреть логи",
   "select folder": "Выбрать папку",
@@ -129,7 +129,7 @@
   "unsupported device": "Ваше устройство не поддерживает тему.",
   "vibrate on tap": "Вибрировать при нажатии",
   "copy command is not supported by ftp.": "Команда копирования не поддерживается в режиме FTP",
-  "support title": "Support Acode",
+  "support title": "Поддержи Acode",
   "support text": "Acode нуждается в вашей поддержке! Покажите свою поддержку, пожертвовав небольшую сумму в размере 3$",
   "exit fullscreen": "Выйти из полноэкранного режима",
   "fullscreen": "Полноэкранный режим",
@@ -138,8 +138,8 @@
   "restore": "Восстановить",
   "backup successful": "Резервная копия создана",
   "invalid backup file": "Не получилось создать резервную копию",
-  "backup file found": "Резервная копия найдена, восстановить?",
+  "backup file found": "Найдена резервная копия, восстановить?",
   "welcome back": "С возвращением!",
   "add path": "Добавить путь",
-  "disable floating button": "Disable floating button"
+  "disable floating button": "Отключить плавающую кнопку"
 }
