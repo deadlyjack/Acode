@@ -354,7 +354,7 @@ a {
         opacity: 0.6;
     }
 
-    &:not(.float):active {
+    &:not(.floating):active {
         transition: all 100ms ease;
         background-color: rgba(0, 0, 0, 0.2) !important;
     }
@@ -687,6 +687,9 @@ textarea {
     right: 10px;
     opacity: 0.2;
     box-sizing: border-box;
+    color: white;
+    color: var(--text-main-color);
+    transition: all 300ms ease;
 }
 
 #header-toggler {
