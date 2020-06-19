@@ -173,9 +173,11 @@ function actions(action) {
   function enableQuickTools() {
     if (root.hasAttribute('quicktools')) return; //Quicktools is already enabled
 
-    const quickToolsState = (parseInt(localStorage.quickToolsState) || 1);
+    let quickToolsState = (parseInt(localStorage.quickToolsState) || 1);
     const $row1 = tag.parse($_row1);
     const $row2 = tag.parse($_row2);
+
+    if (quickToolsState > 2) quickToolsState = 1;
 
     if (quickToolsState == 2)
       $footer.append($row1, $row2);
