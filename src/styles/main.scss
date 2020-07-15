@@ -115,7 +115,8 @@ a {
     background-color: var(--secondary-color);
     color: #252525;
     color: var(--text-color);
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 4px var(--box-shadow-color);
     height: fit-content;
     min-height: 30px;
     z-index: 999;
@@ -199,6 +200,7 @@ a {
         max-width: 600px;
         border-radius: 4px;
         box-shadow: rgba(0, 0, 0, 0.2);
+        box-shadow: var(--box-shadow-color);
         border: none;
         margin: 5px;
         box-sizing: border-box;
@@ -240,6 +242,58 @@ a {
         to {
             opacity: 1;
             transform: translate3d(0, 0, 0);
+        }
+    }
+}
+
+#file-info {
+    .name {
+        height: 40px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            opacity: 1;
+        }
+
+        .share-button {
+            background-color: var(--primary-button-background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 30px;
+            width: 95px;
+            margin-left: 5px;
+            border-radius: 20px;
+
+            * {
+                pointer-events: none;
+            }
+
+            .icon {
+                height: 30px;
+                margin-right: 10px;
+            }
+        }
+    }
+
+    >div {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+
+        >span:first-child {
+            font-size: 0.95rem;
+            opacity: 0.5;
+            margin-right: 10px;
+        }
+
+        >span:last-child {
+            max-width: 100%;
+            overflow: auto;
         }
     }
 }
@@ -414,6 +468,7 @@ footer {
             background-color: #39f !important;
             background-color: var(--primary-button-background-color) !important;
             box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 4px var(--box-shadow-color);
             border-radius: 4px;
 
             &:active {
@@ -445,6 +500,10 @@ footer {
         background-color: inherit;
         color: inherit;
 
+        * {
+            pointer-events: none;
+        }
+
         &.disabled {
             pointer-events: none;
             opacity: 0.6;
@@ -453,6 +512,7 @@ footer {
         &:active {
             transition: all 100ms ease;
             box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 0 4px var(--box-shadow-color);
         }
 
         &:disabled {
@@ -546,7 +606,8 @@ textarea {
     background-color: white;
     background-color: var(--text-main-color);
     z-index: 9;
-    box-shadow: 0 0 2px rgba($color: #000000, $alpha: 0.5);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 2px var(--box-shadow-color);
 
     &.end {
         border-radius: 0% 50% 50% 50%;
@@ -566,6 +627,7 @@ textarea {
     display: flex;
     border-radius: 4px;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 8px var(--box-shadow-color);
     z-index: 99;
     color: #252525;
     color: var(--text-color);

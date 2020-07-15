@@ -7,20 +7,20 @@ import Url from "../utils/Url";
 
 /**
  * 
- * @param {string} fileUri 
+ * @param {string} uri 
  * @returns {Promise<FileSystem>}
  */
-function fsOperation(fileUri) {
+function fsOperation(uri) {
 
   return new Promise((resolve, reject) => {
-    const protocol = Url.getProtocol(fileUri);
+    const protocol = Url.getProtocol(uri);
     if (protocol === 'file:') {
 
-      createInternalFsOperation(internalFs, fileUri, resolve);
+      createInternalFsOperation(internalFs, uri, resolve);
 
     } else if (protocol === "content:") {
 
-      createExternalFsOperation(externalFs, fileUri, resolve);
+      createExternalFsOperation(externalFs, uri, resolve);
 
     } else if (protocol === 'ftp:') {
 
@@ -30,7 +30,7 @@ function fsOperation(fileUri) {
         hostname,
         port,
         search
-      } = new URL(fileUri);
+      } = new URL(uri);
 
       let security, mode;
 
@@ -41,7 +41,7 @@ function fsOperation(fileUri) {
       }
 
       const fs = remoteFs(decodeURIComponent(username), decodeURIComponent(password), decodeURIComponent(hostname), port, security, mode);
-      createRemoteFsOperation(fs, fileUri, resolve);
+      createRemoteFsOperation(fs, uri, resolve);
 
     }
 
@@ -92,7 +92,8 @@ function fsOperation(fileUri) {
         newname = origin + path.join(parent, newname) + query;
         return fs.rename(url, newname);
       },
-      exists: () => fs.exists(url)
+      exists: () => fs.exists(url),
+      stats: () => fs.stats(url)
     });
 
   }
@@ -115,10 +116,12 @@ function fsOperation(fileUri) {
       copyTo: dest => fs.copyTo(dest),
       moveTo: dest => fs.moveTo(dest),
       renameTo: newname => fs.renameFile(url, newname),
-      exists: () => pathExist(url)
+      exists: () => fs.exists(url),
+      stats: () => fs.stats(url)
     });
 
   }
+
   /**
    * 
    * @param {ExternalFs} fs 
@@ -167,8 +170,8 @@ function fsOperation(fileUri) {
             else resolve(false);
           }, reject);
         });
-      }
-
+      },
+      stats: () => fs.stats(url)
     });
 
   }
@@ -204,21 +207,6 @@ function fsOperation(fileUri) {
           resolve(files);
         })
         .catch(reject);
-    });
-  }
-
-  /**
-   * 
-   * @param {Promise<Boolean>} url 
-   */
-  function pathExist(url) {
-    return new Promise((resolve, reject) => {
-      window.resolveLocalFileSystemURL(url, entry => {
-        resolve(true);
-      }, err => {
-        if (err.code === 1) resolve(false);
-        reject(err);
-      });
     });
   }
 

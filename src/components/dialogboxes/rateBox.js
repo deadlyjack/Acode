@@ -6,7 +6,7 @@ import helpers from '../../lib/utils/helpers';
 function rateBox() {
   const box = dialogs.box('Did you like the app?', template, strings.cancel)
     .onclick(onInteract)
-    .onhide(onhide);
+    .onhide(() => ++localStorage.count);
 
   function onInteract(e) {
     /**
@@ -26,11 +26,15 @@ function rateBox() {
     }
 
     setTimeout(() => {
-      if (val === 5) window.open(`https://play.google.com/store/apps/details?id=${BuildInfo.packageName}`, '_system');
-      else window.open(`mailto:${constants.FEEDBACK_EMAIL}?subject=feedback - Acode&body=<big>${getStars(val)}</big> <br> ${helpers.getFeedbackBody()}`, '_system');
+      if (val === 5) {
+        window.open(`https://play.google.com/store/apps/details?id=${BuildInfo.packageName}`, '_system');
+        localStorage.dontAskForRating = true;
+      } else {
+        window.open(`mailto:${constants.FEEDBACK_EMAIL}?subject=feedback - Acode&body=<big>${getStars(val)}</big> <br> ${helpers.getFeedbackBody()}`, '_system');
+      }
+      ++localStorage.count;
     }, 100);
 
-    localStorage.count = constants.RATING_TIME;
     box.hide();
   }
 
@@ -51,10 +55,6 @@ function rateBox() {
     }
 
     return str;
-  }
-
-  function onhide() {
-    localStorage.count = 0;
   }
 }
 

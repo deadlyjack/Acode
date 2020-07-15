@@ -37,7 +37,7 @@
   "file deleted": "फ़ाइल डिलीट कर दि गई है",
   "file is not supported": "फ़ाइल समर्थित नहीं है",
   "file not supported": "यह फ़ाइल प्रकार समर्थित नहीं है।",
-  "file too large": "संभाल करने के लिए फ़ाइल बड़ी है। अधिकतम फ़ाइल आकार की अनुमति है",
+  "file too large": "संभाल करने के लिए फ़ाइल बड़ी है। अधिकतम फ़ाइल आकार की अनुमति है {size}",
   "file renamed": "फ़ाइल का नाम बदल दिया गया है",
   "file saved": "फाइल सेव हो गया",
   "folder added": "फ़ोल्डर जोड़ा गया",
@@ -130,7 +130,7 @@
   "vibrate on tap": "Vibrate on tap",
   "copy command is not supported by ftp.": "Copy command is not supported by FTP.",
   "support title": "Support Acode",
-  "support text": "Acode needs your support! Show your support by donating a small amount as $3.",
+  "support text": "Acode needs your support! Show your support by donating a small amount as $5.",
   "exit fullscreen": "Exit fullscreen",
   "fullscreen": "fullscreen",
   "animation": "animation",
@@ -141,5 +141,14 @@
   "backup file found": "Backup file found, do you want to restore settings, key-bindings and ftp-accounts from backup file?",
   "welcome back": "Welcome back",
   "add path": "Add path",
-  "disable floating button": "Disable floating button"
+  "disable floating button": "Disable floating button",
+  "live autocompletion": "Live autocompletion",
+  "file properties": "File properties",
+  "path": "Path",
+  "type": "Type",
+  "word count": "Word count",
+  "line count": "Line count",
+  "last modified": "Last modified",
+  "size": "Size",
+  "share": "Share"
 }

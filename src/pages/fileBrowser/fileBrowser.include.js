@@ -14,11 +14,12 @@ import _list from './list.hbs';
 import _addMenu from './add-menu.hbs';
 import externalFs from '../../lib/fileSystem/externalFs';
 import fsOperation from '../../lib/fileSystem/fsOperation';
-import SearchBar from '../../components/searchbar';
+import searchBar from '../../components/searchbar';
 import projects from './projects';
 import decryptAccounts from '../ftp-accounts/decryptAccounts';
 import Url from '../../lib/utils/Url';
 import util from './util';
+import openFolder from '../../lib/openFolder';
 //#endregion
 /**
  * 
@@ -29,7 +30,10 @@ function FileBrowserInclude(type, option) {
   if (!type) type = 'file';
   const actionStack = window.actionStack;
   const prompt = dialogs.prompt;
+  /**@type {Array<{name: string, uuid: string, uri: string}>} */
   let customUuid = JSON.parse(localStorage.customUuid || '[]');
+  /**@type {Array<FTPAccount>} */
+  let ftpaccounts = JSON.parse(localStorage.ftpaccounts || '[]');
 
   return new Promise((_resolve, reject) => {
     //#region Declaration
@@ -144,7 +148,7 @@ function FileBrowserInclude(type, option) {
 
     $search.onclick = function () {
       const $list = $content.get("#list");
-      if ($list) SearchBar($list);
+      if ($list) searchBar($list);
     };
 
     $page.onhide = function () {
@@ -209,7 +213,9 @@ function FileBrowserInclude(type, option) {
       currentDir.url = "/";
       currentDir.name = "File Browser";
       $page.settitle('File Browser');
-      render(list);
+      render(helpers.sortDir(list,
+        appSettings.value.fileBrowser
+      ));
     }
 
     function resolve(data) {
@@ -227,38 +233,33 @@ function FileBrowserInclude(type, option) {
       util.pushFolder(list, 'Internal storage', path);
       customUuid.map(storage => {
         util.pushFolder(list, storage.name, storage.uri, {
-          closeable: {
-            uuid: storage.uuid
-          }
+          uuid: storage.uuid
         });
       });
 
-      let ftpaccounts;
-      try {
-        ftpaccounts = JSON.parse(localStorage.ftpaccounts);
-        if (Array.isArray(ftpaccounts)) {
-          ftpaccounts = decryptAccounts(ftpaccounts);
-          ftpaccounts.map(account => {
+      const _ftpaccounts = decryptAccounts(ftpaccounts);
+      _ftpaccounts.map(account => {
 
-            const {
-              mode,
-              security,
-              name
-            } = account;
+        const {
+          mode,
+          security,
+          name
+        } = account;
 
-            let url = Url.formate({
-              protocol: "ftp:",
-              ...account,
-              query: {
-                mode,
-                security
-              }
-            });
-            util.pushFolder(list, name, url);
+        let url = Url.formate({
+          protocol: "ftp:",
+          ...account,
+          query: {
+            mode,
+            security
+          }
+        });
+        util.pushFolder(list, name, url, {
+          uuid: account.id,
+          "ftp-account": true
+        });
 
-          });
-        }
-      } catch (error) {}
+      });
 
       if (type === "file") {
         util.pushFolder(list, "Select document", null, {
@@ -357,6 +358,8 @@ function FileBrowserInclude(type, option) {
       const url = $el.getAttribute('url');
       const name = $el.getAttribute('name');
       const opendoc = $el.getAttribute('open-doc');
+      const uuid = $el.getAttribute('uuid');
+      const isFTP = $el.hasAttribute('ftp-account');
 
       if (opendoc) action = "open-doc";
 
@@ -371,19 +374,6 @@ function FileBrowserInclude(type, option) {
         case "open-doc":
           openDoc();
           break;
-        case "remove-path":
-          removePath();
-          break;
-      }
-
-      function removePath() {
-        const uuid = $el.getAttribute("uuid");
-        if (Array.isArray(customUuid)) {
-          customUuid = customUuid.filter(storage => storage.uuid !== uuid);
-          localStorage.customUuid = JSON.stringify(customUuid);
-          navigate.pop();
-          renderStorages();
-        }
       }
 
       function folder() {
@@ -417,16 +407,17 @@ function FileBrowserInclude(type, option) {
       }
 
       function cmhandle() {
+        const enabled = (currentDir.url === "/" && !!uuid) || currentDir.url !== "/";
         navigator.vibrate(constants.VIBRATION_TIME);
         dialogs.select('', [
-            ['delete', strings.delete, 'delete'],
-            ['rename', strings.rename, 'edit']
+            ['delete', strings.delete, 'delete', enabled],
+            ['rename', strings.rename, 'edit', enabled]
           ])
           .then(res => {
 
             switch (res) {
               case 'delete':
-                dialogs.confirm(strings["delete {name}"].replace('{name}', name))
+                dialogs.confirm(strings.warning.toUpperCase(), strings["delete {name}"].replace('{name}', name))
                   .then(remove);
                 break;
               case 'rename':
@@ -442,13 +433,30 @@ function FileBrowserInclude(type, option) {
       }
 
       function rename(newname) {
+        if (uuid) {
+          renameStorage(newname);
+        } else {
+          renameFile(newname);
+        }
+      }
+
+      function remove() {
+        if (uuid) {
+          removeStorage();
+        } else {
+          removeFile();
+        }
+      }
+
+      function renameFile(newname) {
         fsOperation(url)
           .then(fs => {
             return fs.renameTo(newname);
           })
-          .then(() => {
-            updateAddedFolder(url);
+          .then(newUrl => {
+            openFolder.updateItem(url, newUrl, newname);
             window.plugins.toast.showShortBottom(strings.success);
+            delete cachedDir[currentDir.url]
             loadDir(currentDir);
           })
           .catch(err => {
@@ -457,15 +465,16 @@ function FileBrowserInclude(type, option) {
           });
       }
 
-      function remove() {
+      function removeFile() {
         fsOperation(url)
           .then(fs => {
             if (action === "file") return fs.deleteFile();
             if (action === "folder") return fs.deleteDir();
           })
           .then(() => {
-            updateAddedFolder(url);
+            openFolder.removeItem(url);
             window.plugins.toast.showShortBottom(strings.success);
+            delete cachedDir[currentDir.url];
             loadDir(currentDir);
           })
           .catch(err => {
@@ -474,9 +483,40 @@ function FileBrowserInclude(type, option) {
           });
       }
 
+      function removeStorage() {
+        if (isFTP) {
+          ftpaccounts = ftpaccounts.filter(account => account.id !== uuid);
+          localStorage.ftpaccounts = JSON.stringify(ftpaccounts);
+        } else {
+          customUuid = customUuid.filter(storage => storage.uuid !== uuid);
+          localStorage.customUuid = JSON.stringify(customUuid);
+        }
+
+        navigate.pop();
+        renderStorages();
+      }
+
+      function renameStorage(newname) {
+        if (isFTP) {
+          ftpaccounts = ftpaccounts.map(account => {
+            if (account.id === uuid) account.name = newname;
+            return account;
+          });
+          localStorage.ftpaccounts = JSON.stringify(ftpaccounts);
+        } else {
+          customUuid = customUuid.map(storage => {
+            if (storage.uuid === uuid) storage.name = newname;
+            return storage;
+          });
+          localStorage.customUuid = JSON.stringify(customUuid);
+        }
+
+        navigate.pop();
+        renderStorages();
+      }
+
       function openDoc() {
         SDcard.openDocumentFile(res => {
-          res.isContentUri = true;
           res.url = res.uri;
           resolve(res);
           $page.hide();

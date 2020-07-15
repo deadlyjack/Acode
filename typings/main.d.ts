@@ -45,7 +45,8 @@ interface Settings {
     fullscreen: boolean;
     smartCompletion: boolean;
     floatingButtonActivation: "click" | "long tap",
-    disableFloatingButton: boolean
+    disableFloatingButton: boolean,
+    liveAutoCompletion: boolean
 }
 
 interface AppSettings {
@@ -80,13 +81,12 @@ interface storedFiles {
 
 interface fileOptions {
     name: string;
-    dir: string;
+    uri: string;
 }
 
 interface newFileOptions {
-    contentUri?: string;
+    uri?: string;
     filename: string;
-    fileUri?: string;
     location?: string;
     text?: string;
     render?: boolean;
@@ -109,8 +109,7 @@ interface Controls {
 
 interface File {
     assocTile: HTMLElement;
-    contentUri: string;
-    fileUri: string;
+    uri: string;
     filename: string;
     id: string;
     isUnsaved: boolean;
@@ -122,9 +121,38 @@ interface File {
     session: AceAjax.IEditSession;
     editable: boolean;
     canWrite: boolean;
-    origin: string;
     uuid: string;
     onsave(this: File): void;
+}
+
+interface FileData {
+    canRead: boolean;
+    canWrite: boolean;
+    exists: boolean; //indicates if file can be found on device storage
+    isDirectory: boolean;
+    isFile: boolean;
+    isVirtual: boolean;
+    lastModified: number;
+    length: number;
+    name: string;
+    type: string;
+    uri: string;
+}
+
+interface OriginObject {
+    origin: string;
+    query: string;
+}
+
+interface URLObject {
+    url: string;
+    query: string;
+}
+
+
+interface fileData {
+    file: FileEntry;
+    data: ArrayBuffer;
 }
 
 interface ExternalFs {
@@ -136,17 +164,8 @@ interface ExternalFs {
     renameFile(src: string, newname: string): Promise<'SUCCESS'>;
     copy(src: string, dest: string): Promise<'SUCCESS'>;
     move(src: string, dest: string): Promise<'SUCCESS'>;
+    stats(src: string): Promise<FileData>;
     uuid: string;
-}
-
-interface OriginObject {
-    origin: string;
-    query: string;
-}
-
-interface URLObject {
-    url: string;
-    query: string;
 }
 
 interface RemoteFs {
@@ -161,13 +180,10 @@ interface RemoteFs {
     copyTo(src: string, dest: string): Promise;
     currentDirectory(): Promise<string>;
     homeDirectory(): Promise<string>;
+    stats(src: string): Promise<FileData>;
+    exists(): Promise<Boolean>;
     origin: string;
     originObjec: OriginObject;
-}
-
-interface fileData {
-    file: FileEntry;
-    data: ArrayBuffer;
 }
 
 interface InternalFs {
@@ -179,6 +195,8 @@ interface InternalFs {
     readFile(filename: string): Promise<fileData>;
     writeFile(filename: string, content: string, create: boolean, exclusive: boolean): Promise<void>;
     renameFile(src: string, newname: string): Promise<void>;
+    stats(src: string): Promise<FileData>;
+    exists(): Promise<Boolean>;
 }
 
 interface FsEntry {
@@ -192,7 +210,7 @@ interface FileSystem {
     readFile(): Promise<ArrayBuffer>;
     readFile(encoding: string): Promise<string>;
     writeFile(content: string): Promise<void>;
-    createFile(name: string): Promise<void>,
+    createFile(name: string, data: string): Promise<void>,
     createDirectory(name: string): Promise<void>;
     deleteFile(): Promise<void>;
     deleteDir(): Promise<void>;
@@ -200,6 +218,7 @@ interface FileSystem {
     moveTo(dset: string): Promise<void>;
     renameTo(newName: string): Promise<void>;
     exists(): Promise<Boolean>;
+    stats(): Promise<FileData>
 }
 
 interface externalStorageData {
@@ -261,7 +280,7 @@ interface GistRecord {
 
 interface Manager {
     addNewFile(filename: string, options: newFileOptions): File;
-    getFile(checkFor: string | number | Repo | Gist, type: "id" | "name" | "fileUri" | "contentUri" | "git" | "gist"): File;
+    getFile(checkFor: string | number | Repo | Gist, type: "id" | "name" | "uri" | "git" | "gist"): File;
     switchFile(id: string): void;
     removeFile(id: string | File, force: boolean): void;
     editor: AceAjax.Editor;

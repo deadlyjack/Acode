@@ -5,7 +5,7 @@ import helpers from '../lib/utils/helpers';
  * 
  * @param {HTMLUListElement|HTMLOListElement} list 
  */
-function SearchBar(list) {
+function searchBar(list) {
 
   const $searchInput = tag('input', {
     type: 'search',
@@ -77,4 +77,4 @@ function SearchBar(list) {
 
 }
 
-export default SearchBar;
+export default searchBar;

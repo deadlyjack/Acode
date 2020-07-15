@@ -10,5 +10,16 @@ window.system = {
   },
   disableFullScreen: function (onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, "System", "disable-fullscreen", []);
+  },
+  shareFile: function (fileUri, filename, onSuccess, onFail) {
+    if (typeof filename === "function") {
+      onSuccess = filename;
+      onFail = onSuccess;
+      filename = "";
+    }
+    cordova.exec(onSuccess, onFail, "System", "share-file", [fileUri, filename]);
+  },
+  sendEmail: function (subject, bodyText, bodyHTML, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, "System", "send-email", [subject, bodyText, bodyHTML]);
   }
 };

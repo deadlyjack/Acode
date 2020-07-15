@@ -23,6 +23,7 @@ export default {
           return this.basename(rootUri);
 
         if (docId.endsWith("/")) docId = docId.slice(0, -1);
+        docId = docId.split(":").pop();
         return this.pathname(docId).split('/').pop();
 
       } catch (error) {

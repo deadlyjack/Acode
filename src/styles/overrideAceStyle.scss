@@ -53,7 +53,8 @@ main .ace_editor {
         padding: 0;
         margin: 0;
         overflow: hidden;
-        box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 16px var(--box-shadow-color);
 
         >div:first-child {
             height: 25px !important;
@@ -79,7 +80,8 @@ main .ace_editor {
         color: #252525;
         color: var(--text-color);
 
-        box-shadow: 0 16px 16px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 16px 16px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 16px 16px var(--box-shadow-color);
         border: none;
 
         .ace_cursor {

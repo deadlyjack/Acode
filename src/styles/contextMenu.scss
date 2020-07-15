@@ -22,7 +22,8 @@ body.no-animation {
 
     background-color: white;
     background-color: var(--menu-background-color);
-    box-shadow: 0 0 4px rgba($color: #000000, $alpha: 0.5);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 4px var(--box-shadow-color);
     border-radius: 4px;
 
     transform-origin: top center;

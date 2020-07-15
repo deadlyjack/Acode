@@ -99,6 +99,11 @@ export default function editorSettings() {
             key: 'fullscreen',
             text: strings.fullscreen.capitalize(),
             checkbox: values.fullscreen
+        },
+        {
+            key: 'liveAutoCompletion',
+            text: strings["live autocompletion"].capitalize(),
+            checkbox: values.liveAutoCompletion
         }
     ];
 
@@ -286,6 +291,13 @@ export default function editorSettings() {
                 root.classList.toggle("disable-floating-button");
                 appSettings.update();
                 this.value = values.disableFloatingButton;
+                break;
+
+            case 'liveAutoCompletion':
+                values.liveAutoCompletion = !values.liveAutoCompletion;
+                editorManager.editor.setOption("enableLiveAutocompletion", values.liveAutoCompletion);
+                appSettings.update();
+                this.value = values.liveAutoCompletion;
                 break;
         }
     }

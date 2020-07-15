@@ -41,22 +41,22 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
             return clipboard.getText && clipboard.getText();
         },
         FILENAME: function (editor) {
-            return /[^/\\]*$/.exec(this.FILEPATH(editor))[0];
+            return editorManager.activeFile.name;
         },
         FILENAME_BASE: function (editor) {
-            return /[^/\\]*$/.exec(this.FILEPATH(editor))[0].replace(/\.[^.]*$/, "");
+            return editorManager.activeFile.name.replace(/\.[^.]*$/, "");
         },
         DIRECTORY: function (editor) {
             return this.FILEPATH(editor).replace(/[^/\\]*$/, "");
         },
         FILEPATH: function (editor) {
-            return "/not implemented.txt";
+            return editorManager.activeFile.uri;
         },
         WORKSPACE_NAME: function () {
             return "Unknown";
         },
         FULLNAME: function () {
-            return "Unknown";
+            return editorManager.activeFile.name;
         },
         BLOCK_COMMENT_START: function (editor) {
             var mode = editor.session.$mode || {};
@@ -195,7 +195,11 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                         onMatch: function (val, state, stack) {
                             var choices = val.slice(1, -1).replace(/\\[,|\\]|,/g, function (operator) {
                                 return operator.length == 2 ? operator[1] : "\x00";
-                            }).split("\x00");
+                            }).split("\x00").map(function (value) {
+                                return {
+                                    value: value
+                                };
+                            });
                             stack[0].choices = choices;
                             return [choices[0]];
                         },
@@ -967,18 +971,17 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
             this.selectedTabstop = ts;
             var range = ts.firstNonLinked || ts;
+            if (ts.choices) range.cursor = range.start;
             if (!this.editor.inVirtualSelectionMode) {
                 var sel = this.editor.multiSelect;
-                sel.toSingleRange(range.clone());
+                sel.toSingleRange(range);
                 for (var i = 0; i < ts.length; i++) {
                     if (ts.hasLinkedRanges && ts[i].linked)
                         continue;
                     sel.addRange(ts[i].clone(), true);
                 }
-                if (sel.ranges[0])
-                    sel.addRange(sel.ranges[0].clone());
             } else {
-                this.editor.selection.setRange(range);
+                this.editor.selection.fromOrientedRange(range);
             }
 
             this.editor.keyBinding.addKeyboardHandler(this.keyboardHandler);

@@ -1,7 +1,7 @@
 import internalFs from "./internalFs";
 import ftpCodes from "../ftpCodes";
 import Url from "../utils/Url";
-import path from "../utils/path";
+import mimeType from 'mime-types';
 
 /**
  * @param {string} username
@@ -33,6 +33,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
     exists,
     currentDirectory,
     homeDirectory,
+    stats,
     get origin() {
       return Url.formate({
         protocol: "ftp:",
@@ -92,15 +93,14 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function listDir(pathname) {
-    if (pathname !== fs.origin) pathname = Url.pathname(pathname);
-    else pathname = '';
     return new Promise((resolve, reject) => {
+      if (pathname !== fs.origin) pathname = Url.pathname(pathname);
+      else pathname = '';
       connect()
         .then(() => {
           ftp.ls(pathname, success, error);
 
           /**
-           * 
            * @param {Array<FTPFile>} list 
            */
           function success(list) {
@@ -127,6 +127,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
               ls.push({
                 size,
                 name,
+                modifiedDate: new Date(entry.modifiedDate).getTime(),
                 url: origin + url + query,
                 isDirectory: type === DIR,
                 isFile: type === FILE,
@@ -149,10 +150,10 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function writeFile(pathname, data) {
-    const cacheFile = CACHE_STORAGE_REMOTE + pathname.hashCode();
-    const originalPathname = pathname;
-    pathname = Url.pathname(pathname);
     return new Promise((resolve, reject) => {
+      const cacheFile = CACHE_STORAGE_REMOTE + pathname.hashCode();
+      const originalPathname = pathname;
+      pathname = Url.pathname(pathname);
 
       connect("write")
         .then(res => internalFs.writeFile(cacheFile, data, true, false))
@@ -180,7 +181,6 @@ function remoteFs(username, password, hostname, port, security, mode) {
           finish();
           reject(err);
         });
-
     });
 
     function finish() {
@@ -195,9 +195,9 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function deleteFile(pathname) {
-    const cacheFile = CACHE_STORAGE_REMOTE + pathname.hashCode();
-    pathname = Url.pathname(pathname);
     return new Promise((resolve, reject) => {
+      const cacheFile = CACHE_STORAGE_REMOTE + pathname.hashCode();
+      pathname = Url.pathname(pathname);
       connect()
         .then(res => {
           internalFs.deleteFile(cacheFile)
@@ -221,8 +221,8 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function deleteDir(pathname) {
-    pathname = Url.pathname(pathname);
     return new Promise((resolve, reject) => {
+      pathname = Url.pathname(pathname);
       connect()
         .then(res => {
           ftp.rmdir(pathname, success, error);
@@ -243,22 +243,20 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function readFile(pathname) {
-    const cacheFile = CACHE_STORAGE_REMOTE + pathname.hashCode();
-    pathname = Url.pathname(pathname);
     return new Promise((resolve, reject) => {
+      const cacheFile = CACHE_STORAGE_REMOTE + pathname.hashCode();
+      pathname = Url.pathname(pathname);
       connect("read")
         .then(res => {
           ftp.download(cacheFile, pathname, success, error);
 
           function success(res) {
-
             if (res === 1) {
               finish();
               internalFs.readFile(cacheFile)
                 .then(resolve)
                 .catch(reject);
             }
-
           }
 
           function error(err) {
@@ -283,11 +281,10 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function rename(pathname, newPathname) {
-    const originalNewPathName = newPathname;
-    pathname = Url.pathname(pathname);
-    newPathname = Url.pathname(newPathname);
-
     return new Promise((resolve, reject) => {
+      const originalNewPathName = newPathname;
+      pathname = Url.pathname(pathname);
+      newPathname = Url.pathname(newPathname);
       connect()
         .then(res => {
           ftp.rename(pathname, newPathname, success, error);
@@ -308,10 +305,9 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function createDir(pathname) {
-    const originalPathname = pathname;
-    pathname = Url.pathname(pathname);
     return new Promise((resolve, reject) => {
-
+      const originalPathname = pathname;
+      pathname = Url.pathname(pathname);
       connect()
         .then(res => {
           ftp.mkdir(pathname, success, error);
@@ -328,7 +324,6 @@ function remoteFs(username, password, hostname, port, security, mode) {
           }
         })
         .catch(reject);
-
     });
   }
 
@@ -337,8 +332,8 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 
   function exists(pathname) {
-    pathname = Url.pathname(pathname);
     return new Promise((resolve, reject) => {
+      pathname = Url.pathname(pathname);
       connect()
         .then(res => {
           ftp.exists(pathname, resolve, error);
@@ -397,6 +392,41 @@ function remoteFs(username, password, hostname, port, security, mode) {
           if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
           else reject(err);
         });
+    });
+  }
+
+  function stats(pathname) {
+    return new Promise((resolve, reject) => {
+      const parent = Url.dirname(pathname);
+      const filename = Url.basename(pathname);
+      if (!filename) return reject("Cannot get stats for given path.");
+
+      listDir(parent)
+        .then(res => {
+          let file = null;
+          for (let f of res) {
+            if (f.name === filename) {
+              file = f;
+              break;
+            }
+          }
+
+          if (!file) return reject("Cannot get stats for given path");
+          resolve({
+            name: file.name,
+            exists: true,
+            length: file.size,
+            isFile: file.isFile,
+            isDirectory: file.isDirectory,
+            isVirtual: file.isLink,
+            canWrite: true,
+            canRead: true,
+            modifiedDate: file.modifiedDate,
+            type: mimeType.lookup(filename),
+            uri: pathname
+          });
+        })
+        .catch(reject);
     });
   }
 }

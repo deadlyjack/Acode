@@ -62,7 +62,8 @@ class Settings {
             vibrateOnTap: true,
             fullscreen: false,
             floatingButtonActivation: "click",
-            disableFloatingButton: false
+            disableFloatingButton: false,
+            liveAutoCompletion: true
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;
@@ -95,7 +96,14 @@ class Settings {
                 if (this.onload) this.onload();
             }).catch(save);
     }
-    update(showToast = true) {
+    update(settings, showToast = true) {
+        if (typeof settings === "boolean") showToast = settings;
+        else if (typeof settings === "object") {
+            for (let key in settings) {
+                if (key in this.value) this.value[key] = settings[key];
+            }
+        }
+
         fs.writeFile(this.settingsFile, JSON.stringify(this.value, undefined, 4), true, false)
             .then(() => {
                 if (this.onsave) this.onsave();

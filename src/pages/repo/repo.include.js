@@ -12,7 +12,7 @@ import helpers from '../../lib/utils/helpers';
 import dialogs from '../../components/dialogs';
 import git from '../../lib/git';
 import contextMenu from '../../components/contextMenu';
-import SearchBar from '../../components/searchbar';
+import searchBar from '../../components/searchbar';
 
 export default function RepoInclude(owner, repoName) {
   const $page = Page(repoName);
@@ -255,7 +255,7 @@ export default function RepoInclude(owner, repoName) {
         break;
 
       case 'search':
-        SearchBar($content.get(".list"));
+        searchBar($content.get(".list"));
         break;
     }
 

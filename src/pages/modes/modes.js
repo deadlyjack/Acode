@@ -6,7 +6,7 @@ import Page from '../../components/page';
 import _template from './modes.hbs';
 import _list from './list.hbs';
 import './modes.scss';
-import SearchBar from '../../components/searchbar';
+import searchBar from '../../components/searchbar';
 //#endregion
 
 function Modes() {
@@ -45,7 +45,7 @@ function Modes() {
 
         $search.onclick = function () {
             const $list = $content.get("#list");
-            if ($list) SearchBar($list);
+            if ($list) searchBar($list);
         };
 
         $page.onhide = function () {
@@ -67,7 +67,7 @@ function Modes() {
             if (!action) return;
 
             if (action === "search") {
-                SearchBar($list);
+                searchBar($list);
             } else if (action === "select") {
                 const mode = $el.getAttribute('mode');
                 resolve(mode);

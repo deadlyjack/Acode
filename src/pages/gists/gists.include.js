@@ -13,7 +13,7 @@ import dialogs from '../../components/dialogs';
 import git from '../../lib/git';
 import GistFiles from '../gistFiles/gistFiles';
 import constants from '../../lib/constants';
-import SearchBar from '../../components/searchbar';
+import searchBar from '../../components/searchbar';
 
 function GistsInclude(callbackGists) {
   const $search = tag('span', {
@@ -49,7 +49,7 @@ function GistsInclude(callbackGists) {
   $cm.addEventListener('click', handleClick);
   $page.querySelector('header').append($search, $menuToggler);
   $search.onclick = () => {
-    SearchBar($page.querySelector('.list'));
+    searchBar($page.querySelector('.list'));
   };
 
   fs.readFile(gistsFile)

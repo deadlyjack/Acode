@@ -4,8 +4,8 @@ import runPreview from "./runPreview";
 
 import settingsMain from '../pages/settings/mainSettings';
 import dialogs from '../components/dialogs';
-import createEditorFromURI from "../lib/createEditorFromURI";
-import openFolder from "../lib/addFolder";
+import openFile from "./openFile";
+import openFolder from "./openFolder";
 import helpers from "../lib/utils/helpers";
 import constants from "./constants";
 import GithubLogin from "../pages/login/login";
@@ -20,6 +20,7 @@ import FTPAccounts from "../pages/ftp-accounts/ftp-accounts";
 import FileBrowser from "../pages/fileBrowser/fileBrowser";
 import Url from "./utils/Url";
 import path from "./utils/path";
+import showFileInfo from "./showFileInfo";
 
 const commands = {
   "console": function () {
@@ -75,6 +76,7 @@ const commands = {
   "ftp": function () {
     FTPAccounts();
   },
+  "file-info": showFileInfo,
   "github": function () {
     if ((!localStorage.username || !localStorage.password) && !localStorage.token)
       return GithubLogin();
@@ -137,16 +139,14 @@ const commands = {
       .then(res => {
         const {
           url,
-          isContentUri,
           filename
         } = res;
 
         const createOption = {
-          fileUri: isContentUri ? null : url,
-          contentUri: isContentUri ? url : null,
+          uri: url,
           name: filename
         };
-        createEditorFromURI(createOption, undefined);
+        openFile(createOption);
       })
       .catch(err => {
         if (err.code) {
@@ -210,7 +210,7 @@ const commands = {
     recents.select()
       .then(res => {
         if (res.type === 'file') {
-          createEditorFromURI(res.val);
+          openFile(res.val);
         } else if (res.type === 'dir') {
           openFolder(res.val.url, res.val.opts);
         } else if (res === 'clear') {
@@ -229,19 +229,17 @@ const commands = {
       .then(newname => {
         if (!newname || newname === file.filename) return;
         newname = helpers.removeLineBreaks(newname);
-        const uri = file.fileUri || file.contentUri;
+        const uri = file.uri;
         if (uri) {
           fsOperation(uri)
             .then(fs => {
               return fs.renameTo(newname);
             })
             .then((newUri) => {
-              if (file.contentUri)
-                file.contentUri = newUri;
+              file.uri = newUri;
+              file.filename = newname;
 
               openFolder.updateItem(uri, newUri, newname);
-
-              file.filename = newname;
               window.plugins.toast.showShortBottom(strings['file renamed']);
             })
             .catch(err => {

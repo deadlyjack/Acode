@@ -1,4 +1,5 @@
 import quickTools from "./handlers/quickTools";
+import constants from "./constants";
 
 export default {
   beforeRender() {
@@ -36,7 +37,7 @@ export default {
         editorManager.files.map(file => {
           if (
             !file.readOnly &&
-            (file.fileUri || file.contentUri) &&
+            file.uri &&
             file.isUnsaved &&
             !file.isSaving
           ) Acode.exec("save", false);
@@ -46,7 +47,6 @@ export default {
     }
   },
   afterRender() {
-
     //quick-tools
     if (appSettings.value.quickTools)
       quickTools.actions("enable-quick-tools");

@@ -15,7 +15,9 @@ export default function AboutInclude() {
         const $content = tag.parse(mustache.render(_template, {
             ...BuildInfo,
             webview,
-            PERSONAL_EMAIL: constants.PERSONAL_EMAIL
+            PERSONAL_EMAIL: constants.PERSONAL_EMAIL,
+            PAYPAL: constants.PAYPAL,
+            PATREON: constants.PATREON
         }));
         actionStack.push({
             id: 'about',

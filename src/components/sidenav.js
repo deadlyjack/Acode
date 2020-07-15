@@ -1,5 +1,5 @@
 import tag from 'html-tag-js';
-import openFolder from '../lib/addFolder';
+import openFolder from '../lib/openFolder';
 
 /**
  * @typedef {object} SideBar

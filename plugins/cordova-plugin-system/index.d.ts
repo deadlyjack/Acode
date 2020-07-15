@@ -7,6 +7,7 @@ interface Info {
 interface System {
   getWebviewInfo(): Info;
   clearCache(): void;
+  shareFile(fileUri: String, onSuccess: () => void, onFail: () => object): void;
 }
 
-declare var syste: System;
+declare var system: System;

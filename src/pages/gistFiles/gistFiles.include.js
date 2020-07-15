@@ -11,7 +11,7 @@ import dialogs from '../../components/dialogs';
 import Gists from '../gists/gists';
 import git from '../../lib/git';
 import constants from '../../lib/constants';
-import SearchBar from '../../components/searchbar';
+import searchBar from '../../components/searchbar';
 
 /**
  * 
@@ -59,7 +59,7 @@ function GistFilesInclude(gist) {
   $page.querySelector('header').append($search, $menuToggler);
   app.appendChild($page);
   $search.onclick = () => {
-    SearchBar($page.querySelector('.list'));
+    searchBar($page.querySelector('.list'));
   };
 
   actionStack.push({

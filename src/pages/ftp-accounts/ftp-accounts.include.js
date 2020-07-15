@@ -7,10 +7,10 @@ import _template from './ftp-accounts.hbs';
 import _list from './list.hbs';
 import './ftp-accounts.scss';
 
-import SearchBar from '../../components/searchbar';
+import searchBar from '../../components/searchbar';
 import dialogs from '../../components/dialogs';
 import remoteFs from '../../lib/fileSystem/remoteFs';
-import openFolder from '../../lib/addFolder';
+import openFolder from '../../lib/openFolder';
 import _decryptAccounts from './decryptAccounts';
 import Url from '../../lib/utils/Url';
 
@@ -35,7 +35,7 @@ function FTPAccountsInclude() {
   $content.addEventListener('click', handleClick);
   $page.querySelector('header').append($search);
   $search.onclick = () => {
-    SearchBar($page.querySelector('.list'));
+    searchBar($page.querySelector('.list'));
   };
 
 

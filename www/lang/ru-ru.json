@@ -37,7 +37,7 @@
   "file deleted": "Файл удален",
   "file is not supported": "Файл не поддерживается",
   "file not supported": "Тип файла не поддерживается.",
-  "file too large": "Файл слишком большой. Допустимый размер",
+  "file too large": "Файл слишком большой. Допустимый размер {size}",
   "file renamed": "Файл переименован",
   "file saved": "Файл сохранен",
   "folder added": "Папка добавлена",
@@ -141,5 +141,14 @@
   "backup file found": "Найдена резервная копия, восстановить?",
   "welcome back": "С возвращением!",
   "add path": "Добавить путь",
-  "disable floating button": "Отключить плавающую кнопку"
+  "disable floating button": "Отключить плавающую кнопку",
+  "live autocompletion": "Live autocompletion",
+  "file properties": "File properties",
+  "path": "Path",
+  "type": "Type",
+  "word count": "Word count",
+  "line count": "Line count",
+  "last modified": "Last modified",
+  "size": "Size",
+  "share": "Share"
 }

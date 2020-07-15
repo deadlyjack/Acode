@@ -37,7 +37,7 @@
   "file deleted": "fichier éffacé",
   "file is not supported": "fichier non supporté",
   "file not supported": "Type de fichier non supporté.",
-  "file too large": "Fichier trop volumineux. La taille maximale autorisée est",
+  "file too large": "Fichier trop volumineux. La taille maximale autorisée est {size}",
   "file renamed": "fichier renommé",
   "file saved": "fichier sauvgardé",
   "folder added": "dossier ajouté",
@@ -129,7 +129,7 @@
   "vibrate on tap": "Vibrations",
   "copy command is not supported by ftp.": "Copier non supporté en FTP.",
   "support title": "Support Acode",
-  "support text": "Acode needs your support! Show your support by donating a small amount as $3.",
+  "support text": "Acode needs your support! Show your support by donating a small amount as $5.",
   "exit fullscreen": "Exit fullscreen",
   "fullscreen": "fullscreen",
   "animation": "animation",
@@ -140,5 +140,14 @@
   "backup file found": "Backup file found, do you want to restore settings, key-bindings and ftp-accounts from backup file?",
   "welcome back": "Welcome back",
   "add path": "Add path",
-  "disable floating button": "Disable floating button"
+  "disable floating button": "Disable floating button",
+  "live autocompletion": "Live autocompletion",
+  "file properties": "File properties",
+  "path": "Path",
+  "type": "Type",
+  "word count": "Word count",
+  "line count": "Line count",
+  "last modified": "Last modified",
+  "size": "Size",
+  "share": "Share"
 }

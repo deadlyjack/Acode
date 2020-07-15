@@ -37,7 +37,7 @@
   "file deleted": "Dosya silindi",
   "file is not supported": "Dosya desteklenmiyor",
   "file not supported": "Bu dosya türü desteklenmiyor",
-  "file too large": "Dosya çok büyük. İzin verilen maksimum dosya boyutu",
+  "file too large": "Dosya çok büyük. İzin verilen maksimum dosya boyutu {size}",
   "file renamed": "Dosya yeniden adlandırıldı",
   "file saved": "Dosya kaydedildi",
   "folder added": "Klasör eklendi",
@@ -129,7 +129,7 @@
   "vibrate on tap": "Vibrate on tap",
   "copy command is not supported by ftp.": "Copy command is not supported by FTP.",
   "support title": "Support Acode",
-  "support text": "Acode needs your support! Show your support by donating a small amount as $3.",
+  "support text": "Acode needs your support! Show your support by donating a small amount as $5.",
   "exit fullscreen": "Exit fullscreen",
   "fullscreen": "fullscreen",
   "animation": "animation",
@@ -140,5 +140,14 @@
   "backup file found": "Backup file found, do you want to restore settings, key-bindings and ftp-accounts from backup file?",
   "welcome back": "Welcome back",
   "add path": "Add path",
-  "disable floating button": "Disable floating button"
+  "disable floating button": "Disable floating button",
+  "live autocompletion": "Live autocompletion",
+  "file properties": "File properties",
+  "path": "Path",
+  "type": "Type",
+  "word count": "Word count",
+  "line count": "Line count",
+  "last modified": "Last modified",
+  "size": "Size",
+  "share": "Share"
 }

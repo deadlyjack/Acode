@@ -20,6 +20,25 @@
 -->
 # Release Notes
 
+### 2.4.3 (Jun 19, 2019)
+
+-   docs: Improved documentation and removed text that implies iOS only ([#130](https://github.com/apache/cordova-plugin-statusbar/issues/130)) ([`33e410a`](https://github.com/apache/cordova-plugin-statusbar/commit/33e410a), [`14b1513`](https://github.com/apache/cordova-plugin-statusbar/commit/14b1513))
+-   docs: Alpha example doesn't match description ([#100](https://github.com/apache/cordova-plugin-statusbar/issues/100)) ([`5b77cae`](https://github.com/apache/cordova-plugin-statusbar/commit/5b77cae), [`9b5baa2`](https://github.com/apache/cordova-plugin-statusbar/commit/9b5baa2))
+-   chore(types): remove version from types ([`fade76b`](https://github.com/apache/cordova-plugin-statusbar/commit/fade76b))
+-   chore: fix github issues link ([`288bd71`](https://github.com/apache/cordova-plugin-statusbar/commit/288bd71))
+-   docs: remove outdated translations ([`8dacefa`](https://github.com/apache/cordova-plugin-statusbar/commit/8dacefa))
+-   build: add `.npmignore` to remove unneeded files from npm package ([`84081de`](https://github.com/apache/cordova-plugin-statusbar/commit/84081de))
+-   build: add `.gitattributes` to force LF (instead of possible CRLF on Windows) ([`da6c2a8`](https://github.com/apache/cordova-plugin-statusbar/commit/da6c2a8))
+-   ci(travis): Update Travis CI configuration for new paramedic ([#139](https://github.com/apache/cordova-plugin-statusbar/issues/139)) ([`a538bfe`](https://github.com/apache/cordova-plugin-statusbar/commit/a538bfe))
+-   feat: update typings ([#132](https://github.com/apache/cordova-plugin-statusbar/issues/132)) ([`003fa61`](https://github.com/apache/cordova-plugin-statusbar/commit/003fa61))
+-   chore: drop Node.js v4 support ([#124](https://github.com/apache/cordova-plugin-statusbar/issues/124)) ([`a07612a`](https://github.com/apache/cordova-plugin-statusbar/commit/a07612a))
+-   chore(github): Add or update GitHub pull request and issue template ([`727eea3`](https://github.com/apache/cordova-plugin-statusbar/commit/727eea3))
+-   docs: remove JIRA link ([`adcee9f`](https://github.com/apache/cordova-plugin-statusbar/commit/adcee9f))
+-   ci(travis): also accept terms for android sdk `android-27` ([`c8a13b8`](https://github.com/apache/cordova-plugin-statusbar/commit/c8a13b8))
+-   docs: remove second title headline ([`ecf8ccd`](https://github.com/apache/cordova-plugin-statusbar/commit/ecf8ccd))
+-   docs: Add Android overlay support to README ([#97](https://github.com/apache/cordova-plugin-statusbar/issues/97)) ([`e0256b2`](https://github.com/apache/cordova-plugin-statusbar/commit/e0256b2), [`053a902`](https://github.com/apache/cordova-plugin-statusbar/commit/053a902))
+
+
 ### 2.4.2 (Apr 12, 2018)
 * [CB-12679](https://issues.apache.org/jira/browse/CB-12679) Remove Permissions section
 

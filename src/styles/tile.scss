@@ -7,6 +7,7 @@ header {
         background-color: #9999ff;
         background-color: var(--primary-color);
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px var(--box-shadow-color);
         color: white;
         color: var(--text-main-color);
 

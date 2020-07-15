@@ -37,7 +37,7 @@
   "file deleted": "檔案已刪除",
   "file is not supported": "檔案不支持",
   "file not supported": "不支持此檔案格式",
-  "file too large": "檔案過大，無法處理，最大的檔案大小為 ",
+  "file too large": "檔案過大，無法處理，最大的檔案大小為 {size}",
   "file renamed": "檔案重新命名",
   "file saved": "檔案已儲存",
   "folder added": "資料夾已建立",
@@ -141,5 +141,14 @@
   "backup file found": "備份檔案已找到，你是否需要從備份檔案恢復檔案的設定、鍵綁定以及 FTP 帳戶？",
   "welcome back": "歡迎你再次開啟 Acode！",
   "add path": "建立檔案路徑",
-  "disable floating button": "隱藏懸浮按鈕"
+  "disable floating button": "隱藏懸浮按鈕",
+  "live autocompletion": "Live autocompletion",
+  "file properties": "File properties",
+  "path": "Path",
+  "type": "Type",
+  "word count": "Word count",
+  "line count": "Line count",
+  "last modified": "Last modified",
+  "size": "Size",
+  "share": "Share"
 }

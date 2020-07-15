@@ -8,7 +8,7 @@ const recents = {
   MAX: 10,
   /**
    * 
-   * @param {File} file 
+   * @param {string} file 
    */
   addFile(file) {
 

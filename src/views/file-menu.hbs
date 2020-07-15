@@ -1,3 +1,8 @@
+<li action="file-info" {{^file_info}}class="disabled" {{/file_info}}>
+  <span class="text">{{file properties}}</span>
+  <span class="icon info"></span>
+</li>
+<hr>
 <li action="rename">
   <span class="text">{{rename}}</span>
 </li>
@@ -32,10 +37,6 @@
   <span class="text">{{goto}}</span>
   <span class="icon subdirectory_arrow_left"></span>
 </li>
-<!-- <li action="find">
-  <span class="text">{{search}}</span>
-  <span class="icon search"></span>
-</li> -->
 <hr>
 <li action="cut">
   <div class="text">

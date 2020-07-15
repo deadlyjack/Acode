@@ -13,7 +13,6 @@ import fsOperation from './fileSystem/fsOperation';
 import path from './utils/path';
 import Url from './utils/Url';
 
-//TODO: not working for external fs
 
 /**
  * Starts the server and run the active file in browser
@@ -42,8 +41,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     pathName = activeFile.location;
     extension = helpers.extname(filename);
 
-    if (!pathName && activeFile.contentUri) {
-      pathName = Url.dirname(activeFile.contentUri);
+    if (!pathName && activeFile.uri) {
+      pathName = Url.dirname(activeFile.uri);
     }
   }
 
@@ -176,6 +175,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
       function sendAccToExt() {
         switch (ext) {
+          case 'htm':
           case 'html':
             if (isConsole) {
               const doc = mustache.render($_console, {
@@ -206,7 +206,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
           default:
             if (activeFile && activeFile.type === 'git') {
-              const uri = CACHE_STORAGE + activeFile.record.sha + encodeURIComponent(reqPath) + '.' + ext;
+              const id = activeFile.record.sha + encodeURIComponent(reqPath);
+              const uri = CACHE_STORAGE + id.hashCode() + "." + ext;
 
               window.resolveLocalFileSystemURL(uri, () => {
                 sendFile(uri, req.requestId);
@@ -225,7 +226,6 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
                         });
                     })
                     .catch(err => {
-                      console.log(err);
                       error(req.requestId);
                     });
                 } else {
@@ -235,8 +235,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
             } else {
               if (pathName) {
                 const url = Url.join(pathName, reqPath);
-                const file = editorManager.getFile(url, "fileUri") ||
-                  editorManager.getFile(url, "contentUri");
+                const file = editorManager.getFile(url, "uri");
                 if (file && file.isUnsaved) {
                   sendText(file.session.getValue(), req.requestId, mimeType.lookup(file.filename));
                 } else {
@@ -273,7 +272,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
   function error(id) {
     webserver.sendResponse(id, {
-      status: 404
+      status: 404,
+      body: "File not found!"
     });
   }
 
@@ -373,19 +373,12 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function openBrowser() {
-
-    let count = parseInt(localStorage.count);
-    if (count < constants.RATING_TIME) {
-      localStorage.count = ++count;
-    }
-
     const theme = appSettings.value.appTheme;
     const themeData = constants.appThemeList[theme];
     const themeColor = themeData.primary.toUpperCase();
     const color = (themeData.type === "dark" || theme === "default") ? "#ffffff" : "#313131";
     const options = `background=${isConsole?"#313131":'#ffffff'},location=${isConsole?'no':'yes'},hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
     cordova.InAppBrowser.open(`http://localhost:${port}/` + filename, target, options);
-
   }
 
   function checkFile(reqPath) {

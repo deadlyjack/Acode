@@ -1,5 +1,4 @@
 export default {
-
   "421": "Service not available, closing control connection. This may be a reply to any command if the service knows it must shut down.",
   "425": "Can't open data connection.",
   "426": "Connection closed; transfer aborted.",
@@ -24,5 +23,4 @@ export default {
   "10061": "Cannot connect to remote server. The connection is actively refused by the server.",
   "10066": "Directory not empty.",
   "10068": "Too many users, server is full."
-
 };

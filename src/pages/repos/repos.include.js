@@ -12,7 +12,7 @@ import contextMenu from '../../components/contextMenu';
 import fs from '../../lib/fileSystem/internalFs';
 import dialogs from '../../components/dialogs';
 import git from '../../lib/git';
-import SearchBar from '../../components/searchbar';
+import searchBar from '../../components/searchbar';
 
 function ReposInclude() {
   const $search = tag('span', {
@@ -48,7 +48,7 @@ function ReposInclude() {
   $cm.addEventListener('click', handleClick);
   $page.querySelector('header').append($search, $menuToggler);
   $search.onclick = () => {
-    SearchBar($page.querySelector('#repos'));
+    searchBar($page.querySelector('#repos'));
   };
 
   dialogs.loader.create('GitHub', strings.loading + '...');

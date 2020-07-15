@@ -25,7 +25,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
     cancle
   };
 
-  let cancelBtn;
+  let cancelBtn, hideButton = typeof hideButtonText === "boolean" ? hideButtonText : false;
 
   if (cancelButtonText) {
     cancelBtn = tag('button', {
@@ -56,17 +56,20 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
         className: 'title',
         textContent: titleText
       }),
-      body,
-      tag('div', {
-        className: 'button-container',
-        children: cancelBtn ? [cancelBtn, okBtn] : [okBtn]
-      })
+      body
     ]
   });
   const mask = tag('span', {
     className: 'mask',
     onclick: _hide
   });
+
+  if (!hideButton) {
+    box.append(tag('div', {
+      className: 'button-container',
+      children: cancelBtn ? [cancelBtn, okBtn] : [okBtn]
+    }));
+  }
 
   setTimeout(() => {
     decTime();

@@ -42,10 +42,8 @@ export default {
   createFile(parent, filename, data) {
     return new Promise((resolve, reject) => {
       SDcard.createFile(parent, filename, res => {
-        if (data) {
-          if (!parent.endsWith("/")) parent += '/';
-          return SDcard.write(parent + filename, data, res => resolve(res), err => reject(err));
-        }
+        if (data)
+          return SDcard.write(res, data, () => resolve(res), err => reject(err));
         resolve(res);
       }, err => reject(err));
     });
@@ -113,6 +111,17 @@ export default {
   getPath(uri, filename) {
     return new Promise((resolve, reject) => {
       SDcard.getPath(uri, filename, resolve, reject);
+    });
+  },
+
+  stats(uri) {
+    return new Promise((resolve, reject) => {
+      SDcard.formatUri(uri, res => {
+        SDcard.stats(uri, stats => {
+          stats.uri = res;
+          resolve(stats);
+        }, reject);
+      }, reject);
     });
   }
 

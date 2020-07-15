@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-statusbar-tests",
-  "version": "2.2.3-dev",
+  "version": "2.4.3",
   "description": "",
   "cordova": {
     "id": "cordova-plugin-statusbar-tests",

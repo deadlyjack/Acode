@@ -1,17 +1,15 @@
 import Page from "../../components/page";
 import dialogs from "../../components/dialogs";
 import tag from 'html-tag-js';
-import searchSettings from "./searchSettings";
 import gen from "../../components/gen";
-import themeSettings from "./themeSettings";
 import About from "../about/about";
 import editorSettings from "./editorSettings";
 import constants from "../../lib/constants";
 import helpers from "../../lib/utils/helpers";
-import createEditorFromURI from "../../lib/createEditorFromURI";
+import openFile from "../../lib/openFile";
 import internalFs from "../../lib/fileSystem/internalFs";
 import backupRestore from "./backup-restore";
-import fsOperation from "../../lib/fileSystem/fsOperation";
+import themeSetting from "../themeSetting/themeSetting";
 
 export default function settingsMain(demo) {
     const value = appSettings.value;
@@ -29,7 +27,7 @@ export default function settingsMain(demo) {
             action: 'edit-settings'
         },
         onclick: () => {
-            createEditorFromURI(appSettings.settingsFile, {
+            openFile(appSettings.settingsFile, {
                 text: JSON.stringify(appSettings.value, undefined, 4),
                 render: true
             });
@@ -69,10 +67,6 @@ export default function settingsMain(demo) {
             key: 'theme',
             text: strings.theme,
             icon: 'color_lenspalette'
-        }, {
-            key: 'search',
-            text: strings.search,
-            icon: 'search'
         }, {
             key: 'about',
             text: strings.about,
@@ -118,12 +112,8 @@ export default function settingsMain(demo) {
                 editorSettings();
                 break;
 
-            case 'search':
-                searchSettings();
-                break;
-
             case 'theme':
-                themeSettings();
+                themeSetting();
                 break;
 
             case 'about':
@@ -142,7 +132,7 @@ export default function settingsMain(demo) {
                     .then(res => {
                         if (res === 'edit') {
                             $page.hide();
-                            createEditorFromURI(KEYBINDING_FILE);
+                            openFile(KEYBINDING_FILE);
                         } else {
                             helpers.resetKeyBindings();
                         }

@@ -10,20 +10,18 @@ import constants from "../../lib/constants";
 export default function backupRestore() {
     const rootDir = cordova.file.externalRootDirectory;
     const backupFile = constants.BACKUP_FILE;
-    const page = Page(strings.backup.capitalize() + '/' + strings.restore.capitalize());
+    const $page = Page(strings.backup.capitalize() + '/' + strings.restore.capitalize());
     const settingsList = tag('div', {
         className: 'main list'
     });
 
     actionStack.push({
         id: 'backup-restore',
-        action: page.hide
+        action: $page.hide
     });
-    page.onhide = function () {
+    $page.onhide = function () {
         actionStack.remove('backup-restore');
     };
-
-    const values = appSettings.value.search;
 
     const settingsOptions = [{
             key: 'backup',
@@ -38,6 +36,9 @@ export default function backupRestore() {
     ];
 
     gen.listItems(settingsList, settingsOptions, changeSetting);
+
+    $page.appendChild(settingsList);
+    document.body.append($page);
 
     function changeSetting() {
 
@@ -101,9 +102,6 @@ export default function backupRestore() {
         }, helpers.error, "application/octet-stream");
 
     }
-
-    page.appendChild(settingsList);
-    document.body.append(page);
 }
 
 backupRestore.restore = function (url) {
@@ -119,12 +117,12 @@ backupRestore.restore = function (url) {
 
                 fsOperation(window.KEYBINDING_FILE)
                     .then(fs => {
-                        return fs.writeFile(JSON.stringify(backup.keyBindings));
+                        return fs.writeFile(JSON.stringify(backup.keyBindings, undefined, 2));
                     })
                     .then(() => {
                         localStorage.modeassoc = JSON.stringify(backup.modes || {});
                         localStorage.ftpaccounts = JSON.stringify(backup.ftpaccounts);
-                        return internalFs.writeFile(appSettings.settingsFile, JSON.stringify(backup.settings), true, false);
+                        return internalFs.writeFile(appSettings.settingsFile, JSON.stringify(backup.settings, undefined, 2), true, false);
                     })
                     .then(() => {
                         location.reload();

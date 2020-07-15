@@ -16,7 +16,7 @@ function saveFile(file, as = false, showToast = true) {
     beautifyFile();
 
     let newFile = false;
-    if (file.type === 'regular' && !file.location && !file.contentUri) newFile = true;
+    if (file.type === 'regular' && !file.location) newFile = true;
 
     if (!as && !newFile) {
 
@@ -71,7 +71,7 @@ function saveFile(file, as = false, showToast = true) {
                     if (err) dialogs.alert(strings.error, err.toString());
                     else window.plugins.toast.showShortBottom(strings.error);
                 });
-        } else if (file.fileUri || file.contentUri) {
+        } else if (file.uri) {
             save();
         }
 
@@ -146,10 +146,7 @@ function saveFile(file, as = false, showToast = true) {
     function save(url, filename) {
         const data = file.session.getValue();
         let createFile = false || as;
-        if (url) {
-            file.type = 'regular';
-            file.location = url;
-        }
+
         if (filename) {
             if (filename.overwrite) {
                 filename = filename.filename;
@@ -165,18 +162,16 @@ function saveFile(file, as = false, showToast = true) {
         file.isSaving = true;
         if (createFile) {
 
-            fsOperation(file.location)
+            fsOperation(url)
                 .then(fs => {
-                    return fs.createFile(file.filename);
+                    return fs.createFile(file.filename, data);
                 })
-                .then(() => {
-                    return fsOperation(file.fileUri);
-                })
-                .then(fs => {
-                    return fs.writeFile(data);
-                })
-                .then(() => {
-                    return updateFile();
+                .then(url => {
+                    file.type = 'regular';
+                    file.uri = url;
+                    editorManager.setSubText(file);
+                    recents.addFile(url);
+                    updateFile();
                 })
                 .catch(error)
                 .finally(() => {
@@ -185,12 +180,12 @@ function saveFile(file, as = false, showToast = true) {
 
         } else {
 
-            fsOperation(file.fileUri || file.contentUri)
+            fsOperation(file.uri)
                 .then(fs => {
                     return fs.writeFile(data);
                 })
                 .then(() => {
-                    return updateFile();
+                    updateFile();
                 })
                 .catch(error)
                 .finally(() => {
@@ -235,13 +230,13 @@ function saveFile(file, as = false, showToast = true) {
             }
 
             if (window.saveTimeout) clearTimeout(window.saveTimeout);
-            if (file.id === constants.DEFAULT_SESSION) file.id = helpers.uuid();
+            if (file.id === constants.DEFAULT_FILE_SESSION) file.id = helpers.uuid();
             window.saveTimeout = setTimeout(() => {
                 file.isSaving = false;
                 file.isUnsaved = false;
                 file.onsave();
                 if (showToast) window.plugins.toast.showShortBottom(strings['file saved']);
-                if (url) recents.addFile(file.fileUri);
+                if (url) recents.addFile(file.uri);
                 editorManager.onFileSave(file);
                 editorManager.onupdate();
                 resetText();

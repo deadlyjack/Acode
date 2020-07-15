@@ -6,6 +6,7 @@ import tile from "../tile";
  * @param {string[]} options 
  * @param {object} opts 
  * @param {string} opts.default 
+ * @param {string} opts.onCancel
  * @param {boolean} opts.hideOnSelect
  * @param {boolean} opts.textTransform 
  */
@@ -27,7 +28,10 @@ function select(title, options, opts = {}) {
     });
     const mask = tag('span', {
       className: 'mask',
-      onclick: hide
+      onclick: () => {
+        hide();
+        if (typeof opts.onCancel === "function") opts.onCancel();
+      }
     });
     let $defaultVal;
 

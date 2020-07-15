@@ -1,15 +1,18 @@
 package com.foxdebug;
 
-import android.os.Build;
+import android.app.Activity;
 import android.content.pm.PackageInfo;
+import android.content.Intent;
+import android.content.Context;
 import android.content.pm.PackageManager;
-import android.webkit.WebView;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
+import android.net.Uri;
+import android.support.v4.content.FileProvider;
 
-import android.content.Context;
-import android.app.Activity;
-
+import org.apache.commons.io.IOUtils;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -21,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.io.File;
 
 public class System extends CordovaPlugin {
   private Activity activity;
@@ -47,11 +51,17 @@ public class System extends CordovaPlugin {
     } else if (action.equals("disable-fullscreen")) {
       this.disableFullScreen(callbackContext);
       return true;
+    } else if (action.equals("share-file")) {
+      this.shareFile(args.getString(0), args.getString(1), callbackContext);
+      return true;
+    } else if (action.equals("send-email")) {
+      this.sendEmail(args.getString(0), args.getString(1), args.getString(2), callbackContext);
+      return true;
     }
     return false;
   }
 
-  public void getWebkitInfo(CallbackContext callbackContext) throws org.json.JSONException {
+  private void getWebkitInfo(CallbackContext callbackContext) throws org.json.JSONException {
     PackageInfo info = null;
     JSONObject res = new JSONObject();
 
@@ -86,7 +96,7 @@ public class System extends CordovaPlugin {
     }
   }
 
-  public void clearCache(CallbackContext callbackContext) {
+  private void clearCache(CallbackContext callbackContext) {
     final String LOG_TAG = "CacheClear";
     final String MESSAGE_TASK = "Cordova Android CacheClear() called.";
     final String MESSAGE_ERROR = "Error while clearing webview cache.";
@@ -110,7 +120,7 @@ public class System extends CordovaPlugin {
     });
   }
 
-  public void enableFullScreen(CallbackContext callbackContext) {
+  private void enableFullScreen(CallbackContext callbackContext) {
     final CallbackContext callback = callbackContext;
     cordova.getActivity().runOnUiThread(new Runnable() {
       public void run() {
@@ -124,15 +134,61 @@ public class System extends CordovaPlugin {
     });
   }
 
-  public void disableFullScreen(CallbackContext callbackContext) {
+  private void disableFullScreen(CallbackContext callbackContext) {
     final CallbackContext callback = callbackContext;
     cordova.getActivity().runOnUiThread(new Runnable() {
       public void run() {
         try {
-          activity.getWindow().getDecorView()
-              .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+          activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         } catch (Exception e) {
           callback.error(e.getMessage());
+        }
+      }
+    });
+  }
+
+  private void shareFile(final String fileURI, final String filename, final CallbackContext callbackContext) {
+    final Activity activity = this.activity;
+    final Context context = this.context;
+    cordova.getThreadPool().execute(new Runnable() {
+      public void run() {
+        try {
+          Uri uri = Uri.parse(fileURI);
+
+          if (fileURI.matches("file:///(.*)")) {
+            File file = new File(uri.getPath());
+            uri = FileProvider.getUriForFile(context, "com.foxdebug.provider", file);
+          }
+
+          Intent intent = new Intent(Intent.ACTION_SEND);
+          intent.putExtra(Intent.EXTRA_STREAM, uri);
+          if (!filename.equals(""))
+            intent.putExtra(Intent.EXTRA_TEXT, filename);
+          intent.setType("application/octet-stream");
+          activity.startActivity(intent);
+          callbackContext.success(uri.toString());
+        } catch (Exception e) {
+          callbackContext.error(e.getMessage());
+        }
+      }
+    });
+  }
+
+  private void sendEmail(final String subject, final String bodyText, final String bodyHTML,
+      final CallbackContext callbackContext) {
+    final Activity activity = this.activity;
+    cordova.getThreadPool().execute(new Runnable() {
+      public void run() {
+        try {
+          Intent intent = new Intent(Intent.ACTION_SEND);
+          intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+          intent.putExtra(Intent.EXTRA_TEXT, bodyText);
+          intent.putExtra(Intent.EXTRA_HTML_TEXT, bodyHTML);
+          intent.setType("text/plain");
+          activity.startActivity(intent);
+          callbackContext.success("OK");
+        } catch (Exception e) {
+          callbackContext.error(e.getMessage());
         }
       }
     });

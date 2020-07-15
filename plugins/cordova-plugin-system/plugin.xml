@@ -15,6 +15,12 @@
         <param name="android-package" value="com.foxdebug.System"/>
       </feature>
     </config-file>
+    <config-file target="AndroidManifest.xml" parent="./application">
+      <provider android:name="android.support.v4.content.FileProvider" android:authorities="com.foxdebug.provider" android:exported="false" android:grantUriPermissions="true">
+        <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_provider"/>
+      </provider>
+    </config-file>
+    <resource-file src="file_provider.xml" target="res/xml/file_provider.xml" />
     <source-file src="src/android/System.java" target-dir="src/com/foxdebug/system"/>
     <config-file target="AndroidManifest.xml" parent="/manifest"></config-file>
   </platform>

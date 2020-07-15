@@ -1,5 +1,5 @@
 import "core-js/stable";
-import loadPolyFill from "./polyfill";
+import loadPolyFill from "./utils/polyfill";
 
 (function () {
     loadPolyFill.apply(window);

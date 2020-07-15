@@ -95,5 +95,34 @@ export default {
     if (docId) return [rootUri, docId].join("::");
     else return rootUri;
 
+  },
+  /**
+   * Gets virtual address by replacing root with name i.e. added in file explorer
+   * @param {string} url 
+   */
+  getVirtualAddress(url) {
+    try {
+      const {
+        docId,
+        rootUri,
+        isFileUri
+      } = this.parse(url);
+
+      if (isFileUri) return url;
+      const customUuid = JSON.parse(localStorage.customUuid || "[]");
+
+      for (let storage of customUuid) {
+        if (storage.uri === rootUri) {
+          const id = rootUri.split("/").pop();
+          let filePath = docId.replace(decodeURL(id), "");
+          if (filePath.startsWith("/")) filePath = filePath.slice(1);
+          return `${storage.name}/${filePath}`;
+        }
+      }
+
+      return url;
+    } catch (e) {
+      return url;
+    }
   }
 };

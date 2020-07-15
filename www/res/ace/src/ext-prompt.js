@@ -496,22 +496,22 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
             return clipboard.getText && clipboard.getText();
         },
         FILENAME: function (editor) {
-            return /[^/\\]*$/.exec(this.FILEPATH(editor))[0];
+            return editorManager.activeFile.name;
         },
         FILENAME_BASE: function (editor) {
-            return /[^/\\]*$/.exec(this.FILEPATH(editor))[0].replace(/\.[^.]*$/, "");
+            return editorManager.activeFile.name.replace(/\.[^.]*$/, "");
         },
         DIRECTORY: function (editor) {
             return this.FILEPATH(editor).replace(/[^/\\]*$/, "");
         },
         FILEPATH: function (editor) {
-            return "/not implemented.txt";
+            return editorManager.activeFile.uri;
         },
         WORKSPACE_NAME: function () {
             return "Unknown";
         },
         FULLNAME: function () {
-            return "Unknown";
+            return editorManager.activeFile.name;
         },
         BLOCK_COMMENT_START: function (editor) {
             var mode = editor.session.$mode || {};
@@ -650,7 +650,11 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
                         onMatch: function (val, state, stack) {
                             var choices = val.slice(1, -1).replace(/\\[,|\\]|,/g, function (operator) {
                                 return operator.length == 2 ? operator[1] : "\x00";
-                            }).split("\x00");
+                            }).split("\x00").map(function (value) {
+                                return {
+                                    value: value
+                                };
+                            });
                             stack[0].choices = choices;
                             return [choices[0]];
                         },
@@ -1422,18 +1426,17 @@ define("ace/snippets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/
 
             this.selectedTabstop = ts;
             var range = ts.firstNonLinked || ts;
+            if (ts.choices) range.cursor = range.start;
             if (!this.editor.inVirtualSelectionMode) {
                 var sel = this.editor.multiSelect;
-                sel.toSingleRange(range.clone());
+                sel.toSingleRange(range);
                 for (var i = 0; i < ts.length; i++) {
                     if (ts.hasLinkedRanges && ts[i].linked)
                         continue;
                     sel.addRange(ts[i].clone(), true);
                 }
-                if (sel.ranges[0])
-                    sel.addRange(sel.ranges[0].clone());
             } else {
-                this.editor.selection.setRange(range);
+                this.editor.selection.fromOrientedRange(range);
             }
 
             this.editor.keyBinding.addKeyboardHandler(this.keyboardHandler);
@@ -1666,6 +1669,7 @@ define("ace/autocomplete", ["require", "exports", "module", "ace/keyboard/hash_h
             } else if (keepPopupPosition && !prefix) {
                 this.detach();
             }
+            this.changeTimer.cancel();
         };
 
         this.detach = function () {
@@ -1728,6 +1732,7 @@ define("ace/autocomplete", ["require", "exports", "module", "ace/keyboard/hash_h
             if (!data)
                 return false;
 
+            var completions = this.completions;
             this.editor.startOperation({
                 command: {
                     name: "insertMatch"
@@ -1736,10 +1741,10 @@ define("ace/autocomplete", ["require", "exports", "module", "ace/keyboard/hash_h
             if (data.completer && data.completer.insertMatch) {
                 data.completer.insertMatch(this.editor, data);
             } else {
-                if (this.completions.filterText) {
+                if (completions.filterText) {
                     var ranges = this.editor.selection.getAllRanges();
                     for (var i = 0, range; range = ranges[i]; i++) {
-                        range.start.column -= this.completions.filterText.length;
+                        range.start.column -= completions.filterText.length;
                         this.editor.session.remove(range);
                     }
                 }
@@ -1748,7 +1753,8 @@ define("ace/autocomplete", ["require", "exports", "module", "ace/keyboard/hash_h
                 else
                     this.editor.execCommand("insertstring", data.value || data);
             }
-            this.detach();
+            if (this.completions == completions)
+                this.detach();
             this.editor.endOperation();
         };
 
@@ -2263,7 +2269,6 @@ background: #f0f0f0;\
             setIgnoreFocusOut: setIgnoreFocusOut
         };
     };
-
 });
 
 define("ace/ext/modelist", ["require", "exports", "module"], function (require, exports, module) {

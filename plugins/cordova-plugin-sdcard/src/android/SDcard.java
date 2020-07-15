@@ -147,6 +147,10 @@ public class SDcard extends CordovaPlugin {
 
         break;
 
+      case "stats":
+        this.getStats(arg1);
+        break;
+
       default:
         return false;
     }
@@ -369,12 +373,11 @@ public class SDcard extends CordovaPlugin {
 
       ContentResolver contentResolver = this.context.getContentResolver();
       Uri newDocumentUri = DocumentsContract.createDocument(contentResolver, parentUri, mimeType, name);
-      docId = DocumentsContract.getDocumentId(newDocumentUri);
-
       DocumentFile file = getFile(newDocumentUri);
       if (!name.equals(file.getName()))
         newDocumentUri = DocumentsContract.renameDocument(contentResolver, newDocumentUri, name);
 
+      docId = DocumentsContract.getDocumentId(newDocumentUri);
       if (newDocumentUri != null)
         this.callback.success(srcUri + SAPERATOR + docId);
       else
@@ -609,6 +612,30 @@ public class SDcard extends CordovaPlugin {
 
   private boolean isDirectory(String mimeType) {
     return DocumentsContract.Document.MIME_TYPE_DIR.equals(mimeType);
+  }
+
+  private void getStats(String filename) {
+    String fileUri = formatUri(filename);
+
+    try {
+      DocumentFile file = getFile(fileUri);
+
+      JSONObject result = new JSONObject();
+      result.put("exists", file.exists());
+      result.put("canRead", file.canRead());
+      result.put("canWrite", file.canWrite());
+      result.put("name", file.getName());
+      result.put("length", file.length());
+      result.put("type", file.getType());
+      result.put("isFile", file.isFile());
+      result.put("isDirectory", file.isDirectory());
+      result.put("isVirtual", file.isVirtual());
+      result.put("lastModified", file.lastModified());
+
+      this.callback.success(result);
+    } catch (Exception e) {
+      this.error(e.getMessage());
+    }
   }
 
   private Uri getUri(String src, String docId) {

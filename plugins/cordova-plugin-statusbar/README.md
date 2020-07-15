@@ -47,15 +47,19 @@ Preferences
 
 #### config.xml
 
--  __StatusBarOverlaysWebView__ (boolean, defaults to true). On iOS, make the statusbar overlay or not overlay the WebView at startup.
+-  __StatusBarOverlaysWebView__ (boolean, defaults to true). Make the statusbar overlay or not overlay the WebView at startup.
 
         <preference name="StatusBarOverlaysWebView" value="true" />
 
-- __StatusBarBackgroundColor__ (color hex string, no default value). On iOS, set the background color of the statusbar by a hex string (#RRGGBB) at startup. If this value is not set, the background color will be transparent.
+    ##### Android Quirks
+    
+    Only supported on Android 5 or later. Earlier versions will ignore this preference.
+
+- __StatusBarBackgroundColor__ (color hex string, no default value). Set the background color of the statusbar by a hex string (#RRGGBB) at startup. If this value is not set, the background color will be transparent.
 
         <preference name="StatusBarBackgroundColor" value="#000000" />
 
-- __StatusBarStyle__ (status bar style, defaults to lightcontent). On iOS, set the status bar style. Available options default, lightcontent, blacktranslucent, blackopaque.
+- __StatusBarStyle__ (status bar style, defaults to lightcontent). Set the status bar style. Available options default, lightcontent, blacktranslucent, blackopaque.
 
         <preference name="StatusBarStyle" value="lightcontent" />
 

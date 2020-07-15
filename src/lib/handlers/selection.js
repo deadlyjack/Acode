@@ -133,7 +133,7 @@ function enableSingleMode() {
     controls.update = updateEnd;
     controls.callBeforeContextMenu = callBeforeContextMenu;
 
-    $end.style.marginLeft = '-14px';
+    $end.style.marginLeft = '-12.5px';
     $end.style.marginTop = '4px';
 
     editor.on('blur', hide);
@@ -213,7 +213,7 @@ function enableSingleMode() {
         if (!editorManager.activeFile.controls) return $end.remove();
         const cursor = $cursor.getBoundingClientRect();
 
-        cpos.x = cursor.right - (cursor.width / 2);
+        cpos.x = cursor.left + 1;
         cpos.y = cursor.bottom;
 
         update();

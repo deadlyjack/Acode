@@ -7,6 +7,14 @@ test("Url -> basename", () => {
   basename = Url.basename(url);
   expect(basename).toBeNull();
 
+  url = "ftp://user:pass@ftp.foxdebug.com/?mode=passive";
+  basename = Url.basename(url);
+  expect(basename).toBe("");
+
+  url = "ftp://user:pass@ftp.foxdebug.com?mode=passive";
+  basename = Url.basename(url);
+  expect(basename).toBe("");
+
   url = "ftp://user:pass@ftp.foxdebug.com/src/index.html?mode=passive";
   basename = Url.basename(url);
   expect(basename).toBe("index.html");

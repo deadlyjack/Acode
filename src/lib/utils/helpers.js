@@ -4,7 +4,7 @@ import dialogs from '../../components/dialogs';
 import keyBindings from '../keyBindings';
 import fs from '../fileSystem/internalFs';
 import tag from 'html-tag-js';
-import ajax from '../ajax';
+import ajax from './ajax';
 import path from './path';
 import Url from './Url';
 
@@ -440,10 +440,10 @@ function error(e, ...args) {
 
 /**
  * Checks if the given url has write permission.
- * @param {string} fileUri 
+ * @param {string} uri 
  * @returns {Promise<{canWrite: boolean, uuid: string, origin: string}>}
  */
-function canWrite(fileUri) {
+function canWrite(uri) {
     return new Promise((resolve, reject) => {
 
         cordova.plugins.diagnostic.getExternalSdCardDetails(ls => {
@@ -451,7 +451,7 @@ function canWrite(fileUri) {
                 const uuid = card.path.split('/').splice(-1)[0];
                 const _path = card.filePath + '/';
 
-                if (path.isParent(_path, fileUri)) {
+                if (path.isParent(_path, uri)) {
                     if (!card.canWrite) {
                         resolve({
                             canWrite: false,
@@ -467,7 +467,7 @@ function canWrite(fileUri) {
 
             });
 
-            if (path.isParent(cordova.file.externalRootDirectory, fileUri)) {
+            if (path.isParent(cordova.file.externalRootDirectory, uri)) {
                 resolve({
                     canWrite: true
                 });

@@ -1,30 +1,33 @@
 {
-  "_from": "git+https://github.com/breautek/cordova-plugin-statusbar.git",
-  "_id": "cordova-plugin-statusbar@2.4.3-dev",
+  "_from": "cordova-plugin-statusbar@2.4.3",
+  "_id": "cordova-plugin-statusbar@2.4.3",
   "_inBundle": false,
-  "_integrity": "",
+  "_integrity": "sha512-ThmXzl6QIKWFXf4wWw7Q/zpB+VKkz3VM958+5A0sXD4jmR++u7KnGttLksXshVwWr6lvGwUebLYtIyXwS4Ovcg==",
   "_location": "/cordova-plugin-statusbar",
   "_phantomChildren": {},
   "_requested": {
-    "type": "git",
-    "raw": "https://github.com/breautek/cordova-plugin-statusbar.git",
-    "rawSpec": "https://github.com/breautek/cordova-plugin-statusbar.git",
-    "saveSpec": "git+https://github.com/breautek/cordova-plugin-statusbar.git",
-    "fetchSpec": "https://github.com/breautek/cordova-plugin-statusbar.git",
-    "gitCommittish": null
+    "type": "version",
+    "registry": true,
+    "raw": "cordova-plugin-statusbar@2.4.3",
+    "name": "cordova-plugin-statusbar",
+    "escapedName": "cordova-plugin-statusbar",
+    "rawSpec": "2.4.3",
+    "saveSpec": null,
+    "fetchSpec": "2.4.3"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "git+https://github.com/breautek/cordova-plugin-statusbar.git#adcee9f66f01f95eaa286f956105bbccf62b14df",
-  "_spec": "https://github.com/breautek/cordova-plugin-statusbar.git",
-  "_where": "/media/dellevenjack/Projects/git/Acode",
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-statusbar/-/cordova-plugin-statusbar-2.4.3.tgz",
+  "_shasum": "cc557aef66c27484e0f7f045004040d03321f82d",
+  "_spec": "cordova-plugin-statusbar@2.4.3",
+  "_where": "/mnt/sdb1/cordova/code editor",
   "author": {
     "name": "Apache Software Foundation"
   },
   "bugs": {
-    "url": "https://issues.apache.org/jira/browse/CB"
+    "url": "https://github.com/apache/cordova-plugin-statusbar/issues"
   },
   "bundleDependencies": false,
   "cordova": {
@@ -74,5 +77,5 @@
     "test": "npm run jshint"
   },
   "types": "./types/index.d.ts",
-  "version": "2.4.3-dev"
+  "version": "2.4.3"
 }

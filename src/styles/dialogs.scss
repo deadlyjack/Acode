@@ -10,7 +10,8 @@
     max-width: 320px;
     background-color: white;
     background-color: var(--dialogbox-background-color);
-    box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 16px var(--box-shadow-color);
     border-radius: 2px !important;
     overflow: hidden;
 
@@ -141,7 +142,8 @@
             .picker_selector {
                 border: solid 1px #252525;
                 border: solid 1px var(--dialogbox-text-color);
-                box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+                box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
+                box-shadow: 0 0 2px 0 var(--box-shadow-color);
             }
 
             .picker_hue {
@@ -266,6 +268,7 @@
 
         &:focus {
             border-bottom: solid 1px #3399ff;
+            border-bottom: solid 1px var(--accent-color);
         }
     }
 

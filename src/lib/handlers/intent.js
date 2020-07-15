@@ -1,4 +1,4 @@
-import createEditorFromURI from '../createEditorFromURI';
+import openFile from '../openFile';
 import helpers from "../utils/helpers";
 import dialogs from '../../components/dialogs';
 
@@ -32,9 +32,8 @@ function HandleIntent(intent = {}) {
 
             window.resolveLocalFileSystemURL(intent.fileUri, () => {
 
-                createEditorFromURI({
-                    fileUri: intent.fileUri,
-                    contentUri: intent.data,
+                openFile({
+                    uri: intent.fileUri || intent.data,
                     name: intent.filename
                 }).then(stopLoading);
 
@@ -56,17 +55,16 @@ function HandleIntent(intent = {}) {
     function checkAndCreate() {
         helpers.convertToFile(intent.data)
             .then(url => {
-                return createEditorFromURI({
+                return openFile({
                     name: intent.filename,
-                    fileUri: url,
-                    contentUri: intent.data
-                }, false);
+                    uri: url || intent.data
+                });
             })
             .catch(() => {
-                return createEditorFromURI({
-                    contentUri: intent.data,
-                    name: intent.filename
-                }, true);
+                return openFile({
+                    name: intent.filename,
+                    uri: intent.data
+                });
             })
             .finally(stopLoading);
     }

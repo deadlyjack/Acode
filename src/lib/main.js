@@ -1,5 +1,5 @@
+import "../styles/main.scss";
 import "../styles/themes.scss";
-import "../styles/index.scss";
 import "../styles/page.scss";
 import '../styles/list.scss';
 import '../styles/sidenav.scss';
@@ -23,22 +23,24 @@ import Settings from "./settings";
 import dialogs from "../components/dialogs";
 import constants from "./constants";
 import intentHandler from "./handlers/intent";
-import createEditorFromURI from "./createEditorFromURI";
-import openFolder from "./addFolder";
+import openFile from "./openFile";
+import openFolder from "./openFolder";
 import arrowkeys from "./handlers/arrowkeys";
 
 import $_menu from '../views/menu.hbs';
 import $_fileMenu from '../views/file-menu.hbs';
+import $_hintText from '../views/hint-txt.hbs';
 import git from "./git";
 import commands from "./commands";
 import keyBindings from './keyBindings';
 import quickTools from "./handlers/quickTools";
 import rateBox from "../components/dialogboxes/rateBox";
-import loadPolyFill from "./polyfill";
+import loadPolyFill from "./utils/polyfill";
 import internalFs from "./fileSystem/internalFs";
 import Url from "./utils/Url";
 import backupRestore from "../pages/settings/backup-restore";
 import applySettings from "./applySettings";
+import fsOperation from "./fileSystem/fsOperation";
 //@ts-check
 
 loadPolyFill.apply(window);
@@ -347,10 +349,12 @@ function App() {
     top: '6px',
     transformOrigin: 'top right',
     innerHTML: () => {
+      const file = editorManager.activeFile;
       return mustache.render($_fileMenu, Object.assign(strings, {
-        file_mode: (editorManager.activeFile.session.getMode().$id || '').split('/').pop(),
-        file_encoding: editorManager.activeFile.encoding,
-        file_read_only: !editorManager.activeFile.editable
+        file_mode: (file.session.getMode().$id || '').split('/').pop(),
+        file_encoding: file.encoding,
+        file_read_only: !file.editable,
+        file_info: !!file.uri
       }));
     }
   });
@@ -377,14 +381,15 @@ function App() {
     id: "quicktool-toggler"
   });
   const actions = constants.COMMANDS;
-  let registeredKey = '';
+  let registeredKey = '',
+    editor;
 
+  //#endregion
   Acode.$menuToggler = $menuToggler;
   Acode.$editMenuToggler = $editMenuToggler;
   $sidebar.setAttribute('empty-msg', strings['open folder']);
   window.editorManager = EditorManager($sidebar, $header, $main);
-  const editor = editorManager.editor;
-  //#endregion
+  editor = editorManager.editor;
 
   const fmode = appSettings.value.floatingButtonActivation;
   const activationMode = fmode === "long tap" ? "oncontextmenu" : "onclick";
@@ -449,9 +454,8 @@ function App() {
     const activeFile = this.activeFile;
     const $save = $footer.querySelector('[action=save]');
 
-    if (!$editMenuToggler.isConnected) {
+    if (!$editMenuToggler.isConnected)
       $header.insertBefore($editMenuToggler, $header.lastChild);
-    }
 
     if (activeFile) {
       if (activeFile.isUnsaved) {
@@ -487,41 +491,14 @@ function App() {
   };
 
   function onAppLoad() {
+    if (localStorage.count === undefined) localStorage.count = 0;
+    let count = +localStorage.count;
 
-    let count = parseInt(localStorage.count) || 0;
-    if (count === constants.RATING_TIME) rateBox();
-    else {
-      if (count === constants.RATING_TIME - 1) {
+    if (count === constants.RATING_COUNT) askForRating();
+    else if (count === constants.DONATION_COUNT) askForDonation();
+    else ++localStorage.count;
 
-        //TODO: Ask for support
-
-      }
-      localStorage.count = ++count;
-    }
-
-    if (!localStorage.init) {
-      localStorage.init = true;
-      const backup = cordova.file.externalRootDirectory + constants.BACKUP_FILE;
-      window.resolveLocalFileSystemURL(backup, fs => {
-        dialogs.confirm(strings["welcome back"].toUpperCase(), strings['backup file found'])
-          .then(() => {
-            backupRestore.restore(backup);
-          });
-      }, err => {
-        if (!BuildInfo.debug) dialogs.box(
-            strings.info.toUpperCase(),
-            "If editor is not working properly, try these suggestions:<br><br>" +
-            "1. Turn off keyboard <strong>Autocorrect</strong> settings.<br>" +
-            "<img src='./res/imgs/autocorrect/autocorrect-" + appSettings.value.lang + ".jpg'><br>" +
-            "2. Use <a href='https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin'>" +
-            "<strong>Gboard</strong></a> or " +
-            "<a href='https://play.google.com/store/apps/details?id=org.pocketworkstation.pckeyboard'> <strong>" +
-            "Hacker's Keyboard</strong></a><br><br>" +
-            "3. Please read <a href='https://acode.foxdebug.com/faqs'>FAQs</a>"
-          )
-          .wait(12000);
-      });
-    }
+    if (!localStorage.init) showWelcomeMessage();
   }
 
   /**
@@ -530,11 +507,6 @@ function App() {
    */
   function handleMainKeyDown(e) {
     registeredKey = helpers.getCombination(e);
-    if (registeredKey === 'escape') {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      e.stopPropagation();
-    }
   }
 
   /**
@@ -545,14 +517,6 @@ function App() {
     let key = helpers.getCombination(e);
     if (registeredKey && key !== registeredKey) return;
 
-    if (key === 'escape') {
-      if (actionStack.length) actionStack.pop();
-      else editor.focus();
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      e.stopPropagation();
-      return;
-    }
     const isFocused = editor.textInput.getElement() === document.activeElement;
     if (actionStack.length || isFocused) return;
     for (let name in keyBindings) {
@@ -575,7 +539,7 @@ function App() {
     const unsaved = [];
 
     for (let file of editorManager.files) {
-      if (file.id === constants.DEFAULT_SESSION && !file.session.getValue()) continue;
+      if (file.id === constants.DEFAULT_FILE_SESSION && !file.session.getValue()) continue;
       const edit = {};
       edit.name = file.filename;
       edit.type = file.type;
@@ -585,15 +549,12 @@ function App() {
         edit.recordid = file.record.id;
         edit.isNew = file.record.isNew;
       }
-      if (file.fileUri) {
-        edit.fileUri = file.fileUri;
-        edit.contentUri = file.contentUri;
+      if (file.uri) {
+        edit.uri = file.uri;
         unsaved.push({
           id: btoa(file.id),
-          fileUri: file.fileUri
+          uri: file.uri
         });
-      } else if (file.contentUri) {
-        edit.contentUri = file.contentUri;
       }
       if (file.isUnsaved) {
         edit.data = file.session.getValue();
@@ -603,9 +564,9 @@ function App() {
     }
 
     unsaved.map(file => {
-      const protocol = new URL(file.fileUri).protocol;
+      const protocol = new URL(file.uri).protocol;
       if (protocol === 'file:') {
-        window.resolveLocalFileSystemURL(file.fileUri, fs => {
+        window.resolveLocalFileSystemURL(file.uri, fs => {
           window.resolveLocalFileSystemURL(CACHE_STORAGE, parent => {
             fs.copyTo(parent, file.id);
           }, err => {
@@ -668,7 +629,7 @@ function App() {
             index: i
           };
 
-          const showName = file.fileUri ? Url.hidePassword(file.fileUri) : file.name;
+          const showName = file.uri ? Url.hidePassword(file.uri) : file.name;
           document.body.setAttribute('data-small-msg', `Loading files... (${showName})`);
 
           if (file.type === 'git') {
@@ -700,31 +661,12 @@ function App() {
               });
             }
             if (i === files.length - 1) resolve();
-          } else if (file.fileUri) {
+          } else if (file.uri) {
 
+            if (file.data) xtra.saved = false;
+            else xtra.saved = true;
 
-            if (file.data) {
-              xtra.saved = false;
-            } else {
-              xtra.saved = true;
-            }
-
-            createEditorFromURI({
-              fileUri: file.fileUri,
-              contentUri: file.contentUri
-            }, false, xtra).then(index => {
-              if (index === files.length - 1) resolve();
-            });
-          } else if (file.contentUri) {
-
-            if (file.contentUri === lastfile) {
-              xtra.render = true;
-            }
-
-            createEditorFromURI({
-              name: file.name,
-              contentUri: file.contentUri,
-            }, true, xtra).then(index => {
+            openFile(file.uri, xtra).then(index => {
               if (index === files.length - 1) resolve();
             });
 
@@ -760,7 +702,7 @@ function App() {
 
     files.map(file => {
       if (file.type === 'git') return;
-      if (file.fileUri) {
+      if (file.uri) {
         const id = btoa(file.id);
         window.resolveLocalFileSystemURL(CACHE_STORAGE + id, entry => {
           fs.readFile(CACHE_STORAGE + id).then(res => {
@@ -772,9 +714,11 @@ function App() {
                 console.log(err);
               });
 
-            window.resolveLocalFileSystemURL(file.fileUri, () => {
-              fs.readFile(file.fileUri).then(res => {
-                const data = res.data;
+            fsOperation(file.uri)
+              .then(fs => {
+                return fs.readFile();
+              })
+              .then(data => {
                 const text = helpers.decodeText(data);
 
                 if (text !== originalText) {
@@ -790,14 +734,11 @@ function App() {
                       });
                   }
                 }
-              }).catch(err => {
+              })
+              .catch(err => {
                 console.error(err);
+                if (err.code === 1) editorManager.removeFile(file);
               });
-            }, err => {
-              if (err.code === 1) {
-                editorManager.removeFile(file);
-              }
-            });
           });
         }, err => {});
       }
@@ -820,6 +761,7 @@ function App() {
       editor.gotoLine(cursorPos.row, cursorPos.column);
       editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
       file.assocTile.classList.remove('notice');
+      editorManager.onupdate();
     }
   }
   //#endregion
@@ -897,4 +839,54 @@ function restoreTheme(darken) {
 
   }
 }
+
+function askForDonation() {
+  if (localStorage.dontAskForDonation) return resetCount();
+
+  const options = [
+    [constants.PATREON, "Patreon", "patreon"],
+    [constants.PAYPAL + "/5usd", "PayPal", "paypal"]
+  ];
+
+  if (IS_FREE_VERSION) options.push([constants.PAID_VERSION, "Download paid version", "googleplay"]);
+
+  dialogs.select(strings["support text"], options, {
+      onCancel: resetCount
+    })
+    .then(res => {
+      localStorage.dontAskForDonation = true;
+      window.open(res, '_system');
+      resetCount();
+    });
+}
+
+function resetCount() {
+  localStorage.count = -10;
+}
+
+function askForRating() {
+  if (!localStorage.dontAskForRating) rateBox();
+}
+
+function showWelcomeMessage() {
+  localStorage.init = true;
+  const backup = cordova.file.externalRootDirectory + constants.BACKUP_FILE;
+  window.resolveLocalFileSystemURL(backup, fs => {
+    dialogs.confirm(strings["welcome back"].toUpperCase(), strings['backup file found'])
+      .then(() => {
+        backupRestore.restore(backup);
+      });
+  }, err => {
+    if (!BuildInfo.debug) {
+      const title = strings.info.toUpperCase();
+      const body = mustache.render($_hintText, {
+        lang: appSettings.value.lang
+      });
+      dialogs
+        .box(title, body)
+        .wait(12000);
+    }
+  });
+}
+
 //#endregion

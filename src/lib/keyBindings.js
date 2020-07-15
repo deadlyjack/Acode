@@ -59,6 +59,11 @@ export default {
     "readOnly": false,
     "action": "select-word"
   },
+  "autoindent": {
+    "key": null,
+    "description": "Auto indentation",
+    "readOnly": false
+  },
   "showSettingsMenu": {
     "key": "Ctrl-,",
     "description": "Show settings menu",
@@ -84,7 +89,7 @@ export default {
   },
   "toggleEditMenu": {
     "key": "F4",
-    "description": "Toggle sidebar",
+    "description": "Toggle edit menu",
     "readOnly": true,
     "action": "toggle-editmenu"
   },

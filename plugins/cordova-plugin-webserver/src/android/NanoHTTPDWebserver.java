@@ -214,7 +214,8 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
 
         JSONObject responseObject = (JSONObject) this.webserver.responses.get(requestUUID);
         Response response = null;
-        Log.d(this.getClass().getName(), "responseObject: " + responseObject.toString());
+        // Log.d(this.getClass().getName(), "responseObject: " +
+        // responseObject.toString());
 
         if (responseObject.has("path")) {
             try {
@@ -261,7 +262,6 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
         }
 
         return documentFile;
-
     }
 
     private InputStream getInputStream(DocumentFile file) throws FileNotFoundException, IOException {

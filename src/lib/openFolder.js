@@ -7,7 +7,7 @@ import tile from '../components/tile';
 import constants from './constants';
 import recents from './recents';
 import path from './utils/path';
-import createEditorFromURI from './createEditorFromURI';
+import openFile from './openFile';
 import Url from './utils/Url';
 
 /**
@@ -173,21 +173,15 @@ function openFolder(_path, opts = {}) {
    * @param {string} name 
    * @param {HTMLElement} $target 
    */
-  function handleClick(type, url, name, $target) {
+  function handleClick(type, uri, name, $target) {
     if (type === 'file') {
 
       const options = {
-        name
+        name,
+        uri
       };
 
-      const protocol = Url.getProtocol(url);
-
-      if (protocol === "content:")
-        options.contentUri = url;
-      else
-        options.fileUri = url;
-
-      createEditorFromURI(options);
+      openFile(options);
       editorManager.sidebar.hide();
 
     }
@@ -220,7 +214,7 @@ function openFolder(_path, opts = {}) {
 
     if (type === 'file') options = [COPY, CUT, RENAME, REMOVE];
     else if (type === 'dir') options = [COPY, CUT, REMOVE, RENAME, PASTE, NEW_FILE, NEW_FOLDER, OPEN_FOLDER];
-    else if (type === 'root') options = [REMOVE, RENAME, PASTE, NEW_FILE, NEW_FOLDER];
+    else if (type === 'root') options = [RENAME, PASTE, NEW_FILE, NEW_FOLDER];
 
     if (clipBoard) options.push(CANCEL);
 
@@ -307,18 +301,15 @@ function openFolder(_path, opts = {}) {
 
                   if (type === 'file') {
                     $target.querySelector(':scope>span').className = helpers.getIconForFile(newName);
-                    let file;
-                    if (protocol === "content:") {
-                      file = editorManager.getFile(url, "contentUri");
-                      if (file) file.contentUri = newURL;
-                    } else {
-                      file = editorManager.getFile(url, 'fileUri');
+                    let file = editorManager.getFile(url, "uri");
+                    if (file) {
+                      file.uri = newURL;
+                      file.filename = newName;
                     }
-                    if (file) file.filename = newName;
                   } else {
                     //Reloading the folder by collasping and expanding the folder
-                    $target.click();
-                    $target.click();
+                    $target.click(); //collaspe
+                    $target.click(); //expand
                   }
 
                   helpers.showToast(strings.success);
@@ -607,10 +598,17 @@ openFolder.updateHeight = function () {
 
 openFolder.updateItem = function (oldFile, newFile, newFilename) {
   const $el = editorManager.sidebar.querySelector(`[url="${oldFile}"]`);
-  $el.setAttribute('url', newFile);
-  $el.setAttribute('name', newFilename);
-  $el.querySelector(':scope>span').className = helpers.getIconForFile(newFilename);
-  $el.querySelector(':scope>.text').textContent = newFilename;
+  if ($el) {
+    $el.setAttribute('url', newFile);
+    $el.setAttribute('name', newFilename);
+    $el.querySelector(':scope>span').className = helpers.getIconForFile(newFilename);
+    $el.querySelector(':scope>.text').textContent = newFilename;
+  }
+};
+
+openFolder.removeItem = function (url) {
+  const $el = editorManager.sidebar.querySelector(`[url="${url}"]`);
+  if ($el) $el.remove();
 };
 
 export default openFolder;
