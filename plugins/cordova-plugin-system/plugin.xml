@@ -20,6 +20,10 @@
         <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_provider"/>
       </provider>
     </config-file>
+
+    <hook type="before_prepare" src="utils/resetProvider.js" />
+    <hook type="after_prepare" src="utils/fixProvider.js" />
+
     <resource-file src="file_provider.xml" target="res/xml/file_provider.xml" />
     <source-file src="src/android/System.java" target-dir="src/com/foxdebug/system"/>
     <config-file target="AndroidManifest.xml" parent="/manifest"></config-file>

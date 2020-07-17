@@ -28,7 +28,8 @@ async function open(file, data = {}) {
         cursorPos,
         render,
         index,
-        onsave
+        onsave,
+        text
     } = data;
 
     if (!name) name = fileInfo.name;
@@ -40,15 +41,15 @@ async function open(file, data = {}) {
     if (existingFile) {
         editorManager.switchFile(existingFile.id);
         return index === undefined ? uri : index;
-    } else if (data.text) {
+    } else if (text) {
         editorManager.addNewFile(name, {
             uri,
             render,
-            text: data.text,
-            cursorPos: data.cursorPos,
+            text,
+            cursorPos,
             isUnsaved: true,
             onsave,
-            readonly: readOnly
+            readOnly
         });
         return index === undefined ? uri : index;
     } else {

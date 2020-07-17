@@ -454,6 +454,7 @@ declare var AceMouseEvent: any;
 
 declare var CACHE_STORAGE: string;
 declare var CACHE_STORAGE_REMOTE: string;
+declare var TEMP_STORAGE: string;
 declare var DATA_STORAGE: string;
 declare var DOES_SUPPORT_THEME: boolean;
 declare var IS_FREE_VERSION: boolean;

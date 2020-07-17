@@ -167,18 +167,18 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-system": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-system"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-statusbar": {
     "source": {
       "type": "registry",
       "id": "cordova-plugin-statusbar@2.4.3"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-system": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-system"
     },
     "is_top_level": true,
     "variables": {}

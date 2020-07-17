@@ -421,7 +421,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
             isVirtual: file.isLink,
             canWrite: true,
             canRead: true,
-            modifiedDate: file.modifiedDate,
+            lastModified: file.modifiedDate,
             type: mimeType.lookup(filename),
             uri: pathname
           });

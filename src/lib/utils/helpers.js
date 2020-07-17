@@ -481,16 +481,14 @@ function canWrite(uri) {
     });
 }
 
-function getFeedbackBody() {
+function getFeedbackBody(eol) {
     const buildInfo = window.BuildInfo || {};
     const device = window.device || {};
-    return `
-    version: ${buildInfo.version} <br>
-    device: ${device.model||''} <br> 
-    manufacturer: ${device.manufacturer||''} ${device.isVirtual?"(Virtual)":""} <br> 
-    OS: ${device.version} <br> 
-    info:
-    `;
+    return "Version: " + buildInfo.version + eol +
+        "Device: " + (device.model || '') + eol +
+        "Manufacturer: " + (device.manufacturer || '') + eol +
+        "Android version: " + device.version + eol +
+        "Info: ";
 }
 
 function blob2text(blob) {

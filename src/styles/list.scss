@@ -116,6 +116,11 @@
         min-height: 60px;
         text-decoration: none;
 
+        &.disabled {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
         &.no-transform {
             .value {
                 text-transform: none !important;

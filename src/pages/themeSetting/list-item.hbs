@@ -1,4 +1,5 @@
-<div class="list-item" action="select-theme" tabindex="0" name="{{theme}}" mode="{{mode}}">
+<div class="list-item {{#disable}}disabled{{/disable}}" action="select-theme" tabindex="0" name="{{theme}}"
+  mode="{{mode}}">
   <span class="icon color {{type}}"></span>
   <div class="container">
     <span class="text">{{name}}</span>
@@ -6,4 +7,7 @@
   {{#default}}
   <span class="icon check"></span>
   {{/default}}
+  {{#paid}}
+  <span class="icon stars"></span>
+  {{/paid}}
 </div>

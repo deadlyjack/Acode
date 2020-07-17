@@ -260,7 +260,10 @@ a {
         }
 
         .share-button {
+            background-color: #3399ff;
             background-color: var(--primary-button-background-color);
+            color: white;
+            color: var(--text-main-color);
             display: flex;
             justify-content: center;
             align-items: center;

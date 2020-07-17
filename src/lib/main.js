@@ -107,6 +107,14 @@ function Main() {
         document.body.setAttribute('data-small-msg', "This is taking unexpectedly long time!");
     }, 1000 * 10);
 
+    window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
+    window.DATA_STORAGE = cordova.file.externalDataDirectory || cordova.file.dataDirectory;
+    window.TEMP_STORAGE = DATA_STORAGE + "tmp/";
+    window.CACHE_STORAGE = cordova.file.externalCacheDirectory || cordova.file.cacheDirectory;
+    window.CACHE_STORAGE_REMOTE = CACHE_STORAGE + 'ftp-temp/';
+    window.KEYBINDING_FILE = DATA_STORAGE + '.key-bindings.json';
+    window.gitRecordURL = DATA_STORAGE + 'git/.gitfiles';
+    window.gistRecordURL = DATA_STORAGE + 'git/.gistfiles';
     window.DOES_SUPPORT_THEME = (() => {
       const $testEl = tag('div', {
         style: {
@@ -122,13 +130,17 @@ function Main() {
       if (client.height === 0) return false;
       else return true;
     })();
-    window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
-    window.DATA_STORAGE = cordova.file.externalDataDirectory || cordova.file.dataDirectory;
-    window.CACHE_STORAGE = cordova.file.externalCacheDirectory || cordova.file.cacheDirectory;
-    window.CACHE_STORAGE_REMOTE = CACHE_STORAGE + 'ftp-temp/';
-    window.KEYBINDING_FILE = DATA_STORAGE + '.key-bindings.json';
-    window.gitRecordURL = DATA_STORAGE + 'git/.gitfiles';
-    window.gistRecordURL = DATA_STORAGE + 'git/.gistfiles';
+
+    fsOperation(TEMP_STORAGE)
+      .then(fs => {
+        return fs.deleteDir();
+      })
+      .finally(() => {
+        fsOperation(DATA_STORAGE)
+          .then(fs => {
+            fs.createDirectory("tmp/");
+          });
+      });
 
     document.body.setAttribute('data-version', 'v' + BuildInfo.version);
 
@@ -629,8 +641,7 @@ function App() {
             index: i
           };
 
-          const showName = file.uri ? Url.hidePassword(file.uri) : file.name;
-          document.body.setAttribute('data-small-msg', `Loading files... (${showName})`);
+          document.body.setAttribute('data-small-msg', `Loading ${file.name}...`);
 
           if (file.type === 'git') {
             gitRecord.get(file.sha)

@@ -187,7 +187,7 @@ function FileBrowserInclude(type, option) {
       if (!localStorage.fileBrowserInit) {
         externalFs.listStorages()
           .then(res => {
-            if (Array.isArray(res))
+            if (Array.isArray(res) && res.length > 0)
               util.addPath(res[0].name)
               .then(res => {
                 customUuid.push(res);
@@ -456,7 +456,7 @@ function FileBrowserInclude(type, option) {
           .then(newUrl => {
             openFolder.updateItem(url, newUrl, newname);
             window.plugins.toast.showShortBottom(strings.success);
-            delete cachedDir[currentDir.url]
+            delete cachedDir[currentDir.url];
             loadDir(currentDir);
           })
           .catch(err => {

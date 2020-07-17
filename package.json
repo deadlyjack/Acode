@@ -40,6 +40,7 @@
     "core-js": "^3.6.5",
     "crypto-js": "^3.1.9-1",
     "debug": "^4.1.1",
+    "fast-safe-stringify": "^2.0.7",
     "filesize": "^6.1.0",
     "html-tag-js": "^0.2.22",
     "js-base64": "^2.6.3",
@@ -91,8 +92,8 @@
         "ANDROID_SUPPORT_VERSION": "28.+"
       },
       "cordova-plugin-webserver": {},
-      "cordova-plugin-system": {},
-      "cordova-plugin-statusbar": {}
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-system": {}
     },
     "platforms": [
       "android"

@@ -9,6 +9,7 @@ import $_list_item from './list-item.hbs';
 
 import searchBar from "../../components/searchbar";
 import './themeSetting.scss';
+import dialogs from "../../components/dialogs";
 
 export default function () {
   const $page = Page(strings.theme);
@@ -63,13 +64,22 @@ export default function () {
   render();
 
   function render(mode = "app") {
-    let themeList = [];
-    let defaultValue = () => false;
+    let themeList = [],
+      html = '',
+      defaultValue = () => false;
 
     if (mode === "editor" && innerHeight * 0.3 >= 120) $container.append($themePreview);
     else $themePreview.remove();
 
     if (mode === "app") {
+      if (!DOES_SUPPORT_THEME)
+        html = "<div class=\"list-item\">" +
+        "<span class=\"icon warningreport_problem\"></span>" +
+        "<div class=\"container\">" +
+        "<span class=\"text\">" + strings["unsupported device"] + "</span>" +
+        "</div>" +
+        "</div>";
+
       themeList = constants.appThemeList;
       defaultValue = theme => appSettings.value.appTheme === theme;
     } else if (mode === "editor") {
@@ -77,14 +87,24 @@ export default function () {
       defaultValue = theme => appSettings.value.editorTheme === `ace/theme/${theme}`;
     } else if (mode === "md") {}
 
-    let html = '';
     for (let theme in themeList) {
+      let paid = false,
+        disable = false;
+      const themeData = themeList[theme];
+
+      if (mode === "app") {
+        if (IS_FREE_VERSION && !themeData.isFree) paid = true;
+        if (!DOES_SUPPORT_THEME) disable = true;
+      }
+
       html += mustache.render($_list_item, {
         name: theme.replace(/_/g, ' ').capitalize(),
         theme,
         mode,
-        type: themeList[theme].type,
-        default: defaultValue(theme)
+        type: themeData.type,
+        default: defaultValue(theme),
+        disable,
+        paid
       });
     }
     $page.get("#theme-list").innerHTML = html;

@@ -42,9 +42,28 @@ export default function showFileInfo() {
         options.showUri = Uri.getVirtualAddress(file.uri);
         showBox(options);
       } else if (protocol === "ftp:") {
+        options.shareUri = TEMP_STORAGE + file.name;
         options.showUri = Url.hidePassword(uri);
-        options.shareUri = CACHE_STORAGE_REMOTE + uri.hashCode();
-        showBox(options);
+        let fileFs;
+        const text = file.session.getValue();
+
+        fsOperation(TEMP_STORAGE + file.name)
+          .then(fs => {
+            fileFs = fs;
+            return fs.exists();
+          })
+          .then(exists => {
+            fsOperation(TEMP_STORAGE)
+              .then(fs => {
+                if (!exists)
+                  return fs.createFile(file.name, text);
+                else
+                  return fileFs.writeFile(text);
+              })
+              .then(() => {
+                showBox(options);
+              });
+          });
       } else {
         showBox(options);
       }

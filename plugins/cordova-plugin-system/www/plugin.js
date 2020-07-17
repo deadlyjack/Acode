@@ -17,9 +17,20 @@ window.system = {
       onFail = onSuccess;
       filename = "";
     }
+
+    if (!filename) filename = "";
+
     cordova.exec(onSuccess, onFail, "System", "share-file", [fileUri, filename]);
   },
-  sendEmail: function (subject, bodyText, bodyHTML, onSuccess, onFail) {
-    cordova.exec(onSuccess, onFail, "System", "send-email", [subject, bodyText, bodyHTML]);
+  sendEmail: function (email, subject, bodyText, bodyHTML, onSuccess, onFail) {
+    if (typeof bodyHTML === "function") {
+      onSuccess = bodyHTML;
+      onFail = onSuccess;
+      bodyHTML = "";
+    }
+
+    if (!bodyHTML) bodyHTML = "";
+
+    cordova.exec(onSuccess, onFail, "System", "send-email", [email, subject, bodyText, bodyHTML]);
   }
 };

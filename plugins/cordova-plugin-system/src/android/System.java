@@ -55,7 +55,7 @@ public class System extends CordovaPlugin {
       this.shareFile(args.getString(0), args.getString(1), callbackContext);
       return true;
     } else if (action.equals("send-email")) {
-      this.sendEmail(args.getString(0), args.getString(1), args.getString(2), callbackContext);
+      this.sendEmail(args.getString(0), args.getString(1), args.getString(2), args.getString(3), callbackContext);
       return true;
     }
     return false;
@@ -154,10 +154,10 @@ public class System extends CordovaPlugin {
       public void run() {
         try {
           Uri uri = Uri.parse(fileURI);
-
+          String Id = context.getPackageName();
           if (fileURI.matches("file:///(.*)")) {
             File file = new File(uri.getPath());
-            uri = FileProvider.getUriForFile(context, "com.foxdebug.provider", file);
+            uri = FileProvider.getUriForFile(context, Id + ".provider", file);
           }
 
           Intent intent = new Intent(Intent.ACTION_SEND);
@@ -174,18 +174,19 @@ public class System extends CordovaPlugin {
     });
   }
 
-  private void sendEmail(final String subject, final String bodyText, final String bodyHTML,
+  private void sendEmail(final String email, final String subject, final String bodyText, final String bodyHTML,
       final CallbackContext callbackContext) {
     final Activity activity = this.activity;
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
         try {
-          Intent intent = new Intent(Intent.ACTION_SEND);
+          Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email, null));
           intent.putExtra(Intent.EXTRA_SUBJECT, subject);
           intent.putExtra(Intent.EXTRA_TEXT, bodyText);
-          intent.putExtra(Intent.EXTRA_HTML_TEXT, bodyHTML);
-          intent.setType("text/plain");
-          activity.startActivity(intent);
+          if (!bodyHTML.equals(""))
+            intent.putExtra(Intent.EXTRA_HTML_TEXT, bodyHTML);
+
+          activity.startActivity(Intent.createChooser(intent, "Send Email"));
           callbackContext.success("OK");
         } catch (Exception e) {
           callbackContext.error(e.getMessage());

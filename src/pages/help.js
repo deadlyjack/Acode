@@ -21,9 +21,7 @@ export default function help(opts) {
 
     const settingsOptions = [{
             key: 'feedback',
-            text: 'Feedback',
-            type: 'a',
-            href: `mailto:${constants.FEEDBACK_EMAIL}?subject=feedback - Acode code editor for android&body=${helpers.getFeedbackBody()}`
+            text: 'Feedback'
         },
         {
             key: 'help',
@@ -41,7 +39,14 @@ export default function help(opts) {
 
     gen.listItems(options, settingsOptions, changeSetting);
 
-    function changeSetting() {}
+    function changeSetting() {
+        if (this.key === "feedback") {
+            const subject = "feedback - Acode editor";
+            const textBody = helpers.getFeedbackBody("<br/>%0A");
+            const email = constants.FEEDBACK_EMAIL;
+            window.open(`mailto:${email}?subject=${subject}&body=${textBody}`, "_system");
+        }
+    }
 
     page.append(options);
     document.body.append(page);

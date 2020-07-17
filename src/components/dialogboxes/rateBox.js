@@ -30,7 +30,12 @@ function rateBox() {
         window.open(`https://play.google.com/store/apps/details?id=${BuildInfo.packageName}`, '_system');
         localStorage.dontAskForRating = true;
       } else {
-        window.open(`mailto:${constants.FEEDBACK_EMAIL}?subject=feedback - Acode&body=<big>${getStars(val)}</big> <br> ${helpers.getFeedbackBody()}`, '_system');
+        const stars = getStars(val);
+        const subject = "feedback - Acode editor";
+        const textBody = stars + "</br>%0A" + helpers.getFeedbackBody("</br>%0A");
+        const email = constants.FEEDBACK_EMAIL;
+        // system.sendEmail(email, subject, textBody);
+        window.open(`mailto:${email}?subject=${subject}&body=${textBody}`, "_system");
       }
       ++localStorage.count;
     }, 100);
@@ -46,13 +51,9 @@ function rateBox() {
     let star = num;
     let nostar = 5 - num;
     let str = '';
-    while (star--) {
-      str += '★';
-    }
 
-    while (nostar--) {
-      str += '☆';
-    }
+    while (star--) str += '★';
+    while (nostar--) str += '☆';
 
     return str;
   }
