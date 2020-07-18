@@ -87,9 +87,9 @@ body {
 
       &.page {
         main {
-          height: 100vh;
           top: 0;
           position: fixed;
+          height: 100vh;
           width: 100%;
         }
 
@@ -187,7 +187,6 @@ div.page {
   }
 
   .main {
-    max-width: 600px;
     margin: auto;
 
     .navigation {

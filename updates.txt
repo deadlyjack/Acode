@@ -1,4 +1,4 @@
-version 1.1.14.116
+version 1.1.14.117
 ☞ Latest Ace editor v1.4.12
 ☞ Share file
 ☞ UI improvement
@@ -6,11 +6,6 @@ version 1.1.14.116
 ☞ Bugs fixes
 
 version 1.1.14.115
-version 1.1.14.114
-version 1.1.14.113
-☞ Minor bugs fixes
-
-version 1.1.14.112
 ☞ Bugs fixes
 ☞ Option to disable floating button
 ☞ Remembers state of quicktools

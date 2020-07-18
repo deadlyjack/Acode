@@ -115,6 +115,9 @@
         display: flex;
         min-height: 60px;
         text-decoration: none;
+        max-width: 600px;
+        margin: auto;
+        box-sizing: border-box;
 
         &.disabled {
             pointer-events: none;
@@ -128,7 +131,8 @@
         }
 
         &:not(:last-child) {
-            border-bottom: solid 1px rgba(243, 233, 233, 0.3);
+            border-bottom: solid 1px rgba(122, 122, 122, 0.227);
+            border-bottom: solid 1px var(--border-color);
         }
 
         &:first-child {
@@ -196,6 +200,9 @@ ul {
         overflow-y: auto;
 
         li {
+            max-width: 600px;
+            margin: auto;
+            box-sizing: border-box;
 
             &.tile {
                 .icon {
