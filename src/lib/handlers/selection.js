@@ -9,19 +9,80 @@ function textControl(editor, controls, container) {
     const $content = container.querySelector('.ace_scroller'),
         threshold = 200;
 
-    let oldPos = editor.getCursorPosition(),
+    let counterTimeout, timeout,
+        oldPos = editor.getCursorPosition(),
         count = 0,
-        counterTimeout, touch = false,
-        cmFlag = false;
+        touch = false,
+        cmFlag = false,
+        move = false;
 
     $content.addEventListener('touchstart', ontouchstart);
+    $content.addEventListener('touchmove', ontouchmove);
+    $content.addEventListener('touchcancel', ontouchmove);
+    $content.addEventListener('touchend', ontouchend);
     $content.oncontextmenu = oncontextmenu;
+
+    function ontouchmove(e) {
+        if (!touch) return;
+        count = 0;
+        move = true;
+        if (timeout) clearTimeout(timeout);
+        console.log("touch move");
+    }
+
+    function ontouchend(e) {
+        if (!touch || move) return;
+
+        console.log("touch end");
+        if (timeout) clearTimeout(timeout);
+
+        const shiftKey = tag.get('#shift-key');
+        if (count) {
+
+            if (count === 1) setTimeout(() => {
+                if (touch) return;
+                preventDefault(e);
+                setTimeout(Acode.exec, 0, "select-word");
+                editor.focus();
+            }, 0);
+
+        } else if (shiftKey && shiftKey.getAttribute('data-state') === 'on') {
+            preventDefault(e);
+            const me = new AceMouseEvent(e, editor);
+            const pos = me.getDocumentPosition();
+            setTimeout(() => {
+                editor.selection.setRange({
+                    start: oldPos,
+                    end: pos
+                });
+                Acode.exec("select");
+            }, 0);
+
+        } else {
+            oldPos = editor.getCursorPosition();
+            enableSingleMode();
+        }
+
+        if (counterTimeout) {
+            clearTimeout(counterTimeout);
+            counterTimeout = null;
+        }
+
+        counterTimeout = setTimeout(() => {
+            count = 0;
+            counterTimeout = null;
+        }, threshold);
+
+        ++count;
+        touch = false;
+    }
 
     function ontouchstart(e) {
 
         if (count) preventDefault(e);
 
-        let timeout;
+        move = false;
+        timeout = null;
         touch = true;
 
         if (cmFlag) {
@@ -29,58 +90,6 @@ function textControl(editor, controls, container) {
             cmFlag = false;
             return;
         }
-
-        document.ontouchmove = document.ontouchcancel = function () {
-            count = 0;
-            if (timeout) clearTimeout(timeout);
-            document.ontouchmove = document.ontouchcancel = document.ontouchend = null;
-        };
-
-        document.ontouchend = function () {
-            if (timeout) clearTimeout(timeout);
-
-            const shiftKey = tag.get('#shift-key');
-            if (count) {
-
-                if (count === 1) setTimeout(() => {
-                    if (touch) return;
-                    preventDefault(e);
-                    setTimeout(Acode.exec, 0, "select-word");
-                    editor.focus();
-                }, 0);
-
-            } else if (shiftKey && shiftKey.getAttribute('data-state') === 'on') {
-                preventDefault(e);
-                const me = new AceMouseEvent(e, editor);
-                const pos = me.getDocumentPosition();
-                setTimeout(() => {
-                    editor.selection.setRange({
-                        start: oldPos,
-                        end: pos
-                    });
-                    Acode.exec("select");
-                }, 0);
-
-            } else {
-                oldPos = editor.getCursorPosition();
-                enableSingleMode();
-            }
-
-            document.ontouchmove = document.ontouchcancel = document.ontouchend = null;
-
-            if (counterTimeout) {
-                clearTimeout(counterTimeout);
-                counterTimeout = null;
-            }
-
-            counterTimeout = setTimeout(() => {
-                count = 0;
-                counterTimeout = null;
-            }, threshold);
-
-            ++count;
-            touch = false;
-        };
     }
 
     function preventDefault(e) {
@@ -127,7 +136,6 @@ function enableSingleMode() {
     const $end = controls.end;
     let updateTimeout;
 
-    editor.focus();
     if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
     $cm.innerHTML = lessConent;
     if (editorManager.activeFile) editorManager.activeFile.controls = true;
@@ -143,6 +151,7 @@ function enableSingleMode() {
     editor.selection.on('changeCursor', onchange);
     controls.checkForColor();
 
+    editor.focus();
     updateEnd();
 
     const mObserver = new MutationObserver(oberser);
@@ -218,7 +227,6 @@ function enableSingleMode() {
         cpos.y = cursor.bottom;
 
         update();
-
     }
 
     function update(left = 0, top = 0) {
