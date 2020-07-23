@@ -74,6 +74,7 @@ function sidenav(activator, toggler) {
 
     function show() {
         $el.activated = true;
+        $el.onclick = null;
 
         if (mode === 'phone') {
 
@@ -93,6 +94,11 @@ function sidenav(activator, toggler) {
             app.append($el);
             editorManager.editor.resize(true);
             editorManager.controls.update();
+
+            $el.onclick = () => {
+                if (!$el.textContent)
+                    Acode.exec("open-folder");
+            };
         }
 
         restoreScrollPos();

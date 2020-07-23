@@ -127,6 +127,7 @@ function enableSingleMode() {
     const $end = controls.end;
     let updateTimeout;
 
+    editor.focus();
     if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
     $cm.innerHTML = lessConent;
     if (editorManager.activeFile) editorManager.activeFile.controls = true;

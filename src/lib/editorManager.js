@@ -399,6 +399,7 @@ function EditorManager($sidebar, $header, $body) {
 
         return file;
     }
+
     /**
      * 
      * @param {File} file 

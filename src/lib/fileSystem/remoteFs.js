@@ -116,6 +116,8 @@ function remoteFs(username, password, hostname, port, security, mode) {
                 size
               } = entry;
 
+              if (name === "." || name === "..") return entry;
+
               link = link === "null" ? null : link;
 
               const url = link ? link : absolutePath;

@@ -176,7 +176,7 @@ export default {
      */
     moveOrCopy(action, src, dest) {
         return new Promise((resolve, reject) => {
-            verify(src, dest)
+            this.verify(src, dest)
                 .then(res => {
                     const {
                         src,

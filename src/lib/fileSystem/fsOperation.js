@@ -113,8 +113,8 @@ function fsOperation(uri) {
       createDirectory: name => fs.createDir(url, name),
       deleteFile: () => fs.deleteFile(url),
       deleteDir: () => fs.deleteFile(url),
-      copyTo: dest => fs.copyTo(dest),
-      moveTo: dest => fs.moveTo(dest),
+      copyTo: dest => fs.moveOrCopy("copyTo", url, dest),
+      moveTo: dest => fs.moveOrCopy("moveTo", url, dest),
       renameTo: newname => fs.renameFile(url, newname),
       exists: () => fs.exists(url),
       stats: () => fs.stats(url)

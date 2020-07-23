@@ -3886,7 +3886,7 @@ define("ace/mouse/mouse_handler", ["require", "exports", "module", "ace/lib/even
                 !editor.isFocused() && document.activeElement == (editor.textInput && editor.textInput.getElement());
             if (windowBlurred)
                 window.focus();
-            editor.focus();
+            // editor.focus();
         };
 
         var mouseTarget = editor.renderer.getMouseEventTarget();
@@ -4098,7 +4098,7 @@ define("ace/mouse/fold_handler", ["require", "exports", "module", "ace/lib/dom"]
                 var session = editor.session;
                 if (session.foldWidgets && session.foldWidgets[row])
                     editor.session.onFoldWidgetClick(row, e);
-                if (!editor.isFocused())
+                if (editorManager.state === "focus")
                     editor.focus();
                 e.stop();
             }
