@@ -57,6 +57,9 @@ public class System extends CordovaPlugin {
     } else if (action.equals("send-email")) {
       this.sendEmail(args.getString(0), args.getString(1), args.getString(2), args.getString(3), callbackContext);
       return true;
+    }else if(action.equals("termux")){
+      this.termux(args.getString(0), args.getString(1), callbackContext);
+      return true;
     }
     return false;
   }
@@ -193,6 +196,20 @@ public class System extends CordovaPlugin {
         }
       }
     });
+  }
+
+  private void termux(String command, String arg, CallbackContext callbackContext){
+    try{
+      Intent intent = new Intent();
+      intent.setClassName("com.termux", "com.termux.app.RunCommandService");
+      intent.setAction("com.termux.RUN_COMMAND");
+      intent.putExtra("com.termux.RUN_COMMAND_PATH", command);
+      intent.putExtra("com.termux.RUN_COMMAND_ARGUMENTS", new String[]{arg});
+      context.startService(intent);
+      callbackContext.success("SUCCESS");
+    }catch(Exception e){
+      callbackContext.success(e.getMessage());
+    }
   }
 
 }

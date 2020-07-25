@@ -1,4 +1,4 @@
-version 1.1.14.119
+version 1.1.14.120
 ☞ Bugs fixes
 ☞ Latest Ace editor v1.4.12
 ☞ Share file

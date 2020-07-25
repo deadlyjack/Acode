@@ -32,5 +32,8 @@ window.system = {
     if (!bodyHTML) bodyHTML = "";
 
     cordova.exec(onSuccess, onFail, "System", "send-email", [email, subject, bodyText, bodyHTML]);
+  },
+  termux: function (command, argument, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, "System", "termux", [command, argument]);
   }
 };

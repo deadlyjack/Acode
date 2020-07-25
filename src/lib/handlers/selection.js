@@ -20,20 +20,33 @@ function textControl(editor, controls, container) {
     $content.addEventListener('touchmove', ontouchmove);
     $content.addEventListener('touchcancel', ontouchmove);
     $content.addEventListener('touchend', ontouchend);
-    $content.oncontextmenu = oncontextmenu;
+    $content.addEventListener('click', () => editor.focus());
+    $content.addEventListener("contextmenu", oncontextmenu);
+
+    function ontouchstart(e) {
+        console.log(e.type);
+        if (count) preventDefault(e);
+
+        move = false;
+        timeout = null;
+        touch = true;
+
+        if (cmFlag) {
+            count = 0;
+            cmFlag = false;
+            return;
+        }
+    }
 
     function ontouchmove(e) {
         if (!touch) return;
         count = 0;
         move = true;
         if (timeout) clearTimeout(timeout);
-        console.log("touch move");
     }
 
     function ontouchend(e) {
         if (!touch || move) return;
-
-        console.log("touch end");
         if (timeout) clearTimeout(timeout);
 
         const shiftKey = tag.get('#shift-key');
@@ -75,21 +88,6 @@ function textControl(editor, controls, container) {
 
         ++count;
         touch = false;
-    }
-
-    function ontouchstart(e) {
-
-        if (count) preventDefault(e);
-
-        move = false;
-        timeout = null;
-        touch = true;
-
-        if (cmFlag) {
-            count = 0;
-            cmFlag = false;
-            return;
-        }
     }
 
     function preventDefault(e) {
@@ -151,7 +149,6 @@ function enableSingleMode() {
     editor.selection.on('changeCursor', onchange);
     controls.checkForColor();
 
-    editor.focus();
     updateEnd();
 
     const mObserver = new MutationObserver(oberser);

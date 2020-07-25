@@ -52,7 +52,6 @@ a {
     color: var(--text-main-color);
 
     li.tile {
-        min-width: min-content;
         height: 30px;
         overflow: hidden;
         font-size: 0.8em;
@@ -60,6 +59,8 @@ a {
         margin: 0;
         padding: 0;
         color: inherit;
+        min-width: 100px;
+        max-width: 100px;
 
         .text {
             display: inline-block;
