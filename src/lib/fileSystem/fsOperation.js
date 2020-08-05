@@ -4,6 +4,7 @@ import externalFs from "./externalFs";
 import path from "../utils/path";
 import remoteFs from "./remoteFs";
 import Url from "../utils/Url";
+import dialogs from "../../components/dialogs";
 
 /**
  * 
@@ -16,7 +17,12 @@ function fsOperation(uri) {
     const protocol = Url.getProtocol(uri);
     if (protocol === 'file:') {
 
-      createInternalFsOperation(internalFs, uri, resolve);
+      if (/file:\/\/\/storage\/emulated/.test(uri)) {
+        createInternalFsOperation(internalFs, uri, resolve);
+      } else {
+        convertToContentUri(uri)
+          .then(res => createExternalFsOperation(externalFs, res, resolve));
+      }
 
     } else if (protocol === "content:") {
 
@@ -165,7 +171,7 @@ function fsOperation(uri) {
       },
       exists: () => {
         return new Promise((resolve, reject) => {
-          SDcard.exists(url, res => {
+          sdcard.exists(url, res => {
             if (res === "TRUE") resolve(true);
             else resolve(false);
           }, reject);
@@ -209,6 +215,45 @@ function fsOperation(uri) {
         .catch(reject);
     });
   }
+
+}
+
+/**
+ * 
+ * @param {String} uri 
+ */
+async function convertToContentUri(uri) {
+
+  const regEx = /^file:\/\/\/storage\/([0-9a-z\-]+)/i;
+  const uuid = regEx.exec(uri)[1];
+  const filePath = Url.join(
+    `content://com.android.externalstorage.documents/tree/${uuid}%3A`,
+    uri.replace(regEx, "")
+  );
+
+  const canWrite = await (() => new Promise((resolve, reject) => {
+    sdcard.stats(filePath, res => resolve(res.canWrite), reject);
+  }))();
+
+  if (!canWrite) {
+    try {
+      await (() => new Promise((resolve, reject) => {
+        dialogs.confirm(strings.info.toUpperCase(), strings["allow storage"])
+          .then(() => sdcard.getStorageAccessPermission(uuid, resolve, reject))
+          .catch(() => reject(strings["permission denied"]));
+      }))();
+    } catch (error) {
+      if (typeof error === "string") {
+        dialogs.alert(strings.info.toUpperCase(), error);
+        throw new Error(error);
+      } else {
+        dialogs.alert(strings.info.toUpperCase(), error.message);
+        throw error;
+      }
+    }
+  }
+
+  return filePath;
 
 }
 

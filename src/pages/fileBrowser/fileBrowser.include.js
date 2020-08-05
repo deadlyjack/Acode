@@ -185,7 +185,10 @@ function FileBrowserInclude(type, option) {
       renderList(getStorageList());
 
       if (!localStorage.fileBrowserInit) {
-        externalFs.listStorages()
+        dialogs.confirm(strings.info.toUpperCase(), strings["sdcard found"])
+          .then(res => {
+            return externalFs.listStorages();
+          })
           .then(res => {
             if (Array.isArray(res) && res.length > 0)
               util.addPath(res[0].name)
@@ -516,7 +519,7 @@ function FileBrowserInclude(type, option) {
       }
 
       function openDoc() {
-        SDcard.openDocumentFile(res => {
+        sdcard.openDocumentFile(res => {
           res.url = res.uri;
           resolve(res);
           $page.hide();

@@ -463,7 +463,7 @@ function App() {
     /**
      * @type {File}
      */
-    const activeFile = this.activeFile;
+    const activeFile = editorManager.activeFile;
     const $save = $footer.querySelector('[action=save]');
 
     if (!$editMenuToggler.isConnected)
@@ -478,7 +478,7 @@ function App() {
         if ($save) $save.classList.remove('notice');
       }
 
-      this.editor.setReadOnly(!activeFile.editable);
+      editorManager.editor.setReadOnly(!activeFile.editable);
 
       if (['html', 'htm', 'xhtml', 'md', 'js'].includes(helpers.extname(activeFile.filename))) {
         $header.insertBefore($runBtn, $header.lastChild);

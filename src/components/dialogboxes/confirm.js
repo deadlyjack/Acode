@@ -6,7 +6,7 @@ import tag from 'html-tag-js';
  * @returns {Promise<void>}
  */
 function confirm(titleText, message) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     if (!message && titleText) {
       message = titleText;
       titleText = '';
@@ -31,6 +31,7 @@ function confirm(titleText, message) {
       textContent: strings.cancel,
       onclick: function () {
         hide();
+        reject(false);
       }
     });
     const confirmDiv = tag('div', {

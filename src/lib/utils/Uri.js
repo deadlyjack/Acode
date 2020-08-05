@@ -16,7 +16,6 @@ export default {
   parse(contentUri) {
     let rootUri, docId = "";
 
-
     const DOC_PROVIDER = /^content:\/\/com\.((?![:<>"\/\\\|\?\*]).)*\.documents\//;
     const TREE_URI = /^content:\/\/com\.((?![:<>"\/\\\|\?\*]).)*\.documents\/tree\//;
     const SINGLE_URI = /^content:\/\/com\.(((?![:<>"\/\\\|\?\*]).)*)\.documents\/document/;

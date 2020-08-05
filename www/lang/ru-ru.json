@@ -150,5 +150,8 @@
   "line count": "Количество строк",
   "last modified": "Последнее изменение",
   "size": "Размер",
-  "share": "Поделиться"
+  "share": "Поделиться",
+  "sdcard found": "External storage found! Do you want to add it?",
+  "allow storage": "Give permission to access your external storage?",
+  "permission denied": "Permission denied to access external storage."
 }

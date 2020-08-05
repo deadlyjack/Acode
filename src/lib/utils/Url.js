@@ -57,6 +57,7 @@ export default {
     if (protocol === "content://") {
 
       try {
+        if (pathnames[1].startsWith("/")) pathnames[1] = pathnames[1].slice(1);
         const contentUri = Uri.parse(url);
         const protocol = this.getProtocol(contentUri.rootUri);
         if (protocol === "content:") {

@@ -33,6 +33,7 @@
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^6.0.2",
     "cordova-plugin-navigationbar-color": "0.0.9",
+    "cordova-plugin-sdcard": "^1.0.1",
     "cordova-plugin-shell-exec": "^1.0.0",
     "cordova-plugin-statusbar": "^2.4.3",
     "cordova-plugin-vibration": "^3.1.1",
@@ -88,12 +89,12 @@
       "cordova-disable-http-cache": {},
       "cordova-plugin-intent": {},
       "cordova-plugin-ftp": {},
-      "cordova-plugin-sdcard": {
-        "ANDROID_SUPPORT_VERSION": "28.+"
-      },
       "cordova-plugin-webserver": {},
       "cordova-plugin-statusbar": {},
-      "cordova-plugin-system": {}
+      "cordova-plugin-system": {},
+      "cordova-plugin-sdcard": {
+        "ANDROID_SUPPORT_VERSION": "28.+"
+      }
     },
     "platforms": [
       "android"

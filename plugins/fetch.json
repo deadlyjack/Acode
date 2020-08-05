@@ -151,14 +151,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-sdcard": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-sytem"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-webserver": {
     "source": {
       "type": "local",
@@ -179,6 +171,14 @@
     "source": {
       "type": "local",
       "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-system"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-sdcard": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-sdcard"
     },
     "is_top_level": true,
     "variables": {}

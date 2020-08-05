@@ -33,7 +33,7 @@ export default {
           type: "text",
           required: true,
           onclick: function () {
-            SDcard.getStorageAccessPermission("", res => {
+            sdcard.getStorageAccessPermission("", res => {
               this.value = res;
             }, err => {
               helpers.error(err);

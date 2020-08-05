@@ -40,10 +40,6 @@
     "cordova-plugin-navigationbar-color": {
       "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
-    "cordova-plugin-sdcard": {
-      "ANDROID_SUPPORT_VERSION": "28.+",
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
-    },
     "cordova-plugin-statusbar": {
       "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
@@ -60,6 +56,10 @@
       "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-system": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-sdcard": {
+      "ANDROID_SUPPORT_VERSION": "28.+",
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

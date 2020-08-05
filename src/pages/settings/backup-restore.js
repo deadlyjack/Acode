@@ -97,7 +97,7 @@ export default function backupRestore() {
 
     function restore() {
 
-        SDcard.openDocumentFile(data => {
+        sdcard.openDocumentFile(data => {
             backupRestore.restore(data.uri);
         }, helpers.error, "application/octet-stream");
 
