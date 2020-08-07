@@ -1,0 +1,21 @@
+<div id="ad">
+  <div class="heading">
+    <span class="text">A message from sponsor.</span>
+    <span class="icon clearclose" action="close"></span>
+  </div>
+  <a href="{{url}}">
+    <div class="ad-body">
+      {{#image}}
+      <div class="image"><img src="{{.}}"></div>
+      {{/image}}
+      <div class="content">
+        {{#title}}
+        <span class="title">{{.}}</span>
+        {{/title}}
+        {{#description}}
+        <span class="description">{{.}}</span>
+        {{/description}}
+      </div>
+    </div>
+  </a>
+</div>

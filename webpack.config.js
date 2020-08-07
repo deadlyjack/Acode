@@ -38,8 +38,8 @@ module.exports = {
             }
           },
           "css-loader?url=false",
-          "sass-loader",
-          "postcss-loader"
+          "postcss-loader",
+          "sass-loader"
         ]
       }
     ]

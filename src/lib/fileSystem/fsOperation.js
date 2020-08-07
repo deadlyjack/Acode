@@ -5,6 +5,7 @@ import path from "../utils/path";
 import remoteFs from "./remoteFs";
 import Url from "../utils/Url";
 import dialogs from "../../components/dialogs";
+import constants from "../constants";
 
 /**
  * 
@@ -16,12 +17,12 @@ function fsOperation(uri) {
   return new Promise((resolve, reject) => {
     const protocol = Url.getProtocol(uri);
     if (protocol === 'file:') {
-
-      if (/file:\/\/\/storage\/emulated/.test(uri)) {
-        createInternalFsOperation(internalFs, uri, resolve);
-      } else {
+      const match = constants.EXTERNAL_STORAGE.exec(uri);
+      if (match && match[1] !== "emulated") {
         convertToContentUri(uri)
           .then(res => createExternalFsOperation(externalFs, res, resolve));
+      } else {
+        createInternalFsOperation(internalFs, uri, resolve);
       }
 
     } else if (protocol === "content:") {
@@ -223,12 +224,10 @@ function fsOperation(uri) {
  * @param {String} uri 
  */
 async function convertToContentUri(uri) {
-
-  const regEx = /^file:\/\/\/storage\/([0-9a-z\-]+)/i;
-  const uuid = regEx.exec(uri)[1];
+  const uuid = constants.EXTERNAL_STORAGE.exec(uri)[1];
   const filePath = Url.join(
     `content://com.android.externalstorage.documents/tree/${uuid}%3A`,
-    uri.replace(regEx, "")
+    uri.replace(constants.EXTERNAL_STORAGE, "")
   );
 
   const canWrite = await (() => new Promise((resolve, reject) => {

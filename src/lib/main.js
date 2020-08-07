@@ -41,6 +41,7 @@ import Url from "./utils/Url";
 import backupRestore from "../pages/settings/backup-restore";
 import applySettings from "./applySettings";
 import fsOperation from "./fileSystem/fsOperation";
+import ajax from "./utils/ajax";
 //@ts-check
 
 loadPolyFill.apply(window);
@@ -60,6 +61,26 @@ function Main() {
   if (!localStorage.globalSettings && language in constants.langList) {
     lang = language;
   }
+
+  ajax({
+      url: "https://acode.foxdebug.com/api/getad",
+      responseType: "json"
+    })
+    .then(res => {
+      window.ad = res;
+      if (res.image) {
+        return ajax({
+          url: res.image,
+          responseType: 'arraybuffer'
+        });
+      } else {
+        return Promise.resolve(res);
+      }
+    })
+    .then(res => {
+      if (res instanceof ArrayBuffer)
+        ad.image = URL.createObjectURL(new Blob([res]));
+    });
 
   window.root = tag(window.root);
   window.app = document.body = tag(document.body);

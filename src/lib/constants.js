@@ -4,6 +4,7 @@ export default {
   HEX_COLOR: /^#([a-f0-9]{3}){1,2}([a-f0-9]{2})?$/i,
   RGB_COLOR: /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(\s*,\s*\d?(\.\d+)?)?\)$/i,
   HSL_COLOR: /^hsla?\(([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(\s*,\s*\d?(\.\d+)?)?\)$/i,
+  EXTERNAL_STORAGE: /^file:\/\/\/storage\/([0-9a-z\-]+)/i,
   DEFAULT_FILE_SESSION: "default-session",
   DEFAULT_FILE_NAME: "untitled.txt",
   RATING_COUNT: 15,
