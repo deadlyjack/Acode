@@ -82,7 +82,8 @@ export default {
     "ir-fa": "فارسی",
     "ar-ye": "العربية",
     "ja-jp": "日本語",
-    "bn-bd": "বাংলা"
+    "bn-bd": "বাংলা",
+    "cs-cz": "Čeština"
   },
   editorThemeList: {
     "ambiance": scheme('ambiance', 'dark'),
@@ -143,12 +144,12 @@ export default {
 };
 
 /**
- * 
- * @param {string} type 
- * @param {"light"|"dark"} type 
- * @param {boolean} [isFree] 
+ *
+ * @param {string} type
+ * @param {"light"|"dark"} type
+ * @param {boolean} [isFree]
  * @param {string} [darken]  primary color darkened by 40%
- * @param {string} [primary] 
+ * @param {string} [primary]
  * @returns {ThemeData}
  */
 function scheme(name, type, isFree, darken, primary) {
