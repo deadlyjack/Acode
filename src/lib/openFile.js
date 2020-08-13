@@ -54,6 +54,7 @@ async function open(file, data = {}) {
         return index === undefined ? uri : index;
     } else {
         const ext = helpers.extname(name);
+        const winLF = /\/r\/n/g;
         if (appSettings.defaultSettings.filesNotAllowed.includes((ext || '').toLowerCase())) {
             dialogs.loader.destroy();
             return alert(strings.notice.toUpperCase(), `'${ext}' ${strings['file is not supported']}`);
@@ -63,7 +64,7 @@ async function open(file, data = {}) {
         }
 
         const binData = await fs.readFile();
-        const text = helpers.decodeText(binData);
+        let text = helpers.decodeText(binData);
 
         if (helpers.isBinary(text) && /image/i.test(fileInfo.type)) {
             const blob = new Blob([binData]);

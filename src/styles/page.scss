@@ -175,8 +175,11 @@ div.page {
   overflow-y: auto;
   background-color: white;
   background-color: var(--secondary-color);
-  animation: page-transition 200ms ease 1;
   z-index: 108;
+
+  &:not(.primary) {
+    animation: page-transition 200ms ease 1;
+  }
 
   &:not(#root) {
     z-index: 110;

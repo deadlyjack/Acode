@@ -236,7 +236,8 @@ function FileBrowserInclude(type, option) {
       util.pushFolder(list, 'Internal storage', path);
       customUuid.map(storage => {
         util.pushFolder(list, storage.name, storage.uri, {
-          uuid: storage.uuid
+          uuid: storage.uuid,
+          storageType: "SD"
         });
       });
 
@@ -259,7 +260,8 @@ function FileBrowserInclude(type, option) {
         });
         util.pushFolder(list, name, url, {
           uuid: account.id,
-          "ftp-account": true
+          "ftp-account": true,
+          storageType: "FTP"
         });
 
       });
