@@ -49,7 +49,7 @@
   "info": "informace",
   "invalid value": "Neplatná hodnota",
   "language changed": "jazyk byl úspěšně změněn",
-  "linting": "Kontrola syntaktických chyb?",
+  "linting": "Kontrola syntaktických chyb",
   "logout": "Odhlásit",
   "loading": "Načítání",
   "my profile": "Můj profil",
@@ -84,9 +84,9 @@
   "select folder": "Vybrat složku",
   "settings": "nastavení",
   "settings saved": "Nastavení uloženo",
-  "show line numbers": "Zobrazit čísla řádků?",
-  "show hidden files": "Zobrazit skryté soubory?",
-  "show spaces": "Zobrazit mezery?",
+  "show line numbers": "Zobrazit čísla řádků",
+  "show hidden files": "Zobrazit skryté soubory",
+  "show spaces": "Zobrazit mezery",
   "soft tab": "Měkký tabulátor",
   "sort by name": "Setřídit podle jména",
   "success": "úspěch",
@@ -149,5 +149,6 @@
   "line count": "Počet řádek",
   "last modified": "Poslední úprava",
   "size": "Velikost",
-  "share": "Sdílet"
+  "share": "Sdílet",
+  "show print margin": "Show print margin"
 }
