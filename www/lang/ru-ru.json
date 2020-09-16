@@ -151,8 +151,8 @@
   "last modified": "Последнее изменение",
   "size": "Размер",
   "share": "Поделиться",
-  "sdcard found": "External storage found! Do you want to add it?",
-  "allow storage": "Give permission to access your external storage?",
-  "permission denied": "Permission denied to access external storage.",
-  "show print margin": "Show print margin"
+  "sdcard found": "Обнаружено внешнее хранилище, хотите добавить?",
+  "allow storage": "Предоставить доступ к внешнему хранилищу?",
+  "permission denied": "Отказано в разрешении на доступ к внешнему хранилищу",
+  "show print margin": "Показать поле печати"
 }
