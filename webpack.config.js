@@ -3,7 +3,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: {
     main: "./src/lib/main.js",
     console: "./src/lib/console.js",
@@ -38,8 +38,8 @@ module.exports = {
             }
           },
           "css-loader?url=false",
-          "sass-loader",
-          "postcss-loader"
+          "postcss-loader",
+          "sass-loader"
         ]
       }
     ]

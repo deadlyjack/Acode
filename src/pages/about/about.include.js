@@ -30,6 +30,7 @@ export default function AboutInclude() {
             const action = $el.getAttribute('action');
             if (!action) return;
 
+            e.preventDefault();
             switch (action) {
                 case "rate-box":
                     rateBox();

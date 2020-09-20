@@ -26,17 +26,21 @@ function sidenav(activator, toggler) {
         onclick: hide
     });
     const touch = {
-        start: 0,
-        total: 0,
-        end: 0,
+        startX: 0,
+        totalX: 0,
+        endX: 0,
+        startY: 0,
+        totalY: 0,
+        endY: 0,
         target: null
     };
     let width = 250,
         eventAddedFlag = 0,
         _innerWidth = innerWidth,
-        isScrolling = true,
-        $$ = [],
-        timeout, flag = false;
+        openedFolders = [],
+        flag = false,
+        isScrolling = false,
+        scrollTimeout = null;
     activator = activator || app;
 
     if (toggler)
@@ -113,18 +117,26 @@ function sidenav(activator, toggler) {
     }
 
     function restoreScrollPos() {
-        $$ = [...$el.getAll(':scope>div>ul')];
-        $$.map($ => {
+        openedFolders = [...$el.getAll(':scope>div>ul')];
+        openedFolders.map($ => {
             const scrollTop = $.getAttribute('scroll-pos');
             if (scrollTop) $.scrollTop = scrollTop;
+            return $;
         });
     }
 
     function attachListner() {
-        $$.map($ => {
+        openedFolders.map($ => {
             $.onscroll = function () {
-                if (timeout) clearTimeout(timeout);
                 isScrolling = true;
+                if (flag) {
+                    flag = false;
+                    resetState();
+                }
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 100);
                 this.setAttribute('scroll-pos', this.scrollTop);
             };
         });
@@ -156,12 +168,11 @@ function sidenav(activator, toggler) {
         document.ontouchstart = null;
         resetState();
 
-        $$.map($ => {
-            isScrolling = false;
-            timeout = null;
+        openedFolders.map($ => {
             $.onscroll = null;
+            return $;
         });
-        $$ = [];
+        openedFolders = [];
     }
 
     /**
@@ -169,17 +180,22 @@ function sidenav(activator, toggler) {
      * @param {TouchEvent} e 
      */
     function ontouchstart(e) {
+        if (isScrolling) return;
         const {
-            clientX
+            clientX,
+            clientY
         } = e.touches[0];
         $el.style.transition = 'none';
-        touch.start = clientX;
+        touch.startX = clientX;
+        touch.startY = clientY;
         touch.target = e.target;
 
         if ($el.activated && !$el.contains(e.target) && e.target !== mask) return;
-        else if (!$el.activated && touch.start > START_THRESHOLD || e.target === toggler) return;
+        else if (!$el.activated && touch.startX > START_THRESHOLD || e.target === toggler) return;
 
-        document.ontouchmove = ontouchmove;
+        document.addEventListener("touchmove", ontouchmove, {
+            passive: false
+        });
         document.ontouchend = ontouchend;
     }
 
@@ -188,26 +204,53 @@ function sidenav(activator, toggler) {
      * @param {TouchEvent} e 
      */
     function ontouchmove(e) {
+        e.preventDefault();
+
+        const [{
+            clientX,
+            clientY
+        }, scroll] = [e.touches[0], touch.target.getParent('.scroll')];
+        touch.endX = clientX;
+        touch.endY = clientY;
+        touch.totalX = touch.endX - touch.startX;
+        touch.totalY = touch.endY - touch.startY;
+
+        console.log({
+            ...touch
+        });
 
         if (!flag) {
             flag = true;
-            timeout = setTimeout(() => {
-                timeout = null;
-                isScrolling = false;
-            }, 50);
+            const scrollLeft = () => scroll.scrollBy({
+                left: -touch.totalX
+            });
+            const scrollTop = () => scroll.scrollBy({
+                top: -touch.totalY
+            });
+            if (scroll) {
+                if (Math.abs(touch.totalX) > Math.abs(touch.totalY)) {
+                    if (
+                        (touch.totalX > 0 &&
+                            scroll.scrollLeft > 0) ||
+                        (touch.totalX < 0 &&
+                            Math.round(scroll.scrollWidth - scroll.scrollLeft) > scroll.clientWidth)
+                    ) scrollLeft();
+                } else {
+                    if (
+                        (touch.totalY > 0 &&
+                            scroll.scrollTop > 0) ||
+                        (touch.totalY < 0 &&
+                            Math.round(scroll.scrollHeight - scroll.scrollTop) > scroll.clientHeight)
+                    ) scrollTop();
+                }
+
+                return;
+            }
         }
 
-        if (isScrolling) return;
-
         let width = $el.getwidth();
-        const {
-            clientX
-        } = e.touches[0];
 
-        touch.end = clientX;
-        touch.total = touch.end - touch.start;
-
-        if (!$el.activated && touch.total < width && touch.start < START_THRESHOLD) {
+        if (!$el.activated && touch.totalX < width && touch.startX < START_THRESHOLD) {
 
             if (!$el.isConnected) {
                 app.append($el, mask);
@@ -215,9 +258,9 @@ function sidenav(activator, toggler) {
                 restoreScrollPos();
             }
 
-            $el.style.transform = `translate3d(${-(width - touch.total)}px, 0, 0)`;
-        } else if (touch.total < 0 && $el.activated) {
-            $el.style.transform = `translate3d(${touch.total}px, 0, 0)`;
+            $el.style.transform = `translate3d(${-(width - touch.totalX)}px, 0, 0)`;
+        } else if (touch.totalX < 0 && $el.activated) {
+            $el.style.transform = `translate3d(${touch.totalX}px, 0, 0)`;
         }
     }
 
@@ -228,21 +271,20 @@ function sidenav(activator, toggler) {
     function ontouchend(e) {
 
         flag = false;
-        isScrolling = true;
 
-        if (e.target === $el && !$el.textContent && touch.total === 0) {
+        if (e.target === $el && !$el.textContent && touch.totalX === 0) {
             Acode.exec("open-folder");
             resetState();
             return hide();
-        } else if (e.target !== mask && touch.total === 0) return resetState();
-        else if (e.target === mask && touch.total === 0) return hide();
+        } else if (e.target !== mask && touch.totalX === 0) return resetState();
+        else if (e.target === mask && touch.totalX === 0) return hide();
         e.preventDefault();
 
         const threshold = $el.getwidth() / 3;
 
-        if (($el.activated && touch.total > -threshold) || (!$el.activated && touch.total >= threshold)) {
+        if (($el.activated && touch.totalX > -threshold) || (!$el.activated && touch.totalX >= threshold)) {
             lclShow();
-        } else if ((!$el.activated && touch.total < threshold) || ($el.activated && touch.total <= -threshold)) {
+        } else if ((!$el.activated && touch.totalX < threshold) || ($el.activated && touch.totalX <= -threshold)) {
             hide();
         }
 
@@ -263,14 +305,18 @@ function sidenav(activator, toggler) {
     }
 
     function resetState() {
-        touch.total = 0;
-        touch.start = 0;
-        touch.end = 0;
+        touch.totalY = 0;
+        touch.startY = 0;
+        touch.endY = 0;
+        touch.totalX = 0;
+        touch.startX = 0;
+        touch.endX = 0;
         touch.target = null;
-        document.ontouchmove = null;
+        document.removeEventListener("touchmove", ontouchmove, {
+            passive: false
+        });
         document.ontouchend = null;
         $el.style.transition = null;
-        document.onscroll = null;
     }
 
     $el.getwidth = function () {

@@ -104,6 +104,11 @@ export default function editorSettings() {
             key: 'liveAutoCompletion',
             text: strings["live autocompletion"].capitalize(),
             checkbox: values.liveAutoCompletion
+        },
+        {
+            key: 'showPrintMargin',
+            text: strings["show print margin"].capitalize(),
+            checkbox: values.showPrintMargin
         }
     ];
 
@@ -298,6 +303,12 @@ export default function editorSettings() {
                 editorManager.editor.setOption("enableLiveAutocompletion", values.liveAutoCompletion);
                 appSettings.update();
                 this.value = values.liveAutoCompletion;
+                break;
+            case 'showPrintMargin':
+                values.showPrintMargin = !values.showPrintMargin;
+                editorManager.editor.setOption("showPrintMargin", values.showPrintMargin);
+                appSettings.update();
+                this.value = values.showPrintMargin;
                 break;
         }
     }

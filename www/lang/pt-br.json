@@ -49,7 +49,7 @@
   "info": "Informação",
   "invalid value": "Valor inválido",
   "language changed": "O idioma foi alterado com sucesso",
-  "linting": "Verificar erros de sintaxe?",
+  "linting": "Verificar erros de sintaxe",
   "logout": "Sair",
   "loading": "Carregando",
   "my profile": "Meu perfil",
@@ -85,9 +85,9 @@
   "select folder": "Selecionar pasta",
   "settings": "Configurações",
   "settings saved": "Configurações salvas",
-  "show line numbers": "Mostrar números das linhas?",
-  "show hidden files": "Mostrar arquivos ocultos?",
-  "show spaces": "Mostrar espaços?",
+  "show line numbers": "Mostrar números das linhas",
+  "show hidden files": "Mostrar arquivos ocultos",
+  "show spaces": "Mostrar espaços",
   "soft tab": "Usar espaços em vez de tabs?",
   "sort by name": "Classificar por nome",
   "success": "Sucesso!",
@@ -150,5 +150,9 @@
   "line count": "Line count",
   "last modified": "Last modified",
   "size": "Size",
-  "share": "Share"
+  "share": "Share",
+  "sdcard found": "External storage found! Do you want to add it?",
+  "allow storage": "Give permission to access your external storage?",
+  "permission denied": "Permission denied to access external storage.",
+  "show print margin": "Show print margin"
 }

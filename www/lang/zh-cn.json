@@ -49,7 +49,7 @@
   "info": "信息",
   "invalid value": "无效值",
   "language changed": "语言更改成功",
-  "linting": "检查语法错误?",
+  "linting": "检查语法错误",
   "logout": "登出",
   "loading": "载入中",
   "my profile": "我的简历",
@@ -85,9 +85,9 @@
   "select folder": "选择文件夹",
   "settings": "设置",
   "settings saved": "设置已保存",
-  "show line numbers": "显示行号?",
-  "show hidden files": "显示隐藏文件?",
-  "show spaces": "显示空间?",
+  "show line numbers": "显示行号",
+  "show hidden files": "显示隐藏文件",
+  "show spaces": "显示空间",
   "soft tab": "软键盘Tab",
   "sort by name": "按名称排序",
   "success": "成功",
@@ -150,5 +150,9 @@
   "line count": "Line count",
   "last modified": "Last modified",
   "size": "Size",
-  "share": "Share"
+  "share": "Share",
+  "sdcard found": "External storage found! Do you want to add it?",
+  "allow storage": "Give permission to access your external storage?",
+  "permission denied": "Permission denied to access external storage.",
+  "show print margin": "Show print margin"
 }

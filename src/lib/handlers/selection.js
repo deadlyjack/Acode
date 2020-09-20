@@ -9,26 +9,53 @@ function textControl(editor, controls, container) {
     const $content = container.querySelector('.ace_scroller'),
         threshold = 200;
 
-    let counterTimeout, timeout,
+    let counterTimeout,
         oldPos = editor.getCursorPosition(),
         count = 0,
         touch = false,
         cmFlag = false,
         move = false;
 
+    const clearDoubleclick = () => {
+        count = 0;
+        if (clearTimeout) clearTimeout(counterTimeout);
+        counterTimeout = null;
+    };
+
     $content.addEventListener('touchstart', ontouchstart);
     $content.addEventListener('touchmove', ontouchmove);
     $content.addEventListener('touchcancel', ontouchmove);
     $content.addEventListener('touchend', ontouchend);
-    $content.addEventListener('click', () => editor.focus());
+    $content.addEventListener('click', onclick);
     $content.addEventListener("contextmenu", oncontextmenu);
 
+    function onclick(e) {
+        const shiftKey = tag.get('#shift-key');
+        if (shiftKey && shiftKey.getAttribute('data-state') === 'on') {
+            const me = new AceMouseEvent(e, editor);
+            const pos = me.getDocumentPosition();
+            editor.selection.setRange({
+                start: oldPos,
+                end: pos
+            });
+            Acode.exec("select-word");
+        } else {
+            if (!editor.isFocused())
+                editor.focus();
+
+            oldPos = editor.getCursorPosition();
+        }
+
+        enableSingleMode();
+    }
+
     function ontouchstart(e) {
-        console.log(e.type);
+
+        const shiftKey = tag.get('#shift-key');
+        if ((shiftKey && shiftKey.getAttribute('data-state') === 'on')) return;
         if (count) preventDefault(e);
 
         move = false;
-        timeout = null;
         touch = true;
 
         if (cmFlag) {
@@ -40,54 +67,24 @@ function textControl(editor, controls, container) {
 
     function ontouchmove(e) {
         if (!touch) return;
-        count = 0;
         move = true;
-        if (timeout) clearTimeout(timeout);
+        clearDoubleclick();
     }
 
     function ontouchend(e) {
+
         if (!touch || move) return;
-        if (timeout) clearTimeout(timeout);
 
-        const shiftKey = tag.get('#shift-key');
-        if (count) {
-
-            if (count === 1) setTimeout(() => {
+        if (count++) {
+            clearDoubleclick();
+            setTimeout(() => {
                 if (touch) return;
-                preventDefault(e);
                 setTimeout(Acode.exec, 0, "select-word");
                 editor.focus();
             }, 0);
-
-        } else if (shiftKey && shiftKey.getAttribute('data-state') === 'on') {
-            preventDefault(e);
-            const me = new AceMouseEvent(e, editor);
-            const pos = me.getDocumentPosition();
-            setTimeout(() => {
-                editor.selection.setRange({
-                    start: oldPos,
-                    end: pos
-                });
-                Acode.exec("select");
-            }, 0);
-
-        } else {
-            oldPos = editor.getCursorPosition();
-            enableSingleMode();
         }
-
-        if (counterTimeout) {
-            clearTimeout(counterTimeout);
-            counterTimeout = null;
-        }
-
-        counterTimeout = setTimeout(() => {
-            count = 0;
-            counterTimeout = null;
-        }, threshold);
-
-        ++count;
         touch = false;
+        counterTimeout = setTimeout(clearDoubleclick, threshold);
     }
 
     function preventDefault(e) {
@@ -97,11 +94,11 @@ function textControl(editor, controls, container) {
     }
 
     function oncontextmenu(e) {
-        cmFlag = true;
         preventDefault(e);
         const ev = new AceMouseEvent(e, editor);
         const pos = ev.getDocumentPosition();
         editor.gotoLine(parseInt(pos.row + 1), parseInt(pos.column + 1));
+        cmFlag = true;
 
         Acode.exec("select-word");
         editor.focus();

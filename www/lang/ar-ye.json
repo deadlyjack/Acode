@@ -50,7 +50,7 @@
   "info": "تفاصيل",
   "invalid value": "قيمة غير صالحة",
   "language changed": "تم تغيير اللغة بنجاح",
-  "linting": "فحص سينتاكس الجمل؟",
+  "linting": "فحص سينتاكس الجمل",
   "logout": "تسجيل الخروج",
   "loading": "جارِ التحميل",
   "my profile": "ملفي الشخصي",
@@ -85,9 +85,9 @@
   "select folder": "تحديد مجلد",
   "settings": "الإعدادات",
   "settings saved": "تم حفظ الإعدادات",
-  "show line numbers": "عرض ارقام الأسطر؟",
-  "show hidden files": "عرض الملفات المخفية؟",
-  "show spaces": "عرض المسافات؟",
+  "show line numbers": "عرض ارقام الأسطر",
+  "show hidden files": "عرض الملفات المخفية",
+  "show spaces": "عرض المسافات",
   "soft tab": "تبويب سلس",
   "sort by name": "الترتيب بواسطة الإسم؟",
   "success": "نجاح",
@@ -149,5 +149,9 @@
   "line count": "عدد الأسطر",
   "last modified": "آخر تعديل",
   "size": "الحجم",
-  "share": "مشاركة"
+  "share": "مشاركة",
+  "sdcard found": "External storage found! Do you want to add it?",
+  "allow storage": "Give permission to access your external storage?",
+  "permission denied": "Permission denied to access external storage.",
+  "show print margin": "Show print margin"
 }

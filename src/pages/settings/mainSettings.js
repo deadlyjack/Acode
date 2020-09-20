@@ -1,6 +1,8 @@
+import tag from 'html-tag-js';
+import mustache from 'mustache';
+
 import Page from "../../components/page";
 import dialogs from "../../components/dialogs";
-import tag from 'html-tag-js';
 import gen from "../../components/gen";
 import About from "../about/about";
 import editorSettings from "./editorSettings";
@@ -11,10 +13,12 @@ import internalFs from "../../lib/fileSystem/internalFs";
 import backupRestore from "./backup-restore";
 import themeSetting from "../themeSetting/themeSetting";
 
+import $_ad from '../../views/ad.hbs';
+
 export default function settingsMain(demo) {
     const value = appSettings.value;
     const $page = Page(strings.settings);
-    const settingsList = tag('div', {
+    const $settingsList = tag('div', {
         className: 'main list',
         style: {
             textTransform: "capitalize"
@@ -82,7 +86,7 @@ export default function settingsMain(demo) {
         });
     }
 
-    gen.listItems(settingsList, settingsOptions, changeSetting);
+    gen.listItems($settingsList, settingsOptions, changeSetting);
 
     function changeSetting() {
         const lanuguages = [];
@@ -156,6 +160,17 @@ export default function settingsMain(demo) {
         }
     }
 
-    $page.appendChild(settingsList);
+    $page.appendChild($settingsList);
+    if (window.ad && !localStorage.hideAd) {
+        const $ad = tag.parse(mustache.render($_ad, window.ad));
+        $ad.onclick = function (e) {
+            const action = e.target.getAttribute("action");
+            if (action === "close") {
+                this.remove();
+                localStorage.hideAd = true;
+            }
+        };
+        $settingsList.append($ad);
+    }
     document.body.append($page);
 }

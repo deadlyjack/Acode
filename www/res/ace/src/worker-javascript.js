@@ -11455,7 +11455,7 @@ exports.val = {
   ignore       : false, // start/end ignoring lines of code, bypassing the lexer
 
   ignoreDelimiters: false, // array of start/end delimiters used to ignore
-  esversion: 5
+  esversion: 7
 };
 exports.unstable = {
   bigint: true
@@ -12304,14 +12304,14 @@ var state = {
       }
 
       if (this.option.esversion === 2015) {
-        this.esVersion = 6;
+        this.esVersion = 7;
       } else {
         this.esVersion = this.option.esversion;
       }
     } else if (this.option.es3) {
-      this.esVersion = 3;
+      this.esVersion = 7;
     } else if (this.option.esnext) {
-      this.esVersion = 6;
+      this.esVersion = 7;
     }
 
     return null;
@@ -12325,7 +12325,7 @@ var state = {
     };
 
     this.option = { unstable: {} };
-    this.esVersion = 5;
+    this.esVersion = 7;
     this.funct = null;
     this.ignored = {};
     this.directive = Object.create(null);
@@ -15010,3 +15010,4 @@ oop.inherits(JavaScriptWorker, Mirror);
 }).call(JavaScriptWorker.prototype);
 
 });
+

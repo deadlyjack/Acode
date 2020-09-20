@@ -4,6 +4,8 @@ import externalFs from "./externalFs";
 import path from "../utils/path";
 import remoteFs from "./remoteFs";
 import Url from "../utils/Url";
+import dialogs from "../../components/dialogs";
+import constants from "../constants";
 
 /**
  * 
@@ -15,8 +17,13 @@ function fsOperation(uri) {
   return new Promise((resolve, reject) => {
     const protocol = Url.getProtocol(uri);
     if (protocol === 'file:') {
-
-      createInternalFsOperation(internalFs, uri, resolve);
+      const match = constants.EXTERNAL_STORAGE.exec(uri);
+      if (match && match[1] !== "emulated") {
+        convertToContentUri(uri)
+          .then(res => createExternalFsOperation(externalFs, res, resolve));
+      } else {
+        createInternalFsOperation(internalFs, uri, resolve);
+      }
 
     } else if (protocol === "content:") {
 
@@ -165,7 +172,7 @@ function fsOperation(uri) {
       },
       exists: () => {
         return new Promise((resolve, reject) => {
-          SDcard.exists(url, res => {
+          sdcard.exists(url, res => {
             if (res === "TRUE") resolve(true);
             else resolve(false);
           }, reject);
@@ -209,6 +216,43 @@ function fsOperation(uri) {
         .catch(reject);
     });
   }
+
+}
+
+/**
+ * 
+ * @param {String} uri 
+ */
+async function convertToContentUri(uri) {
+  const uuid = constants.EXTERNAL_STORAGE.exec(uri)[1];
+  const filePath = Url.join(
+    `content://com.android.externalstorage.documents/tree/${uuid}%3A`,
+    uri.replace(constants.EXTERNAL_STORAGE, "")
+  );
+
+  const canWrite = await (() => new Promise((resolve, reject) => {
+    sdcard.stats(filePath, res => resolve(res.canWrite), reject);
+  }))();
+
+  if (!canWrite) {
+    try {
+      await (() => new Promise((resolve, reject) => {
+        dialogs.confirm(strings.info.toUpperCase(), strings["allow storage"])
+          .then(() => sdcard.getStorageAccessPermission(uuid, resolve, reject))
+          .catch(() => reject(strings["permission denied"]));
+      }))();
+    } catch (error) {
+      if (typeof error === "string") {
+        dialogs.alert(strings.info.toUpperCase(), error);
+        throw new Error(error);
+      } else {
+        dialogs.alert(strings.info.toUpperCase(), error.message);
+        throw error;
+      }
+    }
+  }
+
+  return filePath;
 
 }
 

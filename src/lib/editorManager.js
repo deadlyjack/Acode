@@ -9,7 +9,6 @@ import constants from './constants';
 import internalFs from './fileSystem/internalFs';
 import openFolder from './openFolder';
 import Url from './utils/Url';
-import fsOperation from './fileSystem/fsOperation';
 import path from './utils/path';
 import Uri from './utils/Uri';
 import configEditor from './aceConfig';
@@ -42,18 +41,26 @@ function EditorManager($sidebar, $header, $body) {
         ready = false,
         lastHeight = innerHeight,
         editorState = 'blur';
-    const container = tag('div', {
+    // scrollTimeout = null,
+    // containerHeight = $body.getBoundingClientRect().height;
+    const $container = tag('div', {
         className: 'editor-container'
     });
     const queue = [];
     /**
      * @type {AceAjax.Editor}
      */
-    const editor = ace.edit(container);
+    const editor = ace.edit($container);
     const readOnlyContent = `<span action="copy">${strings.copy}</span><span action="select all">${strings["select all"]}<span>`;
     const fullContent = `<span action="copy">${strings.copy}</span><span action="cut">${strings.cut}</span><span action="paste">${strings.paste}</span><span action="select all">${strings["select all"]}</span>`;
     const SESSION_DIRNAME = 'sessions';
     const SESSION_PATH = cordova.file.cacheDirectory + SESSION_DIRNAME + '/';
+    // const $scrollerV = tag('span', {
+    //     className: 'scroller v'
+    // });
+    // const $scrollerH = tag('span', {
+    //     className: 'scroller h'
+    // });
     const controls = {
         start: tag('span', {
             className: 'cursor-control start'
@@ -106,7 +113,7 @@ function EditorManager($sidebar, $header, $body) {
         setSubText,
         moveOpenFileList,
         sidebar: $sidebar,
-        container,
+        container: $container,
         checkChanges,
         onFileSave,
         get state() {
@@ -120,12 +127,13 @@ function EditorManager($sidebar, $header, $body) {
         }
     };
 
+    // $container.append($scrollerV, $scrollerH);
     configEditor(editor);
-    container.classList.add(appSettings.value.editorFont);
+    $container.classList.add(appSettings.value.editorFont);
     moveOpenFileList();
-    $body.appendChild(container);
+    $body.appendChild($container);
     setupEditor();
-    textControl(editor, controls, container);
+    textControl(editor, controls, $container);
     controls.menu.ontouchend = function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -143,6 +151,7 @@ function EditorManager($sidebar, $header, $body) {
         }
         lastHeight = innerHeight;
         editor.renderer.scrollCursorIntoView();
+        // containerHeight = $body.getBoundingClientRect().height;
     });
 
     editor.on('focus', () => {
@@ -352,7 +361,14 @@ function EditorManager($sidebar, $header, $body) {
         file.assocTile.classList.add('light');
 
         file.assocTile.addEventListener('click', function (e) {
-            if (manager.activeFile && (e.target === removeBtn || manager.activeFile.id === file.id)) return;
+            if (
+                manager.activeFile &&
+                (
+                    e.target === removeBtn ||
+                    manager.activeFile.id === file.id
+                )
+            ) return;
+
             $sidebar.hide();
             switchFile(file.id);
         });
@@ -469,13 +485,47 @@ function EditorManager($sidebar, $header, $body) {
             enableEmmet: true,
             showInvisibles: settings.showSpaces,
             indentedSoftWrap: false,
-            scrollPastEnd: 0.5
+            scrollPastEnd: 0.5,
+            showPrintMargin: settings.showPrintMargin
         });
+
+        editor.container.style.lineHeight = 1.5;
 
         if (!appSettings.value.linting && appSettings.value.linenumbers) {
             editor.renderer.setMargin(0, 0, -16, 0);
         }
     }
+
+    // function adjustScrollV() {
+    //     const renderer = editor.renderer;
+    //     const session = editor.getSession();
+
+    //     if (!scrollTimeout) {
+    //         $scrollerV.classList.add("show");
+    //         scrollTimeout = setTimeout(() => {
+    //             $scrollerV.classList.remove("show");
+    //             scrollTimeout = null;
+    //         }, 2000);
+    //     }
+
+    //     if (!containerHeight) containerHeight = $container.getBoundingClientRect().height;
+    //     const offset = ((renderer.$size.scrollerHeight - renderer.lineHeight) * 0.5);
+    //     const editorHeight = session.getScreenLength() * renderer.lineHeight + offset;
+    //     const factor = (session.getScrollTop() / editorHeight);
+
+    //     $scrollerV.style.top = (((containerHeight + offset) * factor) - 60) + 'px';
+    // }
+
+    // function adjustScrollH() {
+    //     if (appSettings.value.textWrap) return;
+    //     if (!scrollTimeout) {
+    //         $scrollerH.classList.add("show");
+    //         scrollTimeout = setTimeout(() => {
+    //             $scrollerH.classList.remove("show");
+    //             scrollTimeout = null;
+    //         }, 2000);
+    //     }
+    // }
 
     function setupSession(file) {
         const session = file.session;
@@ -483,6 +533,9 @@ function EditorManager($sidebar, $header, $body) {
         const settings = appSettings.value;
         const ext = path.extname(filename);
         let mode;
+
+        // session.on('changeScrollTop', adjustScrollV);
+        // session.on('changeScrollLeft', adjustScrollH);
 
         try {
 
@@ -697,6 +750,7 @@ function EditorManager($sidebar, $header, $body) {
             }
 
             file.assocTile.remove();
+            file.session.destroy();
             delete file.session;
             delete file.assocTile;
             manager.onupdate();
@@ -756,7 +810,8 @@ function EditorManager($sidebar, $header, $body) {
         this.assocTile.text(name);
         this.name = name;
 
-        if (oldExt !== newExt) setupSession(this);
+        if (oldExt !== newExt)
+            setupSession(this);
 
         manager.onupdate();
 

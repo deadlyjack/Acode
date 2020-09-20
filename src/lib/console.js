@@ -14,7 +14,10 @@ import loadPolyFill from "./utils/polyfill";
     const inputContainer = document.createElement('c-input');
     const input = document.createElement('textarea');
     const toggler = document.createElement('c-toggler');
-    const clearBtn = document.createElement('c-toggler');
+    const errId = '_c_error' + new Date().getMilliseconds();
+    const consoleElement = document.createElement('c-console');
+    const counter = {};
+    const _console = console;
     const tagsToReplace = {
         '&': '&amp;',
         '<': '&lt;',
@@ -22,15 +25,9 @@ import loadPolyFill from "./utils/polyfill";
     };
     let isFocused = false;
     let flag;
-    const _console = console;
 
     input.id = '__c-input';
     inputContainer.appendChild(input);
-    clearBtn.innerHTML = '&times;';
-    clearBtn.onclick = clear;
-    clearBtn.style.fontSize = '1.2em';
-    clearBtn.style.left = 'calc(100vw - 40px)';
-    clearBtn.style.transform = "translate(-2px, 2px)";
 
     toggler.innerHTML = '&#9888;';
     toggler.style.transform = "translate(2px, 400px)";
@@ -56,14 +53,6 @@ import loadPolyFill from "./utils/polyfill";
         };
     };
 
-    function touchmove(e) {
-        e.preventDefault();
-        toggler.style.transform = "translate(".concat(e.touches[0].clientX - 20, "px, ").concat(e.touches[0].clientY - 20, "px)");
-    }
-
-    const errId = '_c_error' + new Date().getMilliseconds();
-    const consoleElement = document.createElement('c-console');
-    const counter = {};
     consoleElement.appendChild(inputContainer);
 
     consoleElement.onclick = function (e) {
@@ -98,8 +87,12 @@ import loadPolyFill from "./utils/polyfill";
         }
     }
 
-
     window.consoleLoaded = true;
+
+    function touchmove(e) {
+        e.preventDefault();
+        toggler.style.transform = "translate(".concat(e.touches[0].clientX - 20, "px, ").concat(e.touches[0].clientY - 20, "px)");
+    }
 
     function loadConsole() {
         if (sessionStorage.getItem('__mode') === 'console') {
@@ -142,17 +135,8 @@ import loadPolyFill from "./utils/polyfill";
 
     function toggleConsole() {
         if (consoleElement.isConnected) {
-            document.body.removeChild(clearBtn);
-            document.body.removeChild(consoleElement);
-            // if (sessionStorage.getItem('__mode') !== 'console') window.removeEventListener("hashchange", toggleConsole);
+            consoleElement.remove();
         } else {
-            // if (sessionStorage.getItem('__mode') !== 'console') {
-            //     location.hash = "console";
-            //     setTimeout(() => {
-            //         window.addEventListener("hashchange", toggleConsole);
-            //     }, 0);
-            // }
-            document.body.appendChild(clearBtn);
             document.body.appendChild(consoleElement);
             if (!flag) {
                 input.addEventListener('keydown', function (e) {
@@ -465,13 +449,16 @@ import loadPolyFill from "./utils/polyfill";
             const stack = document.createElement('c-stack');
             clean = decodeURI(clean.replace('.run_', '').replace(/\)$/, '').replace(location.origin, ''));
             clean = clean.length > 35 ? '...' + clean.substr(clean.length - 32) : clean;
-            stack.textContent = clean;
+            stack.innerHTML = `<c-date>${new Date().toLocaleString()}</c-date><c-trace>${clean}</c-trace>`;
             messages.appendChild(stack);
         } else if (mode === 'code') {
             messages.style.marginBottom = '0';
             messages.style.border = 'none';
         }
         consoleElement.insertBefore(messages, inputContainer);
+
+        while (consoleElement.childElementCount - 100 > 0)
+            consoleElement.firstElementChild.remove();
     }
 
     function error() {

@@ -84,9 +84,9 @@
   "select folder": "ফোল্ডার নির্বাচন করুন",
   "settings": "সেটিংস",
   "settings saved": "সেটিংস সংরক্ষিত হয়েছে",
-  "show line numbers": "লাইন নাম্বার দেখান?",
-  "show hidden files": "লুকায়িত ফাইলগুলো দেখুন?",
-  "show spaces": "ফাকাগুলি দেখুন?",
+  "show line numbers": "লাইন নাম্বার দেখান",
+  "show hidden files": "লুকায়িত ফাইলগুলো দেখুন",
+  "show spaces": "ফাকাগুলি দেখুন",
   "soft tab": "Soft tab",
   "sort by name": "নাম অনুসারে সাজান",
   "success": "সফল",
@@ -149,5 +149,9 @@
   "line count": "Line count",
   "last modified": "Last modified",
   "size": "Size",
-  "share": "Share"
+  "share": "Share",
+  "sdcard found": "External storage found! Do you want to add it?",
+  "allow storage": "Give permission to access your external storage?",
+  "permission denied": "Permission denied to access external storage.",
+  "show print margin": "Show print margin"
 }

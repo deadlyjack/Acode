@@ -1,0 +1,48 @@
+.editor-container {
+  .scroller {
+    position: absolute;
+    background-color: var(--button-background-color);
+    border: solid 1px currentColor;
+    border-radius: 4px;
+    color: var(--button-text-color);
+    z-index: 112;
+    opacity: 0;
+    transition: opacity 300ms;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &::after {
+      font-family: "code-editor-icon";
+      content: "\e9b0";
+      color: inherit;
+      font-size: 0.8rem;
+    }
+
+    &.v {
+      top: 0px;
+      right: 10px;
+      bottom: auto;
+      left: auto;
+      height: 60px;
+      width: 20px;
+    }
+
+    &.h {
+      top: auto;
+      right: auto;
+      bottom: 10px;
+      left: 0px;
+      height: 20px;
+      width: 60px;
+
+      &::after {
+        transform: rotate(90deg);
+      }
+    }
+
+    &.show {
+      opacity: 1;
+    }
+  }
+}
