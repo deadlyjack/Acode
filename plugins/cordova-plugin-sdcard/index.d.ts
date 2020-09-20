@@ -1,10 +1,36 @@
-# Write/modify content on external storage
+interface Storage {
+  /**
+   * Name of the storage
+   */
+  name: String;
+  /**
+   * UUID of the storage
+   */
+  uuid: String;
+}
 
-Using this plugin, cordova apps can check for external storages and write/modify files.
+interface DirListItem {
+  name: String;
+  mime: String;
+  isDirectory: Boolean;
+  isFile: Boolean;
+  uri: String;
+}
 
-## Usage
+interface Stats {
+  canRead: boolean;
+  canWrite: boolean;
+  exists: boolean; //indicates if file can be found on device storage
+  isDirectory: boolean;
+  isFile: boolean;
+  isVirtual: boolean;
+  lastModified: number;
+  length: number;
+  name: string;
+  type: string;
+  uri: string;
+}
 
-```ts
 interface SDcard {
 
   /**
@@ -39,7 +65,7 @@ interface SDcard {
    */
   delete(src: String, onSuccess: (url: String) => void, onFail: (err: any) => void): void;
   /**
-   * Checks if given file/directory
+   * Checks if given file/directory 
    * @param src File/Directory url
    * @param onSuccess Callback function on success returns string "TRUE" or "FALSE"
    * @param onFail Callback function on error returns error object
@@ -55,7 +81,7 @@ interface SDcard {
   /**
    * Gets actual url for relative path to src
    * e.g. getPath(src, "../path/to/file.txt") => actual url
-   * @param src Directory url
+   * @param src Directory url 
    * @param path Relative file/direcotry path
    * @param onSuccess Callback function on success returns actual url
    * @param onFail Callback function on error returns error object
@@ -99,7 +125,7 @@ interface SDcard {
   /**
    * Renames the given file/directory to given new name
    * @param src Url of file/directory
-   * @param newname New name
+   * @param newname New name 
    * @param onSuccess Callback function on success returns url of renamed file
    * @param onFail Callback function on error returns error object
    */
@@ -121,36 +147,4 @@ interface SDcard {
   stats(src: String, onSuccess: (stats: Stats) => void, onFail: (err: any) => void): void;
 }
 
-interface Storage {
-  /**
-   * Name of the storage
-   */
-  name: String;
-  /**
-   * UUID of the storage
-   */
-  uuid: String;
-}
-
-interface DirListItem {
-  name: String;
-  mime: String;
-  isDirectory: Boolean;
-  isFile: Boolean;
-  uri: String;
-}
-
-interface Stats {
-  canRead: boolean;
-  canWrite: boolean;
-  exists: boolean; //indicates if file can be found on device storage
-  isDirectory: boolean;
-  isFile: boolean;
-  isVirtual: boolean;
-  lastModified: number;
-  length: number;
-  name: string;
-  type: string;
-  uri: string;
-}
-```
+declare var sdcard: SDcard;

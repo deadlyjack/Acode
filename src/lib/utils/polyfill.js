@@ -28,6 +28,15 @@ export default function loadPolyFill() {
     };
   }
 
+  if (!HTMLElement.prototype.getParent) {
+    HTMLElement.prototype.getParent = function (queryString) {
+      const $$ = [...document.querySelectorAll(queryString)];
+      for (let $ of $$)
+        if ($.contains(this)) return $;
+      return null;
+    };
+  }
+
   Object.defineProperty(String.prototype, 'hashCode', {
     value: function () {
       let hash = 0;

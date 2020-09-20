@@ -262,7 +262,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function sendExternalFile(file, id) {
-    SDcard.getPath(rootPath, path.join(relPath, file), res => {
+    sdcard.getPath(rootPath, path.join(relPath, file), res => {
       sendFileContent(res, id, mimeType.lookup(file));
     }, err => {
       console.log(err);
@@ -322,7 +322,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
     } else if (protocol === "content:") {
 
-      SDcard.formatUri(path, uri => {
+      sdcard.formatUri(path, uri => {
         send(uri, mimetype);
       }, err => {
         error(id);

@@ -1,11 +1,12 @@
 package com.foxdebug;
 
-import java.io.OutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.OutputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import java.util.List;
 import java.util.Arrays;
@@ -721,10 +722,18 @@ public class SDcard extends CordovaPlugin {
     return getFile(uri.toString());
   }
 
-  private DocumentFile getFile(String src) {
+  private DocumentFile getFile(String filePath) {
+        Uri fileUri = Uri.parse(filePath);
+        DocumentFile documentFile = null;
+        
+        if (filePath.matches("file:///(.*)")) {
+            File file = new File(fileUri.getPath());
+            documentFile = DocumentFile.fromFile(file);
+        } else {
+            documentFile = DocumentFile.fromSingleUri(this.context, Uri.parse(filePath));
+        }
 
-    return DocumentFile.fromSingleUri(this.context, Uri.parse(src));
-
+        return documentFile;
   }
 
   private void takePermission(Uri uri) {

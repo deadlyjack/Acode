@@ -149,5 +149,9 @@
   "line count": "Satır sayısı",
   "last modified": "En Son değiştirilen",
   "size": "Boyut",
-  "share": "paylaş"
+  "share": "paylaş",
+  "sdcard found": "External storage found! Do you want to add it?",
+  "allow storage": "Give permission to access your external storage?",
+  "permission denied": "Permission denied to access external storage.",
+  "show print margin": "Show print margin"
 }

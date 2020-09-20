@@ -10,9 +10,9 @@ body {
 
   --box-shadow-color: rgba(0, 0, 0, 0.2);
 
-  --primary-button-background-color: #3399ff;
-  --primary-button-active-color: #2c8ef0;
-  --primary-button-text-color: white;
+  --button-background-color: #3399ff;
+  --button-active-color: #2c8ef0;
+  --button-text-color: white;
 
   --scrollbar-color: #0005;
 
@@ -81,9 +81,9 @@ body {
     --dialogbox-text-color: #ececec;
     --dialogbox-selected-option-color: gold;
 
-    --primary-button-background-color: #f2a365;
-    --primary-button-active-color: #d4894f;
-    --primary-button-text-color: #ececec;
+    --button-background-color: #f2a365;
+    --button-active-color: #d4894f;
+    --button-text-color: #ececec;
   }
 
   &[theme=bling] {
@@ -103,9 +103,9 @@ body {
     --dialogbox-text-color: #ffbd69;
     --dialogbox-selected-option-color: #3399ff;
 
-    --primary-button-background-color: #ff6363;
-    --primary-button-active-color: #a06334;
-    --primary-button-text-color: #ffbd69;
+    --button-background-color: #ff6363;
+    --button-active-color: #a06334;
+    --button-text-color: #ffbd69;
   }
 
   &[theme=moon] {
@@ -125,9 +125,9 @@ body {
     --dialogbox-text-color: #00fff5;
     --dialogbox-selected-option-color: #3399ff;
 
-    --primary-button-background-color: #00adb5;
-    --primary-button-active-color: #008e95;
-    --primary-button-text-color: #00fff5;
+    --button-background-color: #00adb5;
+    --button-active-color: #008e95;
+    --button-text-color: #00fff5;
   }
 
   &[theme=atticus] {
@@ -147,9 +147,9 @@ body {
     --dialogbox-text-color: #f6e9e9;
     --dialogbox-selected-option-color: #3399ff;
 
-    --primary-button-background-color: #e16428;
-    --primary-button-active-color: #009199;
-    --primary-button-text-color: #f6e9e9;
+    --button-background-color: #e16428;
+    --button-active-color: #009199;
+    --button-text-color: #f6e9e9;
   }
 
   &[theme=tomyris] {
@@ -169,9 +169,9 @@ body {
     --dialogbox-text-color: #f1bbd5;
     --dialogbox-selected-option-color: #3399ff;
 
-    --primary-button-background-color: #a12559;
-    --primary-button-active-color: #009199;
-    --primary-button-text-color: #f1bbd5;
+    --button-background-color: #a12559;
+    --button-active-color: #009199;
+    --button-text-color: #f1bbd5;
   }
 
   &[theme=menes] {
@@ -191,9 +191,9 @@ body {
     --dialogbox-text-color: #90b8f8;
     --dialogbox-selected-option-color: #3399ff;
 
-    --primary-button-background-color: #5f85db;
-    --primary-button-active-color: #009199;
-    --primary-button-text-color: #90b8f8;
+    --button-background-color: #5f85db;
+    --button-active-color: #009199;
+    --button-text-color: #90b8f8;
   }
 
   &[theme=light] {

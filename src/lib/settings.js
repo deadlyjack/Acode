@@ -63,7 +63,8 @@ class Settings {
             fullscreen: false,
             floatingButtonActivation: "click",
             disableFloatingButton: false,
-            liveAutoCompletion: true
+            liveAutoCompletion: true,
+            showPrintMargin: false
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;

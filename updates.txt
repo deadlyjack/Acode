@@ -1,4 +1,4 @@
-version 1.1.14.121
+version 1.1.14.124
 ☞ Bugs fixes
 ☞ Latest Ace editor v1.4.12
 ☞ Share file
@@ -15,26 +15,6 @@ version 1.1.14.111
 ☞ UI improvement
 ☞ Add any directory to explorer using SAF
 ☞ Performance improvement
-☞ Smaller APK size
-
-version 1.1.14.111 BETA
-☞ Bugs fixes
-☞ UI improvement
-☞ Add any directory to explorer using SAF
-☞ Performance improvement
-☞ Smaller APK size
-
-version 1.1.14.111 ALPHA II
-☞ UI improvement
-☞ Add any directory to explorer using SAF
-☞ Performance improvement
-☞ Bugs fixes
-☞ Smaller APK size
-
-version 1.1.14.111 ALPHA I
-☞ Add any directory to explorer using SAF
-☞ Performance improvement
-☞ Bugs fixes
 ☞ Smaller APK size
 
 version 0.1.14.110

@@ -29,27 +29,33 @@ function Page(title, options = {}) {
         lead: leadBtn,
         tail: options.tail || undefined
     });
-    const page = tag('div', {
+    const $page = tag('div', {
         className: 'page',
         child: header
     });
+    const $placeholder = tag('div', {
+        style: {
+            display: 'none'
+        }
+    });
+
+    if (!window.pageCount) window.pageCount = 0;
+    if (!(pageCount++)) document.body.replaceChild($placeholder, root);
 
     header.classList.add('light');
-
+    $page.onhide = () => {};
+    $page.hide = hide;
+    $page.settitle = header.text;
+    return $page;
 
     function hide() {
-        page.onhide();
-        page.classList.add('hide');
+        if (!(--pageCount)) document.body.replaceChild(root, $placeholder);
+        $page.onhide();
+        $page.classList.add('hide');
         setTimeout(() => {
-            page.remove();
+            $page.remove();
         }, 150);
     }
-
-    page.onhide = () => {};
-    page.hide = hide;
-    page.settitle = header.text;
-
-    return page;
 }
 
 

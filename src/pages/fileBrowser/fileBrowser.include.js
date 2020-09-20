@@ -185,7 +185,10 @@ function FileBrowserInclude(type, option) {
       renderList(getStorageList());
 
       if (!localStorage.fileBrowserInit) {
-        externalFs.listStorages()
+        dialogs.confirm(strings.info.toUpperCase(), strings["sdcard found"])
+          .then(res => {
+            return externalFs.listStorages();
+          })
           .then(res => {
             if (Array.isArray(res) && res.length > 0)
               util.addPath(res[0].name)
@@ -233,7 +236,8 @@ function FileBrowserInclude(type, option) {
       util.pushFolder(list, 'Internal storage', path);
       customUuid.map(storage => {
         util.pushFolder(list, storage.name, storage.uri, {
-          uuid: storage.uuid
+          uuid: storage.uuid,
+          storageType: "SD"
         });
       });
 
@@ -256,7 +260,8 @@ function FileBrowserInclude(type, option) {
         });
         util.pushFolder(list, name, url, {
           uuid: account.id,
-          "ftp-account": true
+          "ftp-account": true,
+          storageType: "FTP"
         });
 
       });
@@ -516,7 +521,7 @@ function FileBrowserInclude(type, option) {
       }
 
       function openDoc() {
-        SDcard.openDocumentFile(res => {
+        sdcard.openDocumentFile(res => {
           res.url = res.uri;
           resolve(res);
           $page.hide();

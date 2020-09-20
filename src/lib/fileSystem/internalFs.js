@@ -191,25 +191,9 @@ export default {
 
     stats(filename) {
         return new Promise((resolve, reject) => {
-            window.resolveLocalFileSystemURL(filename, entry => {
-                const result = {
-                    name: entry.name,
-                    isFile: entry.isFile,
-                    isDirectory: entry.isDirectory,
-                    canWrite: true,
-                    canRead: true,
-                    isVirtual: false,
-                    type: mimeType.lookup(entry.name),
-                    exists: true,
-                    uri: decodeURL(entry.nativeURL)
-                };
-
-                entry.getMetadata(res => {
-                    result.length = res.size;
-                    result.lastModified = res.modificationTime.getTime();
-
-                    resolve(result);
-                }, reject);
+            sdcard.stats(filename, stats => {
+                stats.uri = filename;
+                resolve(stats);
             }, reject);
         });
     },

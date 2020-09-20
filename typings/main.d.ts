@@ -44,9 +44,10 @@ interface Settings {
     vibrateOnTap: boolean;
     fullscreen: boolean;
     smartCompletion: boolean;
-    floatingButtonActivation: "click" | "long tap",
-    disableFloatingButton: boolean,
-    liveAutoCompletion: boolean
+    floatingButtonActivation: "click" | "long tap";
+    disableFloatingButton: boolean;
+    liveAutoCompletion: boolean;
+    showPrintMargin: boolean;
 }
 
 interface AppSettings {

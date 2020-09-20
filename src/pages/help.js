@@ -25,15 +25,11 @@ export default function help(opts) {
         },
         {
             key: 'help',
-            text: strings.help,
-            type: 'a',
-            href: 'https://t.me/foxdebug_acode',
+            text: strings.help
         },
         {
-            key: 'help',
-            text: 'FAQs',
-            type: 'a',
-            href: 'https://acode.foxdebug.com/faqs',
+            key: 'faqs',
+            text: 'FAQs'
         }
     ];
 
@@ -45,6 +41,10 @@ export default function help(opts) {
             const textBody = helpers.getFeedbackBody("<br/>%0A");
             const email = constants.FEEDBACK_EMAIL;
             window.open(`mailto:${email}?subject=${subject}&body=${textBody}`, "_system");
+        } else if (this.key === "help") {
+            window.open('https://t.me/foxdebug_acode', "_system");
+        } else if (this.key === 'faqs') {
+            window.open('https://acode.foxdebug.com/faqs', "_system");
         }
     }
 

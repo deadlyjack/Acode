@@ -1,8 +1,9 @@
 import textControl from "./selection";
+import constants from "../constants";
 
 /**
  * 
- * @param {"word"|"line"} type 
+ * @param {"word"} type 
  */
 function select(type) {
 
@@ -72,6 +73,7 @@ function select(type) {
 
   setTimeout(() => {
     container.append($start, $end, $cm);
+    navigator.vibrate(constants.VIBRATION_TIME);
     updateControls();
   }, 100);
 
