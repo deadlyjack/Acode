@@ -18,7 +18,7 @@ function fsOperation(uri) {
     const protocol = Url.getProtocol(uri);
     if (protocol === 'file:') {
       const match = constants.EXTERNAL_STORAGE.exec(uri);
-      if (match && match[1] !== "emulated") {
+      if (!IS_ANDROID_VERSION_5 && match && match[1] !== "emulated") {
         convertToContentUri(uri)
           .then(res => createExternalFsOperation(externalFs, res, resolve));
       } else {

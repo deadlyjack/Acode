@@ -154,5 +154,6 @@
   "allow storage": "是否要給予Acode外部儲存的存取權？",
   "permission denied": "沒有權限存取外部儲存",
   "show print margin": "顯示輸出邊界",
-  "login": "login"
+  "login": "login",
+  "add external storage?": "Add external storage?"
 }

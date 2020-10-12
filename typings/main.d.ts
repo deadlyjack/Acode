@@ -460,6 +460,7 @@ declare var DATA_STORAGE: string;
 declare var DOES_SUPPORT_THEME: boolean;
 declare var IS_FREE_VERSION: boolean;
 declare var KEYBINDING_FILE: string;
+declare var IS_ANDROID_VERSION_5: boolean;
 
 declare var ace: AceAjax;
 declare var actionStack: ActionStack;

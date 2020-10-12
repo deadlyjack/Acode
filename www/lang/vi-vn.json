@@ -154,5 +154,6 @@
   "allow storage": "Hãy cho phép sử dụng quyền truy cập bộ nhớ?",
   "permission denied": "Quyền bị từ chối truy cập bộ nhớ ngoài.",
   "show print margin": "Show print margin",
-  "login": "login"
+  "login": "login",
+  "add external storage?": "Add external storage?"
 }

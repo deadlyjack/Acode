@@ -154,5 +154,6 @@
   "allow storage": "Give permission to access your external storage?",
   "permission denied": "Permission denied to access external storage.",
   "show print margin": "Show print margin",
-  "login": "login"
+  "login": "login",
+  "add external storage?": "Add external storage?"
 }

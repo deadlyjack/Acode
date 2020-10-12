@@ -137,6 +137,7 @@ function Main() {
     window.KEYBINDING_FILE = DATA_STORAGE + '.key-bindings.json';
     window.gitRecordURL = DATA_STORAGE + 'git/.gitfiles';
     window.gistRecordURL = DATA_STORAGE + 'git/.gistfiles';
+    window.IS_ANDROID_VERSION_5 = /^5/.test(device.version);
     window.DOES_SUPPORT_THEME = (() => {
       const $testEl = tag('div', {
         style: {

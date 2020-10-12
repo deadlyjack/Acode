@@ -154,5 +154,6 @@
   "allow storage": "Donner l'autorisation de stockage maintenant?",
   "permission denied": "Permission d'accès au stockage externe refusée.",
   "show print margin": "Afficher les marges d'impression",
-  "login": "login"
+  "login": "login",
+  "add external storage?": "Add external storage?"
 }

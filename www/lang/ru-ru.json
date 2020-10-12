@@ -155,5 +155,6 @@
   "allow storage": "Предоставить доступ к внешнему хранилищу?",
   "permission denied": "Отказано в разрешении на доступ к внешнему хранилищу",
   "show print margin": "Показать поле печати",
-  "login": "login"
+  "login": "login",
+  "add external storage?": "Add external storage?"
 }
