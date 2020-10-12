@@ -537,7 +537,7 @@ function EditorManager($sidebar, $header, $body) {
             }
         }
 
-        manager.onupdate();
+        manager.onupdate(false);
     }
 
     function setupEditor() {

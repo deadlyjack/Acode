@@ -481,7 +481,7 @@ function App() {
       checkFiles();
     });
 
-  editorManager.onupdate = function () {
+  editorManager.onupdate = function (doSaveState = true) {
     /**
      * @type {File}
      */
@@ -509,7 +509,7 @@ function App() {
       }
     }
 
-    saveState();
+    if (doSaveState) saveState();
   };
 
   window.getCloseMessage = function () {

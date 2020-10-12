@@ -91,8 +91,8 @@ export default function ScrollBar(options) {
     touchStartValue.y = touch.clientY;
 
     if (isVertical) {
-      let top = parseInt($cursor.style.top) - touchDiffY;
-      const currentTopValue = parseInt($cursor.style.top);
+      let top = parseFloat($cursor.style.top) - touchDiffY;
+      const currentTopValue = parseFloat($cursor.style.top);
 
       if (top < 0) top = 0;
       else if (top > height) top = height;
@@ -103,8 +103,8 @@ export default function ScrollBar(options) {
         if (typeof $scrollbar.onScroll === "function") $scrollbar.onScroll(scroll);
       }
     } else {
-      let left = parseInt($cursor.style.left) - touchDiffX;
-      const currentLeftValue = parseInt($cursor.style.left);
+      let left = parseFloat($cursor.style.left) - touchDiffX;
+      const currentLeftValue = parseFloat($cursor.style.left);
 
       if (left < 0) left = 0;
       else if (left > width) left = width;
@@ -137,6 +137,9 @@ export default function ScrollBar(options) {
     rect = $scrollbar.getBoundingClientRect();
     height = rect.height - 20;
     width = rect.width - 20;
+
+    if (height < 0) height = 0;
+    if (width < 0) width = 0;
   }
 
   Object.defineProperty($scrollbar, "value", {

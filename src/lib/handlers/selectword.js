@@ -35,11 +35,10 @@ function select(type) {
   const $start = controls.start;
   const $end = controls.end;
 
-  if (type === "word") editor.selectMore(1, false, true);
-
-  const copyText = editor.getCopyText();
-
-  if (!copyText) return textControl.enableSingleMode().showContextMenu();
+  if (!editor.getCopyText() && type === "word")
+    editor.selectMore(1, false, true);
+  if (!editor.getCopyText())
+    return textControl.enableSingleMode().showContextMenu();
 
   if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
   $end.style.marginLeft = '-4px';
