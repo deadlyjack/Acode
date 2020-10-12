@@ -114,14 +114,15 @@ function gitHubInclude(options = {}) {
     };
 
     $content.addEventListener('click', handleClick);
+
+    if (options.$loginPage)
+      options.$loginPage.hide();
   }
 
   function loadProfile(onload) {
     dialogs.loader.create('GitHub', strings.loading + '...');
     user.getProfile()
       .then(res => {
-        if (options.$loginPage)
-          options.$loginPage.hide();
 
         const profile = res.data;
         const data = credentials.encrypt(JSON.stringify(profile));
@@ -171,10 +172,7 @@ function gitHubInclude(options = {}) {
     if (localStorage.username) delete localStorage.username;
     if (localStorage.password) delete localStorage.password;
     if (localStorage.token) delete localStorage.token;
-    fs.deleteFile(githubFile)
-      .then(() => {
-        return fs.deleteFile(gitProfile);
-      })
+    Promise.all([fs.deleteFile(githubFile), fs.deleteFile(gitProfile)])
       .finally(() => {
         if (onlogout) onlogout();
       });

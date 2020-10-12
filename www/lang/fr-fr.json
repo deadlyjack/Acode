@@ -153,5 +153,6 @@
   "sdcard found": "Stockage externe détecté! Voulez vous l'ajouter maintenant?",
   "allow storage": "Donner l'autorisation de stockage maintenant?",
   "permission denied": "Permission d'accès au stockage externe refusée.",
-  "show print margin": "Show print margin"
+  "show print margin": "Show print margin",
+  "login": "login"
 }

@@ -12,6 +12,7 @@ import Url from './utils/Url';
 import path from './utils/path';
 import Uri from './utils/Uri';
 import configEditor from './aceConfig';
+import ScrollBar from '../components/scrollbar';
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -40,9 +41,9 @@ function EditorManager($sidebar, $header, $body) {
         TIMEOUT_VALUE = 300,
         ready = false,
         lastHeight = innerHeight,
-        editorState = 'blur';
-    // scrollTimeout = null,
-    // containerHeight = $body.getBoundingClientRect().height;
+        editorState = 'blur',
+        preventScrollbarV = false,
+        preventScrollbarH = false;
     const $container = tag('div', {
         className: 'editor-container'
     });
@@ -55,12 +56,20 @@ function EditorManager($sidebar, $header, $body) {
     const fullContent = `<span action="copy">${strings.copy}</span><span action="cut">${strings.cut}</span><span action="paste">${strings.paste}</span><span action="select all">${strings["select all"]}</span>`;
     const SESSION_DIRNAME = 'sessions';
     const SESSION_PATH = cordova.file.cacheDirectory + SESSION_DIRNAME + '/';
-    // const $scrollerV = tag('span', {
-    //     className: 'scroller v'
-    // });
-    // const $scrollerH = tag('span', {
-    //     className: 'scroller h'
-    // });
+    const $Vscrollbar = ScrollBar({
+        width: 20,
+        onscroll: onscrollV,
+        onscrollend: onscrollVend,
+        parent: $body
+    });
+    const $Hscrollbar = ScrollBar({
+        width: 20,
+        onscroll: onscrollH,
+        onscrollend: onscrollHend,
+        parent: $body,
+        direction: "bottom"
+    });
+
     const controls = {
         start: tag('span', {
             className: 'cursor-control start'
@@ -127,7 +136,6 @@ function EditorManager($sidebar, $header, $body) {
         }
     };
 
-    // $container.append($scrollerV, $scrollerH);
     configEditor(editor);
     $container.classList.add(appSettings.value.editorFont);
     moveOpenFileList();
@@ -151,7 +159,6 @@ function EditorManager($sidebar, $header, $body) {
         }
         lastHeight = innerHeight;
         editor.renderer.scrollCursorIntoView();
-        // containerHeight = $body.getBoundingClientRect().height;
     });
 
     editor.on('focus', () => {
@@ -186,6 +193,64 @@ function EditorManager($sidebar, $header, $body) {
         render: true,
         id: constants.DEFAULT_FILE_SESSION
     });
+
+    /**
+     * Callback function
+     * @param {Number} value 
+     */
+    function onscrollV(value) {
+        preventScrollbarV = true;
+        const renderer = editor.renderer;
+        const session = editor.getSession();
+        const offset = ((renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5);
+        const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
+        const scroll = editorHeight * value;
+
+        session.setScrollTop(scroll);
+    }
+
+    function onscrollVend() {
+        preventScrollbarV = false;
+    }
+
+    /**
+     * Callback function
+     * @param {Number} value 
+     */
+    function onscrollH(value) {
+        preventScrollbarH = true;
+        const renderer = editor.renderer;
+        const session = editor.getSession();
+        const editorWidth = session.getScreenWidth() * renderer.characterWidth;
+        const scroll = editorWidth * value;
+
+        session.setScrollLeft(scroll);
+    }
+
+    function onscrollHend() {
+        preventScrollbarH = false;
+    }
+
+    function onscrollleft() {
+        if (preventScrollbarH) return;
+        const renderer = editor.renderer;
+        const session = editor.getSession();
+        const editorWidth = session.getScreenWidth() * renderer.characterWidth;
+        const factor = (session.getScrollLeft() / editorWidth);
+
+        $Hscrollbar.value = factor;
+    }
+
+    function onscrolltop() {
+        if (preventScrollbarV) return;
+        const renderer = editor.renderer;
+        const session = editor.getSession();
+        const offset = ((renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5);
+        const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
+        const factor = (session.getScrollTop() / editorHeight);
+
+        $Vscrollbar.value = factor;
+    }
 
     /**
      * 
@@ -403,6 +468,10 @@ function EditorManager($sidebar, $header, $body) {
             editor.resize(true);
         }, 0);
 
+        file.session.on("changeScrollTop", onscrolltop);
+        if (!appSettings.value.textWrap)
+            file.session.on("changeScrollLeft", onscrollleft);
+
         function createSession(text) {
             internalFs.writeFile(SESSION_PATH + id, text, true, false)
                 .then(() => {
@@ -462,6 +531,8 @@ function EditorManager($sidebar, $header, $body) {
                 manager.activeFile = file;
                 manager.onupdate();
                 file.assocTile.scrollIntoView();
+                onscrolltop();
+                if (!appSettings.value.textWrap) onscrollleft();
                 return;
             }
         }
@@ -496,46 +567,12 @@ function EditorManager($sidebar, $header, $body) {
         }
     }
 
-    // function adjustScrollV() {
-    //     const renderer = editor.renderer;
-    //     const session = editor.getSession();
-
-    //     if (!scrollTimeout) {
-    //         $scrollerV.classList.add("show");
-    //         scrollTimeout = setTimeout(() => {
-    //             $scrollerV.classList.remove("show");
-    //             scrollTimeout = null;
-    //         }, 2000);
-    //     }
-
-    //     if (!containerHeight) containerHeight = $container.getBoundingClientRect().height;
-    //     const offset = ((renderer.$size.scrollerHeight - renderer.lineHeight) * 0.5);
-    //     const editorHeight = session.getScreenLength() * renderer.lineHeight + offset;
-    //     const factor = (session.getScrollTop() / editorHeight);
-
-    //     $scrollerV.style.top = (((containerHeight + offset) * factor) - 60) + 'px';
-    // }
-
-    // function adjustScrollH() {
-    //     if (appSettings.value.textWrap) return;
-    //     if (!scrollTimeout) {
-    //         $scrollerH.classList.add("show");
-    //         scrollTimeout = setTimeout(() => {
-    //             $scrollerH.classList.remove("show");
-    //             scrollTimeout = null;
-    //         }, 2000);
-    //     }
-    // }
-
     function setupSession(file) {
         const session = file.session;
         const filename = file.filename;
         const settings = appSettings.value;
         const ext = path.extname(filename);
         let mode;
-
-        // session.on('changeScrollTop', adjustScrollV);
-        // session.on('changeScrollLeft', adjustScrollH);
 
         try {
 
@@ -575,7 +612,9 @@ function EditorManager($sidebar, $header, $body) {
 
             session.setOptions({
                 tabSize: settings.tabSize,
-                useSoftTabs: settings.softTab
+                useSoftTabs: settings.softTab,
+                HScrollBarAlwaysVisible: true,
+                VScrollBarAlwaysVisible: true
             });
             file.setMode(mode);
         }
@@ -748,6 +787,10 @@ function EditorManager($sidebar, $header, $body) {
                     switchFile(manager.files[manager.files.length - 1].id);
                 }
             }
+
+            file.session.off("changeScrollTop", onscrolltop);
+            if (!appSettings.value.textWrap)
+                file.session.off("changeScrollLeft", onscrollleft);
 
             file.assocTile.remove();
             file.session.destroy();

@@ -126,7 +126,7 @@ interface File {
     onsave(this: File): void;
 }
 
-interface FileData {
+interface FileStatus {
     canRead: boolean;
     canWrite: boolean;
     exists: boolean; //indicates if file can be found on device storage
@@ -165,7 +165,7 @@ interface ExternalFs {
     renameFile(src: string, newname: string): Promise<'SUCCESS'>;
     copy(src: string, dest: string): Promise<'SUCCESS'>;
     move(src: string, dest: string): Promise<'SUCCESS'>;
-    stats(src: string): Promise<FileData>;
+    stats(src: string): Promise<FileStatus>;
     uuid: string;
 }
 
@@ -181,7 +181,7 @@ interface RemoteFs {
     copyTo(src: string, dest: string): Promise;
     currentDirectory(): Promise<string>;
     homeDirectory(): Promise<string>;
-    stats(src: string): Promise<FileData>;
+    stats(src: string): Promise<FileStatus>;
     exists(): Promise<Boolean>;
     origin: string;
     originObjec: OriginObject;
@@ -196,7 +196,7 @@ interface InternalFs {
     readFile(filename: string): Promise<fileData>;
     writeFile(filename: string, content: string, create: boolean, exclusive: boolean): Promise<void>;
     renameFile(src: string, newname: string): Promise<void>;
-    stats(src: string): Promise<FileData>;
+    stats(src: string): Promise<FileStatus>;
     exists(): Promise<Boolean>;
 }
 
@@ -219,7 +219,7 @@ interface FileSystem {
     moveTo(dset: string): Promise<void>;
     renameTo(newName: string): Promise<void>;
     exists(): Promise<Boolean>;
-    stats(): Promise<FileData>
+    stats(): Promise<FileStatus>
 }
 
 interface externalStorageData {

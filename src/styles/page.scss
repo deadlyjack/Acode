@@ -191,6 +191,7 @@ div.page {
 
   .main {
     margin: auto;
+    z-index: 1;
 
     .navigation {
       display: flex;
@@ -263,6 +264,8 @@ div.page {
   }
 
   main {
+    position: relative;
+
     &:empty {
       position: fixed;
       top: 45px;

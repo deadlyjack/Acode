@@ -44,7 +44,8 @@ function select(type) {
   if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
   $end.style.marginLeft = '-4px';
   $end.style.marginTop = '0px';
-  $start.style.marginLeft = '-21.5px';
+  // $start.style.marginLeft = '-21.5px';
+  $start.style.marginLeft = '-30.5px';
   $start.style.marginTop = '0px';
   controls.update = updateControls;
   controls.callBeforeContextMenu = disable;

@@ -84,7 +84,8 @@ export default {
     "ar-ye": "العربية",
     "ja-jp": "日本語",
     "bn-bd": "বাংলা",
-    "cs-cz": "Čeština"
+    "cs-cz": "Čeština",
+    "vi-vn": "Vietnamese"
   },
   editorThemeList: {
     "ambiance": scheme('ambiance', 'dark'),

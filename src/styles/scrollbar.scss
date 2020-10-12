@@ -1,0 +1,94 @@
+.scrollbar-container {
+  position: absolute;
+  background-color: transparent;
+  padding: 10px;
+  z-index: 999;
+  opacity: 0.5;
+  z-index: 9999;
+
+  &.active {
+    opacity: 1;
+
+    .thumb {
+      box-shadow: 0 0 0 4px rgba($color: #fff, $alpha: 0.2);
+    }
+  }
+
+  .container {
+    height: 100%;
+    width: 100%;
+    position: relative;
+
+    .thumb,
+    .cursor {
+      position: absolute;
+      display: block;
+    }
+
+    .thumb {
+      background-color: #39f;
+      background-color: var(--button-background-color);
+      border-radius: 4px;
+    }
+  }
+
+  &.right,
+  &.left {
+    height: calc(100% - (50px * 2));
+    width: 10px;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+
+    .thumb,
+    .cursor {
+      height: 1px;
+      width: 100%;
+    }
+
+    .thumb {
+      height: 50px;
+      margin-top: -25px;
+    }
+  }
+
+  &.right {
+    left: auto;
+    right: 0;
+  }
+
+  &.left {
+    left: 0;
+    right: auto;
+  }
+
+  &.top,
+  &.bottom {
+    width: calc(100% - (50px * 2));
+    height: 10px;
+    left: 0;
+    right: 0;
+    margin: auto;
+
+    .thumb,
+    .cursor {
+      height: 100%;
+      width: 1px;
+    }
+
+    .thumb {
+      width: 50px;
+      margin-left: -25px;
+    }
+  }
+
+  &.top {
+    top: 0;
+    bottom: auto;
+  }
+
+  &.bottom {
+    bottom: 0;
+    top: auto;
+  }
+}

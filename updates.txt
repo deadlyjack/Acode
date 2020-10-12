@@ -1,4 +1,18 @@
-version 1.1.14.124
+version 1.1.14.128
+☞ Added Vietnamese language
+☞ Added scrollbar
+☞ Small bugs fix
+
+version 1.1.14.127
+☞ Fixed laggy scrolling
+☞ Small bugs fix
+
+version 1.1.14.126
+☞ Fixed laggy sidebar
+☞ Added option for disabling print margin
+☞ Fixed editor not working properly after renaming file.
+
+version 1.1.14.125
 ☞ Bugs fixes
 ☞ Latest Ace editor v1.4.12
 ☞ Share file

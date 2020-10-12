@@ -500,10 +500,12 @@ import loadPolyFill from "./utils/polyfill";
     }
 
     console = {
-        log: log,
-        error: error,
-        count: count,
-        clear: clear
+        log,
+        error,
+        count,
+        clear,
+        warn: error,
+        info: log
     };
 
     function execute(code) {

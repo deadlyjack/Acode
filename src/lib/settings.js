@@ -35,7 +35,7 @@ class Settings {
                 showHiddenFiles: false,
                 sortByName: true
             },
-            maxFileSize: 5,
+            maxFileSize: 10,
             filesNotAllowed: ['zip', 'apk', 'doc', 'docx', 'mp3', 'mp4', 'avi', 'flac', 'mov', 'rar', 'pdf', 'gif', 'flv'],
             search: {
                 caseSensitive: false,

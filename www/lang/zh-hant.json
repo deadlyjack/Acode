@@ -154,5 +154,6 @@
   "sdcard found": "找到外部儲存！你需不需要新增它？",
   "allow storage": "你確定需要設置權限才能使用外部儲存？",
   "permission denied": "沒有權限使用外部儲存",
-  "show print margin": "Show print margin"
+  "show print margin": "Show print margin",
+  "login": "login"
 }

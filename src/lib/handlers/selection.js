@@ -137,8 +137,10 @@ function enableSingleMode() {
     controls.update = updateEnd;
     controls.callBeforeContextMenu = callBeforeContextMenu;
 
-    $end.style.marginLeft = '-12.5px';
-    $end.style.marginTop = '4px';
+    // $end.style.marginLeft = '-12.5px';
+    $end.style.marginLeft = '-17.5px';
+    // $end.style.marginTop = '4px';
+    $end.style.marginTop = '7px';
 
     editor.on('blur', hide);
     editor.session.on('changeScrollTop', hide);
