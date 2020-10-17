@@ -231,7 +231,11 @@ function EditorManager($sidebar, $header, $body) {
         preventScrollbarH = false;
     }
 
-    function onscrollleft() {
+    /**
+     * Callback function called on scroll vertically
+     * @param {Boolean} render 
+     */
+    function onscrollleft(render = true) {
         if (preventScrollbarH) return;
         const renderer = editor.renderer;
         const session = editor.getSession();
@@ -239,9 +243,14 @@ function EditorManager($sidebar, $header, $body) {
         const factor = (session.getScrollLeft() / editorWidth);
 
         $Hscrollbar.value = factor;
+        if(render) $Vscrollbar.render();
     }
 
-    function onscrolltop() {
+    /**
+     * Callback function called on scroll vertically
+     * @param {Boolean} render 
+     */
+    function onscrolltop(render = true) {
         if (preventScrollbarV) return;
         const renderer = editor.renderer;
         const session = editor.getSession();
@@ -250,6 +259,7 @@ function EditorManager($sidebar, $header, $body) {
         const factor = (session.getScrollTop() / editorHeight);
 
         $Vscrollbar.value = factor;
+        if(render) $Vscrollbar.render();
     }
 
     /**
@@ -531,8 +541,8 @@ function EditorManager($sidebar, $header, $body) {
                 manager.activeFile = file;
                 manager.onupdate();
                 file.assocTile.scrollIntoView();
-                onscrolltop();
-                if (!appSettings.value.textWrap) onscrollleft();
+                onscrolltop(false);
+                if (!appSettings.value.textWrap) onscrollleft(false);
                 return;
             }
         }

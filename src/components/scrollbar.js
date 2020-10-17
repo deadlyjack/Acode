@@ -147,8 +147,6 @@ export default function ScrollBar(options) {
       return scroll;
     },
     set(val) {
-      $scrollbar.render();
-
       if (!height || !width) resize();
       scroll = val;
       if (isVertical) $cursor.style.top = (val * height) + 'px';
