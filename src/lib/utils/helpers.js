@@ -218,7 +218,6 @@ function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null
                 return file.push(item);
         }
 
-        return item;
     });
 
     if (sortByName) {

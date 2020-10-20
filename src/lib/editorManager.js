@@ -56,26 +56,26 @@ function EditorManager($sidebar, $header, $body) {
     const fullContent = `<span action="copy">${strings.copy}</span><span action="cut">${strings.cut}</span><span action="paste">${strings.paste}</span><span action="select all">${strings["select all"]}</span>`;
     const SESSION_DIRNAME = 'sessions';
     const SESSION_PATH = cordova.file.cacheDirectory + SESSION_DIRNAME + '/';
-    const $Vscrollbar = ScrollBar({
+    const $vScrollbar = ScrollBar({
         width: 20,
         onscroll: onscrollV,
         onscrollend: onscrollVend,
         parent: $body
     });
-    const $Hscrollbar = ScrollBar({
+    const $hScrollbar = ScrollBar({
         width: 20,
         onscroll: onscrollH,
         onscrollend: onscrollHend,
         parent: $body,
         direction: "bottom"
     });
-
+    const size = appSettings.value.largeCursorController ? "large" : "small";
     const controls = {
         start: tag('span', {
-            className: 'cursor-control start'
+            className: 'cursor-control start ' + size
         }),
         end: tag('span', {
-            className: 'cursor-control end'
+            className: 'cursor-control end ' + size
         }),
         menu: tag('div', {
             className: 'clipboard-contextmneu',
@@ -87,6 +87,9 @@ function EditorManager($sidebar, $header, $body) {
                 action: 'color'
             }
         }),
+        vScrollbar: $vScrollbar,
+        hScrollbar: $hScrollbar,
+        size,
         fullContent,
         readOnlyContent,
         update: () => {},
@@ -200,10 +203,8 @@ function EditorManager($sidebar, $header, $body) {
      */
     function onscrollV(value) {
         preventScrollbarV = true;
-        const renderer = editor.renderer;
         const session = editor.getSession();
-        const offset = ((renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5);
-        const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
+        const editorHeight = getEditorHeight();
         const scroll = editorHeight * value;
 
         session.setScrollTop(scroll);
@@ -219,9 +220,8 @@ function EditorManager($sidebar, $header, $body) {
      */
     function onscrollH(value) {
         preventScrollbarH = true;
-        const renderer = editor.renderer;
         const session = editor.getSession();
-        const editorWidth = session.getScreenWidth() * renderer.characterWidth;
+        const editorWidth = getEditorWidth();
         const scroll = editorWidth * value;
 
         session.setScrollLeft(scroll);
@@ -237,13 +237,13 @@ function EditorManager($sidebar, $header, $body) {
      */
     function onscrollleft(render = true) {
         if (preventScrollbarH) return;
-        const renderer = editor.renderer;
         const session = editor.getSession();
-        const editorWidth = session.getScreenWidth() * renderer.characterWidth;
-        const factor = (session.getScrollLeft() / editorWidth);
+        const editorWidth = getEditorWidth();
+        const factor = (session.getScrollLeft() / editorWidth).toFixed(2);
 
-        $Hscrollbar.value = factor;
-        if(render) $Vscrollbar.render();
+        console.log(factor);
+        $hScrollbar.value = factor;
+        if (render) $hScrollbar.render();
     }
 
     /**
@@ -252,14 +252,12 @@ function EditorManager($sidebar, $header, $body) {
      */
     function onscrolltop(render = true) {
         if (preventScrollbarV) return;
-        const renderer = editor.renderer;
         const session = editor.getSession();
-        const offset = ((renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5);
-        const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
-        const factor = (session.getScrollTop() / editorHeight);
+        const editorHeight = getEditorHeight();
+        const factor = (session.getScrollTop() / editorHeight).toFixed(2);
 
-        $Vscrollbar.value = factor;
-        if(render) $Vscrollbar.render();
+        $vScrollbar.value = factor;
+        if (render) $vScrollbar.render();
     }
 
     /**
@@ -268,6 +266,25 @@ function EditorManager($sidebar, $header, $body) {
      */
     function onFileSave(file) {
         internalFs.writeFile(SESSION_PATH + file.id, file.session.getValue(), true, false);
+    }
+
+    /**
+     * @returns {number}
+     */
+    function getEditorHeight() {
+        const renderer = editor.renderer;
+        const session = editor.getSession();
+        const offset = ((renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5);
+        const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
+        return editorHeight;
+    }
+
+    function getEditorWidth() {
+        const renderer = editor.renderer;
+        const session = editor.getSession();
+        const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
+        const editorWidth = (session.getScreenWidth() * renderer.characterWidth) - offset;
+        return editorWidth;
     }
 
     /**
@@ -541,6 +558,9 @@ function EditorManager($sidebar, $header, $body) {
                 manager.activeFile = file;
                 manager.onupdate();
                 file.assocTile.scrollIntoView();
+
+                $hScrollbar.remove();
+                $vScrollbar.remove();
                 onscrolltop(false);
                 if (!appSettings.value.textWrap) onscrollleft(false);
                 return;
@@ -622,13 +642,11 @@ function EditorManager($sidebar, $header, $body) {
 
             session.setOptions({
                 tabSize: settings.tabSize,
-                useSoftTabs: settings.softTab,
-                HScrollBarAlwaysVisible: true,
-                VScrollBarAlwaysVisible: true
+                useSoftTabs: settings.softTab
             });
             file.setMode(mode);
         }
-        file.session.setOption('wrap', settings.textWrap ? "free" : false);
+        file.session.setUseWrapMode(settings.textWrap);
     }
 
     function moveOpenFileList() {

@@ -155,5 +155,7 @@
   "permission denied": "Permission d'accès au stockage externe refusée.",
   "show print margin": "Afficher les marges d'impression",
   "login": "login",
-  "add external storage?": "Add external storage?"
+  "add external storage?": "Add external storage?",
+  "large cursor controller": "Large cursor controller",
+  "scrollbar size": "Scrollbar size"
 }

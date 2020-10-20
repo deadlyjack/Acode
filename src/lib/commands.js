@@ -299,6 +299,7 @@ const commands = {
   },
   "toggle-quick-tools": function () {
     quickTools.actions("toggle-quick-tools");
+    editorManager.controls.vScrollbar.resize();
   },
   "toggle-fullscreen": function () {
     app.classList.toggle("fullscreen-mode");

@@ -156,5 +156,7 @@
   "permission denied": "Отказано в разрешении на доступ к внешнему хранилищу",
   "show print margin": "Показать поле печати",
   "login": "login",
-  "add external storage?": "Add external storage?"
+  "add external storage?": "Add external storage?",
+  "large cursor controller": "Large cursor controller",
+  "scrollbar size": "Scrollbar size"
 }

@@ -48,6 +48,8 @@ interface Settings {
     disableFloatingButton: boolean;
     liveAutoCompletion: boolean;
     showPrintMargin: boolean;
+    largeCursorController: boolean,
+    scrollbarSize: number
 }
 
 interface AppSettings {
@@ -106,6 +108,19 @@ interface Controls {
     update: () => void;
     color: HTMLSpanElement;
     checkForColor(): void;
+    hScrollbar: Scrollbar;
+    vScrollbar: Scrollbar;
+}
+
+interface Scrollbar extends HTMLElement {
+    size: number;
+    value: number;
+    /**Destroys the scrollbar by removing it from DOM and memory. */
+    destroy(): void;
+    /**Displays the scrollbar and hides after 3 seconds of inactivity. */
+    render(): void;
+    /**Resize the scrollbar dimension value */
+    resize(): void;
 }
 
 interface File {

@@ -64,7 +64,9 @@ class Settings {
             floatingButtonActivation: "click",
             disableFloatingButton: false,
             liveAutoCompletion: true,
-            showPrintMargin: false
+            showPrintMargin: false,
+            scrollbarSize: 20,
+            largeCursorController: true
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;

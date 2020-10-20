@@ -8,6 +8,7 @@ import tag from 'html-tag-js';
  * @param {Number} [options.width]
  * @param {function():void} [options.onscroll]
  * @param {function():void} [options.onscrollend]
+ * @returns {Scrollbar}
  */
 export default function ScrollBar(options) {
   if (!options || !options.parent) throw new Error("Parent element required.");
@@ -41,26 +42,29 @@ export default function ScrollBar(options) {
       x: 0,
       y: 0
     },
+    scrollbarSize = 20,
     height, width, rect, scrollbarTimeout;
 
-  if (options.width) {
-    if (isVertical) $scrollbar.style.width = $cursor.style.width = options.width + 'px';
-    else $scrollbar.style.height = $cursor.style.height = options.width + 'px';
-  }
+  if (options.width) scrollbarSize = options.width;
 
+  setWidth(scrollbarSize);
   $scrollbar.onScroll = options.onscroll;
   $scrollbar.onScrollEnd = options.onscrollend;
   $thumb.addEventListener("touchstart", touchStart, config);
   window.addEventListener('resize', resize);
+  observer.observe($cursor, {
+    attributes: true
+  });
 
   function observerCallback() {
     $thumb.style.top = $cursor.style.top;
     $thumb.style.left = $cursor.style.left;
   }
 
-  observer.observe($cursor, {
-    attributes: true
-  });
+  function setWidth(width) {
+    if (isVertical) $scrollbar.style.width = $cursor.style.width = width + 'px';
+    else $scrollbar.style.height = $cursor.style.height = width + 'px';
+  }
 
   /**
    * 
@@ -133,44 +137,58 @@ export default function ScrollBar(options) {
     }, 1000);
   }
 
-  function resize() {
+  function resize(render = true) {
     rect = $scrollbar.getBoundingClientRect();
     height = rect.height - 20;
     width = rect.width - 20;
 
     if (height < 0) height = 0;
     if (width < 0) width = 0;
+    if (render && height && width) setValue(scroll);
   }
 
+  function setValue(val) {
+    if (!height || !width) resize(false);
+    scroll = val;
+    if (isVertical) $cursor.style.top = (val * height) + 'px';
+    else $cursor.style.left = (val * width) + 'px';
+  }
+
+  function destroy() {
+    window.removeEventListener("resize", resize);
+    $thumb.removeEventListener("touchstart", touchStart);
+    observer.disconnect();
+  }
+
+  function render() {
+    options.parent.append($scrollbar);
+
+    clearTimeout(scrollbarTimeout);
+    scrollbarTimeout = setTimeout(() => {
+      $scrollbar.remove();
+    }, 3000);
+  }
+
+  Object.defineProperty($scrollbar, "size", {
+    get: () => scrollbarSize,
+    set: setWidth
+  });
+
+  Object.defineProperty($scrollbar, "resize", {
+    value: resize
+  });
+
   Object.defineProperty($scrollbar, "value", {
-    get() {
-      return scroll;
-    },
-    set(val) {
-      if (!height || !width) resize();
-      scroll = val;
-      if (isVertical) $cursor.style.top = (val * height) + 'px';
-      else $cursor.style.left = (val * width) + 'px';
-    }
+    get: () => scroll,
+    set: setValue
   });
 
   Object.defineProperty($scrollbar, "destroy", {
-    value() {
-      window.removeEventListener("resize", resize);
-      $thumb.removeEventListener("touchstart", touchStart);
-      observer.disconnect();
-    }
+    value: destroy
   });
 
   Object.defineProperty($scrollbar, "render", {
-    value() {
-      options.parent.append($scrollbar);
-
-      clearTimeout(scrollbarTimeout);
-      scrollbarTimeout = setTimeout(() => {
-        $scrollbar.remove();
-      }, 3000);
-    }
+    value: render
   });
 
   return $scrollbar;

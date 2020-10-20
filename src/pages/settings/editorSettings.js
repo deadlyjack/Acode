@@ -18,7 +18,7 @@ export default function editorSettings() {
         actionStack.remove('settings-editor');
     };
 
-
+    const controls = editorManager.controls;
     const values = appSettings.value;
 
     const settingsOptions = [{
@@ -109,6 +109,16 @@ export default function editorSettings() {
             key: 'showPrintMargin',
             text: strings["show print margin"].capitalize(),
             checkbox: values.showPrintMargin
+        },
+        {
+            key: 'largeCursorController',
+            text: strings["large cursor controller"],
+            checkbox: values.largeCursorController
+        },
+        {
+            key: 'scrollbarSize',
+            text: strings["scrollbar size"],
+            subText: values.scrollbarSize
         }
     ];
 
@@ -157,9 +167,7 @@ export default function editorSettings() {
                 }).then(res => {
                     if (res === values.tabSize) return;
                     values.tabSize = res;
-                    files.map(file => {
-                        file.session.setOption('tabSize', res);
-                    });
+                    files.map(file => file.session.setOption('tabSize', res));
                     appSettings.update();
                     this.changeSubText(res);
                 });
@@ -167,21 +175,17 @@ export default function editorSettings() {
 
             case 'text wrap':
                 values.textWrap = !values.textWrap;
-                files.map(file => {
-                    file.session.setOption('wrap', values.textWrap);
-                    return file;
-                });
-                values.textWrap = values.textWrap;
                 appSettings.update();
+
+                files.map(file => file.session.setUseWrapMode(values.textWrap));
                 this.value = values.textWrap;
                 break;
 
             case 'soft tab':
                 values.softTab = !values.softTab;
-                files.map(file => {
-                    file.session.setOption('useSoftTabs', values.softTab);
-                });
                 appSettings.update();
+
+                files.map(file => file.session.setOption('useSoftTabs', values.softTab));
                 this.value = values.softTab;
                 break;
 
@@ -204,9 +208,7 @@ export default function editorSettings() {
                 dialogs.prompt(strings.except + ' (eg. php,py)', values.beautify.join(','))
                     .then(res => {
                         const files = res.split(',');
-                        files.map((file, i) => {
-                            files[i] = file.trim().toLowerCase();
-                        });
+                        files.map((file, i) => files[i] = file.trim().toLowerCase());
                         appSettings.value.beautify = files;
                         appSettings.update();
                         this.changeSubText(strings.except + ': ' + res);
@@ -215,9 +217,7 @@ export default function editorSettings() {
 
             case 'linting':
                 values.linting = !values.linting;
-                files.map(file => {
-                    file.session.setUseWorker(values.linting);
-                });
+                files.map(file => file.session.setUseWorker(values.linting));
                 if (values.linting)
                     editorManager.editor.renderer.setMargin(0, 0, 0, 0);
                 else
@@ -309,6 +309,36 @@ export default function editorSettings() {
                 editorManager.editor.setOption("showPrintMargin", values.showPrintMargin);
                 appSettings.update();
                 this.value = values.showPrintMargin;
+                break;
+            case 'largeCursorController':
+                values.largeCursorController = !values.largeCursorController;
+                editorManager.editor.setOption("largeCursorController", values.largeCursorController);
+                appSettings.update();
+                this.value = values.largeCursorController;
+
+                const {
+                    start, end
+                } = controls;
+
+                if (this.value) {
+                    start.classList.add("large");
+                    end.classList.add("large");
+                } else {
+                    start.classList.remove("large");
+                    end.classList.remove("large");
+                }
+                break;
+            case 'scrollbarSize':
+                dialogs.select(strings["scrollbar size"], [5, 10, 15, 20], {
+                        default: values.scrollbarSize
+                    })
+                    .then(res => {
+                        values.scrollbarSize = res;
+                        controls.vScrollbar.size = res;
+                        controls.hScrollbar.size = res;
+                        appSettings.update();
+                        this.value = res;
+                    });
                 break;
         }
     }

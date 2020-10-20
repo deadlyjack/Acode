@@ -152,5 +152,7 @@
   "share": "Sdílet",
   "show print margin": "Show print margin",
   "login": "login",
-  "add external storage?": "Add external storage?"
+  "add external storage?": "Add external storage?",
+  "large cursor controller": "Large cursor controller",
+  "scrollbar size": "Scrollbar size"
 }

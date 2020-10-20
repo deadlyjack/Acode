@@ -91,9 +91,6 @@ export default {
    * @param  {...string} paths 
    */
   join(...paths) {
-    // paths = paths.map(path => {
-    //   return this.normalize(path);
-    // });
     let res = paths.join('/');
     return this.normalize(res);
   },

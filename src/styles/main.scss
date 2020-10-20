@@ -484,14 +484,19 @@ textarea {
     top: 0;
     left: 0;
     display: block;
-    height: 30px;
-    width: 30px;
+    height: 20px;
+    width: 20px;
     border-radius: 50%;
     background-color: white;
     background-color: var(--text-main-color);
     z-index: 9;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
     box-shadow: 0 0 2px var(--box-shadow-color);
+
+    &.large {
+        height: 30px;
+        width: 30px;
+    }
 
     &.end {
         border-radius: 0% 50% 50% 50%;
@@ -643,8 +648,8 @@ textarea {
 
 #quicktool-toggler {
     top: auto;
-    bottom: 10px;
-    right: 10px;
+    bottom: 30px;
+    right: 30px;
 }
 
 @keyframes move-around {

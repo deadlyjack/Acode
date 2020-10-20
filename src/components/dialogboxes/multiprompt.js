@@ -83,7 +83,6 @@ function multiPrompt(message, inputs) {
       if (Array.isArray(input)) createGroup(input);
       else $body.append(createInput(input));
 
-      return input;
     });
 
     actionStack.push({
@@ -113,12 +112,12 @@ function multiPrompt(message, inputs) {
       const values = {};
       const inputAr = [...$body.getAll('input')];
       inputAr.map($input => {
-        if ($input.type === "checkbox" || $input.type === "radio") {
+
+        if ($input.type === "checkbox" || $input.type === "radio")
           values[$input.id] = $input.checked;
-        } else {
+        else
           values[$input.id] = $input.value;
-        }
-        return $input;
+
       });
 
       return values;
@@ -147,7 +146,6 @@ function multiPrompt(message, inputs) {
           $group.append($input);
         }
 
-        return input;
       });
 
       $body.append($group);

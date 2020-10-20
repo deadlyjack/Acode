@@ -325,10 +325,7 @@ import loadPolyFill from "./utils/polyfill";
 
         function joinParams(params, type) {
             let parameter = '(';
-            params.map((param) => {
-                parameter += param.type === "RestElement" ? '...' + param.argument.name : param.name + ',';
-                return param;
-            });
+            params.map(param => parameter += param.type === "RestElement" ? '...' + param.argument.name : param.name + ',');
             parameter = parameter.replace(/,$/, '');
             parameter += ')' + (type === 'arrow' ? '=>' : '') + '{...}';
             return parameter;
@@ -531,7 +528,6 @@ import loadPolyFill from "./utils/polyfill";
                     const excode = code.substring(range[0], range[1]) + ';';
                     extra += excode;
                 }
-                return st;
             });
 
             if (extra) {

@@ -155,5 +155,7 @@
   "permission denied": "沒有權限存取外部儲存",
   "show print margin": "顯示輸出邊界",
   "login": "login",
-  "add external storage?": "Add external storage?"
+  "add external storage?": "Add external storage?",
+  "large cursor controller": "Large cursor controller",
+  "scrollbar size": "Scrollbar size"
 }

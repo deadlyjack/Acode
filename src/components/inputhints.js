@@ -118,7 +118,6 @@ function inputhints($input, hints) {
     const matched = [];
     hints.map(hint => {
       if (new RegExp(value).test(hint)) matched.push(hint);
-      return hint;
     });
     $hintingContainer.textContent = '';
     $hintingContainer.innerHTML = mustache.render(template, matched);

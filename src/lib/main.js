@@ -173,9 +173,7 @@ function Main() {
       permissions.WRITE_MEDIA_STORAGE
     ];
 
-    requiredPermissions.map((permission, i) => {
-      permissions.checkPermission(permission, (status) => success(status, i));
-    });
+    requiredPermissions.map((permission, i) => permissions.checkPermission(permission, (status) => success(status, i)));
 
     function success(status, i) {
       if (!status.hasPermission) {
@@ -255,9 +253,7 @@ function Main() {
       })
       .then(entries => {
         const styles = [];
-        entries.map(entry => {
-          styles.push(entry.nativeURL);
-        });
+        entries.map(entry => styles.push(entry.nativeURL));
         return helpers.loadStyles(...styles);
       })
       .then(res => {
@@ -611,7 +607,6 @@ function App() {
           console.error(err);
         });
       }
-      return file;
     });
 
     addedFolder.map(folder => {
@@ -629,7 +624,6 @@ function App() {
           name: title
         }
       });
-      return folder;
     });
 
     if (activeFile) {
@@ -714,7 +708,6 @@ function App() {
 
             if (i === files.length - 1) resolve();
           }
-          return file;
         });
       } else {
         resolve();
@@ -725,9 +718,7 @@ function App() {
   function loadFolders() {
     try {
       const folders = JSON.parse(localStorage.getItem('folders'));
-      folders.map(folder => {
-        openFolder(folder.url, folder.opts);
-      });
+      folders.map(folder => openFolder(folder.url, folder.opts));
     } catch (error) {}
   }
 
@@ -776,7 +767,6 @@ function App() {
           });
         }, err => {});
       }
-      return file;
     });
 
     if (!editorManager.activeFile) {
