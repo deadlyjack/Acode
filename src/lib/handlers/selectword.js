@@ -73,7 +73,7 @@ function select(type) {
 
   setTimeout(() => {
     container.append($start, $end, $cm);
-    navigator.vibrate(constants.VIBRATION_TIME);
+    if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
     updateControls();
   }, 100);
 
