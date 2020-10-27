@@ -198,7 +198,7 @@ function openFolder(_path, opts = {}) {
    */
   function handleContextmenu(type, url, name, $target) {
 
-    navigator.vibrate(constants.VIBRATION_TIME);
+    if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
     const cancel = strings.cancel + (clipBoard ? ' (' + strings[clipBoard.action] + ')' : '');
     const COPY = ['copy', strings.copy, 'copy'],
       CUT = ['cut', strings.cut, 'cut'],
