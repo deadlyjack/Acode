@@ -273,7 +273,6 @@ export default function editorSettings() {
 
             case 'fullscreen':
                 values.fullscreen = !values.fullscreen;
-                const id = constants.notification.EXIT_FULL_SCREEN;
 
                 if (values.fullscreen)
                     Acode.exec("enable-fullscreen");

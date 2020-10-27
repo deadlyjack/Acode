@@ -56,14 +56,15 @@ function EditorManager($sidebar, $header, $body) {
     const fullContent = `<span action="copy">${strings.copy}</span><span action="cut">${strings.cut}</span><span action="paste">${strings.paste}</span><span action="select all">${strings["select all"]}</span>`;
     const SESSION_DIRNAME = 'sessions';
     const SESSION_PATH = cordova.file.cacheDirectory + SESSION_DIRNAME + '/';
+    const scrollbarSize = appSettings.value.scrollbarSize;
     const $vScrollbar = ScrollBar({
-        width: 20,
+        width: scrollbarSize,
         onscroll: onscrollV,
         onscrollend: onscrollVend,
         parent: $body
     });
     const $hScrollbar = ScrollBar({
-        width: 20,
+        width: scrollbarSize,
         onscroll: onscrollH,
         onscrollend: onscrollHend,
         parent: $body,

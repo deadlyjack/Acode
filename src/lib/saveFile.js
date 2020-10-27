@@ -98,9 +98,7 @@ function saveFile(file, as = false, showToast = true) {
                 if (res === "select-folder") return selectFolder();
                 const url = res.val.url;
                 checkFile(url, file.filename)
-                    .then(filename => {
-                        save(url, filename);
-                    })
+                    .then(filename => save(url, filename))
                     .catch(error);
             });
     }
@@ -112,15 +110,11 @@ function saveFile(file, as = false, showToast = true) {
                 let url = file.location === res.url ? undefined : res.url;
                 if (as) {
                     newfilename(res.url, file.filename)
-                        .then(filename => {
-                            save(url, filename);
-                        })
+                        .then(filename => save(url, filename))
                         .catch(error);
                 } else {
                     checkFile(url, file.filename)
-                        .then((filename) => {
-                            save(url, filename);
-                        })
+                        .then(filename => save(url, filename))
                         .catch(error);
                 }
             });

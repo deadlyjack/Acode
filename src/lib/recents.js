@@ -86,7 +86,10 @@ const recents = {
     if (type === "all") all.push(['clear', strings.clear, 'icon clearclose']);
 
     if (extra) {
-      extra = extra.map(item => item[1] = shortName(item[1]));
+      extra = extra.map(item => {
+        item[1] = shortName(item[1]);
+        return item;
+      });
 
       all.push(...extra);
     }
