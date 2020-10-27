@@ -718,7 +718,7 @@ function EditorManager($sidebar, $header, $body) {
             let classFlag = false;
 
             $placeholder.style.opacity = '0';
-            navigator.vibrate(constants.VIBRATION_TIME);
+            if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
             document.ontouchmove = document.onmousemove = null;
             document.addEventListener(type, drag, opts);
 

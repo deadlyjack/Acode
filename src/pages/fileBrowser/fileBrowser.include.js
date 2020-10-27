@@ -429,7 +429,7 @@ function FileBrowserInclude(type, option) {
 
       function cmhandle() {
         const enabled = (currentDir.url === "/" && !!uuid) || currentDir.url !== "/";
-        navigator.vibrate(constants.VIBRATION_TIME);
+        if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
         dialogs.select('', [
             ['delete', strings.delete, 'delete', enabled],
             ['rename', strings.rename, 'edit', enabled]
