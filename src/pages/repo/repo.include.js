@@ -63,9 +63,7 @@ export default function RepoInclude(owner, repoName) {
     .then(res => {
       dialogs.loader.destroy();
       const data = res.data;
-      data.map(branch => {
-        branches.push(branch.name);
-      });
+      data.map(branch => branches.push(branch.name));
       branches.push(['add', strings['new branch'], 'add']);
       return dialogs.select(strings['select branch'], branches);
     })
@@ -118,9 +116,7 @@ export default function RepoInclude(owner, repoName) {
           $cm.removeEventListener('click', handleClick);
           $page.removeEventListener('click', handleClick);
           actionStack.remove('repo');
-          idsToFlush.map(id => {
-            actionStack.remove(id);
-          });
+          idsToFlush.map(id => actionStack.remove(id));
         };
       })
       .catch(err => {

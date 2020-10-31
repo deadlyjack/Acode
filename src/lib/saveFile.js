@@ -38,10 +38,7 @@ function saveFile(file, as = false, showToast = true) {
                             .then(res => {
                                 const data = res.data;
                                 const branches = [];
-                                data.map(branch => {
-                                    branches.push(branch.name);
-                                    return branch;
-                                });
+                                data.map(branch => branches.push(branch.name));
                                 cb(branches);
                             });
                     }

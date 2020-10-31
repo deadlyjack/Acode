@@ -185,24 +185,40 @@ function FileBrowserInclude(type, option) {
       renderList(getStorageList());
 
       if (!localStorage.fileBrowserInit) {
-        dialogs.confirm(strings.info.toUpperCase(), strings["sdcard found"])
-          .then(res => {
-            return externalFs.listStorages();
+        dialogs.loader.destroy();
+
+        new Promise((resolve, reject) => {
+
+            if (IS_ANDROID_VERSION_5)
+              resolve([{
+                name: "External storage"
+              }]);
+            else
+              externalFs.listStorages()
+              .then(resolve)
+              .catch(reject);
+
           })
           .then(res => {
-            if (Array.isArray(res) && res.length > 0)
-              util.addPath(res[0].name)
-              .then(res => {
-                customUuid.push(res);
-                localStorage.customUuid = JSON.stringify(customUuid);
-                navigate.pop();
-                renderStorages();
-              })
-              .catch(err => {
-                helpers.error(err);
-                console.error(err);
+
+            dialogs.confirm(strings.info.toUpperCase(), strings[IS_ANDROID_VERSION_5 ? "add external storage?" : "sdcard found"])
+              .then(() => {
+                if (Array.isArray(res) && res.length > 0)
+                  util.addPath(res[0].name)
+                  .then(res => {
+                    customUuid.push(res);
+                    localStorage.customUuid = JSON.stringify(customUuid);
+                    navigate.pop();
+                    renderStorages();
+                  })
+                  .catch(err => {
+                    helpers.error(err);
+                    console.error(err);
+                  });
               });
+
           });
+
         localStorage.fileBrowserInit = true;
       }
     }
@@ -413,7 +429,7 @@ function FileBrowserInclude(type, option) {
 
       function cmhandle() {
         const enabled = (currentDir.url === "/" && !!uuid) || currentDir.url !== "/";
-        navigator.vibrate(constants.VIBRATION_TIME);
+        if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
         dialogs.select('', [
             ['delete', strings.delete, 'delete', enabled],
             ['rename', strings.rename, 'edit', enabled]

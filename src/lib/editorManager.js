@@ -12,6 +12,7 @@ import Url from './utils/Url';
 import path from './utils/path';
 import Uri from './utils/Uri';
 import configEditor from './aceConfig';
+import ScrollBar from '../components/scrollbar';
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -40,9 +41,9 @@ function EditorManager($sidebar, $header, $body) {
         TIMEOUT_VALUE = 300,
         ready = false,
         lastHeight = innerHeight,
-        editorState = 'blur';
-    // scrollTimeout = null,
-    // containerHeight = $body.getBoundingClientRect().height;
+        editorState = 'blur',
+        preventScrollbarV = false,
+        preventScrollbarH = false;
     const $container = tag('div', {
         className: 'editor-container'
     });
@@ -55,18 +56,26 @@ function EditorManager($sidebar, $header, $body) {
     const fullContent = `<span action="copy">${strings.copy}</span><span action="cut">${strings.cut}</span><span action="paste">${strings.paste}</span><span action="select all">${strings["select all"]}</span>`;
     const SESSION_DIRNAME = 'sessions';
     const SESSION_PATH = cordova.file.cacheDirectory + SESSION_DIRNAME + '/';
-    // const $scrollerV = tag('span', {
-    //     className: 'scroller v'
-    // });
-    // const $scrollerH = tag('span', {
-    //     className: 'scroller h'
-    // });
+    const $vScrollbar = ScrollBar({
+        width: 20,
+        onscroll: onscrollV,
+        onscrollend: onscrollVend,
+        parent: $body
+    });
+    const $hScrollbar = ScrollBar({
+        width: 20,
+        onscroll: onscrollH,
+        onscrollend: onscrollHend,
+        parent: $body,
+        direction: "bottom"
+    });
+    const size = appSettings.value.largeCursorController ? "large" : "small";
     const controls = {
         start: tag('span', {
-            className: 'cursor-control start'
+            className: 'cursor-control start ' + size
         }),
         end: tag('span', {
-            className: 'cursor-control end'
+            className: 'cursor-control end ' + size
         }),
         menu: tag('div', {
             className: 'clipboard-contextmneu',
@@ -78,6 +87,9 @@ function EditorManager($sidebar, $header, $body) {
                 action: 'color'
             }
         }),
+        vScrollbar: $vScrollbar,
+        hScrollbar: $hScrollbar,
+        size,
         fullContent,
         readOnlyContent,
         update: () => {},
@@ -127,7 +139,6 @@ function EditorManager($sidebar, $header, $body) {
         }
     };
 
-    // $container.append($scrollerV, $scrollerH);
     configEditor(editor);
     $container.classList.add(appSettings.value.editorFont);
     moveOpenFileList();
@@ -151,7 +162,6 @@ function EditorManager($sidebar, $header, $body) {
         }
         lastHeight = innerHeight;
         editor.renderer.scrollCursorIntoView();
-        // containerHeight = $body.getBoundingClientRect().height;
     });
 
     editor.on('focus', () => {
@@ -188,11 +198,93 @@ function EditorManager($sidebar, $header, $body) {
     });
 
     /**
+     * Callback function
+     * @param {Number} value 
+     */
+    function onscrollV(value) {
+        preventScrollbarV = true;
+        const session = editor.getSession();
+        const editorHeight = getEditorHeight();
+        const scroll = editorHeight * value;
+
+        session.setScrollTop(scroll);
+    }
+
+    function onscrollVend() {
+        preventScrollbarV = false;
+    }
+
+    /**
+     * Callback function
+     * @param {Number} value 
+     */
+    function onscrollH(value) {
+        preventScrollbarH = true;
+        const session = editor.getSession();
+        const editorWidth = getEditorWidth();
+        const scroll = editorWidth * value;
+
+        session.setScrollLeft(scroll);
+    }
+
+    function onscrollHend() {
+        preventScrollbarH = false;
+    }
+
+    /**
+     * Callback function called on scroll vertically
+     * @param {Boolean} render 
+     */
+    function onscrollleft(render = true) {
+        if (preventScrollbarH) return;
+        const session = editor.getSession();
+        const editorWidth = getEditorWidth();
+        const factor = (session.getScrollLeft() / editorWidth).toFixed(2);
+
+        console.log(factor);
+        $hScrollbar.value = factor;
+        if (render) $hScrollbar.render();
+    }
+
+    /**
+     * Callback function called on scroll vertically
+     * @param {Boolean} render 
+     */
+    function onscrolltop(render = true) {
+        if (preventScrollbarV) return;
+        const session = editor.getSession();
+        const editorHeight = getEditorHeight();
+        const factor = (session.getScrollTop() / editorHeight).toFixed(2);
+
+        $vScrollbar.value = factor;
+        if (render) $vScrollbar.render();
+    }
+
+    /**
      * 
      * @param {File} file 
      */
     function onFileSave(file) {
         internalFs.writeFile(SESSION_PATH + file.id, file.session.getValue(), true, false);
+    }
+
+    /**
+     * @returns {number}
+     */
+    function getEditorHeight() {
+        const renderer = editor.renderer;
+        const session = editor.getSession();
+        const offset = ((renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5);
+        const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
+        return editorHeight;
+    }
+
+    function getEditorWidth() {
+        const renderer = editor.renderer;
+        const session = editor.getSession();
+        const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
+        const editorWidth = (session.getScreenWidth() * renderer.characterWidth) - offset;
+        return editorWidth;
     }
 
     /**
@@ -403,6 +495,10 @@ function EditorManager($sidebar, $header, $body) {
             editor.resize(true);
         }, 0);
 
+        file.session.on("changeScrollTop", onscrolltop);
+        if (!appSettings.value.textWrap)
+            file.session.on("changeScrollLeft", onscrollleft);
+
         function createSession(text) {
             internalFs.writeFile(SESSION_PATH + id, text, true, false)
                 .then(() => {
@@ -462,11 +558,16 @@ function EditorManager($sidebar, $header, $body) {
                 manager.activeFile = file;
                 manager.onupdate();
                 file.assocTile.scrollIntoView();
+
+                $hScrollbar.remove();
+                $vScrollbar.remove();
+                onscrolltop(false);
+                if (!appSettings.value.textWrap) onscrollleft(false);
                 return;
             }
         }
 
-        manager.onupdate();
+        manager.onupdate(false);
     }
 
     function setupEditor() {
@@ -496,46 +597,12 @@ function EditorManager($sidebar, $header, $body) {
         }
     }
 
-    // function adjustScrollV() {
-    //     const renderer = editor.renderer;
-    //     const session = editor.getSession();
-
-    //     if (!scrollTimeout) {
-    //         $scrollerV.classList.add("show");
-    //         scrollTimeout = setTimeout(() => {
-    //             $scrollerV.classList.remove("show");
-    //             scrollTimeout = null;
-    //         }, 2000);
-    //     }
-
-    //     if (!containerHeight) containerHeight = $container.getBoundingClientRect().height;
-    //     const offset = ((renderer.$size.scrollerHeight - renderer.lineHeight) * 0.5);
-    //     const editorHeight = session.getScreenLength() * renderer.lineHeight + offset;
-    //     const factor = (session.getScrollTop() / editorHeight);
-
-    //     $scrollerV.style.top = (((containerHeight + offset) * factor) - 60) + 'px';
-    // }
-
-    // function adjustScrollH() {
-    //     if (appSettings.value.textWrap) return;
-    //     if (!scrollTimeout) {
-    //         $scrollerH.classList.add("show");
-    //         scrollTimeout = setTimeout(() => {
-    //             $scrollerH.classList.remove("show");
-    //             scrollTimeout = null;
-    //         }, 2000);
-    //     }
-    // }
-
     function setupSession(file) {
         const session = file.session;
         const filename = file.filename;
         const settings = appSettings.value;
         const ext = path.extname(filename);
         let mode;
-
-        // session.on('changeScrollTop', adjustScrollV);
-        // session.on('changeScrollLeft', adjustScrollH);
 
         try {
 
@@ -579,7 +646,7 @@ function EditorManager($sidebar, $header, $body) {
             });
             file.setMode(mode);
         }
-        file.session.setOption('wrap', settings.textWrap ? "free" : false);
+        file.session.setUseWrapMode(settings.textWrap);
     }
 
     function moveOpenFileList() {
@@ -650,7 +717,7 @@ function EditorManager($sidebar, $header, $body) {
             let classFlag = false;
 
             $placeholder.style.opacity = '0';
-            navigator.vibrate(constants.VIBRATION_TIME);
+            if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
             document.ontouchmove = document.onmousemove = null;
             document.addEventListener(type, drag, opts);
 
@@ -748,6 +815,10 @@ function EditorManager($sidebar, $header, $body) {
                     switchFile(manager.files[manager.files.length - 1].id);
                 }
             }
+
+            file.session.off("changeScrollTop", onscrolltop);
+            if (!appSettings.value.textWrap)
+                file.session.off("changeScrollLeft", onscrollleft);
 
             file.assocTile.remove();
             file.session.destroy();

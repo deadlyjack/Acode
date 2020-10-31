@@ -55,7 +55,6 @@ function select(title, options, opts = {}) {
 
         option.map((o, i) => {
           if (typeof o === 'boolean' && i > 1) disabled = !o;
-          return o;
         });
 
       } else {
@@ -88,7 +87,6 @@ function select(title, options, opts = {}) {
 
       $list.append($item);
 
-      return option;
     });
 
     actionStack.push({
@@ -117,9 +115,7 @@ function select(title, options, opts = {}) {
       actionStack.remove('select');
       hideSelect();
       let listItems = [...$list.children];
-      listItems.map(item => {
-        item.onclick = null;
-      });
+      listItems.map(item => item.onclick = null);
     }
   });
 }

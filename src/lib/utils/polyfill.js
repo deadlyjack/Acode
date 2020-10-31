@@ -16,9 +16,7 @@ export default function loadPolyFill() {
 
   if (!HTMLElement.prototype.append) {
     HTMLElement.prototype.append = function (...nodes) {
-      nodes.map(node => {
-        this.appendChild(node);
-      });
+      nodes.map(node => this.appendChild(node));
     };
   }
 

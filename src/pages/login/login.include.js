@@ -13,8 +13,6 @@ export default function GithubLoginInclude() {
   const $content = tag.parse(mustache.render(_template, strings));
   /**@type {HTMLFormElement} */
   const $form = $content.get('.form');
-  const $username = $content.get("#username");
-  const $password = $content.get("#password");
   const $token = $content.get("#token");
   const $errorMsg = $content.get('#error-msg');
   fs.deleteFile(cordova.file.externalDataDirectory + '.github');
@@ -55,24 +53,13 @@ export default function GithubLoginInclude() {
   function storeCredentials(e) {
     e.preventDefault();
     let token = $token.value;
-    let username = $username.value;
-    let password = $password.value;
     const credentials = helpers.credentials;
 
-    if (!username && !token)
-      return ($errorMsg.textContent = 'Please enter username and password or token!');
 
-
-    if (token) {
+    if (token)
       localStorage.setItem('token', credentials.encrypt(token));
-    }
-    if (username) {
-      if (!password) return ($errorMsg.textContent = 'Please enter password!');
-      username = credentials.encrypt(username);
-      password = credentials.encrypt(password);
-      localStorage.setItem('username', username);
-      localStorage.setItem('password', password);
-    }
+    else
+      return ($errorMsg.textContent = 'Please enter GitHub token!');
 
     gitHub({
       $loginPage: $page

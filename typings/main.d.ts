@@ -48,6 +48,8 @@ interface Settings {
     disableFloatingButton: boolean;
     liveAutoCompletion: boolean;
     showPrintMargin: boolean;
+    largeCursorController: boolean,
+    scrollbarSize: number
 }
 
 interface AppSettings {
@@ -106,6 +108,19 @@ interface Controls {
     update: () => void;
     color: HTMLSpanElement;
     checkForColor(): void;
+    hScrollbar: Scrollbar;
+    vScrollbar: Scrollbar;
+}
+
+interface Scrollbar extends HTMLElement {
+    size: number;
+    value: number;
+    /**Destroys the scrollbar by removing it from DOM and memory. */
+    destroy(): void;
+    /**Displays the scrollbar and hides after 3 seconds of inactivity. */
+    render(): void;
+    /**Resize the scrollbar dimension value */
+    resize(): void;
 }
 
 interface File {
@@ -126,7 +141,7 @@ interface File {
     onsave(this: File): void;
 }
 
-interface FileData {
+interface FileStatus {
     canRead: boolean;
     canWrite: boolean;
     exists: boolean; //indicates if file can be found on device storage
@@ -165,7 +180,7 @@ interface ExternalFs {
     renameFile(src: string, newname: string): Promise<'SUCCESS'>;
     copy(src: string, dest: string): Promise<'SUCCESS'>;
     move(src: string, dest: string): Promise<'SUCCESS'>;
-    stats(src: string): Promise<FileData>;
+    stats(src: string): Promise<FileStatus>;
     uuid: string;
 }
 
@@ -181,7 +196,7 @@ interface RemoteFs {
     copyTo(src: string, dest: string): Promise;
     currentDirectory(): Promise<string>;
     homeDirectory(): Promise<string>;
-    stats(src: string): Promise<FileData>;
+    stats(src: string): Promise<FileStatus>;
     exists(): Promise<Boolean>;
     origin: string;
     originObjec: OriginObject;
@@ -196,7 +211,7 @@ interface InternalFs {
     readFile(filename: string): Promise<fileData>;
     writeFile(filename: string, content: string, create: boolean, exclusive: boolean): Promise<void>;
     renameFile(src: string, newname: string): Promise<void>;
-    stats(src: string): Promise<FileData>;
+    stats(src: string): Promise<FileStatus>;
     exists(): Promise<Boolean>;
 }
 
@@ -219,7 +234,7 @@ interface FileSystem {
     moveTo(dset: string): Promise<void>;
     renameTo(newName: string): Promise<void>;
     exists(): Promise<Boolean>;
-    stats(): Promise<FileData>
+    stats(): Promise<FileStatus>
 }
 
 interface externalStorageData {
@@ -286,7 +301,7 @@ interface Manager {
     removeFile(id: string | File, force: boolean): void;
     editor: AceAjax.Editor;
     activeFile: File;
-    onupdate: function(): void;
+    onupdate(doSaveState: boolean): void;
     files: Array<File>;
     controls: Controls;
     state: 'blur' | 'focus';
@@ -460,6 +475,7 @@ declare var DATA_STORAGE: string;
 declare var DOES_SUPPORT_THEME: boolean;
 declare var IS_FREE_VERSION: boolean;
 declare var KEYBINDING_FILE: string;
+declare var IS_ANDROID_VERSION_5: boolean;
 
 declare var ace: AceAjax;
 declare var actionStack: ActionStack;

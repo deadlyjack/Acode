@@ -137,8 +137,13 @@ function enableSingleMode() {
     controls.update = updateEnd;
     controls.callBeforeContextMenu = callBeforeContextMenu;
 
-    $end.style.marginLeft = '-12.5px';
-    $end.style.marginTop = '4px';
+    if (appSettings.value.largeCursorController) {
+        $end.style.marginLeft = '-17.5px';
+        $end.style.marginTop = '7px';
+    } else {
+        $end.style.marginLeft = '-12.5px';
+        $end.style.marginTop = '4px';
+    }
 
     editor.on('blur', hide);
     editor.session.on('changeScrollTop', hide);

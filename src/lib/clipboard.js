@@ -32,10 +32,7 @@ function clipboardAction(action) {
             if (selectedText) {
                 clipboard.copy(selectedText);
                 const ranges = editor.selection.getAllRanges();
-                ranges.map(range => {
-                    editor.remove(range);
-                    return range;
-                });
+                ranges.map(range => editor.remove(range));
                 update();
                 plugins.toast.showShortBottom('copied to clipboard');
             }

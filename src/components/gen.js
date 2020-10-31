@@ -33,7 +33,6 @@ function listTileGen(options) {
             })
         });
         menuoptions[key] = item;
-        return option;
     });
 
     return menuoptions;
@@ -58,7 +57,6 @@ function iconButton(options) {
         opts[name] = tag('button', {
             className: `icon ${className}`
         });
-        return opt;
     });
 
     return opts;

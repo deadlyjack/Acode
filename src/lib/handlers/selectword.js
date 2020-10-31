@@ -35,16 +35,16 @@ function select(type) {
   const $start = controls.start;
   const $end = controls.end;
 
-  if (type === "word") editor.selectMore(1, false, true);
-
-  const copyText = editor.getCopyText();
-
-  if (!copyText) return textControl.enableSingleMode().showContextMenu();
+  if (!editor.getCopyText() && type === "word")
+    editor.selectMore(1, false, true);
+  if (!editor.getCopyText())
+    return textControl.enableSingleMode().showContextMenu();
 
   if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
   $end.style.marginLeft = '-4px';
   $end.style.marginTop = '0px';
-  $start.style.marginLeft = '-21.5px';
+  if (appSettings.value.largeCursorController) $start.style.marginLeft = '-30.5px';
+  else $start.style.marginLeft = '-21.5px';
   $start.style.marginTop = '0px';
   controls.update = updateControls;
   controls.callBeforeContextMenu = disable;
@@ -73,7 +73,7 @@ function select(type) {
 
   setTimeout(() => {
     container.append($start, $end, $cm);
-    navigator.vibrate(constants.VIBRATION_TIME);
+    if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
     updateControls();
   }, 100);
 

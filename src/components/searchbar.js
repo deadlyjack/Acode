@@ -63,7 +63,6 @@ function searchBar(list) {
     children.map(child => {
       const text = child.textContent.toLowerCase();
       if (text.match(val, "i")) result.push(child);
-      return child;
     });
 
     list.textContent = '';

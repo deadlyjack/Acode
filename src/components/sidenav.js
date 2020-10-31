@@ -168,10 +168,7 @@ function sidenav(activator, toggler) {
         document.ontouchstart = null;
         resetState();
 
-        openedFolders.map($ => {
-            $.onscroll = null;
-            return $;
-        });
+        openedFolders.map($ => $.onscroll = null);
         openedFolders = [];
     }
 

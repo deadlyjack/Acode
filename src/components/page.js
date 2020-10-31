@@ -33,7 +33,8 @@ function Page(title, options = {}) {
         className: 'page',
         child: header
     });
-    const $placeholder = tag('div', {
+
+    if (!window.$placeholder) window.$placeholder = tag('div', {
         style: {
             display: 'none'
         }

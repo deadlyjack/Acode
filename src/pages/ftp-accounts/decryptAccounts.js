@@ -36,7 +36,6 @@ function decryptAccounts(accounts) {
       mode,
       path
     });
-    return account;
   });
 
   return temp;

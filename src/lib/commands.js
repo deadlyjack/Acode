@@ -83,12 +83,13 @@ const commands = {
     gitHub();
   },
   "goto": function () {
-    dialogs.prompt(strings['enter line number'], '', 'number').then(lineNumber => {
+    dialogs.prompt(strings['enter line number'], '', 'number', {
+        placeholder: 'line.column'
+      }).then(lineNumber => {
         const editor = editorManager.editor;
         editor.focus();
-        if (editor) {
-          editor.gotoLine(lineNumber, 0, true);
-        }
+        const [line, col] = lineNumber.split(".");
+        editor.gotoLine(line, col, true);
       })
       .catch(err => {
         console.log(err);
@@ -298,6 +299,7 @@ const commands = {
   },
   "toggle-quick-tools": function () {
     quickTools.actions("toggle-quick-tools");
+    editorManager.controls.vScrollbar.resize();
   },
   "toggle-fullscreen": function () {
     app.classList.toggle("fullscreen-mode");

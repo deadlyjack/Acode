@@ -41,7 +41,6 @@ export default {
             file.isUnsaved &&
             !file.isSaving
           ) Acode.exec("save", false);
-          return file;
         });
       }, autoSave);
     }

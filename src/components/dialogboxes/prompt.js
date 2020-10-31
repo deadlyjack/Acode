@@ -9,6 +9,7 @@ import autosize from 'autosize';
  * @param {object} options
  * @param {RegExp} options.match
  * @param {boolean} options.required
+ * @param {string} options.placeholder
  */
 function prompt(message, defaultValue, type = 'text', options = {}) {
   return new Promise((resolve) => {
@@ -23,6 +24,7 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
     const input = tag(inputType, {
       value: defaultValue,
       className: 'input',
+      placeholder: options.placeholder || ""
     });
     const okBtn = tag('button', {
       type: "submit",
