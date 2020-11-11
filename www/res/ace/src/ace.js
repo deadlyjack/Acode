@@ -11866,11 +11866,11 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
                 Acode.exec("close-current-tab");
             }
         }, {
-            name: "closeAllTab",
-            description: "Close all tab",
-            bindKey: bindKey("closeAllTab"),
+            name: "closeAllTabs",
+            description: "Close all tabs",
+            bindKey: bindKey("closeAllTabs"),
             exec: function () {
-                Acode.exec("close-all-tab");
+                Acode.exec("close-all-tabs");
             }
         }, {
             name: "newFile",

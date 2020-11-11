@@ -5,11 +5,11 @@ export default {
     "readOnly": false,
     "action": "close-current-tab"
   },
-  "closeAllTab": {
-    "description": "Close all tab.",
+  "closeAllTabs": {
+    "description": "Close all tabs.",
     "key": "Ctrl-Shift-Q",
     "readOnly": false,
-    "action": "close-all-tab"
+    "action": "close-all-tabs"
   },
   "newFile": {
     "description": "Create new file",

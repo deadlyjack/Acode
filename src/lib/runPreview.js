@@ -399,15 +399,15 @@ runPreview.checkRunnable = async function () {
           }
         }
       }
-    } else {
+    }
 
+    if (!result) {
       const runnableFile = /\.((html?)|(md)|(js))$/;
       const filename = activeFile.filename;
-      const extname = helpers.extname(filename);
-      if (runnableFile.test(extname))
+      if (runnableFile.test(filename))
         result = filename;
-
     }
+
     return result;
   } catch (err) {
     if (err instanceof Error) throw error;
