@@ -442,6 +442,7 @@ function App() {
   applySettings.beforeRender();
   window.restoreTheme();
   root.append($header, $main, $footer, $headerToggler, $quickToolToggler);
+  if (!appSettings.value.floatingButton) root.classList.add("hide-floating-button");
   applySettings.afterRender();
   //#endregion
 
