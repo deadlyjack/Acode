@@ -1,7 +1,6 @@
 @import './searchBar.scss';
 @import './hints.scss';
 @import './fileInfo.scss';
-@import './scrollbar.scss';
 
 * {
     margin: 0;
@@ -122,6 +121,7 @@ a {
     max-width: 600px;
     margin: 0 auto;
     box-sizing: border-box;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2);
     box-shadow: 0 0 4px 0 var(--box-shadow-color);
 
     .heading {
@@ -498,6 +498,10 @@ textarea {
         width: 30px;
     }
 
+    &.none {
+        display: none;
+    }
+
     &.end {
         border-radius: 0% 50% 50% 50%;
     }
@@ -628,7 +632,7 @@ textarea {
     height: 40px;
     width: 40px;
     font-size: 1.8rem;
-    border: solid;
+    border: 1px solid;
     background-color: #9999ff;
     background-color: var(--primary-color);
     top: 10px;
@@ -638,18 +642,33 @@ textarea {
     color: white;
     color: var(--text-main-color);
     transition: all 300ms ease;
+    animation: floating-btn 300ms ease 1;
+
+    &.hide {
+        opacity: 0 !important;
+    }
+
+    @keyframes floating-btn {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
 }
 
 #header-toggler {
     display: none;
-    top: 35px;
-    right: 35px;
+    top: 10px;
+    right: 10px;
 }
 
 #quicktool-toggler {
     top: auto;
-    bottom: 35px;
-    right: 35px;
+    bottom: 10px;
+    right: 10px;
 }
 
 @keyframes move-around {

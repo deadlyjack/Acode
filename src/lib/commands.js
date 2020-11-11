@@ -22,29 +22,43 @@ import Url from "./utils/Url";
 import path from "./utils/path";
 import showFileInfo from "./showFileInfo";
 
+
+/**
+ * TODO: Add file to close current and all tab
+ */
+
 const commands = {
-  "console": function () {
+  "close-all-tabs"() {
+    for (let file of editorManager.files) {
+      editorManager.removeFile(file);
+    }
+  },
+  "close-current-tab"() {
+    editorManager.removeFile(editorManager.activeFile);
+  },
+  "console"() {
     runPreview(true, 'in app');
   },
-  "copy": function () {
+  "copy"() {
     clipboardAction('copy');
   },
-  "color": function () {
+  "color"() {
     clipboardAction("color");
   },
-  "cut": function () {
+  "cut"() {
     clipboardAction('cut');
   },
-  "disable-fullscreen": function () {
+  "disable-fullscreen"() {
     app.classList.remove("fullscreen-mode");
     this["resize-editor"]();
   },
-  "enable-fullscreen": function () {
+  "enable-fullscreen"() {
     // system.enableFullScreen();
     app.classList.add("fullscreen-mode");
     this["resize-editor"]();
+    editorManager.controls.vScrollbar.resize();
   },
-  "encoding": function () {
+  "encoding"() {
     dialogs.select(strings.encoding, constants.encodings, {
         default: editorManager.activeFile.encoding
       })
@@ -59,10 +73,10 @@ const commands = {
         editorManager.onupdate();
       });
   },
-  "find": function () {
+  "find"() {
     quickTools.actions('search');
   },
-  "format": function () {
+  "format"() {
     const file = editorManager.activeFile;
     const editor = editorManager.editor;
 
@@ -73,16 +87,16 @@ const commands = {
     editorManager.onupdate = tmp;
     editor.selection.moveCursorToPosition(pos);
   },
-  "ftp": function () {
+  "ftp"() {
     FTPAccounts();
   },
   "file-info": showFileInfo,
-  "github": function () {
+  "github"() {
     if ((!localStorage.username || !localStorage.password) && !localStorage.token)
       return GithubLogin();
     gitHub();
   },
-  "goto": function () {
+  "goto"() {
     dialogs.prompt(strings['enter line number'], '', 'number', {
         placeholder: 'line.column'
       }).then(lineNumber => {
@@ -95,7 +109,7 @@ const commands = {
         console.log(err);
       });
   },
-  "new-file": function () {
+  "new-file"() {
     dialogs.prompt(strings['enter file name'], constants.DEFAULT_FILE_NAME, "filename", {
         match: constants.FILE_NAME_REGEX,
         required: true
@@ -112,7 +126,7 @@ const commands = {
         console.log(err);
       });
   },
-  "next-file": function () {
+  "next-file"() {
     const len = editorManager.files.length;
     let fileIndex = editorManager.files.indexOf(editorManager.activeFile);
 
@@ -121,12 +135,12 @@ const commands = {
 
     editorManager.switchFile(editorManager.files[fileIndex].id);
   },
-  "open": function (page) {
+  "open"(page) {
     if (page === 'settings') settingsMain();
     if (page === 'help') help();
     editorManager.editor.blur();
   },
-  "open-file": function () {
+  "open-file"() {
     editorManager.editor.blur();
     FileBrowser('file', function (uri) {
         const ext = helpers.extname(uri);
@@ -158,7 +172,7 @@ const commands = {
         console.error(err);
       });
   },
-  "open-folder": function () {
+  "open-folder"() {
     editorManager.editor.blur();
     FileBrowser('folder')
       .then(res => {
@@ -190,10 +204,10 @@ const commands = {
         }
       });
   },
-  "paste": function () {
+  "paste"() {
     clipboardAction('paste');
   },
-  "prev-file": function () {
+  "prev-file"() {
     const len = editorManager.files.length;
     let fileIndex = editorManager.files.indexOf(editorManager.activeFile);
 
@@ -202,16 +216,20 @@ const commands = {
 
     editorManager.switchFile(editorManager.files[fileIndex].id);
   },
-  "read-only": function () {
+  "read-only"() {
     const file = editorManager.activeFile;
     file.editable = !file.editable;
     editorManager.onupdate();
   },
-  "recent": function () {
+  "recent"() {
     recents.select()
       .then(res => {
         if (res.type === 'file') {
-          openFile(res.val);
+          openFile(res.val)
+            .catch(err => {
+              helpers.error(err);
+              console.error(err);
+            });
         } else if (res.type === 'dir') {
           openFolder(res.val.url, res.val.opts);
         } else if (res === 'clear') {
@@ -222,7 +240,7 @@ const commands = {
         }
       });
   },
-  "rename": function (file) {
+  "rename"(file) {
     file = file || editorManager.activeFile;
     dialogs.prompt(strings.rename, file.filename, 'filename', {
         match: constants.FILE_NAME_REGEX
@@ -253,28 +271,28 @@ const commands = {
         }
       });
   },
-  "replace": function () {
+  "replace"() {
     this.find();
   },
-  "resize-editor": function () {
+  "resize-editor"() {
     editorManager.editor.resize(true);
     editorManager.controls.update();
   },
-  "run": function () {
-    runPreview();
+  "run"() {
+    if (Acode.$runBtn.isConnected) runPreview();
   },
-  "save": function (toast) {
+  "save"(toast) {
     saveFile(editorManager.activeFile, false, toast);
   },
-  "save-as": function (toast) {
+  "save-as"(toast) {
     saveFile(editorManager.activeFile, true, toast);
   },
-  "select-all": function () {
+  "select-all"() {
     clipboardAction('select all');
   },
   "select-word": select,
-  "select-line": () => select('line'),
-  "syntax": function () {
+  "select-line": select.bind({}, "line"),
+  "syntax"() {
     editorManager.editor.blur();
     Modes()
       .then(mode => {
@@ -297,21 +315,21 @@ const commands = {
         activefile.setMode(mode);
       });
   },
-  "toggle-quick-tools": function () {
+  "toggle-quick-tools"() {
     quickTools.actions("toggle-quick-tools");
     editorManager.controls.vScrollbar.resize();
   },
-  "toggle-fullscreen": function () {
+  "toggle-fullscreen"() {
     app.classList.toggle("fullscreen-mode");
     this["resize-editor"]();
   },
-  "toggle-sidebar": () => {
+  "toggle-sidebar"() {
     editorManager.sidebar.toggle();
   },
-  "toggle-menu": () => {
+  "toggle-menu"() {
     Acode.$menuToggler.click();
   },
-  "toggle-editmenu": () => {
+  "toggle-editmenu"() {
     Acode.$editMenuToggler.click();
   }
 };

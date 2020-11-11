@@ -140,7 +140,6 @@
   "backup file found": "Yedek dosya bulundu, Ayarları geri yüklemek istiyorumusun, şifre ve ftp-hesaplari?",
   "welcome back": "yeniden hoş geldiniz.",
   "add path": "Yol ekle",
-  "disable floating button": "yüzer tuşu kapat",
   "live autocompletion": "canlı Otomatik Düzenleme",
   "file properties": "dosya bilgileri",
   "path": "Yol",
@@ -156,6 +155,10 @@
   "show print margin": "Show print margin",
   "login": "login",
   "add external storage?": "Add external storage?",
-  "large cursor controller": "Large cursor controller",
-  "scrollbar size": "Scrollbar size"
+  "scrollbar size": "Scrollbar size",
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

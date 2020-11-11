@@ -44,9 +44,10 @@ function contextMenu(arg1, arg2) {
             transformOrigin: arg2.transformOrigin || null
         }
     });
-    const mask = tag('span', {
+    const $mask = tag('span', {
         className: 'mask',
-        ontouchstart: hide
+        ontouchstart: hide,
+        onmousedown: hide
     });
 
     if (!arg2.innerHTML) addTabindex();
@@ -72,7 +73,7 @@ function contextMenu(arg1, arg2) {
 
         }
 
-        document.body.append($el, mask);
+        document.body.append($el, $mask);
 
         const $firstChild = $el.firstChild;
         if ($firstChild && $firstChild.focus) $firstChild.focus();
@@ -83,7 +84,7 @@ function contextMenu(arg1, arg2) {
         $el.onhide();
         $el.classList.add('hide');
         setTimeout(() => {
-            document.body.removeChild(mask);
+            document.body.removeChild($mask);
             document.body.removeChild($el);
         }, 100);
     }

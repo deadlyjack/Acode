@@ -43,6 +43,7 @@ import backupRestore from "../pages/settings/backup-restore";
 import applySettings from "./applySettings";
 import fsOperation from "./fileSystem/fsOperation";
 import ajax from "./utils/ajax";
+import runPreview from "./runPreview";
 //@ts-check
 
 loadPolyFill.apply(window);
@@ -414,10 +415,14 @@ function App() {
   const actions = constants.COMMANDS;
   let registeredKey = '',
     editor;
-
   //#endregion
+
   Acode.$menuToggler = $menuToggler;
   Acode.$editMenuToggler = $editMenuToggler;
+  Acode.$headerToggler = $headerToggler;
+  Acode.$quickToolToggler = $quickToolToggler;
+  Acode.$runBtn = $runBtn;
+
   $sidebar.setAttribute('empty-msg', strings['open folder']);
   window.editorManager = EditorManager($sidebar, $header, $main);
   editor = editorManager.editor;
@@ -460,7 +465,6 @@ function App() {
         app.classList.remove('loading', 'splash');
         onAppLoad();
       }, 500);
-      //#region event listeners 
 
       window.plugins.intent.setNewIntentHandler(intentHandler);
       window.plugins.intent.getCordovaIntent(intentHandler, function (e) {
@@ -499,11 +503,20 @@ function App() {
 
       editorManager.editor.setReadOnly(!activeFile.editable);
 
-      if (['html', 'htm', 'xhtml', 'md', 'js'].includes(helpers.extname(activeFile.filename))) {
-        $header.insertBefore($runBtn, $header.lastChild);
-      } else {
-        $runBtn.remove();
-      }
+      runPreview.checkRunnable()
+        .then(res => {
+          if (res) {
+            $runBtn.setAttribute("run-file", res);
+            $header.insertBefore($runBtn, $header.lastChild);
+          } else {
+            $runBtn.removeAttribute("run-file");
+            $runBtn.remove();
+          }
+        })
+        .catch(err => {
+          $runBtn.removeAttribute("run-file");
+          $runBtn.remove();
+        });
     }
 
     if (doSaveState) saveState();

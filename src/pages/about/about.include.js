@@ -1,8 +1,8 @@
+import './about.scss';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from "../../components/page";
 import _template from './about.hbs';
-import './about.scss';
 import rateBox from '../../components/dialogboxes/rateBox';
 import constants from '../../lib/constants';
 

@@ -140,7 +140,6 @@
   "backup file found": "Đã tìm thấy tệp sao lưu, bạn có muốn khôi phục cài đặt, liên kết khóa và tài khoản ftp từ tệp sao lưu không?",
   "welcome back": "Chào Mừng Trở Lại",
   "add path": "Thêm đường dẫn",
-  "disable floating button": "Tắt nút nổi",
   "live autocompletion": "Tự động hoàn thành trực tiếp",
   "file properties": "Thông Tin Tệp",
   "path": "Đường dẫn",
@@ -156,6 +155,10 @@
   "show print margin": "Show print margin",
   "login": "login",
   "add external storage?": "Add external storage?",
-  "large cursor controller": "Large cursor controller",
-  "scrollbar size": "Scrollbar size"
+  "scrollbar size": "Scrollbar size",
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

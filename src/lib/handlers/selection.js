@@ -118,18 +118,32 @@ function enableSingleMode() {
         controls,
         container
     } = editorManager;
+    const margin = {
+        left: 0,
+        top: 0
+    };
+
+    if (controls.size === "large") {
+        margin.left = '-17.5px';
+        margin.top = '7px';
+    } else if (controls.size === 'small') {
+        margin.left = '-12.5px';
+        margin.top = '4px';
+    } else return;
+
     const selectedText = editor.getCopyText();
     if (selectedText) return;
     const $cursor = editor.container.querySelector('.ace_cursor-layer>.ace_cursor');
     const $cm = controls.menu;
     const lineHeight = editor.renderer.lineHeight;
+    const lessConent = `<span action="select">${strings.select}</span>${editor.getReadOnly()? '' : `<span action="paste">${strings.paste}</span>`}<span action="select all">${strings["select all"]}<span>`;
+    const $end = controls.end;
+    let updateTimeout;
+
     const cpos = {
         x: 0,
         y: 0
     };
-    const lessConent = `<span action="select">${strings.select}</span>${editor.getReadOnly()? '' : `<span action="paste">${strings.paste}</span>`}<span action="select all">${strings["select all"]}<span>`;
-    const $end = controls.end;
-    let updateTimeout;
 
     if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
     $cm.innerHTML = lessConent;
@@ -137,13 +151,8 @@ function enableSingleMode() {
     controls.update = updateEnd;
     controls.callBeforeContextMenu = callBeforeContextMenu;
 
-    if (appSettings.value.largeCursorController) {
-        $end.style.marginLeft = '-17.5px';
-        $end.style.marginTop = '7px';
-    } else {
-        $end.style.marginLeft = '-12.5px';
-        $end.style.marginTop = '4px';
-    }
+    $end.style.marginLeft = margin.left;
+    $end.style.marginTop = margin.top;
 
     editor.on('blur', hide);
     editor.session.on('changeScrollTop', hide);

@@ -140,7 +140,6 @@
   "invalid backup file": "الملف الإحتياطي غير صالح",
   "backup file found": "تم العثور على ملف النسخ الإحتياطي هل تريد الإستعادة؟",
   "welcome back": "مرحباً بك من جديد",
-  "disable floating button": "تعطيل الزر الأساسي(الطافي)",
   "live autocompletion": "إكمال تلقائي مباشر",
   "file properties": "تفاصيل الملف",
   "path": "مسار",
@@ -156,6 +155,10 @@
   "show print margin": "Show print margin",
   "login": "login",
   "add external storage?": "Add external storage?",
-  "large cursor controller": "Large cursor controller",
-  "scrollbar size": "Scrollbar size"
+  "scrollbar size": "Scrollbar size",
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

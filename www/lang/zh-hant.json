@@ -140,7 +140,6 @@
   "backup file found": "找到備份檔案，是否要使用備份檔案恢復編輯器設定、快捷鍵設定以及 FTP 帳戶？",
   "welcome back": "歡迎你再次回到 Acode！",
   "add path": "建立檔案路徑",
-  "disable floating button": "隱藏懸浮按鈕",
   "live autocompletion": "自動完成",
   "file properties": "檔案資訊",
   "path": "路徑",
@@ -156,6 +155,10 @@
   "show print margin": "顯示輸出邊界",
   "login": "login",
   "add external storage?": "Add external storage?",
-  "large cursor controller": "Large cursor controller",
-  "scrollbar size": "Scrollbar size"
+  "scrollbar size": "Scrollbar size",
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

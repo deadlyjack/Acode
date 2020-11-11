@@ -45,10 +45,10 @@ interface Settings {
     fullscreen: boolean;
     smartCompletion: boolean;
     floatingButtonActivation: "click" | "long tap";
-    disableFloatingButton: boolean;
+    floatingButton: boolean;
     liveAutoCompletion: boolean;
     showPrintMargin: boolean;
-    largeCursorController: boolean,
+    cursorControllerSize: "none" | "small" | "large",
     scrollbarSize: number
 }
 
@@ -119,18 +119,47 @@ interface Scrollbar extends HTMLElement {
     destroy(): void;
     /**Displays the scrollbar and hides after 3 seconds of inactivity. */
     render(): void;
-    /**Resize the scrollbar dimension value */
+    /**Resize the scrollbar dimension value. */
     resize(): void;
+    /**Callback function called when scrollbar is rendered. */
+    onhide(): void;
+    /**Callback function called when scrollbar is removed. */
+    onshow(): void;
+    /**Renders the scrollbar. */
+    show(): void;
+    /**Hides the scroller. */
+    hide(): void;
 }
 
 interface File {
     assocTile: HTMLElement;
+    /**
+     * Location of the file on the current device or on remote server/device.
+     */
     uri: string;
+    /**
+     * Name of the file
+     */
     filename: string;
+    /**
+     * Unique ID of the file.
+     */
     id: string;
+    /**
+     * If changed is changed this will be marked as true else false.
+     */
     isUnsaved: boolean;
+    /**
+     * Path of the file.
+     */
     location: string;
+    /**
+     * Checked if file can be edited.
+     */
     readOnly: boolean;
+    /**
+     * Type of file.
+     */
     type: 'regular' | 'git' | 'gist';
     record: Repo | Gist,
     updateControls: function(): void;
@@ -479,6 +508,9 @@ declare var IS_ANDROID_VERSION_5: boolean;
 
 declare var ace: AceAjax;
 declare var actionStack: ActionStack;
+/**
+ * List of folders that is opened in Acode
+ */
 declare var addedFolder: Array<Folder>;
 declare var app: HTMLBodyElement;
 declare var editorManager: Manager;

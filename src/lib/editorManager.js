@@ -12,7 +12,7 @@ import Url from './utils/Url';
 import path from './utils/path';
 import Uri from './utils/Uri';
 import configEditor from './aceConfig';
-import ScrollBar from '../components/scrollbar';
+import ScrollBar from '../components/scrollbar/scrollbar';
 /**
  * @typedef {object} ActiveEditor
  * @property {HTMLElement} container
@@ -43,7 +43,9 @@ function EditorManager($sidebar, $header, $body) {
         lastHeight = innerHeight,
         editorState = 'blur',
         preventScrollbarV = false,
-        preventScrollbarH = false;
+        preventScrollbarH = false,
+        cursorControllerSize = appSettings.value.cursorControllerSize,
+        timeoutQuicktoolToggler, timeoutHeaderToggler;
     const $container = tag('div', {
         className: 'editor-container'
     });
@@ -70,13 +72,12 @@ function EditorManager($sidebar, $header, $body) {
         parent: $body,
         direction: "bottom"
     });
-    const size = appSettings.value.largeCursorController ? "large" : "small";
     const controls = {
         start: tag('span', {
-            className: 'cursor-control start ' + size
+            className: 'cursor-control start ' + cursorControllerSize
         }),
         end: tag('span', {
-            className: 'cursor-control end ' + size
+            className: 'cursor-control end ' + cursorControllerSize
         }),
         menu: tag('div', {
             className: 'clipboard-contextmneu',
@@ -90,9 +91,20 @@ function EditorManager($sidebar, $header, $body) {
         }),
         vScrollbar: $vScrollbar,
         hScrollbar: $hScrollbar,
-        size,
         fullContent,
         readOnlyContent,
+        get size() {
+            return cursorControllerSize;
+        },
+        set size(s) {
+            cursorControllerSize = s;
+
+            const sizes = ['large', 'small', 'none'];
+            this.start.classList.remove(...sizes);
+            this.end.classList.remove(...sizes);
+            this.start.classList.add(s);
+            this.end.classList.add(s);
+        },
         update: () => {},
         checkForColor: function () {
             const copyTxt = editor.getCopyText();
@@ -156,6 +168,9 @@ function EditorManager($sidebar, $header, $body) {
         }
     };
 
+    $hScrollbar.onshow = $vScrollbar.onshow = updateFloatingButton.bind({}, false);
+    $hScrollbar.onhide = $vScrollbar.onhide = updateFloatingButton.bind({}, true);
+
     window.addEventListener('resize', () => {
         if (innerHeight > lastHeight) {
             editor.blur();
@@ -167,6 +182,8 @@ function EditorManager($sidebar, $header, $body) {
 
     editor.on('focus', () => {
         editorState = 'focus';
+        $hScrollbar.hide();
+        $vScrollbar.hide();
     });
 
     editor.on('change', function (e) {
@@ -286,6 +303,39 @@ function EditorManager($sidebar, $header, $body) {
         const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
         const editorWidth = (session.getScreenWidth() * renderer.characterWidth) - offset;
         return editorWidth;
+    }
+
+    function updateFloatingButton(show = false) {
+        const {
+            $quickToolToggler,
+            $headerToggler
+        } = Acode;
+
+        if (show) {
+
+            clearTimeout(timeoutHeaderToggler);
+            clearTimeout(timeoutQuicktoolToggler);
+
+            if (appSettings.value.floatingButton) {
+                $quickToolToggler.classList.remove('hide');
+                root.append($quickToolToggler);
+            }
+
+            $headerToggler.classList.remove('hide');
+            root.append($headerToggler);
+
+        } else {
+
+            if ($quickToolToggler.isConnected) {
+                $quickToolToggler.classList.add('hide');
+                timeoutQuicktoolToggler = setTimeout(() => $quickToolToggler.remove(), 300);
+            }
+            if ($headerToggler.isConnected) {
+                $headerToggler.classList.add('hide');
+                timeoutHeaderToggler = setTimeout(() => $headerToggler.remove(), 300);
+            }
+
+        }
     }
 
     /**
@@ -691,7 +741,6 @@ function EditorManager($sidebar, $header, $body) {
         const $el = e.target;
         if (!$el.classList.contains('tile')) return;
 
-
         const $parent = this;
         const type = e.type === 'mousedown' ? 'mousemove' : 'touchmove';
         const opts = {
@@ -727,13 +776,15 @@ function EditorManager($sidebar, $header, $body) {
                 $el.style.removeProperty('transform');
                 document.removeEventListener(type, drag, opts);
                 document.ontouchend = document.onmouseup = null;
-                if ($placeholder.isConnected) $parent.replaceChild($el, $placeholder);
+                if ($placeholder.isConnected) {
+                    $parent.replaceChild($el, $placeholder);
+                    updateFileList();
+                }
                 $el.eventAdded = false;
                 document.ontouchend = document.onmouseup = document.ontouchcancel = document.onmouseleave = null;
             };
 
             function drag(e) {
-                console.log(e.type);
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
@@ -766,12 +817,26 @@ function EditorManager($sidebar, $header, $body) {
             }
         }, 300);
 
-
         document.ontouchend = document.onmouseup = document.ontouchmove = document.onmousemove = function (e) {
             document.ontouchend = document.onmouseup = document.ontouchmove = document.onmousemove = null;
             if (timeout) clearTimeout(timeout);
             $el.eventAdded = false;
         };
+
+        function updateFileList() {
+            const children = [...$parent.children];
+            const newFileList = [];
+            for (let el of children) {
+                for (let file of manager.files) {
+                    if (file.assocTile === el) {
+                        newFileList.push(file);
+                        break;
+                    }
+                }
+            }
+
+            manager.files = newFileList;
+        }
     }
 
     function hasUnsavedFiles() {
