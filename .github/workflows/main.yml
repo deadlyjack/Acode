@@ -58,7 +58,7 @@ jobs:
       run: echo "$signing_properties" > platforms/android/build.json
     
     - name: Build with cordova
-      run: cordova build android --${BUILD_TYPE} && rm platforms/android/{build.json}
+      run: cordova build android --${BUILD_TYPE} && rm platforms/android/build.json
     
     - name: Create env variable APP_VERSION
       run: echo "::set-env name=APP_VERSION::$(cat package.json | jq -r '.version')"
