@@ -71,6 +71,7 @@ export default {
     "en-us": "English",
     "es-sv": "Español",
     "fr-fr": "Francais",
+    "de-de": "Deutsch",
     "id-id": "Indonesian",
     "uz-uz": "O'zbekcha",
     "ru-ru": "Русский",
