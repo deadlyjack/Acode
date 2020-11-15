@@ -86,9 +86,9 @@ export default function editorSettings() {
             checkbox: values.vibrateOnTap,
         },
         {
-            key: 'disableFloatingButton',
-            text: strings["disable floating button"],
-            checkbox: values.disableFloatingButton
+            key: 'floatingButton',
+            text: strings["floating button"],
+            checkbox: values.floatingButton
         },
         {
             key: 'quickTools',
@@ -111,9 +111,9 @@ export default function editorSettings() {
             checkbox: values.showPrintMargin
         },
         {
-            key: 'largeCursorController',
-            text: strings["large cursor controller"],
-            checkbox: values.largeCursorController
+            key: 'cursorControllerSize',
+            text: strings["cursor controller size"],
+            subText: values.cursorControllerSize
         },
         {
             key: 'scrollbarSize',
@@ -218,10 +218,12 @@ export default function editorSettings() {
             case 'linting':
                 values.linting = !values.linting;
                 files.map(file => file.session.setUseWorker(values.linting));
+
                 if (values.linting)
                     editorManager.editor.renderer.setMargin(0, 0, 0, 0);
                 else
                     editorManager.editor.renderer.setMargin(0, 0, -16, 0);
+
                 appSettings.update();
                 this.value = values.linting;
                 break;
@@ -242,6 +244,7 @@ export default function editorSettings() {
                         values.openFileListPos = res;
                         appSettings.update();
                         editorManager.moveOpenFileList();
+                        editorManager.controls.vScrollbar.resize();
                         this.changeSubText(res);
                     });
                 break;
@@ -273,7 +276,6 @@ export default function editorSettings() {
 
             case 'fullscreen':
                 values.fullscreen = !values.fullscreen;
-                const id = constants.notification.EXIT_FULL_SCREEN;
 
                 if (values.fullscreen)
                     Acode.exec("enable-fullscreen");
@@ -291,11 +293,11 @@ export default function editorSettings() {
                 this.value = values.animation;
                 break;
 
-            case 'disableFloatingButton':
-                values.disableFloatingButton = !values.disableFloatingButton;
-                root.classList.toggle("disable-floating-button");
+            case 'floatingButton':
+                values.floatingButton = !values.floatingButton;
+                root.classList.toggle("hide-floating-button");
                 appSettings.update();
-                this.value = values.disableFloatingButton;
+                this.value = values.floatingButton;
                 break;
 
             case 'liveAutoCompletion':
@@ -304,30 +306,30 @@ export default function editorSettings() {
                 appSettings.update();
                 this.value = values.liveAutoCompletion;
                 break;
+
             case 'showPrintMargin':
                 values.showPrintMargin = !values.showPrintMargin;
                 editorManager.editor.setOption("showPrintMargin", values.showPrintMargin);
                 appSettings.update();
                 this.value = values.showPrintMargin;
                 break;
-            case 'largeCursorController':
-                values.largeCursorController = !values.largeCursorController;
-                editorManager.editor.setOption("largeCursorController", values.largeCursorController);
-                appSettings.update();
-                this.value = values.largeCursorController;
 
-                const {
-                    start, end
-                } = controls;
-
-                if (this.value) {
-                    start.classList.add("large");
-                    end.classList.add("large");
-                } else {
-                    start.classList.remove("large");
-                    end.classList.remove("large");
-                }
+            case 'cursorControllerSize':
+                dialogs.select(
+                        strings['cursor controller size'],
+                        [
+                            [strings.none, 'none'],
+                            [strings.small, 'small'],
+                            [strings.large, 'large']
+                        ], {
+                            default: values.cursorControllerSize
+                        })
+                    .then(res => {
+                        this.value = values.cursorControllerSize = editorManager.controls.size = res;
+                        appSettings.update();
+                    });
                 break;
+
             case 'scrollbarSize':
                 dialogs.select(strings["scrollbar size"], [5, 10, 15, 20], {
                         default: values.scrollbarSize

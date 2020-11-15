@@ -141,7 +141,6 @@
   "backup file found": "Найден бэкап, восстановить?",
   "welcome back": "С возвращением!",
   "add path": "Добавить путь",
-  "disable floating button": "Отключить плавающую кнопку",
   "live autocompletion": "Мгновенное автозавершение",
   "file properties": "Свойства файла",
   "path": "Путь",
@@ -157,6 +156,10 @@
   "show print margin": "Показать поле печати",
   "login": "login",
   "add external storage?": "Add external storage?",
-  "large cursor controller": "Large cursor controller",
-  "scrollbar size": "Scrollbar size"
+  "scrollbar size": "Scrollbar size",
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

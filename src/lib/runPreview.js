@@ -13,6 +13,10 @@ import fsOperation from './fileSystem/fsOperation';
 import path from './utils/path';
 import Url from './utils/Url';
 
+/**
+ * TODO: No preview button for html file with opening file.
+ */
+
 
 /**
  * Starts the server and run the active file in browser
@@ -50,7 +54,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     for (let folder of addedFolder) {
       if (path.isParent(folder.url, pathName)) {
         addedFolderUrl = folder.url;
-        window.resolveLocalFileSystemURL(addedFolderUrl + 'index.html', select, next);
+        window.resolveLocalFileSystemURL(addedFolderUrl + 'index.html', runHTML, next);
         return;
       }
     }
@@ -64,20 +68,11 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
 
-  function select() {
-    dialogs.select('', [
-      ['other', filename],
-      ['html', 'index.html']
-    ]).then(res => {
-      if (res === 'other') {
-        next();
-      } else {
-        filename = 'index.html';
-        extension = 'html';
-        pathName = addedFolderUrl;
-        start();
-      }
-    });
+  function runHTML() {
+    filename = 'index.html';
+    extension = 'html';
+    pathName = addedFolderUrl;
+    start();
   }
 
   function startConsole() {
@@ -386,5 +381,38 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     return (reqPath === filename) && (activeFile.isUnsaved || !activeFile.location || activeFile.type === 'git');
   }
 }
+
+
+runPreview.checkRunnable = async function () {
+  try {
+    const activeFile = editorManager.activeFile;
+    let result = null;
+    if (activeFile.type === "regular") {
+      for (let folder of addedFolder) {
+        const folderPath = new RegExp('^' + folder.url);
+        if (folderPath.test(activeFile.uri)) {
+          const url = Url.join(folder.url, 'index.html');
+          const fs = await fsOperation(url);
+          if (await fs.exists()) {
+            result = url;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!result) {
+      const runnableFile = /\.((html?)|(md)|(js))$/;
+      const filename = activeFile.filename;
+      if (runnableFile.test(filename))
+        result = filename;
+    }
+
+    return result;
+  } catch (err) {
+    if (err instanceof Error) throw error;
+    else throw new Error(err);
+  }
+};
 
 export default runPreview;

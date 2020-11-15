@@ -140,7 +140,6 @@
   "backup file found": "バックアップファイルが見つかりました。バックアップファイルから設定、キーバインド、FTPアカウントを復元しますか？",
   "welcome back": "おかえりなさい",
   "add path": "パスを追加",
-  "disable floating button": "フローティングボタンを無効化",
   "live autocompletion": "自動補完を実行",
   "file properties": "ファイルプロパティ",
   "path": "パス",
@@ -156,6 +155,10 @@
   "show print margin": "印刷時の余白を表示",
   "login": "ログイン",
   "add external storage?": "外部ストレージを追加しますか？",
-  "large cursor controller": "カーソルを大きくする",
-  "scrollbar size": "スクロールバーサイズ"
+  "scrollbar size": "スクロールバーサイズ",
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

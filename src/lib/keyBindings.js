@@ -1,4 +1,16 @@
 export default {
+  "closeCurrentTab": {
+    "description": "Close current tab.",
+    "key": "Ctrl-Q",
+    "readOnly": false,
+    "action": "close-current-tab"
+  },
+  "closeAllTabs": {
+    "description": "Close all tabs.",
+    "key": "Ctrl-Shift-Q",
+    "readOnly": false,
+    "action": "close-all-tabs"
+  },
   "newFile": {
     "description": "Create new file",
     "key": "Ctrl-N",

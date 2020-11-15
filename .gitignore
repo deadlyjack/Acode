@@ -1,7 +1,7 @@
 node_modules
 platforms
 .vscode
-release-signing.properties
+build.json
 www/js/build
 www/css/build
 package-lock.json

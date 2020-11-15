@@ -1,3 +1,4 @@
+import './scrollbar.scss';
 import tag from 'html-tag-js';
 
 /**
@@ -35,6 +36,7 @@ export default function ScrollBar(options) {
   const config = {
     passive: false
   };
+  const TIMEOUT = 2000;
   const isVertical = (options.direction === "right" || options.direction === "left");
   const observer = new MutationObserver(observerCallback);
   let scroll = 0,
@@ -43,7 +45,7 @@ export default function ScrollBar(options) {
       y: 0
     },
     scrollbarSize = 20,
-    height, width, rect, scrollbarTimeout;
+    height, width, rect, scrollbarTimeoutHide, scrollbarTimeoutRemove, onshow, onhide;
 
   if (options.width) scrollbarSize = options.width;
 
@@ -51,6 +53,7 @@ export default function ScrollBar(options) {
   $scrollbar.onScroll = options.onscroll;
   $scrollbar.onScrollEnd = options.onscrollend;
   $thumb.addEventListener("touchstart", touchStart, config);
+  $thumb.addEventListener("mousedown", touchStart, config);
   window.addEventListener('resize', resize);
   observer.observe($cursor, {
     attributes: true
@@ -68,27 +71,29 @@ export default function ScrollBar(options) {
 
   /**
    * 
-   * @param {TouchEvent} e 
+   * @param {TouchEvent|MouseEvent} e 
    */
   function touchStart(e) {
     e.preventDefault();
     if (!rect) resize();
-    const touch = e.touches[0];
+    const touch = e.type === "touchstart" ? e.touches[0] : e;
     touchStartValue.x = touch.clientX;
     touchStartValue.y = touch.clientY;
     $scrollbar.classList.add("active");
     document.addEventListener("touchmove", touchMove, config);
+    document.addEventListener("mousemove", touchMove, config);
     document.addEventListener("touchend", touchEnd, config);
+    document.addEventListener("mouseup", touchEnd, config);
     document.addEventListener("touchcancel", touchEnd, config);
-    clearTimeout(scrollbarTimeout);
+    clearTimeout(scrollbarTimeoutHide);
   }
 
   /**
    * 
-   * @param {TouchEvent} e 
+   * @param {TouchEvent | MouseEvent} e 
    */
   function touchMove(e) {
-    const touch = e.touches[0];
+    const touch = e.type === "touchmove" ? e.touches[0] : e;
     const touchDiffX = touchStartValue.x - touch.clientX;
     const touchDiffY = touchStartValue.y - touch.clientY;
     touchStartValue.x = touch.clientX;
@@ -123,18 +128,18 @@ export default function ScrollBar(options) {
 
   /**
    * 
-   * @param {TouchEvent} e 
+   * @param {TouchEvent|MouseEvent} e 
    */
   function touchEnd(e) {
     e.preventDefault();
     $scrollbar.classList.remove("active");
     document.removeEventListener("touchmove", touchMove, config);
+    document.removeEventListener("mousemove", touchMove, config);
     document.removeEventListener("touchend", touchEnd, config);
+    document.removeEventListener("mouseup", touchEnd, config);
     document.removeEventListener("touchcancel", touchEnd, config);
     if (typeof $scrollbar.onScrollEnd === "function") $scrollbar.onScrollEnd();
-    scrollbarTimeout = setTimeout(() => {
-      $scrollbar.remove();
-    }, 1000);
+    scrollbarTimeoutHide = setTimeout(hide, TIMEOUT);
   }
 
   function resize(render = true) {
@@ -149,6 +154,11 @@ export default function ScrollBar(options) {
 
   function setValue(val) {
     if (!height || !width) resize(false);
+
+    //Make sure value is between 0 and 1
+    if (val < 0) val = 0;
+    else if (val > 1) val = 1;
+
     scroll = val;
     if (isVertical) $cursor.style.top = (val * height) + 'px';
     else $cursor.style.left = (val * width) + 'px';
@@ -158,15 +168,28 @@ export default function ScrollBar(options) {
     window.removeEventListener("resize", resize);
     $thumb.removeEventListener("touchstart", touchStart);
     observer.disconnect();
+    if (typeof onhide === "function") onhide();
   }
 
   function render() {
-    options.parent.append($scrollbar);
+    show();
+    scrollbarTimeoutHide = setTimeout(hide, TIMEOUT);
+  }
 
-    clearTimeout(scrollbarTimeout);
-    scrollbarTimeout = setTimeout(() => {
-      $scrollbar.remove();
-    }, 3000);
+  function show() {
+    clearTimeout(scrollbarTimeoutHide);
+    clearTimeout(scrollbarTimeoutRemove);
+    $scrollbar.classList.remove("hide");
+    if (!$scrollbar.isConnected) {
+      options.parent.append($scrollbar);
+      if (typeof onshow === "function") onshow();
+    }
+  }
+
+  function hide() {
+    $scrollbar.classList.add("hide");
+    scrollbarTimeoutRemove = setTimeout(() => $scrollbar.remove(), 300);
+    if (typeof onhide === "function") onhide();
   }
 
   Object.defineProperty($scrollbar, "size", {
@@ -189,6 +212,32 @@ export default function ScrollBar(options) {
 
   Object.defineProperty($scrollbar, "render", {
     value: render
+  });
+
+  Object.defineProperty($scrollbar, 'show', {
+    value: show
+  });
+
+  Object.defineProperty($scrollbar, 'hide', {
+    value: hide
+  });
+
+  Object.defineProperty($scrollbar, "onshow", {
+    set(fun) {
+      onshow = fun;
+    },
+    get() {
+      return onshow;
+    }
+  });
+
+  Object.defineProperty($scrollbar, "onhide", {
+    set(fun) {
+      onhide = fun;
+    },
+    get() {
+      return onhide;
+    }
   });
 
   return $scrollbar;

@@ -141,7 +141,6 @@
   "backup file found": "Backup file found, do you want to restore settings, key-bindings and ftp-accounts from backup file?",
   "welcome back": "Welcome back",
   "add path": "Add path",
-  "disable floating button": "Disable floating button",
   "live autocompletion": "Live autocompletion",
   "file properties": "File properties",
   "path": "Path",
@@ -157,6 +156,10 @@
   "show print margin": "Show print margin",
   "login": "login",
   "add external storage?": "Add external storage?",
-  "large cursor controller": "Large cursor controller",
-  "scrollbar size": "Scrollbar size"
+  "scrollbar size": "Scrollbar size",
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

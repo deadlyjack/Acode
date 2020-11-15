@@ -140,7 +140,6 @@
   "backup file found": "Nalezen soubor zálohy. Přejete si z něj obnovit nastavení, kl.zkratky a ftp účty?",
   "welcome back": "Vítejte zpět",
   "add path": "Přidat cestu",
-  "disable floating button": "Vypnout plovoucí tlačítko",
   "live autocompletion": "Aktivní doplňování kódu",
   "file properties": "Vlastnosti souboru",
   "path": "Cesta",
@@ -153,6 +152,10 @@
   "show print margin": "Show print margin",
   "login": "login",
   "add external storage?": "Add external storage?",
-  "large cursor controller": "Large cursor controller",
-  "scrollbar size": "Scrollbar size"
+  "scrollbar size": "Scrollbar size",
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

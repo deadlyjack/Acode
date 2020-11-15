@@ -140,7 +140,6 @@
   "backup file found": "Знойдзены файл рэзервовай копіі. Хочаце аднавіць налады, прывязкі клавіш і акаўнты ftp з файла рэзервовай копіі?",
   "welcome back": "Вітаем",
   "add path": "Дадаць шлях",
-  "disable floating button": "Адключыць плавальную кнопку",
   "live autocompletion": "Імгненнае аўтазавяршэнне",
   "file properties": "Уласцівасці файла",
   "path": "Шлях",
@@ -155,5 +154,11 @@
   "permission denied": "Адмоўлена ў доступе да вонкавага сховішча.",
   "show print margin": "Паказаць поле друку",
   "login": "уваход",
-  "add external storage?": "Дадаць вонкавае сховішча?"
+  "add external storage?": "Дадаць вонкавае сховішча?",
+  "scrollbar size": "Scrollbar size",
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

@@ -140,7 +140,6 @@
   "backup file found": "Fichier de sauvegarde trouvé, voulez vous restorer les paramètres, raccourcis clavier et comptes FTP depuis le fichier de sauvegarde?",
   "welcome back": "Bienvenue à nouveau!",
   "add path": "Ajouter chemin",
-  "disable floating button": "Désactiver le bouton flottant",
   "live autocompletion": "Correction automatique",
   "file properties": "Propriétés du fichier",
   "path": "Chemin",
@@ -156,6 +155,10 @@
   "show print margin": "Afficher les marges d'impression",
   "login": "login",
   "add external storage?": "Add external storage?",
-  "large cursor controller": "Large cursor controller",
-  "scrollbar size": "Scrollbar size"
+  "scrollbar size": "Scrollbar size",
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

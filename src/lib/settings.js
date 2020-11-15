@@ -62,11 +62,11 @@ class Settings {
             vibrateOnTap: true,
             fullscreen: false,
             floatingButtonActivation: "click",
-            disableFloatingButton: false,
+            floatingButton: true,
             liveAutoCompletion: true,
             showPrintMargin: false,
             scrollbarSize: 20,
-            largeCursorController: true
+            cursorControllerSize: 'small'
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;

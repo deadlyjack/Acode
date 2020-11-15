@@ -8,59 +8,59 @@
   },
   "installed_plugins": {
     "cordova-clipboard": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-custom-config": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-disable-http-cache": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-android-permissions": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-buildinfo": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-device": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-file": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-ftp": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-inappbrowser": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-intent": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-navigationbar-color": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-sdcard": {
       "ANDROID_SUPPORT_VERSION": "28.+",
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-statusbar": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-system": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-vibration": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-webserver": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-whitelist": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     },
     "cordova-plugin-x-toast": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
+      "PACKAGE_NAME": "com.foxdebug.acodefree"
     }
   },
   "dependent_plugins": {}

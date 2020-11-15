@@ -1,4 +1,18 @@
-version 1.1.14.130
+version 1.1.14.133
+☞ Fixed dir list not working.
+
+version 1.1.14.132
+☞ Close current tab (Ctrl-Q)
+☞ Close all tab (Ctrl-Shift-Q)
+☞ Scrollbar now works with mouse
+☞ Added option to disable teardrop (cursor controller)
+☞ Added Belarusian language
+☞ Fixed scrollbar behaviour
+☞ GUI improvement
+☞ Performance improvement
+☞ Small bugs fix
+
+version 1.1.14.131
 ☞ Fixed scrollbar behaviour
 ☞ GUI improvement
 ☞ Performance improvement

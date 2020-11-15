@@ -157,6 +157,10 @@
   "show print margin": "tunjukkan batas cetak",
   "login": "login",
   "add external storage?": "Tambahkan penyimpanan eksternal?",
-  "large cursor controller": "Kontorler Cursor Besar",
   "scrollbar size": "Ukuran scrollbar"
+  "cursor controller size": "Cursor controller size",
+  "none": "none",
+  "small": "small",
+  "large": "large",
+  "floating button": "Floating button"
 }

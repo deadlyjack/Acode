@@ -14,10 +14,18 @@ function select(type) {
     controls,
     container
   } = editorManager;
+  let marginLeft;
+
+  if (controls.size === "large") marginLeft = '-30.5px';
+  else if (controls.size === 'small') marginLeft = '-21.5px';
+  else return;
+
   const $content = container.querySelector('.ace_scroller');
   const lineHeight = editor.renderer.lineHeight;
   const $cm = controls.menu;
   const $cursor = editor.container.querySelector('.ace_cursor-layer>.ace_cursor');
+  const $start = controls.start;
+  const $end = controls.end;
   const initialScroll = {
     top: 0,
     left: 0
@@ -32,8 +40,6 @@ function select(type) {
       y: 0
     }
   };
-  const $start = controls.start;
-  const $end = controls.end;
 
   if (!editor.getCopyText() && type === "word")
     editor.selectMore(1, false, true);
@@ -41,11 +47,13 @@ function select(type) {
     return textControl.enableSingleMode().showContextMenu();
 
   if (controls.callBeforeContextMenu) controls.callBeforeContextMenu();
+
   $end.style.marginLeft = '-4px';
   $end.style.marginTop = '0px';
-  if (appSettings.value.largeCursorController) $start.style.marginLeft = '-30.5px';
-  else $start.style.marginLeft = '-21.5px';
+
+  $start.style.marginLeft = marginLeft;
   $start.style.marginTop = '0px';
+
   controls.update = updateControls;
   controls.callBeforeContextMenu = disable;
   $end.onclick = null;

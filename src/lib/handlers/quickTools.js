@@ -7,7 +7,7 @@ import searchSettings from '../../pages/settings/searchSettings';
 
 function actions(action) {
   const search = mustache.render($_search, strings);
-  const $footer = document.getElementById('quick-tools');
+  const $footer = root.get('#quick-tools');
   const editor = editorManager.editor;
   const $row2 = $footer.querySelector('#row2');
   const $searchRow1 = $footer.querySelector('#search_row1');

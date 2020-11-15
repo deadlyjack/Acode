@@ -11859,6 +11859,20 @@ define("ace/commands/default_commands", ["require", "exports", "module", "ace/li
         };
     }
     exports.commands = [{
+            name: "closeCurrentTab",
+            description: "Close current tab",
+            bindKey: bindKey("closeCurrentTab"),
+            exec: function () {
+                Acode.exec("close-current-tab");
+            }
+        }, {
+            name: "closeAllTabs",
+            description: "Close all tabs",
+            bindKey: bindKey("closeAllTabs"),
+            exec: function () {
+                Acode.exec("close-all-tabs");
+            }
+        }, {
             name: "newFile",
             description: "Create new file",
             bindKey: bindKey("newFile"),

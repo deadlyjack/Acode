@@ -212,10 +212,6 @@ function sidenav(activator, toggler) {
         touch.totalX = touch.endX - touch.startX;
         touch.totalY = touch.endY - touch.startY;
 
-        console.log({
-            ...touch
-        });
-
         if (!flag) {
             flag = true;
             const scrollLeft = () => scroll.scrollBy({
