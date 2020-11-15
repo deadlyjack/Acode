@@ -154,12 +154,12 @@
   "allow storage": "Предоставить доступ к внешнему хранилищу?",
   "permission denied": "Отказано в разрешении на доступ к внешнему хранилищу",
   "show print margin": "Показать поле печати",
-  "login": "login",
-  "add external storage?": "Add external storage?",
-  "scrollbar size": "Scrollbar size",
-  "cursor controller size": "Cursor controller size",
+  "login": "логин",
+  "add external storage?": "Добавить внешнее хранилище?",
+  "scrollbar size": "Размер полосы прокрутки",
+  "cursor controller size": "Размер контроллера курсора",
   "none": "none",
-  "small": "small",
-  "large": "large",
-  "floating button": "Floating button"
+  "small": "маленький",
+  "large": "большой",
+  "floating button": "Плавающая кнопка"
 }
