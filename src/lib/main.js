@@ -563,6 +563,7 @@ function App() {
     if (registeredKey && key !== registeredKey) return;
 
     const isFocused = editor.textInput.getElement() === document.activeElement;
+    if (key === "escape" && (!actionStack.length || isFocused)) e.preventDefault();
     if (actionStack.length || isFocused) return;
     for (let name in keyBindings) {
       const obj = keyBindings[name];

@@ -14,11 +14,6 @@ import path from './utils/path';
 import Url from './utils/Url';
 
 /**
- * TODO: No preview button for html file with opening file.
- */
-
-
-/**
  * Starts the server and run the active file in browser
  * @param {Boolean} isConsole 
  * @param {"_blank"|"_system"} target 
@@ -54,7 +49,12 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     for (let folder of addedFolder) {
       if (path.isParent(folder.url, pathName)) {
         addedFolderUrl = folder.url;
-        window.resolveLocalFileSystemURL(addedFolderUrl + 'index.html', runHTML, next);
+        fsOperation(addedFolderUrl + 'index.html')
+          .then(fs => {
+            return fs.exists();
+          })
+          .then(onresult)
+          .catch(onerror);
         return;
       }
     }
@@ -67,6 +67,18 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     else start();
   }
 
+  function onerror() {
+    helpers.error(err);
+    console.log(err);
+  }
+  /**
+   * 
+   * @param {boolean} exists 
+   */
+  function onresult(exists) {
+    if (exists) runHTML();
+    else next();
+  }
 
   function runHTML() {
     filename = 'index.html';
@@ -279,19 +291,22 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
    * @param {string} id 
    */
   function sendHTML(text, id) {
-    const js = `<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<script src="/${EDITOR_SCRIPT}" crossorigin="anonymous"></script>
-<script src="/${CONSOLE_SCRIPT}" crossorigin="anonymous"></script>
-<script src="/${ESPRISMA_SCRIPT}" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="/${CONSOLE_STYLE}">`;
-    text = text.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
-    const part = text.split('<head>');
-    if (part.length === 2) {
-      text = `${part[0]}<head>${js}${part[1]}`;
-    } else if (/<html>/i.test(text)) {
-      text = text.replace('<html>', `<html><head>${js}</head>`);
-    } else {
-      text = `<head>${js}</head>` + text;
+
+    if (appSettings.value.showConsole) {
+      const js = `<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <script src="/${EDITOR_SCRIPT}" crossorigin="anonymous"></script>
+      <script src="/${CONSOLE_SCRIPT}" crossorigin="anonymous"></script>
+      <script src="/${ESPRISMA_SCRIPT}" crossorigin="anonymous"></script>
+      <link rel="stylesheet" href="/${CONSOLE_STYLE}">`;
+      text = text.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
+      const part = text.split('<head>');
+      if (part.length === 2) {
+        text = `${part[0]}<head>${js}${part[1]}`;
+      } else if (/<html>/i.test(text)) {
+        text = text.replace('<html>', `<html><head>${js}</head>`);
+      } else {
+        text = `<head>${js}</head>` + text;
+      }
     }
 
     sendText(text, id);

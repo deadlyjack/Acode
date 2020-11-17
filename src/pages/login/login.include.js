@@ -11,7 +11,6 @@ import fs from '../../lib/fileSystem/internalFs';
 export default function GithubLoginInclude() {
   const $page = Page('Github Login');
   const $content = tag.parse(mustache.render(_template, strings));
-  /**@type {HTMLFormElement} */
   const $form = $content.get('.form');
   const $token = $content.get("#token");
   const $errorMsg = $content.get('#error-msg');

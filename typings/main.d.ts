@@ -49,7 +49,9 @@ interface Settings {
     liveAutoCompletion: boolean;
     showPrintMargin: boolean;
     cursorControllerSize: "none" | "small" | "large",
-    scrollbarSize: number
+    scrollbarSize: number;
+    confirmOnExit: boolean;
+    showConsole: boolean;
 }
 
 interface AppSettings {
@@ -226,6 +228,9 @@ interface RemoteFs {
     currentDirectory(): Promise<string>;
     homeDirectory(): Promise<string>;
     stats(src: string): Promise<FileStatus>;
+    /**
+     * Resolve with true if file exists else resolve if false. Rejects if any error is generated.
+     */
     exists(): Promise<Boolean>;
     origin: string;
     originObjec: OriginObject;

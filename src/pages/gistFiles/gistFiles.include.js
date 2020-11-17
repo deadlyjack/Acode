@@ -53,8 +53,8 @@ function GistFilesInclude(gist) {
     }
   });
 
-  $content.on('click', handleClick);
-  $cm.on('click', handleClick);
+  $content.addEventListener('click', handleClick);
+  $cm.addEventListener('click', handleClick);
   $page.append($content);
   $page.querySelector('header').append($search, $menuToggler);
   app.appendChild($page);

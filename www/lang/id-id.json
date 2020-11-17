@@ -97,7 +97,7 @@
   "unable to delete file": "tidak dapat menghapus berkas",
   "unable to open file": "Maaf, tidak dapat membuka berkas",
   "unable to open folder": "Maaf, tidak dapat membuka folder",
-  "unable to save file": "Maaf, tidak dapat menyimpan berkas,
+  "unable to save file": "Maaf, tidak dapat menyimpan berkas",
   "unable to rename": "Maaf, tidak dapat mengganti nama",
   "unsaved file": "Berkas ini tidak disimpan, tutup?",
   "warning": "peringatan",
@@ -157,10 +157,13 @@
   "show print margin": "tunjukkan batas cetak",
   "login": "login",
   "add external storage?": "Tambahkan penyimpanan eksternal?",
-  "scrollbar size": "Ukuran scrollbar"
+  "scrollbar size": "Ukuran scrollbar",
   "cursor controller size": "Cursor controller size",
   "none": "none",
   "small": "small",
   "large": "large",
-  "floating button": "Floating button"
+  "floating button": "Floating button",
+  "confirm on exit": "Confirm on exit",
+  "other settings": "Other settings",
+  "show console": "Show console"
 }

@@ -31,6 +31,6 @@ for (let splashScreen of splashScreens) {
     fs.rmdirSync(file, {
       recursive: true
     });
-    console.log("Removed: ", file);
+    console.log("Removed: ", splashScreen);
   }
 }

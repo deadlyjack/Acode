@@ -161,5 +161,8 @@
   "none": "none",
   "small": "small",
   "large": "large",
-  "floating button": "Floating button"
+  "floating button": "Floating button",
+  "confirm on exit": "Confirm on exit",
+  "other settings": "Other settings",
+  "show console": "Show console"
 }

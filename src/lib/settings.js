@@ -66,7 +66,9 @@ class Settings {
             liveAutoCompletion: true,
             showPrintMargin: false,
             scrollbarSize: 20,
-            cursorControllerSize: 'small'
+            cursorControllerSize: 'small',
+            confirmOnExit: true,
+            showConsole: true
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;

@@ -22,11 +22,6 @@ import Url from "./utils/Url";
 import path from "./utils/path";
 import showFileInfo from "./showFileInfo";
 
-
-/**
- * TODO: Add file to close current and all tab
- */
-
 const commands = {
   "close-all-tabs"() {
     for (let file of editorManager.files) {

@@ -84,8 +84,8 @@ function contextMenu(arg1, arg2) {
         $el.onhide();
         $el.classList.add('hide');
         setTimeout(() => {
-            document.body.removeChild($mask);
-            document.body.removeChild($el);
+            $mask.remove();
+            $el.remove();
         }, 100);
     }
 

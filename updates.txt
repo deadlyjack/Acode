@@ -1,3 +1,14 @@
+version 1.1.14.137
+☞ Added option to disable console.
+☞ Added option disable confirmation on exit the app.
+☞ Fixed unable to preview HTML or Js file.
+☞ Fixed unable to open gist files.
+☞ Fixed Esc key not working in editor.
+☞ Other minor bug fixes.
+
+version 1.1.14.134
+☞ Fixed not able to preview HTML from sd card.
+
 version 1.1.14.133
 ☞ Fixed dir list not working.
 

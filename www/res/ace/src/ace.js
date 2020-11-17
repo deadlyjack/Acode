@@ -2009,6 +2009,9 @@ define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event
         var syncComposition = lang.delayedCall(onCompositionUpdate, 50).schedule.bind(null, null);
 
         function onKeyup(e) {
+            //DONOTREMOVE
+            //To prevent app from closing.
+            if (e.keyCode == 27) e.preventDefault();
             if (e.keyCode == 27 && text.value.length < text.selectionStart) {
                 if (!inComposition)
                     lastValue = text.value;

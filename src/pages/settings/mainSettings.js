@@ -14,6 +14,7 @@ import backupRestore from "./backup-restore";
 import themeSetting from "../themeSetting/themeSetting";
 
 import $_ad from '../../views/ad.hbs';
+import otherSettings from './otherSettings';
 
 export default function settingsMain(demo) {
     const value = appSettings.value;
@@ -51,41 +52,26 @@ export default function settingsMain(demo) {
 
 
     const settingsOptions = [{
-        key: 'language',
-        text: strings['change language'],
-        subText: strings.lang,
-        icon: 'translate'
+        key: 'editor',
+        text: strings['editor settings'],
+        icon: 'text_format'
+    }, {
+        key: 'theme',
+        text: strings.theme,
+        icon: 'color_lenspalette'
+    }, {
+        key: 'about',
+        text: strings.about,
+        icon: 'acode'
+    }, {
+        key: 'backup-restore',
+        text: strings.backup.capitalize() + '/' + strings.restore.capitalize(),
+        icon: 'cached'
+    }, {
+        key: 'other-settings',
+        text: strings['other settings'],
+        icon: 'tune'
     }];
-
-    if (!demo) {
-        settingsOptions.push({
-            key: 'editor',
-            text: strings['editor settings'],
-            icon: 'text_format'
-        }, {
-            key: 'previewMode',
-            text: strings['preview mode'],
-            icon: 'play_arrow',
-            subText: value.previewMode === 'none' ? strings['not set'] : value.previewMode
-        }, {
-            key: 'theme',
-            text: strings.theme,
-            icon: 'color_lenspalette'
-        }, {
-            key: 'about',
-            text: strings.about,
-            icon: 'acode'
-        }, {
-            key: 'keybindings',
-            text: strings['key bindings'],
-            icon: 'keyboard_hide'
-        }, {
-            key: 'backup-restore',
-            text: strings.backup.capitalize() + '/' + strings.restore.capitalize(),
-            icon: 'cached'
-        });
-    }
-
     gen.listItems($settingsList, settingsOptions, changeSetting);
 
     function changeSetting() {
@@ -95,23 +81,6 @@ export default function settingsMain(demo) {
             lanuguages.push([lang, langList[lang]]);
         }
         switch (this.key) {
-            case 'language':
-                dialogs.select(this.text, lanuguages, {
-                        default: value.lang
-                    })
-                    .then(res => {
-                        if (res === value.lang) return;
-                        appSettings.value.lang = res;
-                        appSettings.update();
-                        internalFs.readFile(`${cordova.file.applicationDirectory}www/lang/${res}.json`)
-                            .then(res => {
-                                const text = helpers.decodeText(res.data);
-                                window.strings = JSON.parse(text);
-                                if (actionStack.has("settings-main")) actionStack.pop();
-                            });
-                    });
-                break;
-
             case 'editor':
                 editorSettings();
                 break;
@@ -124,38 +93,12 @@ export default function settingsMain(demo) {
                 About();
                 break;
 
+            case 'other-settings':
+                otherSettings();
+                break;
+
             case 'backup-restore':
                 backupRestore();
-                break;
-
-            case 'keybindings':
-                dialogs.select(strings['key bindings'], [
-                        ['edit', strings.edit],
-                        ['reset', strings.reset]
-                    ])
-                    .then(res => {
-                        if (res === 'edit') {
-                            $page.hide();
-                            openFile(KEYBINDING_FILE);
-                        } else {
-                            helpers.resetKeyBindings();
-                        }
-                    });
-                break;
-
-            case 'previewMode':
-                dialogs.select(this.text, ['browser', 'in app', ['none', strings['not set']]], {
-                        default: value.previewMode
-                    })
-                    .then(res => {
-                        if (res === value.previewMode) return;
-                        appSettings.value.previewMode = res;
-                        appSettings.update();
-                        this.changeSubText(res === 'none' ? strings['not set'] : res);
-                    });
-                break;
-
-            default:
                 break;
         }
     }

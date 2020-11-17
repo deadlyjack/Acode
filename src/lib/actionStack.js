@@ -16,7 +16,7 @@ function ActionStack() {
         if (window.freeze) return;
         const fun = stack.pop();
         if (fun) fun.action();
-        else {
+        else if (appSettings.value.confirmOnExit) {
             const closeMessage = window.getCloseMessage();
             if (closeMessage) {
                 dialogs.confirm(strings.warning.toUpperCase(), closeMessage)
@@ -24,6 +24,8 @@ function ActionStack() {
             } else {
                 dialogs.confirm(strings.alert.toUpperCase(), strings['close app']).then(closeApp);
             }
+        } else {
+            closeApp();
         }
 
         function closeApp() {
