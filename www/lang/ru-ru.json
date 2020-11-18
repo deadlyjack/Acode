@@ -158,11 +158,11 @@
   "add external storage?": "Добавить внешнее хранилище?",
   "scrollbar size": "Размер полосы прокрутки",
   "cursor controller size": "Размер контроллера курсора",
-  "none": "none",
+  "none": "никто",
   "small": "маленький",
   "large": "большой",
   "floating button": "Плавающая кнопка",
-  "confirm on exit": "Confirm on exit",
-  "other settings": "Other settings",
-  "show console": "Show console"
+  "confirm on exit": "Подтвердить и выйти",
+  "other settings": "Остальные настройки",
+  "show console": "Открыть консоль"
 }
