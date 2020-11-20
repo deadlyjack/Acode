@@ -156,12 +156,12 @@
   "login": "ログイン",
   "add external storage?": "外部ストレージを追加しますか？",
   "scrollbar size": "スクロールバーサイズ",
-  "cursor controller size": "Cursor controller size",
-  "none": "none",
-  "small": "small",
-  "large": "large",
-  "floating button": "Floating button",
-  "confirm on exit": "Confirm on exit",
-  "other settings": "Other settings",
-  "show console": "Show console"
+  "cursor controller size": "カーソルコントローラーのサイズ",
+  "none": "なし",
+  "small": "小さい",
+  "large": "大きい",
+  "floating button": "フローティングボタン",
+  "confirm on exit": "アプリケーション終了時に確認",
+  "other settings": "その他の設定",
+  "show console": "コンソールを表示"
 }
