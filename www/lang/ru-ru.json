@@ -133,7 +133,7 @@
   "support text": "Acode нуждается в вашей поддержке! Покажите свою поддержку, пожертвовав небольшую сумму в размере 3$",
   "exit fullscreen": "Выйти из полноэкранного режима",
   "fullscreen": "Полноэкранный режим",
-  "animation": "Анимации",
+  "animation": "Анимация",
   "backup": "Резервное копирование",
   "restore": "Восстановление",
   "backup successful": "Бэкап создан",
@@ -162,7 +162,7 @@
   "small": "маленький",
   "large": "большой",
   "floating button": "Плавающая кнопка",
-  "confirm on exit": "Confirm on exit",
-  "other settings": "Other settings",
-  "show console": "Show console"
+  "confirm on exit": "Подтвердите на выходе",
+  "other settings": "Прочие настройки",
+  "show console": "Показать консоль"
 }
