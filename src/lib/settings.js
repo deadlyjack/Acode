@@ -25,6 +25,12 @@ import helpers from './utils/helpers';
 class Settings {
     constructor(lang) {
         lang = lang || "en-us";
+
+        this.methods = {
+            update: [],
+            reset: []
+        };
+
         /**
          * @type {settingsValue}
          */
@@ -101,12 +107,21 @@ class Settings {
                 if (this.onload) this.onload();
             }).catch(save);
     }
-    update(settings, showToast = true) {
-        if (typeof settings === "boolean") showToast = settings;
-        else if (typeof settings === "object") {
-            for (let key in settings) {
-                if (key in this.value) this.value[key] = settings[key];
-            }
+    update(settings = null, showToast = true) {
+
+        if (typeof settings === "boolean") {
+            showToast = settings;
+            settings = null;
+        }
+
+        const onupdate = [...this.methods.update];
+
+        for (let key in settings) {
+            if (key in this.value)
+                this.value[key] = settings[key];
+            if (Array.isArray(this.methods[`update:${key}`]))
+                for (let cb of this.methods[`update:${key}`])
+                    onupdate.push(cb.bind(this.value, this.value[key]));
         }
 
         fs.writeFile(this.settingsFile, JSON.stringify(this.value, undefined, 4), true, false)
@@ -114,6 +129,8 @@ class Settings {
                 if (this.onsave) this.onsave();
                 if (showToast)
                     plugins.toast.showShortBottom(strings['settings saved']);
+
+                for (let callback of onupdate) callback(this.value);
             })
             .catch((err) => {
                 console.error(err);
@@ -123,6 +140,27 @@ class Settings {
     reset() {
         this.value = this.defaultSettings;
         this.update(false);
+        for (let onreset of this.methods.reset) onreset(this.value);
+    }
+
+    /**
+     * 
+     * @param {'update' | 'reset'} event 
+     * @param {function():void} callback 
+     */
+    on(event, callback) {
+        if (!this.methods[event]) this.methods[event] = [];
+        this.methods[event].push(callback);
+    }
+
+    /**
+     * 
+     * @param {'update' | 'reset'} event 
+     * @param {function():void} callback 
+     */
+    off(event, callback) {
+        if (!this.methods[event]) this.methods[event] = [];
+        this.methods[event].splice(this.methods[event].indexOf(callback), 1);
     }
 }
 

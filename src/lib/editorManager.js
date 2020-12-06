@@ -45,7 +45,7 @@ function EditorManager($sidebar, $header, $body) {
         preventScrollbarV = false,
         preventScrollbarH = false,
         cursorControllerSize = appSettings.value.cursorControllerSize,
-        timeoutQuicktoolToggler, timeoutHeaderToggler;
+        timeoutQuicktoolToggler, timeoutHeaderToggler, scrollBarVisiblityCount = 0;
     const $container = tag('div', {
         className: 'editor-container'
     });
@@ -215,6 +215,81 @@ function EditorManager($sidebar, $header, $body) {
         id: constants.DEFAULT_FILE_SESSION
     });
 
+    appSettings.on("update:textWrap", function (value) {
+        for (let file of manager.files) {
+            file.session.setUseWrapMode(value);
+            if (!value) file.session.on("changeScrollLeft", onscrollleft);
+            else file.session.off("changeScrollLeft", onscrollleft);
+        }
+    });
+
+    appSettings.on("update:tabSize", function (value) {
+        for (let file of manager.files)
+            file.session.setOption('tabSize', value);
+    });
+
+    appSettings.on("update:sofTab", function (value) {
+        for (let file of manager.files)
+            file.session.setOption('useSoftTabs', value);
+    });
+
+    appSettings.on("update:showSpaces", function (value) {
+        editor.setOption('showInvisibles', value);
+    });
+
+    appSettings.on("update:editorFont", function (value) {
+        $container.classList.remove(this.editorFont);
+        $container.classList.add(value);
+    });
+
+    appSettings.on("update:fontSize", function (value) {
+        editor.setFontSize(value);
+    });
+
+    appSettings.on("update:openFileListPos", function (value) {
+        moveOpenFileList();
+        controls.vScrollbar.resize();
+    });
+
+    appSettings.on("update:showPrintMargin", function (value) {
+        editorManager.editor.setOption("showPrintMargin", value);
+    });
+
+    appSettings.on("update:cursorControllerSize", function (value) {
+        controls.size = value;
+    });
+
+    appSettings.on("update:scrollbarSize", function (value) {
+        controls.vScrollbar.size = value;
+        controls.hScrollbar.size = value;
+    });
+
+    appSettings.on("update:liveAutoCompletion", function (value) {
+        editor.setOption("enableLiveAutocompletion", value);
+    });
+
+    appSettings.on("update:linting", function (value) {
+        for (let file of manager.files)
+            file.session.setUseWorker(value);
+
+        if (value)
+            editor.renderer.setMargin(0, 0, 0, 0);
+        else
+            editor.renderer.setMargin(0, 0, -16, 0);
+    });
+
+    appSettings.on("update:linenumbers", function (value) {
+        editor.setOptions({
+            showGutter: value,
+            showLineNumbers: value
+        });
+        if (value)
+            editor.renderer.setMargin(0, 0, -16, 0);
+        else
+            editor.renderer.setMargin(0, 0, 0, 0);
+        editor.resize(true);
+    });
+
     /**
      * Callback function
      * @param {Number} value 
@@ -259,7 +334,6 @@ function EditorManager($sidebar, $header, $body) {
         const editorWidth = getEditorWidth();
         const factor = (session.getScrollLeft() / editorWidth).toFixed(2);
 
-        console.log(factor);
         $hScrollbar.value = factor;
         if (render) $hScrollbar.render();
     }
@@ -313,27 +387,35 @@ function EditorManager($sidebar, $header, $body) {
 
         if (show) {
 
-            clearTimeout(timeoutHeaderToggler);
-            clearTimeout(timeoutQuicktoolToggler);
+            if (scrollBarVisiblityCount) --scrollBarVisiblityCount;
 
-            if (appSettings.value.floatingButton) {
-                $quickToolToggler.classList.remove('hide');
-                root.append($quickToolToggler);
+            if (!scrollBarVisiblityCount) {
+                clearTimeout(timeoutHeaderToggler);
+                clearTimeout(timeoutQuicktoolToggler);
+
+                if (appSettings.value.floatingButton) {
+                    $quickToolToggler.classList.remove('hide');
+                    root.append($quickToolToggler);
+                }
+
+                $headerToggler.classList.remove('hide');
+                root.append($headerToggler);
             }
-
-            $headerToggler.classList.remove('hide');
-            root.append($headerToggler);
 
         } else {
 
-            if ($quickToolToggler.isConnected) {
-                $quickToolToggler.classList.add('hide');
-                timeoutQuicktoolToggler = setTimeout(() => $quickToolToggler.remove(), 300);
+            if (!scrollBarVisiblityCount) {
+                if ($quickToolToggler.isConnected) {
+                    $quickToolToggler.classList.add('hide');
+                    timeoutQuicktoolToggler = setTimeout(() => $quickToolToggler.remove(), 300);
+                }
+                if ($headerToggler.isConnected) {
+                    $headerToggler.classList.add('hide');
+                    timeoutHeaderToggler = setTimeout(() => $headerToggler.remove(), 300);
+                }
             }
-            if ($headerToggler.isConnected) {
-                $headerToggler.classList.add('hide');
-                timeoutHeaderToggler = setTimeout(() => $headerToggler.remove(), 300);
-            }
+
+            ++scrollBarVisiblityCount;
 
         }
     }

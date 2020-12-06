@@ -1,3 +1,8 @@
+version 1.1.14.139
+☞ New black theme.
+☞ Updated language pack.
+☞ Minor bug fixes.
+
 version 1.1.14.137
 ☞ Added option to disable console.
 ☞ Added option disable confirmation on exit the app.

@@ -50,12 +50,17 @@ function Page(title, options = {}) {
     return $page;
 
     function hide() {
-        if (!(--pageCount)) document.body.replaceChild(root, $placeholder);
-        $page.onhide();
-        $page.classList.add('hide');
-        setTimeout(() => {
-            $page.remove();
-        }, 150);
+        if (!(--pageCount)) {
+            document.body.replaceChild(root, $placeholder);
+            editorManager.editor.resize(true);
+        }
+        if ($page.isConnected) {
+            $page.onhide();
+            $page.classList.add('hide');
+            setTimeout(() => {
+                $page.remove();
+            }, 150);
+        }
     }
 }
 

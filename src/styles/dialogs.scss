@@ -15,6 +15,9 @@
     border-radius: 2px !important;
     overflow: hidden;
 
+    border: solid 1px transparent;
+    border: solid 1px var(--popup-border-color);
+
     display: flex;
     flex-direction: column;
 

@@ -22,7 +22,8 @@ function ActionStack() {
                 dialogs.confirm(strings.warning.toUpperCase(), closeMessage)
                     .then(closeApp);
             } else {
-                dialogs.confirm(strings.alert.toUpperCase(), strings['close app']).then(closeApp);
+                dialogs.confirm(strings.alert.toUpperCase(), strings['close app'])
+                    .then(closeApp);
             }
         } else {
             closeApp();

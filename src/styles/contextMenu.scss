@@ -31,6 +31,8 @@ body.no-animation {
 
     list-style: none;
     padding: 0;
+    border: solid 1px transparent;
+    border: solid 1px var(--popup-border-color);
 
     hr {
         border: none;

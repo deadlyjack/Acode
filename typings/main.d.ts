@@ -21,6 +21,7 @@ interface searchSettings {
 }
 
 interface Settings {
+    animation: Boolean;
     autosave: number;
     fileBrowser: fileBrowserSettings;
     maxFileSize: number;
@@ -56,12 +57,15 @@ interface Settings {
 
 interface AppSettings {
     value: Settings;
-    update(settings?: String): void;
+    update(settings?: Settings, showToast?: Boolean): void;
+    update(showToast?: Boolean): void;
     defaultSettings: Settings;
     reset(): void;
     onload: () => void;
     onsave: () => void;
     loaded: boolean;
+    on(eventName: 'reset' | 'update', callback: (this: Settings, settings: Settings | String) => void): void;
+    off(eventName: 'reset' | 'update', callback: (this: Settings, settings: Settings | String) => void): void;
 }
 
 interface ActionStackOptions {

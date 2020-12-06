@@ -8,6 +8,8 @@ body {
   --border-color: rgba(122, 122, 122, 0.227);
   --error-text-color: #ffb95c;
 
+  --popup-border-color: transparent;
+
   --box-shadow-color: rgba(0, 0, 0, 0.2);
 
   --button-background-color: #3399ff;
@@ -46,6 +48,27 @@ body {
     --dialogbox-background-color: #313131;
     --dialogbox-text-color: white;
     --dialogbox-selected-option-color: gold;
+  }
+
+  &[theme=black] {
+    --primary-color: #000000;
+    --secondary-color: #000000;
+    --text-color: white;
+    --text-main-color: white;
+    --accent-color: #383838;
+    --a-color: #b5b4e9;
+    --border-color: rgba(255, 255, 255, 0.133);
+
+    --menu-background-color: #000000;
+    --menu-text-color: white;
+    --menu-icon-color: white;
+
+    --dialogbox-background-color: #000000;
+    --dialogbox-text-color: white;
+    --dialogbox-selected-option-color: rgb(121, 103, 0);
+
+    --box-shadow-color: none;
+    --popup-border-color: rgba(255, 255, 255, 0.4);
   }
 
   &[theme=ocean] {

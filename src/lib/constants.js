@@ -88,7 +88,7 @@ export default {
     "cs-cz": "Čeština",
     "vi-vn": "Vietnamese",
     "be-by": "Беларуская"
-    
+
   },
   editorThemeList: {
     "ambiance": scheme('ambiance', 'dark'),
@@ -138,6 +138,7 @@ export default {
     "atticus": scheme("atticus", "dark", false, "#201e1e", "#363333"),
     "bump": scheme("bump", "dark", false, "#1c2126", "#303841"),
     "bling": scheme("bling", "dark", false, "#131326", "#202040"),
+    "black": scheme("black", "dark", false, "#000000", "#000000"),
     "dark": scheme("dark", "dark", false, "#1d1d1d", "#313131"),
     "moon": scheme("moon", "dark", false, "#14181d", "#222831"),
     "ocean": scheme("ocean", "dark", false, "#13131a", "#20202c"),

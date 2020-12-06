@@ -146,6 +146,8 @@ function gitHubInclude(options = {}) {
         } else {
           console.log(err);
         }
+
+        $page.hide();
       })
       .finally(() => {
         dialogs.loader.destroy();
