@@ -87,8 +87,9 @@ export default {
     "bn-bd": "বাংলা",
     "cs-cz": "Čeština",
     "vi-vn": "Vietnamese",
-    "be-by": "Беларуская"
-
+    "be-by": "Беларуская",
+    "mm-unicode":"ဗမာစာ(Unicode)",
+    "mm-zawgyi":"ဗမာစာ(Zawgyi)"
   },
   editorThemeList: {
     "ambiance": scheme('ambiance', 'dark'),
