@@ -225,12 +225,12 @@ function EditorManager($sidebar, $header, $body) {
 
     appSettings.on("update:tabSize", function (value) {
         for (let file of manager.files)
-            file.session.setOption('tabSize', value);
+            file.session.setTabSize(value);
     });
 
-    appSettings.on("update:sofTab", function (value) {
+    appSettings.on("update:softTab", function (value) {
         for (let file of manager.files)
-            file.session.setOption('useSoftTabs', value);
+            file.session.setUseSoftTabs(value);
     });
 
     appSettings.on("update:showSpaces", function (value) {

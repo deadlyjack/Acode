@@ -8,6 +8,8 @@ body {
   --border-color: rgba(122, 122, 122, 0.227);
   --error-text-color: #ffb95c;
 
+  --active-icon-color: rgba(0, 0, 0, 0.2);
+
   --popup-border-color: transparent;
 
   --box-shadow-color: rgba(0, 0, 0, 0.2);
@@ -69,6 +71,7 @@ body {
 
     --box-shadow-color: none;
     --popup-border-color: rgba(255, 255, 255, 0.4);
+    --active-icon-color: rgba(255, 255, 255, 0.2);
   }
 
   &[theme=ocean] {
