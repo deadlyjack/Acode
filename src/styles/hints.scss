@@ -11,6 +11,8 @@
   color: var(--text-color);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 4px var(--box-shadow-color);
+  border: solid 1px transparent;
+  border: solid 1px var(--popup-border-color);
   height: fit-content;
   min-height: 30px;
   z-index: 999;

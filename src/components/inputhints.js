@@ -44,7 +44,7 @@ function inputhints($input, hints) {
     let activeHint = $hintingContainer.get('.active');
     if (!activeHint) return;
     activeHint.classList.remove('active');
-    $el.classList.add('.active');
+    $el.classList.add('active');
     $hintingContainer.textContent = '';
   }
 

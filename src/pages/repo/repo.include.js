@@ -15,7 +15,7 @@ import contextMenu from '../../components/contextMenu';
 import searchBar from '../../components/searchbar';
 
 export default function RepoInclude(owner, repoName) {
-  const $page = Page(repoName);
+  let $page;
   const $menuToggler = tag('span', {
     className: 'icon more_vert',
     attr: {
@@ -78,8 +78,6 @@ export default function RepoInclude(owner, repoName) {
     .catch(err => {
       helpers.error(err);
       console.error(err);
-    })
-    .finally(res => {
       dialogs.loader.destroy();
     });
 
@@ -106,6 +104,7 @@ export default function RepoInclude(owner, repoName) {
     repo.getSha(branch, '')
       .then(res => {
         const list = res.data;
+        $page = Page(repoName);
         render(list, repoName, 'root');
         actionStack.push({
           id: 'repo',
@@ -118,6 +117,12 @@ export default function RepoInclude(owner, repoName) {
           actionStack.remove('repo');
           idsToFlush.map(id => actionStack.remove(id));
         };
+
+        $cm.addEventListener('click', handleClick);
+        $page.addEventListener('click', handleClick);
+        $page.append($content);
+        $page.querySelector('header').append($search, $menuToggler);
+        document.body.appendChild($page);
       })
       .catch(err => {
         helpers.error(err);
@@ -126,11 +131,6 @@ export default function RepoInclude(owner, repoName) {
       .finally(() => {
         dialogs.loader.destroy();
       });
-    $cm.addEventListener('click', handleClick);
-    $page.addEventListener('click', handleClick);
-    $page.append($content);
-    $page.querySelector('header').append($search, $menuToggler);
-    document.body.appendChild($page);
   }
 
   /**

@@ -1,7 +1,7 @@
 {
   "name": "com.foxdebug.acode",
   "displayName": "Acode",
-  "version": "1.1.15.140",
+  "version": "1.1.15.141",
   "description": "Acode is android and IOS code editor app",
   "main": "index.js",
   "scripts": {
