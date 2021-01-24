@@ -13,7 +13,7 @@ export default function Info(repo, owner) {
   dialogs.loader.create(repo, strings.loading + '...');
   repository.getReadme('master', false)
     .then(res => {
-      if (res.statusText === 'OK') {
+      if (res.status === 200) {
         const data = res.data;
         let text = data.content;
         if (data.encoding === 'base64') {
@@ -28,7 +28,7 @@ export default function Info(repo, owner) {
       }
     })
     .then(res => {
-      if (res.statusText === 'OK') {
+      if (res.status === 200) {
         const text = res.data;
         $page.append(tag('div', {
           id: 'info-page',
