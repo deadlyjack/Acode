@@ -6,9 +6,10 @@ import dialogs from '../components/dialogs';
 import tile from '../components/tile';
 import constants from './constants';
 import recents from './recents';
-import path from './utils/path';
+import Path from './utils/Path';
 import openFile from './openFile';
 import Url from './utils/Url';
+import FileBrowser from '../pages/fileBrowser/fileBrowser';
 
 /**
  * 
@@ -117,10 +118,10 @@ function openFolder(_path, opts = {}) {
       if (hostname && port) title += ':' + port;
 
       if (title) return title;
-      else return path.basename(_path);
+      else return Path.basename(_path);
 
     } catch (error) {
-      return path.basename(_path);
+      return Path.basename(_path);
     }
   }
 
@@ -208,19 +209,25 @@ function openFolder(_path, opts = {}) {
       NEW_FILE = ['new file', strings['new file'], 'document-add'],
       NEW_FOLDER = ['new folder', strings['new folder'], 'folder-add'],
       CANCEL = ['cancel', cancel, 'clearclose'],
-      OPEN_FOLDER = ['open-folder', strings['open folder'], 'folder'];
+      OPEN_FOLDER = ['open-folder', strings['open folder'], 'folder'],
+      INSERT_FILE = ['insert-file', strings['insert file'], 'file_copy'];
 
     let options;
 
     if (type === 'file') options = [COPY, CUT, RENAME, REMOVE];
-    else if (type === 'dir') options = [COPY, CUT, REMOVE, RENAME, PASTE, NEW_FILE, NEW_FOLDER, OPEN_FOLDER];
-    else if (type === 'root') options = [RENAME, PASTE, NEW_FILE, NEW_FOLDER];
+    else if (type === 'dir') options = [COPY, CUT, REMOVE, RENAME, PASTE, NEW_FILE, NEW_FOLDER, OPEN_FOLDER, INSERT_FILE];
+    else if (type === 'root') options = [RENAME, PASTE, NEW_FILE, NEW_FOLDER, INSERT_FILE];
 
     if (clipBoard) options.push(CANCEL);
 
     dialogs.select(name, options)
       .then(res => {
         execOperation(type, res, url, $target, name)
+          .catch(err => {
+            if (err === false) return;
+            helpers.error(err);
+            console.error(err);
+          })
           .finally(loading.stop);
       });
 
@@ -235,7 +242,7 @@ function openFolder(_path, opts = {}) {
    */
   function execOperation(type, action, url, $target, name) {
     let newName, CASE = '',
-      src, srcName, srcType, $src, file, msg, defaultValue;
+      src, srcName, srcType, $src, msg, defaultValue;
 
     if (type === "dir") {
       Url.join(url, "/");
@@ -271,53 +278,37 @@ function openFolder(_path, opts = {}) {
             if (type === 'file') $target.remove();
             else $target.parentElement.remove();
             helpers.showToast(strings.success);
-          })
-          .catch(err => {
-            helpers.error(err);
-            console.error(err);
           });
 
       case "rename":
-
         return dialogs.prompt(strings.rename, name, "text", {
             match: constants.FILE_NAME_REGEX,
             required: true
           })
-          .then(newname => {
+          .then(async newname => {
             loading.start();
             newName = newname;
-            if (newName !== name)
-              return fsOperation(url)
-                .then(fs => {
-                  return fs.renameTo(newName);
-                })
-                .then(newURL => {
-
-                  const protocol = Url.getProtocol(newURL);
-
-                  $target.querySelector(':scope>.text').textContent = newName;
-                  $target.setAttribute('url', newURL);
-                  $target.setAttribute('name', newName);
-
-                  if (type === 'file') {
-                    $target.querySelector(':scope>span').className = helpers.getIconForFile(newName);
-                    let file = editorManager.getFile(url, "uri");
-                    if (file) {
-                      file.uri = newURL;
-                      file.filename = newName;
-                    }
-                  } else {
-                    //Reloading the folder by collasping and expanding the folder
-                    $target.click(); //collaspe
-                    $target.click(); //expand
-                  }
-
-                  helpers.showToast(strings.success);
-                });
-          })
-          .catch(err => {
-            helpers.error(err);
-            console.error(err);
+            if (newName !== name) {
+              const fs = await fsOperation(url);
+              const newURL = await fs.renameTo(newName);
+              newName = Url.basename(newURL);
+              $target.querySelector(':scope>.text').textContent = newName;
+              $target.setAttribute('url', newURL);
+              $target.setAttribute('name', newName);
+              if (type === 'file') {
+                $target.querySelector(':scope>span').className = helpers.getIconForFile(newName);
+                let file = editorManager.getFile(url, "uri");
+                if (file) {
+                  file.uri = newURL;
+                  file.filename = newName;
+                }
+              } else {
+                //Reloading the folder by collasping and expanding the folder
+                $target.click(); //collaspe
+                $target.click(); //expand
+              }
+              helpers.showToast(strings.success);
+            }
           });
 
       case "paste":
@@ -419,10 +410,6 @@ function openFolder(_path, opts = {}) {
             helpers.showToast(strings.success);
             clipBoard = null;
 
-          })
-          .catch(err => {
-            helpers.error(err);
-            console.error(err);
           });
 
       case "new file":
@@ -448,12 +435,7 @@ function openFolder(_path, opts = {}) {
               if (action === "new file") appendTile($target, createFileTile(newName, newUrl));
               else appendList($target, createFolderTile(newName, newUrl));
             }
-
             helpers.showToast(strings.success);
-          })
-          .catch(err => {
-            helpers.error(err);
-            console.error(err);
           });
 
       case "cancel":
@@ -466,6 +448,32 @@ function openFolder(_path, opts = {}) {
         obj.name = name;
         openFolder(url, obj);
         return Promise.resolve();
+
+      case "insert-file":
+        return (async () => {
+          loading.start();
+          const file = await FileBrowser("file", undefined, strings["insert file"]);
+          let fs = await fsOperation(file.url);
+          let data = await fs.readFile();
+          const stats = await fs.stats();
+
+          if (stats.length > 50000000)
+            throw new Error("Unable to insert file large than 50MB.");
+
+          const name = stats.name;
+          const fileUrl = Url.join(url, name);
+
+          fs = await fsOperation(url);
+
+          try {
+            await fs.createFile(name);
+          } catch (error) {}
+
+          fs = await fsOperation(fileUrl);
+          await fs.writeFile(data);
+          appendTile($target, createFileTile(name, fileUrl));
+
+        })();
 
     }
 
@@ -551,7 +559,7 @@ function openFolder(_path, opts = {}) {
             showHiddenFiles: true
           }, true);
           entries.map(entry => {
-            const name = entry.name || path.basename(entry.url);
+            const name = entry.name || Path.basename(entry.url);
             if (entry.isDirectory) {
 
               const $list = createFolderTile(name, entry.url);

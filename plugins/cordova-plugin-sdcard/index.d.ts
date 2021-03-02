@@ -31,6 +31,14 @@ interface Stats {
   uri: string;
 }
 
+interface DocumentFile {
+  canWrite: boolean;
+  filename: string;
+  length: number;
+  type: string;
+  uri: string;
+}
+
 interface SDcard {
 
   /**
@@ -121,7 +129,7 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    * @param mimeType MimeType of file to be selected
    */
-  openDocumentFile(onSuccess: (url: String) => void, onFail: (err: any) => void, mimeType: String): void;
+  openDocumentFile(onSuccess: (url: DocumentFile) => void, onFail: (err: any) => void, mimeType: String): void;
   /**
    * Renames the given file/directory to given new name
    * @param src Url of file/directory
@@ -137,7 +145,7 @@ interface SDcard {
    * @param onSuccess Callback function on success returns "OK"
    * @param onFail Callback function on error returns error object
    */
-  write(src: String, content: String, onSuccess: (url: "OK") => void, onFail: (err: any) => void): void;
+  write(src: String, content: String, onSuccess: (res: "OK") => void, onFail: (err: any) => void): void;
   /**
    * Gets stats of given file
    * @param src file/directory url

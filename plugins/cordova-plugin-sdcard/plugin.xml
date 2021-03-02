@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" 
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-sdcard" version="0.0.1">
   <name>cordova-plugin-sdcard</name>
   <description>Choose folder to get read/write access to the document tree</description>
@@ -20,5 +20,6 @@
     <source-file src="src/android/SDcard.java" target-dir="src/com/foxdebug/sdcard"/>
     <config-file target="AndroidManifest.xml" parent="/manifest"></config-file>
     <lib-file src="src/android/commons-io-2.7.jar" />
+    <lib-file src="src/android/commons-codec-1.15.jar" />
   </platform>
 </plugin>

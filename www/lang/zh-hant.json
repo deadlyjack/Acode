@@ -163,5 +163,8 @@
   "floating button": "隱藏懸浮按鈕",
   "confirm on exit": "離開時確認",
   "other settings": "其他設定",
-  "show console": "顯示控制臺"
+  "show console": "顯示控制臺",
+  "image": "Image",
+  "insert file": "Insert file",
+  "insert color": "Insert color"
 }

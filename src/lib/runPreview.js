@@ -10,7 +10,7 @@ import git from './git';
 import constants from './constants';
 import externalFs from './fileSystem/externalFs';
 import fsOperation from './fileSystem/fsOperation';
-import path from './utils/path';
+import path from './utils/Path';
 import Url from './utils/Url';
 
 /**
@@ -19,6 +19,7 @@ import Url from './utils/Url';
  * @param {"_blank"|"_system"} target 
  */
 function runPreview(isConsole = false, target = appSettings.value.previewMode) {
+
   const activeFile = isConsole ? null : editorManager.activeFile;
   const uuid = helpers.uuid();
 
@@ -45,11 +46,28 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     }
   }
 
+  if (extension === 'svg') {
+    fsOperation(activeFile.uri)
+      .then(fs => {
+        return fs.readFile();
+      })
+      .then(res => {
+        const blob = new Blob([new Uint8Array(res)], {
+          type: mimeType.lookup(extension)
+        });
+        dialogs.box(filename, `<img src='${URL.createObjectURL(blob)}'>`);
+      })
+      .catch(console.error);
+
+    return;
+  }
+
   if (filename !== 'index.html' && pathName) {
     for (let folder of addedFolder) {
       if (path.isParent(folder.url, pathName)) {
         addedFolderUrl = folder.url;
-        fsOperation(addedFolderUrl + 'index.html')
+        const url = Url.join(addedFolderUrl, 'index.html');
+        fsOperation(url)
           .then(fs => {
             return fs.exists();
           })
@@ -417,7 +435,7 @@ runPreview.checkRunnable = async function () {
     }
 
     if (!result) {
-      const runnableFile = /\.((html?)|(md)|(js))$/;
+      const runnableFile = /\.((html?)|(md)|(js)|(svg))$/;
       const filename = activeFile.filename;
       if (runnableFile.test(filename))
         result = filename;

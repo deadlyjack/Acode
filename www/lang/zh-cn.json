@@ -164,5 +164,8 @@
   "floating button": "悬浮按钮",
   "confirm on exit": "退出前确认",
   "other settings": "其他设置",
-  "show console": "显示控制台"
+  "show console": "显示控制台",
+  "image": "Image",
+  "insert file": "Insert file",
+  "insert color": "Insert color"
 }

@@ -163,5 +163,8 @@
   "floating button": "Schwebende Taste",
   "confirm on exit": "Bestätigung beim Beenden",
   "other settings": "Andere Einstellungen",
-  "show console": "Konsole anzeigen"
+  "show console": "Konsole anzeigen",
+  "image": "Image",
+  "insert file": "Insert file",
+  "insert color": "Insert color"
 }

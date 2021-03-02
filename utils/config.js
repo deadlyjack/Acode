@@ -26,10 +26,10 @@ try {
   babelrc = JSON.parse(babelrc);
 
   if (arg === 'd') {
-    wbc = wbc.replace(/mode: '.*'/, "mode: 'development'");
+    wbc = wbc.replace(/mode: '.*'/g, "mode: 'development'");
     babelrc.compact = false;
   } else if (arg === 'p') {
-    wbc = wbc.replace(/mode: '.*'/, "mode: 'production'");
+    wbc = wbc.replace(/mode: '.*'/g, "mode: 'production'");
     babelrc.compact = true;
   }
 

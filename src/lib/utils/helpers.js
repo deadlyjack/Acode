@@ -5,7 +5,7 @@ import keyBindings from '../keyBindings';
 import fs from '../fileSystem/internalFs';
 import tag from 'html-tag-js';
 import ajax from './ajax';
-import path from './path';
+import path from './Path';
 import Url from './Url';
 
 function extname(pathname) {
@@ -190,7 +190,7 @@ function getLangNameFromFileName(filename) {
  * @param {FileEntry[]} list 
  * @param {object} fileBrowser settings
  * @param {boolean} [readOnly] 
- * @param {string} [origin] 
+ * @param {string|function(string):boolean} [origin] 
  * @param {string} [uuid] 
  */
 function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null) {
@@ -198,14 +198,22 @@ function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null
     const file = [];
     const sortByName = fileBrowser.sortByName;
     const showHiddenFile = fileBrowser.showHiddenFiles;
+    let getEnabled = () => true;
+
+    if (typeof readOnly === "function") {
+        getEnabled = readOnly;
+        readOnly = false;
+    }
 
     list.map(item => {
 
         item.name = decodeURL(item.name || path.basename(item.url)) || '';
         item.readOnly = readOnly;
         item.canWrite = !readOnly;
-        item.type = getType(item);
+        item.type = item.isDirectory ? "dir" : "file";
+        item.icon = getIcon(item);
         item.url = item.url || item.uri;
+        if (item.isFile) item.disabled = !getEnabled(item.name);
 
         if (origin) item.origin = origin;
         if (uuid) item.uuid = uuid;
@@ -229,7 +237,7 @@ function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null
         return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
     }
 
-    function getType(item) {
+    function getIcon(item) {
         const ext = extname(item.name);
         if (item.isDirectory || (!ext && item.isLink)) {
             item.isDirectory = true;
@@ -424,7 +432,7 @@ function error(e, ...args) {
             hide();
         });
     } else {
-        const msg = (e && typeof e === 'string') ? e : (toString in e && e.toString());
+        const msg = typeof e === 'string' ? e : e instanceof Error ? e.message : null;
         if (msg) dialogs.alert(strings.error, msg + extra, () => {
             hide();
         });

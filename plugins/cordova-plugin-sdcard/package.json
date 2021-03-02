@@ -1,37 +1,19 @@
 {
-  "_from": "cordova-plugin-sdcard",
-  "_id": "cordova-plugin-sdcard@1.0.1",
-  "_inBundle": false,
-  "_integrity": "sha512-cXS+TQS1VNGmAatGVmqGLBoRbrHETGG09r3OyKtKQGYJihPE+Q9drngbuB40IBu4rNPFRv6n9OYOzxDtR/+dDQ==",
-  "_location": "/cordova-plugin-sdcard",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "cordova-plugin-sdcard",
-    "name": "cordova-plugin-sdcard",
-    "escapedName": "cordova-plugin-sdcard",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-sdcard/-/cordova-plugin-sdcard-1.0.1.tgz",
-  "_shasum": "932f1fe2f4622778a4813a566b43abd9d91f57c4",
-  "_spec": "cordova-plugin-sdcard",
-  "_where": "/mnt/sdb1/cordova/code editor",
-  "author": "",
-  "bundleDependencies": false,
-  "deprecated": false,
-  "description": "Using this plugin, cordova apps can check for external storages and write/modify files.",
-  "license": "ISC",
-  "main": "index.js",
   "name": "cordova-plugin-sdcard",
+  "version": "1.0.2",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.1"
+  "author": "",
+  "license": "ISC",
+  "keywords": [
+    "cordova",
+    "plugin",
+    "sdcard",
+    "external storage",
+    "access external storage",
+    "android"
+  ]
 }

@@ -14,9 +14,26 @@ export default {
   },
 
   writeFile(filename, content) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+      if (content instanceof ArrayBuffer)
+        content = await toBase64(content);
       sdcard.write(filename, content, res => resolve(res), err => reject(err));
     });
+
+    function toBase64(data) {
+      const blob = new Blob([data]);
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const data = e.target.result;
+          resolve(data.substr(data.indexOf(',') + 1));
+        };
+        reader.onerror = err => {
+          reject(err);
+        };
+        reader.readAsDataURL(blob);
+      });
+    }
   },
 
   copy(src, dest) {

@@ -21,12 +21,17 @@ import Url from '../../lib/utils/Url';
 import util from './util';
 import openFolder from '../../lib/openFolder';
 //#endregion
+
+//TODO: Open default url in file browser
+
 /**
  * 
- * @param {"file"|"dir"} [type='file']
- * @param {string|function(string):boolean} option button text or function to check extension
+ * @param {"file"|"folder"} [type='file']
+ * @param {string|function(string):boolean} [option] button text or function to check extension
+ * @param {string} [info]
+ * @param {string} [url]
  */
-function FileBrowserInclude(type, option) {
+function FileBrowserInclude(type, option, info, url) {
   if (!type) type = 'file';
   const actionStack = window.actionStack;
   const prompt = dialogs.prompt;
@@ -34,6 +39,11 @@ function FileBrowserInclude(type, option) {
   let customUuid = JSON.parse(localStorage.customUuid || '[]');
   /**@type {Array<FTPAccount>} */
   let ftpaccounts = JSON.parse(localStorage.ftpaccounts || '[]');
+  let mapFunction = typeof option === "function" ? option : () => true;
+  info = info || (type === "folder" ? strings["open folder"] : strings["open file"]);
+
+  if (type === "folder")
+    mapFunction = () => false;
 
   return new Promise((_resolve, reject) => {
     //#region Declaration
@@ -57,7 +67,8 @@ function FileBrowserInclude(type, option) {
     });
     const $page = Page('File Browser');
     const $content = tag.parse(mustache.render(_template, {
-      type
+      type,
+      info
     }));
     const $navigation = $content.querySelector('.navigation');
     const actionsToDispose = [];
@@ -289,7 +300,7 @@ function FileBrowserInclude(type, option) {
       }
 
       cachedDir["/"] = {
-        name,
+        name: "/",
         list
       };
 
@@ -324,8 +335,10 @@ function FileBrowserInclude(type, option) {
           })
           .then(list => {
             update();
-            list = helpers.sortDir(list,
-              appSettings.value.fileBrowser
+            list = helpers.sortDir(
+              list,
+              appSettings.value.fileBrowser,
+              mapFunction
             );
             cachedDir[url] = {
               name,
@@ -378,19 +391,24 @@ function FileBrowserInclude(type, option) {
 
       const url = $el.getAttribute('url');
       const name = $el.getAttribute('name');
-      const opendoc = $el.getAttribute('open-doc');
+      const opendoc = $el.hasAttribute('open-doc');
       const uuid = $el.getAttribute('uuid');
       const isFTP = $el.hasAttribute('ftp-account');
+      const type = $el.getAttribute('type');
 
       if (opendoc) action = "open-doc";
+      if (contextMenu) action = "contextmenu";
 
       switch (action) {
         case 'navigation':
-        case 'folder':
           folder();
           break;
-        case 'file':
-          file();
+        case 'contextmenu':
+          cmhandle();
+          break;
+        case 'open':
+          if (type === "dir") folder();
+          else if (!$el.hasAttribute("disabled")) file();
           break;
         case "open-doc":
           openDoc();
@@ -398,33 +416,23 @@ function FileBrowserInclude(type, option) {
       }
 
       function folder() {
-        if (contextMenu !== 'contextmenu') {
-          const currentUrl = currentDir.url;
-          cachedDir[currentUrl].scroll = tag.get('#list').scrollTop;
-          actionsToDispose.push(currentUrl);
-          actionStack.push({
-            id: currentUrl,
-            action: function () {
-              navigate.pop();
-            }
-          });
-          loadDir(url, name);
-        } else {
-          cmhandle();
-        }
+        const currentUrl = currentDir.url;
+        cachedDir[currentUrl].scroll = tag.get('#list').scrollTop;
+        actionsToDispose.push(currentUrl);
+        actionStack.push({
+          id: currentUrl,
+          action: function () {
+            navigate.pop();
+          }
+        });
+        loadDir(url, name);
       }
 
       function file() {
-        if (contextMenu !== "contextmenu") {
-          if (typeof option === 'function' && option(name)) {
-            $page.hide();
-            resolve({
-              url
-            });
-          }
-        } else {
-          cmhandle();
-        }
+        $page.hide();
+        resolve({
+          url
+        });
       }
 
       function cmhandle() {
@@ -489,8 +497,8 @@ function FileBrowserInclude(type, option) {
       function removeFile() {
         fsOperation(url)
           .then(fs => {
-            if (action === "file") return fs.deleteFile();
-            if (action === "folder") return fs.deleteDir();
+            if (type === "file") return fs.deleteFile();
+            if (type === "dir") return fs.deleteDir();
           })
           .then(() => {
             openFolder.removeItem(url);
@@ -550,7 +558,7 @@ function FileBrowserInclude(type, option) {
     }
 
     function handleContextMenu(e) {
-      handleClick(e, 'contextmenu');
+      handleClick(e, true);
     }
 
     function refresh() {

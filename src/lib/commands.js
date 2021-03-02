@@ -19,8 +19,9 @@ import quickTools from './handlers/quickTools';
 import FTPAccounts from "../pages/ftp-accounts/ftp-accounts";
 import FileBrowser from "../pages/fileBrowser/fileBrowser";
 import Url from "./utils/Url";
-import path from "./utils/path";
+import path from "./utils/Path";
 import showFileInfo from "./showFileInfo";
+import alert from "../components/dialogboxes/alert";
 
 const commands = {
   "close-all-tabs"() {
@@ -36,9 +37,6 @@ const commands = {
   },
   "copy"() {
     clipboardAction('copy');
-  },
-  "color"() {
-    clipboardAction("color");
   },
   "cut"() {
     clipboardAction('cut');
@@ -104,6 +102,9 @@ const commands = {
         console.log(err);
       });
   },
+  "insert-color"() {
+    clipboardAction("color");
+  },
   "new-file"() {
     dialogs.prompt(strings['enter file name'], constants.DEFAULT_FILE_NAME, "filename", {
         match: constants.FILE_NAME_REGEX,
@@ -140,10 +141,8 @@ const commands = {
     FileBrowser('file', function (uri) {
         const ext = helpers.extname(uri);
 
-        if (appSettings.defaultSettings.filesNotAllowed.includes((ext || '').toLowerCase())) {
-          alert(strings.notice.toUpperCase(), `'${ext}' ${strings['file is not supported']}`);
+        if (appSettings.defaultSettings.filesNotAllowed.includes((ext || '').toLowerCase()))
           return false;
-        }
         return true;
       })
       .then(res => {
@@ -166,6 +165,8 @@ const commands = {
         }
         console.error(err);
       });
+
+    // alert(strings.notice.toUpperCase(), `'${ext}' ${strings['file is not supported']}`);
   },
   "open-folder"() {
     editorManager.editor.blur();

@@ -1,4 +1,4 @@
-import path from "./path";
+import path from "./Path";
 import Uri from "./Uri";
 
 export default {

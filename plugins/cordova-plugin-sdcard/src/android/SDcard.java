@@ -35,6 +35,7 @@ import org.apache.cordova.CordovaWebView;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.codec.binary.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -317,16 +318,25 @@ public class SDcard extends CordovaPlugin {
           DocumentFile file = getFile(filename);
 
           if (file.canWrite()) {
-
             OutputStream op = context.getContentResolver().openOutputStream(file.getUri(), "rwt");
-            PrintWriter pw = new PrintWriter(op, true);
 
-            pw.print(content);
-            pw.flush();
-            pw.close();
+            if (Base64.isArrayByteBase64(content.getBytes())) {
+
+              callback.success("Base64");
+              byte[] contentAsByte = Base64.decodeBase64(content);
+              op.write(contentAsByte);
+
+            } else {
+              callback.success("Not Base64");
+              PrintWriter pw = new PrintWriter(op, true);
+
+              pw.print(content);
+              pw.flush();
+              pw.close();
+            }
+
             op.close();
-
-            callback.success("OK");
+            // callback.success("OK");
 
           } else {
             callback.error("No write permission - " + filename);
@@ -723,17 +733,17 @@ public class SDcard extends CordovaPlugin {
   }
 
   private DocumentFile getFile(String filePath) {
-        Uri fileUri = Uri.parse(filePath);
-        DocumentFile documentFile = null;
-        
-        if (filePath.matches("file:///(.*)")) {
-            File file = new File(fileUri.getPath());
-            documentFile = DocumentFile.fromFile(file);
-        } else {
-            documentFile = DocumentFile.fromSingleUri(this.context, Uri.parse(filePath));
-        }
+    Uri fileUri = Uri.parse(filePath);
+    DocumentFile documentFile = null;
 
-        return documentFile;
+    if (filePath.matches("file:///(.*)")) {
+      File file = new File(fileUri.getPath());
+      documentFile = DocumentFile.fromFile(file);
+    } else {
+      documentFile = DocumentFile.fromSingleUri(this.context, Uri.parse(filePath));
+    }
+
+    return documentFile;
   }
 
   private void takePermission(Uri uri) {

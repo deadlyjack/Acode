@@ -1,13 +1,14 @@
 <ul class="list" id="list" empty-msg="{{msg}}">{{#list}}
   {{#.}}
-  <li tabindex="1" class="tile" url="{{url}}" {{#isDirectory}} action="folder" type="folder" {{/isDirectory}}
-    uuid="{{uuid}}" {{#isFile}} action="file" type="file" {{/isFile}} name="{{name}}" {{#open-doc}} open-doc="true"
-    {{/open-doc}} {{#ftp-account}} ftp-account {{/ftp-account}}>
-    <span class="icon {{type}} {{#uuid}}user-added-storage{{/uuid}}" {{#storageType}} storageType="{{.}}"
+  <li tabindex="1" class="tile" url="{{url}}" type="{{type}}" {{#uuid}}uuid="{{uuid}}" {{/uuid}} action="open"
+    name="{{name}}" {{#open-doc}} open-doc="true" {{/open-doc}} {{#ftp-account}} ftp-account {{/ftp-account}}
+    {{#disabled}}disabled{{/disabled}}>
+    <span class="icon {{icon}} {{#uuid}}user-added-storage{{/uuid}}" {{#storageType}} storageType="{{.}}"
       {{/storageType}}></span>
     <div class="text">
       <span>{{name}}</span>
     </div>
   </li>
   {{/.}}
-  {{/list}}</ul>
+  {{/list}}
+</ul>

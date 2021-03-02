@@ -163,5 +163,8 @@
   "floating button": "フローティングボタン",
   "confirm on exit": "アプリケーション終了時に確認",
   "other settings": "その他の設定",
-  "show console": "コンソールを表示"
+  "show console": "コンソールを表示",
+  "image": "Image",
+  "insert file": "Insert file",
+  "insert color": "Insert color"
 }

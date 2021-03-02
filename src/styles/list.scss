@@ -39,23 +39,23 @@
                 margin: 0 auto;
                 width: 30%;
                 height: 2px;
-                background-color: rgba($color: #000000, $alpha: 0.5);
+                background-color: black;
                 animation: move ease 1s infinite;
                 border-radius: 1px;
 
                 @keyframes move {
                     0% {
-                        background-color: rgba($color: #000000, $alpha: 0.5);
+                        background-color: black;
                         transform: scale3d(0, 1, 1);
                     }
 
                     50% {
-                        background-color: rgba($color: #833737, $alpha: 0.5);
+                        background-color: white;
                         transform: scale3d(4, 1, 1);
                     }
 
                     100% {
-                        background-color: rgba($color: #000000, $alpha: 0.5);
+                        background-color: black;
                         transform: scale3d(0, 1, 1);
                     }
                 }

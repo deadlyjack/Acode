@@ -34,11 +34,26 @@
     }
   }
 
+  .info {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    background-color: rgba($color: #000000, $alpha: 0.1);
+  }
+
   #list {
-    height: calc(100% - 30px);
+    height: calc(100% - 60px);
     overflow-y: auto;
 
     .tile {
+
+      &[disabled] {
+        .text {
+          opacity: 0.5;
+        }
+      }
 
       &[read-only] {
         .text::after {

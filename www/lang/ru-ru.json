@@ -164,5 +164,8 @@
   "floating button": "Плавающая кнопка",
   "confirm on exit": "Подтверждение для выхода",
   "other settings": "Прочие настройки",
-  "show console": "Показать консоль"
+  "show console": "Показать консоль",
+  "image": "Image",
+  "insert file": "Insert file",
+  "insert color": "Insert color"
 }

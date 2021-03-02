@@ -9,22 +9,14 @@ import constants from './constants';
 import internalFs from './fileSystem/internalFs';
 import openFolder from './openFolder';
 import Url from './utils/Url';
-import path from './utils/path';
+import path from './utils/Path';
 import Uri from './utils/Uri';
 import configEditor from './aceConfig';
 import ScrollBar from '../components/scrollbar/scrollbar';
-/**
- * @typedef {object} ActiveEditor
- * @property {HTMLElement} container
- * @property {object} editor ace editor object
- * @property {string} id
- * @property {string} filename
- * @property {HTMLElement} assocTile associated tab element in sidenav
- * @property {string} uri
- * @property {string} location
- * @property {bool} isUnsaved
- */
 
+//TODO: Add customizable tools bar
+//TODO: Impelement X3D viewer
+//TODO: Add option to work multiple files at same time in large display.
 /**
  * 
  * @param {HTMLElement} $sidebar 
@@ -44,8 +36,9 @@ function EditorManager($sidebar, $header, $body) {
         editorState = 'blur',
         preventScrollbarV = false,
         preventScrollbarH = false,
+        scrollBarVisiblityCount = 0,
         cursorControllerSize = appSettings.value.cursorControllerSize,
-        timeoutQuicktoolToggler, timeoutHeaderToggler, scrollBarVisiblityCount = 0;
+        timeoutQuicktoolToggler, timeoutHeaderToggler;
     const $container = tag('div', {
         className: 'editor-container'
     });

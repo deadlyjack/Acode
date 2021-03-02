@@ -175,5 +175,36 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
   */
   isParent(root, child) {
     return new RegExp("^" + root).test(child);
+  },
+
+  /**
+   * Gets path for path2 relative to path1
+   * @param {String} path1 
+   * @param {String} path2 
+   */
+  convertToRelative(path1, path2) {
+    path1 = this.normalize(path1).split("/");
+    path2 = this.normalize(path2).split("/");
+
+    const p1len = path1.length;
+    const p2len = path2.length;
+
+    let flag = false,
+      path = [];
+    path1.map((dir, i) => {
+      if (dir === path2[i] && !flag) return;
+
+      path.push(path2[i]);
+      if (!flag) {
+        flag = true;
+        return;
+      }
+
+      if (flag) path.unshift("..");
+    });
+
+    if (p2len > p1len) path.push(...path2.slice(p1len));
+
+    return path.join("/");
   }
 };
