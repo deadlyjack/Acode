@@ -88,6 +88,7 @@ export default {
     "cs-cz": "Čeština",
     "vi-vn": "Vietnamese",
     "be-by": "Беларуская",
+    "hu-hu": "Magyar",
     "mm-unicode":"ဗမာစာ(Unicode)",
     "mm-zawgyi":"ဗမာစာ(Zawgyi)"
   },
