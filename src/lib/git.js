@@ -162,7 +162,7 @@ function Record(owner, sha, name, data, repo, path, branch) {
         dialogs.loader.create(name, strings.loading + '...');
         repository.deleteFile(branch, _path)
           .then(res => {
-            if (res.statusText === 'OK') {
+            if (res.status === 200) {
               _path = getPath(str);
               return repository.writeFile(branch, _path, data, `Rename ${name} to ${str}`, {});
             }
@@ -170,7 +170,7 @@ function Record(owner, sha, name, data, repo, path, branch) {
             return Promise.reject(res);
           })
           .then(res => {
-            if (res.statusText === 'Created') {
+            if (res.status ===201) {
               _record.name = str;
               _record.commitMessage = `update ${str}`;
               update();
@@ -211,7 +211,7 @@ function Record(owner, sha, name, data, repo, path, branch) {
         dialogs.loader.create(name, strings.saving + '...');
         repository.writeFile(branch, _path, txt, commitMessage, {})
           .then(res => {
-            if (res.statusText === 'OK') {
+            if (res.status === 200) {
               update(txt);
               resolve();
             } else {
@@ -403,7 +403,7 @@ function Gist(id, files, isNew, _public) {
       gist.update(update)
         .then(res => {
           if (!res) return Promise.reject('No response');
-          if (res.status === 200 || res.statusText === 'OK') {
+          if (res.status === 200) {
 
             if (isDelete) {
               delete _this.files[name];
@@ -443,7 +443,7 @@ function Gist(id, files, isNew, _public) {
       dialogs.loader.create(name, strings.loading + '...');
       gist.update(update)
         .then(res => {
-          if (res.status === 200 || res.statusText === 'OK') {
+          if (res.status === 200) {
 
             resolve();
           } else {
