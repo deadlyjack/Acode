@@ -1,3 +1,9 @@
+version 1.1.15.142
+☞ Updated language pack.
+☞ Now you can preview SVG files.
+☞ Now you can insert images/files to a project folder.
+☞ Bugs fixes
+
 version 1.1.15.141
 ☞ Updated language pack.
 ☞ Minor bug fixes.

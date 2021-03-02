@@ -316,7 +316,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       <script src="/${CONSOLE_SCRIPT}" crossorigin="anonymous"></script>
       <script src="/${ESPRISMA_SCRIPT}" crossorigin="anonymous"></script>
       <link rel="stylesheet" href="/${CONSOLE_STYLE}">`;
-      text = text.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
+      text = text.replace(/><\/script>/g, ' crossorigin="anonymous"></script>');
       const part = text.split('<head>');
       if (part.length === 2) {
         text = `${part[0]}<head>${js}${part[1]}`;

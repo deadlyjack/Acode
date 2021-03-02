@@ -17,6 +17,7 @@ import ScrollBar from '../components/scrollbar/scrollbar';
 //TODO: Add customizable tools bar
 //TODO: Impelement X3D viewer
 //TODO: Add option to work multiple files at same time in large display.
+
 /**
  * 
  * @param {HTMLElement} $sidebar 
