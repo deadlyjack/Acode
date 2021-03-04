@@ -11,6 +11,7 @@
     "build-run-free": "yarn config-build d free && webpack && cordova run android",
     "build-run": "yarn config-build d && webpack && cordova run android",
     "build-run-release": "yarn config-build p && webpack && cordova run android --release",
+    "build-run-release-free": "yarn config-build p free && webpack && cordova run android --release",
     "start": "yarn build-run",
     "start-release": "yarn build-run-release",
     "start-free": "yarn build-run-free",
@@ -67,6 +68,7 @@
     "babel-loader": "^8.2.2",
     "cordova-common": "^4.0.2",
     "cordova-plugin-sdcard": "file:../plugins/cordova-plugin-sdcard",
+    "cordova-plugin-system": "file:../plugins/cordova-plugin-system",
     "cordova-plugin-whitelist": "^1.3.3",
     "css-loader": "^3.6.0",
     "jest": "^26.6.3",
@@ -101,8 +103,10 @@
       "cordova-plugin-ftp": {},
       "cordova-plugin-webserver": {},
       "cordova-plugin-statusbar": {},
-      "cordova-plugin-system": {},
       "cordova-plugin-sdcard": {
+        "ANDROID_SUPPORT_VERSION": "28.+"
+      },
+      "cordova-plugin-system": {
         "ANDROID_SUPPORT_VERSION": "28.+"
       }
     },

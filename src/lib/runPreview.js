@@ -133,8 +133,21 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     }
   }
 
-
   function run() {
+    if (target === "_system") {
+      system.isPowerSaveMode(res => {
+        if (res)
+          dialogs.alert(strings.info, strings["powersave mode warning"]);
+        else
+          _run();
+      }, () => {
+        _run();
+      });
+    } else _run();
+  }
+
+
+  function _run() {
     webserver.stop();
 
     webserver.start(() => {

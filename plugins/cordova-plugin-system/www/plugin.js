@@ -11,6 +11,9 @@ window.system = {
   disableFullScreen: function (onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, "System", "disable-fullscreen", []);
   },
+  isPowerSaveMode: function (onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, "System", "is-powersave-mode", []);
+  },
   shareFile: function (fileUri, filename, onSuccess, onFail) {
     if (typeof filename === "function") {
       onSuccess = filename;
@@ -22,6 +25,10 @@ window.system = {
 
     cordova.exec(onSuccess, onFail, "System", "share-file", [fileUri, filename]);
   },
+  shareViaWhatsapp: function (fileUri, contact, countryCode, onSuccess, onFail) {
+    if (!fileUri || !contact || !countryCode) throw new Error("Missing required parameters!");
+    cordova.exec(onSuccess, onFail, "System", "share-via-whatsapp", [fileUri, contact, countryCode]);
+  },
   sendEmail: function (email, subject, bodyText, bodyHTML, onSuccess, onFail) {
     if (typeof bodyHTML === "function") {
       onSuccess = bodyHTML;
@@ -32,8 +39,5 @@ window.system = {
     if (!bodyHTML) bodyHTML = "";
 
     cordova.exec(onSuccess, onFail, "System", "send-email", [email, subject, bodyText, bodyHTML]);
-  },
-  termux: function (command, argument, onSuccess, onFail) {
-    cordova.exec(onSuccess, onFail, "System", "termux", [command, argument]);
   }
 };

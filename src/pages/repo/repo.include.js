@@ -157,8 +157,7 @@ export default function RepoInclude(owner, repoName) {
       list.map(entry => {
         const {
           size,
-          type,
-          name
+          type
         } = entry;
         entry.size = (size / 1024).toFixed(2) + 'KB';
         if (!entry.name && entry.path) entry.name = entry.path;

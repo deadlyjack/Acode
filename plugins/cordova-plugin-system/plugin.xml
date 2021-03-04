@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" 
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-system" version="0.0.1">
   <name>cordova-plugin-system</name>
-  <description>Utility methos for Android.</description>
+  <description>Utility methods for Android.</description>
   <license>Apache 2.0</license>
   <keywords>cordova,plugin,system</keywords>
 
@@ -24,8 +24,11 @@
     <hook type="before_prepare" src="utils/resetProvider.js" />
     <hook type="after_prepare" src="utils/fixProvider.js" />
 
+    <preference name="ANDROID_SUPPORT_VERSION" default="28.+" />
+    <framework src="com.android.support:support-v4:$ANDROID_SUPPORT_VERSION" />
     <resource-file src="file_provider.xml" target="res/xml/file_provider.xml" />
     <source-file src="src/android/System.java" target-dir="src/com/foxdebug/system"/>
     <config-file target="AndroidManifest.xml" parent="/manifest"></config-file>
+    <lib-file src="src/android/commons-io-2.7.jar" />
   </platform>
 </plugin>

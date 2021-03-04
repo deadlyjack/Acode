@@ -168,5 +168,6 @@
   "show console": "Tampilkan konsol",
   "image": "Image",
   "insert file": "Insert file",
-  "insert color": "Insert color"
+  "insert color": "Insert color",
+  "powersave mode warning": "Turn off power saving mode to preview in external browser."
 }

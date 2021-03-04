@@ -89,8 +89,9 @@ export default {
     "vi-vn": "Vietnamese",
     "be-by": "Беларуская",
     "hu-hu": "Magyar",
-    "mm-unicode":"ဗမာစာ(Unicode)",
-    "mm-zawgyi":"ဗမာစာ(Zawgyi)"
+    "ml-in": "മലയാളം",
+    "mm-unicode": "ဗမာစာ(Unicode)",
+    "mm-zawgyi": "ဗမာစာ(Zawgyi)"
   },
   editorThemeList: {
     "ambiance": scheme('ambiance', 'dark'),

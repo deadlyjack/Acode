@@ -22,17 +22,16 @@ import util from './util';
 import openFolder from '../../lib/openFolder';
 //#endregion
 
-//TODO: Open default url in file browser
-
 /**
  * 
  * @param {"file"|"folder"} [type='file']
  * @param {string|function(string):boolean} [option] button text or function to check extension
  * @param {string} [info]
- * @param {string} [url]
  */
-function FileBrowserInclude(type, option, info, url) {
+function FileBrowserInclude(type, option, info) {
   if (!type) type = 'file';
+  let fileBrowserState = [];
+  let fileBrowserOldState = JSON.parse(localStorage.fileBrowserState || "[]");
   const actionStack = window.actionStack;
   const prompt = dialogs.prompt;
   /**@type {Array<{name: string, uuid: string, uri: string}>} */
@@ -193,7 +192,9 @@ function FileBrowserInclude(type, option, info, url) {
     renderStorages();
 
     function renderStorages() {
-      renderList(getStorageList());
+      const storageList = getStorageList();
+      if (fileBrowserOldState.length > 1) loadUrl();
+      else renderList(storageList);
 
       if (!localStorage.fileBrowserInit) {
         dialogs.loader.destroy();
@@ -234,8 +235,36 @@ function FileBrowserInclude(type, option, info, url) {
       }
     }
 
+    function loadUrl() {
+      let state = fileBrowserOldState,
+        currUrl;
+      fileBrowserOldState = [];
+
+      for (let i = 0; i < state.length; ++i) {
+        const {
+          url,
+          name
+        } = state[i];
+
+        if (i) actionStack.push({
+          id: currUrl,
+          action
+        });
+
+        if (i === state.length - 1)
+          loadDir(url, name);
+        else
+          navigate(name, url);
+
+        currUrl = url;
+      }
+
+      function action() {
+        navigate.pop();
+      }
+    }
+
     function renderList(list) {
-      delete localStorage.lastDir;
       if (type === 'folder')
         folderOption.classList.add('disabled');
 
@@ -249,7 +278,6 @@ function FileBrowserInclude(type, option, info, url) {
     }
 
     function resolve(data) {
-      localStorage.setItem("lastDir", currentDir.url);
       _resolve(data);
     }
 
@@ -366,7 +394,6 @@ function FileBrowserInclude(type, option, info, url) {
           if (type === 'folder') folderOption.classList.remove('disabled');
         }
 
-        localStorage.lastDir = url;
         currentDir.url = url;
         currentDir.name = name;
         const $list = tag.get('#list');
@@ -416,8 +443,9 @@ function FileBrowserInclude(type, option, info, url) {
       }
 
       function folder() {
+        const $list = tag.get('#list');
         const currentUrl = currentDir.url;
-        cachedDir[currentUrl].scroll = tag.get('#list').scrollTop;
+        cachedDir[currentUrl].scroll = $list ? $list.scrollTop : 0;
         actionsToDispose.push(currentUrl);
         actionStack.push({
           id: currentUrl,
@@ -579,6 +607,15 @@ function FileBrowserInclude(type, option, info, url) {
     }
 
     function navigate(name, url) {
+
+      if (name) {
+        fileBrowserState.push({
+          name,
+          url
+        });
+        localStorage.fileBrowserState = JSON.stringify(fileBrowserState);
+      }
+
       let $nav = $navigation.querySelector(`[url="${url}"]`);
       const $old = $navigation.querySelector('.active');
       if ($old) $old.classList.remove('active');
@@ -615,6 +652,7 @@ function FileBrowserInclude(type, option, info, url) {
     }
 
     navigate.pop = function () {
+      localStorage.fileBrowserState = JSON.stringify(fileBrowserState.slice(0, -1));
       const $nav = $navigation.lastChild.previousElementSibling;
       if ($nav) {
         const url = $nav.getAttribute('url');

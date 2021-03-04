@@ -167,18 +167,18 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-system": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-system"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-sdcard": {
     "source": {
       "type": "local",
       "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-sdcard"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-system": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-system"
     },
     "is_top_level": true,
     "variables": {}

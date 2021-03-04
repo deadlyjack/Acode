@@ -1,7 +1,7 @@
 <div class="list" id="repo-list" empty-message="{{msg}}">{{#list}}{{#.}}
   <div class="list-item" sha="{{sha}}" name="{{name}}"
     action="{{#isDirectory}}folder{{/isDirectory}}{{#isFile}}file{{/isFile}}">
-    <span class="icon {{type}}"></span>
+    <span class="icon {{icon}}"></span>
     <span class="container">
       <div class="text">
         <span>{{name}}</span>
@@ -11,4 +11,5 @@
       {{/isFile}}
     </span>
   </div>
-  {{/.}}{{/list}}</div>
+  {{/.}}{{/list}}
+</div>

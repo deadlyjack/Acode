@@ -1,5 +1,11 @@
-# Write/modify on external storage
+# Utitly plugin for cordova apps.
 
-Using this plugin, cordova apps can check for external storages and write/modify files.
+Using this plugin, cordova apps can:
+
+- Enable/disable fullscreen
+- Share file
+- Get webview information
+- Send email
+- Clear cache
 
 ## Installation
