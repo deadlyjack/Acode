@@ -8,6 +8,13 @@ This is a hybrid app using Apache Cordova. This app is published on play store. 
 
 Note: This project is not organised and it is very hard understand the project structure. I'll try to make it clear as possible.
 
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/com.foxdebug.acode/)
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+     alt="Get it on Google Play"
+     height="80">](https://play.google.com/store/apps/details?id=com.foxdebug.acode)
+
 ## Project structure
 
 - `src` (directory) contains all raw codes
