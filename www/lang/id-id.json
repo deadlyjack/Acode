@@ -8,7 +8,7 @@
   "autosave": "Penyimpanan otomatis",
   "beautify on save": "Mempercantik saat menyimpan",
   "cancel": "batal",
-  "change language": "Ganti BAHASA",
+  "change language": "Ganti bahasa",
   "choose color": "Pilih warna",
   "clear": "kosongkan",
   "close app": "Tutup aplikasi?",
@@ -134,7 +134,7 @@
   "exit fullscreen": "Keluar dari layar penuh",
   "fullscreen": "layar penuh",
   "animation": "animasi",
-  "backup": "backup",
+  "backup": "cadangkan",
   "restore": "kembalikan",
   "backup successful": "Backup berhasil",
   "invalid backup file": "Berkas backup tidak valid",
@@ -155,7 +155,7 @@
   "allow storage": "Berikan izin untuk mengakses penyimpanan eksternal?",
   "permission denied": "Izin ditolak untuk mengakses penyimpanan external",
   "show print margin": "tunjukkan batas cetak",
-  "login": "login",
+  "login": "masuk",
   "add external storage?": "Tambahkan penyimpanan eksternal?",
   "scrollbar size": "Ukuran scrollbar",
   "cursor controller size": "Ukuran pengontrol kursor",
@@ -169,5 +169,5 @@
   "image": "Image",
   "insert file": "Insert file",
   "insert color": "Insert color",
-  "powersave mode warning": "Turn off power saving mode to preview in external browser."
+  "powersave mode warning": "Matikan mode hemat daya untuk mempratinjau di browser."
 }
