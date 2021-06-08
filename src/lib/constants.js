@@ -83,7 +83,6 @@ export default {
     "zh-hant": "繁體中文",
     "ir-fa": "فارسی",
     "ar-ye": "العربية",
-    "ko-kr": "한국어"
     "ja-jp": "日本語",
     "bn-bd": "বাংলা",
     "cs-cz": "Čeština",
@@ -92,7 +91,8 @@ export default {
     "hu-hu": "Magyar",
     "ml-in": "മലയാളം",
     "mm-unicode": "ဗမာစာ(Unicode)",
-    "mm-zawgyi": "ဗမာစာ(Zawgyi)"
+    "mm-zawgyi": "ဗမာစာ(Zawgyi)",
+    "ko-kr": "한국어"
   },
   editorThemeList: {
     "ambiance": scheme('ambiance', 'dark'),
