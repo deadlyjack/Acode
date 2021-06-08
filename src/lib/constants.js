@@ -83,6 +83,7 @@ export default {
     "zh-hant": "繁體中文",
     "ir-fa": "فارسی",
     "ar-ye": "العربية",
+    "ko-kr": "한국어"
     "ja-jp": "日本語",
     "bn-bd": "বাংলা",
     "cs-cz": "Čeština",
