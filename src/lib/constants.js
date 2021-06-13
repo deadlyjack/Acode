@@ -91,7 +91,8 @@ export default {
     "hu-hu": "Magyar",
     "ml-in": "മലയാളം",
     "mm-unicode": "ဗမာစာ(Unicode)",
-    "mm-zawgyi": "ဗမာစာ(Zawgyi)"
+    "mm-zawgyi": "ဗမာစာ(Zawgyi)",
+    "ko-kr": "한국어"
   },
   editorThemeList: {
     "ambiance": scheme('ambiance', 'dark'),
