@@ -1,4 +1,4 @@
-window.sdcard = {
+module.exports = {
   copy: function (srcPathname, destPathname, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, "SDcard", "copy", [srcPathname, destPathname]);
   },

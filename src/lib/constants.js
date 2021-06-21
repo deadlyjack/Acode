@@ -14,10 +14,12 @@ export default {
   VIBRATION_TIME: 30,
   BACKUP_FILE: 'backups/Acode/backup',
   PAYPAL: "https://paypal.me/deadlyjack",
+  BUY_ME_A_COFFEE: 'https://buymeacoffee.com/ajitkumar.dev',
   PATREON: "https://patreon.com/foxdebug",
   PAID_VERSION: "https://play.google.com/store/apps/details?id=com.foxdebug.acode",
   FEEDBACK_EMAIL: "acode@foxdebug.com",
   PERSONAL_EMAIL: "ajit@foxdebug.com",
+  GITHUB_TOKEN: "https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token",
   notification: {
     EXIT_FULL_SCREEN: 1,
     SUPPORT_ACODE: 2

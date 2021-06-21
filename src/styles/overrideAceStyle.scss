@@ -1,116 +1,118 @@
 .ace_editor,
 .ace_editor * {
-    font-family: "Roboto Mono", monospace !important;
+  font-family: 'Roboto Mono', monospace !important;
 }
 
 .ace_editor.fira-code,
 .ace_editor.fira-code * {
-    -webkit-font-feature-settings: "liga"on, "calt"on;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-    font-family: 'Fira Code' !important;
+  -webkit-font-feature-settings: 'liga' on, 'calt' on;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: 'Fira Code' !important;
 }
 
 main .ace_editor {
-    textarea {
-        user-select: none;
+  textarea {
+    user-select: none;
 
-        &.ace_text-input {
-            transform: translate(-100000px, -10000px) !important;
-        }
+    &.ace_text-input {
+      transform: translate(-100000px, -10000px) !important;
     }
+  }
 }
 
 .ace_prompt_mask {
-    z-index: 107;
-    opacity: 0.4;
+  z-index: 107;
+  opacity: 0.4;
 }
 
-
 .ace_editor.ace_autocomplete {
-    width: 80vw !important;
-    max-width: 400px !important;
+  width: 80vw !important;
+  max-width: 400px !important;
 }
 
 .ace_prompt_wrapper {
-    position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    left: 0 !important;
-    margin: 50px auto 0 auto !important;
-    width: 90vw !important;
-    max-width: 600px !important;
-    height: fit-content !important;
-    z-index: 108 !important;
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  left: 0 !important;
+  margin: 50px auto 0 auto !important;
+  width: 90vw !important;
+  max-width: 600px !important;
+  height: fit-content !important;
+  z-index: 108 !important;
 
-    .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
-        background-color: #9999ff;
-        background-color: var(--primary-color);
+  .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
+    background-color: #9999ff;
+    background-color: var(--command-palette-background-color);
+  }
+
+  .ace_prompt_container {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 16px var(--box-shadow-color);
+    border: none;
+    border: var(--command-palette-border);
+
+    > div:first-child {
+      height: 25px !important;
+
+      .ace_content {
+        margin-top: 5px;
+      }
     }
 
-    .ace_prompt_container {
-        position: relative;
-        padding: 0;
-        margin: 0;
-        overflow: hidden;
-        box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
-        box-shadow: 0 0 16px var(--box-shadow-color);
-
-        >div:first-child {
-            height: 25px !important;
-
-            .ace_content {
-                margin-top: 5px;
-            }
-        }
-
-        >div:last-child {
-            width: 90vw !important;
-            box-sizing: border-box;
-        }
-
-        .ace_mobile-menu {
-            display: none;
-        }
+    > div:last-child {
+      width: 90vw !important;
+      box-sizing: border-box;
     }
 
-    .ace_editor {
-        background-color: white;
-        background-color: var(--secondary-color);
-        color: #252525;
-        color: var(--text-color);
-
-        box-shadow: 0 16px 16px rgba(0, 0, 0, 0.2);
-        box-shadow: 0 16px 16px var(--box-shadow-color);
-        border: none;
-
-        .ace_cursor {
-            color: #252525;
-            color: var(--text-color);
-        }
+    .ace_mobile-menu {
+      display: none;
     }
+  }
 
-    .ace_active-line {
-        background-color: rgba($color: #000000, $alpha: 0.5);
+  .ace_editor {
+    background-color: white;
+    background-color: var(--secondary-color);
+    color: #252525;
+    color: var(--text-color);
+
+    box-shadow: 0 16px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 16px 16px var(--box-shadow-color);
+    border: none;
+    border: var(--command-palette-border);
+
+    .ace_cursor {
+      color: #252525;
+      color: var(--text-color);
     }
+  }
+
+  .ace_active-line {
+    background-color: rgba($color: #000000, $alpha: 0.5);
+  }
 }
 
 .ace_tooltip {
-    max-width: 80vw;
-    white-space: pre-line;
+  max-width: 80vw;
+  white-space: pre-line;
 }
 
 .ace_scroller.ace_scroll-left {
-    box-shadow: none !important;
+  box-shadow: none !important;
 }
 
 .ace-container {
-    height: 100%;
+  height: 100%;
 }
 
 .ace-editor {
-    .ace_text-input {
-        pointer-events: none !important;
-        user-select: none !important;
-    }
+  .ace_text-input {
+    pointer-events: none !important;
+    user-select: none !important;
+  }
 }

@@ -1,35 +1,7 @@
 {
-  "_from": "cordova-plugin-buildinfo@4.0.0",
-  "_id": "cordova-plugin-buildinfo@4.0.0",
-  "_inBundle": false,
-  "_integrity": "sha512-2Sl4sgr9L0vXryd6ZTWecs0+w3SlYM5iQPUPMwpkryaEo9MIbYvQoiVTosKpzHAyKSho4uTSQT9d2acosVVnFw==",
-  "_location": "/cordova-plugin-buildinfo",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "cordova-plugin-buildinfo@4.0.0",
-    "name": "cordova-plugin-buildinfo",
-    "escapedName": "cordova-plugin-buildinfo",
-    "rawSpec": "4.0.0",
-    "saveSpec": null,
-    "fetchSpec": "4.0.0"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-buildinfo/-/cordova-plugin-buildinfo-4.0.0.tgz",
-  "_shasum": "1a913b45a9233e359092fac67a91b6ad0d73ad44",
-  "_spec": "cordova-plugin-buildinfo@4.0.0",
-  "_where": "/mnt/f62cc89c-ef95-4eee-8953-bf24dd2d66c9/cordova/code editor free",
-  "author": {
-    "name": "Mikihiro Hayashi"
-  },
-  "bugs": {
-    "url": "https://github.com/lynrin/cordova-plugin-buildinfo/issues"
-  },
-  "bundleDependencies": false,
+  "name": "cordova-plugin-buildinfo",
+  "version": "4.0.0",
+  "description": "Cordova/PhoneGap Build Information Plugin. Get PackageName, Version, Debug and more...",
   "cordova": {
     "id": "cordova-plugin-buildinfo",
     "platforms": [
@@ -41,45 +13,10 @@
       "electron"
     ]
   },
-  "deprecated": false,
-  "description": "Cordova/PhoneGap Build Information Plugin. Get PackageName, Version, Debug and more...",
-  "devDependencies": {
-    "jshint": "^2.6.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lynrin/cordova-plugin-buildinfo.git"
   },
-  "engines": {
-    "cordovaDependencies": {
-      "0.0.0": {
-        "cordova": ">=4.0.0"
-      },
-      "2.0.0": {
-        "cordova": ">=5.4.0",
-        "cordova-android": ">=5.0.0",
-        "cordova-ios": ">=4.0.0",
-        "cordova-windows": ">=4.0.0"
-      },
-      "3.0.0": {
-        "cordova": ">=5.4.0",
-        "cordova-android": ">=5.0.0",
-        "cordova-browser": ">=6.0.0",
-        "cordova-electron": ">=1.1.0",
-        "cordova-ios": ">=4.0.0",
-        "cordova-windows": ">=4.0.0"
-      },
-      "4.0.0": {
-        "cordova": ">=5.4.0",
-        "cordova-android": ">=5.0.0",
-        "cordova-browser": ">=6.0.0",
-        "cordova-electron": ">=1.1.0",
-        "cordova-ios": ">=4.0.0",
-        "cordova-osx": ">=4.0.0",
-        "cordova-windows": ">=4.0.0"
-      },
-      "5.0.0": {
-        "cordova": ">100"
-      }
-    }
-  },
-  "homepage": "https://github.com/lynrin/cordova-plugin-buildinfo#readme",
   "keywords": [
     "debug",
     "buildconfig",
@@ -94,15 +31,50 @@
     "cordova-browser",
     "cordova-electron"
   ],
-  "license": "MIT",
-  "name": "cordova-plugin-buildinfo",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lynrin/cordova-plugin-buildinfo.git"
-  },
   "scripts": {
-    "jshint": "node node_modules/jshint/bin/jshint www && node node_modules/jshint/bin/jshint src && node node_modules/jshint/bin/jshint tests",
-    "test": "npm run jshint"
+    "test": "npm run jshint",
+    "jshint": "node node_modules/jshint/bin/jshint www && node node_modules/jshint/bin/jshint src && node node_modules/jshint/bin/jshint tests"
   },
-  "version": "4.0.0"
+  "engines": {
+    "cordovaDependencies": {
+      "0.0.0": {
+        "cordova": ">=4.0.0"
+      },
+      "2.0.0": {
+        "cordova": ">=5.4.0",
+        "cordova-ios": ">=4.0.0",
+        "cordova-android": ">=5.0.0",
+        "cordova-windows": ">=4.0.0"
+      },
+      "3.0.0": {
+        "cordova": ">=5.4.0",
+        "cordova-ios": ">=4.0.0",
+        "cordova-android": ">=5.0.0",
+        "cordova-windows": ">=4.0.0",
+        "cordova-browser": ">=6.0.0",
+        "cordova-electron": ">=1.1.0"
+      },
+      "4.0.0": {
+        "cordova": ">=5.4.0",
+        "cordova-ios": ">=4.0.0",
+        "cordova-android": ">=5.0.0",
+        "cordova-windows": ">=4.0.0",
+        "cordova-osx": ">=4.0.0",
+        "cordova-browser": ">=6.0.0",
+        "cordova-electron": ">=1.1.0"
+      },
+      "5.0.0": {
+        "cordova": ">100"
+      }
+    }
+  },
+  "author": "Mikihiro Hayashi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lynrin/cordova-plugin-buildinfo/issues"
+  },
+  "homepage": "https://github.com/lynrin/cordova-plugin-buildinfo#readme",
+  "devDependencies": {
+    "jshint": "^2.6.0"
+  }
 }

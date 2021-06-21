@@ -1,35 +1,8 @@
 {
-  "_from": "cordova-plugin-device",
-  "_id": "cordova-plugin-device@2.0.3",
-  "_inBundle": false,
-  "_integrity": "sha512-Jb3V72btxf3XHpkPQsGdyc8N6tVBYn1vsxSFj43fIz9vonJDUThYPCJJHqk6PX6N4dJw6I4FjxkpfCR4LDYMlw==",
-  "_location": "/cordova-plugin-device",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "cordova-plugin-device",
-    "name": "cordova-plugin-device",
-    "escapedName": "cordova-plugin-device",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-device/-/cordova-plugin-device-2.0.3.tgz",
-  "_shasum": "c2b41b7efd0455dd097f89356d85bfdd5dadeb0f",
-  "_spec": "cordova-plugin-device",
-  "_where": "/mnt/sda1/cordova/code editor",
-  "author": {
-    "name": "Apache Software Foundation"
-  },
-  "bugs": {
-    "url": "https://issues.apache.org/jira/browse/CB"
-  },
-  "bundleDependencies": false,
+  "name": "cordova-plugin-device",
+  "version": "2.0.3",
+  "description": "Cordova Device Plugin",
+  "types": "./types/index.d.ts",
   "cordova": {
     "id": "cordova-plugin-device",
     "platforms": [
@@ -40,25 +13,13 @@
       "osx"
     ]
   },
-  "deprecated": false,
-  "description": "Cordova Device Plugin",
-  "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-semistandard": "^11.0.0",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-import": "^2.3.0",
-    "eslint-plugin-node": "^5.0.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apache/cordova-plugin-device"
   },
-  "engines": {
-    "cordovaDependencies": {
-      "3.0.0": {
-        "cordova": ">100"
-      }
-    }
+  "bugs": {
+    "url": "https://issues.apache.org/jira/browse/CB"
   },
-  "homepage": "https://github.com/apache/cordova-plugin-device#readme",
   "keywords": [
     "cordova",
     "device",
@@ -69,16 +30,26 @@
     "cordova-browser",
     "cordova-osx"
   ],
-  "license": "Apache-2.0",
-  "name": "cordova-plugin-device",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/apache/cordova-plugin-device.git"
-  },
   "scripts": {
-    "eslint": "node node_modules/eslint/bin/eslint www && node node_modules/eslint/bin/eslint src && node node_modules/eslint/bin/eslint tests",
-    "test": "npm run eslint"
+    "test": "npm run eslint",
+    "eslint": "node node_modules/eslint/bin/eslint www && node node_modules/eslint/bin/eslint src && node node_modules/eslint/bin/eslint tests"
   },
-  "types": "./types/index.d.ts",
-  "version": "2.0.3"
+  "author": "Apache Software Foundation",
+  "license": "Apache-2.0",
+  "engines": {
+    "cordovaDependencies": {
+      "3.0.0": {
+        "cordova": ">100"
+      }
+    }
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-semistandard": "^11.0.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-node": "^5.0.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
 }

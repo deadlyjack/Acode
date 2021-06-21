@@ -1,35 +1,7 @@
 {
-  "_from": "cordova-clipboard",
-  "_id": "cordova-clipboard@1.3.0",
-  "_inBundle": false,
-  "_integrity": "sha512-IGk4LZm/DJ0Xk/jgakHm4wa+A/lrRP3QfzMAHDG7oWLJS4ISOpfI32Wez4ndnENItRslGyBVyJyKD83CxELCAw==",
-  "_location": "/cordova-clipboard",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "cordova-clipboard",
-    "name": "cordova-clipboard",
-    "escapedName": "cordova-clipboard",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-clipboard/-/cordova-clipboard-1.3.0.tgz",
-  "_shasum": "0911da4cbdea5df2e3a769f5b3aab00e0be0e679",
-  "_spec": "cordova-clipboard",
-  "_where": "/media/dellevenjack/Projects/git/Acode",
-  "author": {
-    "name": "Ibrahim Hadeed"
-  },
-  "bugs": {
-    "url": "https://github.com/ihadeed/cordova-clipboard/issues"
-  },
-  "bundleDependencies": false,
+  "name": "cordova-clipboard",
+  "version": "1.3.0",
+  "description": "Clipboard management plugin for Cordova/PhoneGap that supports iOS, Android, and WP8",
   "cordova": {
     "id": "cordova-clipboard",
     "platforms": [
@@ -38,9 +10,10 @@
       "wp8"
     ]
   },
-  "deprecated": false,
-  "description": "Clipboard management plugin for Cordova/PhoneGap that supports iOS, Android, and WP8",
-  "homepage": "https://github.com/ihadeed/cordova-clipboard#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ihadeed/cordova-clipboard.git"
+  },
   "keywords": [
     "cordova",
     "plugin",
@@ -48,11 +21,10 @@
     "phonegap",
     "ionic"
   ],
+  "author": "Ibrahim Hadeed",
   "license": "MIT",
-  "name": "cordova-clipboard",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ihadeed/cordova-clipboard.git"
+  "bugs": {
+    "url": "https://github.com/ihadeed/cordova-clipboard/issues"
   },
-  "version": "1.3.0"
+  "homepage": "https://github.com/ihadeed/cordova-clipboard#readme"
 }

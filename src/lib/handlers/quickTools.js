@@ -71,9 +71,11 @@ function actions(action) {
         if ($searchRow1) {
           removeSearchRow2();
         }
+        $footer.get('[action=more]').classList.replace('arrow_drop_up', 'arrow_drop_down');
         $footer.appendChild(tag.parse($_row2));
         incFooterHeightBy(1);
       } else {
+        $footer.get('[action=more]').classList.replace('arrow_drop_down', 'arrow_drop_up');
         removeRow2();
       }
       editor.resize(true);

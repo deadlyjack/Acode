@@ -1,144 +1,16 @@
 {
-  "cordova-plugin-device": {
+  "cordova-plugin-system": {
     "source": {
       "type": "registry",
-      "id": "cordova-plugin-device"
+      "id": "cordova-plugin-system"
     },
     "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-file": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-file@6.0.2"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-navigationbar-color": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-navigationbar-color@0.0.9"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-custom-config": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-custom-config@^5.1.0"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-x-toast": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-x-toast@^2.7.2"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-android-permissions": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-android-permissions@^1.0.0"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-vibration": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-vibration"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-file-transfer": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-file-transfer"
-    },
-    "is_top_level": false,
     "variables": {}
   },
   "cordova-clipboard": {
     "source": {
       "type": "registry",
-      "id": "cordova-clipboard@^1.3.0"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-whitelist": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-whitelist@1.3.4"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-badge": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-badge@>=0.8.5"
-    },
-    "is_top_level": false,
-    "variables": {}
-  },
-  "cordova-plugin-buildinfo": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-buildinfo@4.0.0"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-extension": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-extension"
-    },
-    "is_top_level": false,
-    "variables": {}
-  },
-  "cordova-facebook-audnet-sdk": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-facebook-audnet-sdk"
-    },
-    "is_top_level": false,
-    "variables": {}
-  },
-  "cordova-facebook-audience-network": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-facebook-audience-network"
-    },
-    "is_top_level": false,
-    "variables": {}
-  },
-  "cordova-plugin-inappbrowser": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-plugin-inappbrowser"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-disable-http-cache": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-disable-http-cache"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-intent": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-plugin-intent"
+      "id": "cordova-clipboard"
     },
     "is_top_level": true,
     "variables": {}
@@ -146,15 +18,23 @@
   "cordova-plugin-ftp": {
     "source": {
       "type": "local",
-      "path": "/mnt/sda1/cordova/code editor/node_modules/cordova-plugin-ftp"
+      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-ftp"
     },
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-webserver": {
+  "cordova-plugin-intent": {
     "source": {
       "type": "local",
-      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-webserver"
+      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-intent"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-inappbrowser": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-inappbrowser"
     },
     "is_top_level": true,
     "variables": {}
@@ -167,18 +47,90 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-sdcard": {
+  "cordova-plugin-vibration": {
     "source": {
-      "type": "local",
-      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-sdcard"
+      "type": "registry",
+      "id": "cordova-plugin-vibration"
     },
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-system": {
+  "cordova-plugin-x-toast": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-x-toast"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-android-permissions": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-android-permissions"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-navigationbar-color": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-navigationbar-color@0.1.0"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-file": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-file@6.0.2"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-buildinfo": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-buildinfo@4.0.0"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-device": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-device"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-sdcard": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-sdcard"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-webserver": {
     "source": {
       "type": "local",
-      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-system"
+      "path": "/mnt/sdb1/cordova/acode/node_modules/cordova-plugin-webserver"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-whitelist": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-whitelist@^1.3.4"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-custom-config": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-custom-config"
     },
     "is_top_level": true,
     "variables": {}

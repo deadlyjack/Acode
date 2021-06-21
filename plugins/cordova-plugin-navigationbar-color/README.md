@@ -18,10 +18,10 @@ Preferences
 ```
         
 
-- __NavigationBarLigth__ (boolean, defaults to __false__). Change the color of the buttons in the navigation bar to black, use in light colors of the navigation bar (Android 8.0 or higher).
+- __NavigationBarLight__ (boolean, defaults to __false__). Change the color of the buttons in the navigation bar to black, use in light colors of the navigation bar (Android 8.0 or higher).
 
 ```xml
-<preference name="NavigationBarLigth" value="true" />
+<preference name="NavigationBarLight" value="true" />
 ```
 
 Methods
@@ -44,19 +44,19 @@ function onDeviceReady()
 Set color of navigation bar by hex string.
 
 ```js
-NavigationBar.backgroundColorByHexString(String colorHex, Boolean ligthNavigationBar = false);
+NavigationBar.backgroundColorByHexString(String colorHex, Boolean lightNavigationBar = false);
 ```
 
 -  __colorHex__ Color hex string. Set the color of navigation bar.
 
--  __ligthNavigationBar__ Change the color of the buttons in the navigation bar to black, use in light colors of the navigation bar (Android 8.0 or higher).
+-  __lightNavigationBar__ Change the color of the buttons in the navigation bar to black, use in light colors of the navigation bar (Android 8.0 or higher).
 
 #### NavigationBar.backgroundColorByName
 
 Set color of navigation bar by color name.
 
 ```js
-NavigationBar.backgroundColorByName(String colorName, Boolean ligthNavigationBar = false);
+NavigationBar.backgroundColorByName(String colorName, Boolean lightNavigationBar = false);
 ```
 
 -  __colorName__ Color name. Set the color of navigation bar.
@@ -76,7 +76,7 @@ NavigationBar.backgroundColorByName(String colorName, Boolean ligthNavigationBar
 - - `purple`: Equals #800080
 - - `brown`: Equals #A52A2A
 
--  __ligthNavigationBar__ Change the color of the buttons in the navigation bar to black, use in light colors of the navigation bar (Android 8.0 or higher).
+-  __lightNavigationBar__ Change the color of the buttons in the navigation bar to black, use in light colors of the navigation bar (Android 8.0 or higher).
 
 #### NavigationBar.hide
 

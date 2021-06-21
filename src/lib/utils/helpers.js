@@ -207,7 +207,7 @@ function sortDir(list, fileBrowser, readOnly = false, origin = null, uuid = null
 
     list.map(item => {
 
-        item.name = decodeURL(item.name || path.basename(item.url)) || '';
+        item.name = decodeURL(item.name || path.basename(item.url || ""));
         item.readOnly = readOnly;
         item.canWrite = !readOnly;
         item.type = item.isDirectory ? "dir" : "file";

@@ -66,6 +66,9 @@ const commands = {
         editorManager.onupdate();
       });
   },
+  "exit"(){
+    navigator.app.exitApp();
+  },
   "find"() {
     quickTools.actions('search');
   },

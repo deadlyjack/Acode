@@ -19,6 +19,11 @@ export default {
       ...extra
     });
   },
+  /**
+   * 
+   * @param {String} name 
+   * @returns {Promise<{name: String, uri: String, uuid: string}>}
+   */
   addPath(name = "") {
     return new Promise((resolve, reject) => {
       dialogs.multiPrompt(strings["add path"], [{
@@ -26,12 +31,15 @@ export default {
           placeholder: "Name",
           type: "text",
           required: true,
-          value: name
+          value: name,
+          readOnly: !!name,
+          autofocus: !name
         }, {
           id: "uri",
           placeholder: "select path",
           type: "text",
           required: true,
+          readOnly: true,
           onclick: function () {
             sdcard.getStorageAccessPermission("", res => {
               this.value = res;

@@ -34,7 +34,11 @@ body {
 
   --distance: 10px;
 
-  &[theme=dark] {
+  --command-palette-background-color: var(--primary-color);
+  --command-palette-text-color: var(--text-main-color);
+  --command-palette-border: none;
+
+  &[theme='dark'] {
     --primary-color: #313131;
     --secondary-color: #252525;
     --text-color: white;
@@ -52,7 +56,7 @@ body {
     --dialogbox-selected-option-color: gold;
   }
 
-  &[theme=black] {
+  &[theme='black'] {
     --primary-color: #000000;
     --secondary-color: #000000;
     --text-color: white;
@@ -72,9 +76,11 @@ body {
     --box-shadow-color: transparent;
     --popup-border-color: rgba(255, 255, 255, 0.4);
     --active-icon-color: rgba(255, 255, 255, 0.2);
+
+    --command-palette-border: solid 0.5px var(--border-color);
   }
 
-  &[theme=ocean] {
+  &[theme='ocean'] {
     --primary-color: #20202c;
     --secondary-color: #262635;
     --text-color: white;
@@ -92,7 +98,7 @@ body {
     --dialogbox-selected-option-color: gold;
   }
 
-  &[theme=bump] {
+  &[theme='bump'] {
     --primary-color: #303841;
     --secondary-color: #30475e;
     --text-color: #ececec;
@@ -114,7 +120,7 @@ body {
     --button-text-color: #ececec;
   }
 
-  &[theme=bling] {
+  &[theme='bling'] {
     --primary-color: #202040;
     --secondary-color: #543864;
     --text-color: #ffbd69;
@@ -136,7 +142,7 @@ body {
     --button-text-color: #ffbd69;
   }
 
-  &[theme=moon] {
+  &[theme='moon'] {
     --primary-color: #222831;
     --secondary-color: #393e46;
     --text-color: #00fff5;
@@ -158,7 +164,7 @@ body {
     --button-text-color: #00fff5;
   }
 
-  &[theme=atticus] {
+  &[theme='atticus'] {
     --primary-color: #363333;
     --secondary-color: #272121;
     --text-color: #f6e9e9;
@@ -180,7 +186,7 @@ body {
     --button-text-color: #f6e9e9;
   }
 
-  &[theme=tomyris] {
+  &[theme='tomyris'] {
     --primary-color: #3b0944;
     --secondary-color: #5f1854;
     --text-color: #90b8f8;
@@ -202,7 +208,7 @@ body {
     --button-text-color: #f1bbd5;
   }
 
-  &[theme=menes] {
+  &[theme='menes'] {
     --primary-color: #353941;
     --secondary-color: #26282b;
     --text-color: #90b8f8;
@@ -224,7 +230,7 @@ body {
     --button-text-color: #90b8f8;
   }
 
-  &[theme=light] {
+  &[theme='light'] {
     --primary-color: white;
     --secondary-color: white;
     --text-color: #333e59;

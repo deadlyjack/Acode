@@ -2,22 +2,18 @@ import tag from 'html-tag-js';
 import mustache from 'mustache';
 
 import Page from "../../components/page";
-import dialogs from "../../components/dialogs";
 import gen from "../../components/gen";
 import About from "../about/about";
 import editorSettings from "./editorSettings";
 import constants from "../../lib/constants";
-import helpers from "../../lib/utils/helpers";
 import openFile from "../../lib/openFile";
-import internalFs from "../../lib/fileSystem/internalFs";
 import backupRestore from "./backup-restore";
 import themeSetting from "../themeSetting/themeSetting";
 
 import $_ad from '../../views/ad.hbs';
 import otherSettings from './otherSettings';
 
-export default function settingsMain(demo) {
-    const value = appSettings.value;
+export default function settingsMain() {
     const $page = Page(strings.settings);
     const $settingsList = tag('div', {
         className: 'main list',

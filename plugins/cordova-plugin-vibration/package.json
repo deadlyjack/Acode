@@ -1,35 +1,8 @@
 {
-  "_from": "cordova-plugin-vibration",
-  "_id": "cordova-plugin-vibration@3.1.1",
-  "_inBundle": false,
-  "_integrity": "sha512-qgv67Rueo4Pydfant3TwnXeFiN9dl+6lKMM6h5jYg9XewiGAGOr8vfWsTvQssC3m3xMKGS1ap3xPNH+BzZ4RMA==",
-  "_location": "/cordova-plugin-vibration",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "cordova-plugin-vibration",
-    "name": "cordova-plugin-vibration",
-    "escapedName": "cordova-plugin-vibration",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-vibration/-/cordova-plugin-vibration-3.1.1.tgz",
-  "_shasum": "38fcdd9a7675cfb44d86339c1b2cb129017e9e00",
-  "_spec": "cordova-plugin-vibration",
-  "_where": "/media/dellevenjack/Projects/git/Acode",
-  "author": {
-    "name": "Apache Software Foundation"
-  },
-  "bugs": {
-    "url": "https://issues.apache.org/jira/browse/CB"
-  },
-  "bundleDependencies": false,
+  "name": "cordova-plugin-vibration",
+  "version": "3.1.1",
+  "description": "Cordova Vibration Plugin",
+  "types": "./types/index.d.ts",
   "cordova": {
     "id": "cordova-plugin-vibration",
     "platforms": [
@@ -38,25 +11,13 @@
       "windows"
     ]
   },
-  "deprecated": false,
-  "description": "Cordova Vibration Plugin",
-  "devDependencies": {
-    "eslint": "^4.0.0",
-    "eslint-config-semistandard": "^11.0.0",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-import": "^2.3.0",
-    "eslint-plugin-node": "^5.0.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apache/cordova-plugin-vibration"
   },
-  "engines": {
-    "cordovaDependencies": {
-      "4.0.0": {
-        "cordova": ">100"
-      }
-    }
+  "bugs": {
+    "url": "https://issues.apache.org/jira/browse/CB"
   },
-  "homepage": "https://github.com/apache/cordova-plugin-vibration#readme",
   "keywords": [
     "cordova",
     "vibration",
@@ -65,16 +26,26 @@
     "cordova-ios",
     "cordova-windows"
   ],
-  "license": "Apache-2.0",
-  "name": "cordova-plugin-vibration",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/apache/cordova-plugin-vibration.git"
-  },
   "scripts": {
-    "eslint": "eslint www && eslint src && eslint tests",
-    "test": "npm run eslint"
+    "test": "npm run eslint",
+    "eslint": "eslint www && eslint src && eslint tests"
   },
-  "types": "./types/index.d.ts",
-  "version": "3.1.1"
+  "author": "Apache Software Foundation",
+  "license": "Apache-2.0",
+  "engines": {
+    "cordovaDependencies": {
+      "4.0.0": {
+        "cordova": ">100"
+      }
+    }
+  },
+  "devDependencies": {
+    "eslint": "^4.0.0",
+    "eslint-config-semistandard": "^11.0.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-node": "^5.0.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
 }

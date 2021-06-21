@@ -1,37 +1,7 @@
 {
-  "_from": "cordova-plugin-x-toast",
-  "_id": "cordova-plugin-x-toast@2.7.2",
-  "_inBundle": false,
-  "_integrity": "sha512-nx4LaBkJyEk1MknkLC0/U904A42WX/1/OZUeUyXkKRtChShsoTdbWlvEqHKzPbELzf2bEMnXd1CI70WRv+a4hA==",
-  "_location": "/cordova-plugin-x-toast",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "cordova-plugin-x-toast",
-    "name": "cordova-plugin-x-toast",
-    "escapedName": "cordova-plugin-x-toast",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-x-toast/-/cordova-plugin-x-toast-2.7.2.tgz",
-  "_shasum": "2f8ca705bc2664832298b348cb17204cda79c17f",
-  "_spec": "cordova-plugin-x-toast",
-  "_where": "/media/dellevenjack/Projects/git/Acode",
-  "author": {
-    "name": "Eddy Verbruggen",
-    "email": "eddyverbruggen@gmail.com",
-    "url": "https://github.com/EddyVerbruggen"
-  },
-  "bugs": {
-    "url": "https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin/issues"
-  },
-  "bundleDependencies": false,
+  "name": "cordova-plugin-x-toast",
+  "version": "2.7.2",
+  "description": "This plugin allows you to show a Toast. A Toast is a little non intrusive buttonless popup which automatically disappears.",
   "cordova": {
     "id": "cordova-plugin-x-toast",
     "platforms": [
@@ -42,15 +12,10 @@
       "blackberry10"
     ]
   },
-  "deprecated": false,
-  "description": "This plugin allows you to show a Toast. A Toast is a little non intrusive buttonless popup which automatically disappears.",
-  "engines": [
-    {
-      "name": "cordova",
-      "version": ">=3.0.0"
-    }
-  ],
-  "homepage": "https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git"
+  },
   "keywords": [
     "Toast",
     "Notification",
@@ -63,11 +28,16 @@
     "cordova-windows",
     "cordova-blackberry10"
   ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
+  "author": "Eddy Verbruggen <eddyverbruggen@gmail.com> (https://github.com/EddyVerbruggen)",
   "license": "MIT",
-  "name": "cordova-plugin-x-toast",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git"
+  "bugs": {
+    "url": "https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin/issues"
   },
-  "version": "2.7.2"
+  "homepage": "https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin#readme"
 }

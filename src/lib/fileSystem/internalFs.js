@@ -1,6 +1,5 @@
 import ajax from '../utils/ajax';
 import Url from '../utils/Url';
-import mimeType from 'mime-types';
 export default {
 
     /**

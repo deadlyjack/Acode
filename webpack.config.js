@@ -3,7 +3,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const noModule = {
-  mode: 'production',
+  mode: 'development',
   entry: {
     main: "./src/lib/main.js",
     console: "./src/lib/console.js",
@@ -34,7 +34,6 @@ const noModule = {
             loader: MiniCssExtractPlugin.loader,
             options: {
               publicPath: "../../",
-              hmr: process.env.NODE_ENV === "development"
             }
           },
           "css-loader?url=false",
@@ -43,6 +42,12 @@ const noModule = {
         ]
       }
     ]
+  },
+  resolve: {
+    fallback: {
+      path: require.resolve('path-browserify'),
+      crypto: false
+    }
   },
   plugins: [
     new MiniCssExtractPlugin({

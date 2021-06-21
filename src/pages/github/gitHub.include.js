@@ -135,7 +135,7 @@ function gitHubInclude(options = {}) {
         else render(profile);
       })
       .catch(err => {
-        if (err.response) {
+        if (err.response.data) {
           console.log(err.response.data.message);
           if (err.response.status === 401) logout();
           if (options.$loginPage) {
@@ -144,7 +144,10 @@ function gitHubInclude(options = {}) {
             GithubLogin();
           }
         } else {
-          console.log(err);
+          if(options.$loginPage){
+            options.$loginPage.setMessage(err.response.statusText);
+          }
+          logout();
         }
       })
       .finally(() => {

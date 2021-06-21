@@ -11,22 +11,31 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
+
+import android.util.Log;
+
 import java.net.URLConnection;
 
 import android.net.Uri;
+
 import android.app.Activity;
+
 import android.content.Intent;
 import android.content.Context;
+import android.content.ContentResolver;
+
 import android.os.Build;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
-import android.content.ContentResolver;
-import android.support.v4.provider.DocumentFile;
+
 import android.text.TextUtils;
+
 import android.provider.DocumentsContract;
 import android.provider.DocumentsContract.Document;
+
 import android.database.Cursor;
-import android.util.Log;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CallbackContext;
@@ -320,14 +329,12 @@ public class SDcard extends CordovaPlugin {
           if (file.canWrite()) {
             OutputStream op = context.getContentResolver().openOutputStream(file.getUri(), "rwt");
 
-            if (Base64.isArrayByteBase64(content.getBytes())) {
+            if (Base64.isBase64(content)) {
 
-              callback.success("Base64");
               byte[] contentAsByte = Base64.decodeBase64(content);
               op.write(contentAsByte);
 
             } else {
-              callback.success("Not Base64");
               PrintWriter pw = new PrintWriter(op, true);
 
               pw.print(content);
@@ -336,7 +343,7 @@ public class SDcard extends CordovaPlugin {
             }
 
             op.close();
-            // callback.success("OK");
+            callback.success("OK");
 
           } else {
             callback.error("No write permission - " + filename);

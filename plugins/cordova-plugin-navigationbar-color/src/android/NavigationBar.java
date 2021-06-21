@@ -59,8 +59,8 @@ public class NavigationBar extends CordovaPlugin {
                 Window window = cordova.getActivity().getWindow();
                 window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 
-                // Read 'NavigationBarBackgroundColor' and 'NavigationBarLigth' from config.xml, default is #000000.
-                setNavigationBarBackgroundColor(preferences.getString("NavigationBarBackgroundColor", "#000000"), preferences.getBoolean("NavigationBarLigth", false));
+                // Read 'NavigationBarBackgroundColor' and 'NavigationBarLight' from config.xml, default is #000000.
+                setNavigationBarBackgroundColor(preferences.getString("NavigationBarBackgroundColor", "#000000"), preferences.getBoolean("NavigationBarLight", false));
             }
         });
     }
@@ -165,9 +165,9 @@ public class NavigationBar extends CordovaPlugin {
         return false;
     }
 
-    private void setNavigationBarBackgroundColor(final String colorPref, Boolean ligthNavigationBar) {
+    private void setNavigationBarBackgroundColor(final String colorPref, Boolean lightNavigationBar) {
 
-        ligthNavigationBar = ligthNavigationBar == null ? false : ligthNavigationBar;
+        lightNavigationBar = lightNavigationBar == null ? false : lightNavigationBar;
 
         if (Build.VERSION.SDK_INT >= 21) {
             if (colorPref != null && !colorPref.isEmpty()) {
@@ -179,7 +179,7 @@ public class NavigationBar extends CordovaPlugin {
 
                 uiOptions = uiOptions | 0x80000000;
 
-                if(Build.VERSION.SDK_INT >= 26 && ligthNavigationBar)
+                if(Build.VERSION.SDK_INT >= 26 && lightNavigationBar)
                     uiOptions = uiOptions | 0x00000010;
                 else
                     uiOptions = uiOptions & ~0x00000010;

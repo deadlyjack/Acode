@@ -88,7 +88,7 @@
   "show hidden files": "숨긴 파일 보기",
   "show spaces": "띄어쓰기 공간 보기",
   "soft tab": "Soft tab",
-  "sort by name": "이름 정령", 
+  "sort by name": "이름 정령",
   "success": "완료",
   "tab size": "Tab 크기",
   "text wrap": "텍스트 반환",
@@ -167,5 +167,6 @@
   "image": "사진",
   "insert file": "파일 삽입",
   "insert color": "색 삽입",
-  "powersave mode warning": "외부 저장소에서 미리 확인하려면 절전모드를 종료해 주십쇼"
+  "powersave mode warning": "외부 저장소에서 미리 확인하려면 절전모드를 종료해 주십쇼",
+  "exit": "Exit"
 }

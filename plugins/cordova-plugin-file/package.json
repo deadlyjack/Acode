@@ -1,35 +1,8 @@
 {
-  "_from": "cordova-plugin-file@6.0.2",
-  "_id": "cordova-plugin-file@6.0.2",
-  "_inBundle": false,
-  "_integrity": "sha512-m7cughw327CjONN/qjzsTpSesLaeybksQh420/gRuSXJX5Zt9NfgsSbqqKDon6jnQ9Mm7h7imgyO2uJ34XMBtA==",
-  "_location": "/cordova-plugin-file",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "cordova-plugin-file@6.0.2",
-    "name": "cordova-plugin-file",
-    "escapedName": "cordova-plugin-file",
-    "rawSpec": "6.0.2",
-    "saveSpec": null,
-    "fetchSpec": "6.0.2"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-file/-/cordova-plugin-file-6.0.2.tgz",
-  "_shasum": "f3911479f8357e9aacb5576674f8d95b31a1fb20",
-  "_spec": "cordova-plugin-file@6.0.2",
-  "_where": "/media/dellevenjack/Projects/git/Acode",
-  "author": {
-    "name": "Apache Software Foundation"
-  },
-  "bugs": {
-    "url": "https://github.com/apache/cordova-plugin-file/issues"
-  },
-  "bundleDependencies": false,
+  "name": "cordova-plugin-file",
+  "version": "6.0.2",
+  "description": "Cordova File Plugin",
+  "types": "./types/index.d.ts",
   "cordova": {
     "id": "cordova-plugin-file",
     "platforms": [
@@ -40,28 +13,13 @@
       "windows"
     ]
   },
-  "deprecated": false,
-  "description": "Cordova File Plugin",
-  "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-semistandard": "^11.0.0",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-import": "^2.3.0",
-    "eslint-plugin-node": "^5.0.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apache/cordova-plugin-file"
   },
-  "engines": {
-    "cordovaDependencies": {
-      "5.0.0": {
-        "cordova-android": ">=6.3.0"
-      },
-      "7.0.0": {
-        "cordova": ">100"
-      }
-    }
+  "bugs": {
+    "url": "https://github.com/apache/cordova-plugin-file/issues"
   },
-  "homepage": "https://github.com/apache/cordova-plugin-file#readme",
   "keywords": [
     "cordova",
     "file",
@@ -72,16 +30,29 @@
     "cordova-osx",
     "cordova-windows"
   ],
-  "license": "Apache-2.0",
-  "name": "cordova-plugin-file",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/apache/cordova-plugin-file.git"
-  },
   "scripts": {
-    "eslint": "node node_modules/eslint/bin/eslint www && node node_modules/eslint/bin/eslint src && node node_modules/eslint/bin/eslint tests",
-    "test": "npm run eslint"
+    "test": "npm run eslint",
+    "eslint": "node node_modules/eslint/bin/eslint www && node node_modules/eslint/bin/eslint src && node node_modules/eslint/bin/eslint tests"
   },
-  "types": "./types/index.d.ts",
-  "version": "6.0.2"
+  "author": "Apache Software Foundation",
+  "license": "Apache-2.0",
+  "engines": {
+    "cordovaDependencies": {
+      "5.0.0": {
+        "cordova-android": ">=6.3.0"
+      },
+      "7.0.0": {
+        "cordova": ">100"
+      }
+    }
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-semistandard": "^11.0.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-node": "^5.0.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
 }

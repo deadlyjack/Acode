@@ -32,13 +32,14 @@ function FileBrowserInclude(type, option, info) {
   if (!type) type = 'file';
   let fileBrowserState = [];
   let fileBrowserOldState = JSON.parse(localStorage.fileBrowserState || "[]");
-  const actionStack = window.actionStack;
   const prompt = dialogs.prompt;
   /**@type {Array<{name: string, uuid: string, uri: string}>} */
-  let customUuid = JSON.parse(localStorage.customUuid || '[]');
+  let allStorages = JSON.parse(localStorage.customUuid || '[]');
   /**@type {Array<FTPAccount>} */
   let ftpaccounts = JSON.parse(localStorage.ftpaccounts || '[]');
   let mapFunction = typeof option === "function" ? option : () => true;
+  const saveStoragList = ()=>{localStorage.customUuid = JSON.stringify(allStorages)};
+
   info = info || (type === "folder" ? strings["open folder"] : strings["open file"]);
 
   if (type === "folder")
@@ -144,8 +145,8 @@ function FileBrowserInclude(type, option, info) {
       } else if (action === "add-path") {
         util.addPath()
           .then(res => {
-            customUuid.push(res);
-            localStorage.customUuid = JSON.stringify(customUuid);
+            allStorages.push(res);
+            localStorage.customUuid = JSON.stringify(allStorages);
             navigate.pop();
             renderStorages();
           })
@@ -192,18 +193,22 @@ function FileBrowserInclude(type, option, info) {
     renderStorages();
 
     function renderStorages() {
-      const storageList = getStorageList();
-      if (fileBrowserOldState.length > 1) loadUrl();
-      else renderList(storageList);
+      const storageList = [];
 
       if (!localStorage.fileBrowserInit) {
         dialogs.loader.destroy();
+
+        allStorages.push({
+          name: 'Internal storage',
+          uuid: helpers.uuid()
+        });
 
         new Promise((resolve, reject) => {
 
             if (IS_ANDROID_VERSION_5)
               resolve([{
-                name: "External storage"
+                name: "External storage",
+                uuid: helpers.uuid()
               }]);
             else
               externalFs.listStorages()
@@ -213,26 +218,31 @@ function FileBrowserInclude(type, option, info) {
           })
           .then(res => {
 
-            dialogs.confirm(strings.info.toUpperCase(), strings[IS_ANDROID_VERSION_5 ? "add external storage?" : "sdcard found"])
-              .then(() => {
-                if (Array.isArray(res) && res.length > 0)
-                  util.addPath(res[0].name)
-                  .then(res => {
-                    customUuid.push(res);
-                    localStorage.customUuid = JSON.stringify(customUuid);
-                    navigate.pop();
-                    renderStorages();
-                  })
-                  .catch(err => {
-                    helpers.error(err);
-                    console.error(err);
-                  });
+            res.forEach(storage=>{
+              if(allStorages.find(s=>s.uuid === storage.uuid)) return;
+              allStorages.push({
+                ...storage,
+                storageType: "SD"
               });
+            });
+            saveStoragList();
+            storageList.push(...getStorageList());
+            renderStorages();
 
           });
 
         localStorage.fileBrowserInit = true;
+
+        return;
       }
+
+      if (fileBrowserOldState.length > 1) {
+        loadUrl();
+        return;
+      }
+
+      storageList.push(...getStorageList());
+      renderList(storageList);
     }
 
     function loadUrl() {
@@ -286,13 +296,11 @@ function FileBrowserInclude(type, option, info) {
      */
     function getStorageList() {
       const list = [];
-
-      const path = cordova.file.externalRootDirectory;
-      util.pushFolder(list, 'Internal storage', path);
-      customUuid.map(storage => {
+      
+      allStorages.map(storage => {
         util.pushFolder(list, storage.name, storage.uri, {
-          uuid: storage.uuid,
-          storageType: "SD"
+          storageType: storage.storageType,
+          uuid: storage.uuid
         });
       });
 
@@ -416,12 +424,25 @@ function FileBrowserInclude(type, option, info) {
       let action = $el.getAttribute('action');
       if (!action) return;
 
-      const url = $el.getAttribute('url');
+      let url = $el.getAttribute('url');
       const name = $el.getAttribute('name');
       const opendoc = $el.hasAttribute('open-doc');
       const uuid = $el.getAttribute('uuid');
       const isFTP = $el.hasAttribute('ftp-account');
       const type = $el.getAttribute('type');
+
+      if(!url && action === 'open' && type === 'dir'){
+        dialogs.loader.hide();
+        util.addPath(name)
+        .then(res=>{
+          const storage = allStorages.find(storage=>storage.uuid === uuid);
+          storage.uri = res.uri;
+          saveStoragList();
+          url = res.uri;
+          folder();
+        });
+        return;
+      }
 
       if (opendoc) action = "open-doc";
       if (contextMenu) action = "contextmenu";
@@ -545,8 +566,8 @@ function FileBrowserInclude(type, option, info) {
           ftpaccounts = ftpaccounts.filter(account => account.id !== uuid);
           localStorage.ftpaccounts = JSON.stringify(ftpaccounts);
         } else {
-          customUuid = customUuid.filter(storage => storage.uuid !== uuid);
-          localStorage.customUuid = JSON.stringify(customUuid);
+          allStorages = allStorages.filter(storage => storage.uuid !== uuid);
+          localStorage.customUuid = JSON.stringify(allStorages);
         }
 
         navigate.pop();
@@ -561,11 +582,11 @@ function FileBrowserInclude(type, option, info) {
           });
           localStorage.ftpaccounts = JSON.stringify(ftpaccounts);
         } else {
-          customUuid = customUuid.map(storage => {
+          allStorages = allStorages.map(storage => {
             if (storage.uuid === uuid) storage.name = newname;
             return storage;
           });
-          localStorage.customUuid = JSON.stringify(customUuid);
+          localStorage.customUuid = JSON.stringify(allStorages);
         }
 
         navigate.pop();
@@ -712,7 +733,11 @@ function FileBrowserInclude(type, option, info) {
               console.error(e);
             });
         });
-      } else if (arg === "project") {
+
+        return;
+      } 
+      
+      if (arg === "project") {
 
         const options = [];
         const alreadyCreated = [];

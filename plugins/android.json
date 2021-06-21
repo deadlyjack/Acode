@@ -10,12 +10,6 @@
     "cordova-clipboard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-custom-config": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
-    "cordova-disable-http-cache": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "cordova-plugin-android-permissions": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
@@ -41,14 +35,12 @@
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-sdcard": {
-      "ANDROID_SUPPORT_VERSION": "28.+",
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-statusbar": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-system": {
-      "ANDROID_SUPPORT_VERSION": "28.+",
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-vibration": {
@@ -57,10 +49,13 @@
     "cordova-plugin-webserver": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
+    "cordova-plugin-x-toast": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
     "cordova-plugin-whitelist": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-x-toast": {
+    "cordova-custom-config": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

@@ -1,20 +1,23 @@
 package com.foxdebug;
 
 import android.app.Activity;
-import android.content.pm.PackageInfo;
+
 import android.content.Intent;
 import android.content.Context;
-import android.content.pm.PackageManager;
+
 import android.os.Build;
 import android.os.PowerManager;
+
 import android.util.Log;
-import android.view.View;
 import android.webkit.WebView;
 import android.net.Uri;
-import android.support.v4.content.FileProvider;
-import android.content.pm.PackageManager;
 
-import org.apache.commons.io.IOUtils;
+import androidx.core.content.FileProvider;
+
+import android.content.pm.PackageManager;
+import android.content.pm.PackageInfo;
+import android.content.pm.ApplicationInfo;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -47,12 +50,6 @@ public class System extends CordovaPlugin {
     } else if (action.equals("clear-cache")) {
       this.clearCache(callbackContext);
       return true;
-    } else if (action.equals("enable-fullscreen")) {
-      this.enableFullScreen(callbackContext);
-      return true;
-    } else if (action.equals("disable-fullscreen")) {
-      this.disableFullScreen(callbackContext);
-      return true;
     } else if (action.equals("share-file")) {
       this.shareFile(args.getString(0), args.getString(1), callbackContext);
       return true;
@@ -65,11 +62,31 @@ public class System extends CordovaPlugin {
     } else if (action.equals("is-powersave-mode")) {
       this.isPowerSaveMode(callbackContext);
       return true;
+    } else if (action.equals("convert-uri-to-content-schema")) {
+      try {
+        Uri uri = this.getContentProviderUri(args.getString(0));
+        callbackContext.success(uri.toString());
+      } catch (Exception e) {
+        callbackContext.error(e.getMessage());
+      }
+      return true;
+    } else if (action.equals("get-app-info")) {
+      this.getAppInfo(callbackContext);
+      return true;
+    } else if (action.equals("close-app")) {
+      int API = Build.VERSION.SDK_INT;
+
+      if (API >= 21) {
+        this.activity.finishAndRemoveTask();
+      } else {
+        this.activity.finish();
+      }
+      return true;
     }
     return false;
   }
 
-  private void getWebkitInfo(CallbackContext callbackContext) throws org.json.JSONException {
+  private void getWebkitInfo(CallbackContext callbackContext) throws JSONException {
     PackageInfo info = null;
     JSONObject res = new JSONObject();
 
@@ -135,46 +152,13 @@ public class System extends CordovaPlugin {
     callbackContext.success(powerSaveMode ? 1 : 0);
   }
 
-  private void enableFullScreen(CallbackContext callbackContext) {
-    final CallbackContext callback = callbackContext;
-    cordova.getActivity().runOnUiThread(new Runnable() {
-      public void run() {
-        try {
-          activity.getWindow().getDecorView()
-              .setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        } catch (Exception e) {
-          callback.error(e.getMessage());
-        }
-      }
-    });
-  }
-
-  private void disableFullScreen(CallbackContext callbackContext) {
-    final CallbackContext callback = callbackContext;
-    cordova.getActivity().runOnUiThread(new Runnable() {
-      public void run() {
-        try {
-          activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        } catch (Exception e) {
-          callback.error(e.getMessage());
-        }
-      }
-    });
-  }
-
   private void shareFile(final String fileURI, final String filename, final CallbackContext callbackContext) {
     final Activity activity = this.activity;
     final Context context = this.context;
+    final Uri uri = this.getContentProviderUri(fileURI);
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
         try {
-          Uri uri = Uri.parse(fileURI);
-          String Id = context.getPackageName();
-          if (fileURI.matches("file:///(.*)")) {
-            File file = new File(uri.getPath());
-            uri = FileProvider.getUriForFile(context, Id + ".provider", file);
-          }
-
           Intent intent = new Intent(Intent.ACTION_SEND);
           intent.putExtra(Intent.EXTRA_STREAM, uri);
           if (!filename.equals(""))
@@ -194,15 +178,10 @@ public class System extends CordovaPlugin {
     final Activity activity = this.activity;
     final Context context = this.context;
     final PackageManager pm = context.getPackageManager();
+    final Uri uri = this.getContentProviderUri(fileURI);
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
         try {
-          Uri uri = Uri.parse(fileURI);
-          String Id = context.getPackageName();
-          if (fileURI.matches("file:///(.*)")) {
-            File file = new File(uri.getPath());
-            uri = FileProvider.getUriForFile(context, Id + ".provider", file);
-          }
 
           String packageName = "com.whatsapp";
 
@@ -228,6 +207,7 @@ public class System extends CordovaPlugin {
 
   private void sendEmail(final String email, final String subject, final String bodyText, final String bodyHTML,
       final CallbackContext callbackContext) {
+
     final Activity activity = this.activity;
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
@@ -245,6 +225,45 @@ public class System extends CordovaPlugin {
         }
       }
     });
+  }
+
+  private void getAppInfo(final CallbackContext callbackContext) {
+
+    final Context context = this.context;
+    cordova.getThreadPool().execute(new Runnable() {
+      public void run() {
+        JSONObject res = new JSONObject();
+        try {
+          PackageManager pm = context.getPackageManager();
+          PackageInfo pInfo = pm.getPackageInfo(context.getPackageName(), 0);
+          ApplicationInfo appInfo = context.getApplicationInfo();
+
+          res.put("firstInstallTime", pInfo.firstInstallTime);
+          res.put("lastUpdateTime", pInfo.lastUpdateTime);
+          res.put("label", appInfo.loadLabel(pm).toString());
+          res.put("packageName", pInfo.packageName);
+          res.put("versionName", pInfo.versionName);
+          res.put("versionCode", pInfo.getLongVersionCode());
+
+          callbackContext.success(res);
+
+        } catch (JSONException e) {
+          callbackContext.error(e.getMessage());
+        } catch (Exception e) {
+          callbackContext.error(e.getMessage());
+        }
+      }
+    });
+  }
+
+  private Uri getContentProviderUri(String fileUri) {
+    Uri uri = Uri.parse(fileUri);
+    String Id = context.getPackageName();
+    if (fileUri.matches("file:///(.*)")) {
+      File file = new File(uri.getPath());
+      uri = FileProvider.getUriForFile(context, Id + ".provider", file);
+    }
+    return uri;
   }
 
   private boolean isPackageInstalled(String packageName, PackageManager packageManager) {

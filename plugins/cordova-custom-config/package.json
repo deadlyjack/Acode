@@ -1,84 +1,48 @@
 {
-  "_from": "cordova-custom-config",
-  "_id": "cordova-custom-config@5.1.0",
-  "_inBundle": false,
-  "_integrity": "sha512-qPk1l1Rayu0PAp5kXqyvzMprc0oCqRa5pcs7iRrb0daq0I/RWIw7BngCyOJuv/wnJrTBbwxVued1+lVLe0/MeA==",
-  "_location": "/cordova-custom-config",
-  "_phantomChildren": {
-    "glob": "7.1.4",
-    "interpret": "1.2.0",
-    "rechoir": "0.6.2"
-  },
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "cordova-custom-config",
+    "version": "5.1.0",
     "name": "cordova-custom-config",
-    "escapedName": "cordova-custom-config",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-custom-config/-/cordova-custom-config-5.1.0.tgz",
-  "_shasum": "bb37c9d4b58eab9d05a6a8dd22ec1bd700b1c1ac",
-  "_spec": "cordova-custom-config",
-  "_where": "/media/dellevenjack/Projects/git/Acode",
-  "author": {
-    "name": "Dave Alden"
-  },
-  "bugs": {
-    "url": "https://github.com/dpa99c/cordova-custom-config/issues"
-  },
-  "bundleDependencies": false,
-  "cordova": {
-    "id": "cordova-custom-config",
-    "platforms": [
-      "android",
-      "ios"
-    ]
-  },
-  "cordova_name": "cordova-custom-config",
-  "dependencies": {
-    "colors": "^1.1.2",
-    "elementtree": "^0.1.6",
-    "lodash": "^4.17.11",
-    "plist": "^3.0.1",
-    "q": "^1.4.1",
-    "shelljs": "^0.7.0",
-    "tostr": "^0.1.0",
-    "xcode": "^1.0.0"
-  },
-  "deprecated": false,
-  "description": "Cordova/Phonegap plugin to update platform configuration files based on preferences and config-file data defined in config.xml.",
-  "devDependencies": {
-    "got": "^6.5.0",
-    "jshint": "^2.6.0"
-  },
-  "homepage": "https://github.com/dpa99c/cordova-custom-config#readme",
-  "issue": "https://github.com/dpa99c/cordova-custom-config/issues",
-  "keywords": [
-    "ecosystem:cordova",
-    "cordova",
-    "cordova-android",
-    "cordova-ios",
-    "phonegap",
-    "config",
-    "configuration",
-    "plist",
-    "manifest"
-  ],
-  "license": "MIT",
-  "name": "cordova-custom-config",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dpa99c/cordova-custom-config.git"
-  },
-  "scripts": {
-    "test": "jshint hooks"
-  },
-  "version": "5.1.0"
+    "cordova_name": "cordova-custom-config",
+    "description": "Cordova/Phonegap plugin to update platform configuration files based on preferences and config-file data defined in config.xml.",
+    "author": "Dave Alden",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dpa99c/cordova-custom-config.git"
+    },
+    "cordova": {
+        "id": "cordova-custom-config",
+        "platforms": [
+            "android",
+            "ios"
+        ]
+    },
+    "issue": "https://github.com/dpa99c/cordova-custom-config/issues",
+    "keywords": [
+        "ecosystem:cordova",
+        "cordova",
+        "cordova-android",
+        "cordova-ios",
+        "phonegap",
+        "config",
+        "configuration",
+        "plist",
+        "manifest"
+    ],
+    "dependencies": {
+        "q": "^1.4.1",
+        "lodash": "^4.17.11",
+        "elementtree": "^0.1.6",
+        "plist": "^3.0.1",
+        "xcode": "^1.0.0",
+        "colors": "^1.1.2",
+        "shelljs": "^0.7.0",
+        "tostr": "^0.1.0"
+    },
+    "devDependencies": {
+        "jshint": "^2.6.0",
+        "got": "^6.5.0"
+    },
+    "scripts": {
+        "test": "jshint hooks"
+    }
 }

@@ -7,7 +7,7 @@
   <keywords>cordova,plugin,system</keywords>
 
   <js-module src="www/plugin.js" name="system">
-    <clobbers target="cordova.plugins.system" />
+    <clobbers target="window.system" />
   </js-module>
   <platform name="android">
     <config-file target="res/xml/config.xml" parent="/*">
@@ -16,7 +16,7 @@
       </feature>
     </config-file>
     <config-file target="AndroidManifest.xml" parent="./application">
-      <provider android:name="android.support.v4.content.FileProvider" android:authorities="com.foxdebug.provider" android:exported="false" android:grantUriPermissions="true">
+      <provider android:name="androidx.core.content.FileProvider" android:authorities="com.foxdebug.provider" android:exported="false" android:grantUriPermissions="true">
         <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_provider"/>
       </provider>
     </config-file>
@@ -24,11 +24,10 @@
     <hook type="before_prepare" src="utils/resetProvider.js" />
     <hook type="after_prepare" src="utils/fixProvider.js" />
 
-    <preference name="ANDROID_SUPPORT_VERSION" default="28.+" />
-    <framework src="com.android.support:support-v4:$ANDROID_SUPPORT_VERSION" />
     <resource-file src="file_provider.xml" target="res/xml/file_provider.xml" />
     <source-file src="src/android/System.java" target-dir="src/com/foxdebug/system"/>
     <config-file target="AndroidManifest.xml" parent="/manifest"></config-file>
     <lib-file src="src/android/commons-io-2.7.jar" />
+    <framework src="androidx.core:core:1.5.0" />
   </platform>
 </plugin>

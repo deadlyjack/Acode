@@ -8,7 +8,7 @@
         Light weight code editor and web IDE for android.
     </description>
     <author email="ajit@foxdebug.com" href="https://foxdebug.com">
-       Ajit Kumar (dellevenjack)
+       Foxdebug
     </author>
     <content src="index.html" />
     <access launch-external="yes" origin="*" />
@@ -25,7 +25,8 @@
 
     <platform name="android">
         <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/colors.xml" />
-        <resource-file src="/res/network_security_config.xml" target="/app/src/main/res/xml/network_security_config.xml" />
+        <resource-file src="res/network_security_config.xml" target="/app/src/main/res/xml/network_security_config.xml" />
+
         <allow-intent href="market:*" />
         <preference name="fullscreen" value="false"/>
         <preference name="SplashScreen" value="none"/>
@@ -37,11 +38,12 @@
         <preference name="android-targetSdkVersion" value="29" />
         <preference name="AndroidLaunchMode" value="singleTask" />
         <preference name="prerendered-icon" value="false" />
+        <preference name="androidxEnabled" value="true" />
 
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
             <application android:networkSecurityConfig="@xml/network_security_config" />
-            <application android:usesCleartextTraffic="true" />
-            <application android:requestLegacyExternalStorage="true" />
+            <application android:hardwareAccelerated="true" />
+            <!-- <application android:requestLegacyExternalStorage="true" /> -->
         </edit-config>
 
         <config-file parent="./application/activity" target="AndroidManifest.xml">
@@ -51,17 +53,16 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/*"/>
                 <data android:mimeType="xml/*" />
+                <data android:mimeType="application/css" />
+                <data android:mimeType="media/ts" />
             </intent-filter>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
-            <uses-permission android:name="android.permission.INTERNET"/>
-            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
             <uses-permission android:name="android.permission.VIBRATE" />
         </config-file>
 
-        <resource-file src="res/logo.png" target="app/src/main/res/drawable/logo.png" />
         <icon background="@color/ic_launcher_background" density="mdpi" foreground="res/icon/android/mipmap-mdpi/ic_launcher_foreground.png" />
         <icon background="@color/ic_launcher_background" density="hdpi" foreground="res/icon/android/mipmap-hdpi/ic_launcher_foreground.png" />
         <icon background="@color/ic_launcher_background" density="xhdpi" foreground="res/icon/android/mipmap-xhdpi/ic_launcher_foreground.png" />

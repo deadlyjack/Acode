@@ -92,7 +92,8 @@ function multiPrompt(message, inputs) {
 
     window.restoreTheme(true);
     document.body.append($promptDiv, $mask);
-    $body.get('input').focus();
+    const $focusEl = [...$body.getAll('input[autofocus]')].pop();
+    if($focusEl) $focusEl.focus();
 
     function hidePrompt() {
       $promptDiv.classList.add('hide');
@@ -166,7 +167,9 @@ function multiPrompt(message, inputs) {
         hints,
         name,
         disabled,
-        onclick
+        onclick,
+        readOnly,
+        autofocus,
       } = input;
 
       const inputType = type === 'textarea' ? 'textarea' : 'input';
@@ -185,7 +188,9 @@ function multiPrompt(message, inputs) {
           placeholder,
           value: value,
           className: 'input',
-          isRequired: required
+          isRequired: required,
+          readOnly,
+          autofocus
         });
 
         if (disabled) $input.disabled = true;

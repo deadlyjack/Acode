@@ -7,18 +7,25 @@ import './login.scss';
 import helpers from '../../lib/utils/helpers';
 import gitHub from '../github/gitHub';
 import fs from '../../lib/fileSystem/internalFs';
+import constants from '../../lib/constants';
 
 export default function GithubLoginInclude() {
   const $page = Page('Github Login');
   const $content = tag.parse(mustache.render(_template, strings));
   const $form = $content.get('.form');
+  const $input = $content.get('input');
   const $token = $content.get("#token");
   const $errorMsg = $content.get('#error-msg');
+  const $info = tag('a', {
+    className: 'icon help',
+    href: constants.GITHUB_TOKEN
+  });
   fs.deleteFile(cordova.file.externalDataDirectory + '.github');
 
+  $page.get('header').append($info);
   $page.append($content);
 
-  $content.onclick = handelClick;
+  $input.onclick = ()=>$errorMsg.textContent = '';
   $form.onsubmit = storeCredentials;
 
   actionStack.push({
@@ -35,19 +42,6 @@ export default function GithubLoginInclude() {
   };
 
   document.body.appendChild($page);
-
-  /**
-   * 
-   * @param {MouseEvent} e 
-   */
-  function handelClick(e) {
-    /**
-     * @type {HTMLElement}
-     */
-    const $el = e.target;
-
-    if ($el instanceof HTMLInputElement) $errorMsg.textContent = '';
-  }
 
   function storeCredentials(e) {
     e.preventDefault();
