@@ -15,7 +15,6 @@ import configEditor from './aceConfig';
 import ScrollBar from '../components/scrollbar/scrollbar';
 
 //TODO: Add customizable tools bar
-//TODO: Impelement X3D viewer
 //TODO: Add option to work multiple files at same time in large display.
 
 /**
@@ -151,7 +150,7 @@ function EditorManager($sidebar, $header, $body) {
     moveOpenFileList();
     $body.appendChild($container);
     setupEditor();
-    textControl(editor, controls, $container);
+    textControl(editor, $container);
     controls.menu.ontouchend = function (e) {
         e.preventDefault();
         e.stopPropagation();

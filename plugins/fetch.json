@@ -103,14 +103,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-sdcard": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-sdcard"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-webserver": {
     "source": {
       "type": "local",
@@ -131,6 +123,14 @@
     "source": {
       "type": "registry",
       "id": "cordova-custom-config"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-sdcard": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-sdcard"
     },
     "is_top_level": true,
     "variables": {}

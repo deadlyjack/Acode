@@ -10,6 +10,9 @@
     "cordova-clipboard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
+    "cordova-custom-config": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
     "cordova-plugin-android-permissions": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
@@ -34,9 +37,6 @@
     "cordova-plugin-navigationbar-color": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-sdcard": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "cordova-plugin-statusbar": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
@@ -49,13 +49,13 @@
     "cordova-plugin-webserver": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-x-toast": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "cordova-plugin-whitelist": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-custom-config": {
+    "cordova-plugin-x-toast": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-sdcard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

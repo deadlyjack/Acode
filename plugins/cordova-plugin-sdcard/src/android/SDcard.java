@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.OutputStream;
 import java.io.FileNotFoundException;
 
@@ -30,6 +29,7 @@ import android.os.storage.StorageVolume;
 
 import android.text.TextUtils;
 
+import android.provider.MediaStore;
 import android.provider.DocumentsContract;
 import android.provider.DocumentsContract.Document;
 
@@ -58,6 +58,7 @@ public class SDcard extends CordovaPlugin {
   private final int ACCESS_INTENT = 6000;
   private final int DOCUMENT_TREE = 6001;
   private final int OPEN_DOCUMENT = 6002;
+  private final int PICK_FROM_GALLARY = 6003;
   private final String SAPERATOR = "::";
   private StorageManager storageManager;
   private Context context;
@@ -102,6 +103,10 @@ public class SDcard extends CordovaPlugin {
 
       case "open document file":
         this.openDocumentFile(arg1);
+        break;
+
+      case "get image":
+        this.getImage(arg1);
         break;
 
       case "list volumes":
@@ -198,6 +203,15 @@ public class SDcard extends CordovaPlugin {
     cordova.startActivityForResult(this, intent, this.OPEN_DOCUMENT);
   }
 
+  public void getImage(String mimeType) {
+    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+    if (mimeType == null)
+      mimeType = "image/*";
+
+    intent.setType(mimeType);
+    cordova.startActivityForResult(this, intent, this.PICK_FROM_GALLARY);
+  }
+
   public void getStorageVolumes() {
     try {
       JSONArray result = new JSONArray();
@@ -257,6 +271,14 @@ public class SDcard extends CordovaPlugin {
     if (data == null)
       return;
 
+    if (requestCode == this.PICK_FROM_GALLARY) {
+      if (resultCode == Activity.RESULT_OK) {
+        Uri uri = data.getData();
+        this.callback.success(uri.toString());
+      }
+      return;
+    }
+
     if (requestCode == this.OPEN_DOCUMENT) {
 
       if (resultCode == Activity.RESULT_OK) {
@@ -283,7 +305,10 @@ public class SDcard extends CordovaPlugin {
 
       }
 
-    } else {
+      return;
+    }
+
+    if (requestCode == this.DOCUMENT_TREE) {
 
       if (requestCode == this.ACCESS_INTENT && resultCode == Activity.RESULT_CANCELED) {
         this.error("Canceled");
@@ -311,6 +336,7 @@ public class SDcard extends CordovaPlugin {
 
       }
 
+      return;
     }
 
   }

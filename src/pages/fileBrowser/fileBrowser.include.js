@@ -703,6 +703,14 @@ function FileBrowserInclude(type, option, info) {
         url,
         name
       } = currentDir;
+      const alreadyCreated = [];
+      const options = [];
+      let cturl = '';
+      let newUrl = null;
+      let project = '';
+      let projectName = '';
+      let framework = '';
+
 
 
       if (arg === "file" || arg === "folder") {
@@ -738,24 +746,18 @@ function FileBrowserInclude(type, option, info) {
       } 
       
       if (arg === "project") {
-
-        const options = [];
-        const alreadyCreated = [];
-        let project = '';
-        let cturl = '';
-        let newUrl = null;
-        let projectName = '';
-        let framework = '';
-
+        /**
+         * Initiating project options
+         */
         Object.keys(projects).map(projectname => {
           options.push([projectname, projectname, "icon " + projectname]);
         });
 
-        dialogs.select(strings["new project"], options)
+        dialogs.select(strings["new project"], options) // Selecting project from optioins
           .then(res => {
             framework = res;
             dialogs.loader.create(res, strings.loading + '...');
-            return projects[res]();
+            return projects[res](); //getting selected project
           })
           .then(res => {
             dialogs.loader.destroy();
@@ -763,78 +765,23 @@ function FileBrowserInclude(type, option, info) {
             return dialogs.prompt(strings["project name"], framework, "text", {
               required: true,
               match: constants.FILE_NAME_REGEX
-            });
+            }); // Asking for project name
           })
           .then(name => {
             projectName = name;
-            return fsOperation(url);
+            return fsOperation(url); // Getting file system for given url (Active directory)
           })
           .then(fs => {
             dialogs.loader.create(projectName, strings.loading + '...');
-            return fs.createDirectory(projectName);
+            return fs.createDirectory(projectName); // Creating project root directory
           })
           .then(res => {
-            newUrl = Url.join(url, projectName, "/");
-            const files = Object.keys(project);
+            newUrl = Url.join(url, projectName, "/"); // CD to project directory
+            const files = Object.keys(project); // All project files
 
             return new Promise((resolve, reject) => {
-              createProject(resolve, reject);
+              createProject(resolve, reject, files); // Creating project
             });
-
-            function createProject(resolve, reject) {
-              if (!files.length) {
-                updateAddedFolder(url);
-                window.plugins.toast.showLongBottom(strings.success);
-                loadDir(url, name);
-                resolve();
-              }
-              cturl = '';
-              const file = files.pop();
-              createFile(file)
-                .then(() => {
-                  createProject(resolve, reject);
-                })
-                .catch(reject);
-            }
-
-            function createFile(fileurl) {
-              const paths = fileurl.split("/");
-              const filename = paths.pop();
-
-              return new Promise((resolve, reject) => {
-                createDir();
-
-                function createDir() {
-                  const lclUrl = Url.join(newUrl, cturl);
-
-                  if (paths.length === 0) {
-                    return fsOperation(lclUrl)
-                      .then(fs => {
-                        const data = project[fileurl].replace(/<%name%>/g, projectName);
-                        return fs.createFile(filename, data);
-                      })
-                      .then(resolve)
-                      .catch(reject);
-                  }
-
-                  const name = paths.splice(0, 1)[0];
-                  const toCreate = Url.join(lclUrl, name);
-
-                  fsOperation(lclUrl)
-                    .then(fs => {
-                      if (alreadyCreated.includes(toCreate)) return Promise.resolve();
-                      return fs.createDirectory(name);
-                    })
-                    .then(res => {
-                      if (!alreadyCreated.includes(toCreate))
-                        alreadyCreated.push(toCreate);
-                      cturl += name + '/';
-                      return createDir(paths);
-                    })
-                    .catch(reject);
-                }
-              });
-            }
 
           })
           .catch(err => {
@@ -845,6 +792,61 @@ function FileBrowserInclude(type, option, info) {
             dialogs.loader.destroy();
           });
 
+      }
+
+      function createProject(resolve, reject, files) {
+        if (!files.length) { // checking if it's the last file
+          updateAddedFolder(url);
+          window.plugins.toast.showLongBottom(strings.success); // notifies when project is created
+          loadDir(url, name); // reload the current directory
+          resolve();
+        }
+        cturl = '';
+        const file = files.pop();
+        createFile(file)
+          .then(() => {
+            createProject(resolve, reject, files);
+          })
+          .catch(reject);
+      }
+
+      function createFile(fileurl) {
+        const paths = fileurl.split("/");
+        const filename = paths.pop();
+
+        return new Promise((resolve, reject) => {
+          createDir(resolve, reject, project, fileurl, filename, paths);
+        });
+      }
+
+      function createDir(resolve, reject, project, fileurl, filename, paths) {
+        const lclUrl = Url.join(newUrl, cturl);
+
+        if (paths.length === 0) {
+          return fsOperation(lclUrl)
+            .then(fs => {
+              const data = project[fileurl].replace(/<%name%>/g, projectName);
+              return fs.createFile(filename, data);
+            })
+            .then(resolve)
+            .catch(reject);
+        }
+
+        const name = paths.splice(0, 1)[0];
+        const toCreate = Url.join(lclUrl, name);
+
+        fsOperation(lclUrl)
+          .then(fs => {
+            if (alreadyCreated.includes(toCreate)) return Promise.resolve();
+            return fs.createDirectory(name);
+          })
+          .then(res => {
+            if (!alreadyCreated.includes(toCreate))
+              alreadyCreated.push(toCreate);
+            cturl += name + '/';
+            return createDir(resolve, reject, project, fileurl, filename, paths);
+          })
+          .catch(reject);
       }
 
     }

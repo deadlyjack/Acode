@@ -1,6 +1,8 @@
 import textControl from "./selection";
 import constants from "../constants";
 
+//TODO: Text control start has bug.
+
 /**
  * 
  * @param {"word"} type 
@@ -15,6 +17,7 @@ function select(type) {
     container
   } = editorManager;
   let marginLeft;
+  let disabled = false;
 
   if (controls.size === "large") marginLeft = '-30.5px';
   else if (controls.size === 'small') marginLeft = '-21.5px';
@@ -83,9 +86,17 @@ function select(type) {
     container.append($start, $end, $cm);
     if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
     updateControls();
+
+    const offset = $end.getBoundingClientRect().bottom - container.getBoundingClientRect().bottom;
+    if(offset > 0){
+      editor.renderer.scrollBy(0, offset);
+    }
   }, 100);
 
   function touchStart(e, action) {
+    
+    if(disabled) return;
+
     $cm.remove();
     const el = this;
 
@@ -122,6 +133,9 @@ function select(type) {
   }
 
   function updatePosition() {
+
+    if(disabled) return;
+
     const scrollTop = editor.renderer.getScrollTop() - initialScroll.top;
     const scrollLeft = editor.renderer.getScrollLeft() - initialScroll.left;
 
@@ -130,14 +144,20 @@ function select(type) {
   }
 
   function onchange() {
+
+    if(disabled) return;
+
     setTimeout(() => {
-      updateControls('start');
       updateControls('end');
+      updateControls('start');
     }, 0);
 
   }
 
   function updateControls(mode) {
+
+    if(disabled) return;
+
     const selected = editor.getCopyText();
     if (!selected) {
       return disable();
@@ -166,7 +186,8 @@ function select(type) {
       } else {
         cpos.start.x = singleMode.left;
         cpos.end.x = singleMode.right;
-        cpos.end.y = cpos.start.y = singleMode.bottom;
+        cpos.end.y = singleMode.bottom;
+        cpos.start.y = singleMode.bottom;
       }
     } else {
       const $clientStart = editor.container.querySelector('.ace_marker-layer>.ace_selection.ace_br1.ace_start');
@@ -198,7 +219,8 @@ function select(type) {
       } else {
         cpos.start.x = cursor.left;
         cpos.end.x = cursor.right;
-        cpos.start.y = cpos.end.y = cursor.bottom;
+        cpos.start.y = cursor.bottom;
+        cpos.end.y = cursor.bottom;
       }
     }
 
@@ -240,13 +262,17 @@ function select(type) {
     }
 
     if (cmClient.top < 0) {
-      cm.top = 50;
+      cm.top += 100;
     }
 
     $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0) scale(${scale})`;
   }
 
   function disable() {
+
+    if(disabled) return;
+    disabled = true;
+
     $start.remove();
     $end.remove();
     $cm.remove();
@@ -262,6 +288,7 @@ function select(type) {
     editor.selection.off('changeCursor', onchange);
     $start.ontouchstart = null;
     $end.ontouchstart = null;
+    controls.update = null;
     editor.textInput.getElement().oninput = null;
   }
 }

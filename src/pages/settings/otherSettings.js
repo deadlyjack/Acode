@@ -89,7 +89,8 @@ export default function otherSettings() {
           ])
           .then(res => {
             if (res === 'edit') {
-              $page.hide();
+              actionStack.pop();
+              actionStack.pop();
               openFile(KEYBINDING_FILE);
             } else {
               helpers.resetKeyBindings();

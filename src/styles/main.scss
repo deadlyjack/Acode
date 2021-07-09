@@ -56,6 +56,7 @@ a {
   flex-direction: row !important;
   color: white;
   color: var(--text-main-color);
+  z-index: 1;
 
   li.tile {
     height: 30px;
@@ -500,7 +501,6 @@ textarea {
   border-radius: 50%;
   background-color: white;
   background-color: var(--text-main-color);
-  z-index: 9;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 2px var(--box-shadow-color);
 
@@ -532,7 +532,6 @@ textarea {
   border-radius: 4px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 8px var(--box-shadow-color);
-  z-index: 99;
   color: #252525;
   color: var(--text-color);
 

@@ -5,7 +5,7 @@ import tag from 'html-tag-js';
  * @param {Object} controls 
  * @param {HTMLElement} container 
  */
-function textControl(editor, controls, container) {
+function textControl(editor, container) {
     const $content = container.querySelector('.ace_scroller'),
         threshold = 200;
 
@@ -164,11 +164,6 @@ function enableSingleMode() {
 
     const mObserver = new MutationObserver(oberser);
 
-    function oberser(list) {
-        if (updateTimeout) clearTimeout(updateTimeout);
-        updateEnd();
-    }
-
     mObserver.observe($cursor, {
         attributeFilter: ['style'],
         attributes: true
@@ -290,6 +285,11 @@ function enableSingleMode() {
     function hide() {
         if ($end.isConnected) $end.remove();
         if ($cm.isConnected) $cm.remove();
+    }
+
+    function oberser() {
+        if (updateTimeout) clearTimeout(updateTimeout);
+        updateEnd();
     }
 
     return {

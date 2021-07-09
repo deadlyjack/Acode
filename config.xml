@@ -21,8 +21,6 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
 
-    <preference name="cordova.plugins.diagnostic.modules" value="EXTERNAL_STORAGE " />
-
     <platform name="android">
         <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/colors.xml" />
         <resource-file src="res/network_security_config.xml" target="/app/src/main/res/xml/network_security_config.xml" />

@@ -131,6 +131,13 @@ interface SDcard {
    */
   openDocumentFile(onSuccess: (url: DocumentFile) => void, onFail: (err: any) => void, mimeType: String): void;
   /**
+   * Opens gallary to select image
+   * @param onSuccess Callback function on success returns url of selected file
+   * @param onFail Callback function on error returns error object
+   * @param mimeType MimeType of file to be selected
+   */
+  getImage(onSuccess: (url: DocumentFile) => void, onFail: (err: any) => void, mimeType: String): void;
+  /**
    * Renames the given file/directory to given new name
    * @param src Url of file/directory
    * @param newname New name 

@@ -35,6 +35,9 @@ module.exports = {
   openDocumentFile: function (onSuccess, onFail, mimeType) {
     cordova.exec(onSuccess, onFail, "SDcard", "open document file", mimeType ? [mimeType] : []);
   },
+  getImage: function (onSuccess, onFail, mimeType) {
+    cordova.exec(onSuccess, onFail, "SDcard", "get image", mimeType ? [mimeType] : []);
+  },
   rename: function (pathname, newFilename, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, "SDcard", "rename", [pathname, newFilename]);
   },
