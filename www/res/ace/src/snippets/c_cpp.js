@@ -74,6 +74,9 @@ snippet bits/stdc++.h\n\
 # conio.h\n\
 snippet conio.h\n\
 	conio.h\n\
+# greater<T>\n\
+snippet gre\n\
+	greater<${1:T}>${2}\n\
 # if\n\
 snippet if\n\
 	if(${1:/*condition*/})\n\
@@ -96,6 +99,18 @@ snippet elseif\n\
 	{\n\
 	  ${2:/*your code*/}\n\
 	}${3}\n\
+# while\n\
+snippet while\n\
+	while(${1:/*condition*/})\n\
+	{\n\
+	  ${2:/*your code*/}\n\
+	}${3}\n\
+snippet do while\n\
+  do\n\
+	{\n\
+	  ${2:/*your code*/}\n\
+	}${3}\n\
+	while(${1:/*condition*/});\n\
 # std::array\n\
 snippet array\n\
 	std::array<${1:T}, ${2:N}> ${3};${4}\n\
