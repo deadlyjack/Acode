@@ -2,6 +2,115 @@ define("ace/snippets/c_cpp",["require","exports","module"], function(require, ex
 "use strict";
 
 exports.snippetText = "## STL Collections\n\
+# boilerplate\n\
+snippet cpp\n\
+	#include <iostream> \n\
+  using namespace std;\n\
+  int main()\n\
+  { \n\
+    ${1:/*Write your code*/}\n\
+    return 0; \n\
+  }\n\
+# #include\n\
+snippet #include\n\
+	#include\n\
+# #define\n\
+snippet #define\n\
+	#define\n\
+# using\n\
+snippet using\n\
+	using\n\
+# namespace\n\
+snippet namespace\n\
+	namespace\n\
+# iostream\n\
+snippet iostream\n\
+	iostream\n\
+# string\n\
+snippet string\n\
+	string\n\
+# vector\n\
+snippet vector\n\
+	vector\n\
+# cmath\n\
+snippet cmath\n\
+	cmath\n\
+# memory\n\
+snippet memory\n\
+	memory\n\
+# algorithm\n\
+snippet algorithm\n\
+	algorithm\n\
+# queue\n\
+snippet queue\n\
+	queue\n\
+# deque\n\
+snippet deque\n\
+	deque\n\
+# set\n\
+snippet set\n\
+	set\n\
+# stack\n\
+snippet stack\n\
+	stack\n\
+# map\n\
+snippet map\n\
+	map\n\
+# unordered_map\n\
+snippet unordered_map\n\
+	unordered_map\n\
+# climits\n\
+snippet climits\n\
+	climits\n\
+# time.h\n\
+snippet time.h\n\
+	time.h\n\
+# stdlib.h\n\
+snippet stdlib.h\n\
+	stdlib.h\n\
+# bits/stdc++.h\n\
+snippet bits/stdc++.h\n\
+	bits/stdc++.h\n\
+# conio.h\n\
+snippet conio.h\n\
+	conio.h\n\
+# greater<T>\n\
+snippet gre\n\
+	greater<${1:T}>${2}\n\
+# if\n\
+snippet if\n\
+	if(${1:/*condition*/})\n\
+	{\n\
+	  ${2:/*your code*/}\n\
+	}${3}\n\
+# if else\n\
+snippet ifelse\n\
+	if(${1:/*condition*/})\n\
+	{\n\
+	  ${2:/*your code*/}\n\
+	}\n\
+	else\n\
+	{\n\
+	  ${3:/*your code*/}\n\
+	}${4}\n\
+# elseif\n\
+snippet elseif\n\
+	else if(${1:/*condition*/})\n\
+	{\n\
+	  ${2:/*your code*/}\n\
+	}${3}\n\
+# while\n\
+snippet while\n\
+	while(${1:/*condition*/})\n\
+	{\n\
+	  ${2:/*your code*/}\n\
+	}${3}\n\
+snippet do while\n\
+  do\n\
+	{\n\
+	  ${2:/*your code*/}\n\
+	}${3}\n\
+	while(${1:/*condition*/});\n\
 # std::array\n\
 snippet array\n\
 	std::array<${1:T}, ${2:N}> ${3};${4}\n\
