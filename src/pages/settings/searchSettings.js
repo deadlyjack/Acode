@@ -4,7 +4,7 @@ import tag from 'html-tag-js';
 import gen from "../../components/gen";
 
 export default function searchSettings() {
-    const page = Page(strings.search);
+    const page = Page(strings.search.capitalize());
     const settingsList = tag('div', {
         className: 'main list'
     });

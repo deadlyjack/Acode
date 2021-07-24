@@ -74,7 +74,34 @@ class Settings {
             scrollbarSize: 20,
             cursorControllerSize: 'small',
             confirmOnExit: true,
-            showConsole: true
+            showConsole: true,
+            customThemeMode: 'dark',
+            customTheme: {
+                '--primary-color': 'rgb(153,153,255)',
+                '--secondary-color': 'rgb(255,255,255)',
+                '--accent-color': 'rgb(51,153,255)',
+                '--text-color': 'rgb(37,37,37)',
+                '--text-main-color': 'rgb(255,255,255)',
+                '--a-color': 'rgb(97,94,253)',
+                '--border-color': 'rgba(122, 122, 122, 0.227)',
+                '--error-text-color': 'rgb(255,185,92)',
+                '--active-icon-color': 'rgba(0, 0, 0, 0.2)',
+                '--popup-border-color': 'rgba(0, 0, 0, 0)',
+                '--box-shadow-color': 'rgba(0, 0, 0, 0.2)',
+                '--button-background-color': 'rgb(51,153,255)',
+                '--button-active-color': 'rgb(44,142,240)',
+                '--button-text-color': 'rgb(255,255,255)',
+                '--scrollbar-color': 'rgba(0, 0, 0, 0.33)',
+                '--menu-background-color': 'rgb(255,255,255)',
+                '--menu-text-color': 'rgb(37,37,37)',
+                '--menu-icon-color': 'rgb(153,153,255)',
+                '--dialogbox-background-color': 'rgb(255,255,255)',
+                '--dialogbox-text-color': 'rgb(37,37,37)',
+                '--dialogbox-selected-option-color': 'rgb(169,0,0)',
+                '--command-palette-background-color': 'rgb(153,153,255)',
+                '--command-palette-text-color': 'rgb(255,255,255)',
+                '--command-palette-border': 'none',
+            }
         };
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;
@@ -107,8 +134,7 @@ class Settings {
                 if (this.onload) this.onload();
             }).catch(save);
     }
-    update(settings = null, showToast = true) {
-
+    async update(settings = null, showToast = true) {
         if (typeof settings === "boolean") {
             showToast = settings;
             settings = null;
@@ -124,22 +150,33 @@ class Settings {
                     onupdate.push(cb.bind(this.value, this.value[key]));
         }
 
-        fs.writeFile(this.settingsFile, JSON.stringify(this.value, undefined, 4), true, false)
-            .then(() => {
-                if (this.onsave) this.onsave();
-                if (showToast)
-                    plugins.toast.showShortBottom(strings['settings saved']);
+        await fs.writeFile(
+                this.settingsFile, 
+                JSON.stringify(this.value, undefined, 4), 
+                true, 
+                false
+            );
 
-                for (let callback of onupdate) callback(this.value);
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+        if (this.onsave) this.onsave();
+        if (showToast)
+            plugins.toast.showShortBottom(strings['settings saved']);
+
+        for (let callback of onupdate) callback(this.value);
     }
 
-    reset() {
-        this.value = this.defaultSettings;
-        this.update(false);
+    reset(setting) {
+        if(setting){
+            if(setting in this.defaultSettings) {
+                this.value[setting] = this.defaultSettings[setting];
+                this.update();
+            }else{
+                return false;
+            }
+        }else{
+            this.value = this.defaultSettings;
+            this.update(false);
+        }
+        
         for (let onreset of this.methods.reset) onreset(this.value);
     }
 

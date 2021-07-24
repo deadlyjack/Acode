@@ -4,7 +4,7 @@ import tag from 'html-tag-js';
 import gen from "../../components/gen";
 
 export default function filesSettings(callback) {
-    const page = Page(strings.settings);
+    const page = Page(strings.settings.capitalize());
     const settingsList = tag('div', {
         className: 'main list'
     });

@@ -65,7 +65,7 @@ function FileBrowserInclude(type, option, info) {
         action: 'search'
       }
     });
-    const $page = Page('File Browser');
+    const $page = Page(strings['file browser'].capitalize());
     const $content = tag.parse(mustache.render(_template, {
       type,
       info
@@ -97,7 +97,7 @@ function FileBrowserInclude(type, option, info) {
     let cachedDir = {};
     let currentDir = {
       url: "/",
-      name: 'File browser'
+      name: strings['file browser']
     };
     let folderOption;
     //#endregion
@@ -281,7 +281,7 @@ function FileBrowserInclude(type, option, info) {
       navigate("/", "/");
       currentDir.url = "/";
       currentDir.name = "File Browser";
-      $page.settitle('File Browser');
+      $page.settitle = strings['file browser'];
       render(helpers.sortDir(list,
         appSettings.value.fileBrowser
       ));
@@ -343,7 +343,7 @@ function FileBrowserInclude(type, option, info) {
       return list;
     }
 
-    function loadDir(path = "/", name = 'File Browser') {
+    function loadDir(path = "/", name = strings['file browser']) {
 
       let url = path;
 
@@ -407,7 +407,7 @@ function FileBrowserInclude(type, option, info) {
         const $list = tag.get('#list');
         if ($list) $list.scrollTop = 0;
         navigate(name, url);
-        $page.settitle(name);
+        $page.settitle = name;
       }
     }
 

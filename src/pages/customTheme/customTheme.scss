@@ -1,0 +1,12 @@
+#custom-theme {
+  overflow: auto;
+
+  .icon.color::before {
+    content: '';
+    height: 30px;
+    width: 30px;
+    border: solid 1px white;
+    border-radius: 50%;
+    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
+  }
+}

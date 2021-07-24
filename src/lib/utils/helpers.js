@@ -663,6 +663,16 @@ function decodeText(arrayBuffer) {
     return new TextDecoder("utf-8").decode(uint8Array);
 }
 
+function jsonToCSS(selector, obj){
+    let cssText = `${selector}{\n`;
+
+    for(let key in obj){
+        cssText += `${key}: ${obj[key]};\n`;
+    }
+
+    return cssText + '}';
+}
+
 export default {
     extname,
     getErrorMessage,
@@ -689,5 +699,6 @@ export default {
     showToast,
     loadStyles,
     parseQuery,
-    decodeText
+    decodeText,
+    jsonToCSS,
 };

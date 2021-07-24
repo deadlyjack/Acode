@@ -12,6 +12,7 @@ export default {
   CONSOLE_PORT: 8159,
   PORT: 8158,
   VIBRATION_TIME: 30,
+  CUSTOM_THEME: 'body[theme="custom"]',
   BACKUP_FILE: 'backups/Acode/backup',
   PAYPAL: "https://paypal.me/deadlyjack",
   BUY_ME_A_COFFEE: 'https://buymeacoffee.com/ajitkumar.dev',
@@ -141,6 +142,7 @@ export default {
    * @type {AppThemeList}
    */
   appThemeList: {
+    "custom": scheme("custom", "custom", false),
     "atticus": scheme("atticus", "dark", false, "#201e1e", "#363333"),
     "bump": scheme("bump", "dark", false, "#1c2126", "#303841"),
     "bling": scheme("bling", "dark", false, "#131326", "#202040"),

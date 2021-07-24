@@ -10,9 +10,10 @@ import $_list_item from './list-item.hbs';
 import searchBar from "../../components/searchbar";
 import './themeSetting.scss';
 import dialogs from "../../components/dialogs";
+import CustomTheme from "../customTheme/customTheme";
 
 export default function () {
-  const $page = Page(strings.theme);
+  const $page = Page(strings.theme.capitalize());
   const $container = tag.parse($_template, {});
   const $search = tag('i', {
     className: 'icon search',
@@ -82,19 +83,22 @@ export default function () {
 
       themeList = constants.appThemeList;
       defaultValue = theme => appSettings.value.appTheme === theme;
+
     } else if (mode === "editor") {
       themeList = constants.editorThemeList;
       defaultValue = theme => appSettings.value.editorTheme === `ace/theme/${theme}`;
     } else if (mode === "md") {}
 
-    for (let theme in themeList) {
-      let paid = false,
-        disable = false;
+    const themes = Object.keys(themeList).sort();
+    for (let i = 0; i < themes.length; ++i) {
+      const theme = themes[i];
+      let paid = false;
+      let disable = false;
       const themeData = themeList[theme];
 
       if (mode === "app") {
-        if (IS_FREE_VERSION && !themeData.isFree) paid = true;
-        if (!DOES_SUPPORT_THEME) disable = true;
+        paid = IS_FREE_VERSION && !themeData.isFree;
+        disable = !DOES_SUPPORT_THEME;
       }
 
       html += mustache.render($_list_item, {
@@ -129,10 +133,11 @@ export default function () {
         break;
 
       case "select-theme":
-        const mode = $target.getAttribute("mode");
-        let theme = $target.getAttribute("name");
-        if (mode === "app") onSelectAppTheme(theme);
-        else if (mode === "editor") onSelectEditorTheme(theme);
+        const mode = $target.getAttribute('mode');
+        const theme = $target.getAttribute('name');
+        const type = $target.getAttribute('type');
+        if (mode === "app") onSelectAppTheme(theme, type);
+        else if (mode === "editor") onSelectEditorTheme(theme, type);
         else if (mode === "md") {}
         break;
 
@@ -149,7 +154,14 @@ export default function () {
     updateTheme("editor", res);
   }
 
-  function onSelectAppTheme(res) {
+  /**
+   * Selects app theme
+   * 
+   * @param {String} res 
+   * @param {String} type 
+   * @returns 
+   */
+  function onSelectAppTheme(res, type) {
     const theme = constants.appThemeList[res];
     if (!theme) return;
 
@@ -168,18 +180,22 @@ export default function () {
       return;
     }
 
+    if(type === 'custom'){
+      CustomTheme();
+      return;
+    }
     updateTheme("app", theme.name);
   }
 
-  function updateTheme(type, theme) {
+  function updateTheme(mode, theme) {
     const setting = {};
     let oldTheme;
-    if (type === "app") {
+    if (mode === "app") {
 
       setting.appTheme = theme;
       oldTheme = appSettings.value.appTheme;
 
-    } else if (type === "editor") {
+    } else if (mode === "editor") {
 
       const themeId = "ace/theme/" + theme;
       editorManager.editor.setTheme(themeId);
@@ -193,7 +209,7 @@ export default function () {
     if ($checkIcon) $checkIcon.remove();
 
     appSettings.update(setting);
-    if (type === "app") window.restoreTheme();
+    if (mode === "app") window.restoreTheme();
 
     tag.get(`#theme-list>[name="${theme}"]`).innerHTML += '<span class="icon check"></span>';
   }

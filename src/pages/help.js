@@ -6,7 +6,7 @@ import helpers from '../lib/utils/helpers';
 import constants from '../lib/constants';
 
 export default function help(opts) {
-    const page = Page(strings.help);
+    const page = Page(strings.help.capitalize());
     const options = tag('div', {
         className: 'main list'
     });

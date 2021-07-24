@@ -11,6 +11,7 @@ import '../styles/overrideAceStyle.scss';
 
 import "core-js/stable";
 import "html-tag-js/dist/polyfill";
+import Irid from 'irid';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import tile from "../components/tile";
@@ -199,6 +200,10 @@ function Main() {
       localStorage.setItem('folders', '[]');
     }
 
+    document.head.append(tag('style', {
+      id: 'custom-theme',
+      textContent: helpers.jsonToCSS(constants.CUSTOM_THEME, appSettings.value.customTheme)
+    }));
 
     if (!window.loaded) window.loaded = true;
     else return;
@@ -842,8 +847,9 @@ function restoreTheme(darken) {
   if (darken && document.body.classList.contains('loading')) return;
 
   let theme = DOES_SUPPORT_THEME ? appSettings.value.appTheme : "default";
-  let themeList = constants.appThemeList;
-  let themeData = themeList[theme];
+  const themeList = constants.appThemeList;
+  const themeData = themeList[theme];
+  let type = themeData.type;
 
   if (
     !themeData ||
@@ -855,11 +861,21 @@ function restoreTheme(darken) {
     appSettings.update();
   }
 
+  if(type === 'custom'){
+    const color = appSettings.value.customTheme['--primary-color'];
+    themeData.primary = Irid(color).toHexString();
+    themeData.darken = Irid(themeData.primary)
+      .darken(0.4)
+      .toHexString();
+
+    type = appSettings.value.customThemeMode;
+  }
+
   let hexColor = darken ? themeData.darken : themeData.primary;
 
   app.setAttribute('theme', theme);
 
-  if (themeData.type === "dark") {
+  if (type === "dark") {
     NavigationBar.backgroundColorByHexString(hexColor, false);
     StatusBar.backgroundColorByHexString(hexColor);
     StatusBar.styleLightContent();
@@ -876,6 +892,8 @@ function restoreTheme(darken) {
     }
 
   }
+
+  document.body.setAttribute('theme-type', type);
 }
 
 function askForDonation() {

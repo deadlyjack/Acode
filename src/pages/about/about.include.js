@@ -7,7 +7,7 @@ import rateBox from '../../components/dialogboxes/rateBox';
 import constants from '../../lib/constants';
 
 export default function AboutInclude() {
-    const $page = Page(strings.about);
+    const $page = Page(strings.about.capitalize());
 
     system.getWebviewInfo(res => render(res), err => render());
 

@@ -169,5 +169,11 @@
   "insert file": "Insert file",
   "insert color": "Insert color",
   "powersave mode warning": "Turn off power saving mode to preview in external browser.",
-  "exit": "Exit"
+  "exit": "Exit",
+  "custom": "custom",
+  "reset warning": "Are you sure you want to reset theme?",
+  "theme type": "Theme type",
+  "light": "light",
+  "dark": "dark",
+  "file browser": "File Browser"
 }

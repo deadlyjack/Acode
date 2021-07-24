@@ -663,7 +663,7 @@ function EditorManager($sidebar, $header, $body) {
         } else {
             text = strings['new file'];
         }
-        $header.subText(text);
+        $header.subText = text;
     }
 
     function switchFile(id) {
@@ -678,7 +678,7 @@ function EditorManager($sidebar, $header, $body) {
                 if (manager.state === 'focus') editor.focus();
                 setTimeout(controls.update, 100);
 
-                $header.text(file.filename);
+                $header.text = file.filename;
                 setSubText(file);
                 file.assocTile.classList.add('active');
                 manager.activeFile = file;
@@ -1014,12 +1014,12 @@ function EditorManager($sidebar, $header, $body) {
             return error(err);
         }
 
-        if (editorManager.activeFile.id === this.id) $header.text(name);
+        if (editorManager.activeFile.id === this.id) $header.text = name;
 
         const oldExt = helpers.extname(this.name);
         const newExt = helpers.extname(name);
 
-        this.assocTile.text(name);
+        this.assocTile.text = name;
         this.name = name;
 
         if (oldExt !== newExt)

@@ -5,7 +5,7 @@ import constants from "../../lib/constants";
 import tag from 'html-tag-js';
 
 export default function editorSettings() {
-    const $page = Page(strings['editor settings']);
+    const $page = Page(strings['editor settings'].capitalize());
     const settingsList = tag('div', {
         className: 'main list'
     });

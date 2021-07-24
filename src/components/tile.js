@@ -2,9 +2,8 @@ import tag from 'html-tag-js';
 
 /**
  * @typedef {object} Tile
- * @property {function(string):void} text
- * @property {function(string):void} subText
- * @property {function(string):void} appendText
+ * @property {String} text
+ * @property {String} subText
  * @property {function(HTMLElement):void} lead
  * @property {function(HTMLElement):void} tail
  */
@@ -20,10 +19,10 @@ import tag from 'html-tag-js';
  * @returns {HTMLElement & Tile}
  */
 function tile(options = {}) {
-    const el = tag(options.type || "li", {
+    const $el = tag(options.type || "li", {
         className: 'tile'
     });
-    const titleEl = typeof options.text === 'string' ? tag('span', {
+    const $titleEl = typeof options.text === 'string' ? tag('span', {
         textContent: options.text || '',
         className: 'text'
     }) : options.text;
@@ -35,56 +34,47 @@ function tile(options = {}) {
     });
 
     if (options.subText) {
-        titleEl.setAttribute('data-subtext', options.subText);
-        titleEl.classList.add('sub-text');
+        $titleEl.setAttribute('data-subtext', options.subText);
+        $titleEl.classList.add('sub-text');
     }
 
-    el.append(leadEl, titleEl, tailEl);
+    $el.append(leadEl, $titleEl, tailEl);
 
-    /**
-     * 
-     * @param {string} txt 
-     */
-    function text(txt) {
-        titleEl.textContent = txt;
-    }
-
-    function subText(txt) {
-        if (txt) {
-            titleEl.setAttribute('data-subtext', txt);
-            titleEl.classList.add('sub-text');
-        } else {
-            titleEl.classList.remove('sub-text');
+    Object.defineProperties($el, {
+        text: {
+            get(){
+                return $titleEl.textContent;
+            },
+            set(text){
+                $titleEl.textContent = text;
+            }
+        },
+        subText: {
+            get(){
+                return $titleEl.getAttribute('data-subtext');
+            },
+            set(text){
+                if (text) {
+                    $titleEl.setAttribute('data-subtext', text);
+                    $titleEl.classList.add('sub-text');
+                } else {
+                    $titleEl.classList.remove('sub-text');
+                }
+            }
+        },
+        lead: {
+            value($newLead){
+                $el.replaceChild($newLead, $el.firstChild);
+            }
+        },
+        tail: {
+            value($newTail){
+                $el.replaceChild($newTail, $el.lastChild);
+            }
         }
-    }
+    });
 
-    function appendText(txt) {
-        titleEl.textContent += txt;
-    }
-
-    /**
-     * 
-     * @param {HTMLElement} newLead 
-     */
-    function lead(newLead) {
-        el.replaceChild(newLead, el.firstChild);
-    }
-
-    /**
-     * 
-     * @param {HTMLElement} newLead 
-     */
-    function tail(newTail) {
-        el.replaceChild(newTail, el.lastChild);
-    }
-
-    el.text = text;
-    el.subText = subText;
-    el.lead = lead;
-    el.tail = tail;
-    el.appendText = appendText;
-
-    return el;
+    return $el;
 }
 
 export default tile;

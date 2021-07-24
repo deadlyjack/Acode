@@ -3,6 +3,8 @@ import tile from './tile';
 
 /**
  * @typedef {object} PageObj
+ * @property {String} settitle sets title of the page
+ * @property {import('./tile').Tile} header header of the page
  * @property {function():void} hide hides the page
  * @property {function():void} onhide executes on page hide event
  */
@@ -47,6 +49,7 @@ function Page(title, options = {}) {
     $page.onhide = () => {};
     $page.hide = hide;
     $page.settitle = header.text;
+    $page.header = header;
     return $page;
 
     function hide() {

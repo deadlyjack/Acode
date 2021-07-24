@@ -169,5 +169,11 @@
   "insert file": "Inserir arquivo",
   "insert color": "Inserir cor",
   "powersave mode warning": "Desligue o modo de economia de energia para pré-visualizar no navegador externo.",
-  "exit": "exit"
+  "exit": "exit",
+  "custom": "custom",
+  "reset warning": "Are you sure you want to reset theme?",
+  "theme type": "Theme type",
+  "light": "light",
+  "dark": "dark",
+  "file browser": "File Browser"
 }

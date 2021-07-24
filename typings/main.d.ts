@@ -53,12 +53,14 @@ interface Settings {
     scrollbarSize: number;
     confirmOnExit: boolean;
     showConsole: boolean;
+    customTheme: Map<String, String>;
+    customThemeMode: 'light' | 'dark';
 }
 
 interface AppSettings {
     value: Settings;
-    update(settings?: Settings, showToast?: Boolean): void;
-    update(showToast?: Boolean): void;
+    update(settings?: Settings, showToast?: Boolean): Promise<void>;
+    update(showToast?: Boolean): Promise<void>;
     defaultSettings: Settings;
     reset(): void;
     onload: () => void;

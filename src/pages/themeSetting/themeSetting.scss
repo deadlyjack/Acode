@@ -10,6 +10,9 @@
     pointer-events: none;
   }
 
+  .icon.color.custom::before {
+    background-color: var(--primary-color);
+  }
 
   #theme-preview-header {
     position: fixed;
@@ -26,7 +29,7 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     box-shadow: 0 1px 4px var(--box-shadow-color);
 
-    [action="select"] {
+    [action='select'] {
       position: relative;
       display: flex;
       flex: 1;

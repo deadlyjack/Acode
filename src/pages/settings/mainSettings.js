@@ -14,7 +14,7 @@ import $_ad from '../../views/ad.hbs';
 import otherSettings from './otherSettings';
 
 export default function settingsMain() {
-    const $page = Page(strings.settings);
+    const $page = Page(strings.settings.capitalize());
     const $settingsList = tag('div', {
         className: 'main list',
         style: {

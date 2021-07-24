@@ -36,7 +36,12 @@ const noModule = {
               publicPath: "../../",
             }
           },
-          "css-loader?url=false",
+          {
+            loader: "css-loader",
+            options: {
+              url: false
+            }
+          },
           "postcss-loader",
           "sass-loader"
         ]
