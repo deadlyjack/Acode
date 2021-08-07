@@ -324,7 +324,7 @@ function GitRecord(obj) {
 
     fs.writeFile(url, text, true, false)
       .then(() => {
-        if (echo) plugins.toast.showShortBottom(echo);
+        if (echo) toast(echo);
       })
       .catch(err => {
         if (err.code) {
@@ -569,7 +569,7 @@ function GistRecord(obj) {
     let url = gistRecordURL;
     fs.writeFile(url, text, true, false)
       .then(() => {
-        if (echo) window.plugins.toast.showShortBottom(echo);
+        if (echo) toast(echo);
       })
       .catch(err => {
         console.error(err);

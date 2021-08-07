@@ -135,7 +135,7 @@ function GistFilesInclude(gist) {
             gist.removeFile(filename)
               .then(() => {
                 $el.parentElement.remove();
-                window.plugins.toast.showShortBottom(strings.success);
+                toast(strings.success);
               })
               .catch(err => {
                 if (err) dialogs.alert(strings.error, err.toString());
@@ -159,7 +159,7 @@ function GistFilesInclude(gist) {
                 for (let file of editorManager.files) {
                   if (file.type === 'gist' && file.record.id === gist.id) editorManager.removeFile(file, true);
                 }
-                window.plugins.toast.showShortBottom(strings.success);
+                toast(strings.success);
                 actionStack.pop();
                 actionStack.pop();
                 Gists(gists => {

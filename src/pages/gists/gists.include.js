@@ -211,7 +211,7 @@ function GistsInclude(callbackGists) {
         const data = credentials.encrypt(JSON.stringify(repos));
         fs.writeFile(gistsFile, data, true, false)
           .catch(err => {
-            plugins.toast.showShortBottom(strings.error);
+            toast(strings.error);
             console.log(err);
           });
 

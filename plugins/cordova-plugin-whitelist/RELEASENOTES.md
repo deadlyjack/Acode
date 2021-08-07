@@ -20,6 +20,20 @@
 -->
 # Release Notes
 
+### 1.3.5 (Jun 26, 2021)
+-   fix: lock next patch release to `cordova-android` <10 (#62)
+-   breaking: deprecate plugin (#59)
+-   ci: add node-14.x to workflow (#58)
+-   chore: clean up `package.json` (#56)
+-   ci(travis): update osx xcode image (#55)
+-   ci(travis): updates **Android*- API level (#54)
+-   chore(asf): update git notification settings
+-   Update CONTRIBUTING.md
+-   ci: updates Node.js version (#52)
+-   chore(npm): improve ignore list (#51)
+-   docs: apply syntax highlighting to code samples (#48)
+-   ci: upgrade to node 8
+
 ### 1.3.4 (Jun 19, 2019)
 
 -   chore: manually fix lines breaks to LF ([`d804ef2`](https://github.com/apache/cordova-plugin-whitelist/commit/d804ef2))

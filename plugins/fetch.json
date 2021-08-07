@@ -1,12 +1,4 @@
 {
-  "cordova-plugin-system": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-system"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-clipboard": {
     "source": {
       "type": "registry",
@@ -51,14 +43,6 @@
     "source": {
       "type": "registry",
       "id": "cordova-plugin-vibration"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-x-toast": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-x-toast"
     },
     "is_top_level": true,
     "variables": {}
@@ -111,26 +95,26 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-whitelist": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-whitelist@^1.3.4"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-custom-config": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-custom-config"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-sdcard": {
     "source": {
       "type": "registry",
       "id": "cordova-plugin-sdcard"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-system": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-system"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-whitelist": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-whitelist@1.3.5"
     },
     "is_top_level": true,
     "variables": {}

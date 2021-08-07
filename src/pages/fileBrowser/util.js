@@ -32,7 +32,6 @@ export default {
           type: "text",
           required: true,
           value: name,
-          readOnly: !!name,
           autofocus: !name
         }, {
           id: "uri",

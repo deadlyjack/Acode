@@ -134,7 +134,7 @@ function ReposInclude() {
         const data = credentials.encrypt(JSON.stringify(repos));
         fs.writeFile(githubFile, data, true, false)
           .catch(err => {
-            plugins.toast.showShortBottom(strings.error);
+            toast(strings.error);
             console.log(err);
           });
 

@@ -83,7 +83,7 @@ export default function CustomThemeInclude(){
           const scrolltop = $page.get('#custom-theme').scrollTop;
           render();
           $page.get('#custom-theme').scrollTop = scrolltop;
-          $page.header.text += ' *';
+          if($page.header.text.slice(-1) !== '*') $page.header.text += ' *';
         });
 
         return;

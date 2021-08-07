@@ -20,14 +20,14 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="cordova-plugin-whitelist"
-      version="1.3.4">
+      version="1.3.5">
     <name>Whitelist</name>
     <description>Cordova Network Whitelist Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,whitelist,policy</keywords>
 
     <engines>
-      <engine name="cordova-android" version=">=4.0.0" />
+      <engine name="cordova-android" version=">=4.0.0 <10.0.0" />
     </engines>
 
     <platform name="android">

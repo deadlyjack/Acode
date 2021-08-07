@@ -437,7 +437,7 @@ function error(e, ...args) {
             hide();
         });
         else {
-            window.plugins.toast.showShortBottom(strings.error);
+            toast(strings.error);
             hide();
         }
     }
@@ -636,7 +636,7 @@ function getCombination(e) {
  * @param {"showLongTop"|"showLongBottom"|"showShortBottom"|"showShortCenter"|"showShortTop"} [type] 
  */
 function showToast(message, type = "showShortBottom") {
-    window.plugins.toast[type](message);
+    // window.plugins.toast[type](message);
 }
 
 /**

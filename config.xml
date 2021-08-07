@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<widget id="com.foxdebug.acode" android-versionCode="144" version="1.2.144"
+<widget id="com.foxdebug.acodefree" android-versionCode="148" version="1.2.148"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -33,7 +33,7 @@
         <preference name="BackgroundColor" value="0xFF313131" />
         <preference name="AndroidPersistentFileLocation" value="Compatibility" />
         <preference name="android-minSdkVersion" value="22" />
-        <preference name="android-targetSdkVersion" value="29" />
+        <preference name="android-targetSdkVersion" value="30" />
         <preference name="AndroidLaunchMode" value="singleTask" />
         <preference name="prerendered-icon" value="false" />
         <preference name="androidxEnabled" value="true" />
@@ -41,7 +41,7 @@
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
             <application android:networkSecurityConfig="@xml/network_security_config" />
             <application android:hardwareAccelerated="true" />
-            <!-- <application android:requestLegacyExternalStorage="true" /> -->
+            <application android:requestLegacyExternalStorage="true" />
         </edit-config>
 
         <config-file parent="./application/activity" target="AndroidManifest.xml">
@@ -53,6 +53,7 @@
                 <data android:mimeType="xml/*" />
                 <data android:mimeType="application/css" />
                 <data android:mimeType="media/ts" />
+                <data android:mimeType="application/js" />
             </intent-filter>
         </config-file>
 
@@ -68,9 +69,5 @@
         <icon background="@color/ic_launcher_background" density="xxxhdpi" foreground="res/icon/android/mipmap-xxxhdpi/ic_launcher_foreground.png" />
 
         <hook type="after_prepare" src="hooks/post-process.js" />
-    </platform>
-    <platform name="ios">
-        <allow-intent href="itms:*" />
-        <allow-intent href="itms-apps:*" />
     </platform>
 </widget>

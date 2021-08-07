@@ -60,7 +60,7 @@ interface SDcard {
   /**
    * Creates new file at given source url.
    * @param src Source url
-   * @param dirName New file name
+   * @param fileName New file name
    * @param onSuccess Callback function on success returns url of new directory
    * @param onFail Callback function on error returns error object
    */

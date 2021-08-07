@@ -73,7 +73,7 @@ function gitHubInclude(options = {}) {
     switch (action) {
       case 'logout':
         logout(() => {
-          plugins.toast.showShortBottom(strings.success);
+          toast(strings.success);
           $page.hide();
         });
         break;
@@ -128,7 +128,7 @@ function gitHubInclude(options = {}) {
         const data = credentials.encrypt(JSON.stringify(profile));
         fs.writeFile(gitProfile, data, true, false)
           .catch(err => {
-            plugins.toast.showShortBottom(strings.error);
+            toast(strings.error);
             console.log(err);
           });
         if (onload) onload(profile);

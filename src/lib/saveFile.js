@@ -54,19 +54,19 @@ function saveFile(file, as = false, showToast = true) {
                         })
                         .catch((err) => {
                             if (err) dialogs.alert(strings.error, err.toString());
-                            else window.plugins.toast.showShortBottom(strings.error);
+                            // else toast(strings.error);
                         });
                 });
         } else if (file.type === 'gist') {
             file.record.setData(file.name, file.session.getValue())
                 .then(() => {
-                    window.plugins.toast.showLongBottom(strings['file saved']);
+                    // window.plugins.toast.showLongBottom(strings['file saved']);
                     file.isUnsaved = false;
                     editorManager.onupdate();
                 })
                 .catch(err => {
                     if (err) dialogs.alert(strings.error, err.toString());
-                    else window.plugins.toast.showShortBottom(strings.error);
+                    // else toast(strings.error);
                 });
         } else if (file.uri) {
             save();
@@ -226,7 +226,7 @@ function saveFile(file, as = false, showToast = true) {
                 file.isSaving = false;
                 file.isUnsaved = false;
                 file.onsave();
-                if (showToast) window.plugins.toast.showShortBottom(strings['file saved']);
+                // if (showToast) toast(strings['file saved']);
                 if (url) recents.addFile(file.uri);
                 editorManager.onFileSave(file);
                 editorManager.onupdate();

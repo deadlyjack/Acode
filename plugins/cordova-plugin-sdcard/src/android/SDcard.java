@@ -1,5 +1,29 @@
 package com.foxdebug;
 
+import android.app.Activity;
+
+import android.content.Intent;
+import android.content.Context;
+import android.content.ContentResolver;
+
+import android.database.Cursor;
+
+import android.net.Uri;
+
+import android.os.Build;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
+
+import android.provider.MediaStore;
+import android.provider.DocumentsContract;
+import android.provider.DocumentsContract.Document;
+
+import android.text.TextUtils;
+
+import android.util.Log;
+
+import androidx.documentfile.provider.DocumentFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,31 +35,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 
-import android.util.Log;
-
 import java.net.URLConnection;
-
-import android.net.Uri;
-
-import android.app.Activity;
-
-import android.content.Intent;
-import android.content.Context;
-import android.content.ContentResolver;
-
-import android.os.Build;
-import android.os.storage.StorageManager;
-import android.os.storage.StorageVolume;
-
-import android.text.TextUtils;
-
-import android.provider.MediaStore;
-import android.provider.DocumentsContract;
-import android.provider.DocumentsContract.Document;
-
-import android.database.Cursor;
-
-import androidx.documentfile.provider.DocumentFile;
 
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CallbackContext;
@@ -355,7 +355,7 @@ public class SDcard extends CordovaPlugin {
           if (file.canWrite()) {
             OutputStream op = context.getContentResolver().openOutputStream(file.getUri(), "rwt");
 
-            if (Base64.isBase64(content)) {
+            if (Base64.isArrayByteBase64(content.getBytes())) {
 
               byte[] contentAsByte = Base64.decodeBase64(content);
               op.write(contentAsByte);
@@ -388,10 +388,15 @@ public class SDcard extends CordovaPlugin {
   private void createFile(String parent, String name) {
     String mimeType = URLConnection.guessContentTypeFromName(name);
     String ext = FilenameUtils.getExtension(name);
+
+    Log.d("ACODE", "filename: " + name + "\next: " + ext);
+
     if (mimeType == null && ext != null)
       mimeType = "text/" + ext;
     else
       mimeType = "text/plain";
+
+    Log.d("ACODE", "mimeType: " + mimeType);
 
     create(parent, name, mimeType);
   }
@@ -415,52 +420,61 @@ public class SDcard extends CordovaPlugin {
         parentUri = DocumentsContract.buildDocumentUriUsingTree(parentUri, docId);
       }
 
-      ContentResolver contentResolver = this.context.getContentResolver();
+      ContentResolver contentResolver = context.getContentResolver();
       Uri newDocumentUri = DocumentsContract.createDocument(contentResolver, parentUri, mimeType, name);
-      DocumentFile file = getFile(newDocumentUri);
-      if (!name.equals(file.getName()))
-        newDocumentUri = DocumentsContract.renameDocument(contentResolver, newDocumentUri, name);
+      DocumentFile file = DocumentFile.fromTreeUri(context, newDocumentUri);
+      Log.i("SDcard", "Uri: " + newDocumentUri.toString());
+      if (!name.equals(file.getName()) && file.renameTo(name)) {
+        newDocumentUri = file.getUri();
+      }
 
       docId = DocumentsContract.getDocumentId(newDocumentUri);
       if (newDocumentUri != null)
-        this.callback.success(srcUri + SAPERATOR + docId);
+        callback.success(srcUri + SAPERATOR + docId);
       else
-        this.error("Unable to create " + parent);
+        error("Unable to create " + parent);
 
     } catch (Exception e) {
-      Log.d("SDcard create " + mimeType, "Unable to create", e);
-      this.error(e.toString());
+      Log.e("CREATE_FILE", "Unable to create file", e);
+      error(e.toString());
     }
 
   }
 
   private void rename(String filename, String newFile) {
+
+    String srcUri = null, docId = null;
+    Uri fileUri = null;
+    if (filename.contains(SAPERATOR)) {
+      String splittedStr[] = filename.split(SAPERATOR, 2);
+      srcUri = splittedStr[0];
+      docId = splittedStr[1];
+      fileUri = getUri(srcUri, docId);
+    } else {
+      srcUri = filename;
+      fileUri = Uri.parse(filename);
+    }
+
     try {
 
-      String srcUri = null, docId = null;
-      Uri fileUri = null;
-      if (filename.contains(SAPERATOR)) {
-        String splittedStr[] = filename.split(SAPERATOR, 2);
-        srcUri = splittedStr[0];
-        docId = splittedStr[1];
-        fileUri = getUri(srcUri, docId);
+      DocumentFile file = DocumentFile.fromTreeUri(context, fileUri);
+
+      Log.i("FILE: ", file.getName());
+      Log.i("NEW_NAME: ", newFile);
+
+      Log.i("SDcard", "Uri: " + fileUri.toString());
+      if (file.renameTo(newFile)) {
+        docId = DocumentsContract.getDocumentId(file.getUri());
+        callback.success(srcUri + SAPERATOR + docId);
       } else {
-        srcUri = filename;
-        fileUri = Uri.parse(filename);
+        error("Unable to rename: " + filename);
       }
 
-      ContentResolver contentResolver = this.context.getContentResolver();
-      Uri renamedDocument = DocumentsContract.renameDocument(contentResolver, fileUri, newFile);
-      docId = DocumentsContract.getDocumentId(renamedDocument);
-
-      if (renamedDocument != null)
-        this.callback.success(srcUri + SAPERATOR + docId);
-      else
-        this.error("Unable to rename " + filename);
-
     } catch (Exception e) {
-      Log.d("SDcard rename", "Unable to rename", e);
-      this.error(e.toString());
+
+      Log.e("RENAME_DOCUMENT_FILE", "Unable to rename file", e);
+      error(e.toString());
+
     }
   }
 

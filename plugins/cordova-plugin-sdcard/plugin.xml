@@ -16,12 +16,11 @@
       </feature>
     </config-file>
 
+    <framework src="commons-io:commons-io:2.11.0" />
+    <framework src="commons-codec:commons-codec:1.10" />
     <framework src="androidx.documentfile:documentfile:1.0.1" />
 
     <source-file src="src/android/SDcard.java" target-dir="src/com/foxdebug/sdcard"/>
     <config-file target="AndroidManifest.xml" parent="/manifest"></config-file>
-
-    <lib-file src="src/android/commons-io-2.7.jar" />
-    <lib-file src="src/android/commons-codec-1.15.jar" />
   </platform>
 </plugin>

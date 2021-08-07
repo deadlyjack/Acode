@@ -25,7 +25,7 @@ function clipboardAction(action) {
             if (selectedText) {
                 clipboard.copy(selectedText);
                 update();
-                plugins.toast.showShortBottom('copied to clipboard');
+                toast('copied to clipboard');
             }
             break;
         case 'cut':
@@ -34,7 +34,7 @@ function clipboardAction(action) {
                 const ranges = editor.selection.getAllRanges();
                 ranges.map(range => editor.remove(range));
                 update();
-                plugins.toast.showShortBottom('copied to clipboard');
+                toast('copied to clipboard');
             }
             break;
 

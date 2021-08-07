@@ -192,7 +192,7 @@ const commands = {
 
       })
       .then(() => {
-        window.plugins.toast.showShortBottom(strings['folder added']);
+        toast(strings['folder added']);
         editorManager.onupdate();
       })
       .catch(err => {
@@ -258,7 +258,7 @@ const commands = {
               file.filename = newname;
 
               openFolder.updateItem(uri, newUri, newname);
-              window.plugins.toast.showShortBottom(strings['file renamed']);
+              toast(strings['file renamed']);
             })
             .catch(err => {
               helpers.error(err);
@@ -266,7 +266,7 @@ const commands = {
             });
         } else {
           file.filename = newname;
-          if (file.type === 'regular') window.plugins.toast.showShortBottom(strings['file renamed']);
+          // if (file.type === 'regular') toast(strings['file renamed']);
         }
       });
   },

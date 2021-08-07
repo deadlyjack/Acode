@@ -1,5 +1,5 @@
 import openFile from '../openFile';
-import helpers from "../utils/helpers";
+// import helpers from "../utils/helpers";
 import dialogs from '../../components/dialogs';
 
 export default HandleIntent;
@@ -24,50 +24,56 @@ function HandleIntent(intent = {}) {
         dialogs.loader.create(strings.loading + '...');
     }, 300);
 
-    if (intent.fileUri) intent.fileUri = decodeURL(intent.fileUri);
+    intent.fileUri = null;
+    // if (intent.fileUri) intent.fileUri = decodeURL(intent.fileUri);
 
     if (["SEND", "VIEW", "EDIT"].includes(type)) {
 
-        if (intent.fileUri) {
+        return openFile({
+            name: intent.filename,
+            uri: intent.data || intent.fileUri
+        }).then(stopLoading);
 
-            window.resolveLocalFileSystemURL(intent.fileUri, () => {
+        // if (intent.fileUri) {
 
-                openFile({
-                    uri: intent.fileUri || intent.data,
-                    name: intent.filename
-                }).then(stopLoading);
+        //     window.resolveLocalFileSystemURL(intent.fileUri, () => {
 
-            }, () => {
+        //         openFile({
+        //             uri: intent.fileUri || intent.data,
+        //             name: intent.filename
+        //         }).then(stopLoading);
 
-                checkAndCreate();
+        //     }, () => {
 
-            });
+        //         checkAndCreate();
 
-        } else if (intent.data) {
+        //     });
 
-            checkAndCreate();
+        // } else if (intent.data) {
 
-        }
+        //     checkAndCreate();
+
+        // }
     } else {
         stopLoading();
     }
 
-    function checkAndCreate() {
-        helpers.convertToFile(intent.data)
-            .then(url => {
-                return openFile({
-                    name: intent.filename,
-                    uri: url || intent.data
-                });
-            })
-            .catch(() => {
-                return openFile({
-                    name: intent.filename,
-                    uri: intent.data
-                });
-            })
-            .finally(stopLoading);
-    }
+    // function checkAndCreate() {
+    //     helpers.convertToFile(intent.data)
+    //         .then(url => {
+    //             return openFile({
+    //                 name: intent.filename,
+    //                 uri: url || intent.data
+    //             });
+    //         })
+    //         .catch(() => {
+    //             return openFile({
+    //                 name: intent.filename,
+    //                 uri: intent.data
+    //             });
+    //         })
+    //         .finally(stopLoading);
+    // }
 
     function stopLoading() {
         if (timeout) {

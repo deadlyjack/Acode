@@ -533,6 +533,8 @@ declare var gitRecordURL: string;
 declare var gistRecordURL: string;
 declare var root: HTMLDivElement;
 declare var saveInterval: Number;
+declare var toastQueue: Array<HTMLElement>;
+declare var toast: (string)=>void;
 /**
  * A custom alert box to show alert notification
  * @param title 

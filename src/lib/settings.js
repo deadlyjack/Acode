@@ -41,7 +41,7 @@ class Settings {
                 showHiddenFiles: false,
                 sortByName: true
             },
-            maxFileSize: 10,
+            maxFileSize: 12,
             filesNotAllowed: ['zip', 'apk', 'doc', 'docx', 'mp3', 'mp4', 'avi', 'flac', 'mov', 'rar', 'pdf', 'gif', 'flv'],
             search: {
                 caseSensitive: false,
@@ -159,7 +159,7 @@ class Settings {
 
         if (this.onsave) this.onsave();
         if (showToast)
-            plugins.toast.showShortBottom(strings['settings saved']);
+            toast(strings['settings saved']);
 
         for (let callback of onupdate) callback(this.value);
     }

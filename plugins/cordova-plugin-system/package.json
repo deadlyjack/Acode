@@ -1,11 +1,37 @@
 {
-  "name": "cordova-plugin-system",
-  "version": "1.0.1",
-  "description": "",
+  "_from": "cordova-plugin-system",
+  "_id": "cordova-plugin-system@1.0.3",
+  "_inBundle": false,
+  "_integrity": "sha512-MX/lCfF2uGAeqOleUgPdGFuop+2V5EAPY72KpqMr+okvfI3SQJXxvWvSUBGvFIdf2KBGrIeA7FKgM3cv2a2b7Q==",
+  "_location": "/cordova-plugin-system",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cordova-plugin-system",
+    "name": "cordova-plugin-system",
+    "escapedName": "cordova-plugin-system",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#DEV:/",
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-system/-/cordova-plugin-system-1.0.3.tgz",
+  "_shasum": "e76e20768df61b75c4cb077d110ce1f8f2df4473",
+  "_spec": "cordova-plugin-system",
+  "_where": "/mnt/sdb1/cordova/acode",
+  "author": "",
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "Using this plugin, cordova apps can:",
+  "license": "ISC",
   "main": "index.js",
+  "name": "cordova-plugin-system",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC"
+  "version": "1.0.3"
 }

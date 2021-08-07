@@ -1,4 +1,6 @@
-version 1.2.144
+version 1.2.148
+☞ Fixed unable to open document.
+☞ Fixed app crashing on Android 11.
 ☞ Updated language pack.
 ☞ Custom theme.
 ☞ Bugs fixes.

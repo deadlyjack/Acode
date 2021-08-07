@@ -431,12 +431,13 @@ function FileBrowserInclude(type, option, info) {
       const isFTP = $el.hasAttribute('ftp-account');
       const type = $el.getAttribute('type');
 
-      if(!url && action === 'open' && type === 'dir'){
+      if(!url && action === 'open' && type === 'dir' && !openDoc){
         dialogs.loader.hide();
         util.addPath(name)
         .then(res=>{
           const storage = allStorages.find(storage=>storage.uuid === uuid);
           storage.uri = res.uri;
+          storage.name = res.name;
           saveStoragList();
           url = res.uri;
           folder();
@@ -533,7 +534,7 @@ function FileBrowserInclude(type, option, info) {
           })
           .then(newUrl => {
             openFolder.updateItem(url, newUrl, newname);
-            window.plugins.toast.showShortBottom(strings.success);
+            toast(strings.success);
             delete cachedDir[currentDir.url];
             loadDir(currentDir);
           })
@@ -551,7 +552,7 @@ function FileBrowserInclude(type, option, info) {
           })
           .then(() => {
             openFolder.removeItem(url);
-            window.plugins.toast.showShortBottom(strings.success);
+            toast(strings.success);
             delete cachedDir[currentDir.url];
             loadDir(currentDir);
           })
@@ -734,7 +735,7 @@ function FileBrowserInclude(type, option, info) {
             })
             .then((res) => {
               updateAddedFolder(url);
-              window.plugins.toast.showLongBottom(strings.success);
+              toast(strings.success);
               loadDir(url, name);
             }).catch(e => {
               helpers.error(e);
@@ -797,7 +798,7 @@ function FileBrowserInclude(type, option, info) {
       function createProject(resolve, reject, files) {
         if (!files.length) { // checking if it's the last file
           updateAddedFolder(url);
-          window.plugins.toast.showLongBottom(strings.success); // notifies when project is created
+          toast(strings.success); // notifies when project is created
           loadDir(url, name); // reload the current directory
           resolve();
         }

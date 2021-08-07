@@ -534,6 +534,7 @@ textarea {
   box-shadow: 0 0 8px var(--box-shadow-color);
   color: #252525;
   color: var(--text-color);
+  z-index: 4;
 
   > span {
     display: inline-block;
@@ -681,6 +682,36 @@ textarea {
   right: 10px;
 }
 
+#toast {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: rgba(9, 14, 29, 0.9);
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  max-height: 50vh;
+  max-width: 80vw;
+  width: fit-content;
+  overflow: auto;
+  animation: slow-appear 500ms linear 1;
+  z-index: 9999;
+  border-radius: 4px;
+  pointer-events: none;
+
+  &.hide {
+    transition: all 1s linear;
+    opacity: 0;
+  }
+}
+
 @keyframes move-around {
   0% {
     transform: scaleX(1) translate3d(-100px, 0, 0);
@@ -703,5 +734,14 @@ textarea {
   100% {
     transform: scaleX(1) translate3d(-100px, 0, 0);
     background-color: rgb(211, 106, 106);
+  }
+}
+
+@keyframes slow-appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }

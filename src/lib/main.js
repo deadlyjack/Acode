@@ -45,6 +45,7 @@ import applySettings from "./applySettings";
 import fsOperation from "./fileSystem/fsOperation";
 import ajax from "./utils/ajax";
 import runPreview from "./runPreview";
+import toast from "../components/toast";
 
 loadPolyFill.apply(window);
 window.onload = Main;
@@ -110,6 +111,7 @@ function Main() {
   };
 
   document.addEventListener("deviceready", () => {
+
     system.clearCache(res => console.log("clear cache", res), err => console.error(err));
 
     const oldRURL = window.resolveLocalFileSystemURL;
@@ -130,6 +132,8 @@ function Main() {
         document.body.setAttribute('data-small-msg', "This is taking unexpectedly long time!");
     }, 1000 * 10);
 
+    window.toastQueue = [];
+    window.toast = toast;
     window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
     window.DATA_STORAGE = cordova.file.externalDataDirectory || cordova.file.dataDirectory;
     window.TEMP_STORAGE = DATA_STORAGE + "tmp/";
@@ -170,8 +174,7 @@ function Main() {
 
     const permissions = cordova.plugins.permissions;
     const requiredPermissions = [
-      permissions.WRITE_EXTERNAL_STORAGE,
-      permissions.WRITE_MEDIA_STORAGE
+      permissions.WRITE_EXTERNAL_STORAGE
     ];
 
     requiredPermissions.map((permission, i) => permissions.checkPermission(permission, (status) => success(status, i)));
