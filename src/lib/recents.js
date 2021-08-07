@@ -37,6 +37,13 @@ const recents = {
 
     localStorage.recentFolders = JSON.stringify(this.folders);
   },
+
+  clear(){
+    delete localStorage.recentFiles;
+    delete localStorage.recentFolders;
+    this.files = [];
+    this.folders = [];
+  },
   /**
    * 
    * @param {Array<Array<string, any, string>>} [extra]

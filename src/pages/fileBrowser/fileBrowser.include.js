@@ -20,6 +20,7 @@ import decryptAccounts from '../ftp-accounts/decryptAccounts';
 import Url from '../../lib/utils/Url';
 import util from './util';
 import openFolder from '../../lib/openFolder';
+import recents from '../../lib/recents';
 //#endregion
 
 /**
@@ -79,8 +80,9 @@ function FileBrowserInclude(type, option, info) {
       transformOrigin: 'top right'
     };
     const $fbMenu = contextMenu(
-      `<li action="settings">${strings.settings}</li>
-      <li action="reload">${strings.reload}</li>`,
+      `<li action="settings">${strings.settings.capitalize(0)}</li>
+      <li action="reload">${strings.reload.capitalize(0)}</li>
+      <li action="help">${strings.help.capitalize(0)}</li>`,
       menuOption
     );
     const $addMenu = contextMenu({
@@ -124,13 +126,24 @@ function FileBrowserInclude(type, option, info) {
       const action = e.target.getAttribute('action');
       if (action === 'settings') {
         filesSettings(refresh);
-      } else if (action === 'reload') {
+        return;
+      }
+      
+      if (action === 'reload') {
         const {
           url,
           name
         } = currentDir;
         if (url in cachedDir) delete cachedDir[url];
         loadDir(url, name);
+        return;
+      }
+
+      if(action === 'help'){
+        localStorage.__fbHelp = true;
+        $menuToggler.classList.remove('notice');
+        alert(strings.info.toUpperCase(), strings['file browser help']);
+        return;
       }
     };
 
@@ -143,6 +156,8 @@ function FileBrowserInclude(type, option, info) {
         const value = e.target.getAttribute('value');
         create(value);
       } else if (action === "add-path") {
+        localStorage.__fbAddPath = true;
+        $addMenuToggler.classList.remove('notice');
         util.addPath()
           .then(res => {
             allStorages.push(res);
@@ -195,11 +210,13 @@ function FileBrowserInclude(type, option, info) {
     function renderStorages() {
       const storageList = [];
 
-      if (!localStorage.fileBrowserInit) {
+      if (!localStorage.fileBrowserInit || !allStorages.length) {
+        fileBrowserOldState = [];
+        recents.clear();
         dialogs.loader.destroy();
 
         allStorages.push({
-          name: 'Internal storage',
+          name: 'Acode',
           uuid: helpers.uuid()
         });
 
@@ -246,8 +263,8 @@ function FileBrowserInclude(type, option, info) {
     }
 
     function loadUrl() {
-      let state = fileBrowserOldState,
-        currUrl;
+      let state = fileBrowserOldState;
+      let currUrl;
       fileBrowserOldState = [];
 
       for (let i = 0; i < state.length; ++i) {
@@ -347,6 +364,18 @@ function FileBrowserInclude(type, option, info) {
 
       let url = path;
 
+      if(url === '/'){
+        if(!localStorage.__fbHelp){
+          $menuToggler.classList.add('notice');
+        }
+        if(!localStorage.__fbAddPath){
+          $addMenuToggler.classList.add('notice');
+        }
+      }else{
+        $menuToggler.classList.remove('notice');
+        $addMenuToggler.classList.remove('notice');
+      }
+
       if (typeof path === 'object') {
         url = path.url;
         name = path.name;
@@ -425,19 +454,20 @@ function FileBrowserInclude(type, option, info) {
       if (!action) return;
 
       let url = $el.getAttribute('url');
-      const name = $el.getAttribute('name');
+      let name = $el.getAttribute('name');
       const opendoc = $el.hasAttribute('open-doc');
       const uuid = $el.getAttribute('uuid');
       const isFTP = $el.hasAttribute('ftp-account');
       const type = $el.getAttribute('type');
 
-      if(!url && action === 'open' && type === 'dir' && !openDoc){
+      if(!url && action === 'open' && type === 'dir' && !opendoc){
         dialogs.loader.hide();
         util.addPath(name)
         .then(res=>{
           const storage = allStorages.find(storage=>storage.uuid === uuid);
           storage.uri = res.uri;
           storage.name = res.name;
+          name = res.name;
           saveStoragList();
           url = res.uri;
           folder();

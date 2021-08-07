@@ -166,7 +166,6 @@ const commands = {
         } else if (err.code !== 0) {
           alert(strings.error.toUpperCase(), strings['unable to open file']);
         }
-        console.error(err);
       });
 
     // alert(strings.notice.toUpperCase(), `'${ext}' ${strings['file is not supported']}`);
@@ -232,10 +231,7 @@ const commands = {
         } else if (res.type === 'dir') {
           openFolder(res.val.url, res.val.opts);
         } else if (res === 'clear') {
-          delete localStorage.recentFiles;
-          delete localStorage.recentFolders;
-          recents.files = [];
-          recents.folders = [];
+          recents.clear();
         }
       });
   },

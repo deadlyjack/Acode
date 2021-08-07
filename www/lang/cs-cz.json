@@ -171,5 +171,6 @@
   "theme type": "Theme type",
   "light": "light",
   "dark": "dark",
-  "file browser": "File Browser"
+  "file browser": "File Browser",
+  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped."
 }

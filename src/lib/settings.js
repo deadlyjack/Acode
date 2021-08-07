@@ -101,8 +101,9 @@ class Settings {
                 '--command-palette-background-color': 'rgb(153,153,255)',
                 '--command-palette-text-color': 'rgb(255,255,255)',
                 '--command-palette-border': 'none',
-            }
+            },
         };
+
         this.settingsFile = DATA_STORAGE + 'settings.json';
         this.loaded = false;
         this.onload = null;
@@ -198,6 +199,15 @@ class Settings {
     off(event, callback) {
         if (!this.methods[event]) this.methods[event] = [];
         this.methods[event].splice(this.methods[event].indexOf(callback), 1);
+    }
+
+    /**
+     * 
+     * @param {String} key 
+     * @returns 
+     */
+    get(key){
+        return this.value[key];
     }
 }
 
