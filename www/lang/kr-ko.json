@@ -154,7 +154,6 @@
   "permission denied": "외부 저장소 접근이 거부되었습니다.",
   "show print margin": "여백표시",
   "login": "로그인",
-  "add external storage?": "외부 저장소를 추가하시겠습니까?",
   "scrollbar size": "스크롤바 크기",
   "cursor controller size": "커서 컨트로러 크기",
   "none": "없음",
@@ -174,5 +173,6 @@
   "light": "light",
   "dark": "dark",
   "file browser": "File Browser",
-  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped."
+  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped.",
+  "exit": "Exit"
 }

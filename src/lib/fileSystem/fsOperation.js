@@ -2,7 +2,7 @@ import helpers from "../utils/helpers";
 import internalFs from "./internalFs";
 import externalFs from "./externalFs";
 import path from "../utils/Path";
-import remoteFs from "./remoteFs";
+import Ftp from "./ftp";
 import Url from "../utils/Url";
 import dialogs from "../../components/dialogs";
 import constants from "../constants";
@@ -47,7 +47,7 @@ function fsOperation(uri) {
         mode = parsedQuery.mode;
       }
 
-      const fs = remoteFs(decodeURIComponent(username), decodeURIComponent(password), decodeURIComponent(hostname), port, security, mode);
+      const fs = Ftp(decodeURIComponent(username), decodeURIComponent(password), decodeURIComponent(hostname), port, security, mode);
       createRemoteFsOperation(fs, uri, resolve);
 
     }

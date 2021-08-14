@@ -36,13 +36,11 @@
   "file changed": " बदल दी गई है, फ़ाइल पुनः लोड करें?",
   "file deleted": "फ़ाइल डिलीट कर दि गई है",
   "file is not supported": "फ़ाइल समर्थित नहीं है",
-  "file not supported": "यह फ़ाइल प्रकार समर्थित नहीं है।",
   "file too large": "संभाल करने के लिए फ़ाइल बड़ी है। अधिकतम फ़ाइल आकार की अनुमति है {size}",
   "file renamed": "फ़ाइल का नाम बदल दिया गया है",
   "file saved": "फाइल सेव हो गया",
   "folder added": "फ़ोल्डर जोड़ा गया",
   "folder already added": "फ़ोल्डर पहले से ही जोड़ा गया",
-  "font size": "फॉण्ट साइज",
   "goto": "गोटू लाइन",
   "help": "सहायता",
   "icons definition": "आइकन स्पष्टीकरण",
@@ -155,7 +153,6 @@
   "permission denied": "Permission denied to access external storage.",
   "show print margin": "Show print margin",
   "login": "login",
-  "add external storage?": "Add external storage?",
   "scrollbar size": "Scrollbar size",
   "cursor controller size": "Cursor controller size",
   "none": "none",
@@ -176,5 +173,7 @@
   "light": "light",
   "dark": "dark",
   "file browser": "File Browser",
-  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped."
+  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped.",
+  "file not supported": "यह फ़ाइल प्रकार समर्थित नहीं है।",
+  "font size": "फॉण्ट साइज"
 }

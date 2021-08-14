@@ -33,7 +33,6 @@
   "failed": "gagal",
   "file already exists": "Berkas sudah ada",
   "file already exists force": "Berkas sudah ada. Timpa?",
-  "file changed": "telah diubah, muat ulang berkas?",
   "file deleted": "berkas telah dihapus",
   "file is not supported": "Berkas tidak didukung",
   "file not supported": "Jenis berkas ini tidak didukung.",
@@ -156,7 +155,6 @@
   "permission denied": "Izin ditolak untuk mengakses penyimpanan external",
   "show print margin": "tunjukkan batas cetak",
   "login": "masuk",
-  "add external storage?": "Tambahkan penyimpanan eksternal?",
   "scrollbar size": "Ukuran scrollbar",
   "cursor controller size": "Ukuran pengontrol kursor",
   "none": "tidak ada",
@@ -172,10 +170,11 @@
   "powersave mode warning": "Matikan mode hemat daya untuk mempratinjau di browser.",
   "exit": "exit",
   "custom": "custom",
-  "reset warning": "Are you sure you want to reset theme?",
   "theme type": "Theme type",
   "light": "light",
   "dark": "dark",
   "file browser": "File Browser",
-  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped."
+  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped.",
+  "file changed": "telah diubah, muat ulang berkas?",
+  "reset warning": "Are you sure you want to reset theme?"
 }

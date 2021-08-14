@@ -42,7 +42,8 @@
       "cordova-plugin-webserver": {},
       "cordova-plugin-sdcard": {},
       "cordova-plugin-system": {},
-      "cordova-plugin-whitelist": {}
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-sftp": {}
     },
     "platforms": [
       "android"
@@ -76,6 +77,7 @@
     "cordova-plugin-intent": "file:src/plugins/cordova-plugin-intent",
     "cordova-plugin-navigationbar-color": "^0.1.0",
     "cordova-plugin-sdcard": "^1.0.5",
+    "cordova-plugin-sftp": "file:../plugins/cordova-plugin-sftp",
     "cordova-plugin-statusbar": "^2.4.3",
     "cordova-plugin-system": "^1.0.3",
     "cordova-plugin-vibration": "^3.1.1",

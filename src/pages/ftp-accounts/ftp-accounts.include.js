@@ -9,10 +9,11 @@ import './ftp-accounts.scss';
 
 import searchBar from '../../components/searchbar';
 import dialogs from '../../components/dialogs';
-import remoteFs from '../../lib/fileSystem/remoteFs';
+import Ftp from '../../lib/fileSystem/ftp';
 import openFolder from '../../lib/openFolder';
 import _decryptAccounts from './decryptAccounts';
 import Url from '../../lib/utils/Url';
+import FileBrowser from '../fileBrowser/fileBrowser';
 
 function FTPAccountsInclude() {
   let accounts = JSON.parse(localStorage.ftpaccounts || '[]');
@@ -42,11 +43,11 @@ function FTPAccountsInclude() {
   $page.append($content);
   app.appendChild($page);
   actionStack.push({
-    id: 'repos',
+    id: 'remoteStorages',
     action: $page.hide
   });
   $page.onhide = function () {
-    actionStack.remove('repos');
+    actionStack.remove('remoteStorages');
   };
 
   /**
@@ -94,12 +95,14 @@ function FTPAccountsInclude() {
         addAccount(account);
       } else {
 
-        for (let folder of addedFolder)
-          if (folder.id && folder.id === id) return actionStack.pop();
+        // for (let folder of addedFolder)
+        //   if (folder.id && folder.id === id) return actionStack.pop();
 
-        account.username = account.username || null;
-        account.password = account.password || null;
-        addFTPFolder(account);
+        // account.username = account.username || null;
+        // account.password = account.password || null;
+        // addFTPFolder(account);
+
+        FileBrowser("dir", ()=>true, undefined, false);
       }
 
     }
@@ -174,7 +177,7 @@ function FTPAccountsInclude() {
       const mode = active ? "active" : "passive";
 
 
-      const fs = remoteFs(username, password, hostname, port, security, mode);
+      const fs = Ftp(username, password, hostname, port, security, mode);
       dialogs.loader.create('', strings.loading + '...');
       fs.homeDirectory()
         .then(res => {

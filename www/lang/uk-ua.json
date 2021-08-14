@@ -47,7 +47,6 @@
   "help": "Допомога",
   "icons definition": "Визначення значків",
   "info": "Інформація",
-  "Invalid Value": "Недійсне значення",
   "language changed": "Мову успішно змінено",
   "linting": "Перевіряти синтаксичні помилки",
   "logout": "Вийти",
@@ -155,7 +154,6 @@
   "permission denied": "Permission denied to access external storage.",
   "show print margin": "Show print margin",
   "login": "login",
-  "add external storage?": "Add external storage?",
   "scrollbar size": "Scrollbar size",
   "cursor controller size": "Cursor controller size",
   "none": "none",
@@ -176,5 +174,6 @@
   "light": "light",
   "dark": "dark",
   "file browser": "File Browser",
-  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped."
+  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped.",
+  "invalid value": "Недійсне значення"
 }

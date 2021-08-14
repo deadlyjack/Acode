@@ -26,10 +26,11 @@ import recents from '../../lib/recents';
 /**
  * 
  * @param {"file"|"folder"} [type='file']
- * @param {string|function(string):boolean} [option] button text or function to check extension
+ * @param {function(string):boolean} [option] button text or function to check extension
  * @param {string} [info]
+ * @param {boolean} [doesOpenLast]
  */
-function FileBrowserInclude(type, option, info) {
+function FileBrowserInclude(type, option, info, doesOpenLast=true) {
   if (!type) type = 'file';
   let fileBrowserState = [];
   let fileBrowserOldState = JSON.parse(localStorage.fileBrowserState || "[]");
@@ -253,7 +254,7 @@ function FileBrowserInclude(type, option, info) {
         return;
       }
 
-      if (fileBrowserOldState.length > 1) {
+      if (doesOpenLast && fileBrowserOldState.length > 1) {
         loadUrl();
         return;
       }
@@ -660,7 +661,7 @@ function FileBrowserInclude(type, option, info) {
 
     function navigate(name, url) {
 
-      if (name) {
+      if (name && doesOpenLast) {
         fileBrowserState.push({
           name,
           url
@@ -704,7 +705,7 @@ function FileBrowserInclude(type, option, info) {
     }
 
     navigate.pop = function () {
-      localStorage.fileBrowserState = JSON.stringify(fileBrowserState.slice(0, -1));
+      if(doesOpenLast) localStorage.fileBrowserState = JSON.stringify(fileBrowserState.slice(0, -1));
       const $nav = $navigation.lastChild.previousElementSibling;
       if ($nav) {
         const url = $nav.getAttribute('url');

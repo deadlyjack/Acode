@@ -629,16 +629,6 @@ function getCombination(e) {
     return key.toLowerCase();
 }
 
-
-/**
- * Show short toast at bottom
- * @param {string} message 
- * @param {"showLongTop"|"showLongBottom"|"showShortBottom"|"showShortCenter"|"showShortTop"} [type] 
- */
-function showToast(message, type = "showShortBottom") {
-    // window.plugins.toast[type](message);
-}
-
 /**
  * Parse search query
  * @param {string} query 
@@ -696,7 +686,6 @@ export default {
     loadScripts,
     parseJSON,
     getCombination,
-    showToast,
     loadStyles,
     parseQuery,
     decodeText,

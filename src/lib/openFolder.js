@@ -277,7 +277,7 @@ function openFolder(_path, opts = {}) {
           .then(res => {
             if (type === 'file') $target.remove();
             else $target.parentElement.remove();
-            helpers.showToast(strings.success);
+            toast(strings.success);
           });
 
       case "rename":
@@ -307,7 +307,7 @@ function openFolder(_path, opts = {}) {
                 $target.click(); //collaspe
                 $target.click(); //expand
               }
-              helpers.showToast(strings.success);
+              toast(strings.success);
             }
           });
 
@@ -407,7 +407,7 @@ function openFolder(_path, opts = {}) {
 
             }
 
-            helpers.showToast(strings.success);
+            toast(strings.success);
             clipBoard = null;
 
           });
@@ -435,7 +435,7 @@ function openFolder(_path, opts = {}) {
               if (action === "new file") appendTile($target, createFileTile(newName, newUrl));
               else appendList($target, createFolderTile(newName, newUrl));
             }
-            helpers.showToast(strings.success);
+            toast(strings.success);
           });
 
       case "cancel":

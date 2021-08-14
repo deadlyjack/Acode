@@ -12,7 +12,7 @@ import mimeType from 'mime-types';
  * @param {"active"|"passive"} [mode]
  * @returns {RemoteFs}
  */
-function remoteFs(username, password, hostname, port, security, mode) {
+function Ftp(username, password, hostname, port, security, mode) {
 
   port = port || 21;
   const ftp = window.cordova.plugin.ftp;
@@ -61,16 +61,16 @@ function remoteFs(username, password, hostname, port, security, mode) {
   function connect(mode) {
     return new Promise((resolve, reject) => {
 
-      if (remoteFs.busy === "write") {
+      if (Ftp.busy === "write") {
         document.addEventListener('remotewriteend', next);
-      } else if (remoteFs.busy === "read") {
+      } else if (Ftp.busy === "read") {
         document.addEventListener('remotereadend', next);
       } else {
         next();
       }
 
       function next() {
-        if (mode) remoteFs.busy = mode;
+        if (mode) Ftp.busy = mode;
         document.removeEventListener('remotereadend', next);
         document.removeEventListener('remotewriteend', next);
         internalFs.createDir(CACHE_STORAGE, 'ftp-temp')
@@ -186,7 +186,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
     });
 
     function finish() {
-      remoteFs.busy = false;
+      Ftp.busy = false;
       document.dispatchEvent(new CustomEvent("remotewriteend"));
     }
   }
@@ -277,7 +277,7 @@ function remoteFs(username, password, hostname, port, security, mode) {
     });
 
     function finish() {
-      remoteFs.busy = false;
+      Ftp.busy = false;
       document.dispatchEvent(new CustomEvent("remotereadend"));
     }
   }
@@ -433,6 +433,6 @@ function remoteFs(username, password, hostname, port, security, mode) {
   }
 }
 
-remoteFs.busy = false;
+Ftp.busy = false;
 
-export default remoteFs;
+export default Ftp;

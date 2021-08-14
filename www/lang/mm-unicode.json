@@ -153,7 +153,6 @@
   "permission denied": "External Storage ကိုဝင်ဖို့ခွင့်ပြုချက်မရှိပါ။",
   "show print margin": "Show print margin",
   "login": "login",
-  "add external storage?": "external storage ထည့်မှာလား?",
   "scrollbar size": "Scrollbar အရွယ်အစား",
   "cursor controller size": "Cursor အရွယ်အစား",
   "none": "none",
@@ -174,5 +173,6 @@
   "light": "light",
   "dark": "dark",
   "file browser": "File Browser",
-  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped."
+  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped.",
+  "welcome back": "Welcome back"
 }

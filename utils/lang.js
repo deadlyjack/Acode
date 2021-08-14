@@ -9,14 +9,18 @@ const read = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
-
+const enLang = path.join(dir, 'en-us.json');
 const list = fs.readdirSync(dir);
+const len = list.length;
 let command = "";
-if (args._.length > 1) {
+let arg = "";
+
+if (args._.length > 2) {
   console.error("Invalid argments", args._);
   process.exit(0);
 } else {
   command = args._[0];
+  arg = args._[1];
 }
 
 switch (command) {
@@ -24,25 +28,135 @@ switch (command) {
   case 'remove':
   case 'update':
   case 'search':
+  case 'check':
     update();
     break;
   default:
-    console.error(`Missing arguments.
-use 'add' add new string 
-use 'remove' remove string 
-use 'search' remove string 
-use 'update' update string`);
+    console.error(`Missing/Invalid arguments.
+use 'add' to add a new string 
+use 'remove' to remove a string 
+use 'search' to search a string 
+use 'update' to update a string
+use 'check' to check a string`);
     process.exit();
 }
 
 function update() {
-  let key, string;
-  getStr("string: ")
+  let key;
+  
+  if(command === "check"){
+    let total = 0;
+    let done = 0;
+
+    fs.readFile(enLang, 'utf-8', (err, data)=>{
+      if(err){
+        console.error(err);
+        process.exit(0);
+        return;
+      }
+
+      let error = false;
+
+      const fix = arg === 'fix';
+      const enLangData = JSON.parse(data);
+      
+      list.forEach((file, i)=>{
+        if(file === 'en-us.json') return;
+        
+        let flagError = false;
+        let langFile = path.join(dir, file);
+        const exit = (i, len)=>{
+          if(i+1 === len){
+            if(!error){
+              console.log("\nGOOD NEWS! No Error Found\n");
+            }
+            process.exit(0);
+          }
+        };
+
+        fs.readFile(langFile, 'utf-8', (err, data)=>{
+          if(err){
+            console.error(err);
+            process.exit(1);
+            return;
+          }
+          
+          let langError = ()=>{
+            if(!flagError){
+              error = true;
+              flagError = true;
+              console.log(`-------------- ${file}`);
+            }
+          };
+          const langData = JSON.parse(data);
+          flagError = false;
+          
+          for(let enKey in enLangData){
+
+            const key = Object.keys(langData).find((k)=>{
+              if((new RegExp(`^${k}$`, 'i')).test(enKey)){
+                return true;
+              }
+              return false;
+            });
+
+            if(!key){
+              langError();
+              if(fix){
+                langData[enKey] = enLangData[enKey];
+              }
+
+              console.log(`Missing: ${enKey} ${fix ? '✔' : ''}`);
+            }else if(key !== enKey){
+              langError();
+              console.log(`Fix: "${key} --> ${enKey}" ${fix ? '✔' : ''}`);
+              
+              if(fix){
+                const val = langData[key];
+                delete langData[key];
+                langData[enKey] = val;
+              }
+            }
+          }
+
+          if(flagError){
+            if(fix){
+              total += 1;
+              const langJSONData = JSON.stringify(langData, undefined, 2);
+              fs.writeFile(langFile, langJSONData, (err)=>{
+                if(err) {
+                  console.error(err);
+                  process.exit(1);
+                }
+                done +=1;
+                exit(done, total);
+              });
+            }
+            console.log('\n');
+          }
+
+          if(!fix){
+            exit(i, len);
+          }
+        });
+      });
+    });
+    return;
+  }
+
+  if(!arg){
+    getStr("string: ")
     .then(res => {
       key = res.toLowerCase();
-      string = res;
+      arg = res;
       askTranslation();
     });
+    return;
+  }
+
+  key = arg;
+  askTranslation();
+
 
   function askTranslation(i = 0) {
     const lang = list[i];
@@ -51,7 +165,7 @@ function update() {
       getStr(`${langName}: `)
         .then(res => {
 
-          res = res || string;
+          res = res || arg;
           update(strings => {
             if (key in strings) {
               console.error("String already exists");
@@ -67,17 +181,17 @@ function update() {
       update(strings => {
         if (key in strings) {
           delete strings[key];
+          console.log(`Removed: ${key}`);
           return strings;
         } else {
           console.error("String not exists");
-          process.exit(1);
         }
       });
     } else if (command === "update") {
       getStr(`${langName}: `)
         .then(res => {
 
-          res = res || string;
+          res = res || arg;
           update(strings => {
             strings[key] = res;
             return strings;
