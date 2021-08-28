@@ -15,23 +15,21 @@ import Repos from '../repos/repos';
 import Gists from '../gists/gists';
 
 /**
- * 
+ *
  * @param {object} options
  */
 function gitHubInclude(options = {}) {
   const $search = tag('span', {
-    className: 'icon search hidden'
+    className: 'icon search hidden',
   });
   const $menuToggler = tag('span', {
     className: 'icon more_vert',
     attr: {
-      action: 'toggle-menu'
-    }
+      action: 'toggle-menu',
+    },
   });
   const $page = Page('Github');
-  const {
-    credentials
-  } = helpers;
+  const { credentials } = helpers;
 
   const github = git.GitHub();
   const user = github.getUser();
@@ -41,26 +39,25 @@ function gitHubInclude(options = {}) {
     top: '8px',
     right: '8px',
     toggle: $menuToggler,
-    transformOrigin: 'top right'
+    transformOrigin: 'top right',
   });
 
   $cm.addEventListener('click', handleClick);
   $page.querySelector('header').append($search, $menuToggler);
 
   fs.readFile(gitProfile)
-    .then(res => {
+    .then((res) => {
       const text = credentials.decrypt(helpers.decodeText(res.data));
       const profile = JSON.parse(text || '{}');
       render(profile);
     })
-    .catch(err => {
+    .catch((err) => {
       loadProfile();
     });
 
-
   /**
-   * 
-   * @param {MouseEvent} e 
+   *
+   * @param {MouseEvent} e
    */
   function handleClick(e) {
     /**
@@ -99,14 +96,13 @@ function gitHubInclude(options = {}) {
   }
 
   function render(profile) {
-
     const $content = content(profile);
     $page.append($content);
     app.appendChild($page);
 
     actionStack.push({
       id: 'github',
-      action: $page.hide
+      action: $page.hide,
     });
 
     $page.onhide = function () {
@@ -115,28 +111,26 @@ function gitHubInclude(options = {}) {
 
     $content.addEventListener('click', handleClick);
 
-    if (options.$loginPage)
-      options.$loginPage.hide();
+    if (options.$loginPage) options.$loginPage.hide();
   }
 
   function loadProfile(onload) {
     dialogs.loader.create('GitHub', strings.loading + '...');
-    user.getProfile()
-      .then(res => {
-
+    user
+      .getProfile()
+      .then((res) => {
         const profile = res.data;
         const data = credentials.encrypt(JSON.stringify(profile));
-        fs.writeFile(gitProfile, data, true, false)
-          .catch(err => {
-            toast(strings.error);
-            console.log(err);
-          });
+        fs.writeFile(gitProfile, data, true, false).catch((err) => {
+          toast(strings.error);
+          console.error(err);
+        });
         if (onload) onload(profile);
         else render(profile);
       })
-      .catch(err => {
+      .catch((err) => {
         if (err.response.data) {
-          console.log(err.response.data.message);
+          console.error(err.response.data.message);
           if (err.response.status === 401) logout();
           if (options.$loginPage) {
             options.$loginPage.setMessage(err.response.data.message);
@@ -144,7 +138,7 @@ function gitHubInclude(options = {}) {
             GithubLogin();
           }
         } else {
-          if(options.$loginPage){
+          if (options.$loginPage) {
             options.$loginPage.setMessage(err.response.statusText);
           }
           logout();
@@ -156,8 +150,8 @@ function gitHubInclude(options = {}) {
   }
 
   /**
-   * 
-   * @param {*} profile 
+   *
+   * @param {*} profile
    * @returns {HTMLElement}
    */
   function content(profile) {
@@ -165,20 +159,23 @@ function gitHubInclude(options = {}) {
       profile.total_repos = profile.total_private_repos + profile.public_repos;
       profile.total_gists = profile.private_gists + profile.public_gists;
     }
-    return tag.parse(mustache.render(_template, {
-      ...strings,
-      ...profile
-    }));
+    return tag.parse(
+      mustache.render(_template, {
+        ...strings,
+        ...profile,
+      })
+    );
   }
 
   function logout(onlogout) {
     if (localStorage.username) delete localStorage.username;
     if (localStorage.password) delete localStorage.password;
     if (localStorage.token) delete localStorage.token;
-    Promise.all([fs.deleteFile(githubFile), fs.deleteFile(gitProfile)])
-      .finally(() => {
+    Promise.all([fs.deleteFile(githubFile), fs.deleteFile(gitProfile)]).finally(
+      () => {
         if (onlogout) onlogout();
-      });
+      }
+    );
   }
 }
 

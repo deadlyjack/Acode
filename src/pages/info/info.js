@@ -1,7 +1,7 @@
 import tag from 'html-tag-js';
-import Page from "../../components/page";
-import git from "../../lib/git";
-import dialogs from "../../components/dialogs";
+import Page from '../../components/page';
+import git from '../../lib/git';
+import dialogs from '../../components/dialogs';
 
 import './info.scss';
 
@@ -11,8 +11,9 @@ export default function Info(repo, owner) {
   const repository = gitHub.getRepo(owner, repo);
 
   dialogs.loader.create(repo, strings.loading + '...');
-  repository.getReadme('master', false)
-    .then(res => {
+  repository
+    .getReadme('master', false)
+    .then((res) => {
       if (res.status === 200) {
         const data = res.data;
         let text = data.content;
@@ -21,27 +22,29 @@ export default function Info(repo, owner) {
         }
 
         return gitHub.getMarkdown().render({
-          text
+          text,
         });
       } else {
         return Promise.reject(res);
       }
     })
-    .then(res => {
+    .then((res) => {
       if (res.status === 200) {
         const text = res.data;
-        $page.append(tag('div', {
-          id: 'info-page',
-          className: 'main',
-          innerHTML: text
-        }));
+        $page.append(
+          tag('div', {
+            id: 'info-page',
+            className: 'main',
+            innerHTML: text,
+          })
+        );
       } else {
         $page.hide();
       }
     })
-    .catch(err => {
+    .catch((err) => {
       dialogs.alert(strings.error, err.message);
-      console.log(err);
+      console.error(err);
       $page.hide();
     })
     .finally(() => {
@@ -50,7 +53,7 @@ export default function Info(repo, owner) {
 
   actionStack.push({
     id: 'info',
-    action: $page.hide
+    action: $page.hide,
   });
   $page.onhide = function () {
     actionStack.remove('info');

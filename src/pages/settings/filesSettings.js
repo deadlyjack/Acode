@@ -1,56 +1,56 @@
-import Page from "../../components/page";
-import dialogs from "../../components/dialogs";
+import Page from '../../components/page';
 import tag from 'html-tag-js';
-import gen from "../../components/gen";
+import gen from '../../components/gen';
 
 export default function filesSettings(callback) {
-    const page = Page(strings.settings.capitalize());
-    const settingsList = tag('div', {
-        className: 'main list'
-    });
+  const page = Page(strings.settings.capitalize());
+  const settingsList = tag('div', {
+    className: 'main list',
+  });
 
-    actionStack.push({
-        id: 'settings-theme',
-        action: page.hide
-    });
-    page.onhide = function () {
-        actionStack.remove('settings-theme');
-    };
+  actionStack.push({
+    id: 'settings-theme',
+    action: page.hide,
+  });
+  page.onhide = function () {
+    actionStack.remove('settings-theme');
+  };
 
-    const values = appSettings.value.fileBrowser;
+  const values = appSettings.value.fileBrowser;
 
-    const settingsOptions = [{
-            key: 'sort',
-            text: strings['sort by name'],
-            checkbox: values.sortByName
-        },
-        {
-            key: 'show',
-            text: strings['show hidden files'],
-            checkbox: values.showHiddenFiles
-        }
-    ];
+  const settingsOptions = [
+    {
+      key: 'sort',
+      text: strings['sort by name'],
+      checkbox: values.sortByName,
+    },
+    {
+      key: 'show',
+      text: strings['show hidden files'],
+      checkbox: values.showHiddenFiles,
+    },
+  ];
 
-    gen.listItems(settingsList, settingsOptions, changeSetting);
+  gen.listItems(settingsList, settingsOptions, changeSetting);
 
-    function changeSetting() {
-        switch (this.key) {
-            case 'sort':
-                values.sortByName = !values.sortByName;
-                appSettings.update();
-                this.value = values.sortByName;
-                if (callback) callback();
-                break;
+  function changeSetting() {
+    switch (this.key) {
+      case 'sort':
+        values.sortByName = !values.sortByName;
+        appSettings.update();
+        this.value = values.sortByName;
+        if (callback) callback();
+        break;
 
-            case 'show':
-                values.showHiddenFiles = !values.showHiddenFiles;
-                appSettings.update();
-                this.value = values.showHiddenFiles;
-                if (callback) callback();
-                break;
-        }
+      case 'show':
+        values.showHiddenFiles = !values.showHiddenFiles;
+        appSettings.update();
+        this.value = values.showHiddenFiles;
+        if (callback) callback();
+        break;
     }
+  }
 
-    page.appendChild(settingsList);
-    document.body.append(page);
+  page.appendChild(settingsList);
+  document.body.append(page);
 }

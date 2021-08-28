@@ -1,19 +1,19 @@
 //jshint ignore:start
 
 export default {
-  "angular": () => {
-    return import( /* webpackChunkName: "angular" */ './projects/ng');
+  angular: () => {
+    return import(/* webpackChunkName: "angular" */ './projects/ng');
   },
-  "angularjs": () => {
-    return import( /* webpackChunkName: "angularjs" */ './projects/ngjs');
+  angularjs: () => {
+    return import(/* webpackChunkName: "angularjs" */ './projects/ngjs');
   },
-  "html": () => {
-    return import( /* webpackChunkName: "html" */ './projects/html');
+  html: () => {
+    return import(/* webpackChunkName: "html" */ './projects/html');
   },
-  "react": () => {
-    return import( /* webpackChunkName: "react" */ './projects/react');
+  react: () => {
+    return import(/* webpackChunkName: "react" */ './projects/react');
   },
-  "vue": () => {
-    return import( /* webpackChunkName: "vue" */ './projects/vue');
-  }
+  vue: () => {
+    return import(/* webpackChunkName: "vue" */ './projects/vue');
+  },
 };

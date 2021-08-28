@@ -28,7 +28,7 @@
     <repo>https://github.com/xfally/cordova-plugin-ftp.git</repo>
 
     <js-module src="www/ftp.js" name="ftp">
-        <clobbers target="cordova.plugin.ftp" />
+        <clobbers target="window.ftp" />
     </js-module>
 
     <!-- android -->

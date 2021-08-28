@@ -1,5 +1,4 @@
 export default function loadPolyFill() {
-
   if (!('isConnected' in Node.prototype)) {
     Object.defineProperty(Node.prototype, 'isConnected', {
       get() {
@@ -16,7 +15,7 @@ export default function loadPolyFill() {
 
   if (!HTMLElement.prototype.append) {
     HTMLElement.prototype.append = function (...nodes) {
-      nodes.map(node => this.appendChild(node));
+      nodes.map((node) => this.appendChild(node));
     };
   }
 
@@ -29,8 +28,7 @@ export default function loadPolyFill() {
   if (!HTMLElement.prototype.getParent) {
     HTMLElement.prototype.getParent = function (queryString) {
       const $$ = [...document.querySelectorAll(queryString)];
-      for (let $ of $$)
-        if ($.contains(this)) return $;
+      for (let $ of $$) if ($.contains(this)) return $;
       return null;
     };
   }
@@ -40,33 +38,37 @@ export default function loadPolyFill() {
       let hash = 0;
       for (let i = 0; i < this.length; i++) {
         const chr = this.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
+        hash = (hash << 5) - hash + chr;
         hash |= 0; // Convert to 32bit integer
       }
       return Math.abs(hash) + (hash < 0 ? 'N' : '');
-    }
+    },
   });
 
   Object.defineProperty(String.prototype, 'subtract', {
     value: function (str) {
-      return this.replace(new RegExp("^" + str), '');
-    }
+      return this.replace(new RegExp('^' + str), '');
+    },
   });
 
   Object.defineProperty(String.prototype, 'capitalize', {
     value: function (index) {
-      if (typeof index === "number" && index >= 0) {
-        const strs = [this.slice(0, index), this.slice(index, index + 1), this.slice(index + 1)];
+      if (typeof index === 'number' && index >= 0) {
+        const strs = [
+          this.slice(0, index),
+          this.slice(index, index + 1),
+          this.slice(index + 1),
+        ];
         return strs[0] + (strs[1] ? strs[1].toUpperCase() : '') + strs[2];
       } else {
         let strs = this.split(' ');
-        strs = strs.map(str => {
-          if (str.length > 0) return (str[0].toUpperCase() + str.slice(1));
+        strs = strs.map((str) => {
+          if (str.length > 0) return str[0].toUpperCase() + str.slice(1);
           return '';
         });
         return strs.join(' ');
       }
-    }
+    },
   });
 
   /**
@@ -74,7 +76,7 @@ export default function loadPolyFill() {
    * @param {string} url URL string
    * @returns {string}
    */
-  window.decodeURL = url => {
+  window.decodeURL = (url) => {
     if (/%[0-9a-f]{2}/i.test(url)) {
       const newurl = decodeURIComponent(url);
       if (url === newurl) return url;

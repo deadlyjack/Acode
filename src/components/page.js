@@ -10,62 +10,64 @@ import tile from './tile';
  */
 
 /**
- * 
- * @param {string} title 
- * @param {object} options 
- * @param {HTMLElement} [options.lead] type of page 
- * @param {HTMLElement} [options.tail] type of page 
+ *
+ * @param {string} title
+ * @param {object} options
+ * @param {HTMLElement} [options.lead] type of page
+ * @param {HTMLElement} [options.tail] type of page
  * @returns {HTMLDivElement & PageObj}
  */
 function Page(title, options = {}) {
-    const leadBtn = options.lead || tag('span', {
-        className: 'icon arrow_back',
-        onclick: hide,
-        attr: {
-            action: 'go-back'
-        }
+  const leadBtn =
+    options.lead ||
+    tag('span', {
+      className: 'icon arrow_back',
+      onclick: hide,
+      attr: {
+        action: 'go-back',
+      },
     });
-    const header = tile({
-        type: 'header',
-        text: title,
-        lead: leadBtn,
-        tail: options.tail || undefined
-    });
-    const $page = tag('div', {
-        className: 'page',
-        child: header
+  const header = tile({
+    type: 'header',
+    text: title,
+    lead: leadBtn,
+    tail: options.tail || undefined,
+  });
+  const $page = tag('div', {
+    className: 'page',
+    child: header,
+  });
+
+  if (!window.$placeholder)
+    window.$placeholder = tag('div', {
+      style: {
+        display: 'none',
+      },
     });
 
-    if (!window.$placeholder) window.$placeholder = tag('div', {
-        style: {
-            display: 'none'
-        }
-    });
+  if (!window.pageCount) window.pageCount = 0;
+  if (!pageCount++) document.body.replaceChild($placeholder, root);
 
-    if (!window.pageCount) window.pageCount = 0;
-    if (!(pageCount++)) document.body.replaceChild($placeholder, root);
+  header.classList.add('light');
+  $page.onhide = () => {};
+  $page.hide = hide;
+  $page.settitle = header.text;
+  $page.header = header;
+  return $page;
 
-    header.classList.add('light');
-    $page.onhide = () => {};
-    $page.hide = hide;
-    $page.settitle = header.text;
-    $page.header = header;
-    return $page;
-
-    function hide() {
-        if (!(--pageCount)) {
-            document.body.replaceChild(root, $placeholder);
-            editorManager.editor.resize(true);
-        }
-        if ($page.isConnected) {
-            $page.onhide();
-            $page.classList.add('hide');
-            setTimeout(() => {
-                $page.remove();
-            }, 150);
-        }
+  function hide() {
+    if (!--pageCount) {
+      document.body.replaceChild(root, $placeholder);
+      editorManager.editor.resize(true);
     }
+    if ($page.isConnected) {
+      $page.onhide();
+      $page.classList.add('hide');
+      setTimeout(() => {
+        $page.remove();
+      }, 150);
+    }
+  }
 }
-
 
 export default Page;

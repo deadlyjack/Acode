@@ -1,5 +1,5 @@
 import tag from 'html-tag-js';
-import tile from "./tile";
+import tile from './tile';
 
 /**
  * @typedef {object} Collaspable
@@ -12,69 +12,69 @@ import tile from "./tile";
  */
 
 /**
- * 
+ *
  * @param {string} titleText
- * @param {boolean} hidden 
- * @param {"indicator"|"folder"} type 
- * @param {object} [options] 
- * @param {HTMLElement} [options.tail] 
- * @param {string} [options.type] 
- * @param {boolean} [options.allCaps] 
- * @param {function(this:Collaspable):void} [options.ontoggle] 
+ * @param {boolean} hidden
+ * @param {"indicator"|"folder"} type
+ * @param {object} [options]
+ * @param {HTMLElement} [options.tail]
+ * @param {string} [options.type]
+ * @param {boolean} [options.allCaps]
+ * @param {function(this:Collaspable):void} [options.ontoggle]
  * @returns {HTMLElement & Collaspable}
  */
 function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
-    const $ul = tag('ul', {
-        className: "scroll"
-    });
-    const $collaspeIndicator = tag('span', {
-        className: `icon ${type}`
-    });
-    const $title = tile({
-        lead: $collaspeIndicator,
-        type: 'div',
-        text: options.allCaps ? titleText.toUpperCase() : titleText,
-        tail: options.tail
-    });
-    const $mainWrapper = tag(options.type || 'div', {
-        className: 'list collaspable hidden',
-        children: [$title, $ul]
-    });
+  const $ul = tag('ul', {
+    className: 'scroll',
+  });
+  const $collaspeIndicator = tag('span', {
+    className: `icon ${type}`,
+  });
+  const $title = tile({
+    lead: $collaspeIndicator,
+    type: 'div',
+    text: options.allCaps ? titleText.toUpperCase() : titleText,
+    tail: options.tail,
+  });
+  const $mainWrapper = tag(options.type || 'div', {
+    className: 'list collaspable hidden',
+    children: [$title, $ul],
+  });
 
-    $title.classList.add('light');
-    $title.addEventListener('click', toggle);
+  $title.classList.add('light');
+  $title.addEventListener('click', toggle);
 
-    if (!hidden) setTimeout(toggle, 0);
+  if (!hidden) setTimeout(toggle, 0);
 
-    function toggle() {
-        if ($mainWrapper.classList.contains('hidden')) {
-            uncollapse();
-        } else {
-            collapse();
-        }
+  function toggle() {
+    if ($mainWrapper.classList.contains('hidden')) {
+      uncollapse();
+    } else {
+      collapse();
     }
+  }
 
-    function collapse() {
-        let state = "collapsed";
-        $mainWrapper.classList.add('hidden');
-        $title.setAttribute("state", state);
-        if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper, state);
-    }
+  function collapse() {
+    let state = 'collapsed';
+    $mainWrapper.classList.add('hidden');
+    $title.setAttribute('state', state);
+    if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper, state);
+  }
 
-    function uncollapse() {
-        let state = "uncollapsed";
-        $mainWrapper.classList.remove('hidden');
-        $title.setAttribute("state", state);
-        if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper, state);
-    }
+  function uncollapse() {
+    let state = 'uncollapsed';
+    $mainWrapper.classList.remove('hidden');
+    $title.setAttribute('state', state);
+    if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper, state);
+  }
 
-    $mainWrapper.$title = $title;
-    $mainWrapper.$ul = $ul;
-    $mainWrapper.ontoggle = options.ontoggle || (() => {});
-    $mainWrapper.collapse = collapse;
-    $mainWrapper.uncollapse = uncollapse;
+  $mainWrapper.$title = $title;
+  $mainWrapper.$ul = $ul;
+  $mainWrapper.ontoggle = options.ontoggle || (() => {});
+  $mainWrapper.collapse = collapse;
+  $mainWrapper.uncollapse = uncollapse;
 
-    return $mainWrapper;
+  return $mainWrapper;
 }
 
 export default collapsableList;

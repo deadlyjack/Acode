@@ -1,13 +1,13 @@
-import dialogs from "../../components/dialogs";
-import helpers from "../../lib/utils/helpers";
+import dialogs from '../../components/dialogs';
+import helpers from '../../lib/utils/helpers';
 
 export default {
   /**
-   * 
-   * @param {Array} list 
-   * @param {String} name 
-   * @param {String} url 
-   * @param {Object} extra 
+   *
+   * @param {Array} list
+   * @param {String} name
+   * @param {String} url
+   * @param {Object} extra
    */
   pushFolder(list, name, url, extra = {}) {
     list.push({
@@ -16,48 +16,53 @@ export default {
       isDirectory: true,
       parent: true,
       type: 'folder',
-      ...extra
+      ...extra,
     });
   },
   /**
-   * 
-   * @param {String} name 
+   *
+   * @param {String} name
    * @returns {Promise<{name: String, uri: String, uuid: string}>}
    */
-  addPath(name = "") {
+  addPath(name = '') {
     return new Promise((resolve, reject) => {
-      dialogs.multiPrompt(strings["add path"], [{
-          id: "name",
-          placeholder: "Name",
-          type: "text",
-          required: true,
-          value: name,
-          autofocus: !name
-        }, {
-          id: "uri",
-          placeholder: "select path",
-          type: "text",
-          required: true,
-          readOnly: true,
-          onclick: function () {
-            sdcard.getStorageAccessPermission("", res => {
-              this.value = res;
-            }, err => {
-              helpers.error(err);
-            });
-          }
-        }])
-        .then(values => {
-          const {
-            name,
-            uri
-          } = values;
+      dialogs
+        .multiPrompt(strings['add path'], [
+          {
+            id: 'name',
+            placeholder: 'Name',
+            type: 'text',
+            required: true,
+            value: name,
+            autofocus: !name,
+          },
+          {
+            id: 'uri',
+            placeholder: 'select path',
+            type: 'text',
+            required: true,
+            readOnly: true,
+            onclick: function () {
+              sdcard.getStorageAccessPermission(
+                '',
+                (res) => {
+                  this.value = res;
+                },
+                (err) => {
+                  helpers.error(err);
+                }
+              );
+            },
+          },
+        ])
+        .then((values) => {
+          const { name, uri } = values;
           resolve({
             name,
             uri,
-            uuid: helpers.uuid()
+            uuid: helpers.uuid(),
           });
         });
     });
-  }
+  },
 };

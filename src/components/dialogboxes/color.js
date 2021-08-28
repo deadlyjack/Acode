@@ -4,24 +4,24 @@ import helpers from '../../lib/utils/helpers';
 
 /**
  * Choose color
- * @param {string} defaultColor 
+ * @param {string} defaultColor
  */
 function color(defaultColor) {
   let type = helpers.checkColorType(defaultColor) || 'hex';
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const colorModes = ['hsl', 'hex', 'rgb'];
     let mode = colorModes.indexOf(type);
     let color = null;
 
     const parent = tag('div', {
-      className: 'message color-picker'
+      className: 'message color-picker',
     });
     const okBtn = tag('button', {
       textContent: strings.ok,
       onclick: function () {
         hide();
         resolve(color);
-      }
+      },
     });
     const toggleMode = tag('button', {
       textContent: type,
@@ -32,30 +32,30 @@ function color(defaultColor) {
         this.textContent = type;
         picker.setOptions({
           color,
-          editorFormat: type
+          editorFormat: type,
         });
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-      }
+      },
     });
     const box = tag('div', {
       className: 'prompt box',
       children: [
         tag('strong', {
           className: 'title',
-          textContent: strings['choose color']
+          textContent: strings['choose color'],
         }),
         parent,
         tag('div', {
           className: 'button-container',
-          children: [toggleMode, okBtn]
-        })
-      ]
+          children: [toggleMode, okBtn],
+        }),
+      ],
     });
     const mask = tag('span', {
       className: 'mask',
-      onclick: hide
+      onclick: hide,
     });
     const picker = new Picker({
       parent,
@@ -64,14 +64,14 @@ function color(defaultColor) {
       color: defaultColor,
       onChange,
       alpha: true,
-      editorFormat: type
+      editorFormat: type,
     });
 
     picker.show();
 
     actionStack.push({
       id: 'box',
-      action: hideSelect
+      action: hideSelect,
     });
 
     document.body.append(box, mask);
@@ -98,20 +98,14 @@ function color(defaultColor) {
 
       const alpha = c.rgba[3] < 1 ? true : false;
       if (type === 'hex') {
-
         if (alpha) color = c.hex;
         else color = c.hex.slice(0, -2);
-
       } else if (type === 'rgb') {
-
         if (alpha) color = c.rgbaString;
         else color = c.rgbString;
-
       } else {
-
         if (alpha) color = c.hslaString;
         else color = c.hslString;
-
       }
 
       if (color) {

@@ -1,44 +1,48 @@
 import tag from 'html-tag-js';
-import tile from "../tile";
+import tile from '../tile';
 /**
- * 
- * @param {string} title 
- * @param {string[]} options 
- * @param {object} opts 
- * @param {string} opts.default 
+ *
+ * @param {string} title
+ * @param {string[]} options [value, text, icon, disable?]
+ * @param {{
+ *            onCancel: ()=>void,
+ *            hideOnSelect: boolean,
+ *            textTransform: boolean,
+ *            default: String
+ *        }} opts
+ * @param {string} opts.default
  * @param {string} opts.onCancel
  * @param {boolean} opts.hideOnSelect
- * @param {boolean} opts.textTransform 
+ * @param {boolean} opts.textTransform
  */
 function select(title, options, opts = {}) {
-  return new Promise(resolve => {
-    const titleSpan = title && tag('strong', {
-      className: 'title',
-      textContent: title
-    });
+  return new Promise((resolve) => {
+    const titleSpan =
+      title &&
+      tag('strong', {
+        className: 'title',
+        textContent: title,
+      });
     const $list = tag('ul', {
-      className: 'scroll' + (opts.textTransform === false ? ' no-text-transform' : '')
+      className:
+        'scroll' + (opts.textTransform === false ? ' no-text-transform' : ''),
     });
     const selectDiv = tag('div', {
       className: 'prompt select',
-      children: titleSpan ? [
-        titleSpan,
-        $list
-      ] : [$list]
+      children: titleSpan ? [titleSpan, $list] : [$list],
     });
     const mask = tag('span', {
       className: 'mask',
       onclick: () => {
         hide();
-        if (typeof opts.onCancel === "function") opts.onCancel();
-      }
+        if (typeof opts.onCancel === 'function') opts.onCancel();
+      },
     });
     let $defaultVal;
 
     if (opts.hideOnSelect === undefined) opts.hideOnSelect = true;
 
-    options.map(option => {
-
+    options.map((option) => {
       let value = null;
       let text = null;
       let lead = null;
@@ -49,14 +53,13 @@ function select(title, options, opts = {}) {
 
         if (option.length > 2 && typeof option[2] === 'string') {
           lead = tag('i', {
-            className: `icon ${option[2]}`
+            className: `icon ${option[2]}`,
           });
         }
 
         option.map((o, i) => {
           if (typeof o === 'boolean' && i > 1) disabled = !o;
         });
-
       } else {
         value = text = option;
       }
@@ -65,8 +68,8 @@ function select(title, options, opts = {}) {
         lead,
         text: tag('span', {
           className: 'text',
-          innerHTML: text
-        })
+          innerHTML: text,
+        }),
       });
 
       if (opts.default === value) {
@@ -74,7 +77,7 @@ function select(title, options, opts = {}) {
         $defaultVal = $item;
       }
 
-      $item.tabIndex = "0";
+      $item.tabIndex = '0';
 
       $item.onclick = function () {
         if (value !== undefined) {
@@ -86,12 +89,11 @@ function select(title, options, opts = {}) {
       if (disabled) $item.classList.add('disabled');
 
       $list.append($item);
-
     });
 
     actionStack.push({
       id: 'select',
-      action: hideSelect
+      action: hideSelect,
     });
 
     document.body.append(selectDiv, mask);
@@ -115,7 +117,7 @@ function select(title, options, opts = {}) {
       actionStack.remove('select');
       hideSelect();
       let listItems = [...$list.children];
-      listItems.map(item => item.onclick = null);
+      listItems.map((item) => (item.onclick = null));
     }
   });
 }

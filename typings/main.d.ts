@@ -66,6 +66,7 @@ interface AppSettings {
     onload: () => void;
     onsave: () => void;
     loaded: boolean;
+    isFileAllowed(ext: String): Boolean;
     on(eventName: 'reset' | 'update', callback: (this: Settings, settings: Settings | String) => void): void;
     off(eventName: 'reset' | 'update', callback: (this: Settings, settings: Settings | String) => void): void;
 }
@@ -106,6 +107,7 @@ interface newFileOptions {
     type: 'regular' | 'git' | 'gist';
     record: Repo | Gist;
     onsave(): void;
+    isUnsaved: Boolean;
 }
 
 interface Controls {
@@ -401,6 +403,17 @@ interface AppThemeList {
     [theme: string]: ThemeData
 }
 
+interface Prompt{
+    /**
+     * Body of the prompt
+     */
+    $body: HTMLElement;
+    /**
+     * Hides the prompt
+     */
+    hide(): void;
+}
+
 interface Input {
     id: string;
     type: "text" | "numberic" | "tel" | "search" | "email" | "url" | "checkbox" | "radio" | "group" | "button";
@@ -429,18 +442,6 @@ interface PathObject {
     base: string;
     name: string;
     ext: string;
-}
-
-interface FTPAccount {
-    username: string;
-    password: string;
-    port: string | number;
-    hostname: string;
-    path: string;
-    mode: "active" | "passive";
-    security: "ftp" | "ftps";
-    id: string;
-    name: string;
 }
 
 interface PathData {
@@ -509,7 +510,6 @@ declare var Acode: Acode;
 declare var AceMouseEvent: any;
 
 declare var CACHE_STORAGE: string;
-declare var CACHE_STORAGE_REMOTE: string;
 declare var TEMP_STORAGE: string;
 declare var DATA_STORAGE: string;
 declare var DOES_SUPPORT_THEME: boolean;

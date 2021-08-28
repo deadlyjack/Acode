@@ -2,29 +2,28 @@ import tag from 'html-tag-js';
 import helpers from '../lib/utils/helpers';
 
 /**
- * 
- * @param {HTMLUListElement|HTMLOListElement} list 
+ *
+ * @param {HTMLUListElement|HTMLOListElement} list
  */
 function searchBar(list) {
-
   const $searchInput = tag('input', {
     type: 'search',
-    placeholder: strings.search
+    placeholder: strings.search,
   });
   const $container = tag('div', {
-    id: "search-bar",
+    id: 'search-bar',
     children: [
       $searchInput,
       tag('span', {
         className: 'icon clearclose',
-        onclick: e => {
+        onclick: (e) => {
           e.preventDefault();
           e.stopImmediatePropagation();
           e.stopPropagation();
           hide();
-        }
-      })
-    ]
+        },
+      }),
+    ],
   });
   const children = [...list.children];
 
@@ -36,12 +35,12 @@ function searchBar(list) {
   };
 
   actionStack.push({
-    id: "searchbar",
-    action: hideSearchBar
+    id: 'searchbar',
+    action: hideSearchBar,
   });
 
   function hide(resetList) {
-    actionStack.remove("searchbar");
+    actionStack.remove('searchbar');
     hideSearchBar(resetList);
   }
 
@@ -60,9 +59,9 @@ function searchBar(list) {
     const val = helpers.removeLineBreaks(this.value).toLowerCase();
     const result = [];
 
-    children.map(child => {
+    children.map((child) => {
       const text = child.textContent.toLowerCase();
-      if (text.match(val, "i")) result.push(child);
+      if (text.match(val, 'i')) result.push(child);
     });
 
     list.textContent = '';
@@ -73,7 +72,6 @@ function searchBar(list) {
     list.textContent = '';
     list.append(...children);
   }
-
 }
 
 export default searchBar;

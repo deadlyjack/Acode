@@ -15,12 +15,16 @@ function actions(action) {
   const $textarea = editor.textInput.getElement();
   let $searchInput = $footer.querySelector('#searchInput'),
     $replaceInput = $footer.querySelector('#replaceInput'),
-    state, selectedText = editor.getCopyText();
+    state,
+    selectedText = editor.getCopyText();
 
   if (selectedText.length > 50) selectedText = '';
 
-  if (!['pallete', 'search', 'search-settings'].includes(action) &&
-    editorManager.state === 'focus') editor.focus();
+  if (
+    !['pallete', 'search', 'search-settings'].includes(action) &&
+    editorManager.state === 'focus'
+  )
+    editor.focus();
 
   switch (action) {
     case 'pallete':
@@ -28,12 +32,17 @@ function actions(action) {
       break;
 
     case 'tab':
-      const shiftKey = $footer.querySelector('#shift-key').getAttribute('data-state') === 'on' ? true : false;
-      $textarea.dispatchEvent(window.createKeyboardEvent('keydown', {
-        key: 9,
-        keyCode: 9,
-        shiftKey
-      }));
+      const shiftKey =
+        $footer.querySelector('#shift-key').getAttribute('data-state') === 'on'
+          ? true
+          : false;
+      $textarea.dispatchEvent(
+        window.createKeyboardEvent('keydown', {
+          key: 9,
+          keyCode: 9,
+          shiftKey,
+        })
+      );
       break;
 
     case 'shift':
@@ -63,7 +72,7 @@ function actions(action) {
       break;
 
     case 'save':
-      Acode.exec("save");
+      Acode.exec('save');
       break;
 
     case 'more':
@@ -71,11 +80,15 @@ function actions(action) {
         if ($searchRow1) {
           removeSearchRow2();
         }
-        $footer.get('[action=more]').classList.replace('arrow_drop_up', 'arrow_drop_down');
+        $footer
+          .get('[action=more]')
+          .classList.replace('arrow_drop_up', 'arrow_drop_down');
         $footer.appendChild(tag.parse($_row2));
         incFooterHeightBy(1);
       } else {
-        $footer.get('[action=more]').classList.replace('arrow_drop_down', 'arrow_drop_up');
+        $footer
+          .get('[action=more]')
+          .classList.replace('arrow_drop_down', 'arrow_drop_up');
         removeRow2();
       }
       editor.resize(true);
@@ -126,7 +139,6 @@ function actions(action) {
       enableQuickTools();
       break;
 
-
     case 'diable-quick-tools':
       disableQuickTools();
       break;
@@ -150,8 +162,8 @@ function actions(action) {
       actionStack.push({
         id: 'search-bar',
         action: () => {
-          actions("search");
-        }
+          actions('search');
+        },
       });
     } else {
       removeSearchRow2();
@@ -175,22 +187,19 @@ function actions(action) {
   function enableQuickTools() {
     if (root.hasAttribute('quicktools')) return; //Quicktools is already enabled
 
-    let quickToolsState = (parseInt(localStorage.quickToolsState) || 1);
+    let quickToolsState = parseInt(localStorage.quickToolsState) || 1;
     const $row1 = tag.parse($_row1);
     const $row2 = tag.parse($_row2);
 
     if (quickToolsState > 2) quickToolsState = 1;
 
-    if (quickToolsState == 2)
-      $footer.append($row1, $row2);
-    else
-      $footer.append($row1);
+    if (quickToolsState == 2) $footer.append($row1, $row2);
+    else $footer.append($row1);
 
-    root.setAttribute("quicktools", "enabled");
+    root.setAttribute('quicktools', 'enabled');
     incFooterHeightBy(quickToolsState);
     if (editorManager.activeFile && editorManager.activeFile.isUnsaved)
       $row1.querySelector("[action='save']").classList.add('notice');
-
   }
 
   function disableQuickTools() {
@@ -207,7 +216,7 @@ function actions(action) {
       incFooterHeightBy(-1);
     }
 
-    root.removeAttribute("quicktools");
+    root.removeAttribute('quicktools');
   }
 
   function removeRow2() {
@@ -231,7 +240,7 @@ function actions(action) {
       caseSensitive: searchSettings.caseSensitive,
       wrap: searchSettings.wrap,
       wholeWord: searchSettings.wholeWord,
-      regExp: searchSettings.regExp
+      regExp: searchSettings.regExp,
     });
 
     updateStatus();
@@ -244,31 +253,31 @@ function actions(action) {
     const MAX_COUNT = 999;
     if (regex) {
       const value = editor.getValue();
-      const offset = editor.session.doc.positionToIndex(editor.selection.anchor);
-      let last = regex.lastIndex = 0;
+      const offset = editor.session.doc.positionToIndex(
+        editor.selection.anchor
+      );
+      let last = (regex.lastIndex = 0);
       let m;
       while ((m = regex.exec(value))) {
         all++;
         last = m.index;
-        if (last <= offset)
-          before++;
-        if (all > MAX_COUNT)
-          break;
+        if (last <= offset) before++;
+        if (all > MAX_COUNT) break;
         if (!m[0]) {
           regex.lastIndex = last += 1;
-          if (last >= value.length)
-            break;
+          if (last >= value.length) break;
         }
       }
     }
-    $footer.querySelector('#total-result').textContent = all > MAX_COUNT ? '999+' : all;
+    $footer.querySelector('#total-result').textContent =
+      all > MAX_COUNT ? '999+' : all;
     $footer.querySelector('#current-pos').textContent = before;
   }
 }
 
 /**
- * 
- * @param {TouchEvent | MouseEvent} e 
+ *
+ * @param {TouchEvent | MouseEvent} e
  */
 function clickListener(e) {
   if (!e.target) return;
@@ -292,5 +301,5 @@ function incFooterHeightBy(factor) {
 export default {
   actions,
   clickListener,
-  incFooterHeightBy
+  incFooterHeightBy,
 };

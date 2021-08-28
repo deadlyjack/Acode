@@ -2,15 +2,15 @@ import tag from 'html-tag-js';
 import mustache from 'mustache';
 
 /**
- * 
- * @param {HTMLInputElement} $input 
- * @param {Array<string>|function(function(Array<string>):void):void} hints 
+ *
+ * @param {HTMLInputElement} $input
+ * @param {Array<string>|function(function(Array<string>):void):void} hints
  */
 function inputhints($input, hints) {
   const template = '{{#.}}<li action="hint" value="{{.}}">{{.}}</li>{{/.}}';
   const $hintingContainer = tag('ul', {
     id: 'hints',
-    className: 'loading scroll'
+    className: 'loading scroll',
   });
   $input.addEventListener('focus', onfocus);
   let interval;
@@ -18,7 +18,7 @@ function inputhints($input, hints) {
   if (typeof hints === 'function') {
     const cb = hints;
     hints = [];
-    cb(res => {
+    cb((res) => {
       hints = res;
       $hintingContainer.innerHTML = mustache.render(template, hints);
       $hintingContainer.classList.remove('loading');
@@ -29,8 +29,8 @@ function inputhints($input, hints) {
   }
 
   /**
-   * 
-   * @param {MouseEvent} e 
+   *
+   * @param {MouseEvent} e
    */
   function handleClick(e) {
     e.preventDefault();
@@ -49,8 +49,8 @@ function inputhints($input, hints) {
   }
 
   /**
-   * 
-   * @param {KeyboardEvent} e 
+   *
+   * @param {KeyboardEvent} e
    */
   function handleKeypress(e) {
     if (e.keyCode === 13) {
@@ -65,11 +65,10 @@ function inputhints($input, hints) {
   }
 
   /**
-   * 
-   * @param {KeyboardEvent} e 
+   *
+   * @param {KeyboardEvent} e
    */
   function handleKeydown(e) {
-
     const code = e.keyCode;
     execute();
     interval = setInterval(execute, 300);
@@ -83,18 +82,18 @@ function inputhints($input, hints) {
       let activeHint = $hintingContainer.get('.active');
       if (!activeHint) activeHint = $hintingContainer.firstChild;
 
-      if (code === 40) { //downarrow
+      if (code === 40) {
+        //downarrow
 
         prevent();
         nextHint = activeHint.nextElementSibling;
         if (!nextHint) nextHint = $hintingContainer.firstElementChild;
-
-      } else if (code === 38) { //uparrow
+      } else if (code === 38) {
+        //uparrow
 
         prevent();
         nextHint = activeHint.previousElementSibling;
         if (!nextHint) nextHint = $hintingContainer.lastElementChild;
-
       }
 
       if (nextHint) {
@@ -116,7 +115,7 @@ function inputhints($input, hints) {
   function oninput() {
     const value = this.value;
     const matched = [];
-    hints.map(hint => {
+    hints.map((hint) => {
       if (new RegExp(value).test(hint)) matched.push(hint);
     });
     $hintingContainer.textContent = '';

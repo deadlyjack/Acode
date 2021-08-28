@@ -13,6 +13,7 @@
         color: white;
         font-size: 0.6rem;
         font-weight: 600;
+        text-transform: uppercase;
       }
 
       &.clearclose {
@@ -48,7 +49,6 @@
     overflow-y: auto;
 
     .tile {
-
       &[disabled] {
         .text {
           opacity: 0.5;

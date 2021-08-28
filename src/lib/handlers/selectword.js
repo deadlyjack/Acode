@@ -1,50 +1,48 @@
-import textControl from "./selection";
-import constants from "../constants";
+import textControl from './selection';
+import constants from '../constants';
 
 //TODO: Text control start has bug.
 
 /**
- * 
- * @param {"word"} type 
+ *
+ * @param {"word"} type
  */
 function select(type) {
+  type = type || 'word';
 
-  type = type || "word";
-
-  const {
-    editor,
-    controls,
-    container
-  } = editorManager;
+  const { editor, controls, container } = editorManager;
+  const containerClient = container.getBoundingClientRect();
   let marginLeft;
   let disabled = false;
 
-  if (controls.size === "large") marginLeft = '-30.5px';
+  if (controls.size === 'large') marginLeft = '-30.5px';
   else if (controls.size === 'small') marginLeft = '-21.5px';
   else return;
 
   const $content = container.querySelector('.ace_scroller');
   const lineHeight = editor.renderer.lineHeight;
   const $cm = controls.menu;
-  const $cursor = editor.container.querySelector('.ace_cursor-layer>.ace_cursor');
+  const $cursor = editor.container.querySelector(
+    '.ace_cursor-layer>.ace_cursor'
+  );
   const $start = controls.start;
   const $end = controls.end;
   const initialScroll = {
     top: 0,
-    left: 0
+    left: 0,
   };
   let cpos = {
     start: {
       x: 0,
-      y: 0
+      y: 0,
     },
     end: {
       x: 0,
-      y: 0
-    }
+      y: 0,
+    },
   };
 
-  if (!editor.getCopyText() && type === "word")
+  if (!editor.getCopyText() && type === 'word')
     editor.selectMore(1, false, true);
   if (!editor.getCopyText())
     return textControl.enableSingleMode().showContextMenu();
@@ -84,18 +82,20 @@ function select(type) {
 
   setTimeout(() => {
     container.append($start, $end, $cm);
-    if (appSettings.value.vibrateOnTap) navigator.vibrate(constants.VIBRATION_TIME);
+    if (appSettings.value.vibrateOnTap)
+      navigator.vibrate(constants.VIBRATION_TIME);
     updateControls();
 
-    const offset = $end.getBoundingClientRect().bottom - container.getBoundingClientRect().bottom;
-    if(offset > 0){
+    const offset =
+      $end.getBoundingClientRect().bottom -
+      container.getBoundingClientRect().bottom;
+    if (offset > 0) {
       editor.renderer.scrollBy(0, offset);
     }
   }, 100);
 
   function touchStart(e, action) {
-    
-    if(disabled) return;
+    if (disabled) return;
 
     $cm.remove();
     const el = this;
@@ -108,11 +108,13 @@ function select(type) {
       const range = editor.selection.getRange();
 
       if (action === 'start') {
-        if (pos.row > range.end.row && pos.column >= range.end.column) pos.column = range.end.column - 1;
+        if (pos.row > range.end.row && pos.column >= range.end.column)
+          pos.column = range.end.column - 1;
         if (pos.row > range.end.row) pos.row = range.end.row;
         editor.selection.setSelectionAnchor(pos.row, pos.column);
       } else {
-        if (pos.row < range.start.row && pos.column <= range.start.column) pos.column = range.start.column + 1;
+        if (pos.row < range.start.row && pos.column <= range.start.column)
+          pos.column = range.start.column + 1;
         if (pos.row < range.start.row) pos.row = range.start.row;
         editor.selection.moveCursorToPosition(pos);
       }
@@ -133,37 +135,34 @@ function select(type) {
   }
 
   function updatePosition() {
-
-    if(disabled) return;
+    if (disabled) return;
 
     const scrollTop = editor.renderer.getScrollTop() - initialScroll.top;
     const scrollLeft = editor.renderer.getScrollLeft() - initialScroll.left;
 
     update(-scrollLeft, -scrollTop);
-
   }
 
   function onchange() {
-
-    if(disabled) return;
+    if (disabled) return;
 
     setTimeout(() => {
       updateControls('end');
       updateControls('start');
     }, 0);
-
   }
 
   function updateControls(mode) {
-
-    if(disabled) return;
+    if (disabled) return;
 
     const selected = editor.getCopyText();
     if (!selected) {
       return disable();
     }
 
-    const $singleMode = editor.container.querySelector('.ace_marker-layer>.ace_selection.ace_br15');
+    const $singleMode = editor.container.querySelector(
+      '.ace_marker-layer>.ace_selection.ace_br15'
+    );
     const cursor = $cursor.getBoundingClientRect();
     const scrollTop = editor.renderer.getScrollTop();
     const scrollLeft = editor.renderer.getScrollLeft();
@@ -190,8 +189,12 @@ function select(type) {
         cpos.start.y = singleMode.bottom;
       }
     } else {
-      const $clientStart = editor.container.querySelector('.ace_marker-layer>.ace_selection.ace_br1.ace_start');
-      const $clientEnd = editor.container.querySelector('.ace_marker-layer>.ace_selection.ace_br12');
+      const $clientStart = editor.container.querySelector(
+        '.ace_marker-layer>.ace_selection.ace_br1.ace_start'
+      );
+      const $clientEnd = editor.container.querySelector(
+        '.ace_marker-layer>.ace_selection.ace_br12'
+      );
 
       if ($clientStart && $clientEnd) {
         const clientStart = $clientStart.getBoundingClientRect();
@@ -209,7 +212,6 @@ function select(type) {
             cpos.end.x = clientEnd.right;
             cpos.end.y = clientEnd.bottom;
           }
-
         } else {
           cpos.start.x = clientStart.left;
           cpos.end.x = clientEnd.right;
@@ -232,12 +234,18 @@ function select(type) {
 
   function update(left = 0, top = 0) {
     const offset = parseFloat(root.style.marginLeft) || 0;
-    $start.style.transform = `translate3d(${cpos.start.x + 1 + left - offset}px, ${cpos.start.y + top}px, 0)`;
-    $end.style.transform = `translate3d(${cpos.end.x + 4 + left - offset}px, ${cpos.end.y + top}px, 0)`;
+
+    $start.style.transform = `translate3d(${
+      cpos.start.x + 1 + left - offset
+    }px, ${cpos.start.y + top}px, 0)`;
+
+    $end.style.transform = `translate3d(${cpos.end.x + 4 + left - offset}px, ${
+      cpos.end.y + top
+    }px, 0)`;
 
     const cm = {
       left: cpos.end.x + left - offset,
-      top: cpos.end.y - (40 + lineHeight) + top
+      top: cpos.end.y - (40 + lineHeight) + top,
     };
     const containerWidth = innerWidth - 40;
     let scale = 1;
@@ -246,7 +254,8 @@ function select(type) {
 
     const cmClient = $cm.getBoundingClientRect();
 
-    if (cmClient.width > containerWidth) scale = (containerWidth) / cmClient.width;
+    if (cmClient.width > containerWidth)
+      scale = containerWidth / cmClient.width;
 
     if (cmClient.right > containerWidth) {
       cm.left = containerWidth - cmClient.width;
@@ -258,19 +267,18 @@ function select(type) {
     }
 
     if (cmClient.right > containerWidth) {
-      cm.left = (containerWidth - (cmClient.width * scale)) / 2;
+      cm.left = (containerWidth - cmClient.width * scale) / 2;
     }
 
-    if (cmClient.top < 0) {
-      cm.top += 100;
+    if (cmClient.top < containerClient.top) {
+      cm.top += 80;
     }
 
     $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0) scale(${scale})`;
   }
 
   function disable() {
-
-    if(disabled) return;
+    if (disabled) return;
     disabled = true;
 
     $start.remove();

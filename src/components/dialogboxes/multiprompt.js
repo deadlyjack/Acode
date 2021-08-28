@@ -4,25 +4,25 @@ import inputhints from '../inputhints';
 import Checkbox from '../checkbox';
 
 /**
- * 
- * @param {string} message 
- * @param {Array<Input|Array<Input>>} inputs 
+ *
+ * @param {string} message
+ * @param {Array<Input|Array<Input>>} inputs
  * @returns {Promise<Strings>}
  */
 function multiPrompt(message, inputs) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const $title = tag('span', {
       className: 'title',
-      textContent: message
+      textContent: message,
     });
     const $body = tag('div', {
       className: 'message scroll',
       style: {
-        fontSize: '1rem'
-      }
+        fontSize: '1rem',
+      },
     });
     const okBtn = tag('button', {
-      type: "submit",
+      type: 'submit',
       textContent: strings.ok,
       onclick: function (e) {
         e.preventDefault();
@@ -41,23 +41,24 @@ function multiPrompt(message, inputs) {
         }
         hide();
         resolve(getValue());
-      }
+      },
     });
     const cancelBtn = tag('button', {
       textContent: strings.cancel,
       type: 'button',
       onclick: function () {
+        reject();
         hide();
-      }
+      },
     });
-    const $errorMessage = tag("span", {
-      className: 'error-msg'
+    const $errorMessage = tag('span', {
+      className: 'error-msg',
     });
     const $mask = tag('span', {
-      className: 'mask'
+      className: 'mask',
     });
     const $promptDiv = tag('form', {
-      action: "#",
+      action: '#',
       className: 'prompt multi',
       onsubmit: (e) => {
         e.preventDefault();
@@ -70,30 +71,25 @@ function multiPrompt(message, inputs) {
         $body,
         tag('div', {
           className: 'button-container',
-          children: [
-            cancelBtn,
-            okBtn
-          ]
-        })
-      ]
+          children: [cancelBtn, okBtn],
+        }),
+      ],
     });
 
-    inputs.map(input => {
-
+    inputs.map((input) => {
       if (Array.isArray(input)) createGroup(input);
       else $body.append(createInput(input));
-
     });
 
     actionStack.push({
       id: 'prompt',
-      action: hidePrompt
+      action: hidePrompt,
     });
 
     window.restoreTheme(true);
     document.body.append($promptDiv, $mask);
     const $focusEl = [...$body.getAll('input[autofocus]')].pop();
-    if($focusEl) $focusEl.focus();
+    if ($focusEl) $focusEl.focus();
 
     function hidePrompt() {
       $promptDiv.classList.add('hide');
@@ -112,49 +108,45 @@ function multiPrompt(message, inputs) {
     function getValue() {
       const values = {};
       const inputAr = [...$body.getAll('input')];
-      inputAr.map($input => {
-
-        if ($input.type === "checkbox" || $input.type === "radio")
+      inputAr.map(($input) => {
+        if ($input.type === 'checkbox' || $input.type === 'radio')
           values[$input.id] = $input.checked;
-        else
-          values[$input.id] = $input.value;
-
+        else values[$input.id] = $input.value;
       });
 
       return values;
     }
 
     /**
-     * 
-     * @param {Array<input>} inputs 
+     *
+     * @param {Array<input>} inputs
      */
     function createGroup(inputs) {
       const $text = tag('span', {
-        className: 'hero'
+        className: 'hero',
       });
       const $group = tag('div', {
         className: 'input-group',
-        child: $text
+        child: $text,
       });
 
-      inputs.map(input => {
+      inputs.map((input) => {
         let $input;
 
-        if (typeof input === "string") {
+        if (typeof input === 'string') {
           $text.textContent = input;
         } else {
           $input = createInput(input);
           $group.append($input);
         }
-
       });
 
       $body.append($group);
     }
 
     /**
-     * 
-     * @param {Input} input 
+     *
+     * @param {Input} input
      */
     function createInput(input) {
       const {
@@ -168,21 +160,20 @@ function multiPrompt(message, inputs) {
         name,
         disabled,
         onclick,
+        onchange,
         readOnly,
         autofocus,
+        hidden,
       } = input;
 
       const inputType = type === 'textarea' ? 'textarea' : 'input';
-      let _type = type === 'filename' ? 'text' : type;
+      let _type = type === 'filename' ? 'text' : type || 'text';
 
       let $input;
 
-      if (_type === "checkbox" || _type === "radio") {
-
+      if (_type === 'checkbox' || _type === 'radio') {
         $input = Checkbox(placeholder, value, name, id, type);
-
       } else {
-
         $input = tag(inputType, {
           id,
           placeholder,
@@ -190,11 +181,11 @@ function multiPrompt(message, inputs) {
           className: 'input',
           isRequired: required,
           readOnly,
-          autofocus
+          autofocus,
+          hidden,
         });
 
         if (disabled) $input.disabled = true;
-        if (onclick) $input.onclick = onclick.bind($input);
         if (hints) inputhints($input, hints);
 
         if (inputType === 'textarea') {
@@ -220,6 +211,13 @@ function multiPrompt(message, inputs) {
           this.select();
         };
       }
+
+      Object.defineProperty($input, 'prompt', {
+        value: { $body, hide },
+      });
+
+      if (onclick) $input.onclick = onclick.bind($input);
+      if (onchange) $input.onchange = onchange.bind($input);
 
       return $input;
     }

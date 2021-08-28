@@ -12,17 +12,18 @@ import externalFs from './fileSystem/externalFs';
 import fsOperation from './fileSystem/fsOperation';
 import path from './utils/Path';
 import Url from './utils/Url';
+import URLParse from 'url-parse';
 
 /**
  * Starts the server and run the active file in browser
- * @param {Boolean} isConsole 
- * @param {"_blank"|"_system"} target 
+ * @param {Boolean} isConsole
+ * @param {"_blank"|"_system"} target
  */
 function runPreview(isConsole = false, target = appSettings.value.previewMode) {
-
   const activeFile = isConsole ? null : editorManager.activeFile;
   const uuid = helpers.uuid();
 
+  let isLoading = false;
   let filename, pathName, extension, addedFolderUrl;
   let port = constants.PORT;
   let useExternalFs = false;
@@ -35,6 +36,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   const EDITOR_SCRIPT = uuid + '_editor.js';
   const CONSOLE_STYLE = uuid + '_console.css';
   const MARKDOWN_STYLE = uuid + '_md.css';
+  const queue = [];
 
   if (activeFile) {
     filename = activeFile.filename;
@@ -48,12 +50,12 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
   if (extension === 'svg') {
     fsOperation(activeFile.uri)
-      .then(fs => {
+      .then((fs) => {
         return fs.readFile();
       })
-      .then(res => {
+      .then((res) => {
         const blob = new Blob([new Uint8Array(res)], {
-          type: mimeType.lookup(extension)
+          type: mimeType.lookup(extension),
         });
         dialogs.box(filename, `<img src='${URL.createObjectURL(blob)}'>`);
       })
@@ -64,11 +66,13 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
   if (filename !== 'index.html' && pathName) {
     for (let folder of addedFolder) {
-      if (path.isParent(folder.url, pathName)) {
+      const path1 = URLParse(folder.url).pathname;
+      const path2 = URLParse(pathName).pathname;
+      if (path.isParent(path1, path2)) {
         addedFolderUrl = folder.url;
         const url = Url.join(addedFolderUrl, 'index.html');
         fsOperation(url)
-          .then(fs => {
+          .then((fs) => {
             return fs.exists();
           })
           .then(onresult)
@@ -87,11 +91,11 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
   function onerror() {
     helpers.error(err);
-    console.log(err);
+    console.error(err);
   }
   /**
-   * 
-   * @param {boolean} exists 
+   *
+   * @param {boolean} exists
    */
   function onresult(exists) {
     if (exists) runHTML();
@@ -111,8 +115,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function runConsole() {
-    if (!isConsole)
-      EXECUTING_SCRIPT = activeFile.filename;
+    if (!isConsole) EXECUTING_SCRIPT = activeFile.filename;
     isConsole = true;
     target = '_blank';
     filename = 'console.html';
@@ -122,8 +125,9 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
   function start() {
     if (target === 'none' && extension !== 'js') {
-      dialogs.select(strings['preview mode'], ['browser', 'in app'])
-        .then(res => {
+      dialogs
+        .select(strings['preview mode'], ['browser', 'in app'])
+        .then((res) => {
           target = res === 'browser' ? '_system' : '_blank';
           run();
         });
@@ -134,33 +138,38 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function run() {
-    if (target === "_system") {
-      system.isPowerSaveMode(res => {
-        if (res)
-          dialogs.alert(strings.info, strings["powersave mode warning"]);
-        else
+    if (target === '_system') {
+      system.isPowerSaveMode(
+        (res) => {
+          if (res)
+            dialogs.alert(strings.info, strings['powersave mode warning']);
+          else _run();
+        },
+        () => {
           _run();
-      }, () => {
-        _run();
-      });
+        }
+      );
     } else _run();
   }
-
 
   function _run() {
     webserver.stop();
 
-    webserver.start(() => {
-      openBrowser();
-    }, err => {
-      if (err === "Server already running") {
+    webserver.start(
+      () => {
         openBrowser();
-      } else {
-        ++port;
-        run();
-      }
-    }, port);
-    webserver.onRequest(req => {
+      },
+      (err) => {
+        if (err === 'Server already running') {
+          openBrowser();
+        } else {
+          ++port;
+          run();
+        }
+      },
+      port
+    );
+    webserver.onRequest((req) => {
       let reqPath = req.path.substr(1);
 
       if (reqPath === '/') {
@@ -173,7 +182,9 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
       switch (reqPath) {
         case CONSOLE_SCRIPT:
-          url = `${assets}/js/build/${appSettings.console || 'console'}.build.js`;
+          url = `${assets}/js/build/${
+            appSettings.console || 'console'
+          }.build.js`;
           sendFileContent(url, req.requestId, 'application/javascript');
           break;
 
@@ -200,10 +211,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
 
         case MARKDOWN_STYLE:
           url = appSettings.value.markdownStyle;
-          if (url)
-            sendFileContent(url, req.requestId, 'text/css');
-          else
-            sendText('img {max-width: 100%;}', req.requestId, 'text/css');
+          if (url) sendFileContent(url, req.requestId, 'text/css');
+          else sendText('img {max-width: 100%;}', req.requestId, 'text/css');
           break;
 
         default:
@@ -221,7 +230,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
                 CONSOLE_STYLE,
                 ESPRISMA_SCRIPT,
                 EXECUTING_SCRIPT,
-                EDITOR_SCRIPT
+                EDITOR_SCRIPT,
               });
               sendText(doc, req.requestId, MIMETYPE_HTML);
             } else if (checkFile(reqPath)) {
@@ -237,7 +246,7 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
             const doc = mustache.render($_markdown, {
               html,
               filename,
-              MARKDOWN_STYLE
+              MARKDOWN_STYLE,
             });
             sendText(doc, req.requestId, MIMETYPE_HTML);
             break;
@@ -245,47 +254,62 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
           default:
             if (activeFile && activeFile.type === 'git') {
               const id = activeFile.record.sha + encodeURIComponent(reqPath);
-              const uri = CACHE_STORAGE + id.hashCode() + "." + ext;
+              const uri = CACHE_STORAGE + id.hashCode() + '.' + ext;
 
-              window.resolveLocalFileSystemURL(uri, () => {
-                sendFile(uri, req.requestId);
-              }, err => {
-                if (err.code === 1) {
-                  git.getGitFile(activeFile.record, reqPath)
-                    .then(res => {
-                      const data = helpers.b64toBlob(res, mimeType.lookup(reqPath));
-                      fs.writeFile(uri, data, true, false)
-                        .then(() => {
-                          sendFile(uri, req.requestId);
-                        })
-                        .catch(err => {
-                          if (err.code) dialogs.alert(strings.error, helpers.getErrorMessage(err.code));
-                          console.log(err);
-                        });
-                    })
-                    .catch(err => {
-                      error(req.requestId);
-                    });
-                } else {
-                  error(req.requestId);
+              window.resolveLocalFileSystemURL(
+                uri,
+                () => {
+                  sendFile(uri, req.requestId);
+                },
+                (err) => {
+                  if (err.code === 1) {
+                    git
+                      .getGitFile(activeFile.record, reqPath)
+                      .then((res) => {
+                        const data = helpers.b64toBlob(
+                          res,
+                          mimeType.lookup(reqPath)
+                        );
+                        fs.writeFile(uri, data, true, false)
+                          .then(() => {
+                            sendFile(uri, req.requestId);
+                          })
+                          .catch((err) => {
+                            if (err.code)
+                              dialogs.alert(
+                                strings.error,
+                                helpers.getErrorMessage(err.code)
+                              );
+                            console.error(err);
+                          });
+                      })
+                      .catch((err) => {
+                        error(req.requestId);
+                      });
+                  } else {
+                    error(req.requestId);
+                  }
                 }
-              });
+              );
             } else {
               if (pathName) {
                 const url = Url.join(pathName, reqPath);
-                const file = editorManager.getFile(url, "uri");
+                const file = editorManager.getFile(url, 'uri');
                 if (file && file.isUnsaved) {
-                  sendText(file.session.getValue(), req.requestId, mimeType.lookup(file.filename));
+                  sendText(
+                    file.session.getValue(),
+                    req.requestId,
+                    mimeType.lookup(file.filename)
+                  );
                 } else {
                   sendFile(url, req.requestId);
                 }
               } else if (useExternalFs) {
                 if (!rootPath) {
-                  externalFs.getPath(useExternalFs)
-                    .then(res => {
-                      rootPath = res;
-                      sendExternalFile(reqPath, req.requestId);
-                    });
+                  externalFs.getPath(useExternalFs).then((res) => {
+                    rootPath = res;
+                    sendExternalFile(reqPath, req.requestId);
+                  });
                 } else {
                   sendExternalFile(reqPath, req.requestId);
                 }
@@ -300,29 +324,32 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function sendExternalFile(file, id) {
-    sdcard.getPath(rootPath, path.join(relPath, file), res => {
-      sendFileContent(res, id, mimeType.lookup(file));
-    }, err => {
-      console.log(err);
-      error(id);
-    });
+    sdcard.getPath(
+      rootPath,
+      path.join(relPath, file),
+      (res) => {
+        sendFileContent(res, id, mimeType.lookup(file));
+      },
+      (err) => {
+        console.error(err);
+        error(id);
+      }
+    );
   }
 
   function error(id) {
     webserver.sendResponse(id, {
       status: 404,
-      body: "File not found!"
+      body: 'File not found!',
     });
   }
 
-
   /**
-   * 
-   * @param {string} text 
-   * @param {string} id 
+   *
+   * @param {string} text
+   * @param {string} id
    */
   function sendHTML(text, id) {
-
     if (appSettings.value.showConsole) {
       const js = `<meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <script src="/${EDITOR_SCRIPT}" crossorigin="anonymous"></script>
@@ -344,31 +371,43 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   }
 
   function sendFile(path, id) {
+    if (isLoading) {
+      queue.push(() => {
+        sendFile(path, id);
+      });
+      return;
+    }
     const protocol = Url.getProtocol(path);
     const ext = Url.extname(path);
     const mimetype = mimeType.lookup(ext);
-    if (protocol === "ftp:") {
-
-      const cacheFile = CACHE_STORAGE_REMOTE + path.hashCode();
+    if (/s?ftp:/.test(protocol)) {
+      const cacheFile = Url.join(CACHE_STORAGE, path.hashCode());
+      isLoading = true;
       fsOperation(path)
-        .then(fs => {
+        .then((fs) => {
           return fs.readFile();
         })
-        .then(data => {
+        .then(() => {
           send(cacheFile, mimetype);
         })
-        .catch(err => {
+        .catch(() => {
           error(id);
+        })
+        .finally(() => {
+          isLoading = false;
+          const action = queue.splice(-1, 1)[0];
+          if (typeof action === 'function') action();
         });
-
-    } else if (protocol === "content:") {
-
-      sdcard.formatUri(path, uri => {
-        send(uri, mimetype);
-      }, err => {
-        error(id);
-      });
-
+    } else if (protocol === 'content:') {
+      sdcard.formatUri(
+        path,
+        (uri) => {
+          send(uri, mimetype);
+        },
+        () => {
+          error(id);
+        }
+      );
     } else {
       send(path, mimetype);
     }
@@ -378,18 +417,18 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
         status: 200,
         path,
         headers: {
-          "Content-Type": mimetype
-        }
+          'Content-Type': mimetype,
+        },
       });
     }
   }
 
   function sendFileContent(url, id, mime, processText) {
     fsOperation(url)
-      .then(fs => {
+      .then((fs) => {
         return fs.readFile('utf-8');
       })
-      .then(text => {
+      .then((text) => {
         text = processText ? processText(text) : text;
         if (mime === MIMETYPE_HTML) {
           sendHTML(text, id);
@@ -397,8 +436,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
           sendText(text, id, mime);
         }
       })
-      .catch(err => {
-        console.log(err);
+      .catch((err) => {
+        console.error(err);
         error(id);
       });
   }
@@ -408,8 +447,8 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       status: 200,
       body: processText ? processText(text) : text,
       headers: {
-        'Content-Type': mimeType || 'text/html'
-      }
+        'Content-Type': mimeType || 'text/html',
+      },
     });
   }
 
@@ -417,26 +456,37 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     const theme = appSettings.value.appTheme;
     const themeData = constants.appThemeList[theme];
     const themeColor = themeData.primary.toUpperCase();
-    const color = (themeData.type === "dark" || theme === "default") ? "#ffffff" : "#313131";
-    const options = `background=${isConsole?"#313131":'#ffffff'},location=${isConsole?'no':'yes'},hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
-    cordova.InAppBrowser.open(`http://localhost:${port}/` + filename, target, options);
+    const color =
+      themeData.type === 'dark' || theme === 'default' ? '#ffffff' : '#313131';
+    const options = `background=${isConsole ? '#313131' : '#ffffff'},location=${
+      isConsole ? 'no' : 'yes'
+    },hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
+    cordova.InAppBrowser.open(
+      `http://localhost:${port}/` + filename,
+      target,
+      options
+    );
   }
 
   function checkFile(reqPath) {
     if (!activeFile) return false;
-    return (reqPath === filename) && (activeFile.isUnsaved || !activeFile.location || activeFile.type === 'git');
+    return (
+      reqPath === filename &&
+      (activeFile.isUnsaved ||
+        !activeFile.location ||
+        activeFile.type === 'git')
+    );
   }
 }
-
 
 runPreview.checkRunnable = async function () {
   try {
     const activeFile = editorManager.activeFile;
     let result = null;
-    if (activeFile.type === "regular") {
+    if (activeFile.type === 'regular') {
       for (let folder of addedFolder) {
-        const folderPath = new RegExp('^' + folder.url);
-        if (folderPath.test(activeFile.uri)) {
+        const folderPath = new RegExp('^' + URLParse(folder.url).pathname);
+        if (folderPath.test(URLParse(activeFile.uri).pathname)) {
           const url = Url.join(folder.url, 'index.html');
           const fs = await fsOperation(url);
           if (await fs.exists()) {
@@ -450,8 +500,7 @@ runPreview.checkRunnable = async function () {
     if (!result) {
       const runnableFile = /\.((html?)|(md)|(js)|(svg))$/;
       const filename = activeFile.filename;
-      if (runnableFile.test(filename))
-        result = filename;
+      if (runnableFile.test(filename)) result = filename;
     }
 
     return result;

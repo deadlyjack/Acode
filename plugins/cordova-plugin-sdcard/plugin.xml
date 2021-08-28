@@ -12,7 +12,7 @@
   <platform name="android">
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="SDcard">
-        <param name="android-package" value="com.foxdebug.SDcard"/>
+        <param name="android-package" value="com.foxdebug.sdcard.SDcard"/>
       </feature>
     </config-file>
 

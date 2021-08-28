@@ -1,6 +1,6 @@
-import internalFs from "./internalFs";
-import ftpCodes from "../ftpCodes";
-import Url from "../utils/Url";
+import internalFs from './internalFs';
+import ftpCodes from '../ftpCodes';
+import Url from '../utils/Url';
 import mimeType from 'mime-types';
 
 /**
@@ -13,9 +13,7 @@ import mimeType from 'mime-types';
  * @returns {RemoteFs}
  */
 function Ftp(username, password, hostname, port, security, mode) {
-
   port = port || 21;
-  const ftp = window.cordova.plugin.ftp;
   const FILE = 0,
     DIR = 1,
     LINK = 2;
@@ -36,34 +34,33 @@ function Ftp(username, password, hostname, port, security, mode) {
     stats,
     get origin() {
       return Url.formate({
-        protocol: "ftp:",
+        protocol: 'ftp:',
         hostname,
         password,
         username,
         port,
         query: {
           security,
-          mode
-        }
+          mode,
+        },
       });
     },
     get originObject() {
-      const [origin, query = ""] = this.origin.split(/(?=\?)/);
+      const [origin, query = ''] = this.origin.split(/(?=\?)/);
       return {
         origin,
-        query
+        query,
       };
-    }
+    },
   };
 
   return fs;
 
   function connect(mode) {
     return new Promise((resolve, reject) => {
-
-      if (Ftp.busy === "write") {
+      if (Ftp.busy === 'write') {
         document.addEventListener('remotewriteend', next);
-      } else if (Ftp.busy === "read") {
+      } else if (Ftp.busy === 'read') {
         document.addEventListener('remotereadend', next);
       } else {
         next();
@@ -73,21 +70,18 @@ function Ftp(username, password, hostname, port, security, mode) {
         if (mode) Ftp.busy = mode;
         document.removeEventListener('remotereadend', next);
         document.removeEventListener('remotewriteend', next);
-        internalFs.createDir(CACHE_STORAGE, 'ftp-temp')
-          .finally(() => {
-            ftp.connect(
-              hostname + ':' + port,
-              username || 'anonymous',
-              password || 'anonymous',
-              security,
-              mode,
-              res => resolve(res),
-              err => {
-                ftp.disconnect();
-                reject("cannot connect to ftp: " + err);
-              }
-            );
-          });
+        ftp.connect(
+          hostname + ':' + port,
+          username || 'anonymous',
+          password || 'anonymous',
+          security,
+          mode,
+          (res) => resolve(res),
+          (err) => {
+            ftp.disconnect();
+            reject('cannot connect to ftp: ' + err);
+          }
+        );
       }
     });
   }
@@ -101,30 +95,19 @@ function Ftp(username, password, hostname, port, security, mode) {
           ftp.ls(pathname, success, error);
 
           /**
-           * @param {Array<FTPFile>} list 
+           * @param {Array<FTPFile>} list
            */
           function success(list) {
-
             const ls = [];
-            list.map(entry => {
+            list.map((entry) => {
+              let { link, type, absolutePath, name, size } = entry;
 
-              let {
-                link,
-                type,
-                absolutePath,
-                name,
-                size
-              } = entry;
+              if (name === '.' || name === '..') return entry;
 
-              if (name === "." || name === "..") return entry;
-
-              link = link === "null" ? null : link;
+              link = link === 'null' ? null : link;
 
               const url = link ? link : absolutePath;
-              const {
-                origin,
-                query
-              } = fs.originObject;
+              const { origin, query } = fs.originObject;
 
               ls.push({
                 size,
@@ -133,11 +116,10 @@ function Ftp(username, password, hostname, port, security, mode) {
                 url: origin + url + query,
                 isDirectory: type === DIR,
                 isFile: type === FILE,
-                isLink: type === LINK
+                isLink: type === LINK,
               });
             });
             resolve(ls);
-
           }
 
           function error(err) {
@@ -153,22 +135,20 @@ function Ftp(username, password, hostname, port, security, mode) {
 
   function writeFile(pathname, data) {
     return new Promise((resolve, reject) => {
-      const cacheFile = CACHE_STORAGE_REMOTE + pathname.hashCode();
+      const cacheFile = Url.join(CACHE_STORAGE, pathname.hashCode());
       const originalPathname = pathname;
       pathname = Url.pathname(pathname);
 
-      connect("write")
-        .then(res => internalFs.writeFile(cacheFile, data, true, false))
-        .then(res => {
+      connect('write')
+        .then((res) => internalFs.writeFile(cacheFile, data, true, false))
+        .then((res) => {
           ftp.upload(cacheFile, pathname, success, error);
 
           function success(res) {
-
             if (res === 1) {
               finish();
               resolve(originalPathname);
             }
-
           }
 
           function error(err) {
@@ -179,7 +159,7 @@ function Ftp(username, password, hostname, port, security, mode) {
             else reject(err);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           finish();
           reject(err);
         });
@@ -187,7 +167,7 @@ function Ftp(username, password, hostname, port, security, mode) {
 
     function finish() {
       Ftp.busy = false;
-      document.dispatchEvent(new CustomEvent("remotewriteend"));
+      document.dispatchEvent(new CustomEvent('remotewriteend'));
     }
   }
 
@@ -198,25 +178,24 @@ function Ftp(username, password, hostname, port, security, mode) {
 
   function deleteFile(pathname) {
     return new Promise((resolve, reject) => {
-      const cacheFile = CACHE_STORAGE_REMOTE + pathname.hashCode();
+      const cacheFile = Url.join(CACHE_STORAGE, pathname.hashCode());
       pathname = Url.pathname(pathname);
       connect()
-        .then(res => {
-          internalFs.deleteFile(cacheFile)
-            .finally(() => {
-              ftp.rm(pathname, success, error);
+        .then((res) => {
+          internalFs.deleteFile(cacheFile).finally(() => {
+            ftp.rm(pathname, success, error);
 
-              function success(res) {
-                resolve(res);
-              }
+            function success(res) {
+              resolve(res);
+            }
 
-              function error(err) {
-                ftp.disconnect();
-                const code = getCode(err);
-                if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
-                else reject(err);
-              }
-            });
+            function error(err) {
+              ftp.disconnect();
+              const code = getCode(err);
+              if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+              else reject(err);
+            }
+          });
         })
         .catch(reject);
     });
@@ -226,7 +205,7 @@ function Ftp(username, password, hostname, port, security, mode) {
     return new Promise((resolve, reject) => {
       pathname = Url.pathname(pathname);
       connect()
-        .then(res => {
+        .then((res) => {
           ftp.rmdir(pathname, success, error);
 
           function success(res) {
@@ -246,18 +225,16 @@ function Ftp(username, password, hostname, port, security, mode) {
 
   function readFile(pathname) {
     return new Promise((resolve, reject) => {
-      const cacheFile = CACHE_STORAGE_REMOTE + pathname.hashCode();
+      const cacheFile = Url.join(CACHE_STORAGE, pathname.hashCode());
       pathname = Url.pathname(pathname);
-      connect("read")
-        .then(res => {
+      connect('read')
+        .then((res) => {
           ftp.download(cacheFile, pathname, success, error);
 
           function success(res) {
             if (res === 1) {
               finish();
-              internalFs.readFile(cacheFile)
-                .then(resolve)
-                .catch(reject);
+              internalFs.readFile(cacheFile).then(resolve).catch(reject);
             }
           }
 
@@ -270,7 +247,7 @@ function Ftp(username, password, hostname, port, security, mode) {
             else reject(err);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           finish();
           reject(err);
         });
@@ -278,7 +255,7 @@ function Ftp(username, password, hostname, port, security, mode) {
 
     function finish() {
       Ftp.busy = false;
-      document.dispatchEvent(new CustomEvent("remotereadend"));
+      document.dispatchEvent(new CustomEvent('remotereadend'));
     }
   }
 
@@ -288,7 +265,7 @@ function Ftp(username, password, hostname, port, security, mode) {
       pathname = Url.pathname(pathname);
       newPathname = Url.pathname(newPathname);
       connect()
-        .then(res => {
+        .then((res) => {
           ftp.rename(pathname, newPathname, success, error);
 
           function success(res) {
@@ -311,7 +288,7 @@ function Ftp(username, password, hostname, port, security, mode) {
       const originalPathname = pathname;
       pathname = Url.pathname(pathname);
       connect()
-        .then(res => {
+        .then((res) => {
           ftp.mkdir(pathname, success, error);
 
           function success(res) {
@@ -330,14 +307,14 @@ function Ftp(username, password, hostname, port, security, mode) {
   }
 
   function copyTo(path, newPath) {
-    return Promise.reject(strings["copy command is not supported by ftp"]);
+    return Promise.reject(strings['copy command is not supported by ftp']);
   }
 
   function exists(pathname) {
     return new Promise((resolve, reject) => {
       pathname = Url.pathname(pathname);
       connect()
-        .then(res => {
+        .then((res) => {
           ftp.exists(pathname, resolve, error);
 
           function error(err) {
@@ -352,10 +329,10 @@ function Ftp(username, password, hostname, port, security, mode) {
   }
 
   function getCode(err) {
-    if (typeof err === "string")
+    if (typeof err === 'string')
       try {
         const code = parseInt(/code=(\d+)\b/.exec(err)[1]);
-        if (typeof code === "number") return code;
+        if (typeof code === 'number') return code;
         return null;
       } catch (error) {
         return null;
@@ -367,11 +344,11 @@ function Ftp(username, password, hostname, port, security, mode) {
     return new Promise((resolve, reject) => {
       connect()
         .then(() => {
-          return ftp.currentDirectory(resolve, err => {
+          return ftp.currentDirectory(resolve, (err) => {
             throw new Error(err);
           });
         })
-        .catch(err => {
+        .catch((err) => {
           ftp.disconnect();
           const code = getCode(err);
           if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
@@ -384,11 +361,11 @@ function Ftp(username, password, hostname, port, security, mode) {
     return new Promise((resolve, reject) => {
       connect()
         .then(() => {
-          return ftp.homeDirectory(resolve, err => {
+          return ftp.homeDirectory(resolve, (err) => {
             throw new Error(err);
           });
         })
-        .catch(err => {
+        .catch((err) => {
           ftp.disconnect();
           const code = getCode(err);
           if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
@@ -401,10 +378,10 @@ function Ftp(username, password, hostname, port, security, mode) {
     return new Promise((resolve, reject) => {
       const parent = Url.dirname(pathname);
       const filename = Url.basename(pathname);
-      if (!filename) return reject("Cannot get stats for given path.");
+      if (!filename) return reject('Cannot get stats for given path.');
 
       listDir(parent)
-        .then(res => {
+        .then((res) => {
           let file = null;
           for (let f of res) {
             if (f.name === filename) {
@@ -413,7 +390,7 @@ function Ftp(username, password, hostname, port, security, mode) {
             }
           }
 
-          if (!file) return reject("Cannot get stats for given path");
+          if (!file) return reject('Cannot get stats for given path');
           resolve({
             name: file.name,
             exists: true,
@@ -425,7 +402,7 @@ function Ftp(username, password, hostname, port, security, mode) {
             canRead: true,
             lastModified: file.modifiedDate,
             type: mimeType.lookup(filename),
-            uri: pathname
+            uri: pathname,
           });
         })
         .catch(reject);

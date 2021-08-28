@@ -1,12 +1,11 @@
 import tag from 'html-tag-js';
 /**
- * 
- * @param {string} titleText 
- * @param {string} message 
- * @param {function():void} [onhide] 
+ *
+ * @param {string} titleText
+ * @param {string} message
+ * @param {function():void} [onhide]
  */
 function alert(titleText, message, onhide) {
-
   if (!message && titleText) {
     message = titleText;
     titleText = '';
@@ -21,15 +20,15 @@ function alert(titleText, message, onhide) {
 
   const titleSpan = tag('strong', {
     className: 'title',
-    textContent: titleText
+    textContent: titleText,
   });
   const messageSpan = tag('span', {
     className: 'message scroll',
-    innerHTML: message
+    innerHTML: message,
   });
   const okBtn = tag('button', {
     textContent: strings.ok,
-    onclick: hide
+    onclick: hide,
   });
   const alertDiv = tag('div', {
     className: 'prompt alert',
@@ -38,18 +37,18 @@ function alert(titleText, message, onhide) {
       messageSpan,
       tag('div', {
         className: 'button-container',
-        child: okBtn
-      })
-    ]
+        child: okBtn,
+      }),
+    ],
   });
   const mask = tag('span', {
     className: 'mask',
-    onclick: hide
+    onclick: hide,
   });
 
   actionStack.push({
     id: 'alert',
-    action: hideAlert
+    action: hideAlert,
   });
 
   app.append(alertDiv, mask);

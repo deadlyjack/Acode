@@ -1,108 +1,86 @@
-import helpers from "./utils/helpers";
-import dialogs from "../components/dialogs";
-import recents from "./recents";
-import fsOperation from "./fileSystem/fsOperation";
+import helpers from './utils/helpers';
+import dialogs from '../components/dialogs';
+import recents from './recents';
+import fsOperation from './fileSystem/fsOperation';
 
 /**
- * 
- * @param {string|fileOptions} file 
+ *
+ * @param {string|fileOptions} file
  * @param {object} data
  */
-async function open(file, data = {}) {
-    let name, uri;
 
-    if (typeof file === 'object') {
-        name = file.name;
-        uri = file.uri;
-    } else {
-        uri = file;
-    }
+export default async function openFile(file, data = {}) {
+  try {
+    let uri = typeof file === 'object' && 'uri' in file ? file.uri : file;
+    if (!uri && typeof uri !== 'string') return;
 
-    if (!uri) return;
-
-    const fs = await fsOperation(uri);
-    const fileInfo = await fs.stats();
-    const settings = appSettings.value;
-    const readOnly = fileInfo.canWrite ? false : true;
-    const {
-        cursorPos,
-        render,
-        index,
-        onsave,
-        text
-    } = data;
-
-    if (!name) name = fileInfo.name;
-
-    let existingFile;
-
-    if (uri) existingFile = editorManager.getFile(uri, "uri");
+    const existingFile = editorManager.getFile(uri, 'uri');
 
     if (existingFile) {
-        editorManager.switchFile(existingFile.id);
-        return index === undefined ? uri : index;
-    } else if (text) {
-        editorManager.addNewFile(name, {
-            uri,
-            render,
-            text,
-            cursorPos,
-            isUnsaved: true,
-            onsave,
-            readOnly
-        });
-        return index === undefined ? uri : index;
-    } else {
-        const ext = helpers.extname(name);
-        const winLF = /\/r\/n/g;
-        if (appSettings.defaultSettings.filesNotAllowed.includes((ext || '').toLowerCase())) {
-            dialogs.loader.destroy();
-            return alert(strings.notice.toUpperCase(), `'${ext}' ${strings['file is not supported']}`);
-        } else if (fileInfo.length * 0.000001 > settings.maxFileSize) {
-            dialogs.loader.destroy();
-            return alert(strings.error.toUpperCase(), strings['file too large'].replace("{size}", settings.maxFileSize + "MB"));
-        }
-
-        const binData = await fs.readFile();
-        let text = helpers.decodeText(binData);
-
-        if (helpers.isBinary(text) && /image/i.test(fileInfo.type)) {
-            const blob = new Blob([binData]);
-            dialogs.box(name, `<img src='${URL.createObjectURL(blob)}'>`);
-            return;
-        }
-
-        editorManager.addNewFile(name, {
-            uri,
-            cursorPos,
-            text,
-            isUnsaved: false,
-            render,
-            onsave,
-            readonly: readOnly
-        });
-
-        recents.addFile(uri);
-        return index === undefined ? uri : index;
+      // If file is already opened
+      editorManager.switchFile(existingFile.id);
+      return;
     }
-}
 
-export default function openFile(uri, data = {}) {
+    dialogs.loader.create('', strings['loading'] + '...');
+    const fs = await fsOperation(uri);
+    const fileInfo = await fs.stats();
+    const name = fileInfo.name || file.name || uri;
+    const settings = appSettings.value;
+    const readOnly = fileInfo.canWrite ? false : true;
+    const { cursorPos, render, onsave, text } = data;
+    const createEditor = (isUnsaved, text) => {
+      editorManager.addNewFile(name, {
+        uri,
+        text,
+        cursorPos,
+        isUnsaved,
+        render,
+        onsave,
+        readOnly,
+      });
+    };
 
-    return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-            dialogs.loader.create(strings.loading + "...");
-        }, 100);
+    if (text) {
+      // If file is not opened and has unsaved text
+      dialogs.loader.destroy();
+      createEditor(true, text);
+      return;
+    }
 
-        open(uri, data)
-            .then(resolve)
-            .catch(err => {
-                if (data.index !== undefined) resolve(data.index);
-                else reject(err);
-            })
-            .finally(() => {
-                clearTimeout(timeout);
-                dialogs.loader.destroy();
-            });
-    });
+    // Else open a new file
+    // Checks for valid file
+    const ext = helpers.extname(name);
+    if (appSettings.isFileAllowed(ext)) {
+      dialogs.loader.destroy();
+      return alert(
+        strings.notice.toUpperCase(),
+        `'${ext}' ${strings['file is not supported']}`
+      );
+    } else if (fileInfo.length * 0.000001 > settings.maxFileSize) {
+      dialogs.loader.destroy();
+      return alert(
+        strings.error.toUpperCase(),
+        strings['file too large'].replace('{size}', settings.maxFileSize + 'MB')
+      );
+    }
+
+    const binData = await fs.readFile();
+    dialogs.loader.destroy();
+    const fileContent = helpers.decodeText(binData);
+
+    if (helpers.isBinary(fileContent) && /image/i.test(fileInfo.type)) {
+      const blob = new Blob([binData]);
+      dialogs.box(name, `<img src='${URL.createObjectURL(blob)}'>`);
+      return;
+    }
+
+    createEditor(false, fileContent);
+    recents.addFile(uri);
+    return;
+  } catch (error) {
+    dialogs.loader.destroy();
+    console.error(error);
+    helpers.error(error);
+  }
 }

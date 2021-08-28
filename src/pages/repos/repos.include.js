@@ -18,19 +18,17 @@ function ReposInclude() {
   const $search = tag('span', {
     className: 'icon search',
     attr: {
-      action: "search"
-    }
+      action: 'search',
+    },
   });
   const $menuToggler = tag('span', {
     className: 'icon more_vert',
     attr: {
-      action: 'toggle-menu'
-    }
+      action: 'toggle-menu',
+    },
   });
   const $page = Page('Repositories');
-  const {
-    credentials
-  } = helpers;
+  const { credentials } = helpers;
   /**
    * @type {Array<object>}
    */
@@ -42,7 +40,7 @@ function ReposInclude() {
     top: '8px',
     right: '8px',
     toggle: $menuToggler,
-    transformOrigin: 'top right'
+    transformOrigin: 'top right',
   });
 
   $cm.addEventListener('click', handleClick);
@@ -53,28 +51,24 @@ function ReposInclude() {
 
   dialogs.loader.create('GitHub', strings.loading + '...');
   fs.readFile(githubFile)
-    .then(res => {
+    .then((res) => {
       const text = credentials.decrypt(helpers.decodeText(res.data));
       const repos = JSON.parse(text);
       render(repos);
     })
-    .catch(err => {
+    .catch((err) => {
       loadRepos();
     });
 
   /**
-   * 
+   *
    * @param {Array<object>} res
    */
   function render(res) {
     repos = res;
 
-    repos.map(repo => {
-      const {
-        language,
-        size,
-        updated_at
-      } = repo;
+    repos.map((repo) => {
+      const { language, size, updated_at } = repo;
 
       repo.size = (size / 1024).toFixed(2) + 'KB';
       repo.updated_at = new Date(updated_at).toLocaleDateString();
@@ -89,7 +83,7 @@ function ReposInclude() {
 
     actionStack.push({
       id: 'repos',
-      action: $page.hide
+      action: $page.hide,
     });
     $page.onhide = function () {
       actionStack.remove('repos');
@@ -99,8 +93,8 @@ function ReposInclude() {
   }
 
   /**
-   * 
-   * @param {MouseEvent} e 
+   *
+   * @param {MouseEvent} e
    */
   function handleClick(e) {
     /**
@@ -128,23 +122,23 @@ function ReposInclude() {
   }
 
   function loadRepos() {
-    user.listRepos()
-      .then(res => {
+    user
+      .listRepos()
+      .then((res) => {
         const repos = res.data;
         const data = credentials.encrypt(JSON.stringify(repos));
-        fs.writeFile(githubFile, data, true, false)
-          .catch(err => {
-            toast(strings.error);
-            console.log(err);
-          });
+        fs.writeFile(githubFile, data, true, false).catch((err) => {
+          toast(strings.error);
+          console.error(err);
+        });
 
         render(repos);
       })
-      .catch(err => {
+      .catch((err) => {
         if (err.response) {
           GithubLogin();
         } else {
-          console.log(err);
+          console.error(err);
         }
       })
       .finally(() => {

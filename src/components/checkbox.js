@@ -3,30 +3,60 @@ import mustache from 'mustache';
 import $_checkbox from '../views/checkbox.hbs';
 
 /**
- * 
- * @param {String} text 
- * @param {Boolean} checked 
- * @param {String} [name] 
- * @param {String} [id] 
- * @param {"checkbox"|"radio"} [type] 
+ *
+ * @param {String} text
+ * @param {Boolean} checked
+ * @param {String} [name]
+ * @param {String} [id]
+ * @param {"checkbox"|"radio"} [type]
  */
 function Checkbox(text, checked, name, id, type) {
-  type = type || "checkbox";
-  const $checkbox = tag.parse(mustache.render($_checkbox, {
-    text,
-    checked,
-    name,
-    id,
-    type
-  }));
+  type = type || 'checkbox';
+  const $checkbox = tag.parse(
+    mustache.render($_checkbox, {
+      text,
+      checked,
+      name,
+      id,
+      type,
+    })
+  );
 
-  Object.defineProperty($checkbox, 'checked', {
-    get: function () {
-      return !!$checkbox.get('input').checked;
+  const $input = $checkbox.get('input');
+
+  Object.defineProperties($checkbox, {
+    checked: {
+      get() {
+        return !!$input.checked;
+      },
+      set(value) {
+        $input.checked = value;
+      },
     },
-    set: function (value) {
-      $checkbox.get('input').checked = value;
-    }
+    onclick: {
+      get() {
+        return $input.onclick;
+      },
+      set(onclick) {
+        $input.onclick = onchange;
+      },
+    },
+    onchange: {
+      get() {
+        return $input.onchange;
+      },
+      set(onchange) {
+        $input.onchange = onchange;
+      },
+    },
+    value: {
+      get() {
+        return this.checked;
+      },
+      set(value) {
+        this.checked = value;
+      },
+    },
   });
 
   return $checkbox;

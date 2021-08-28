@@ -1,81 +1,73 @@
 export default {
   /**
-   * The path.dirname() method returns the directory name of a path, 
+   * The path.dirname() method returns the directory name of a path,
    * similar to the Unix dirname command.
    * Trailing directory separators are ignored.
-   * @param {string} path 
+   * @param {string} path
    * @returns {string}
    */
   dirname(path) {
-    if (path.endsWith("/")) path = path.slice(0, -1);
+    if (path.endsWith('/')) path = path.slice(0, -1);
     const parts = path.split('/').slice(0, -1);
     if (!/^(\.|\.\.|)$/.test(parts[0])) parts.unshift('.');
     const res = parts.join('/');
 
-    if (!res) return "/";
+    if (!res) return '/';
     else return res;
   },
 
   /**
-   * The path.basename() methods returns the last portion of a path, 
-   * similar to the Unix basename command. 
+   * The path.basename() methods returns the last portion of a path,
+   * similar to the Unix basename command.
    * Trailing directory separators are ignored, see path.sep.
-   * @param {string} path 
+   * @param {string} path
    * @returns {string}
    */
-  basename(path, ext = "") {
-    ext = ext || "";
-    if (path === "" || path === "/") return path;
+  basename(path, ext = '') {
+    ext = ext || '';
+    if (path === '' || path === '/') return path;
     const ar = path.split('/');
     const last = ar.slice(-1)[0];
     // if (!last) return decodeURL(ar.slice(-2)[0]);
     if (!last) return ar.slice(-2)[0];
-    let res = decodeURI(last.split("?")[0] || "");
-    if (this.extname(res) === ext) res = res.replace(new RegExp(ext + "$"), "");
+    let res = decodeURI(last.split('?')[0] || '');
+    if (this.extname(res) === ext) res = res.replace(new RegExp(ext + '$'), '');
     // return decodeURL(res);
     return res;
   },
 
   /**
-   * returns the extension of the path, from the last occurrence of the . (period) 
-   * character to end of string in the last portion of the path. 
-   * If there is no . in the last portion of the path, or if there are no . characters 
-   * other than the first character of the basename of path (see path.basename()) , an 
+   * returns the extension of the path, from the last occurrence of the . (period)
+   * character to end of string in the last portion of the path.
+   * If there is no . in the last portion of the path, or if there are no . characters
+   * other than the first character of the basename of path (see path.basename()) , an
    * empty string is returned.
-   * @param {string} path 
+   * @param {string} path
    */
   extname(path) {
     const filename = path.split('/').slice(-1)[0];
     if (/.+\..*$/.test(filename))
-      return /(?:\.([^.]*))?$/.exec(filename)[0] || "";
-    return "";
+      return /(?:\.([^.]*))?$/.exec(filename)[0] || '';
+    return '';
   },
 
   /**
    * returns a path string from an object.
-   * @param {PathObject} pathObject 
+   * @param {PathObject} pathObject
    */
   format(pathObject) {
-
-    let {
-      root,
-      dir,
-      ext,
-      name,
-      base
-    } = pathObject;
+    let { root, dir, ext, name, base } = pathObject;
 
     if (base || !ext.startsWith('.')) {
       ext = '';
       if (base) name = '';
     }
 
-    dir = (dir || root);
+    dir = dir || root;
 
-    if (!dir.endsWith("/")) dir += "/";
+    if (!dir.endsWith('/')) dir += '/';
 
     return dir + (base || name) + ext;
-
   },
 
   /**
@@ -83,12 +75,12 @@ export default {
    * @param {string} path
    */
   isAbsolute(path) {
-    return path.startsWith("/");
+    return path.startsWith('/');
   },
 
   /**
    * Joins the given number of paths
-   * @param  {...string} paths 
+   * @param  {...string} paths
    */
   join(...paths) {
     let res = paths.join('/');
@@ -97,10 +89,9 @@ export default {
 
   /**
    * Normalizes the given path, resolving '..' and '.' segments.
-   * @param {string} path 
+   * @param {string} path
    */
   normalize(path) {
-
     path = path.replace(/\.\/+/g, './');
     path = path.replace(/\/+/g, '/');
 
@@ -118,12 +109,12 @@ export default {
   },
 
   /**
-   * 
-   * @param {string} path 
+   *
+   * @param {string} path
    * @returns {PathObject}
    */
   parse(path) {
-    const root = path.startsWith("/") ? "/" : "";
+    const root = path.startsWith('/') ? '/' : '';
     const dir = this.dirname(path);
     const ext = this.extname(path);
     const name = this.basename(path, ext);
@@ -134,7 +125,7 @@ export default {
       dir,
       base,
       ext,
-      name
+      name,
     };
   },
 
@@ -146,13 +137,12 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
  * @param {...string} paths 
  */
   resolve(...paths) {
-
-    if (!paths.length) throw new Error("resolve(...path) : Arguments missing!");
+    if (!paths.length) throw new Error('resolve(...path) : Arguments missing!');
 
     let result = '';
 
     for (let path of paths) {
-      if (path.startsWith("/")) {
+      if (path.startsWith('/')) {
         result = path;
         continue;
       }
@@ -160,8 +150,8 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
       result = this.normalize(this.join(result, path));
     }
 
-    if (result.startsWith("/")) return result;
-    else return "/" + result;
+    if (result.startsWith('/')) return result;
+    else return '/' + result;
   },
 
   /**
@@ -174,17 +164,17 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
   * @param {string} child 
   */
   isParent(root, child) {
-    return new RegExp("^" + root).test(child);
+    return new RegExp('^' + root).test(child);
   },
 
   /**
    * Gets path for path2 relative to path1
-   * @param {String} path1 
-   * @param {String} path2 
+   * @param {String} path1
+   * @param {String} path2
    */
   convertToRelative(path1, path2) {
-    path1 = this.normalize(path1).split("/");
-    path2 = this.normalize(path2).split("/");
+    path1 = this.normalize(path1).split('/');
+    path2 = this.normalize(path2).split('/');
 
     const p1len = path1.length;
     const p2len = path2.length;
@@ -200,11 +190,11 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
         return;
       }
 
-      if (flag) path.unshift("..");
+      if (flag) path.unshift('..');
     });
 
     if (p2len > p1len) path.push(...path2.slice(p1len));
 
-    return path.join("/");
-  }
+    return path.join('/');
+  },
 };

@@ -1,60 +1,59 @@
 import tag from 'html-tag-js';
-import mustache from 'mustache';
-
-import Page from "../../components/page";
-import dialogs from "../../components/dialogs";
-import gen from "../../components/gen";
-import About from "../about/about";
-import editorSettings from "./editorSettings";
-import constants from "../../lib/constants";
-import helpers from "../../lib/utils/helpers";
-import openFile from "../../lib/openFile";
-import internalFs from "../../lib/fileSystem/internalFs";
-import backupRestore from "./backup-restore";
-import themeSetting from "../themeSetting/themeSetting";
-
-import $_ad from '../../views/ad.hbs';
+import Page from '../../components/page';
+import dialogs from '../../components/dialogs';
+import gen from '../../components/gen';
+import constants from '../../lib/constants';
+import helpers from '../../lib/utils/helpers';
+import openFile from '../../lib/openFile';
+import internalFs from '../../lib/fileSystem/internalFs';
 
 export default function otherSettings() {
   const values = appSettings.value;
   const $page = Page(strings['other settings'].capitalize());
   const $settingsList = tag('div', {
-    className: 'main list'
+    className: 'main list',
   });
 
   actionStack.push({
     id: 'other-settings',
-    action: $page.hide
+    action: $page.hide,
   });
   $page.onhide = function () {
     actionStack.remove('other-settings');
   };
 
-  const settingsOptions = [{
-    key: 'language',
-    text: strings['change language'],
-    subText: strings.lang,
-    icon: 'translate'
-  }, {
-    key: 'previewMode',
-    text: strings['preview mode'],
-    icon: 'play_arrow',
-    subText: values.previewMode === 'none' ? strings['not set'] : values.previewMode
-  }, {
-    key: 'keybindings',
-    text: strings['key bindings'],
-    icon: 'keyboard_hide'
-  }, {
-    key: 'confirm-on-exit',
-    text: strings['confirm on exit'],
-    icon: 'exit_to_app',
-    checkbox: values.confirmOnExit
-  }, {
-    key: 'show-console',
-    text: strings['show console'],
-    icon: 'code',
-    checkbox: values.showConsole
-  }];
+  const settingsOptions = [
+    {
+      key: 'language',
+      text: strings['change language'],
+      subText: strings.lang,
+      icon: 'translate',
+    },
+    {
+      key: 'previewMode',
+      text: strings['preview mode'],
+      icon: 'play_arrow',
+      subText:
+        values.previewMode === 'none' ? strings['not set'] : values.previewMode,
+    },
+    {
+      key: 'keybindings',
+      text: strings['key bindings'],
+      icon: 'keyboard_hide',
+    },
+    {
+      key: 'confirm-on-exit',
+      text: strings['confirm on exit'],
+      icon: 'exit_to_app',
+      checkbox: values.confirmOnExit,
+    },
+    {
+      key: 'show-console',
+      text: strings['show console'],
+      icon: 'code',
+      checkbox: values.showConsole,
+    },
+  ];
 
   gen.listItems($settingsList, settingsOptions, changeSetting);
 
@@ -66,28 +65,33 @@ export default function otherSettings() {
     }
     switch (this.key) {
       case 'language':
-        dialogs.select(this.text, lanuguages, {
-            default: values.lang
+        dialogs
+          .select(this.text, lanuguages, {
+            default: values.lang,
           })
-          .then(res => {
+          .then((res) => {
             if (res === values.lang) return;
             appSettings.value.lang = res;
             appSettings.update();
-            internalFs.readFile(`${cordova.file.applicationDirectory}www/lang/${res}.json`)
-              .then(res => {
+            internalFs
+              .readFile(
+                `${cordova.file.applicationDirectory}www/lang/${res}.json`
+              )
+              .then((res) => {
                 const text = helpers.decodeText(res.data);
                 window.strings = JSON.parse(text);
-                if (actionStack.has("settings-main")) actionStack.pop();
+                if (actionStack.has('settings-main')) actionStack.pop();
               });
           });
         break;
 
       case 'keybindings':
-        dialogs.select(strings['key bindings'], [
+        dialogs
+          .select(strings['key bindings'], [
             ['edit', strings.edit],
-            ['reset', strings.reset]
+            ['reset', strings.reset],
           ])
-          .then(res => {
+          .then((res) => {
             if (res === 'edit') {
               actionStack.pop();
               actionStack.pop();
@@ -99,10 +103,15 @@ export default function otherSettings() {
         break;
 
       case 'previewMode':
-        dialogs.select(this.text, ['browser', 'in app', ['none', strings['not set']]], {
-            default: values.previewMode
-          })
-          .then(res => {
+        dialogs
+          .select(
+            this.text,
+            ['browser', 'in app', ['none', strings['not set']]],
+            {
+              default: values.previewMode,
+            }
+          )
+          .then((res) => {
             if (res === values.previewMode) return;
             appSettings.value.previewMode = res;
             appSettings.update();

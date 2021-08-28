@@ -1,66 +1,68 @@
-const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const noModule = {
   mode: 'development',
   entry: {
-    main: "./src/lib/main.js",
-    console: "./src/lib/console.js",
+    main: './src/lib/main.js',
+    console: './src/lib/console.js',
   },
   output: {
-    path: path.resolve(__dirname, "www/js/build/"),
-    filename: "[name].build.js",
-    chunkFilename: "[name].build.js",
-    publicPath: './js/build/'
+    path: path.resolve(__dirname, 'www/js/build/'),
+    filename: '[name].build.js',
+    chunkFilename: '[name].build.js',
+    publicPath: './js/build/',
   },
   module: {
-    rules: [{
+    rules: [
+      {
         test: /\.hbs$/,
-        use: ['raw-loader']
+        use: ['raw-loader'],
       },
       {
         test: /\.m?js$/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader',
           options: {
-            presets: ["@babel/preset-env"]
-          }
-        }
+            presets: ['@babel/preset-env'],
+          },
+        },
       },
       {
         test: /\.(sa|sc|c)ss$/,
-        use: [{
+        use: [
+          {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              publicPath: "../../",
-            }
+              publicPath: '../../',
+            },
           },
           {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: {
-              url: false
-            }
+              url: false,
+            },
           },
-          "postcss-loader",
-          "sass-loader"
-        ]
-      }
-    ]
+          'postcss-loader',
+          'sass-loader',
+        ],
+      },
+    ],
   },
   resolve: {
     fallback: {
       path: require.resolve('path-browserify'),
-      crypto: false
-    }
+      crypto: false,
+    },
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "../../css/build/[name].css",
+      filename: '../../css/build/[name].css',
       // chunkFilename: "../css/[id].css"
     }),
     // new BundleAnalyzerPlugin()
-  ]
+  ],
 };
 
 module.exports = [noModule];

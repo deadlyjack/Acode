@@ -1,137 +1,183 @@
-import Page from "../../components/page";
+import Page from '../../components/page';
 import tag from 'html-tag-js';
-import gen from "../../components/gen";
-import internalFs from "../../lib/fileSystem/internalFs";
-import helpers from "../../lib/utils/helpers";
-import dialogs from "../../components/dialogs";
-import fsOperation from "../../lib/fileSystem/fsOperation";
-import constants from "../../lib/constants";
+import gen from '../../components/gen';
+import helpers from '../../lib/utils/helpers';
+import dialogs from '../../components/dialogs';
+import fsOperation from '../../lib/fileSystem/fsOperation';
+import URLParse from 'url-parse';
+import Url from '../../lib/utils/Url';
 
-export default function backupRestore() {
-    const rootDir = cordova.file.externalRootDirectory;
-    const backupFile = constants.BACKUP_FILE;
-    const $page = Page(strings.backup.capitalize() + '/' + strings.restore.capitalize());
-    const settingsList = tag('div', {
-        className: 'main list'
-    });
+function backupRestore() {
+  const rootDir = cordova.file.externalRootDirectory;
+  const backupFile = Url.join(rootDir, backupRestore.BACKUP_FILE);
+  const $page = Page(
+    strings.backup.capitalize() + '/' + strings.restore.capitalize()
+  );
+  const settingsList = tag('div', {
+    className: 'main list',
+  });
 
-    actionStack.push({
-        id: 'backup-restore',
-        action: $page.hide
-    });
-    $page.onhide = function () {
-        actionStack.remove('backup-restore');
-    };
+  actionStack.push({
+    id: 'backup-restore',
+    action: $page.hide,
+  });
+  $page.onhide = function () {
+    actionStack.remove('backup-restore');
+  };
 
-    const settingsOptions = [{
-            key: 'backup',
-            text: strings.backup.capitalize(),
-            icon: 'file_downloadget_app'
-        },
-        {
-            key: 'restore',
-            text: strings.restore.capitalize(),
-            icon: 'historyrestore'
+  const settingsOptions = [
+    {
+      key: 'backup',
+      text: strings.backup.capitalize(),
+      icon: 'file_downloadget_app',
+    },
+    {
+      key: 'restore',
+      text: strings.restore.capitalize(),
+      icon: 'historyrestore',
+    },
+  ];
+
+  gen.listItems(settingsList, settingsOptions, changeSetting);
+
+  $page.appendChild(settingsList);
+  document.body.append($page);
+
+  function changeSetting() {
+    switch (this.key) {
+      case 'backup':
+        backup();
+        break;
+
+      case 'restore':
+        restore();
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  async function backup() {
+    try {
+      const settings = appSettings.value;
+      const keyBindings = window.customKeyBindings;
+      const storageList = JSON.parse(localStorage.storageList || '[]').filter(
+        (s) => /s?ftp/.test(s.storageType)
+      );
+
+      const backupDir = Url.join(rootDir, 'Backups');
+      const appBackupDir = Url.join(backupDir, 'Acode');
+      const backupDirFS = await fsOperation(backupDir);
+      const appBackupDirFS = await fsOperation(appBackupDir);
+      const rootDirFS = await fsOperation(rootDir);
+
+      if (!(await backupDirFS.exists())) {
+        await rootDirFS.createDirectory('Backups');
+      }
+
+      if (!(await appBackupDirFS.exists())) {
+        await backupDirFS.createDirectory('Acode');
+      }
+
+      for (let storage of storageList) {
+        const url = URLParse(storage.uri, true);
+        const keyFile = decodeURIComponent(url.query['keyFile'] || '');
+        const passPhrase = decodeURIComponent(url.query['passPhrase'] || '');
+        const filename = Url.basename(keyFile);
+        const newKeyFile = Url.join(appBackupDir, filename);
+        if (keyFile && keyFile !== newKeyFile) {
+          const newKeyFileFs = await fsOperation(newKeyFile);
+
+          if (await newKeyFileFs.exists()) {
+            await newKeyFileFs.deleteFile();
+          }
+
+          const fs = await fsOperation(keyFile);
+          await fs.copyTo(appBackupDir);
+          url.set('query', {
+            keyFile: newKeyFile,
+            passPhrase,
+          });
+          storage.uri = url.toString(true);
         }
-    ];
+      }
 
-    gen.listItems(settingsList, settingsOptions, changeSetting);
+      const backupString = JSON.stringify({
+        settings,
+        keyBindings,
+        storageList,
+      });
 
-    $page.appendChild(settingsList);
-    document.body.append($page);
+      const encrypted = helpers.credentials.encrypt(backupString);
 
-    function changeSetting() {
+      const backupFileFS = await fsOperation(backupFile);
 
-        switch (this.key) {
-            case 'backup':
-                backup();
-                break;
+      if (!(await backupFileFS.exists())) {
+        await appBackupDirFS.createFile('backup');
+      }
 
-            case 'restore':
-                restore();
-                break;
+      await backupFileFS.writeFile(encrypted);
 
-            default:
-                break;
-        }
+      dialogs.alert(
+        strings.success.toUpperCase(),
+        `${strings['backup successful']}\n${backupRestore.BACKUP_FILE}.`
+      );
+    } catch (error) {
+      console.error(error);
+      helpers.error(error);
     }
+  }
 
-    function backup() {
-
-        const settings = appSettings.value;
-        const keyBindings = window.customKeyBindings;
-        const ftpaccounts = JSON.parse(localStorage.ftpaccounts || '[]');
-        const modes = JSON.parse(localStorage.modeassoc || '{}');
-
-        const backupString = JSON.stringify({
-            settings,
-            keyBindings,
-            ftpaccounts,
-            modes
-        });
-        const encrypted = helpers.credentials.encrypt(backupString);
-
-        window.resolveLocalFileSystemURL(rootDir, fs => {
-            fs.getDirectory('backups', {
-                create: true
-            }, fs => {
-
-                fs.getDirectory('Acode', {
-                    create: true
-                }, fs => {
-
-                    internalFs.writeFile(rootDir + backupFile, encrypted, true, false)
-                        .then(() => {
-                            dialogs.alert(
-                                strings.success.toUpperCase(),
-                                `${strings['backup successful']}\n${backupFile}.`
-                            );
-                        })
-                        .catch(helpers.error);
-
-                }, helpers.error);
-
-            }, helpers.error);
-        });
-    }
-
-    function restore() {
-
-        sdcard.openDocumentFile(data => {
-            backupRestore.restore(data.uri);
-        }, helpers.error, "application/octet-stream");
-
-    }
+  function restore() {
+    sdcard.openDocumentFile(
+      (data) => {
+        backupRestore.restore(data.uri);
+      },
+      helpers.error,
+      'application/octet-stream'
+    );
+  }
 }
 
-backupRestore.restore = function (url) {
-    fsOperation(url)
-        .then(fs => {
-            return fs.readFile('utf8');
-        })
-        .then(backup => {
-            try {
-                backup = helpers.credentials.decrypt(backup);
-                backup = JSON.parse(backup);
+backupRestore.restore = async function (url) {
+  try {
+    let fs = await fsOperation(url);
+    let backup = await fs.readFile('utf8');
 
+    try {
+      backup = helpers.credentials.decrypt(backup);
+      backup = JSON.parse(backup);
+    } catch (error) {
+      dialogs.alert(
+        strings.error.toUpperCase(),
+        strings['invalid backup file']
+      );
+    }
 
-                fsOperation(window.KEYBINDING_FILE)
-                    .then(fs => {
-                        return fs.writeFile(JSON.stringify(backup.keyBindings, undefined, 2));
-                    })
-                    .then(() => {
-                        localStorage.modeassoc = JSON.stringify(backup.modes || {});
-                        localStorage.ftpaccounts = JSON.stringify(backup.ftpaccounts);
-                        return internalFs.writeFile(appSettings.settingsFile, JSON.stringify(backup.settings, undefined, 2), true, false);
-                    })
-                    .then(() => {
-                        location.reload();
-                    })
-                    .catch(helpers.error);
+    fs = await fsOperation(window.KEYBINDING_FILE);
+    await fs.writeFile(JSON.stringify(backup.keyBindings, undefined, 2));
 
-            } catch (error) {
-                dialogs.alert(strings.error.toUpperCase(), strings['invalid backup file']);
-            }
-        })
-        .catch(helpers.error);
+    const { settings, storageList } = backup;
+    const storedStorageList = JSON.parse(localStorage.storageList || '[]');
+    storedStorageList.push(...storageList);
+    localStorage.storageList = JSON.stringify(storedStorageList);
+
+    const settingsDir = Url.dirname(appSettings.settingsFile);
+    const settingsFileFS = await fsOperation(settingsDir);
+    fs = await fsOperation(appSettings.settingsFile);
+
+    if (!(await fs.exists())) {
+      await settingsFileFS.createFile(Url.basename(appSettings.settingsFile));
+    }
+
+    await fs.writeFile(JSON.stringify(settings, undefined, 2));
+    location.reload();
+  } catch (error) {
+    helpers.error(error);
+  }
 };
+
+backupRestore.BACKUP_FILE = 'Backups/Acode/backup';
+
+export default backupRestore;

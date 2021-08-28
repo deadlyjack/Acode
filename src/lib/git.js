@@ -1,20 +1,26 @@
-import fs from "./fileSystem/internalFs";
-import dialogs from "../components/dialogs";
-import helpers from "./utils/helpers";
+import fs from './fileSystem/internalFs';
+import dialogs from '../components/dialogs';
+import helpers from './utils/helpers';
 import GitHub from './GitHubAPI/GitHub';
-import path from "./utils/Path";
+import path from './utils/Path';
 
 //Creates new github object
 function gitHub() {
   return new GitHub({
-    username: localStorage.username ? helpers.credentials.decrypt(localStorage.username) : undefined,
-    password: localStorage.password ? helpers.credentials.decrypt(localStorage.password) : undefined,
-    token: localStorage.token ? helpers.credentials.decrypt(localStorage.token) : undefined
+    username: localStorage.username
+      ? helpers.credentials.decrypt(localStorage.username)
+      : undefined,
+    password: localStorage.password
+      ? helpers.credentials.decrypt(localStorage.password)
+      : undefined,
+    token: localStorage.token
+      ? helpers.credentials.decrypt(localStorage.token)
+      : undefined,
   });
 }
 
 /**
- *Initialize github object if directory named git exists 
+ *Initialize github object if directory named git exists
  *then it checks for all git repositories record file
  **/
 function init() {
@@ -26,15 +32,15 @@ function init() {
 
     function success() {
       initFile(gitRecordURL)
-        .then(res => {
+        .then((res) => {
           window.gitRecord = GitRecord(res);
           return initFile(gistRecordURL);
         })
-        .then(res => {
+        .then((res) => {
           window.gistRecord = GistRecord(res);
           resolve();
         })
-        .catch(err => {
+        .catch((err) => {
           if (err.code) {
             fileError(err.code);
           }
@@ -42,24 +48,24 @@ function init() {
         });
     }
 
-
     function initFile(file) {
       return new Promise((resolve, reject) => {
-
         fs.readFile(file) //initialized in main.js on device ready event
-          .then(res => {
+          .then((res) => {
             const data = res.data;
-            const val = JSON.parse(helpers.credentials.decrypt(helpers.decodeText(data)));
+            const val = JSON.parse(
+              helpers.credentials.decrypt(helpers.decodeText(data))
+            );
             resolve(val);
           })
-          .catch(err => {
+          .catch((err) => {
             if (err.code === 1) {
               const text = helpers.credentials.encrypt('{}');
               fs.writeFile(file, text, true, false)
                 .then(() => {
                   resolve({});
                 })
-                .catch(err => {
+                .catch((err) => {
                   reject(err);
                 });
             }
@@ -74,7 +80,7 @@ function init() {
             if (interval) clearInterval(interval);
             init();
           })
-          .catch(err => {
+          .catch((err) => {
             interval = setInterval(error, 1000);
           });
       } else {
@@ -90,23 +96,26 @@ function fileError(code) {
 }
 
 function error(err) {
-  if (err.response && err.response.status === 409) dialogs.alert(strings.error, strings["conflict error"]);
+  if (err.response && err.response.status === 409)
+    dialogs.alert(strings.error, strings['conflict error']);
   else if (err) dialogs.alert(strings.error, err.toString());
   throw err;
 }
 
 /**
  * Creats a git repository record object
- * @param {string} sha 
- * @param {string} name 
- * @param {string} data 
- * @param {object} repo 
- * @param {string} path 
+ * @param {string} sha
+ * @param {string} name
+ * @param {string} data
+ * @param {object} repo
+ * @param {string} path
  * @returns {Repo}
  */
 function Record(owner, sha, name, data, repo, path, branch) {
   if (!owner || !sha || !name || !repo) {
-    throw new Error('Could not create Record because one or more paramert value is not valid');
+    throw new Error(
+      'Could not create Record because one or more paramert value is not valid'
+    );
   }
   const _record = {
     sha,
@@ -116,7 +125,7 @@ function Record(owner, sha, name, data, repo, path, branch) {
     repo,
     commitMessage: null,
     branch,
-    owner
+    owner,
   };
   const repository = gitHub().getRepo(owner, repo);
 
@@ -152,25 +161,29 @@ function Record(owner, sha, name, data, repo, path, branch) {
     get name() {
       return _record.name;
     },
-    setName: str => {
+    setName: (str) => {
       return new Promise((resolve, reject) => {
-        const {
-          branch,
-          data
-        } = _record;
+        const { branch, data } = _record;
         let _path = getPath(name);
         dialogs.loader.create(name, strings.loading + '...');
-        repository.deleteFile(branch, _path)
-          .then(res => {
+        repository
+          .deleteFile(branch, _path)
+          .then((res) => {
             if (res.status === 200) {
               _path = getPath(str);
-              return repository.writeFile(branch, _path, data, `Rename ${name} to ${str}`, {});
+              return repository.writeFile(
+                branch,
+                _path,
+                data,
+                `Rename ${name} to ${str}`,
+                {}
+              );
             }
 
             return Promise.reject(res);
           })
-          .then(res => {
-            if (res.status ===201) {
+          .then((res) => {
+            if (res.status === 201) {
               _record.name = str;
               _record.commitMessage = `update ${str}`;
               update();
@@ -180,7 +193,7 @@ function Record(owner, sha, name, data, repo, path, branch) {
               reject();
             }
           })
-          .catch(err => {
+          .catch((err) => {
             error(err);
             reject();
           })
@@ -202,15 +215,12 @@ function Record(owner, sha, name, data, repo, path, branch) {
     setData: (txt) => {
       return new Promise((resolve, reject) => {
         _record.data = txt;
-        const {
-          name,
-          branch,
-          commitMessage,
-        } = _record;
+        const { name, branch, commitMessage } = _record;
         let _path = path ? path + '/' + name : name;
         dialogs.loader.create(name, strings.saving + '...');
-        repository.writeFile(branch, _path, txt, commitMessage, {})
-          .then(res => {
+        repository
+          .writeFile(branch, _path, txt, commitMessage, {})
+          .then((res) => {
             if (res.status === 200) {
               update(txt);
               resolve();
@@ -219,20 +229,20 @@ function Record(owner, sha, name, data, repo, path, branch) {
               reject();
             }
           })
-          .catch(err => {
+          .catch((err) => {
             error(err);
             reject();
           })
           .finally(dialogs.loader.destroy);
       });
-    }
+    },
   };
 }
 
 /**
- * 
+ *
  * @param {Repo} obj
- * @returns {GitRecord} 
+ * @returns {GitRecord}
  */
 function GitRecord(obj) {
   const gitRecord = obj;
@@ -241,15 +251,9 @@ function GitRecord(obj) {
     return new Promise((resolve, reject) => {
       const record = gitRecord[sha];
       if (!record) resolve(null);
-      const {
-        name,
-        repo,
-        path,
-        owner,
-        branch
-      } = record;
+      const { name, repo, path, owner, branch } = record;
       fs.readFile(DATA_STORAGE + 'git/' + sha)
-        .then(res => {
+        .then((res) => {
           const text = helpers.decodeText(res.data);
           let record;
           try {
@@ -259,7 +263,7 @@ function GitRecord(obj) {
           }
           resolve(record);
         })
-        .catch(err => {
+        .catch((err) => {
           if (err.code) fileError(err.code);
           reject(err);
         });
@@ -268,30 +272,23 @@ function GitRecord(obj) {
 
   function add(obj) {
     if (!obj.sha) throw new Error('sha must be a string');
-    const {
-      name,
-      sha,
-      repo,
-      data,
-      path,
-      owner,
-      branch
-    } = obj;
+    const { name, sha, repo, data, path, owner, branch } = obj;
     gitRecord[obj.sha] = {
       name,
       sha,
       repo,
       path,
       owner,
-      branch
+      branch,
     };
     save();
     const record = Record(owner, sha, name, data, repo, path, branch);
-    fs.writeFile(DATA_STORAGE + 'git/' + record.sha, data, true, false)
-      .catch(err => {
+    fs.writeFile(DATA_STORAGE + 'git/' + record.sha, data, true, false).catch(
+      (err) => {
         if (err.code) FileError(err.code);
-        console.log(err);
-      });
+        console.error(err);
+      }
+    );
     return record;
   }
 
@@ -307,10 +304,10 @@ function GitRecord(obj) {
   }
 
   /**
-   * 
-   * @param {string} [echo] 
-   * @param {string} [data] 
-   * @param {Repo} [record] 
+   *
+   * @param {string} [echo]
+   * @param {string} [data]
+   * @param {Repo} [record]
    */
   function save(echo = false, data = null, record = null) {
     let text = helpers.credentials.encrypt(JSON.stringify(gitRecord));
@@ -326,11 +323,11 @@ function GitRecord(obj) {
       .then(() => {
         if (echo) toast(echo);
       })
-      .catch(err => {
+      .catch((err) => {
         if (err.code) {
           fileError(err.code);
         }
-        console.log(err);
+        console.error(err);
       });
   }
 
@@ -338,16 +335,16 @@ function GitRecord(obj) {
     get,
     add,
     remove,
-    update
+    update,
   };
 }
 
 /**
  * Creats a gist object to manage gist file in editor
- * @param {string} id  
- * @param {GistFiles} [files]  
- * @param {boolean} [isNew]  
- * @param {boolean} [_public]  
+ * @param {string} id
+ * @param {GistFiles} [files]
+ * @param {boolean} [isNew]
+ * @param {boolean} [_public]
  * @returns {Gist}
  */
 function Gist(id, files, isNew, _public) {
@@ -356,17 +353,18 @@ function Gist(id, files, isNew, _public) {
     id,
     files,
     isNew,
-    public: _public
+    public: _public,
   };
 
   /**
-   * 
-   * @param {string} name 
+   *
+   * @param {string} name
    * @returns {File}
    */
   function getFile(name) {
     for (let f of editorManager.files) {
-      if (f.type === 'gist' && f.record.id === _this.id && f.name === name) return f;
+      if (f.type === 'gist' && f.record.id === _this.id && f.name === name)
+        return f;
     }
   }
 
@@ -374,15 +372,16 @@ function Gist(id, files, isNew, _public) {
     return new Promise((resolve, reject) => {
       _this.files[name].content = text;
       const update = {
-        files: {}
+        files: {},
       };
       update.files[name] = _this.files[name];
 
       dialogs.loader.create(name, strings.saving + '...');
       if (_this.isNew) {
         update.public = _this.public;
-        gist.create(update)
-          .then(res => {
+        gist
+          .create(update)
+          .then((res) => {
             if (res.status === 201) {
               _this.id = res.data.id;
               gistRecord.update(_this);
@@ -391,7 +390,7 @@ function Gist(id, files, isNew, _public) {
               resolve();
             }
           })
-          .catch(err => {
+          .catch((err) => {
             error(err);
             reject();
           })
@@ -400,11 +399,11 @@ function Gist(id, files, isNew, _public) {
         return;
       }
 
-      gist.update(update)
-        .then(res => {
+      gist
+        .update(update)
+        .then((res) => {
           if (!res) return Promise.reject('No response');
           if (res.status === 200) {
-
             if (isDelete) {
               delete _this.files[name];
               editorManager.removeFile(getFile(name), true);
@@ -417,7 +416,7 @@ function Gist(id, files, isNew, _public) {
             reject(res);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           error(err);
           reject();
         })
@@ -429,29 +428,28 @@ function Gist(id, files, isNew, _public) {
     if (!newName) return new Error('newName cannot be empty');
 
     return new Promise((resolve, reject) => {
-
       if (_this.isNew) {
         changeName();
         return resolve();
       }
 
       const update = {
-        files: {}
+        files: {},
       };
       update.files[name] = {};
       update.files[name].filename = newName;
       dialogs.loader.create(name, strings.loading + '...');
-      gist.update(update)
-        .then(res => {
+      gist
+        .update(update)
+        .then((res) => {
           if (res.status === 200) {
-
             resolve();
           } else {
             console.error(res);
             reject(res);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           error(err);
           reject();
         })
@@ -468,7 +466,7 @@ function Gist(id, files, isNew, _public) {
 
   function addFile(name) {
     _this.files[name] = {
-      filename: name
+      filename: name,
     };
     gistRecord.update(_this);
   }
@@ -488,23 +486,22 @@ function Gist(id, files, isNew, _public) {
     setName,
     setData,
     addFile,
-    removeFile
+    removeFile,
   };
 }
 
-
 /**
- * 
- * @param {object} obj 
+ *
+ * @param {object} obj
  * @returns {GistRecord}
  */
 function GistRecord(obj) {
   let gistRecord = obj;
 
   /**
-   * 
-   * @param {object} obj 
-   * @param {boolean} isNew 
+   *
+   * @param {object} obj
+   * @param {boolean} isNew
    * @returns {Gist}
    */
   function add(obj, isNew = false) {
@@ -516,12 +513,12 @@ function GistRecord(obj) {
       const file = _files[filename];
       files[filename] = {
         filename: file.filename,
-        content: file.content
+        content: file.content,
       };
     }
     gistRecord[obj.id] = {
       id,
-      files
+      files,
     };
     save();
     return Gist(id, files, isNew, !!obj.public);
@@ -529,15 +526,13 @@ function GistRecord(obj) {
 
   /**
    * gets the gist with file content
-   * @param {string} id 
-   * @param {boolean} wasNew 
+   * @param {string} id
+   * @param {boolean} wasNew
    * @returns {Gist}
    */
   function get(id, wasNew = false) {
     if (id in gistRecord) {
-      const {
-        files
-      } = gistRecord[id];
+      const { files } = gistRecord[id];
       return Gist(id, files, wasNew);
     } else {
       return null;
@@ -545,16 +540,16 @@ function GistRecord(obj) {
   }
 
   /**
-   * 
-   * @param {Gist} gist 
+   *
+   * @param {Gist} gist
    */
   function update(gist) {
     add(gist);
   }
 
   /**
-   * 
-   * @param {Gist} gist 
+   *
+   * @param {Gist} gist
    * @returns {Gist}
    */
   function remove(gist) {
@@ -571,7 +566,7 @@ function GistRecord(obj) {
       .then(() => {
         if (echo) toast(echo);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         if (err.code) fileError(err.code);
       });
@@ -587,30 +582,26 @@ function GistRecord(obj) {
     get,
     update,
     remove,
-    reset
+    reset,
   };
 }
 
 /**
- * 
- * @param {Repo} record 
- * @param {string} _path 
+ *
+ * @param {Repo} record
+ * @param {string} _path
  */
 function getGitFile(record, _path) {
-  const {
-    repo,
-    owner,
-    branch,
-    path: p
-  } = record;
+  const { repo, owner, branch, path: p } = record;
 
   const repository = gitHub().getRepo(owner, repo);
   return new Promise((resolve, reject) => {
-    repository.getSha(branch, path.resolve(p, _path).slice(1))
-      .then(res => {
+    repository
+      .getSha(branch, path.resolve(p, _path).slice(1))
+      .then((res) => {
         resolve(atob(res.data.content));
       })
-      .catch(err => {
+      .catch((err) => {
         reject(err);
       });
   });
@@ -619,5 +610,5 @@ function getGitFile(record, _path) {
 export default {
   init,
   GitHub: gitHub,
-  getGitFile
+  getGitFile,
 };

@@ -1,7 +1,7 @@
 import tag from 'html-tag-js';
 /**
- * 
- * @param {string} titleText 
+ *
+ * @param {string} titleText
  * @param {string} html
  * @param {string} [hideButtonText]
  * @param {string} [cancelButtonText]
@@ -22,10 +22,11 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
     onhide,
     then,
     ok,
-    cancle
+    cancle,
   };
 
-  let cancelBtn, hideButton = typeof hideButtonText === "boolean" ? hideButtonText : false;
+  let cancelBtn,
+    hideButton = typeof hideButtonText === 'boolean' ? hideButtonText : false;
 
   if (cancelButtonText) {
     cancelBtn = tag('button', {
@@ -33,7 +34,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
       textContent: strOK,
       onclick: () => {
         _onCancel();
-      }
+      },
     });
   }
 
@@ -42,40 +43,42 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
     textContent: strOK,
     onclick: () => {
       _onOk();
-    }
+    },
   });
   const body = tag('div', {
     className: 'message',
     innerHTML: html,
-    onclick: __onclick
+    onclick: __onclick,
   });
   const box = tag('div', {
     className: 'prompt box',
     children: [
       tag('strong', {
         className: 'title',
-        textContent: titleText
+        textContent: titleText,
       }),
-      body
-    ]
+      body,
+    ],
   });
   const mask = tag('span', {
     className: 'mask',
-    onclick: _hide
+    onclick: _hide,
   });
 
   if (!hideButton) {
-    box.append(tag('div', {
-      className: 'button-container',
-      children: cancelBtn ? [cancelBtn, okBtn] : [okBtn]
-    }));
+    box.append(
+      tag('div', {
+        className: 'button-container',
+        children: cancelBtn ? [cancelBtn, okBtn] : [okBtn],
+      })
+    );
   }
 
   setTimeout(() => {
     decTime();
     actionStack.push({
       id: 'box',
-      action: hideSelect
+      action: hideSelect,
     });
 
     document.body.append(box, mask);
@@ -86,12 +89,12 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
 
   function decTime() {
     if (waitFor >= 1000) {
-      okBtn.textContent = `${strOK} (${parseInt(waitFor/1000)}sec)`;
+      okBtn.textContent = `${strOK} (${parseInt(waitFor / 1000)}sec)`;
       waitFor -= 1000;
       setTimeout(decTime, 1000);
     } else {
       okBtn.textContent = strOK;
-      okBtn.classList.remove("disabled");
+      okBtn.classList.remove('disabled');
     }
   }
 
@@ -136,8 +139,8 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
   }
 
   /**
-   * 
-   * @param {function(HTMLCollection)} callback 
+   *
+   * @param {function(HTMLCollection)} callback
    */
   function then(callback) {
     _then = callback;
@@ -145,8 +148,8 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
   }
 
   /**
-   * 
-   * @param {function(this:HTMLElement, Event):void} onclick 
+   *
+   * @param {function(this:HTMLElement, Event):void} onclick
    */
   function onclick(onclick) {
     _onclick = onclick;
@@ -154,8 +157,8 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
   }
 
   /**
-   * 
-   * @param {function():void} onhide 
+   *
+   * @param {function():void} onhide
    */
   function onhide(onhide) {
     _onhide = onhide;
@@ -163,7 +166,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
   }
 
   /**
-   * 
+   *
    * @param {function():void} onOk
    */
   function ok(onOk) {
@@ -172,8 +175,8 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
   }
 
   /**
-   * 
-   * @param {function():void} onCancel 
+   *
+   * @param {function():void} onCancel
    */
   function cancle(onCancel) {
     _onCancel = oncancel;

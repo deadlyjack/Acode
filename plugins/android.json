@@ -34,7 +34,7 @@
     "cordova-plugin-navigationbar-color": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-sdcard": {
+    "cordova-plugin-sftp": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-statusbar": {
@@ -52,7 +52,7 @@
     "cordova-plugin-whitelist": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-sftp": {
+    "cordova-plugin-sdcard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

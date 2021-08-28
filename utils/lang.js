@@ -2,7 +2,9 @@ const path = require('path');
 const fs = require('fs');
 const yargs = require('yargs');
 const readline = require('readline');
-const args = yargs.argv;
+const args = yargs
+              .alias('a', 'all')
+              .argv;
 
 const dir = path.resolve(__dirname, '../www/lang');
 const read = readline.createInterface({
@@ -154,7 +156,7 @@ function update() {
     return;
   }
 
-  key = arg;
+  key = arg.toLowerCase();
   askTranslation();
 
 
@@ -162,21 +164,13 @@ function update() {
     const lang = list[i];
     const langName = lang.split('.')[0];
     if (command === "add") {
-      getStr(`${langName}: `)
-        .then(res => {
+      if(!args.a){
+        getStr(`${langName}: `)
+        .then(addString);
+        return;
+      }
 
-          res = res || arg;
-          update(strings => {
-            if (key in strings) {
-              console.error("String already exists");
-              process.exit(1);
-            } else {
-              strings[key] = res;
-              return strings;
-            }
-          });
-
-        });
+      addString();
     } else if (command === "remove") {
       update(strings => {
         if (key in strings) {
@@ -233,6 +227,19 @@ function update() {
           askTranslation(++i);
         }
       }
+    }
+
+    function addString(string){
+      string = string || arg;
+      update(strings => {
+        if (key in strings) {
+          console.error("String already exists");
+          process.exit(1);
+        } else {
+          strings[key] = string;
+          return strings;
+        }
+      });
     }
   }
 
