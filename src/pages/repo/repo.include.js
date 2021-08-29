@@ -31,7 +31,6 @@ export default function RepoInclude(owner, repoName) {
   });
   let cachedTree = {};
   let currentTree = {};
-  let idsToFlush = [];
   let branch;
   const branches = [];
   const input1 = {
@@ -107,6 +106,7 @@ export default function RepoInclude(owner, repoName) {
         const list = res.data;
         $page = Page(repoName);
         render(list, repoName, 'root');
+        actionStack.setMark();
         actionStack.push({
           id: 'repo',
           action: $page.hide,
@@ -115,8 +115,8 @@ export default function RepoInclude(owner, repoName) {
         $page.onhide = function () {
           $cm.removeEventListener('click', handleClick);
           $page.removeEventListener('click', handleClick);
+          actionStack.clearFromMark();
           actionStack.remove('repo');
-          idsToFlush.map((id) => actionStack.remove(id));
         };
 
         $cm.addEventListener('click', handleClick);
@@ -279,7 +279,6 @@ export default function RepoInclude(owner, repoName) {
         id: csha,
         action: function () {
           render(clist, cname, csha);
-          idsToFlush.pop();
           if (action === 'folder') {
             const $nav = $navigation.lastChild;
             if ($nav) {
@@ -290,7 +289,6 @@ export default function RepoInclude(owner, repoName) {
           }
         },
       });
-      idsToFlush.push(csha);
     }
 
     function file() {

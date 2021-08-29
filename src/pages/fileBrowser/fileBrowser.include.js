@@ -42,7 +42,12 @@ function FileBrowserInclude(
   const IS_FOLDER_MODE = ['folder', 'both'].includes(mode);
   const IS_FILE_MODE = ['file', 'both'].includes(mode);
 
-  let fileBrowserState = [];
+  let fileBrowserState = [
+    {
+      url: '/',
+      name: '/',
+    },
+  ];
   let fileBrowserOldState = JSON.parse(localStorage.fileBrowserState || '[]');
   const prompt = dialogs.prompt;
   /**@type {Array<{name: string, uuid: string, url: string, home: String}>} */
@@ -95,7 +100,6 @@ function FileBrowserInclude(
       })
     );
     const $navigation = $content.querySelector('.navigation');
-    const actionsToDispose = [];
     const menuOption = {
       top: '8px',
       right: '8px',
@@ -136,6 +140,7 @@ function FileBrowserInclude(
     let folderOption;
     //#endregion
 
+    actionStack.setMark();
     $lead.onclick = $page.hide;
     $content.addEventListener('click', handleClick);
     $content.addEventListener('contextmenu', handleContextMenu);
@@ -243,10 +248,7 @@ function FileBrowserInclude(
     };
 
     $page.onhide = function () {
-      let id = '';
-      while ((id = actionsToDispose.pop())) {
-        actionStack.remove(id);
-      }
+      actionStack.clearFromMark();
       actionStack.remove('filebrowser');
       $content.removeEventListener('click', handleClick);
       $content.removeEventListener('contextmenu', handleContextMenu);
@@ -537,7 +539,6 @@ function FileBrowserInclude(
         const $list = tag.get('#list');
         const currentUrl = currentDir.url;
         cachedDir[currentUrl].scroll = $list ? $list.scrollTop : 0;
-        actionsToDispose.push(currentUrl);
         actionStack.push({
           id: currentUrl,
           action: function () {
@@ -774,7 +775,6 @@ function FileBrowserInclude(
         while (($topNav = $navigation.lastChild) !== $nav) {
           const url = window.atob($topNav.getAttribute('url'));
           actionStack.remove(url);
-          actionsToDispose.pop();
           $topNav.remove();
         }
 
@@ -784,7 +784,6 @@ function FileBrowserInclude(
 
         localStorage.fileBrowserState = JSON.stringify(fileBrowserState);
         actionStack.remove(url);
-        actionsToDispose.pop();
         return $nav.classList.add('active');
       }
 

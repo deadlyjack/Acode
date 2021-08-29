@@ -82,6 +82,14 @@ interface ActionStack {
     remove(id: string): void;
     has(id: string): Boolean;
     length: Number;
+    /**
+     * Sets a mark to recently pushed action
+     */
+    setMark(): void;
+    /**
+     * Remove all actions that are pushed after marked positions (using `setMark()`)
+     */
+    clearFromMark(): void;
 }
 
 interface storedFiles {

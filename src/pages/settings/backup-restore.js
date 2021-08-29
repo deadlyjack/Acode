@@ -6,10 +6,10 @@ import dialogs from '../../components/dialogs';
 import fsOperation from '../../lib/fileSystem/fsOperation';
 import URLParse from 'url-parse';
 import Url from '../../lib/utils/Url';
+import FileBrowser from '../fileBrowser/fileBrowser';
+import Uri from '../../lib/utils/Uri';
 
 function backupRestore() {
-  const rootDir = cordova.file.externalRootDirectory;
-  const backupFile = Url.join(rootDir, backupRestore.BACKUP_FILE);
   const $page = Page(
     strings.backup.capitalize() + '/' + strings.restore.capitalize()
   );
@@ -66,40 +66,35 @@ function backupRestore() {
         (s) => /s?ftp/.test(s.storageType)
       );
 
-      const backupDir = Url.join(rootDir, 'Backups');
-      const appBackupDir = Url.join(backupDir, 'Acode');
+      const backupStorage = (
+        await FileBrowser(
+          'folder', //
+          strings['select folder']
+        )
+      ).url;
+
+      const backupFilename = 'Acode.backup';
+      const backupDirname = 'Backup';
+      const backupDir = Url.join(backupStorage, backupDirname);
+      const backupFile = Url.join(backupDir, backupFilename);
+      const backupStorageFS = await fsOperation(backupStorage);
       const backupDirFS = await fsOperation(backupDir);
-      const appBackupDirFS = await fsOperation(appBackupDir);
-      const rootDirFS = await fsOperation(rootDir);
+      const backupFileFS = await fsOperation(backupFile);
 
       if (!(await backupDirFS.exists())) {
-        await rootDirFS.createDirectory('Backups');
+        await backupStorageFS.createDirectory(backupDirname);
       }
 
-      if (!(await appBackupDirFS.exists())) {
-        await backupDirFS.createDirectory('Acode');
+      if (!(await backupFileFS.exists())) {
+        await backupDirFS.createFile(backupFilename);
       }
 
       for (let storage of storageList) {
         const url = URLParse(storage.uri, true);
         const keyFile = decodeURIComponent(url.query['keyFile'] || '');
-        const passPhrase = decodeURIComponent(url.query['passPhrase'] || '');
-        const filename = Url.basename(keyFile);
-        const newKeyFile = Url.join(appBackupDir, filename);
-        if (keyFile && keyFile !== newKeyFile) {
-          const newKeyFileFs = await fsOperation(newKeyFile);
-
-          if (await newKeyFileFs.exists()) {
-            await newKeyFileFs.deleteFile();
-          }
-
-          const fs = await fsOperation(keyFile);
-          await fs.copyTo(appBackupDir);
-          url.set('query', {
-            keyFile: newKeyFile,
-            passPhrase,
-          });
-          storage.uri = url.toString(true);
+        if (keyFile) {
+          const srcFs = await fsOperation(keyFile);
+          storage.keyFileData = await srcFs.readFile('utf-8');
         }
       }
 
@@ -109,19 +104,11 @@ function backupRestore() {
         storageList,
       });
 
-      const encrypted = helpers.credentials.encrypt(backupString);
-
-      const backupFileFS = await fsOperation(backupFile);
-
-      if (!(await backupFileFS.exists())) {
-        await appBackupDirFS.createFile('backup');
-      }
-
-      await backupFileFS.writeFile(encrypted);
+      await backupFileFS.writeFile(backupString);
 
       dialogs.alert(
         strings.success.toUpperCase(),
-        `${strings['backup successful']}\n${backupRestore.BACKUP_FILE}.`
+        `${strings['backup successful']}\n${Uri.getVirtualAddress(backupFile)}.`
       );
     } catch (error) {
       console.error(error);
@@ -146,7 +133,6 @@ backupRestore.restore = async function (url) {
     let backup = await fs.readFile('utf8');
 
     try {
-      backup = helpers.credentials.decrypt(backup);
       backup = JSON.parse(backup);
     } catch (error) {
       dialogs.alert(
@@ -160,7 +146,26 @@ backupRestore.restore = async function (url) {
 
     const { settings, storageList } = backup;
     const storedStorageList = JSON.parse(localStorage.storageList || '[]');
-    storedStorageList.push(...storageList);
+    for (let storage of storageList) {
+      if (!storedStorageList.find((st) => st.uuid === storage.uuid)) {
+        if ('keyFileData' in storage) {
+          const keyFileData = storage.keyFileData;
+          delete storage.keyFileData;
+
+          const keyFile = decodeURIComponent(
+            URLParse(storage.uri, true).query['keyFile']
+          );
+          const fs = await fsOperation(keyFile);
+          if (!(await fs.exists())) {
+            const dirFs = await fsOperation(Url.dirname(keyFile));
+            await dirFs.createFile(Url.basename(keyFile));
+          }
+          await fs.writeFile(keyFileData);
+        }
+
+        storedStorageList.push(storage);
+      }
+    }
     localStorage.storageList = JSON.stringify(storedStorageList);
 
     const settingsDir = Url.dirname(appSettings.settingsFile);
@@ -177,7 +182,5 @@ backupRestore.restore = async function (url) {
     helpers.error(error);
   }
 };
-
-backupRestore.BACKUP_FILE = 'Backups/Acode/backup';
 
 export default backupRestore;

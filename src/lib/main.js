@@ -33,7 +33,6 @@ import quickTools from './handlers/quickTools';
 import rateBox from '../components/dialogboxes/rateBox';
 import loadPolyFill from './utils/polyfill';
 import Url from './utils/Url';
-import backupRestore from '../pages/settings/backup-restore';
 import applySettings from './applySettings';
 import fsOperation from './fileSystem/fsOperation';
 import ajax from './utils/ajax';
@@ -900,32 +899,13 @@ function askForRating() {
 
 function showWelcomeMessage() {
   localStorage.init = true;
-  const backup = Url.join(
-    cordova.file.externalRootDirectory,
-    backupRestore.BACKUP_FILE
-  );
-  window.resolveLocalFileSystemURL(
-    backup,
-    (fs) => {
-      dialogs
-        .confirm(
-          strings['welcome back'].toUpperCase(),
-          strings['backup file found']
-        )
-        .then(() => {
-          backupRestore.restore(backup);
-        });
-    },
-    (err) => {
-      if (!BuildInfo.debug) {
-        const title = strings.info.toUpperCase();
-        const body = mustache.render($_hintText, {
-          lang: appSettings.value.lang,
-        });
-        dialogs.box(title, body).wait(12000);
-      }
-    }
-  );
+  if (!BuildInfo.debug) {
+    const title = strings.info.toUpperCase();
+    const body = mustache.render($_hintText, {
+      lang: appSettings.value.lang,
+    });
+    dialogs.box(title, body).wait(12000);
+  }
 }
 
 //#endregion
