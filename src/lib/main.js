@@ -36,7 +36,7 @@ import Url from './utils/Url';
 import applySettings from './applySettings';
 import fsOperation from './fileSystem/fsOperation';
 import ajax from './utils/ajax';
-import runPreview from './runPreview';
+import run from './run';
 import toast from '../components/toast';
 import $_menu from '../views/menu.hbs';
 import $_fileMenu from '../views/file-menu.hbs';
@@ -89,7 +89,6 @@ function Main() {
   window.fileClipBoard = null;
   window.restoreTheme = restoreTheme;
   window.getCloseMessage = () => {};
-  window.beforeClose = null;
   window.saveInterval = null;
   window.editorManager = {
     files: [],
@@ -133,15 +132,18 @@ function Main() {
         );
     }, 1000 * 10);
 
+    const {
+      externalCacheDirectory, //
+      externalDataDirectory,
+      cacheDirectory,
+      dataDirectory,
+    } = cordova.file;
+
     window.toastQueue = [];
     window.toast = toast;
     window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
-    window.DATA_STORAGE =
-      cordova.file.externalDataDirectory || cordova.file.dataDirectory;
-    window.TEMP_STORAGE = DATA_STORAGE + 'tmp/';
-    window.CACHE_STORAGE =
-      cordova.file.externalCacheDirectory || cordova.file.cacheDirectory;
-    window.SFTP_CACHE = Url.join(CACHE_STORAGE, 'sftp');
+    window.DATA_STORAGE = externalDataDirectory || dataDirectory;
+    window.CACHE_STORAGE = externalCacheDirectory || cacheDirectory;
     window.KEYBINDING_FILE = DATA_STORAGE + '.key-bindings.json';
     window.gitRecordURL = DATA_STORAGE + 'git/.gitfiles';
     window.gistRecordURL = DATA_STORAGE + 'git/.gistfiles';
@@ -161,16 +163,6 @@ function Main() {
       if (client.height === 0) return false;
       else return true;
     })();
-
-    fsOperation(TEMP_STORAGE)
-      .then((fs) => {
-        return fs.deleteDir();
-      })
-      .finally(() => {
-        fsOperation(DATA_STORAGE).then((fs) => {
-          fs.createDirectory('tmp/');
-        });
-      });
 
     document.body.setAttribute('data-version', 'v' + BuildInfo.version);
 
@@ -197,11 +189,11 @@ function Main() {
   });
 
   function ondeviceready() {
-    if (!('files' in localStorage)) {
-      // localStorage.files = '[]';
-    }
-    if (!('folders' in localStorage)) {
-      localStorage.folders = '[]';
+    localStorage.versionCode = BuildInfo.versionCode;
+
+    if (localStorage.init) {
+      localStorage.clear();
+      appSettings.reset();
     }
 
     document.head.append(
@@ -329,8 +321,7 @@ function runApp() {
      */
     exec(key, val) {
       if (key in commands) {
-        commands[key](val);
-        return true;
+        return commands[key](val);
       } else {
         return false;
       }
@@ -413,8 +404,11 @@ function App() {
     attr: {
       action: 'run-file',
     },
-    onclick: () => {
+    onclick() {
       Acode.exec('run');
+    },
+    oncontextmenu() {
+      Acode.exec('run-file');
     },
     style: {
       fontSize: '1.2em',
@@ -429,10 +423,10 @@ function App() {
     id: 'quicktool-toggler',
   });
   const actions = constants.COMMANDS;
-  let registeredKey = '',
-    editor;
+  let registeredKey = '';
   //#endregion
 
+  actionStack.onCloseApp = () => Acode.exec('save-state');
   Acode.$menuToggler = $menuToggler;
   Acode.$editMenuToggler = $editMenuToggler;
   Acode.$headerToggler = $headerToggler;
@@ -441,7 +435,6 @@ function App() {
 
   $sidebar.setAttribute('empty-msg', strings['open folder']);
   window.editorManager = EditorManager($sidebar, $header, $main);
-  editor = editorManager.editor;
 
   const fmode = appSettings.value.floatingButtonActivation;
   const activationMode = fmode === 'long tap' ? 'oncontextmenu' : 'onclick';
@@ -470,32 +463,50 @@ function App() {
   document.addEventListener('keydown', handleMainKeyDown);
   document.addEventListener('keyup', handleMainKeyUp);
 
-  window.beforeClose = saveState;
-
   loadFolders();
   document.body.setAttribute('data-small-msg', 'Loading files...');
-  loadFiles().then(() => {
-    document.body.removeAttribute('data-small-msg');
+  loadFiles() //
+    .then(() => {
+      document.body.removeAttribute('data-small-msg');
 
-    setTimeout(() => {
-      app.classList.remove('loading', 'splash');
-      onAppLoad();
-    }, 500);
+      setTimeout(() => {
+        app.classList.remove('loading', 'splash');
+        if (localStorage.count === undefined) localStorage.count = 0;
+        let count = +localStorage.count;
 
-    window.plugins.intent.setNewIntentHandler(intentHandler);
-    window.plugins.intent.getCordovaIntent(intentHandler, function (e) {
-      console.error('Error: Cannot handle open with file intent', e);
+        if (count === constants.RATING_COUNT) askForRating();
+        else if (count === constants.DONATION_COUNT) askForDonation();
+        else ++localStorage.count;
+
+        editorManager.onupdate('loading-complete');
+
+        if (!localStorage.__init) {
+          localStorage.__init = true;
+          if (!BuildInfo.debug) {
+            const title = strings.info.toUpperCase();
+            const body = mustache.render($_hintText, {
+              lang: appSettings.value.lang,
+            });
+            dialogs.box(title, body).wait(12000);
+          }
+        }
+      }, 500);
+
+      window.plugins.intent.setNewIntentHandler(intentHandler);
+      window.plugins.intent.getCordovaIntent(intentHandler, function (e) {
+        console.error('Error: Cannot handle open with file intent', e);
+      });
+      document.addEventListener('menubutton', $sidebar.toggle);
+      navigator.app.overrideButton('menubutton', true);
+      document.addEventListener('pause', () => {
+        Acode.exec('save-state');
+      });
+      document.addEventListener('resume', () => {
+        Acode.exec('check-files');
+      });
     });
-    document.addEventListener('menubutton', $sidebar.toggle);
-    navigator.app.overrideButton('menubutton', true);
-    document.addEventListener('pause', () => {
-      saveState();
-    });
-    document.addEventListener('resume', checkFiles);
-    checkFiles();
-  });
 
-  editorManager.onupdate = function (doSaveState = true) {
+  editorManager.onupdate = function (type) {
     /**
      * @type {File}
      */
@@ -516,24 +527,26 @@ function App() {
 
       editorManager.editor.setReadOnly(!activeFile.editable);
 
-      runPreview
-        .checkRunnable()
-        .then((res) => {
-          if (res) {
-            $runBtn.setAttribute('run-file', res);
-            $header.insertBefore($runBtn, $header.lastChild);
-          } else {
+      if (type !== 'remove-file') {
+        run
+          .checkRunnable()
+          .then((res) => {
+            if (res) {
+              $runBtn.setAttribute('run-file', res);
+              $header.insertBefore($runBtn, $header.lastChild);
+            } else {
+              $runBtn.removeAttribute('run-file');
+              $runBtn.remove();
+            }
+          })
+          .catch((err) => {
             $runBtn.removeAttribute('run-file');
             $runBtn.remove();
-          }
-        })
-        .catch((err) => {
-          $runBtn.removeAttribute('run-file');
-          $runBtn.remove();
-        });
+          });
+      }
     }
 
-    if (doSaveState) saveState();
+    Acode.exec('save-state');
   };
 
   window.getCloseMessage = function () {
@@ -545,19 +558,8 @@ function App() {
 
   $sidebar.onshow = function () {
     const activeFile = editorManager.activeFile;
-    if (activeFile) editor.blur();
+    if (activeFile) editorManager.editor.blur();
   };
-
-  function onAppLoad() {
-    if (localStorage.count === undefined) localStorage.count = 0;
-    let count = +localStorage.count;
-
-    if (count === constants.RATING_COUNT) askForRating();
-    else if (count === constants.DONATION_COUNT) askForDonation();
-    else ++localStorage.count;
-
-    if (!localStorage.init) showWelcomeMessage();
-  }
 
   /**
    *
@@ -575,6 +577,8 @@ function App() {
     let key = helpers.getCombination(e);
     if (registeredKey && key !== registeredKey) return;
 
+    const { editor } = editorManager;
+
     const isFocused = editor.textInput.getElement() === document.activeElement;
     if (key === 'escape' && (!actionStack.length || isFocused))
       e.preventDefault();
@@ -587,58 +591,6 @@ function App() {
     }
 
     registeredKey = null;
-  }
-
-  function saveState() {
-    const lsEditor = [];
-    const folders = [];
-    const activeFile = editorManager.activeFile;
-
-    for (let file of editorManager.files) {
-      if (
-        file.id === constants.DEFAULT_FILE_SESSION &&
-        !file.session.getValue()
-      ) {
-        continue;
-      }
-
-      const edit = {
-        id: file.id,
-        filename: file.filename,
-        type: file.type,
-        uri: file.uri,
-        isUnsaved: file.isUnsaved,
-        readOnly: file.readOnly,
-        cursorPos: editor.getCursorPosition(),
-      };
-
-      if (edit.type === 'git') edit.sha = file.record.sha;
-      else if (edit.type === 'gist') {
-        edit.recordid = file.record.id;
-        edit.isNew = file.record.isNew;
-      }
-
-      lsEditor.push(edit);
-    }
-
-    addedFolder.map((folder) => {
-      const { url, reloadOnResume, saveState, title } = folder;
-      folders.push({
-        url,
-        opts: {
-          saveState,
-          reloadOnResume,
-          name: title,
-        },
-      });
-    });
-
-    if (activeFile) {
-      localStorage.setItem('lastfile', activeFile.id);
-    }
-
-    localStorage.setItem('files', JSON.stringify(lsEditor));
-    localStorage.setItem('folders', JSON.stringify(folders));
   }
 
   function loadFiles() {
@@ -657,6 +609,8 @@ function App() {
             uri,
             id,
             readOnly,
+            mode,
+            deltedFile,
           } = file;
           const render = files.length === 1 || id === lastfile;
 
@@ -699,19 +653,32 @@ function App() {
               });
             }
           } else if (uri) {
-            if (!text) {
+            try {
               const fs = await fsOperation(uri);
-              text = await fs.readFile('utf-8');
+              if (!text) {
+                text = await fs.readFile('utf-8');
+              } else if (!(await fs.exists())) {
+                uri = null;
+                isUnsaved = true;
+                dialogs.alert(
+                  strings.info.toUpperCase(),
+                  strings['file has been deleted'].replace('{file}', filename)
+                );
+              }
+              editorManager.addNewFile(filename, {
+                uri,
+                render,
+                isUnsaved,
+                cursorPos,
+                readOnly,
+                text,
+                id,
+                mode,
+                deltedFile,
+              });
+            } catch (error) {
+              continue;
             }
-            editorManager.addNewFile(filename, {
-              uri,
-              render,
-              isUnsaved,
-              cursorPos,
-              readOnly,
-              text,
-              id,
-            });
           } else {
             editorManager.addNewFile(filename, {
               render,
@@ -723,6 +690,9 @@ function App() {
           }
         }
 
+        if (!editorManager.files.length) {
+          editorManager.addNewFile();
+        }
         resolve();
       })();
     });
@@ -734,54 +704,6 @@ function App() {
       folders.map((folder) => openFolder(folder.url, folder.opts));
     } catch (error) {}
   }
-
-  async function checkFiles(e) {
-    const files = editorManager.files;
-
-    for (let file of files) {
-      if (file.type === 'git') return;
-
-      if (file.uri) {
-        const fs = await fsOperation(file.uri);
-
-        if (!(await fs.exists())) {
-          file.location = null;
-          file.isUnsaved = true;
-          dialogs.alert(
-            strings.info.toUpperCase(),
-            strings['file has been deleted'].replace('{file}', file.filename)
-          );
-          editorManager.onupdate();
-          continue;
-        }
-
-        const text = await fs.readFile('utf-8');
-        const loadedText = file.session.getValue();
-
-        if (text !== loadedText) {
-          try {
-            await dialogs.confirm(
-              strings.warning.toUpperCase(),
-              file.filename + strings['file changed']
-            );
-
-            const cursorPos = editor.getCursorPosition();
-            editorManager.switchFile(file.id);
-
-            file.markChanged = false;
-            file.session.setValue(text);
-            editor.gotoLine(cursorPos.row, cursorPos.column);
-            editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
-          } catch (error) {}
-        }
-      }
-    }
-
-    if (!editorManager.activeFile) {
-      app.focus();
-    }
-  }
-  //#endregion
 
   /**
    *
@@ -813,7 +735,7 @@ function App() {
     )
       return;
     e.preventDefault();
-    editor.focus();
+    editorManager.editor.focus();
   }
 }
 
@@ -895,17 +817,6 @@ function resetCount() {
 
 function askForRating() {
   if (!localStorage.dontAskForRating) rateBox();
-}
-
-function showWelcomeMessage() {
-  localStorage.init = true;
-  if (!BuildInfo.debug) {
-    const title = strings.info.toUpperCase();
-    const body = mustache.render($_hintText, {
-      lang: appSettings.value.lang,
-    });
-    dialogs.box(title, body).wait(12000);
-  }
 }
 
 //#endregion

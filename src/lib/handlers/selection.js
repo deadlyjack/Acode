@@ -109,6 +109,7 @@ function textControl(editor, container) {
 
 function enableSingleMode() {
   const { editor, controls, container } = editorManager;
+  const containerClient = container.getBoundingClientRect();
   const margin = {
     left: 0,
     top: 0,
@@ -250,16 +251,17 @@ function enableSingleMode() {
     $cm.style.transform = `translate3d(${cm.left}px, ${cm.top}px, 0) scale(${scale})`;
 
     const cmClient = $cm.getBoundingClientRect();
+
     if (cmClient.right + 10 > innerWidth) {
-      cm.left = innerWidth - cmClient.width - 10;
+      cm.left = (containerWidth - cmClient.width * scale) / 2;
     }
 
     if (cmClient.left < 10) {
       cm.left = 10;
     }
 
-    if (cmClient.top < 0) {
-      cm.top = 50;
+    if (cmClient.top < containerClient.top) {
+      cm.top += 80;
     }
 
     $cm.style.transform = `translate3d(${cm.left * scale}px, ${

@@ -1,6 +1,6 @@
 import saveFile from './saveFile';
 import select from './handlers/selectword';
-import runPreview from './runPreview';
+import run from './run';
 import settingsMain from '../pages/settings/mainSettings';
 import dialogs from '../components/dialogs';
 import openFile from './openFile';
@@ -29,13 +29,62 @@ const commands = {
     editorManager.removeFile(editorManager.activeFile);
   },
   console() {
-    runPreview(true, 'in app');
+    run(true, 'in app');
   },
   copy() {
     clipboardAction('copy');
   },
   cut() {
     clipboardAction('cut');
+  },
+  'check-files'() {
+    (async () => {
+      const files = editorManager.files;
+      const { editor } = editorManager;
+
+      for (let file of files) {
+        if (file.isUnsaved) continue;
+
+        if (file.uri) {
+          const fs = await fsOperation(file.uri);
+
+          if (!(await fs.exists())) {
+            file.isUnsaved = true;
+            file.uri = null;
+            dialogs.alert(
+              strings.info.toUpperCase(),
+              strings['file has been deleted'].replace('{file}', file.filename)
+            );
+            editorManager.onupdate('file-changed');
+            continue;
+          }
+
+          const text = await fs.readFile('utf-8');
+          const loadedText = file.session.getValue();
+
+          if (text !== loadedText) {
+            try {
+              await dialogs.confirm(
+                strings.warning.toUpperCase(),
+                file.filename + strings['file changed']
+              );
+
+              const cursorPos = editor.getCursorPosition();
+              editorManager.switchFile(file.id);
+
+              file.markChanged = false;
+              file.session.setValue(text);
+              editor.gotoLine(cursorPos.row, cursorPos.column);
+              editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
+            } catch (error) {}
+          }
+        }
+      }
+
+      if (!editorManager.activeFile) {
+        app.focus();
+      }
+    })();
   },
   'disable-fullscreen'() {
     app.classList.remove('fullscreen-mode');
@@ -60,7 +109,7 @@ const commands = {
         const newText = new TextDecoder(encoding).decode(decodedText);
         file.session.setValue(newText);
         file.isUnsaved = false;
-        editorManager.onupdate();
+        editorManager.onupdate('encoding');
       });
   },
   exit() {
@@ -85,7 +134,9 @@ const commands = {
     editorManager.onupdate = tmp;
     editor.selection.moveCursorToPosition(pos);
   },
-  'file-info': showFileInfo,
+  'file-info'(url) {
+    showFileInfo(url);
+  },
   github() {
     if (
       (!localStorage.username || !localStorage.password) &&
@@ -176,7 +227,7 @@ const commands = {
   'read-only'() {
     const file = editorManager.activeFile;
     file.editable = !file.editable;
-    editorManager.onupdate();
+    editorManager.onupdate('read-only');
   },
   recent() {
     recents.select().then((res) => {
@@ -197,6 +248,12 @@ const commands = {
   },
   rename(file) {
     file = file || editorManager.activeFile;
+
+    if (file.mode === 'single') {
+      dialogs.alert(strings.info.toUpperCase(), strings['unable to rename']);
+      return;
+    }
+
     dialogs
       .prompt(strings.rename, file.filename, 'filename', {
         match: constants.FILE_NAME_REGEX,
@@ -235,10 +292,64 @@ const commands = {
     editorManager.controls.update();
   },
   run() {
-    if (Acode.$runBtn.isConnected) runPreview();
+    run();
+  },
+  'run-file'() {
+    run.runFile();
   },
   save(toast) {
     saveFile(editorManager.activeFile, false, toast);
+  },
+  'save-state'() {
+    const filesToSave = [];
+    const folders = [];
+    const { activeFile } = editorManager;
+    const { editor } = editorManager;
+    const { files } = editorManager;
+    for (let file of files) {
+      if (file.id === constants.DEFAULT_FILE_SESSION) {
+        continue;
+      }
+
+      const edit = {
+        id: file.id,
+        filename: file.filename,
+        type: file.type,
+        uri: file.uri,
+        isUnsaved: file.isUnsaved,
+        readOnly: file.readOnly,
+        mode: file.mode,
+        deltedFile: file.deltedFile,
+        cursorPos: editor.getCursorPosition(),
+      };
+
+      if (edit.type === 'git') edit.sha = file.record.sha;
+      else if (edit.type === 'gist') {
+        edit.recordid = file.record.id;
+        edit.isNew = file.record.isNew;
+      }
+
+      filesToSave.push(edit);
+    }
+
+    addedFolder.forEach((folder) => {
+      const { url, reloadOnResume, saveState, title } = folder;
+      folders.push({
+        url,
+        opts: {
+          saveState,
+          reloadOnResume,
+          name: title,
+        },
+      });
+    });
+
+    if (activeFile) {
+      localStorage.setItem('lastfile', activeFile.id);
+    }
+
+    localStorage.setItem('files', JSON.stringify(filesToSave));
+    localStorage.setItem('folders', JSON.stringify(folders));
   },
   'save-as'(toast) {
     saveFile(editorManager.activeFile, true, toast);

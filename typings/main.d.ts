@@ -55,6 +55,7 @@ interface Settings {
     showConsole: boolean;
     customTheme: Map<String, String>;
     customThemeMode: 'light' | 'dark';
+    lineHeight: Number;
 }
 
 interface AppSettings {
@@ -90,6 +91,10 @@ interface ActionStack {
      * Remove all actions that are pushed after marked positions (using `setMark()`)
      */
     clearFromMark(): void;
+    /**
+     * Callback function when app is to close
+     */
+    onCloseApp: ()=> void;
 }
 
 interface storedFiles {
@@ -116,6 +121,7 @@ interface newFileOptions {
     record: Repo | Gist;
     onsave(): void;
     isUnsaved: Boolean;
+    mode: 'single'|'tree';
 }
 
 interface Controls {
@@ -186,6 +192,15 @@ interface File {
     canWrite: boolean;
     uuid: string;
     onsave(this: File): void;
+    mode: 'single'|'tree';
+    /**
+     * Write file data to cache
+     */
+    writeToCache(): Promise<void>;
+    /**
+     * Checks if file is changed or not
+     */
+    isChanged(): Promise<Boolean>;
 }
 
 interface FileStatus {
@@ -388,7 +403,6 @@ interface Folder {
 }
 
 interface Window {
-    beforeClose: function(): void;
     getCloseMessage: function(): string;
     restoreTheme(): void;
 }
@@ -518,7 +532,6 @@ declare var Acode: Acode;
 declare var AceMouseEvent: any;
 
 declare var CACHE_STORAGE: string;
-declare var TEMP_STORAGE: string;
 declare var DATA_STORAGE: string;
 declare var DOES_SUPPORT_THEME: boolean;
 declare var IS_FREE_VERSION: boolean;

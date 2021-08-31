@@ -7,8 +7,8 @@ export default {
    * eg.
    *```js
    * parse("content://.../AA98-181D%3A::.../index.html")
-   * //{rootUri: "content://.../AA98-181D%3A", docId: "...index.html"}
    *```
+   * `returns` {rootUri: "content://.../AA98-181D%3A", docId: "...index.html"}
    *
    * @param {string} contentUri
    * @returns {{rootUri: string, docId: string, isFileUri: boolean}}
@@ -25,20 +25,9 @@ export default {
       /^content:\/\/com\.(((?![:<>"\/\\\|\?\*]).)*)\.documents\/document/;
     const PRIMARY =
       /^content:\/\/com\.android\.externalstorage\.documents\/document\/primary/;
-    let FILE_ROOT;
-
-    try {
-      FILE_ROOT = cordova.file.externalRootDirectory;
-    } catch (error) {
-      FILE_ROOT = 'file:///storage/emulated/0/';
-    }
 
     if (DOC_PROVIDER.test(contentUri)) {
-      //If matches, it means url can be converted to file:///
-      if (PRIMARY.test(contentUri)) {
-        rootUri =
-          FILE_ROOT + decodeURIComponent(contentUri).split(':').slice(-1)[0];
-      } else if (TREE_URI.test(contentUri)) {
+      if (TREE_URI.test(contentUri)) {
         if (/::/.test(contentUri)) {
           [rootUri, docId] = contentUri.split('::');
         } else {

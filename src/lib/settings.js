@@ -92,6 +92,7 @@ class Settings {
       confirmOnExit: true,
       showConsole: true,
       customThemeMode: 'dark',
+      lineHeight: 2,
       customTheme: {
         '--primary-color': 'rgb(153,153,255)',
         '--secondary-color': 'rgb(255,255,255)',

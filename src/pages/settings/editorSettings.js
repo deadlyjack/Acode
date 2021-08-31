@@ -61,6 +61,11 @@ export default function editorSettings() {
       checkbox: values.linenumbers,
     },
     {
+      key: 'lineHeight',
+      text: strings['line height'],
+      subText: values.lineHeight,
+    },
+    {
       key: 'beautify',
       text: strings['beautify on save'],
       subText: strings.except + ': ' + values.beautify.join(','),
@@ -157,6 +162,7 @@ export default function editorSettings() {
             }
           });
         break;
+
       case 'fontSize':
         dialogs
           .prompt(this.text, values.fontSize, 'text', {
@@ -168,6 +174,22 @@ export default function editorSettings() {
 
             appSettings.update({
               fontSize: res,
+            });
+            this.changeSubText(res);
+          });
+        break;
+
+      case 'lineHeight':
+        dialogs
+          .prompt(this.text, values.lineHeight, 'numberic', {
+            required: true,
+          })
+          .then((res) => {
+            res = parseFloat(res);
+            if (res < 1 || res === values.lineHeight) return;
+
+            appSettings.update({
+              lineHeight: res,
             });
             this.changeSubText(res);
           });

@@ -7,7 +7,6 @@ export default {
    * @returns {Promise}
    */
   listDir(url) {
-    // url = decodeURL(url);
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURL(url, success, reject);
 
@@ -82,7 +81,6 @@ export default {
    * @returns {Promise}
    */
   deleteFile(filename) {
-    // filename = decodeURL(filename);
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURL(
         filename,
@@ -104,7 +102,6 @@ export default {
    * @returns {Promise}
    */
   readFile(filename) {
-    // filename = decodeURL(filename);
     return new Promise((resolve, reject) => {
       if (!filename) return reject('Invalid valud of fileURL: ' + filename);
 
@@ -150,7 +147,6 @@ export default {
    * @returns {Promise}
    */
   renameFile(url, newname) {
-    // url = decodeURL(url);
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURL(
         url,
@@ -173,7 +169,6 @@ export default {
    * @returns {Promise}
    */
   createDir(path, dirname) {
-    // path = decodeURL(path);
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURL(
         path,

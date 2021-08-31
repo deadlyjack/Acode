@@ -155,19 +155,6 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
   },
 
   /**
-  * Checks if child uri is originated from root uri eg.
-  * ```js
-  isParent("file:///sdcard/", "file://sdcard/path/to/file") //true 
-  isParent("file:///sdcard2/", "file://sdcard1/path/to/file") //false
-  * ```
-  * @param {string} root 
-  * @param {string} child 
-  */
-  isParent(root, child) {
-    return new RegExp('^' + root).test(child);
-  },
-
-  /**
    * Gets path for path2 relative to path1
    * @param {String} path1
    * @param {String} path2

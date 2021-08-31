@@ -5,14 +5,14 @@ import constants from './constants';
 import recents from '../lib/recents';
 import fsOperation from '../lib/fileSystem/fsOperation';
 import Url from './utils/Url';
+import openFolder from './openFolder';
 
 /**
  *
  * @param {File} file
  * @param {boolean} [as]
- * @param {boolean} [showToast]
  */
-function saveFile(file, as = false, showToast = true) {
+function saveFile(file, as = false) {
   beautifyFile();
 
   let newFile = false;
@@ -53,53 +53,31 @@ function saveFile(file, as = false, showToast = true) {
             .setData(file.session.getValue())
             .then(() => {
               file.isUnsaved = false;
-              editorManager.onupdate();
+              editorManager.onupdate('save-file');
             })
             .catch((err) => {
               if (err) dialogs.alert(strings.error, err.toString());
-              // else toast(strings.error);
+              else toast(strings.error);
             });
         });
     } else if (file.type === 'gist') {
       file.record
         .setData(file.name, file.session.getValue())
         .then(() => {
-          // window.plugins.toast.showLongBottom(strings['file saved']);
           file.isUnsaved = false;
-          editorManager.onupdate();
+          editorManager.onupdate('save-file');
         })
         .catch((err) => {
           if (err) dialogs.alert(strings.error, err.toString());
-          // else toast(strings.error);
+          else toast(err.toString());
         });
     } else if (file.uri) {
       save();
     }
   } else {
-    let locations;
-
-    try {
-      locations = JSON.parse(localStorage.recentlySavedLocations);
-    } catch (error) {
-      locations = [];
-    }
-
     recents
       .select(
-        [
-          ...locations.map((location) => {
-            return [
-              {
-                val: {
-                  url: location,
-                },
-              },
-              Url.hidePassword(location),
-              'folder',
-            ];
-          }),
-          ['select-folder', strings['select folder'], 'folder'],
-        ],
+        [['select-folder', strings['select folder'], 'folder']],
         'dir',
         strings['select folder']
       )
@@ -139,14 +117,10 @@ function saveFile(file, as = false, showToast = true) {
 
   /**
    *
-   * @param {File} file
    * @param {string} [url]
    * @param {string} [filename]
-   * @param {boolean} [canWrite]
-   * @param {string} [uuid]
-   * @param {string} [origin]
    */
-  function save(url, filename) {
+  async function save(url, filename) {
     const data = file.session.getValue();
     let createFile = false || as;
 
@@ -163,34 +137,44 @@ function saveFile(file, as = false, showToast = true) {
     const $text = file.assocTile.querySelector('span.text');
     $text.textContent = strings.saving + '...';
     file.isSaving = true;
+
     if (createFile) {
-      fsOperation(url)
-        .then((fs) => {
-          return fs.createFile(file.filename, data);
-        })
-        .then((url) => {
-          file.type = 'regular';
-          file.uri = url;
-          editorManager.setSubText(file);
-          recents.addFile(url);
-          updateFile();
-        })
-        .catch(error)
-        .finally(() => {
-          resetText();
-        });
+      try {
+        const fs = await fsOperation(url);
+        const fileUri = await fs.createFile(file.filename, data);
+        file.type = 'regular';
+        file.uri = fileUri;
+        editorManager.setSubText(file);
+        recents.addFile(fileUri);
+        updateFolders(url);
+        updateFile();
+      } catch (err) {
+        error(err);
+      }
+      resetText();
     } else {
-      fsOperation(file.uri)
-        .then((fs) => {
-          return fs.writeFile(data);
-        })
-        .then(() => {
-          updateFile();
-        })
-        .catch(error)
-        .finally(() => {
-          resetText();
-        });
+      try {
+        const fs = await fsOperation(file.uri);
+
+        if (!(await fs.exists())) {
+          const fileDir = Url.dirname(file.uri);
+          const dir = await fsOperation(fileDir);
+          await dir.createFile(file.filename, data);
+          updateFolders(dir);
+        } else {
+          await fs.writeFile(data);
+        }
+
+        updateFile();
+      } catch (err) {
+        error(err);
+      }
+      resetText();
+    }
+
+    function updateFolders(dir) {
+      const folder = openFolder.find(dir);
+      folder.reload();
     }
 
     function error(err) {
@@ -206,41 +190,17 @@ function saveFile(file, as = false, showToast = true) {
     }
 
     function updateFile() {
-      if (url) {
-        /**
-         * @type {Array<String>}
-         */
-        let recentlySavedLocations;
-        try {
-          recentlySavedLocations = JSON.parse(
-            localStorage.recentlySavedLocations
-          );
-        } catch (e) {
-          recentlySavedLocations = [];
-        }
-
-        if (recentlySavedLocations.includes(url))
-          recentlySavedLocations = recentlySavedLocations.filter((location) => {
-            return location !== url;
-          });
-        if (recentlySavedLocations.length > 4) recentlySavedLocations.pop();
-
-        recentlySavedLocations.unshift(url);
-        localStorage.recentlySavedLocations = JSON.stringify(
-          recentlySavedLocations
-        );
+      if (file.location) {
+        recents.addFolder(file.location);
       }
 
       if (window.saveTimeout) clearTimeout(window.saveTimeout);
-      if (file.id === constants.DEFAULT_FILE_SESSION) file.id = helpers.uuid();
       window.saveTimeout = setTimeout(() => {
         file.isSaving = false;
         file.isUnsaved = false;
         file.onsave();
-        // if (showToast) toast(strings['file saved']);
         if (url) recents.addFile(file.uri);
-        editorManager.onFileSave(file);
-        editorManager.onupdate();
+        editorManager.onupdate('save-file');
         resetText();
       }, editorManager.TIMEOUT_VALUE + 100);
     }

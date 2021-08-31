@@ -3,8 +3,15 @@ import dialogs from '../components/dialogs';
 function ActionStack() {
   const stack = [];
   let mark = null;
+  let oncloseappCallback;
 
   return {
+    get onCloseApp() {
+      return oncloseappCallback;
+    },
+    set onCloseApp(cb) {
+      oncloseappCallback = cb;
+    },
     /**
      * @param {object} fun
      * @param {string} fun.id
@@ -25,7 +32,10 @@ function ActionStack() {
             .then(closeApp);
         } else {
           dialogs
-            .confirm(strings.alert.toUpperCase(), strings['close app'])
+            .confirm(
+              strings.alert.toUpperCase(),
+              strings['close app'].capitalize(0)
+            )
             .then(closeApp);
         }
       } else {
@@ -33,8 +43,17 @@ function ActionStack() {
       }
 
       function closeApp() {
-        if (window.beforeClose) window.beforeClose();
-        navigator.app.exitApp();
+        const { exitApp } = navigator.app;
+
+        if (typeof oncloseappCallback === 'function') {
+          const res = oncloseappCallback();
+          if (res instanceof Promise) {
+            res.finally(exitApp);
+            return;
+          }
+        }
+
+        exitApp();
       }
     },
     /**

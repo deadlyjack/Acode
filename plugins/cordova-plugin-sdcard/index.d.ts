@@ -154,6 +154,15 @@ interface SDcard {
    */
   write(src: String, content: String, onSuccess: (res: "OK") => void, onFail: (err: any) => void): void;
   /**
+   * Writes new content to the given file.
+   * @param src file url
+   * @param content new file content
+   * @param isBinary is data binary
+   * @param onSuccess Callback function on success returns "OK"
+   * @param onFail Callback function on error returns error object
+   */
+  write(src: String, content: String, isBinary: Boolean, onSuccess: (res: "OK") => void, onFail: (err: any) => void): void;
+  /**
    * Gets stats of given file
    * @param src file/directory url
    * @param onSuccess Callback function on success returns file/directory stats

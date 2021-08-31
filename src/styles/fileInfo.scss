@@ -1,6 +1,6 @@
 #file-info {
   .name {
-    height: 40px;
+    min-height: 40px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -10,43 +10,45 @@
       font-weight: bold;
       opacity: 1;
     }
+  }
 
-    .share-button {
-      background-color: #3399ff;
-      background-color: var(--button-background-color);
-      color: white;
-      color: var(--text-main-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+  .share-button {
+    border: none;
+    box-sizing: border-box;
+    background-color: #3399ff;
+    background-color: var(--button-background-color);
+    color: white;
+    color: var(--text-main-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    width: 95px;
+    margin: 5px auto;
+    border-radius: 20px;
+
+    * {
+      pointer-events: none;
+    }
+
+    .icon {
       height: 30px;
-      width: 95px;
-      margin-left: 5px;
-      border-radius: 20px;
-
-      * {
-        pointer-events: none;
-      }
-
-      .icon {
-        height: 30px;
-        margin-right: 10px;
-      }
+      margin-right: 10px;
     }
   }
 
-  >div {
+  > div {
     display: flex;
     flex-direction: column;
     margin-bottom: 10px;
 
-    >span:first-child {
+    > span:first-child {
       font-size: 0.95rem;
       opacity: 0.5;
       margin-right: 10px;
     }
 
-    >span:last-child {
+    > span:last-child {
       max-width: 100%;
       overflow: auto;
     }

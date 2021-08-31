@@ -252,6 +252,7 @@ function FileBrowserInclude(
       actionStack.remove('filebrowser');
       $content.removeEventListener('click', handleClick);
       $content.removeEventListener('contextmenu', handleContextMenu);
+      Acode.exec('check-files');
     };
 
     if (IS_FOLDER_MODE) {
@@ -439,7 +440,10 @@ function FileBrowserInclude(
             list = helpers.sortDir(
               list,
               appSettings.value.fileBrowser,
-              testFileType
+              testFileType,
+              null,
+              null,
+              mode
             );
             cachedDir[url] = {
               name,
@@ -498,7 +502,7 @@ function FileBrowserInclude(
       const home = $el.getAttribute('home');
       const isDir = ['dir', 'directory', 'folder'].includes(type);
 
-      if (!url && action === 'open' && isDir && !opendoc) {
+      if (!url && action === 'open' && isDir && !opendoc && !contextMenu) {
         dialogs.loader.hide();
         util.addPath(name).then((res) => {
           const storage = allStorages.find((storage) => storage.uuid === uuid);
@@ -575,8 +579,9 @@ function FileBrowserInclude(
       }
 
       function cmhandle() {
-        if (appSettings.value.vibrateOnTap)
+        if (appSettings.value.vibrateOnTap) {
           navigator.vibrate(constants.VIBRATION_TIME);
+        }
         if ($el.getAttribute('open-doc') === 'true') return;
 
         const options = [
@@ -587,6 +592,11 @@ function FileBrowserInclude(
         if (/s?ftp/.test(storageType)) {
           options.push(['edit', strings.edit, 'edit']);
         }
+
+        if (helpers.isFile(type)) {
+          options.push(['info', strings.info, 'info']);
+        }
+
         dialogs.select('', options).then((res) => {
           switch (res) {
             case 'delete':
@@ -616,6 +626,10 @@ function FileBrowserInclude(
                 .catch((err) => {
                   if (err) console.error(err);
                 });
+              break;
+
+            case 'info':
+              Acode.exec('file-info', url);
               break;
           }
         });
@@ -661,10 +675,17 @@ function FileBrowserInclude(
             if (helpers.isDir(type)) return fs.deleteDir();
           })
           .then(() => {
-            openFolder.removeItem(url);
-            toast(strings.success);
+            recents.removeFile(url);
+            if (helpers.isDir(type)) {
+              recents.removeFolder(url);
+              openFolder.removeItem(url);
+              openFolder.removeFolders(url);
+            }
+
+            delete cachedDir[url];
             delete cachedDir[currentDir.url];
             loadDir(currentDir);
+            toast(strings.success);
           })
           .catch((err) => {
             console.error(err);
@@ -673,6 +694,10 @@ function FileBrowserInclude(
       }
 
       function removeStorage() {
+        if (url) {
+          recents.removeFolder(url);
+          recents.removeFiles(url);
+        }
         allStorages = allStorages.filter((storage) => {
           if (storage.uuid !== uuid) {
             return true;
@@ -714,6 +739,7 @@ function FileBrowserInclude(
               type: 'file',
               ...res,
               name: res.filename,
+              mode: 'single',
             });
             $page.hide();
           },
@@ -750,7 +776,7 @@ function FileBrowserInclude(
       //Adding notication icon to let user know about new feature
       if (currentDir.url === '/') {
         const addButtonNotice =
-          !localStorage.__fbAddPath && !localStorage.__fbAddSftp;
+          !localStorage.__fbAddPath || !localStorage.__fbAddSftp;
 
         if (!localStorage.__fbHelp) {
           $menuToggler.classList.add('notice');
@@ -763,7 +789,6 @@ function FileBrowserInclude(
         $addMenuToggler.classList.remove('notice');
       }
     }
-
     function navigate(name, url) {
       let $nav = $navigation.querySelector(`[url="${window.btoa(url)}"]`);
       const $old = $navigation.querySelector('.active');
@@ -818,18 +843,22 @@ function FileBrowserInclude(
       const $nav = $navigation.lastChild.previousElementSibling;
       if ($nav) {
         const url = window.atob($nav.getAttribute('url'));
-        navigate(undefined, url);
-        loadDir(url);
+        const name = $nav.getAttribute('name');
+        navigate(name, url);
+        loadDir(url, name);
       }
     };
 
     function updateAddedFolder(url) {
       if (cachedDir[url]) delete cachedDir[url];
       if (cachedDir[currentDir.url]) delete cachedDir[currentDir.url];
+
+      const regex = new RegExp(Url.parse(url).url);
+
       for (let folder of addedFolder) {
         if (folder.url === url) {
           folder.remove();
-        } else if (new RegExp(url).test(currentDir.url)) {
+        } else if (regex.test(currentDir.url)) {
           folder.reload();
         }
       }

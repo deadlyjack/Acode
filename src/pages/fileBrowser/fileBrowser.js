@@ -51,13 +51,18 @@ FileBrowser.checkForValidFile = (uri) => {
 };
 
 FileBrowser.openFile = (res) => {
-  const { url, name } = res;
+  const { url, name, mode } = res;
 
   const createOption = {
     uri: url,
-    name: name,
+    name,
     render: true,
   };
+
+  if (mode) {
+    createOption.mode = mode;
+  }
+
   openFile(url, createOption);
 };
 

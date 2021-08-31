@@ -10,7 +10,6 @@ import internalFs from './fileSystem/internalFs';
 import openFolder from './openFolder';
 import Url from './utils/Url';
 import path from './utils/Path';
-import Uri from './utils/Uri';
 import configEditor from './aceConfig';
 import ScrollBar from '../components/scrollbar/scrollbar';
 import fsOperation from './fileSystem/fsOperation';
@@ -31,8 +30,7 @@ function EditorManager($sidebar, $header, $body) {
    */
   let $openFileList;
   let checkTimeout = null,
-    TIMEOUT_VALUE = 1000,
-    ready = false,
+    TIMEOUT_VALUE = 300,
     lastHeight = innerHeight,
     editorState = 'blur',
     preventScrollbarV = false,
@@ -44,15 +42,12 @@ function EditorManager($sidebar, $header, $body) {
   const $container = tag('div', {
     className: 'editor-container',
   });
-  const queue = [];
   /**
    * @type {AceAjax.Editor}
    */
   const editor = ace.edit($container);
   const readOnlyContent = `<span action="copy">${strings.copy}</span><span action="select all">${strings['select all']}<span>`;
   const fullContent = `<span action="copy">${strings.copy}</span><span action="cut">${strings.cut}</span><span action="paste">${strings.paste}</span><span action="select all">${strings['select all']}</span>`;
-  const SESSION_DIRNAME = 'sessions';
-  const SESSION_PATH = cordova.file.cacheDirectory + SESSION_DIRNAME + '/';
   const scrollbarSize = appSettings.value.scrollbarSize;
   const $vScrollbar = ScrollBar({
     width: scrollbarSize,
@@ -133,8 +128,6 @@ function EditorManager($sidebar, $header, $body) {
     moveOpenFileList,
     sidebar: $sidebar,
     container: $container,
-    checkChanges,
-    onFileSave,
     get state() {
       return editorState;
     },
@@ -186,52 +179,19 @@ function EditorManager($sidebar, $header, $body) {
   editor.on('change', function (e) {
     if (checkTimeout) clearTimeout(checkTimeout);
     checkTimeout = setTimeout(() => {
-      checkChanges().then((res) => {
-        const { activeFile } = manager;
-        (async () => {
-          const fs = await fsOperation(Url.join(CACHE_STORAGE, activeFile.id));
-          const exists = await fs.exists();
-
-          if (!exists) {
-            const dirFs = await fsOperation(CACHE_STORAGE);
-            console.log('Creating file', activeFile.id);
-            await dirFs.createFile(activeFile.id);
-          }
-
-          await fs.writeFile(activeFile.session.getValue());
-
-          if (activeFile.markChanged) {
-            activeFile.isUnsaved = !res;
-            manager.onupdate();
-            return;
-          }
-
-          activeFile.markChanged = true;
-        })();
-      });
+      const { activeFile } = manager;
+      (async () => {
+        const changed = await activeFile.isChanged();
+        if (!changed) return;
+        activeFile.writeToCache();
+        if (activeFile.markChanged) {
+          activeFile.isUnsaved = true;
+          manager.onupdate('file-changed');
+          return;
+        }
+        activeFile.markChanged = true;
+      })();
     }, TIMEOUT_VALUE);
-  });
-
-  window.resolveLocalFileSystemURL(
-    SESSION_PATH,
-    () => {
-      ready = true;
-      emptyQueue();
-    },
-    () => {
-      internalFs
-        .createDir(cordova.file.cacheDirectory, SESSION_DIRNAME)
-        .then(() => {
-          ready = true;
-          emptyQueue();
-        });
-    }
-  );
-
-  addNewFile(constants.DEFAULT_FILE_NAME, {
-    isUnsaved: false,
-    render: true,
-    id: constants.DEFAULT_FILE_SESSION,
   });
 
   appSettings.on('update:textWrap', function (value) {
@@ -302,6 +262,10 @@ function EditorManager($sidebar, $header, $body) {
     editor.resize(true);
   });
 
+  appSettings.on('update:lineHeight', function (value) {
+    editor.container.style.lineHeight = value;
+  });
+
   /**
    * Callback function
    * @param {Number} value
@@ -365,19 +329,6 @@ function EditorManager($sidebar, $header, $body) {
   }
 
   /**
-   *
-   * @param {File} file
-   */
-  function onFileSave(file) {
-    internalFs.writeFile(
-      SESSION_PATH + file.id,
-      file.session.getValue(),
-      true,
-      false
-    );
-  }
-
-  /**
    * @returns {number}
    */
   function getEditorHeight() {
@@ -437,54 +388,22 @@ function EditorManager($sidebar, $header, $body) {
 
   /**
    *
-   * @param {boolean} [write]
-   * @returns {Promise<boolean>}
-   */
-  function checkChanges(write) {
-    const file = SESSION_PATH + manager.activeFile.id;
-    const text = manager.activeFile.session.getValue();
-    const activeFile = manager.activeFile;
-    return new Promise((resolve, reject) => {
-      if (activeFile && activeFile.sessionCreated) {
-        internalFs
-          .readFile(file)
-          .then((res) => {
-            const old_text = helpers.decodeText(res.data);
-            if (old_text !== text) resolve(false);
-            else resolve(true);
-          })
-          .catch(reject)
-          .finally(() => {
-            if (write) internalFs.writeFile(file, text, true, false);
-          });
-      }
-    });
-  }
-
-  function emptyQueue() {
-    if (!queue.length) return;
-    const { filename, options } = queue.splice(0, 1)[0];
-    if (filename) addNewFile(filename, options);
-    emptyQueue();
-  }
-
-  /**
-   *
    * @param {string} filename
    * @param {newFileOptions} options
    */
-  function addNewFile(filename, options = {}) {
-    if (!ready) {
-      queue.push({
-        filename,
-        options,
-      });
-      return;
+  function addNewFile(filename = 'untitled.txt', options) {
+    if (!options) {
+      options = {
+        isUnsaved: false,
+        render: true,
+        id: constants.DEFAULT_FILE_SESSION,
+      };
     }
 
+    let uri = options.uri;
     let doesExists = null;
     if (options.id) doesExists = getFile(options.id, 'id');
-    else if (options.uri) doesExists = getFile(options.uri, 'uri');
+    else if (uri) doesExists = getFile(uri, 'uri');
     else if (options.record) doesExists = getFile(options.record, options.type);
 
     if (doesExists) {
@@ -497,7 +416,6 @@ function EditorManager($sidebar, $header, $body) {
     if (!('render' in options)) {
       options.render = true;
     }
-
     const removeBtn = tag('span', {
       className: 'icon cancel',
       attr: {
@@ -519,17 +437,16 @@ function EditorManager($sidebar, $header, $body) {
 
     if (options.id) {
       id = options.id;
-    } else if (options.uri) {
-      id = options.uri.hashCode();
+    } else if (uri) {
+      id = uri.hashCode();
     }
 
     let file = {
-      id,
+      deletedFile: options.deletedFile,
+      mode: options.mode,
       markChanged: true,
-      sessionCreated: false,
       controls: false,
       session: ace.createEditSession(text),
-      uri: options.uri,
       name: filename,
       editable: true,
       type: options.type || 'regular',
@@ -538,6 +455,13 @@ function EditorManager($sidebar, $header, $body) {
       encoding: 'utf-8',
       assocTile,
       readOnly: options.readonly,
+      get id() {
+        return id;
+      },
+      set id(newId) {
+        this.renameCacheFile(newId);
+        id = newId;
+      },
       setMode(mode) {
         this.session.setMode(mode);
         const filemode = modelist.getModeForPath(this.filename).mode;
@@ -568,30 +492,79 @@ function EditorManager($sidebar, $header, $body) {
           })
         );
       },
+      get uri() {
+        return uri;
+      },
+      set uri(newUri) {
+        if (this.uri === newUri) return;
+        if (newUri === null) {
+          this.deletedFile = true;
+        } else {
+          this.deletedFile = false;
+        }
+
+        uri = newUri;
+        this.id = newUri.hashCode();
+        setSubText(this);
+        manager.onupdate('file-uri');
+      },
       get filename() {
         if (this.type === 'git') return this.record.name;
         else return this.name;
       },
       set filename(name) {
-        changeName.call(this, name);
+        if (this.name === name) return;
+
+        (async () => {
+          if (!name || this.mode === 'single') return;
+
+          try {
+            if (this.type === 'git') {
+              await this.record.setName(name);
+            } else if (this.type === 'gist') {
+              await this.record.setName(this.name, name);
+            }
+          } catch (err) {
+            dialogs.alert(strings.error, err.toString());
+            console.error(err);
+          }
+
+          if (this.id === constants.DEFAULT_FILE_SESSION) {
+            this.id = helpers.uuid();
+          }
+          if (manager.activeFile.id === this.id) {
+            $header.text = name;
+          }
+
+          const oldExt = helpers.extname(this.name);
+          const newExt = helpers.extname(name);
+          this.assocTile.text = name;
+          this.name = name;
+
+          if (oldExt !== newExt) setupSession(this);
+
+          manager.onupdate('file-name');
+        })();
       },
       get location() {
-        if (this.uri)
+        if (this.mode === 'single') return null;
+        if (this.uri) {
           try {
             return Url.dirname(this.uri);
           } catch (error) {
             return null;
           }
+        }
         return null;
       },
       set location(url) {
+        if (this.url === url) return;
+
+        if (this.mode === 'single') return null;
         if (this.readOnly) this.readOnly = false;
 
         if (url) this.uri = Url.join(url, this.filename);
         else this.uri = null;
-
-        setSubText(this);
-        manager.onupdate();
       },
       onsave() {
         if (this.uri === appSettings.settingsFile) {
@@ -605,13 +578,51 @@ function EditorManager($sidebar, $header, $body) {
         const onsave = options.onsave;
         if (onsave && typeof onsave === 'function') onsave.call(this);
       },
+      async writeToCache() {
+        const cacheFs = await fsOperation(Url.join(CACHE_STORAGE, id));
+        const exists = await cacheFs.exists();
+
+        if (!exists) {
+          const dirFs = await fsOperation(CACHE_STORAGE);
+          await dirFs.createFile(id);
+        }
+
+        let data = text;
+        if (this.session) {
+          data = this.session.getValue();
+        }
+        await cacheFs.writeFile(data);
+      },
+      async removeCacheFile() {
+        try {
+          const fs = await fsOperation(Url.join(CACHE_STORAGE, this.id));
+          fs.deleteFile();
+        } catch (error) {}
+      },
+      async renameCacheFile(cacheNewName) {
+        try {
+          const fs = await fsOperation(Url.join(CACHE_STORAGE, this.id));
+          fs.renameTo(cacheNewName);
+        } catch (error) {}
+      },
+      async isChanged() {
+        if (!this.uri) {
+          if (this.id === constants.DEFAULT_FILE_SESSION) {
+            this.id = helpers.uuid();
+          }
+          return true;
+        }
+        const fs = await fsOperation(this.uri);
+        const oldText = await fs.readFile('utf-8');
+        const text = this.session.getValue();
+        return oldText !== text;
+      },
     };
 
-    if (options.isUnsaved && !options.readOnly)
-      file.assocTile.classList.add('notice');
-
     file.assocTile.classList.add('light');
-
+    if (options.isUnsaved && !options.readOnly) {
+      file.assocTile.classList.add('notice');
+    }
     file.assocTile.addEventListener('click', function (e) {
       if (
         manager.activeFile &&
@@ -623,47 +634,33 @@ function EditorManager($sidebar, $header, $body) {
       switchFile(file.id);
     });
 
-    manager.files.push(file);
-
-    if (appSettings.value.openFileListPos === 'header')
+    if (appSettings.value.openFileListPos === 'header') {
       $openFileList.append(file.assocTile);
-    else $openFileList.$ul.append(file.assocTile);
+    } else {
+      $openFileList.$ul.append(file.assocTile);
+    }
 
-    createSession(text || '');
+    manager.files.push(file);
     setupSession(file);
 
     if (options.render) {
       switchFile(file.id);
-
       if (options.cursorPos) editor.moveCursorToPosition(options.cursorPos);
 
-      if (file.id !== constants.DEFAULT_FILE_SESSION) {
+      if (id !== constants.DEFAULT_FILE_SESSION) {
         const defaultFile = getFile(constants.DEFAULT_FILE_SESSION, 'id');
-        if (defaultFile) {
-          const value = !!defaultFile.session.getValue();
-          const renamed = defaultFile.filename !== constants.DEFAULT_FILE_NAME;
-          if (!value && !renamed) manager.removeFile(defaultFile);
-        }
+        if (defaultFile) removeFile(defaultFile);
       }
     }
 
     setTimeout(() => {
+      file.writeToCache();
       editor.resize(true);
     }, 0);
 
     file.session.on('changeScrollTop', onscrolltop);
-    if (!appSettings.value.textWrap)
+    if (!appSettings.value.textWrap) {
       file.session.on('changeScrollLeft', onscrollleft);
-
-    function createSession(text) {
-      internalFs
-        .writeFile(SESSION_PATH + id, text, true, false)
-        .then(() => {
-          file.sessionCreated = true;
-        })
-        .catch((err) => {
-          console.error(err);
-        });
     }
 
     return file;
@@ -674,7 +671,7 @@ function EditorManager($sidebar, $header, $body) {
    * @param {File} file
    */
   function setSubText(file) {
-    let text = file.location;
+    let text = file.location || file.uri;
 
     if (file.type === 'git') {
       text = 'git • ' + file.record.repo + '/' + file.record.path;
@@ -683,29 +680,12 @@ function EditorManager($sidebar, $header, $body) {
       text =
         'gist • ' + (id.length > 10 ? '...' + id.substring(id.length - 7) : id);
     } else if (text) {
-      const protocol = Url.getProtocol(text);
-      if (protocol === 'content:') text = Uri.getVirtualAddress(text);
-      else {
-        text = Url.parse(text).url;
-
-        const storageList = JSON.parse(localStorage.storageList || '[]');
-
-        for (let uuid of storageList) {
-          const url = Url.parse(uuid.uri || '').url;
-          const regex = new RegExp('^' + url);
-          if (regex.test(text)) {
-            text = text.replace(
-              regex,
-              `${uuid.name}${url.slice(-1) === '/' ? '/' : ''}`
-            );
-            break;
-          }
-        }
-      }
-
+      text = helpers.getVirtualPath(text);
       if (text.length > 30) text = '...' + text.slice(text.length - 27);
     } else if (file.readOnly) {
       text = strings['read only'];
+    } else if (file.deletedFile) {
+      text = strings['deleted file'];
     } else {
       text = strings['new file'];
     }
@@ -727,7 +707,7 @@ function EditorManager($sidebar, $header, $body) {
         setSubText(file);
         file.assocTile.classList.add('active');
         manager.activeFile = file;
-        manager.onupdate();
+        manager.onupdate('switch-file');
         file.assocTile.scrollIntoView();
 
         $hScrollbar.remove();
@@ -738,7 +718,7 @@ function EditorManager($sidebar, $header, $body) {
       }
     }
 
-    manager.onupdate(false);
+    manager.onupdate('switch-file');
   }
 
   function setupEditor() {
@@ -761,7 +741,7 @@ function EditorManager($sidebar, $header, $body) {
       showPrintMargin: settings.showPrintMargin,
     });
 
-    editor.container.style.lineHeight = 1.5;
+    editor.container.style.lineHeight = settings.lineHeight || 2;
 
     if (!appSettings.value.linting && appSettings.value.linenumbers) {
       editor.renderer.setMargin(0, 0, -16, 0);
@@ -1006,17 +986,14 @@ function EditorManager($sidebar, $header, $body) {
       if (!manager.files.length) {
         editor.setSession(new ace.EditSession(''));
         $sidebar.hide();
-        addNewFile('untitled.txt', {
-          isUnsaved: false,
-          render: true,
-          id: constants.DEFAULT_FILE_SESSION,
-        });
+        addNewFile();
       } else {
         if (file.id === manager.activeFile.id) {
           switchFile(manager.files[manager.files.length - 1].id);
         }
       }
 
+      file.removeCacheFile();
       file.session.off('changeScrollTop', onscrolltop);
       if (!appSettings.value.textWrap)
         file.session.off('changeScrollLeft', onscrollleft);
@@ -1025,7 +1002,7 @@ function EditorManager($sidebar, $header, $body) {
       file.session.destroy();
       delete file.session;
       delete file.assocTile;
-      manager.onupdate();
+      manager.onupdate('remove-file');
     }
   }
 
@@ -1037,7 +1014,6 @@ function EditorManager($sidebar, $header, $body) {
    */
   function getFile(checkFor, type = 'id') {
     if (typeof type !== 'string') return null;
-    // if (typeof checkFor === 'string' && !["id" | "name"].includes(type)) checkFor = decodeURL(checkFor);
 
     let result = null;
     for (let file of manager.files) {
@@ -1062,38 +1038,6 @@ function EditorManager($sidebar, $header, $body) {
     }
 
     return result;
-  }
-
-  /**
-   * @this {File}
-   * @param {string} name
-   */
-  async function changeName(name) {
-    if (!name) return;
-
-    try {
-      if (this.type === 'git') await this.record.setName(name);
-      else if (this.type === 'gist') await this.record.setName(this.name, name);
-    } catch (err) {
-      return error(err);
-    }
-
-    if (editorManager.activeFile.id === this.id) $header.text = name;
-
-    const oldExt = helpers.extname(this.name);
-    const newExt = helpers.extname(name);
-
-    this.assocTile.text = name;
-    this.name = name;
-
-    if (oldExt !== newExt) setupSession(this);
-
-    manager.onupdate();
-
-    function error(err) {
-      dialogs.alert(strings.error, err.toString());
-      console.error(err);
-    }
   }
 
   return manager;

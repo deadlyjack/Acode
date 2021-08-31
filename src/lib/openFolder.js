@@ -10,6 +10,7 @@ import Path from './utils/Path';
 import openFile from './openFile';
 import Url from './utils/Url';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
+import URLParse from 'url-parse';
 
 /**
  *
@@ -21,14 +22,9 @@ import FileBrowser from '../pages/fileBrowser/fileBrowser';
  * @param {boolean} [opts.reloadOnResume=true]
  */
 function openFolder(_path, opts = {}) {
-  let flag = false;
-  for (let folder of addedFolder) {
-    if (folder.url === _path) {
-      flag = true;
-      break;
-    }
+  if (addedFolder.find((folder) => folder.url === _path)) {
+    return;
   }
-  if (flag) return;
 
   let saveState = true,
     reloadOnResume = true;
@@ -50,10 +46,11 @@ function openFolder(_path, opts = {}) {
     tail: $closeBtn,
     allCaps: true,
     ontoggle: function (state) {
-      if (state === 'uncollapsed')
-        for (let folder of addedFolder)
+      if (state === 'uncollapsed') {
+        for (let folder of addedFolder) {
           if (folder.url !== _path) folder.$node.collapse();
-
+        }
+      }
       expandList.call(this);
     },
   });
@@ -70,6 +67,9 @@ function openFolder(_path, opts = {}) {
     },
   };
   const $text = $root.$title.querySelector(':scope>span.text');
+
+  $root.id = 'r' + _path.hashCode();
+
   if ($text) {
     $text.style.overflow = 'hidden';
     $text.style.whiteSpace = 'nowrap';
@@ -107,7 +107,7 @@ function openFolder(_path, opts = {}) {
   function getTitle() {
     let title = '';
     try {
-      const { username, hostname, port } = new URL(_path);
+      const { username, hostname, port } = URLParse(_path);
       if (username && hostname) title = `${username}@${hostname}`;
       else if (hostname) title = hostname;
 
@@ -131,10 +131,8 @@ function openFolder(_path, opts = {}) {
       $root.remove();
       $root = null;
     }
-    const tmpFolders = [];
-    for (let folder of addedFolder)
-      if (folder.url !== _path) tmpFolders.push(folder);
-    addedFolder = tmpFolders;
+
+    addedFolder = addedFolder.filter((folder) => folder.url !== _path);
     updateHeight();
   }
 
@@ -276,8 +274,20 @@ function openFolder(_path, opts = {}) {
             else if (helpers.isFile(type)) return fs.deleteFile();
           })
           .then((res) => {
-            if (helpers.isFile(type)) $target.remove();
-            else $target.parentElement.remove();
+            recents.removeFile(url);
+            if (helpers.isFile(type)) {
+              $target.remove();
+              const file = editorManager.getFile(url, 'uri');
+              if (file) {
+                file.isUnsaved = true;
+              }
+              editorManager.onupdate('delete-file');
+            } else {
+              recents.removeFolder(url);
+              updateUriToAllActiveFiles(url, null);
+              $target.parentElement.remove();
+              editorManager.onupdate('delete-folder');
+            }
             toast(strings.success);
           });
 
@@ -292,20 +302,22 @@ function openFolder(_path, opts = {}) {
             newName = newname;
             if (newName !== name) {
               const fs = await fsOperation(url);
-              const newURL = await fs.renameTo(newName);
-              newName = Url.basename(newURL);
+              const newUrl = await fs.renameTo(newName);
+              newName = Url.basename(newUrl);
               $target.querySelector(':scope>.text').textContent = newName;
-              $target.setAttribute('url', newURL);
+              $target.setAttribute('url', newUrl);
               $target.setAttribute('name', newName);
               if (helpers.isFile(type)) {
                 $target.querySelector(':scope>span').className =
                   helpers.getIconForFile(newName);
                 let file = editorManager.getFile(url, 'uri');
                 if (file) {
-                  file.uri = newURL;
+                  file.uri = newUrl;
                   file.filename = newName;
                 }
               } else {
+                updateUriToAllActiveFiles(url, newUrl);
+
                 //Reloading the folder by collasping and expanding the folder
                 $target.click(); //collaspe
                 $target.click(); //expand
@@ -350,7 +362,12 @@ function openFolder(_path, opts = {}) {
             if (clipBoard.action === 'cut') {
               //move
 
-              // const newUrl = Url.join(url, srcName);
+              if (helpers.isFile(srcType)) {
+                const file = editorManager.getFile(clipBoard.url, 'uri');
+                file.uri = newUrl;
+              } else if (helpers.isDir(srcType)) {
+                updateUriToAllActiveFiles(clipBoard.url, newUrl);
+              }
 
               switch (CASE) {
                 case '111':
@@ -484,6 +501,23 @@ function openFolder(_path, opts = {}) {
           await fs.writeFile(data);
           appendTile($target, createFileTile(name, fileUrl));
         })();
+    }
+
+    function updateUriToAllActiveFiles(oldUrl, newUrl) {
+      const files = editorManager.files;
+      const { url } = Url.parse(oldUrl);
+
+      for (let file of files) {
+        const fileUrl = Url.parse(file.uri).url;
+        if (new RegExp('^' + url).test(fileUrl)) {
+          if (newUrl) {
+            file.uri = Url.join(newUrl, file.filename);
+          } else {
+            file.uri = null;
+            file.isUnsaved = true;
+          }
+        }
+      }
     }
 
     /**
@@ -625,7 +659,37 @@ openFolder.updateItem = function (oldFile, newFile, newFilename) {
 
 openFolder.removeItem = function (url) {
   const $el = editorManager.sidebar.querySelector(`[url="${url}"]`);
-  if ($el) $el.remove();
+  if ($el) {
+    const type = $el.getAttribute('type');
+    if (helpers.isFile(type)) {
+      $el.remove();
+    } else {
+      $el.parentElement.remove();
+    }
+  }
+};
+
+openFolder.removeFolders = function (url) {
+  ({ url } = Url.parse(url));
+  const regex = new RegExp('^' + url);
+  addedFolder.forEach((folder) => {
+    if (regex.test(folder.url)) {
+      folder.remove();
+    }
+  });
+};
+
+/**
+ *
+ * @param {String} url
+ * @returns {Folder}
+ */
+openFolder.find = function (url) {
+  return addedFolder.find((folder) => {
+    const { url: furl } = Url.parse(folder.url);
+    const regex = new RegExp('^' + furl);
+    return regex.test(url);
+  });
 };
 
 export default openFolder;

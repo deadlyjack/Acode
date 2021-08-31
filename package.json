@@ -77,7 +77,7 @@
     "cordova-plugin-inappbrowser": "file:src/plugins/cordova-plugin-inappbrowser",
     "cordova-plugin-intent": "file:src/plugins/cordova-plugin-intent",
     "cordova-plugin-navigationbar-color": "^0.1.0",
-    "cordova-plugin-sdcard": "^1.0.6",
+    "cordova-plugin-sdcard": "file:../plugins/cordova-plugin-sdcard",
     "cordova-plugin-sftp": "file:src/plugins/cordova-plugin-sftp",
     "cordova-plugin-statusbar": "^2.4.3",
     "cordova-plugin-system": "^1.0.3",

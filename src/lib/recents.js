@@ -3,43 +3,62 @@ import dialogs from '../components/dialogs';
 import helpers from './utils/helpers';
 
 const recents = {
-  files: JSON.parse(localStorage.recentFiles || '[]'),
-  folders: JSON.parse(localStorage.recentFolders || '[]'),
+  /**
+   * @returns {Array<String>}
+   */
+  get files() {
+    return JSON.parse(localStorage.recentFiles || '[]');
+  },
+  /**
+   * @returns {{url: String, opts: Map<String, String>}[]}
+   */
+  get folders() {
+    return JSON.parse(localStorage.recentFolders || '[]');
+  },
+  set files(list) {
+    if (Array.isArray(list)) localStorage.recentFiles = JSON.stringify(list);
+  },
+  set folders(list) {
+    if (Array.isArray(list)) localStorage.recentFolders = JSON.stringify(list);
+  },
   MAX: 10,
   /**
    *
    * @param {string} file
    */
   addFile(file) {
-    if (this.files.length >= this.MAX) this.files.pop();
-
-    if (this.files.includes(file))
-      this.files.splice(this.files.indexOf(file), 1);
-
-    this.files.unshift(file);
-
-    localStorage.recentFiles = JSON.stringify(this.files);
+    let files = this.files;
+    if (files.length >= this.MAX) files.pop();
+    files = files.filter((i) => i !== file);
+    files.unshift(file);
+    this.files = files;
   },
   addFolder(url, opts) {
-    if (this.folders.length >= this.MAX) this.folders.pop();
-
-    // if (this.folders.includes(folder)) this.folders.splice(this.folders.indexOf(folder), 1);
-
-    this.folders = this.folders.filter((folder) => {
-      return url !== folder.url;
-    });
-
-    this.folders.unshift({
+    let folders = this.folders;
+    if (folders.length >= this.MAX) folders.pop();
+    folders = folders.filter((i) => i.url !== url);
+    folders.unshift({
       url,
       opts,
     });
+    this.folders = folders;
+  },
 
-    localStorage.recentFolders = JSON.stringify(this.folders);
+  removeFolder(url) {
+    ({ url } = Url.parse(url));
+    this.folders = this.folders.filter((folder) => {
+      return !new RegExp('^' + folder.url).test(url);
+    });
+  },
+
+  removeFile(url) {
+    ({ url } = Url.parse(url));
+    this.files = this.files.filter((file) => {
+      return !new RegExp('^' + url).test(file);
+    });
   },
 
   clear() {
-    delete localStorage.recentFiles;
-    delete localStorage.recentFolders;
     this.files = [];
     this.folders = [];
   },
@@ -53,37 +72,33 @@ const recents = {
   select(extra, type = 'all', title = strings['open recent']) {
     const all = [];
     const MAX = 20;
-    const shortName = (name) =>
-      name.length > MAX ? '...' + name.substr(-MAX - 3) : name;
-    if (type === 'dir' || type === 'all') {
-      let dirs = recents.folders;
-      for (let dir of dirs) {
-        const url = new URL(dir.url);
-        let title = dir.url;
-        if (dir.name) {
-          title = dir.name;
-        } else if (url.protocol === 'ftp:') {
-          if (url.hostname && url.username)
-            title = `${url.username}@${url.hostname}`;
-          if (url.hostname) title = url.protocol + url.hostname;
+    const shortName = (name) => {
+      name = helpers.getVirtualPath(name);
 
-          title += Url.pathname(dir.url) || '';
-        } else {
-          title = Url.pathname(dir.url) || title;
-        }
+      if (name.length > MAX) {
+        return '...' + name.substr(-MAX - 3);
+      }
+      return name;
+    };
+
+    if (type === 'dir' || type === 'all') {
+      let dirs = this.folders;
+      for (let dir of dirs) {
+        const { url } = dir;
+
         all.push([
           {
             type: 'dir',
             val: dir,
           },
-          shortName(title),
+          shortName(url),
           'icon folder',
         ]);
       }
     }
 
     if (type === 'file' || type === 'all') {
-      let files = recents.files;
+      let files = this.files;
       for (let file of files) {
         if (!file) continue;
         const name = shortName(Url.parse(file).url);

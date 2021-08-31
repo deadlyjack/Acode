@@ -44,9 +44,9 @@ a {
 
 .open-file-list {
   position: absolute;
-  top: 45px;
-  top: calc(var(--header-height) - 1px);
-  height: 32px;
+  top: 44px;
+  top: calc(var(--header-height));
+  height: 31px;
   width: 100%;
   background-color: #9999ff;
   background-color: var(--primary-color);
@@ -169,7 +169,8 @@ a.icon {
     display: flex;
 
     .image {
-      height: fit-content;
+      min-height: fit-content;
+      min-width: fit-content;
       margin: auto;
 
       img {
@@ -506,6 +507,7 @@ textarea {
   background-color: var(--text-main-color);
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 2px var(--box-shadow-color);
+  z-index: 4;
 
   &.large {
     height: 30px;

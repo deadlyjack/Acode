@@ -141,8 +141,10 @@ backupRestore.restore = async function (url) {
       );
     }
 
-    fs = await fsOperation(window.KEYBINDING_FILE);
-    await fs.writeFile(JSON.stringify(backup.keyBindings, undefined, 2));
+    try {
+      fs = await fsOperation(window.KEYBINDING_FILE);
+      await fs.writeFile(JSON.stringify(backup.keyBindings, undefined, 2));
+    } catch (error) {}
 
     const { settings, storageList } = backup;
     const storedStorageList = JSON.parse(localStorage.storageList || '[]');
@@ -152,15 +154,24 @@ backupRestore.restore = async function (url) {
           const keyFileData = storage.keyFileData;
           delete storage.keyFileData;
 
-          const keyFile = decodeURIComponent(
-            URLParse(storage.uri, true).query['keyFile']
-          );
-          const fs = await fsOperation(keyFile);
+          const url = URLParse(storage.uri, true);
+          const { passPhrase, keyFile } = url.query;
+          const filename = Url.basename(decodeURIComponent(keyFile));
+          const newKeyFile = Url.join(DATA_STORAGE, filename);
+
+          const fs = await fsOperation(newKeyFile);
           if (!(await fs.exists())) {
-            const dirFs = await fsOperation(Url.dirname(keyFile));
-            await dirFs.createFile(Url.basename(keyFile));
+            const dirFs = await fsOperation(DATA_STORAGE);
+            await dirFs.createFile(filename);
           }
           await fs.writeFile(keyFileData);
+
+          url.set('query', {
+            passPhrase,
+            keyFile: encodeURIComponent(newKeyFile),
+          });
+
+          storage.uri = url.toString(true);
         }
 
         storedStorageList.push(storage);

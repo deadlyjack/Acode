@@ -3,32 +3,45 @@ import marked from 'marked';
 import mustache from 'mustache';
 import $_console from '../views/console.hbs';
 import $_markdown from '../views/markdown.hbs';
-import fs from './fileSystem/internalFs';
 import helpers from './utils/helpers';
 import dialogs from '../components/dialogs';
 import git from './git';
 import constants from './constants';
-import externalFs from './fileSystem/externalFs';
 import fsOperation from './fileSystem/fsOperation';
 import path from './utils/Path';
 import Url from './utils/Url';
 import URLParse from 'url-parse';
+import openFolder from './openFolder';
 
 /**
  * Starts the server and run the active file in browser
  * @param {Boolean} isConsole
  * @param {"_blank"|"_system"} target
+ * @param {Boolean} runFile
  */
-function runPreview(isConsole = false, target = appSettings.value.previewMode) {
+async function run(
+  isConsole = false,
+  target = appSettings.value.previewMode,
+  runFile = false
+) {
+  if (!Acode.$runBtn.isConnected && !isConsole) return;
+
+  if (!localStorage.__init_runPreview) {
+    localStorage.__init_runPreview = true;
+
+    await new Promise((resolve) => {
+      dialogs.alert(strings.info.toUpperCase(), strings['preview info'], () => {
+        resolve();
+      });
+    });
+  }
+
   const activeFile = isConsole ? null : editorManager.activeFile;
   const uuid = helpers.uuid();
 
   let isLoading = false;
-  let filename, pathName, extension, addedFolderUrl;
+  let filename, pathName, extension;
   let port = constants.PORT;
-  let useExternalFs = false;
-  let relPath = null;
-  let rootPath = null;
   let EXECUTING_SCRIPT = uuid + '_script.js';
   const MIMETYPE_HTML = mimeType.lookup('html');
   const CONSOLE_SCRIPT = uuid + '_console.js';
@@ -48,35 +61,42 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
     }
   }
 
-  if (extension === 'svg') {
-    fsOperation(activeFile.uri)
-      .then((fs) => {
-        return fs.readFile();
-      })
-      .then((res) => {
-        const blob = new Blob([new Uint8Array(res)], {
-          type: mimeType.lookup(extension),
-        });
-        dialogs.box(filename, `<img src='${URL.createObjectURL(blob)}'>`);
-      })
-      .catch(console.error);
+  if (runFile && extension === 'svg') {
+    try {
+      const fs = await fsOperation(activeFile.uri);
+      const res = await fs.readFile();
+      const blob = new Blob([new Uint8Array(res)], {
+        type: mimeType.lookup(extension),
+      });
 
+      dialogs.box(filename, `<img src='${URL.createObjectURL(blob)}'>`);
+    } catch (err) {
+      console.error(err);
+      helpers.error(err);
+    }
     return;
   }
 
-  if (filename !== 'index.html' && pathName) {
-    for (let folder of addedFolder) {
-      const path1 = URLParse(folder.url).pathname;
-      const path2 = URLParse(pathName).pathname;
-      if (path.isParent(path1, path2)) {
-        addedFolderUrl = folder.url;
-        const url = Url.join(addedFolderUrl, 'index.html');
-        fsOperation(url)
-          .then((fs) => {
-            return fs.exists();
-          })
-          .then(onresult)
-          .catch(onerror);
+  if (!runFile && filename !== 'index.html' && pathName) {
+    const folder = openFolder.find(activeFile.uri);
+
+    if (folder) {
+      const { url } = folder;
+      const fs = await fsOperation(Url.join(url, 'index.html'));
+
+      try {
+        if (await fs.exists()) {
+          filename = 'index.html';
+          extension = 'html';
+          pathName = url;
+          start();
+          return;
+        }
+
+        next();
+      } catch (err) {
+        console.error(err);
+        helpers.error(err);
         return;
       }
     }
@@ -87,26 +107,6 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
   function next() {
     if (extension === 'js' || isConsole) startConsole();
     else start();
-  }
-
-  function onerror() {
-    helpers.error(err);
-    console.error(err);
-  }
-  /**
-   *
-   * @param {boolean} exists
-   */
-  function onresult(exists) {
-    if (exists) runHTML();
-    else next();
-  }
-
-  function runHTML() {
-    filename = 'index.html';
-    extension = 'html';
-    pathName = addedFolderUrl;
-    start();
   }
 
   function startConsole() {
@@ -169,7 +169,9 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       },
       port
     );
+
     webserver.onRequest((req) => {
+      const reqId = req.requestId;
       let reqPath = req.path.substr(1);
 
       if (reqPath === '/') {
@@ -185,34 +187,34 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
           url = `${assets}/js/build/${
             appSettings.console || 'console'
           }.build.js`;
-          sendFileContent(url, req.requestId, 'application/javascript');
+          sendFileContent(url, reqId, 'application/javascript');
           break;
 
         case ESPRISMA_SCRIPT:
           url = `${assets}/js/esprisma.js`;
-          sendFileContent(url, req.requestId, 'application/javascript');
+          sendFileContent(url, reqId, 'application/javascript');
           break;
 
         case EDITOR_SCRIPT:
-          sendText('', req.requestId, 'application/javascript');
+          sendText('', reqId, 'application/javascript');
           break;
 
         case EXECUTING_SCRIPT:
           let text;
           if (extension === 'js') text = activeFile.session.getValue();
           else text = '';
-          sendText(text, req.requestId, 'application/javascript');
+          sendText(text, reqId, 'application/javascript');
           break;
 
         case CONSOLE_STYLE:
           url = `${assets}/css/console.css`;
-          sendFileContent(url, req.requestId, 'text/css');
+          sendFileContent(url, reqId, 'text/css');
           break;
 
         case MARKDOWN_STYLE:
           url = appSettings.value.markdownStyle;
-          if (url) sendFileContent(url, req.requestId, 'text/css');
-          else sendText('img {max-width: 100%;}', req.requestId, 'text/css');
+          if (url) sendFileContent(url, reqId, 'text/css');
+          else sendText('img {max-width: 100%;}', reqId, 'text/css');
           break;
 
         default:
@@ -220,7 +222,30 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
           break;
       }
 
-      function sendAccToExt() {
+      async function sendAccToExt() {
+        if (activeFile.mode === 'single') {
+          if (filename === reqPath) {
+            sendText(
+              activeFile.session.getValue(),
+              reqId,
+              mimeType.lookup(filename)
+            );
+          } else {
+            error(reqId);
+          }
+          return;
+        }
+
+        let url = activeFile.uri;
+        let file = null;
+
+        if (pathName) {
+          url = Url.join(pathName, reqPath);
+          file = editorManager.getFile(url, 'uri');
+        } else if (activeFile.type === 'git') {
+          file = activeFile;
+        }
+
         switch (ext) {
           case 'htm':
           case 'html':
@@ -232,109 +257,75 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
                 EXECUTING_SCRIPT,
                 EDITOR_SCRIPT,
               });
-              sendText(doc, req.requestId, MIMETYPE_HTML);
-            } else if (checkFile(reqPath)) {
-              sendHTML(activeFile.session.getValue(), req.requestId);
+              sendText(doc, reqId, MIMETYPE_HTML);
+            } else if (file) {
+              sendHTML(file.session.getValue(), reqId);
             } else {
-              const url = Url.join(pathName, reqPath);
-              sendFileContent(url, req.requestId, MIMETYPE_HTML);
+              sendFileContent(url, reqId, MIMETYPE_HTML);
             }
             break;
 
           case 'md':
-            const html = marked(activeFile.session.getValue());
-            const doc = mustache.render($_markdown, {
-              html,
-              filename,
-              MARKDOWN_STYLE,
-            });
-            sendText(doc, req.requestId, MIMETYPE_HTML);
+            if (file) {
+              const html = marked(file.session.getValue());
+              const doc = mustache.render($_markdown, {
+                html,
+                filename,
+                MARKDOWN_STYLE,
+              });
+              sendText(doc, reqId, MIMETYPE_HTML);
+            }
             break;
 
           default:
-            if (activeFile && activeFile.type === 'git') {
-              const id = activeFile.record.sha + encodeURIComponent(reqPath);
-              const uri = CACHE_STORAGE + id.hashCode() + '.' + ext;
+            if (file && file.type === 'git') {
+              try {
+                const gitFile = await git.getGitFile(file.record, reqPath);
+                const data = helpers.b64toBlob(
+                  gitFile,
+                  mimeType.lookup(reqPath)
+                );
 
-              window.resolveLocalFileSystemURL(
-                uri,
-                () => {
-                  sendFile(uri, req.requestId);
-                },
-                (err) => {
-                  if (err.code === 1) {
-                    git
-                      .getGitFile(activeFile.record, reqPath)
-                      .then((res) => {
-                        const data = helpers.b64toBlob(
-                          res,
-                          mimeType.lookup(reqPath)
-                        );
-                        fs.writeFile(uri, data, true, false)
-                          .then(() => {
-                            sendFile(uri, req.requestId);
-                          })
-                          .catch((err) => {
-                            if (err.code)
-                              dialogs.alert(
-                                strings.error,
-                                helpers.getErrorMessage(err.code)
-                              );
-                            console.error(err);
-                          });
-                      })
-                      .catch((err) => {
-                        error(req.requestId);
-                      });
-                  } else {
-                    error(req.requestId);
-                  }
+                const id = file.record.sha + encodeURIComponent(reqPath);
+                const cacheFile = id.hashCode() + '.' + ext;
+                const uri = Url.join(CACHE_STORAGE, cacheFile);
+                const cacheDirFs = await fsOperation(CACHE_STORAGE);
+                const cacheFileFs = await fsOperation(uri);
+
+                if (await cacheFileFs.exists()) {
+                  sendFile(uri, reqId);
+                  break;
                 }
-              );
+
+                await cacheDirFs.createFile(cacheFile);
+                await cacheFileFs.writeFile(data);
+
+                sendFile(uri, reqId);
+              } catch (err) {
+                if (reqPath === 'favicon.ico') {
+                  const ico = Url.join(assets, 'res/logo/favicon.ico');
+                  sendFile(ico, reqId);
+                } else {
+                  error(reqId);
+                }
+              }
             } else {
-              if (pathName) {
-                const url = Url.join(pathName, reqPath);
-                const file = editorManager.getFile(url, 'uri');
-                if (file && file.isUnsaved) {
-                  sendText(
-                    file.session.getValue(),
-                    req.requestId,
-                    mimeType.lookup(file.filename)
-                  );
-                } else {
-                  sendFile(url, req.requestId);
-                }
-              } else if (useExternalFs) {
-                if (!rootPath) {
-                  externalFs.getPath(useExternalFs).then((res) => {
-                    rootPath = res;
-                    sendExternalFile(reqPath, req.requestId);
-                  });
-                } else {
-                  sendExternalFile(reqPath, req.requestId);
-                }
+              if (file && file.isUnsaved) {
+                sendText(
+                  file.session.getValue(),
+                  reqId,
+                  mimeType.lookup(file.filename)
+                );
+              } else if (url) {
+                sendFile(url, reqId);
               } else {
-                error(req.requestId);
+                error(reqId);
               }
             }
             break;
         }
       }
     });
-  }
-
-  function sendExternalFile(file, id) {
-    sdcard.getPath(
-      rootPath,
-      path.join(relPath, file),
-      (res) => {
-        sendFileContent(res, id, mimeType.lookup(file));
-      },
-      (err) => {
-        console.error(err);
-        error(id);
-      }
-    );
   }
 
   function error(id) {
@@ -385,10 +376,10 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       isLoading = true;
       fsOperation(path)
         .then((fs) => {
-          return fs.readFile();
+          return fs.readFile(); // Because reading the remote file will create cache file
         })
         .then(() => {
-          send(cacheFile, mimetype);
+          send(cacheFile, mimetype); // send the created file here
         })
         .catch(() => {
           error(id);
@@ -467,47 +458,35 @@ function runPreview(isConsole = false, target = appSettings.value.previewMode) {
       options
     );
   }
-
-  function checkFile(reqPath) {
-    if (!activeFile) return false;
-    return (
-      reqPath === filename &&
-      (activeFile.isUnsaved ||
-        !activeFile.location ||
-        activeFile.type === 'git')
-    );
-  }
 }
 
-runPreview.checkRunnable = async function () {
+run.checkRunnable = async function () {
   try {
     const activeFile = editorManager.activeFile;
-    let result = null;
     if (activeFile.type === 'regular') {
-      for (let folder of addedFolder) {
-        const folderPath = new RegExp('^' + URLParse(folder.url).pathname);
-        if (folderPath.test(URLParse(activeFile.uri).pathname)) {
-          const url = Url.join(folder.url, 'index.html');
-          const fs = await fsOperation(url);
-          if (await fs.exists()) {
-            result = url;
-            break;
-          }
+      const folder = openFolder.find(activeFile.uri);
+      if (folder) {
+        const url = Url.join(folder.url, 'index.html');
+        const fs = await fsOperation(url);
+        if (await fs.exists()) {
+          return url;
         }
       }
     }
 
-    if (!result) {
-      const runnableFile = /\.((html?)|(md)|(js)|(svg))$/;
-      const filename = activeFile.filename;
-      if (runnableFile.test(filename)) result = filename;
-    }
+    const runnableFile = /\.((html?)|(md)|(js)|(svg))$/;
+    const filename = activeFile.filename;
+    if (runnableFile.test(filename)) return filename;
 
-    return result;
+    return null;
   } catch (err) {
     if (err instanceof Error) throw error;
     else throw new Error(err);
   }
 };
 
-export default runPreview;
+run.runFile = () => {
+  run(undefined, undefined, true);
+};
+
+export default run;

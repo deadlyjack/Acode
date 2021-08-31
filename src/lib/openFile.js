@@ -28,7 +28,7 @@ export default async function openFile(file, data = {}) {
     const name = fileInfo.name || file.name || uri;
     const settings = appSettings.value;
     const readOnly = fileInfo.canWrite ? false : true;
-    const { cursorPos, render, onsave, text } = data;
+    const { cursorPos, render, onsave, text, mode } = data;
     const createEditor = (isUnsaved, text) => {
       editorManager.addNewFile(name, {
         uri,
@@ -38,6 +38,7 @@ export default async function openFile(file, data = {}) {
         render,
         onsave,
         readOnly,
+        mode,
       });
     };
 
@@ -76,7 +77,7 @@ export default async function openFile(file, data = {}) {
     }
 
     createEditor(false, fileContent);
-    recents.addFile(uri);
+    if (mode !== 'single') recents.addFile(uri);
     return;
   } catch (error) {
     dialogs.loader.destroy();
