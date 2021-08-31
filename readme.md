@@ -1,7 +1,5 @@
 # Acode editor (Code editor for android)
 
-![Build the app](https://github.com/deadlyjack/code-editor/workflows/Build%20the%20app/badge.svg)
-
 ![logo](./res/icon/android/ic_launcher-web.png)
 
 This is a hybrid app using Apache Cordova. This app is published on play store. Check it out from [here](https://acode.foxdebug.com).
