@@ -112,7 +112,7 @@ function backupRestore() {
       );
     } catch (error) {
       console.error(error);
-      helpers.error(error);
+      helpers.toast(error);
     }
   }
 
@@ -121,7 +121,7 @@ function backupRestore() {
       (data) => {
         backupRestore.restore(data.uri);
       },
-      helpers.error,
+      helpers.toast,
       'application/octet-stream'
     );
   }
@@ -189,8 +189,8 @@ backupRestore.restore = async function (url) {
 
     await fs.writeFile(JSON.stringify(settings, undefined, 2));
     location.reload();
-  } catch (error) {
-    helpers.error(error);
+  } catch (err) {
+    helpers.toast(err);
   }
 };
 

@@ -317,13 +317,45 @@ export default {
   },
   /**
    *
-   * @param {Error} e
+   * @param {Error} err
+   * @param  {...string} args
+   */
+  errorMessage(err, ...args) {
+    args.map((arg) => {
+      try {
+        return Url.pathname(arg);
+      } catch (error) {
+        return arg;
+      }
+    });
+
+    const extra = args.join('<br>');
+    let msg;
+
+    if (typeof err === 'string') {
+      msg = err;
+    } else if (err instanceof Error) {
+      msg = err.message;
+    } else if (err.code !== null) {
+      msg = this.getErrorMessage(err.code);
+    }
+
+    return msg + (extra ? '<br>' + extra : '');
+  },
+  /**
+   *
+   * @param {Error} err
    * @param  {...string} args
    * @returns {PromiseLike<void>}
    */
-  error(e, ...args) {
+  error(err, ...args) {
+    if (err.code === 0) {
+      this.toast(err);
+      return;
+    }
+
     let hide = null;
-    let executer = () => {
+    const onhide = () => {
       if (hide) hide();
     };
     const promise = {
@@ -334,34 +366,17 @@ export default {
       },
     };
 
-    args.map((arg) => {
-      try {
-        return Url.pathname(arg);
-      } catch (error) {
-        return arg;
-      }
-    });
-
-    const extra = (args.length && ' <br>' + args.join('<br>')) || '';
-    if (e.code) {
-      const messsage = this.getErrorMessage(e.code);
-      dialogs.alert(strings.error, messsage + extra, () => {
-        executer();
-      });
-    } else {
-      const msg =
-        typeof e === 'string' ? e : e instanceof Error ? e.message : null;
-      if (msg)
-        dialogs.alert(strings.error, msg + extra, () => {
-          executer();
-        });
-      else {
-        toast(strings.error);
-        executer();
-      }
-    }
-
+    const msg = this.errorMessage(err, ...args);
+    dialogs.alert(strings.error, msg, onhide);
     return promise;
+  },
+  /**
+   *
+   * @param {Error} err
+   * @param  {...string} args
+   */
+  toast(err, ...args) {
+    window.toast(this.errorMessage(err, ...args));
   },
   /**
    *

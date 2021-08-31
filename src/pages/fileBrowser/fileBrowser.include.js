@@ -153,10 +153,11 @@ function FileBrowserInclude(
     actionStack.push({
       id: 'filebrowser',
       action: function () {
-        reject({
-          error: 'user canceled',
-          code: 0,
+        const err = new Error('User cancelled');
+        Object.defineProperty(err, 'code', {
+          value: 0,
         });
+        reject(err);
         $page.hide();
       },
     });

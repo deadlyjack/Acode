@@ -26,7 +26,7 @@ async function run(
 ) {
   if (!Acode.$runBtn.isConnected && !isConsole) return;
 
-  if (!localStorage.__init_runPreview) {
+  if (!isConsole && !localStorage.__init_runPreview) {
     localStorage.__init_runPreview = true;
 
     await new Promise((resolve) => {
@@ -143,16 +143,16 @@ async function run(
         (res) => {
           if (res)
             dialogs.alert(strings.info, strings['powersave mode warning']);
-          else _run();
+          else startServer();
         },
         () => {
-          _run();
+          startServer();
         }
       );
-    } else _run();
+    } else startServer();
   }
 
-  function _run() {
+  function startServer() {
     webserver.stop();
 
     webserver.start(
@@ -218,11 +218,33 @@ async function run(
           break;
 
         default:
-          sendAccToExt();
+          sendByExt();
           break;
       }
 
-      async function sendAccToExt() {
+      async function sendByExt() {
+        if (isConsole) {
+          if (reqPath === 'console.html') {
+            sendText(
+              mustache.render($_console, {
+                CONSOLE_SCRIPT,
+                CONSOLE_STYLE,
+                ESPRISMA_SCRIPT,
+                EXECUTING_SCRIPT,
+                EDITOR_SCRIPT,
+              }),
+              reqId,
+              MIMETYPE_HTML
+            );
+            return;
+          }
+
+          if (reqPath === 'favicon.ico') {
+            sendIco(assets, reqId);
+            return;
+          }
+        }
+
         if (activeFile.mode === 'single') {
           if (filename === reqPath) {
             sendText(
@@ -249,16 +271,7 @@ async function run(
         switch (ext) {
           case 'htm':
           case 'html':
-            if (isConsole) {
-              const doc = mustache.render($_console, {
-                CONSOLE_SCRIPT,
-                CONSOLE_STYLE,
-                ESPRISMA_SCRIPT,
-                EXECUTING_SCRIPT,
-                EDITOR_SCRIPT,
-              });
-              sendText(doc, reqId, MIMETYPE_HTML);
-            } else if (file) {
+            if (file) {
               sendHTML(file.session.getValue(), reqId);
             } else {
               sendFileContent(url, reqId, MIMETYPE_HTML);
@@ -303,8 +316,7 @@ async function run(
                 sendFile(uri, reqId);
               } catch (err) {
                 if (reqPath === 'favicon.ico') {
-                  const ico = Url.join(assets, 'res/logo/favicon.ico');
-                  sendFile(ico, reqId);
+                  sendIco(assets, reqId);
                 } else {
                   error(reqId);
                 }
@@ -333,6 +345,11 @@ async function run(
       status: 404,
       body: 'File not found!',
     });
+  }
+
+  function sendIco(assets, reqId) {
+    const ico = Url.join(assets, 'res/logo/favicon.ico');
+    sendFile(ico, reqId);
   }
 
   /**

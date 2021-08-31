@@ -205,7 +205,7 @@
   "connecting": "Connecting",
   "file has been deleted": "{file} has been deleted!",
   "feature not available": "This feature is only available in paid version of the app.",
-  "preview info": "To run the active file, tap and hold on play icon.",
   "deleted file": "Deleted file",
-  "line height": "Line height"
+  "line height": "Line height",
+  "preview info": "If you want run the active file, tap and hold on play icon."
 }

@@ -103,6 +103,7 @@ function openFolder(_path, opts = {}) {
   updateHeight();
   recents.addFolder(_path, opts);
   editorManager.sidebar.appendChild($root);
+  editorManager.onupdate('add-folder', _path);
 
   function getTitle() {
     let title = '';
@@ -134,6 +135,7 @@ function openFolder(_path, opts = {}) {
 
     addedFolder = addedFolder.filter((folder) => folder.url !== _path);
     updateHeight();
+    editorManager.onupdate('remove-folder', _path);
   }
 
   function updateHeight() {
@@ -218,8 +220,9 @@ function openFolder(_path, opts = {}) {
       execOperation(type, res, url, $target, name)
         .catch((err) => {
           if (err === false) return;
-          helpers.error(err);
+
           console.error(err);
+          helpers.error(err);
         })
         .finally(loading.stop);
     });

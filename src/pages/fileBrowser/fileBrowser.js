@@ -71,7 +71,7 @@ FileBrowser.openFileError = (err) => {
   if (err.code) {
     alert(
       ERROR,
-      `${strings['unable to open file']}. ${helpers.getErrorMessage(err.code)}`
+      `${strings['unable to open file']}. ${helpers.errorMessage(err.code)}`
     );
   } else if (err.code !== 0) {
     alert(ERROR, strings['unable to open file']);
@@ -99,15 +99,14 @@ FileBrowser.openFolder = (res) => {
 };
 
 FileBrowser.openFolderError = (err) => {
+  const ERROR = strings.error.toUpperCase();
   if (err.code) {
     alert(
-      strings.error.toUpperCase(),
-      `${strings['unable to open folder']}. ${helpers.getErrorMessage(
-        err.code
-      )}`
+      ERROR,
+      `${strings['unable to open folder']}. ${helpers.errorMessage(err.code)}`
     );
   } else if (err.code !== 0) {
-    alert(strings.error.toUpperCase(), strings['unable to open folder']);
+    alert(ERROR, strings['unable to open folder']);
   }
 };
 

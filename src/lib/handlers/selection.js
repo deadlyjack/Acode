@@ -253,7 +253,7 @@ function enableSingleMode() {
     const cmClient = $cm.getBoundingClientRect();
 
     if (cmClient.right + 10 > innerWidth) {
-      cm.left = (containerWidth - cmClient.width * scale) / 2;
+      cm.left = (innerWidth - cmClient.width * scale) / 2;
     }
 
     if (cmClient.left < 10) {

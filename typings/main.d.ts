@@ -366,7 +366,7 @@ interface Manager {
     removeFile(id: string | File, force: boolean): void;
     editor: AceAjax.Editor;
     activeFile: File;
-    onupdate(doSaveState: boolean): void;
+    onupdate(operation: String, ...args: any): void;
     files: Array<File>;
     controls: Controls;
     state: 'blur' | 'focus';
