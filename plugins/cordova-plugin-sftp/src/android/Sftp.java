@@ -54,7 +54,6 @@ public class Sftp extends CordovaPlugin {
   )
     throws JSONException {
     callback = callbackContext;
-    int argLen = args.length();
 
     final String arg1 = getJSONValueString(args, 0);
     final String arg2 = getJSONValueString(args, 1);

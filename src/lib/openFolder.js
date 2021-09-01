@@ -32,7 +32,6 @@ function openFolder(_path, opts = {}) {
   if ('saveState' in opts) saveState = opts.saveState;
   if ('reloadOnResume' in opts) reloadOnResume = opts.reloadOnResume;
 
-  // const listState = JSON.parse(localStorage.state || '{}');
   const listState = {};
   const title = opts.name || getTitle();
   const $closeBtn = tag('span', {
@@ -624,8 +623,6 @@ function openFolder(_path, opts = {}) {
           loading.stop();
         });
     }
-
-    // localStorage.setItem('state', JSON.stringify(listState));
   }
 }
 

@@ -454,7 +454,7 @@ function EditorManager($sidebar, $header, $body) {
       record: options.record,
       encoding: 'utf-8',
       assocTile,
-      readOnly: options.readonly,
+      readOnly: options.readOnly,
       get id() {
         return id;
       },
@@ -606,7 +606,7 @@ function EditorManager($sidebar, $header, $body) {
         } catch (error) {}
       },
       async isChanged() {
-        if (!this.uri) {
+        if (!this.uri || this.readOnly) {
           if (this.id === constants.DEFAULT_FILE_SESSION) {
             this.id = helpers.uuid();
           }
@@ -679,7 +679,7 @@ function EditorManager($sidebar, $header, $body) {
       const id = file.record.id;
       text =
         'gist • ' + (id.length > 10 ? '...' + id.substring(id.length - 7) : id);
-    } else if (text) {
+    } else if (text && !file.readOnly) {
       text = helpers.getVirtualPath(text);
       if (text.length > 30) text = '...' + text.slice(text.length - 27);
     } else if (file.readOnly) {

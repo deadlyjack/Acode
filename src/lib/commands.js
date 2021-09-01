@@ -48,7 +48,7 @@ const commands = {
         if (file.uri) {
           const fs = await fsOperation(file.uri);
 
-          if (!(await fs.exists())) {
+          if (!(await fs.exists()) && !file.readOnly) {
             file.isUnsaved = true;
             file.uri = null;
             dialogs.alert(
@@ -91,7 +91,6 @@ const commands = {
     this['resize-editor']();
   },
   'enable-fullscreen'() {
-    // system.enableFullScreen();
     app.classList.add('fullscreen-mode');
     this['resize-editor']();
     editorManager.controls.vScrollbar.resize();
@@ -301,6 +300,8 @@ const commands = {
     saveFile(editorManager.activeFile, false, toast);
   },
   'save-state'() {
+    if (window.isLoading) return;
+
     const filesToSave = [];
     const folders = [];
     const { activeFile } = editorManager;
@@ -348,8 +349,8 @@ const commands = {
       localStorage.setItem('lastfile', activeFile.id);
     }
 
-    localStorage.setItem('files', JSON.stringify(filesToSave));
-    localStorage.setItem('folders', JSON.stringify(folders));
+    localStorage.files = JSON.stringify(filesToSave);
+    localStorage.folders = JSON.stringify(folders);
   },
   'save-as'(toast) {
     saveFile(editorManager.activeFile, true, toast);

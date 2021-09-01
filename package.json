@@ -39,11 +39,11 @@
       "cordova-plugin-buildinfo": {},
       "cordova-plugin-device": {},
       "cordova-plugin-webserver": {},
-      "cordova-plugin-system": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-ftp": {},
+      "cordova-plugin-sdcard": {},
       "cordova-plugin-sftp": {},
-      "cordova-plugin-sdcard": {}
+      "cordova-plugin-system": {}
     },
     "platforms": [
       "android"
@@ -77,10 +77,10 @@
     "cordova-plugin-inappbrowser": "file:src/plugins/cordova-plugin-inappbrowser",
     "cordova-plugin-intent": "file:src/plugins/cordova-plugin-intent",
     "cordova-plugin-navigationbar-color": "^0.1.0",
-    "cordova-plugin-sdcard": "file:../plugins/cordova-plugin-sdcard",
+    "cordova-plugin-sdcard": "^1.0.7",
     "cordova-plugin-sftp": "file:src/plugins/cordova-plugin-sftp",
     "cordova-plugin-statusbar": "^2.4.3",
-    "cordova-plugin-system": "^1.0.3",
+    "cordova-plugin-system": "file:src/plugins/cordova-plugin-system",
     "cordova-plugin-vibration": "^3.1.1",
     "cordova-plugin-webserver": "file:src/plugins/cordova-plugin-webserver",
     "cordova-plugin-whitelist": "^1.3.5",

@@ -39,7 +39,6 @@ function rateBox() {
         const textBody =
           stars + '</br>%0A' + helpers.getFeedbackBody('</br>%0A');
         const email = constants.FEEDBACK_EMAIL;
-        // system.sendEmail(email, subject, textBody);
         window.open(
           `mailto:${email}?subject=${subject}&body=${textBody}`,
           '_system'

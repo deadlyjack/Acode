@@ -144,6 +144,7 @@ function saveFile(file, as = false) {
         const fileUri = await fs.createFile(file.filename, data);
         file.type = 'regular';
         file.uri = fileUri;
+        file.readOnly = false;
         editorManager.setSubText(file);
         recents.addFile(fileUri);
         updateFolders(url);
@@ -174,7 +175,7 @@ function saveFile(file, as = false) {
 
     function updateFolders(dir) {
       const folder = openFolder.find(dir);
-      folder.reload();
+      if (folder) folder.reload();
     }
 
     function error(err) {

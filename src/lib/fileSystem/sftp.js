@@ -436,10 +436,10 @@ class SFTP {
     if (/total/.test(list[0])) list.splice(0, 1);
 
     const fileList = list.map((i) => this.#parseFile(i, dirname));
-    return fileList;
+    return fileList.filter((i) => !!i);
   }
 
-  #parseFile(item, dirname, isFile) {
+  #parseFile(item, dirname) {
     const PERMISSIONS = 0;
     const SIZE = 2;
     const MODIFIED_DATE = 3;
@@ -456,6 +456,8 @@ class SFTP {
           return 'file';
       }
     };
+
+    if (name === '.' || name === '..') return null;
 
     const itemData = item.split(' ');
     const GET = (len, join = true) => {
@@ -482,7 +484,7 @@ class SFTP {
       name,
       size,
       canRead: /r/.test(canrw),
-      canWrtie: /w/.test(canrw),
+      canWrite: /w/.test(canrw),
       isDirectory: type === 'directory',
       isLink: type === 'link',
       isFile: type === 'file',

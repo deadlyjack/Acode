@@ -463,49 +463,6 @@ function App() {
   document.addEventListener('keydown', handleMainKeyDown);
   document.addEventListener('keyup', handleMainKeyUp);
 
-  loadFolders();
-  document.body.setAttribute('data-small-msg', 'Loading files...');
-  loadFiles() //
-    .then(() => {
-      document.body.removeAttribute('data-small-msg');
-
-      setTimeout(() => {
-        app.classList.remove('loading', 'splash');
-        if (localStorage.count === undefined) localStorage.count = 0;
-        let count = +localStorage.count;
-
-        if (count === constants.RATING_COUNT) askForRating();
-        else if (count === constants.DONATION_COUNT) askForDonation();
-        else ++localStorage.count;
-
-        editorManager.onupdate('loading-complete');
-
-        if (!localStorage.__init) {
-          localStorage.__init = true;
-          if (!BuildInfo.debug) {
-            const title = strings.info.toUpperCase();
-            const body = mustache.render($_hintText, {
-              lang: appSettings.value.lang,
-            });
-            dialogs.box(title, body).wait(12000);
-          }
-        }
-      }, 500);
-
-      window.plugins.intent.setNewIntentHandler(intentHandler);
-      window.plugins.intent.getCordovaIntent(intentHandler, function (e) {
-        console.error('Error: Cannot handle open with file intent', e);
-      });
-      document.addEventListener('menubutton', $sidebar.toggle);
-      navigator.app.overrideButton('menubutton', true);
-      document.addEventListener('pause', () => {
-        Acode.exec('save-state');
-      });
-      document.addEventListener('resume', () => {
-        Acode.exec('check-files');
-      });
-    });
-
   editorManager.onupdate = function (type) {
     /**
      * @type {File}
@@ -560,6 +517,51 @@ function App() {
     const activeFile = editorManager.activeFile;
     if (activeFile) editorManager.editor.blur();
   };
+
+  window.isLoading = true;
+  loadFolders();
+  document.body.setAttribute('data-small-msg', 'Loading files...');
+  loadFiles() //
+    .then(() => {
+      document.body.removeAttribute('data-small-msg');
+
+      setTimeout(() => {
+        app.classList.remove('loading', 'splash');
+        if (localStorage.count === undefined) localStorage.count = 0;
+        let count = +localStorage.count;
+
+        if (count === constants.RATING_COUNT) askForRating();
+        else if (count === constants.DONATION_COUNT) askForDonation();
+        else ++localStorage.count;
+
+        editorManager.onupdate('loading-complete');
+        window.isLoading = false;
+
+        if (!localStorage.__init) {
+          localStorage.__init = true;
+          if (!BuildInfo.debug) {
+            const title = strings.info.toUpperCase();
+            const body = mustache.render($_hintText, {
+              lang: appSettings.value.lang,
+            });
+            dialogs.box(title, body).wait(12000);
+          }
+        }
+      }, 500);
+
+      window.plugins.intent.setNewIntentHandler(intentHandler);
+      window.plugins.intent.getCordovaIntent(intentHandler, function (e) {
+        console.error('Error: Cannot handle open with file intent', e);
+      });
+      document.addEventListener('menubutton', $sidebar.toggle);
+      navigator.app.overrideButton('menubutton', true);
+      document.addEventListener('pause', () => {
+        Acode.exec('save-state');
+      });
+      document.addEventListener('resume', () => {
+        Acode.exec('check-files');
+      });
+    });
 
   /**
    *
@@ -657,7 +659,7 @@ function App() {
               const fs = await fsOperation(uri);
               if (!text) {
                 text = await fs.readFile('utf-8');
-              } else if (!(await fs.exists())) {
+              } else if (!(await fs.exists()) && !readOnly) {
                 uri = null;
                 isUnsaved = true;
                 dialogs.alert(
@@ -665,17 +667,20 @@ function App() {
                   strings['file has been deleted'].replace('{file}', filename)
                 );
               }
-              editorManager.addNewFile(filename, {
-                uri,
-                render,
-                isUnsaved,
-                cursorPos,
-                readOnly,
-                text,
-                id,
-                mode,
-                deltedFile,
-              });
+
+              if (text) {
+                editorManager.addNewFile(filename, {
+                  uri,
+                  render,
+                  isUnsaved,
+                  cursorPos,
+                  readOnly,
+                  text,
+                  id,
+                  mode,
+                  deltedFile,
+                });
+              }
             } catch (error) {
               continue;
             }
@@ -700,7 +705,7 @@ function App() {
 
   function loadFolders() {
     try {
-      const folders = JSON.parse(localStorage.getItem('folders'));
+      const folders = JSON.parse(localStorage.folders);
       folders.map((folder) => openFolder(folder.url, folder.opts));
     } catch (error) {}
   }

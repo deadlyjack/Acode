@@ -26,9 +26,8 @@ function HandleIntent(intent = {}) {
   intent.fileUri = null;
 
   if (['SEND', 'VIEW', 'EDIT'].includes(type)) {
-    return openFile({
-      name: intent.filename,
-      uri: intent.data || intent.fileUri,
+    return openFile(intent.data || intent.fileUri, {
+      render: true,
     }).then(stopLoading);
   } else {
     stopLoading();
