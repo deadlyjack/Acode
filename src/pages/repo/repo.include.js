@@ -152,7 +152,7 @@ export default function RepoInclude(owner, repoName) {
   }
 
   function render(list, name, sha) {
-    $page.settitle = repoName + ` (${branch})`;
+    $page.settitle(repoName + ` (${branch})`);
 
     if (!(sha in cachedTree)) {
       list.map((entry) => {

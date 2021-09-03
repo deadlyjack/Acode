@@ -16,6 +16,7 @@ import Sftp from './sftp';
  */
 async function fsOperation(uri) {
   const protocol = Url.getProtocol(uri);
+
   if (protocol === 'file:') {
     const match = constants.EXTERNAL_STORAGE.exec(uri);
     if (!IS_ANDROID_VERSION_5 && match && match[1] !== 'emulated') {
@@ -26,42 +27,62 @@ async function fsOperation(uri) {
     }
   } else if (protocol === 'content:') {
     return externalOperation(externalFs, uri);
-  } else if (protocol === 'ftp:') {
-    const { username, password, hostname, port, query } = UrlParse(uri, true);
-
-    const fs = Ftp(
-      decodeURIComponent(username || ''),
-      decodeURIComponent(password || ''),
-      decodeURIComponent(hostname || ''),
-      port || 21,
-      query['security'],
-      query['mode']
-    );
-    return ftpOperation(fs, uri);
-  } else if (protocol === 'sftp:') {
-    const {
-      username, //
-      password, //
-      pathname, //
-      hostname, //
-      port, //
-      query, //
-    } = UrlParse(uri, true);
-
-    const sftpCon = Sftp(
-      decodeURIComponent(hostname || ''),
-      parseInt(port) || 22,
-      decodeURIComponent(username || ''),
-      {
-        password: decodeURIComponent(password || ''),
-        keyFile: decodeURIComponent(query['keyFile'] || ''),
-        passPhrase: decodeURIComponent(query['passPhrase'] || ''),
-      }
-    );
-
-    return sftpOperation(sftpCon, pathname);
   } else {
-    throw new Error('File system not supported yet.');
+    const uuid = helpers.uuid();
+    const uuidRegex = new RegExp(uuid, 'g');
+
+    if (/#/.test(uri)) {
+      uri = uri.replace(/#/g, uuid);
+    }
+
+    let { username, password, hostname, pathname, port, query } = UrlParse(
+      uri,
+      true
+    );
+
+    if (username) {
+      username = decodeURIComponent(username);
+    }
+
+    if (password) {
+      password = decodeURIComponent(password);
+    }
+
+    if (port) {
+      port = parseInt(port);
+    }
+
+    if (protocol === 'ftp:') {
+      let { security, mode } = query;
+      const fs = Ftp(username, password, hostname, port || 21, security, mode);
+      uri = uri.replace(uuidRegex, '#');
+      return ftpOperation(fs, uri);
+    } else if (protocol === 'sftp:') {
+      let { keyFile, passPhrase } = query;
+
+      if (keyFile) {
+        keyFile = decodeURIComponent(keyFile);
+      }
+
+      if (passPhrase) {
+        passPhrase = decodeURIComponent(passPhrase);
+      }
+
+      if (pathname) {
+        pathname = decodeURIComponent(pathname);
+        pathname = pathname.replace(uuidRegex, '#');
+      }
+
+      const sftpCon = Sftp(hostname, port || 22, username, {
+        password,
+        keyFile,
+        passPhrase,
+      });
+
+      return sftpOperation(sftpCon, pathname);
+    } else {
+      throw new Error('File system not supported yet.');
+    }
   }
   /**
    *

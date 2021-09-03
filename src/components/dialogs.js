@@ -12,8 +12,9 @@ const loader = {
    * Creates new loading dialog
    * @param {string} titleText Title text
    * @param {string} message Loading message
+   * @param {{timeout: Number, callback: function():void}} cancel Loading message
    */
-  create(titleText, message) {
+  create(titleText, message, cancel = null) {
     if (!message && titleText) {
       message = titleText;
       titleText = '';
@@ -30,7 +31,7 @@ const loader = {
       className: 'title',
       textContent: titleText,
     });
-    const messageSpan = tag('span', {
+    const $messageSpan = tag('span', {
       className: 'message loader',
       children: [
         tag('span', {
@@ -42,12 +43,12 @@ const loader = {
         }),
       ],
     });
-    const loaderDiv =
+    const $loaderDiv =
       oldLoaderDiv ||
       tag('div', {
         className: 'prompt alert',
         id: '__loader',
-        children: [titleSpan, messageSpan],
+        children: [titleSpan, $messageSpan],
       });
     const mask =
       tag.get('#__loader-mask') ||
@@ -56,9 +57,34 @@ const loader = {
         id: '__loader-mask',
       });
 
+    if (cancel) {
+      const { timeout, callback } = cancel;
+
+      if (typeof timeout === 'number') {
+        setTimeout(() => {
+          const loader = this;
+          loader.show();
+          $loaderDiv.append(
+            tag('div', {
+              className: 'button-container',
+              child: tag('button', {
+                textContent: strings.cancel,
+                onclick() {
+                  loader.destroy();
+                  if (typeof callback === 'function') {
+                    callback();
+                  }
+                },
+              }),
+            })
+          );
+        }, timeout);
+      }
+    }
+
     if (!oldLoaderDiv) {
       window.freeze = true;
-      document.body.append(loaderDiv, mask);
+      document.body.append($loaderDiv, mask);
       window.restoreTheme(true);
     }
   },

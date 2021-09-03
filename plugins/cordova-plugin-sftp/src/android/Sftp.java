@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 import java.lang.SecurityException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.channels.UnresolvedAddressException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -138,7 +139,7 @@ public class Sftp extends CordovaPlugin {
       }
 
       callback.error("Cannot connect");
-    } catch (SshException | IOException e) {
+    } catch (UnresolvedAddressException | SshException | IOException e) {
       callback.error(errMessage(e));
       Log.e("connectUsingPassword", "Cannot connect", e);
     }
@@ -177,6 +178,7 @@ public class Sftp extends CordovaPlugin {
       callback.error("Cannot connect");
     } catch (
       InvalidPassphraseException
+      | UnresolvedAddressException
       | SshException
       | IOException
       | SecurityException e

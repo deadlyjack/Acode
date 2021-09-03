@@ -74,9 +74,9 @@ function openFolder(_path, opts = {}) {
     $text.style.whiteSpace = 'nowrap';
     $text.style.textOverflow = 'ellipsis';
   }
-  $root.$title.setAttribute('type', 'root');
-  $root.$title.setAttribute('url', _path);
-  $root.$title.setAttribute('name', title);
+  $root.$title.data_type = 'root';
+  $root.$title.data_url = _path;
+  $root.$title.data_name = title;
 
   $root.$ul.onclick =
     $root.$ul.oncontextmenu =
@@ -149,10 +149,10 @@ function openFolder(_path, opts = {}) {
     const mode = e.type;
     const $target = e.target;
     if (!($target instanceof HTMLElement)) return;
-    const type = $target.getAttribute('type');
+    const type = $target.data_type;
     if (!type) return;
-    const url = $target.getAttribute('url');
-    const name = $target.getAttribute('name');
+    const url = $target.data_url;
+    const name = $target.data_name;
 
     if (mode === 'click') handleClick(type, url, name, $target);
     else if (mode === 'contextmenu')
@@ -307,8 +307,8 @@ function openFolder(_path, opts = {}) {
               const newUrl = await fs.renameTo(newName);
               newName = Url.basename(newUrl);
               $target.querySelector(':scope>.text').textContent = newName;
-              $target.setAttribute('url', newUrl);
-              $target.setAttribute('name', newName);
+              $target.data_url = newUrl;
+              $target.data_urlname = newName;
               if (helpers.isFile(type)) {
                 $target.querySelector(':scope>span').className =
                   helpers.getIconForFile(newName);
@@ -330,14 +330,14 @@ function openFolder(_path, opts = {}) {
 
       case 'paste':
         $src = clipBoard.$el;
-        srcType = $src.getAttribute('type');
+        srcType = $src.data_type;
         src = $src.isConnected
           ? (helpers.isFile(srcType)
               ? $src.parentElement
               : $src.parentElement.parentElement
             ).previousElementSibling.getAttribute('state')
           : 'uncollapsed';
-        srcName = $src.getAttribute('name');
+        srcName = $src.data_name;
 
         CASE += helpers.isFile(srcType) ? 1 : 0;
         CASE += src === 'collapsed' ? 1 : 0;
@@ -554,9 +554,9 @@ function openFolder(_path, opts = {}) {
       }),
       text: name,
     });
-    $tile.setAttribute('url', url);
-    $tile.setAttribute('name', name);
-    $tile.setAttribute('type', 'file');
+    $tile.data_url = url;
+    $tile.data_name = name;
+    $tile.data_type = 'file';
 
     return $tile;
   }
@@ -565,9 +565,9 @@ function openFolder(_path, opts = {}) {
     const $list = collapsableList(name, !!!listState[url], 'folder', {
       ontoggle: expandList,
     });
-    $list.$title.setAttribute('url', url);
-    $list.$title.setAttribute('type', 'dir');
-    $list.$title.setAttribute('name', name);
+    $list.$title.data_url = url;
+    $list.$title.data_type = 'dir';
+    $list.$title.data_name = name;
 
     return $list;
   }
@@ -576,10 +576,10 @@ function openFolder(_path, opts = {}) {
    *
    * @this {import('../components/collapsableList').Collaspable}
    */
-  function expandList() {
+  async function expandList() {
     const $target = this.$title;
     const $ul = this.$ul;
-    const url = $target.getAttribute('url');
+    const url = $target.data_url;
     const state = $target.getAttribute('state');
 
     if (!$ul) return;
@@ -590,38 +590,34 @@ function openFolder(_path, opts = {}) {
     if (state === 'uncollapsed') {
       loading.start();
       if (saveState) listState[url] = true;
-      fsOperation(url)
-        .then((fs) => {
-          return fs.lsDir();
-        })
-        .then((entries) => {
-          entries = helpers.sortDir(
-            entries,
-            {
-              sortByName: true,
-              showHiddenFiles: true,
-            },
-            true
-          );
-          entries.map((entry) => {
-            const name = entry.name || Path.basename(entry.url);
-            if (entry.isDirectory) {
-              const $list = createFolderTile(name, entry.url);
-              $ul.appendChild($list);
-            } else {
-              const $item = createFileTile(name, entry.url);
-              $ul.append($item);
-            }
-          });
-        })
-        .catch((err) => {
-          this.collapse();
-          helpers.error(err);
-          console.error(err);
-        })
-        .finally(() => {
-          loading.stop();
+
+      try {
+        const fs = await fsOperation(url);
+        let entries = await fs.lsDir();
+        entries = helpers.sortDir(
+          entries,
+          {
+            sortByName: true,
+            showHiddenFiles: true,
+          },
+          true
+        );
+        entries.map((entry) => {
+          const name = entry.name || Path.basename(entry.url);
+          if (entry.isDirectory) {
+            const $list = createFolderTile(name, entry.url);
+            $ul.appendChild($list);
+          } else {
+            const $item = createFileTile(name, entry.url);
+            $ul.append($item);
+          }
         });
+      } catch (err) {
+        this.collapse();
+        helpers.error(err);
+        console.error(err);
+      }
+      loading.stop();
     }
   }
 }
@@ -649,8 +645,8 @@ openFolder.updateHeight = function () {
 openFolder.updateItem = function (oldFile, newFile, newFilename) {
   const $el = editorManager.sidebar.querySelector(`[url="${oldFile}"]`);
   if ($el) {
-    $el.setAttribute('url', newFile);
-    $el.setAttribute('name', newFilename);
+    $el.data_url = newFile;
+    $el.data_name = newFilename;
     $el.querySelector(':scope>span').className =
       helpers.getIconForFile(newFilename);
     $el.querySelector(':scope>.text').textContent = newFilename;
@@ -660,7 +656,7 @@ openFolder.updateItem = function (oldFile, newFile, newFilename) {
 openFolder.removeItem = function (url) {
   const $el = editorManager.sidebar.querySelector(`[url="${url}"]`);
   if ($el) {
-    const type = $el.getAttribute('type');
+    const type = $el.data_type;
     if (helpers.isFile(type)) {
       $el.remove();
     } else {

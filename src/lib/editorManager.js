@@ -6,7 +6,6 @@ import dialogs from '../components/dialogs';
 import helpers from './utils/helpers';
 import textControl from './handlers/selection';
 import constants from './constants';
-import internalFs from './fileSystem/internalFs';
 import openFolder from './openFolder';
 import Url from './utils/Url';
 import path from './utils/Path';

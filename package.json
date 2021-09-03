@@ -42,8 +42,8 @@
       "cordova-plugin-whitelist": {},
       "cordova-plugin-ftp": {},
       "cordova-plugin-sdcard": {},
-      "cordova-plugin-sftp": {},
-      "cordova-plugin-system": {}
+      "cordova-plugin-system": {},
+      "cordova-plugin-sftp": {}
     },
     "platforms": [
       "android"

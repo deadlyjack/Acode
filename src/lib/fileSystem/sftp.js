@@ -2,6 +2,25 @@ import mimeType from 'mime-types';
 import Url from '../utils/Url';
 import internalFs from './internalFs';
 
+if (!Array.isArray(window.__sftpTaskQueue)) {
+  window.__sftpTaskQueue = [];
+}
+
+if (!('__sftpBusy' in window)) {
+  Object.defineProperty(window, '__sftpBusy', {
+    get() {
+      return !!this.__sftp_busy_;
+    },
+    set(val) {
+      this.__sftp_busy_ = val;
+      if (!val) {
+        const action = this.__sftpTaskQueue.splice(0, 1)[0];
+        if (typeof action === 'function') action();
+      }
+    },
+  });
+}
+
 class SFTP {
   #hostname;
   #port;
@@ -75,7 +94,6 @@ class SFTP {
    * @param {boolean} isFile
    */
   ls(dirname, isFile) {
-    dirname = this.#safeName(dirname);
     return new Promise((resolve, reject) => {
       sftp.isConnected(async (connectionID) => {
         (async () => {
@@ -87,9 +105,20 @@ class SFTP {
               return;
             }
           }
+
+          if (window.__sftpBusy) {
+            window.__sftpTaskQueue.push(() => {
+              this.ls(dirname, isFile).then(resolve).catch(reject);
+            });
+            return;
+          }
+          window.__sftpBusy = true;
           sftp.exec(
-            `ls -gaAG --full-time "${dirname}" | awk '{$2=\"\"; print $0}'`,
+            `ls -gaAG --full-time "${this.#safeName(
+              dirname
+            )}" | awk '{$2=\"\"; print $0}'`,
             (res) => {
+              window.__sftpBusy = false;
               if (res.code <= 0) {
                 if (isFile) {
                   resolve(this.#parseFile(res.result, Url.dirname(dirname)));
@@ -101,6 +130,7 @@ class SFTP {
               reject(this.#errorCodes(res.code));
             },
             (err) => {
+              window.__sftpBusy = false;
               reject(err);
             }
           );
@@ -116,7 +146,6 @@ class SFTP {
    */
   createFile(filename, content) {
     const fullFilename = Url.join(this.#base, filename);
-    filename = this.#safeName(filename);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -128,10 +157,21 @@ class SFTP {
               return;
             }
           }
-          const cmd = `[[ -f "${filename}" ]] && echo "Already exists" || touch "${filename}"`;
+          if (window.__sftpBusy) {
+            window.__sftpTaskQueue.push(() => {
+              this.createFile(filename, content).then(resolve).catch(reject);
+            });
+            return;
+          }
+          window.__sftpBusy = true;
+
+          const cmd = `[[ -f "${this.#safeName(
+            filename
+          )}" ]] && echo "Already exists" || touch "${filename}"`;
           sftp.exec(
             cmd,
             (res) => {
+              window.__sftpBusy = false;
               if (res.code <= 0) {
                 if (content) {
                   this.writeFile(filename, content)
@@ -145,7 +185,10 @@ class SFTP {
               }
               reject(this.#errorCodes(res.code));
             },
-            reject
+            (err) => {
+              window.__sftpBusy = false;
+              reject(err);
+            }
           );
         })();
       });
@@ -158,7 +201,6 @@ class SFTP {
    */
   createDir(dirname) {
     const fullDirname = Url.join(this.#base, dirname);
-    dirname = this.#safeName(dirname);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -171,9 +213,17 @@ class SFTP {
             }
           }
 
+          if (window.__sftpBusy) {
+            window.__sftpTaskQueue.push(() => {
+              this.createDir(dirname).then(resolve).catch(reject);
+            });
+            return;
+          }
+          window.__sftpBusy = true;
           sftp.exec(
-            `mkdir "${dirname}"`,
+            `mkdir "${this.#safeName(dirname)}"`,
             (res) => {
+              window.__sftpBusy = false;
               if (res.code <= 0) {
                 resolve(fullDirname);
                 return;
@@ -181,7 +231,10 @@ class SFTP {
 
               reject(this.#errorCodes(res.code));
             },
-            reject
+            (err) => {
+              window.__sftpBusy = false;
+              reject(err);
+            }
           );
         })();
       });
@@ -195,8 +248,6 @@ class SFTP {
    */
   writeFile(filename, content) {
     const localFilename = this.#getLocalname(filename);
-    filename = this.#safeName(filename);
-
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -204,8 +255,26 @@ class SFTP {
             if (this.#notConnected(connectionID)) {
               await this.connect();
             }
+            if (window.__sftpBusy) {
+              window.__sftpTaskQueue.push(() => {
+                this.writeFile(filename, content).then(resolve).catch(reject);
+              });
+              return;
+            }
+            window.__sftpBusy = true;
             await internalFs.writeFile(localFilename, content, true, false);
-            sftp.putFile(filename, localFilename, resolve, reject);
+            sftp.putFile(
+              this.#safeName(filename),
+              localFilename,
+              (res) => {
+                window.__sftpBusy = false;
+                resolve(res);
+              },
+              (err) => {
+                window.__sftpBusy = false;
+                reject(err);
+              }
+            );
           } catch (err) {
             reject(err);
           }
@@ -220,8 +289,6 @@ class SFTP {
    */
   readFile(filename) {
     const localFilename = this.#getLocalname(filename);
-    filename = this.#safeName(filename);
-
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -234,10 +301,18 @@ class SFTP {
             }
           }
 
+          if (window.__sftpBusy) {
+            window.__sftpTaskQueue.push(() => {
+              this.readFile(filename).then(resolve).catch(reject);
+            });
+            return;
+          }
+          window.__sftpBusy = true;
           sftp.getFile(
-            filename,
+            this.#safeName(filename),
             localFilename,
             async () => {
+              window.__sftpBusy = false;
               try {
                 resolve(await internalFs.readFile(localFilename));
               } catch (error) {
@@ -245,6 +320,7 @@ class SFTP {
               }
             },
             (err) => {
+              window.__sftpBusy = false;
               reject(err);
             }
           );
@@ -255,9 +331,6 @@ class SFTP {
 
   copyTo(filename, dest) {
     const fullDest = Url.join(this.#base, dest, Url.basename(filename));
-    filename = this.#safeName(filename);
-    dest = this.#safeName(dest);
-
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -270,10 +343,20 @@ class SFTP {
             }
           }
 
-          const cmd = `cp -r "${filename}" "${dest}"`;
+          if (window.__sftpBusy) {
+            window.__sftpTaskQueue.push(() => {
+              this.copyTo(filename, dest).then(resolve).catch(reject);
+            });
+            return;
+          }
+          window.__sftpBusy = true;
+          const cmd = `cp -r "${this.#safeName(filename)}" "${this.#safeName(
+            dest
+          )}"`;
           sftp.exec(
             cmd,
             (res) => {
+              window.__sftpBusy = false;
               if (res.code <= 0) {
                 resolve(fullDest);
                 return;
@@ -281,7 +364,10 @@ class SFTP {
 
               reject(this.#errorCodes(res.code));
             },
-            reject
+            (err) => {
+              window.__sftpBusy = false;
+              reject(err);
+            }
           );
         })();
       }, reject);
@@ -300,9 +386,6 @@ class SFTP {
    */
   rename(filename, newname, move) {
     const fullNewname = Url.join(this.#base, newname);
-    filename = this.#safeName(filename);
-    newname = this.#safeName(newname);
-
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -315,10 +398,20 @@ class SFTP {
             }
           }
 
-          const cmd = `mv "${filename}" "${newname}"`;
+          if (window.__sftpBusy) {
+            window.__sftpTaskQueue.push(() => {
+              this.rename(filename, newname, move).then(resolve).catch(reject);
+            });
+            return;
+          }
+          window.__sftpBusy = true;
+          const cmd = `mv "${this.#safeName(filename)}" "${this.#safeName(
+            newname
+          )}"`;
           sftp.exec(
             cmd,
             (res) => {
+              window.__sftpBusy = false;
               if (res.code <= 0) {
                 resolve(
                   move
@@ -330,7 +423,10 @@ class SFTP {
 
               reject(this.#errorCodes(res.code));
             },
-            reject
+            (err) => {
+              window.__sftpBusy = false;
+              reject(err);
+            }
           );
         })();
       }, reject);
@@ -343,7 +439,7 @@ class SFTP {
    * @param {'file' | 'dir'} type
    */
   delete(filename, type) {
-    filename = this.#safeName(filename);
+    const fullFilename = Url.join(this.#base, filename);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -355,18 +451,32 @@ class SFTP {
               return;
             }
           }
-          const cmd = `rm ${type === 'dir' ? '-rf' : ''} "${filename}"`;
+
+          if (window.__sftpBusy) {
+            window.__sftpTaskQueue.push(() => {
+              this.delete(filename, type).then(resolve).catch(reject);
+            });
+            return;
+          }
+          window.__sftpBusy = true;
+          const cmd = `rm ${type === 'dir' ? '-rf' : ''} "${this.#safeName(
+            filename
+          )}"`;
           sftp.exec(
             cmd,
             (res) => {
+              window.__sftpBusy = false;
               if (res.code <= 0) {
-                resolve(res.result);
+                resolve(fullFilename);
                 return;
               }
 
               reject(this.#errorCodes(res.code));
             },
-            reject
+            (err) => {
+              window.__sftpBusy = false;
+              reject(err);
+            }
           );
         })();
       }, reject);
@@ -386,9 +496,17 @@ class SFTP {
             }
           }
 
+          if (window.__sftpBusy) {
+            window.__sftpTaskQueue.push(() => {
+              this.pwd().then(resolve).catch(reject);
+            });
+            return;
+          }
+          window.__sftpBusy = true;
           sftp.exec(
             'pwd',
             (res) => {
+              window.__sftpBusy = false;
               if (res.code <= 0) {
                 resolve(res.result);
                 return;
@@ -396,7 +514,10 @@ class SFTP {
 
               reject(this.#errorCodes(res.code));
             },
-            reject
+            (err) => {
+              window.__sftpBusy = false;
+              reject(err);
+            }
           );
         })();
       }, reject);
@@ -405,7 +526,6 @@ class SFTP {
 
   async stats(filename) {
     filename = this.#safeName(filename);
-
     const file = await this.ls(filename, true);
 
     return {
@@ -457,8 +577,6 @@ class SFTP {
       }
     };
 
-    if (name === '.' || name === '..') return null;
-
     const itemData = item.split(' ');
     const GET = (len, join = true) => {
       const str = itemData.splice(len);
@@ -479,6 +597,7 @@ class SFTP {
       name.splice(name.indexOf('->'));
     }
     name = Url.basename(name.join(' '));
+    if (['..', '.', '`'].includes(name)) return null;
 
     return {
       name,
@@ -499,7 +618,7 @@ class SFTP {
    * @param {String} name
    */
   #safeName(name) {
-    const escapeCh = (str) => str.replace(/\\([\s\S])|(")/g, '\\$1$2');
+    const escapeCh = (str) => str.replace(/\\([\s\S])|([`"])/g, '\\$1$2');
     const ar = name.split('/');
     return ar.map((dirname) => escapeCh(dirname)).join('/');
   }
@@ -578,6 +697,8 @@ class SFTP {
  * @param {String} username
  * @param {{password?: String, passPhrase?: String, keyFile?: String}} authentication
  */
-export default function Sftp(host, port, username, authentication) {
+function Sftp(host, port, username, authentication) {
   return new SFTP(host, port, username, authentication);
 }
+
+export default Sftp;

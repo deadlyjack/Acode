@@ -3,7 +3,7 @@ import tile from './tile';
 
 /**
  * @typedef {object} PageObj
- * @property {String} settitle sets title of the page
+ * @property {function(String):void} settitle sets title of the page
  * @property {import('./tile').Tile} header header of the page
  * @property {function():void} hide hides the page
  * @property {function():void} onhide executes on page hide event
@@ -37,6 +37,7 @@ function Page(title, options = {}) {
     className: 'page',
     child: header,
   });
+  let onhide;
 
   if (!window.$placeholder)
     window.$placeholder = tag('div', {
@@ -49,10 +50,30 @@ function Page(title, options = {}) {
   if (!pageCount++) document.body.replaceChild($placeholder, root);
 
   header.classList.add('light');
-  $page.onhide = () => {};
-  $page.hide = hide;
-  $page.settitle = header.text;
-  $page.header = header;
+
+  Object.defineProperties($page, {
+    onhide: {
+      get() {
+        return onhide;
+      },
+      set(cb) {
+        onhide = cb;
+      },
+    },
+    hide: {
+      value: hide,
+    },
+    settitle: {
+      value(text) {
+        header.text = text;
+      },
+    },
+    header: {
+      get() {
+        return header;
+      },
+    },
+  });
   return $page;
 
   function hide() {
@@ -61,7 +82,7 @@ function Page(title, options = {}) {
       editorManager.editor.resize(true);
     }
     if ($page.isConnected) {
-      $page.onhide();
+      if (typeof onhide === 'function') onhide.call($page);
       $page.classList.add('hide');
       setTimeout(() => {
         $page.remove();

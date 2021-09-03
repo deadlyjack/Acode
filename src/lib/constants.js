@@ -113,6 +113,7 @@ export default {
     'mm-unicode': 'ဗမာစာ(Unicode)',
     'mm-zawgyi': 'ဗမာစာ(Zawgyi)',
     'ko-kr': '한국어',
+    'it-it': 'Italiano',
   },
   editorThemeList: {
     ambiance: scheme('ambiance', 'dark'),

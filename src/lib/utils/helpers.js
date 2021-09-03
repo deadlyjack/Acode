@@ -300,8 +300,6 @@ export default {
         }
         item.icon = this.getIconForFile(item.name);
       }
-
-      item.base64url = window.btoa(item.url || '');
     }
 
     if (sortByName) {

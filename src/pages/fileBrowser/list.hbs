@@ -3,8 +3,7 @@
   <li 
     tabindex="1" 
     class="tile" 
-    action="open"
-    url="{{base64url}}" 
+    action="open" 
     type="{{type}}" 
     name="{{name}}"
     {{#home}}home="{{.}}"{{/home}}
@@ -22,6 +21,7 @@
     <div class="text">
       <span>{{name}}</span>
     </div>
+    <data-url>{{url}}</data-url>
   </li>
   {{/.}}
   {{/list}}

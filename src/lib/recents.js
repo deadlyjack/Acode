@@ -34,6 +34,10 @@ const recents = {
     this.files = files;
   },
   addFolder(url, opts) {
+    if (url.slice(-1) === '/') {
+      url = url.slice(0, -1);
+    }
+
     let folders = this.folders;
     if (folders.length >= this.MAX) folders.pop();
     folders = folders.filter((i) => i.url !== url);

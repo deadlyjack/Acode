@@ -84,9 +84,10 @@ export default {
       return dialogs.multiPrompt(strings['add ftp'], [
         {
           id: 'alias',
-          placeholder: 'Name (optional)',
+          placeholder: 'Name',
           type: 'text',
           value: alias ? alias : '',
+          required: true,
         },
         {
           id: 'username',
@@ -256,13 +257,13 @@ export default {
       port = port || 22;
 
       const MODE_PASS = authType === 'password';
-
       const inputs = [
         {
           id: 'alias',
-          placeholder: 'Name (optional)',
+          placeholder: 'Name',
           type: 'text',
           value: alias ? alias : '',
+          required: true,
         },
         {
           id: 'username',
@@ -351,27 +352,53 @@ export default {
     }
   },
   edit({ name, storageType, uri }) {
-    const { username, password, hostname, port, query } = URLParse(uri, true);
+    let { username, password, hostname, port, query } = URLParse(uri, true);
+
+    if (username) {
+      username = decodeURIComponent(username);
+    }
+
+    if (password) {
+      password = decodeURIComponent(password);
+    }
 
     if (storageType === 'ftp') {
+      let { security, mode } = query;
+      if (security) {
+        security = decodeURIComponent(security);
+      }
+
+      if (mode) {
+        mode = decodeURIComponent(mode);
+      }
+
       return this.addFtp(
         username,
         password,
         hostname,
         name,
         port,
-        query['security'],
-        query['mode']
+        security,
+        mode
       );
     }
 
     if (storageType === 'sftp') {
+      let { passPhrase, keyFile } = query;
+      if (passPhrase) {
+        passPhrase = decodeURIComponent(passPhrase);
+      }
+
+      if (keyFile) {
+        keyFile = decodeURIComponent(keyFile);
+      }
+
       return this.addSftp(
         hostname,
         username,
-        query['keyFile'],
+        keyFile,
         password,
-        query['passPhrase'],
+        passPhrase,
         port,
         name,
         password ? 'password' : 'key'

@@ -132,6 +132,7 @@ function FileBrowserInclude(
       ...((menuOption.toggle = $addMenuToggler) && menuOption),
     });
     const root = 'file:///storage/';
+    const progress = {};
     let cachedDir = {};
     let currentDir = {
       url: '/',
@@ -205,7 +206,7 @@ function FileBrowserInclude(
             .then((res) => {
               allStorages.push(res);
               localStorage.storageList = JSON.stringify(allStorages);
-              navigate.pop();
+              navigationPop();
               renderStorages();
             })
             .catch((err) => {
@@ -359,23 +360,23 @@ function FileBrowserInclude(
           });
 
         if (i === state.length - 1) loadDir(url, name);
-        else navigate(name, url);
+        else navigationPush(name, url);
 
         currUrl = url;
       }
 
       function action() {
-        navigate.pop();
+        navigationPop();
       }
     }
 
     function renderList(list) {
       if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
 
-      navigate('/', '/');
+      navigationPush('/', '/');
       currentDir.url = '/';
       currentDir.name = 'File Browser';
-      $page.settitle = strings['file browser'];
+      $page.settitle(strings['file browser']);
       render(helpers.sortDir(list, appSettings.value.fileBrowser));
     }
 
@@ -411,8 +412,11 @@ function FileBrowserInclude(
       return list;
     }
 
-    function loadDir(path = '/', name = strings['file browser']) {
+    async function loadDir(path = '/', name = strings['file browser']) {
+      const id = helpers.uuid();
       let url = path;
+
+      progress[id] = false;
 
       if (typeof path === 'object') {
         url = path.url;
@@ -430,37 +434,48 @@ function FileBrowserInclude(
         name = item.name;
       } else {
         const timeout = setTimeout(() => {
-          dialogs.loader.create('', strings.loading + '...');
-        }, 100);
-        fsOperation(url)
-          .then((fs) => {
-            return fs.lsDir();
-          })
-          .then((list) => {
-            update();
-            list = helpers.sortDir(
-              list,
-              appSettings.value.fileBrowser,
-              testFileType,
-              null,
-              null,
-              mode
-            );
-            cachedDir[url] = {
-              name,
-              list,
-            };
-            render(list);
-          })
-          .catch((err) => {
-            actionStack.remove(currentDir.url);
-            helpers.error(err, url);
-            console.error(err);
-          })
-          .finally(() => {
-            clearTimeout(timeout);
-            dialogs.loader.destroy();
+          dialogs.loader.create(name, strings.loading + '...', {
+            timeout: 10000,
+            callback() {
+              loadDir('/', '/');
+              progress[id] = true;
+            },
           });
+        }, 100);
+
+        try {
+          const { fileBrowser } = appSettings.value;
+          const fs = await fsOperation(url);
+          let list = await fs.lsDir();
+
+          if (progress[id]) {
+            delete progress[id];
+            return;
+          }
+
+          delete progress[id];
+          list = helpers.sortDir(
+            list,
+            fileBrowser,
+            testFileType,
+            null,
+            null,
+            mode
+          );
+          cachedDir[url] = {
+            name,
+            list,
+          };
+          update();
+          render(list);
+        } catch (err) {
+          actionStack.remove(currentDir.url);
+          helpers.error(err, url);
+          console.error(err);
+        }
+
+        clearTimeout(timeout);
+        dialogs.loader.destroy();
       }
 
       function update() {
@@ -476,8 +491,8 @@ function FileBrowserInclude(
         currentDir.name = name;
         const $list = tag.get('#list');
         if ($list) $list.scrollTop = 0;
-        navigate(name, url);
-        $page.settitle = name;
+        navigationPush(name, url);
+        $page.settitle(name);
       }
     }
 
@@ -494,7 +509,7 @@ function FileBrowserInclude(
       let action = $el.getAttribute('action');
       if (!action) return;
 
-      let url = window.atob($el.getAttribute('url') || '');
+      let url = $el.data_url;
       let name = $el.getAttribute('name');
       const opendoc = $el.hasAttribute('open-doc');
       const uuid = $el.getAttribute('uuid');
@@ -502,6 +517,13 @@ function FileBrowserInclude(
       const storageType = $el.getAttribute('storageType');
       const home = $el.getAttribute('home');
       const isDir = ['dir', 'directory', 'folder'].includes(type);
+
+      if (!url) {
+        const $url = $el.get('data-url');
+        if ($url) {
+          url = $url.textContent;
+        }
+      }
 
       if (!url && action === 'open' && isDir && !opendoc && !contextMenu) {
         dialogs.loader.hide();
@@ -547,7 +569,7 @@ function FileBrowserInclude(
         actionStack.push({
           id: currentUrl,
           action: function () {
-            navigate.pop();
+            navigationPop();
           },
         });
         loadDir(url, name);
@@ -684,8 +706,7 @@ function FileBrowserInclude(
             }
 
             delete cachedDir[url];
-            delete cachedDir[currentDir.url];
-            loadDir(currentDir);
+            reload();
             toast(strings.success);
           })
           .catch((err) => {
@@ -697,7 +718,7 @@ function FileBrowserInclude(
       function removeStorage() {
         if (url) {
           recents.removeFolder(url);
-          recents.removeFiles(url);
+          recents.removeFile(url);
         }
         allStorages = allStorages.filter((storage) => {
           if (storage.uuid !== uuid) {
@@ -718,7 +739,7 @@ function FileBrowserInclude(
           return false;
         });
         localStorage.storageList = JSON.stringify(allStorages);
-        navigate.pop();
+        navigationPop();
         renderStorages();
       }
 
@@ -728,7 +749,7 @@ function FileBrowserInclude(
           return storage;
         });
         localStorage.storageList = JSON.stringify(allStorages);
-        navigate.pop();
+        navigationPop();
         renderStorages();
       }
 
@@ -790,16 +811,19 @@ function FileBrowserInclude(
         $addMenuToggler.classList.remove('notice');
       }
     }
-    function navigate(name, url) {
-      let $nav = $navigation.querySelector(`[url="${window.btoa(url)}"]`);
+
+    function navigationPush(name, url) {
+      const id = `nav_${url.hashCode()}`;
       const $old = $navigation.querySelector('.active');
+      let $nav = tag.get(`#${id}`);
+
       if ($old) $old.classList.remove('active');
 
       //If navigate to previous directories, clear the rest navigation
       if ($nav) {
         let $topNav;
         while (($topNav = $navigation.lastChild) !== $nav) {
-          const url = window.atob($topNav.getAttribute('url'));
+          const url = $topNav.getAttribute('url');
           actionStack.remove(url);
           $topNav.remove();
         }
@@ -823,11 +847,12 @@ function FileBrowserInclude(
 
       $nav = tag('span', {
         className: 'nav active',
+        id: `${id}`,
+        data_url: url,
+        data_name: name,
         attr: {
           action: 'navigation',
-          url: window.btoa(url || ''),
           text: name,
-          name,
         },
         tabIndex: -1,
       });
@@ -836,19 +861,19 @@ function FileBrowserInclude(
       $navigation.scrollLeft = $navigation.scrollWidth;
     }
 
-    navigate.pop = function () {
+    function navigationPop() {
       if (doesOpenLast) {
         fileBrowserState.pop();
         localStorage.fileBrowserState = JSON.stringify(fileBrowserState);
       }
       const $nav = $navigation.lastChild.previousElementSibling;
       if ($nav) {
-        const url = window.atob($nav.getAttribute('url'));
-        const name = $nav.getAttribute('name');
-        navigate(name, url);
+        const url = $nav.data_url;
+        const name = $nav.data_name;
+        navigationPush(name, url);
         loadDir(url, name);
       }
-    };
+    }
 
     function updateAddedFolder(url) {
       if (cachedDir[url]) delete cachedDir[url];
@@ -869,8 +894,8 @@ function FileBrowserInclude(
      *
      * @param {"file"|"folder"|"project"} arg
      */
-    function create(arg) {
-      const { url, name } = currentDir;
+    async function create(arg) {
+      const { url } = currentDir;
       const alreadyCreated = [];
       const options = [];
       let cturl = '';
@@ -886,28 +911,25 @@ function FileBrowserInclude(
           title = strings['enter file name'];
           val = 'untitled.txt';
         }
-        prompt(title, val, 'filename', {
+
+        let entryName = await prompt(title, val, 'filename', {
           match: constants.FILE_NAME_REGEX,
           required: true,
-        }).then((entryName) => {
-          if (!entryName) return;
-          entryName = helpers.removeLineBreaks(entryName);
-
-          fsOperation(url)
-            .then((fs) => {
-              if (arg === 'folder') return fs.createDirectory(entryName);
-              if (arg === 'file') return fs.createFile(entryName);
-            })
-            .then((res) => {
-              updateAddedFolder(url);
-              toast(strings.success);
-              loadDir(url, name);
-            })
-            .catch((e) => {
-              helpers.error(e);
-              console.error(e);
-            });
         });
+
+        if (!entryName) return;
+        entryName = helpers.removeLineBreaks(entryName);
+
+        try {
+          const fs = await fsOperation(url);
+          if (arg === 'folder') await fs.createDirectory(entryName);
+          if (arg === 'file') await fs.createFile(entryName);
+          updateAddedFolder(url);
+          reload();
+        } catch (err) {
+          helpers.error(err);
+          console.error(err);
+        }
 
         return;
       }
@@ -920,52 +942,43 @@ function FileBrowserInclude(
           options.push([projectname, projectname, 'icon ' + projectname]);
         });
 
-        dialogs
-          .select(strings['new project'], options) // Selecting project from optioins
-          .then((res) => {
-            framework = res;
-            dialogs.loader.create(res, strings.loading + '...');
-            return projects[res](); //getting selected project
-          })
-          .then((res) => {
-            dialogs.loader.destroy();
-            project = res.default;
-            return dialogs.prompt(strings['project name'], framework, 'text', {
-              required: true,
-              match: constants.FILE_NAME_REGEX,
-            }); // Asking for project name
-          })
-          .then((name) => {
-            projectName = name;
-            return fsOperation(url); // Getting file system for given url (Active directory)
-          })
-          .then((fs) => {
-            dialogs.loader.create(projectName, strings.loading + '...');
-            return fs.createDirectory(projectName); // Creating project root directory
-          })
-          .then((res) => {
-            newUrl = Url.join(url, projectName, '/'); // CD to project directory
-            const files = Object.keys(project); // All project files
+        framework = await dialogs.select(strings['new project'], options);
+        dialogs.loader.create(framework, strings.loading + '...');
+        project = (await projects[framework]()).default;
+        dialogs.loader.destroy();
+        projectName = await dialogs.prompt(
+          strings['project name'],
+          framework,
+          'text',
+          {
+            required: true,
+            match: constants.FILE_NAME_REGEX,
+          }
+        );
 
-            return new Promise((resolve, reject) => {
-              createProject(resolve, reject, files); // Creating project
-            });
-          })
-          .catch((err) => {
-            helpers.error(err);
-            console.error(err);
-          })
-          .finally(() => {
-            dialogs.loader.destroy();
+        try {
+          const fs = await fsOperation(url);
+          dialogs.loader.create(projectName, strings.loading + '...');
+          await fs.createDirectory(projectName);
+          newUrl = Url.join(url, projectName, '/');
+          const files = Object.keys(project); // All project files
+          await new Promise((resolve, reject) => {
+            createProject(resolve, reject, files); // Creating project
           });
+        } catch (err) {
+          helpers.error(err);
+          console.error(err);
+        }
+
+        dialogs.loader.destroy();
       }
 
       function createProject(resolve, reject, files) {
         if (!files.length) {
           // checking if it's the last file
           updateAddedFolder(url);
+          reload();
           toast(strings.success); // notifies when project is created
-          loadDir(url, name); // reload the current directory
           resolve();
         }
         cturl = '';
@@ -1053,8 +1066,14 @@ function FileBrowserInclude(
         type: 'dir',
       });
       localStorage.storageList = JSON.stringify(allStorages);
-      navigate.pop();
+      navigationPop();
       renderStorages();
+    }
+
+    function reload() {
+      const { url, name } = currentDir;
+      delete cachedDir[url];
+      loadDir(url, name);
     }
   });
 }
