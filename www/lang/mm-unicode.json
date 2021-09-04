@@ -171,7 +171,6 @@
   "light": "light",
   "dark": "dark",
   "file browser": "File Browser",
-  "file browser help": "In Android 11 the app cannot access all files and folders, so you have to manually add a folder using the ‘Add path’ option which will appear when the ‘+’ icon is tapped.",
   "welcome back": "Welcome back",
   "operation not permitted": "Operation not permitted",
   "no such file or directory": "No such file or directory",
@@ -205,5 +204,6 @@
   "feature not available": "This feature is only available in paid version of the app.",
   "deleted file": "Deleted file",
   "line height": "Line height",
-  "preview info": "If you want run the active file, tap and hold on play icon."
+  "preview info": "If you want run the active file, tap and hold on play icon.",
+  "manage all files": "Allow Acode editor to manage all files in settings to edit files on your device easily."
 }

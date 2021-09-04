@@ -17,19 +17,12 @@ import Url from '../../lib/utils/Url';
  * @param {Array<{name: String, url: String}>} defaultDir Default directory to open.
  * @returns {Promise<SelectedFile>}
  */
-function FileBrowser(
-  mode,
-  info,
-  buttonText,
-  doesOpenLast,
-  defaultDir,
-  ...args
-) {
+function FileBrowser(mode, info, buttonText, doesOpenLast, ...args) {
   return new Promise((resolve, reject) => {
     import(/* webpackChunkName: "fileBrowser" */ './fileBrowser.include').then(
       (res) => {
         const FileBrowser = res.default;
-        FileBrowser(mode, info, buttonText, doesOpenLast, defaultDir, ...args)
+        FileBrowser(mode, info, buttonText, doesOpenLast, ...args)
           .then(resolve)
           .catch(reject);
       }
@@ -40,11 +33,7 @@ function FileBrowser(
 FileBrowser.checkForValidFile = (uri) => {
   const ext = helpers.extname(uri);
 
-  if (
-    appSettings.defaultSettings.filesNotAllowed.includes(
-      (ext || '').toLowerCase()
-    )
-  ) {
+  if (appSettings.value.filesNotAllowed.includes((ext || '').toLowerCase())) {
     return false;
   }
   return true;

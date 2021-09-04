@@ -18,7 +18,6 @@ import tile from '../components/tile';
 import sidenav from '../components/sidenav';
 import contextMenu from '../components/contextMenu';
 import EditorManager from './editorManager';
-import internalFs from './fileSystem/internalFs';
 import ActionStack from './actionStack';
 import helpers from './utils/helpers';
 import Settings from './settings';
@@ -45,9 +44,7 @@ import $_hintText from '../views/hint-txt.hbs';
 loadPolyFill.apply(window);
 window.onload = Main;
 
-function Main() {
-  let timeout,
-    alert = window.alert;
+async function Main() {
   const oldPreventDefault = TouchEvent.prototype.preventDefault;
   TouchEvent.prototype.preventDefault = function () {
     if (this.cancelable) {
@@ -55,270 +52,74 @@ function Main() {
     }
   };
 
-  const language = navigator.language.toLowerCase();
-  let lang = null;
-  if (!localStorage.globalSettings && language in constants.langList) {
-    lang = language;
-  }
-
-  ajax({
+  /**
+   * @type {Promotion}
+   */
+  const promotion = await ajax({
     url: 'https://acode.foxdebug.com/api/getad',
     responseType: 'json',
-  })
-    .then((res) => {
-      window.ad = res;
-      if (res.image) {
-        return ajax({
-          url: res.image,
-          responseType: 'arraybuffer',
-        });
-      } else {
-        return Promise.resolve(res);
-      }
-    })
-    .then((res) => {
-      if (res instanceof ArrayBuffer)
-        ad.image = URL.createObjectURL(new Blob([res]));
+  });
+  window.promotion = promotion;
+  if (promotion.image) {
+    const image = await ajax({
+      url: promotion.image,
+      responseType: 'arraybuffer',
     });
 
+    if (image instanceof ArrayBuffer) {
+      promotion.image = URL.createObjectURL(new Blob([image]));
+    }
+  }
+
+  document.addEventListener('deviceready', initGlobalVariables);
+}
+
+async function initGlobalVariables() {
+  const {
+    externalCacheDirectory, //
+    externalDataDirectory,
+    cacheDirectory,
+    dataDirectory,
+  } = cordova.file;
+
   window.root = tag(window.root);
-  window.app = document.body = tag(document.body);
-  window.actionStack = ActionStack();
-  window.alert = dialogs.alert;
+  window.app = tag(document.body);
   window.addedFolder = [];
   window.fileClipBoard = null;
   window.restoreTheme = restoreTheme;
-  window.getCloseMessage = () => {};
   window.saveInterval = null;
-  window.editorManager = {
-    files: [],
-    activeFile: null,
-  };
+  window.editorManager = null;
   window.customKeyBindings = null;
   window.defaultKeyBindings = keyBindings;
-  window.keyBindings = (name) => {
-    if (customKeyBindings && name in window.customKeyBindings)
-      return window.customKeyBindings[name].key;
-    else if (name in defaultKeyBindings) return defaultKeyBindings[name].key;
-    else return null;
-  };
+  window.toastQueue = [];
+  window.toast = toast;
+  window.ANDROID_SDK_INT = await new Promise((resolve, reject) =>
+    system.getAndroidVersion(resolve, reject)
+  );
+  window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
+  window.DATA_STORAGE = externalDataDirectory || dataDirectory;
+  window.CACHE_STORAGE = externalCacheDirectory || cacheDirectory;
+  window.KEYBINDING_FILE = Url.join(DATA_STORAGE, '.key-bindings.json');
+  window.gitRecordFile = Url.join(DATA_STORAGE, 'git/.gitfiles');
+  window.gistRecordFile = Url.join(DATA_STORAGE, 'git/.gistfiles');
+  window.actionStack = ActionStack();
+  window.appSettings = new Settings();
+  window.DOES_SUPPORT_THEME = (() => {
+    const $testEl = tag('div', {
+      style: {
+        height: `var(--test-height)`,
+        width: `var(--test-height)`,
+      },
+    });
+    document.body.append($testEl);
+    const client = $testEl.getBoundingClientRect();
 
-  document.addEventListener('deviceready', () => {
-    system.clearCache(
-      () => {},
-      (err) => console.error(err)
-    );
+    $testEl.remove();
 
-    const oldRURL = window.resolveLocalFileSystemURL;
-
-    window.resolveLocalFileSystemURL = function (url, ...args) {
-      oldRURL.call(this, Url.safe(url), ...args);
-    };
-
-    if (!BuildInfo.debug) {
-      setTimeout(() => {
-        if (document.body.classList.contains('loading'))
-          alert(
-            'Something went wrong! Please clear app data and restart the app or wait.'
-          );
-      }, 1000 * 30);
-    }
-
-    setTimeout(() => {
-      if (document.body.classList.contains('loading'))
-        document.body.setAttribute(
-          'data-small-msg',
-          'This is taking unexpectedly long time!'
-        );
-    }, 1000 * 10);
-
-    const {
-      externalCacheDirectory, //
-      externalDataDirectory,
-      cacheDirectory,
-      dataDirectory,
-    } = cordova.file;
-
-    window.toastQueue = [];
-    window.toast = toast;
-    window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
-    window.DATA_STORAGE = externalDataDirectory || dataDirectory;
-    window.CACHE_STORAGE = externalCacheDirectory || cacheDirectory;
-    window.KEYBINDING_FILE = DATA_STORAGE + '.key-bindings.json';
-    window.gitRecordURL = DATA_STORAGE + 'git/.gitfiles';
-    window.gistRecordURL = DATA_STORAGE + 'git/.gistfiles';
-    window.IS_ANDROID_VERSION_5 = /^5/.test(device.version);
-    window.DOES_SUPPORT_THEME = (() => {
-      const $testEl = tag('div', {
-        style: {
-          height: `var(--test-height)`,
-          width: `var(--test-height)`,
-        },
-      });
-      document.body.append($testEl);
-      const client = $testEl.getBoundingClientRect();
-
-      $testEl.remove();
-
-      if (client.height === 0) return false;
-      else return true;
-    })();
-
-    document.body.setAttribute('data-version', 'v' + BuildInfo.version);
-
-    const permissions = cordova.plugins.permissions;
-    const requiredPermissions = [permissions.WRITE_EXTERNAL_STORAGE];
-
-    requiredPermissions.map((permission, i) =>
-      permissions.checkPermission(permission, (status) => success(status, i))
-    );
-
-    function success(status, i) {
-      if (!status.hasPermission) {
-        permissions.requestPermission(requiredPermissions[i], () => {});
-      }
-    }
-
-    document.body.setAttribute('data-small-msg', 'Loading settings...');
-    window.appSettings = new Settings(lang);
-    if (appSettings.loaded) {
-      ondeviceready();
-    } else {
-      appSettings.onload = ondeviceready;
-    }
-  });
-
-  function ondeviceready() {
-    localStorage.versionCode = BuildInfo.versionCode;
-
-    if (localStorage.init) {
-      localStorage.clear();
-      appSettings.reset();
-    }
-
-    document.head.append(
-      tag('style', {
-        id: 'custom-theme',
-        textContent: helpers.jsonToCSS(
-          constants.CUSTOM_THEME,
-          appSettings.value.customTheme
-        ),
-      })
-    );
-
-    if (!window.loaded) window.loaded = true;
-    else return;
-
-    const languageFile = `${cordova.file.applicationDirectory}www/lang/${appSettings.value.lang}.json`;
-
-    document.body.setAttribute('data-small-msg', 'Loading modules...');
-    internalFs
-      .readFile(KEYBINDING_FILE)
-      .then((res) => {
-        const text = helpers.decodeText(res.data);
-        try {
-          let bindings = JSON.parse(text);
-          window.customKeyBindings = bindings;
-        } catch (error) {
-          return Promise.reject;
-        }
-      })
-      .catch(helpers.resetKeyBindings)
-      .finally(() => {
-        document.body.setAttribute('data-small-msg', 'Loading editor...');
-        loadAceEditor()
-          .then(() => {
-            ace.config.set('basePath', './res/ace/src/');
-            window.modelist = ace.require('ace/ext/modelist');
-            window.AceMouseEvent = ace.require(
-              'ace/mouse/mouse_event'
-            ).MouseEvent;
-            return internalFs.readFile(languageFile);
-          })
-          .then((res) => {
-            const text = helpers.decodeText(res.data);
-            window.strings = JSON.parse(text);
-            initGit();
-          })
-          .catch((err) => {
-            helpers.error(err);
-            console.error(err);
-          });
-      });
-  }
-
-  function initGit() {
-    timeout = setTimeout(initGit, 1000);
-
-    git
-      .init()
-      .then(() => {
-        if (timeout) clearTimeout(timeout);
-        return internalFs.listDir(
-          cordova.file.applicationDirectory + 'www/css/build/'
-        );
-      })
-      .then((entries) => {
-        const styles = [];
-        entries.map((entry) => styles.push(entry.nativeURL));
-        return helpers.loadStyles(...styles);
-      })
-      .then((res) => {
-        runApp();
-      })
-      .catch((err) => {
-        if (timeout) clearTimeout(timeout);
-        console.error(err);
-      });
-  }
-}
-
-function loadAceEditor() {
-  const aceScript = [
-    './res/ace/src/ace.js',
-    './res/ace/emmet-core.js',
-    './res/ace/src/ext-language_tools.js',
-    './res/ace/src/ext-code_lens.js',
-    './res/ace/src/ext-emmet.js',
-    './res/ace/src/ext-beautify.js',
-    './res/ace/src/ext-modelist.js',
-  ];
-  return helpers.loadScripts(...aceScript);
-}
-
-function runApp() {
-  if (!window.runAppInitialized) window.runAppInitialized = true;
-  else return;
-
-  app.addEventListener('click', function (e) {
-    let el = e.target;
-    if (el instanceof HTMLAnchorElement || checkIfInsideAncher()) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      window.open(el.href, '_system');
-    }
-
-    function checkIfInsideAncher() {
-      const allAs = [...tag.getAll('a')];
-
-      for (let a of allAs) {
-        if (a.contains(el)) {
-          el = a;
-          return true;
-        }
-      }
-
-      return false;
-    }
-  });
-
-  const Acode = {
-    /**
-     *
-     * @param {string} key
-     * @param {string} val
-     */
+    if (client.height === 0) return false;
+    else return true;
+  })();
+  window.Acode = {
     exec(key, val) {
       if (key in commands) {
         return commands[key](val);
@@ -326,20 +127,146 @@ function runApp() {
         return false;
       }
     },
-    $menuToggler: null,
-    $editMenuToggler: null,
+    get exitAppMessage() {
+      const numFiles = editorManager.hasUnsavedFiles();
+      if (numFiles) {
+        return strings['unsaved files close app'];
+      }
+    },
+  };
+  window.keyBindings = (name) => {
+    if (customKeyBindings && name in window.customKeyBindings)
+      return window.customKeyBindings[name].key;
+    else if (name in defaultKeyBindings) return defaultKeyBindings[name].key;
+    else return null;
   };
 
-  window.Acode = Acode;
-  document.addEventListener('backbutton', actionStack.pop);
-  window.beautify = ace.require('ace/ext/beautify').beautify;
-
-  new App();
+  ondeviceready();
 }
 
-function App() {
-  if (!window.appInitialized) window.appInitialized = true;
-  else return;
+async function ondeviceready() {
+  const appDir = cordova.file.applicationDirectory;
+  const language = navigator.language.toLowerCase();
+  const oldRURL = window.resolveLocalFileSystemURL;
+  const { permissions } = cordova.plugins;
+  const requiredPermissions = [permissions.WRITE_EXTERNAL_STORAGE];
+  let lang = null;
+
+  localStorage.versionCode = BuildInfo.versionCode;
+  document.body.setAttribute('data-version', 'v' + BuildInfo.version);
+  document.body.setAttribute('data-small-msg', 'Loading settings...');
+
+  window.resolveLocalFileSystemURL = function (url, ...args) {
+    oldRURL.call(this, Url.safe(url), ...args);
+  };
+
+  requiredPermissions.forEach((permission, i) => {
+    permissions.checkPermission(permission, (status) => {
+      if (!status.hasPermission) {
+        permissions.requestPermission(requiredPermissions[i], () => {});
+      }
+    });
+  });
+
+  if (navigator.app && typeof navigator.app.clearCache === 'function') {
+    navigator.app.clearCache();
+  }
+
+  if (!BuildInfo.debug) {
+    setTimeout(() => {
+      if (document.body.classList.contains('loading'))
+        alert(
+          'Something went wrong! Please clear app data and restart the app or wait.'
+        );
+    }, 1000 * 30);
+  }
+
+  setTimeout(() => {
+    if (document.body.classList.contains('loading'))
+      document.body.setAttribute(
+        'data-small-msg',
+        'This is taking unexpectedly long time!'
+      );
+  }, 1000 * 10);
+
+  if (language in constants.langList) {
+    lang = language;
+  }
+  document.body.setAttribute('data-small-msg', 'Loading settings...');
+  await appSettings.init(lang);
+
+  if (localStorage.versionCode < 150) {
+    localStorage.clear();
+    appSettings.reset();
+    window.location.reload();
+  }
+
+  document.body.setAttribute('data-small-msg', 'Loading modules...');
+  document.head.append(
+    tag('style', {
+      id: 'custom-theme',
+      textContent: helpers.jsonToCSS(
+        constants.CUSTOM_THEME,
+        appSettings.value.customTheme
+      ),
+    })
+  );
+
+  document.body.setAttribute('data-small-msg', 'Loading language...');
+  try {
+    const languageFile = `${appDir}www/lang/${appSettings.value.lang}.json`;
+    const fs = await fsOperation(languageFile);
+    const text = await fs.readFile('utf-8');
+    window.strings = helpers.parseJSON(text);
+  } catch (error) {
+    alert('Unable to start app.');
+    navigator.app.exit();
+  }
+
+  document.body.setAttribute('data-small-msg', 'Loading styles...');
+  try {
+    const fs = await fsOperation(Url.join(appDir, 'www/css/build/'));
+    const styles = await fs.lsDir();
+    await helpers.loadStyles(...styles.map((style) => style.url));
+  } catch (error) {
+    alert('Unable to start app.');
+    navigator.app.exit();
+  }
+
+  document.body.setAttribute('data-small-msg', 'Loading keybindings...');
+  try {
+    const fs = await fsOperation(KEYBINDING_FILE);
+    const content = await fs.readFile('utf-8');
+    const bindings = helpers.parseJSON(content);
+    if (bindings) {
+      window.customKeyBindings = bindings;
+    }
+  } catch (error) {
+    helpers.resetKeyBindings();
+  }
+
+  document.body.setAttribute('data-small-msg', 'Loading editor...');
+  await helpers.loadScripts(
+    './res/ace/src/ace.js',
+    './res/ace/emmet-core.js',
+    './res/ace/src/ext-language_tools.js',
+    './res/ace/src/ext-code_lens.js',
+    './res/ace/src/ext-emmet.js',
+    './res/ace/src/ext-beautify.js',
+    './res/ace/src/ext-modelist.js'
+  );
+  ace.config.set('basePath', './res/ace/src/');
+  window.modelist = ace.require('ace/ext/modelist');
+  window.AceMouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
+
+  document.body.setAttribute('data-small-msg', 'Initializing GitHub...');
+  await git.init();
+
+  window.beautify = ace.require('ace/ext/beautify').beautify;
+  startApp();
+}
+
+async function startApp() {
   //#region declaration
   const $editMenuToggler = tag('span', {
     className: 'icon edit',
@@ -451,117 +378,66 @@ function App() {
   applySettings.beforeRender();
   window.restoreTheme();
   root.append($header, $main, $footer, $headerToggler, $quickToolToggler);
-  if (!appSettings.value.floatingButton)
+  if (!appSettings.value.floatingButton) {
     root.classList.add('hide-floating-button');
+  }
   applySettings.afterRender();
   //#endregion
 
+  editorManager.onupdate = onEditorUpdate;
+  app.addEventListener('click', onClickApp);
   $fileMenu.addEventListener('click', handleMenu);
   $mainMenu.addEventListener('click', handleMenu);
   $footer.addEventListener('touchstart', footerTouchStart);
   $footer.addEventListener('contextmenu', footerOnContextMenu);
+  document.addEventListener('backbutton', actionStack.pop);
   document.addEventListener('keydown', handleMainKeyDown);
   document.addEventListener('keyup', handleMainKeyUp);
-
-  editorManager.onupdate = function (type) {
-    /**
-     * @type {File}
-     */
-    const activeFile = editorManager.activeFile;
-    const $save = $footer.querySelector('[action=save]');
-
-    if (!$editMenuToggler.isConnected)
-      $header.insertBefore($editMenuToggler, $header.lastChild);
-
-    if (activeFile) {
-      if (activeFile.isUnsaved) {
-        activeFile.assocTile.classList.add('notice');
-        if ($save) $save.classList.add('notice');
-      } else {
-        activeFile.assocTile.classList.remove('notice');
-        if ($save) $save.classList.remove('notice');
-      }
-
-      editorManager.editor.setReadOnly(!activeFile.editable);
-
-      if (type !== 'remove-file') {
-        run
-          .checkRunnable()
-          .then((res) => {
-            if (res) {
-              $runBtn.setAttribute('run-file', res);
-              $header.insertBefore($runBtn, $header.lastChild);
-            } else {
-              $runBtn.removeAttribute('run-file');
-              $runBtn.remove();
-            }
-          })
-          .catch((err) => {
-            $runBtn.removeAttribute('run-file');
-            $runBtn.remove();
-          });
-      }
-    }
-
-    Acode.exec('save-state');
-  };
-
-  window.getCloseMessage = function () {
-    const numFiles = editorManager.hasUnsavedFiles();
-    if (numFiles) {
-      return strings['unsaved files close app'];
-    }
-  };
-
   $sidebar.onshow = function () {
     const activeFile = editorManager.activeFile;
     if (activeFile) editorManager.editor.blur();
   };
 
-  window.isLoading = true;
-  loadFolders();
   document.body.setAttribute('data-small-msg', 'Loading files...');
-  loadFiles() //
-    .then(() => {
-      document.body.removeAttribute('data-small-msg');
+  loadFolders();
+  await loadFiles();
+  document.body.removeAttribute('data-small-msg');
 
-      setTimeout(() => {
-        app.classList.remove('loading', 'splash');
-        if (localStorage.count === undefined) localStorage.count = 0;
-        let count = +localStorage.count;
+  window.intent.setNewIntentHandler(intentHandler);
+  window.intent.getCordovaIntent(intentHandler, function (e) {
+    console.error('Error: Cannot handle open with file intent', e);
+  });
+  document.addEventListener('menubutton', $sidebar.toggle);
+  navigator.app.overrideButton('menubutton', true);
+  document.addEventListener('pause', () => {
+    Acode.exec('save-state');
+  });
+  document.addEventListener('resume', () => {
+    Acode.exec('check-files');
+  });
 
-        if (count === constants.RATING_COUNT) askForRating();
-        else if (count === constants.DONATION_COUNT) askForDonation();
-        else ++localStorage.count;
+  setTimeout(() => {
+    app.classList.remove('loading', 'splash');
+    if (localStorage.count === undefined) localStorage.count = 0;
+    let count = +localStorage.count;
 
-        editorManager.onupdate('loading-complete');
-        window.isLoading = false;
+    if (count === constants.RATING_COUNT) askForRating();
+    else if (count === constants.DONATION_COUNT) askForDonation();
+    else ++localStorage.count;
 
-        if (!localStorage.__init) {
-          localStorage.__init = true;
-          if (!BuildInfo.debug) {
-            const title = strings.info.toUpperCase();
-            const body = mustache.render($_hintText, {
-              lang: appSettings.value.lang,
-            });
-            dialogs.box(title, body).wait(12000);
-          }
-        }
-      }, 500);
+    editorManager.onupdate('loading-complete');
 
-      window.plugins.intent.setNewIntentHandler(intentHandler);
-      window.plugins.intent.getCordovaIntent(intentHandler, function (e) {
-        console.error('Error: Cannot handle open with file intent', e);
-      });
-      document.addEventListener('menubutton', $sidebar.toggle);
-      navigator.app.overrideButton('menubutton', true);
-      document.addEventListener('pause', () => {
-        Acode.exec('save-state');
-      });
-      document.addEventListener('resume', () => {
-        Acode.exec('check-files');
-      });
-    });
+    if (!localStorage.__init) {
+      localStorage.__init = true;
+      if (!BuildInfo.debug) {
+        const title = strings.info.toUpperCase();
+        const body = mustache.render($_hintText, {
+          lang: appSettings.value.lang,
+        });
+        dialogs.box(title, body).wait(12000);
+      }
+    }
+  }, 500);
 
   /**
    *
@@ -742,9 +618,70 @@ function App() {
     e.preventDefault();
     editorManager.editor.focus();
   }
+
+  function onEditorUpdate(type) {
+    const activeFile = editorManager.activeFile;
+    const $save = $footer.querySelector('[action=save]');
+
+    if (!$editMenuToggler.isConnected)
+      $header.insertBefore($editMenuToggler, $header.lastChild);
+
+    if (activeFile) {
+      if (activeFile.isUnsaved) {
+        activeFile.assocTile.classList.add('notice');
+        if ($save) $save.classList.add('notice');
+      } else {
+        activeFile.assocTile.classList.remove('notice');
+        if ($save) $save.classList.remove('notice');
+      }
+
+      editorManager.editor.setReadOnly(!activeFile.editable);
+
+      if (type !== 'remove-file') {
+        run
+          .checkRunnable()
+          .then((res) => {
+            if (res) {
+              $runBtn.setAttribute('run-file', res);
+              $header.insertBefore($runBtn, $header.lastChild);
+            } else {
+              $runBtn.removeAttribute('run-file');
+              $runBtn.remove();
+            }
+          })
+          .catch((err) => {
+            $runBtn.removeAttribute('run-file');
+            $runBtn.remove();
+          });
+      }
+    }
+
+    Acode.exec('save-state');
+  }
 }
 
-//#region global funtions
+function onClickApp(e) {
+  let el = e.target;
+  if (el instanceof HTMLAnchorElement || checkIfInsideAncher()) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    window.open(el.href, '_system');
+  }
+
+  function checkIfInsideAncher() {
+    const allAs = [...tag.getAll('a')];
+
+    for (let a of allAs) {
+      if (a.contains(el)) {
+        el = a;
+        return true;
+      }
+    }
+
+    return false;
+  }
+}
 
 function restoreTheme(darken) {
   if (darken && document.body.classList.contains('loading')) return;
@@ -823,5 +760,3 @@ function resetCount() {
 function askForRating() {
   if (!localStorage.dontAskForRating) rateBox();
 }
-
-//#endregion

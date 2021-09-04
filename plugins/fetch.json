@@ -7,22 +7,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-intent": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-intent"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-inappbrowser": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdb1/cordova/code editor/node_modules/cordova-plugin-inappbrowser"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-statusbar": {
     "source": {
       "type": "registry",
@@ -103,10 +87,26 @@
     "is_top_level": true,
     "variables": {}
   },
+  "cordova-plugin-sftp": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-sftp"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-intent": {
+    "source": {
+      "type": "local",
+      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-intent"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
   "cordova-plugin-sdcard": {
     "source": {
-      "type": "registry",
-      "id": "cordova-plugin-sdcard"
+      "type": "local",
+      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-sdcard"
     },
     "is_top_level": true,
     "variables": {}
@@ -119,10 +119,10 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-sftp": {
+  "cordova-plugin-inappbrowser": {
     "source": {
       "type": "local",
-      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-sftp"
+      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-inappbrowser"
     },
     "is_top_level": true,
     "variables": {}

@@ -15,7 +15,7 @@ export default HandleIntent;
  * @param {string} [intent.filename]
  * @param {object} [intent.extras]
  */
-function HandleIntent(intent = {}) {
+async function HandleIntent(intent = {}) {
   const type = intent.action.split('.').slice(-1)[0];
   let timeout = null;
 
@@ -23,12 +23,11 @@ function HandleIntent(intent = {}) {
     dialogs.loader.create(strings.loading + '...');
   }, 300);
 
-  intent.fileUri = null;
-
   if (['SEND', 'VIEW', 'EDIT'].includes(type)) {
-    return openFile(intent.data || intent.fileUri, {
+    await openFile(intent.fileUri || intent.data, {
       render: true,
-    }).then(stopLoading);
+    });
+    return stopLoading();
   } else {
     stopLoading();
   }

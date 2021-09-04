@@ -25,7 +25,8 @@ function ActionStack() {
       const fun = stack.pop();
       if (fun) fun.action();
       else if (appSettings.value.confirmOnExit) {
-        const closeMessage = window.getCloseMessage();
+        let closeMessage = Acode.exitAppMessage;
+
         if (closeMessage) {
           dialogs
             .confirm(strings.warning.toUpperCase(), closeMessage)

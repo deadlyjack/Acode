@@ -172,7 +172,6 @@
   "light": "chiaro",
   "dark": "scuro",
   "file browser": "Browser dei file",
-  "file browser help": "In Android 11 l'app non può accedere a tutti i file e le cartelle, qundi devi aggiungerli manualmente usando l'opziona 'aggiungi percorso' che apparirà quando il '+' viene cliccato.",
   "operation not permitted": "Azione nnon consentita",
   "no such file or directory": "Nessun file o cartella simile trovato",
   "input/output error": "Errore di input/output",
@@ -205,5 +204,6 @@
   "feature not available": "Questa funzione è disponibile solo nella versione premium dell'app.",
   "deleted file": "File eliminato",
   "line height": "Altezza delle linee",
-  "preview info": "Se vuoi eseguire il file corrente clicca e tieni premuto il tasto play.."
+  "preview info": "Se vuoi eseguire il file corrente clicca e tieni premuto il tasto play..",
+  "manage all files": "Allow Acode editor to manage all files in settings to edit files on your device easily."
 }

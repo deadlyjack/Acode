@@ -1,5 +1,6 @@
-import fs from './fileSystem/internalFs';
+import fsOperation from './fileSystem/fsOperation';
 import helpers from './utils/helpers';
+import Url from './utils/Url';
 /**
  * @typedef {object} fileBrowserSettings
  * @property {string} showHiddenFiles
@@ -23,18 +24,19 @@ import helpers from './utils/helpers';
  */
 
 class Settings {
-  constructor(lang) {
-    lang = lang || 'en-us';
+  /**
+   * @type {settingsValue}
+   */
+  #defaultSettings;
+  #initialized = false;
 
+  constructor() {
     this.methods = {
       update: [],
       reset: [],
     };
 
-    /**
-     * @type {settingsValue}
-     */
-    this.defaultSettings = {
+    this.#defaultSettings = {
       animation: true,
       autosave: 0,
       fileBrowser: {
@@ -63,7 +65,7 @@ class Settings {
         wholeWord: false,
         backwards: true,
       },
-      lang,
+      lang: 'en-us',
       fontSize: '12px',
       editorTheme: /free/.test(BuildInfo.packageName)
         ? 'ace/theme/nord_dark'
@@ -121,43 +123,47 @@ class Settings {
       },
     };
 
-    this.settingsFile = DATA_STORAGE + 'settings.json';
-    this.loaded = false;
-    this.onload = null;
-    this.onsave = null;
-    let interval;
-    const save = () => {
-      interval = setInterval(() => {
-        fs.writeFile(
-          this.settingsFile,
-          JSON.stringify(this.value, undefined, 4),
-          true,
-          false
-        )
-          .then(() => {
-            this.value = this.defaultSettings;
-            this.loaded = true;
-            if (interval) clearInterval(interval);
-            if (this.onload) this.onload();
-          })
-          .catch(() => {
-            save();
-          });
-      }, 1000);
-    };
+    this.settingsFile = Url.join(DATA_STORAGE, 'settings.json');
+  }
 
-    fs.readFile(this.settingsFile)
-      .then((res) => {
-        const settings = JSON.parse(helpers.decodeText(res.data));
-        if (!Array.isArray(settings.beautify)) savedSettings.beautify = ['*'];
-        for (let setting in this.defaultSettings)
-          if (!(setting in settings))
-            settings[setting] = this.defaultSettings[setting];
-        this.value = settings;
-        this.loaded = true;
-        if (this.onload) this.onload();
-      })
-      .catch(save);
+  async init(lang) {
+    if (this.#initialized) return;
+    this.#initialized = true;
+
+    const fs = await fsOperation(this.settingsFile);
+
+    if (!(await fs.exists())) {
+      await this.#save();
+      this.value = this.#defaultSettings;
+      this.value.lang = lang;
+      return;
+    }
+
+    const settings = helpers.parseJSON(await fs.readFile('utf-8'));
+    if (settings) {
+      if (!Array.isArray(settings.beautify)) savedSettings.beautify = ['*'];
+      for (let setting in this.#defaultSettings) {
+        if (!(setting in settings)) {
+          settings[setting] = this.#defaultSettings[setting];
+        }
+      }
+      this.value = settings;
+      return;
+    }
+
+    await this.reset();
+  }
+
+  async #save() {
+    const fs = await fsOperation(this.settingsFile);
+    const settingsText = JSON.stringify(this.value, undefined, 4);
+
+    if (!(await fs.exists())) {
+      const dirFs = await fsOperation(DATA_STORAGE);
+      await dirFs.createFile('settings.json');
+    }
+
+    await fs.writeFile(settingsText);
   }
 
   async update(settings = null, showToast = true, saveFile = true) {
@@ -175,32 +181,22 @@ class Settings {
           onupdate.push(cb.bind(this.value, this.value[key]));
     }
 
-    if (saveFile) {
-      await fs.writeFile(
-        this.settingsFile,
-        JSON.stringify(this.value, undefined, 4),
-        true,
-        false
-      );
-    }
-
-    if (this.onsave) this.onsave();
+    if (saveFile) await this.#save();
     if (showToast) toast(strings['settings saved']);
-
     for (let callback of onupdate) callback(this.value);
   }
 
-  reset(setting) {
+  async reset(setting) {
     if (setting) {
-      if (setting in this.defaultSettings) {
-        this.value[setting] = this.defaultSettings[setting];
-        this.update();
+      if (setting in this.#defaultSettings) {
+        this.value[setting] = this.#defaultSettings[setting];
+        await this.update();
       } else {
         return false;
       }
     } else {
-      this.value = this.defaultSettings;
-      this.update(false);
+      this.value = this.#defaultSettings;
+      await this.update(false);
     }
 
     for (let onreset of this.methods.reset) onreset(this.value);

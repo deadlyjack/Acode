@@ -4,6 +4,7 @@
 
 interface Acode {
     exec(command: string, value?: any): boolean;
+    readonly exitAppMessage: String;
     $menuToggler: HTMLElement;
     $editMenuToggler: HTMLElement;
 }
@@ -403,7 +404,6 @@ interface Folder {
 }
 
 interface Window {
-    getCloseMessage: function(): string;
     restoreTheme(): void;
 }
 
@@ -507,6 +507,19 @@ interface RecentPathDataValue {
     url: String;
 }
 
+interface KeyBinding{
+    description: String;
+    key: String;
+    readOnly: Boolean;
+    action: String;
+}
+
+interface Promotion{
+    image: String;
+    title: String;
+    description: String;
+}
+
 /**
  * Returns fully decoded url
  * @param url 
@@ -536,13 +549,18 @@ declare var DATA_STORAGE: string;
 declare var DOES_SUPPORT_THEME: boolean;
 declare var IS_FREE_VERSION: boolean;
 declare var KEYBINDING_FILE: string;
-declare var IS_ANDROID_VERSION_5: boolean;
+declare var ANDROID_SDK_INT: Number;
 
+declare var modelist: any;
+declare var beautify: any;
+declare var intent: any;
+
+declare var promotion: Promotion;
+declare var appStarted: Boolean;
+declare var defaultKeyBindings: Map<String, KeyBinding>;
+declare var customKeyBindings: Map<String, KeyBinding>;
 declare var ace: AceAjax;
 declare var actionStack: ActionStack;
-/**
- * List of folders that is opened in Acode
- */
 declare var addedFolder: Array<Folder>;
 declare var app: HTMLBodyElement;
 declare var editorManager: Manager;
@@ -550,15 +568,10 @@ declare var fileClipBoard: FileClipBoard;
 declare var freeze: Boolean;
 declare var gitRecord: GitRecord;
 declare var gistRecord: GistRecord;
-declare var gitRecordURL: string;
-declare var gistRecordURL: string;
+declare var gitRecordFile: string;
+declare var gistRecordFile: string;
 declare var root: HTMLDivElement;
 declare var saveInterval: Number;
 declare var toastQueue: Array<HTMLElement>;
+declare var keyBindings: (name: String)=>String;
 declare var toast: (string)=>void;
-/**
- * A custom alert box to show alert notification
- * @param title 
- * @param message 
- */
-declare function alert(title: string, message: string): void;

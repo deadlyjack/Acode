@@ -1,73 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="./css/fira-code.css" />
+    <link rel="stylesheet" href="./res/fonts/Roboto/style.css" />
+    <link rel="stylesheet" href="./res/fonts/Roboto_Mono/style.css" />
+    <link rel="stylesheet" href="./res/icons/style.css" />
+    <link rel="stylesheet" href="./res/icon-file/style.css" />
+    <link rel="stylesheet" href="./res/octicons/style.css" />
+    <script src="./js/createKeyboardEvent.js"></script>
+    <script src="cordova.js"></script>
+    <script defer src="./js/build/main.build.js"></script>
+    <title>Acode</title>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <link rel="stylesheet" href="./css/fira-code.css">
-  <link rel="stylesheet" href="./res/fonts/Roboto/style.css" />
-  <link rel="stylesheet" href="./res/fonts/Roboto_Mono/style.css" />
-  <link rel="stylesheet" href="./res/icons/style.css" />
-  <link rel="stylesheet" href="./res/icon-file/style.css">
-  <link rel="stylesheet" href="./res/octicons/style.css" />
-  <script src="./js/createKeyboardEvent.js"></script>
-  <script src="cordova.js"></script>
-  <script defer src="./js/build/main.build.js"></script>
-  <title>Acode</title>
+    <style>
+      :root {
+        --test-height: 45px;
+      }
 
-  <style>
-    :root {
-      --test-height: 45px;
-    }
+      body.loading {
+        position: relative;
+      }
 
-    body.loading {
-      position: relative;
-    }
+      body.loading.splash::before {
+        content: attr(data-version);
+        background-image: url('./res/logo/logo.svg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 180px;
+        background-color: #313131;
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 100vw;
+        z-index: 999999;
+        text-align: center;
+        line-height: 150vh;
+        color: white;
+        letter-spacing: 2.4px;
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
 
-    body.loading.splash::before {
-      content: attr(data-version);
-      background-image: url('./res/logo/logo.svg');
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: 180px;
-      background-color: #313131;
-      position: fixed;
-      top: 0;
-      right: 0;
-      height: 100vh;
-      width: 100vw;
-      z-index: 999999;
+      body.loading.splash::after {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        left: 50%;
+        transform: translate(-50%, 0);
+        content: attr(data-small-msg);
+        margin: 15px auto;
+        z-index: 999999;
+        color: white;
+        font-size: 1rem;
+        width: 90vw;
+        text-align: center;
+        color: #bd988a;
+      }
+    </style>
+  </head>
 
-      text-align: center;
-      line-height: 150vh;
-      color: white;
-      letter-spacing: 2.4px;
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
-
-    body.loading.splash::after {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      left: 50%;
-      transform: translate(-50%, 0);
-      content: attr(data-small-msg);
-      margin: 15px auto;
-      z-index: 999999;
-      color: white;
-      font-size: 1rem;
-      width: 90vw;
-      text-align: center;
-      color: #bd988a;
-    }
-  </style>
-</head>
-
-<body class="loading splash" data-version="">
-  <div id="root" class="page primary"></div>
-</body>
-
-
+  <body class="loading splash" data-version="">
+    <div id="root" class="page primary"></div>
+  </body>
 </html>

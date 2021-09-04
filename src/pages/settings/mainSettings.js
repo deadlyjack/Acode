@@ -104,8 +104,8 @@ export default function settingsMain() {
   }
 
   $page.appendChild($settingsList);
-  if (window.ad && !localStorage.hideAd) {
-    const $ad = tag.parse(mustache.render($_ad, window.ad));
+  if (window.promotion && !localStorage.hideAd) {
+    const $ad = tag.parse(mustache.render($_ad, window.promotion));
     $ad.onclick = function (e) {
       const action = e.target.getAttribute('action');
       if (action === 'close') {

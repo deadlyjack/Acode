@@ -24,7 +24,7 @@ export default {
    * @param {String} name
    * @returns {Promise<{name: String, uri: String, uuid: string}>}
    */
-  addPath(name = '') {
+  addPath(name = '', uuid) {
     return new Promise((resolve, reject) => {
       dialogs
         .multiPrompt(strings['add path'], [
@@ -44,7 +44,7 @@ export default {
             readOnly: true,
             onclick: function () {
               sdcard.getStorageAccessPermission(
-                '',
+                uuid,
                 (res) => {
                   this.value = res;
                 },

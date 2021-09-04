@@ -3,6 +3,8 @@ import dialogs from '../components/dialogs';
 import helpers from './utils/helpers';
 import GitHub from './GitHubAPI/GitHub';
 import path from './utils/Path';
+import Url from './utils/Url';
+import fsOperation from './fileSystem/fsOperation';
 
 //Creates new github object
 function gitHub() {
@@ -23,72 +25,30 @@ function gitHub() {
  *Initialize github object if directory named git exists
  *then it checks for all git repositories record file
  **/
-function init() {
-  return new Promise((resolve, reject) => {
-    const url = DATA_STORAGE + 'git/';
-    let interval;
+async function init() {
+  const url = Url.join(DATA_STORAGE, 'git/');
+  const fs = await fsOperation(url);
 
-    window.resolveLocalFileSystemURL(url, success, error);
+  if (!(await fs.exists())) {
+    const dataFs = await fsOperation(DATA_STORAGE);
+    await dataFs.createDirectory('git');
+  }
 
-    function success() {
-      initFile(gitRecordURL)
-        .then((res) => {
-          window.gitRecord = GitRecord(res);
-          return initFile(gistRecordURL);
-        })
-        .then((res) => {
-          window.gistRecord = GistRecord(res);
-          resolve();
-        })
-        .catch((err) => {
-          if (err.code) {
-            fileError(err.code);
-          }
-          reject(err);
-        });
-    }
+  const gitFileFs = await fsOperation(gitRecordFile);
+  const gistFileFs = await fsOperation(gistRecordFile);
+  let gitRecord = {};
+  let gistRecord = {};
+  if (await gitFileFs.exists()) {
+    const content = await gitFileFs.readFile('utf-8');
+    gitRecord = helpers.parseJSON(helpers.credentials.decrypt(content));
+  }
+  window.gitRecord = GitRecord(gitRecord);
 
-    function initFile(file) {
-      return new Promise((resolve, reject) => {
-        fs.readFile(file) //initialized in main.js on device ready event
-          .then((res) => {
-            const data = res.data;
-            const val = JSON.parse(
-              helpers.credentials.decrypt(helpers.decodeText(data))
-            );
-            resolve(val);
-          })
-          .catch((err) => {
-            if (err.code === 1) {
-              const text = helpers.credentials.encrypt('{}');
-              fs.writeFile(file, text, true, false)
-                .then(() => {
-                  resolve({});
-                })
-                .catch((err) => {
-                  reject(err);
-                });
-            }
-          });
-      });
-    }
-
-    function error(err) {
-      if (err.code === 1) {
-        fs.createDir(DATA_STORAGE, 'git')
-          .then(() => {
-            if (interval) clearInterval(interval);
-            init();
-          })
-          .catch((err) => {
-            interval = setInterval(error, 1000);
-          });
-      } else {
-        if (err.code) fileError(err.code);
-        reject(err);
-      }
-    }
-  });
+  if (await gistFileFs.exists()) {
+    const content = await gistFileFs.readFile('utf-8');
+    gistRecord = helpers.parseJSON(helpers.credentials.decrypt(content));
+  }
+  window.gistRecord = GistRecord(gistRecord);
 }
 
 function fileError(code) {
@@ -311,7 +271,7 @@ function GitRecord(obj) {
    */
   function save(echo = false, data = null, record = null) {
     let text = helpers.credentials.encrypt(JSON.stringify(gitRecord));
-    let url = gitRecordURL;
+    let url = gitRecordFile;
 
     if (data) {
       if (!record) return;
@@ -561,7 +521,7 @@ function GistRecord(obj) {
 
   function save(echo = null) {
     let text = helpers.credentials.encrypt(JSON.stringify(gistRecord));
-    let url = gistRecordURL;
+    let url = gistRecordFile;
     fs.writeFile(url, text, true, false)
       .then(() => {
         if (echo) toast(echo);

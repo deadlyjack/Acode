@@ -4,6 +4,19 @@
   }
 
   .tile {
+    &[storageType='permission'] {
+      background-color: #9999ff;
+      background-color: var(--primary-color);
+      color: white;
+      color: var(--text-main-color);
+      height: 40px;
+      text-align: center;
+      .icon {
+        display: none;
+        content: '';
+      }
+    }
+
     .icon {
       position: relative;
       color: rgb(65, 85, 133);

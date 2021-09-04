@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.provider.MediaStore.Images.Media;
 import android.webkit.WebView;
@@ -59,26 +60,19 @@ public class System extends CordovaPlugin {
     final String arg3 = getJSONValueString(args, 2);
     final String arg4 = getJSONValueString(args, 3);
     final String arg5 = getJSONValueString(args, 4);
+    final String arg6 = getJSONValueString(args, 5);
 
     switch (action) {
       case "get-webkit-info":
-      case "clear-cache":
-        cordova
-          .getActivity()
-          .runOnUiThread(
-            new Runnable() {
-              public void run() {
-                clearCache();
-              }
-            }
-          );
-        break;
       case "share-file":
       case "is-powersave-mode":
       case "get-app-info":
       case "add-shortcut":
       case "remove-shortcut":
       case "pin-shortcut":
+      case "manage-all-files":
+      case "get-android-version":
+      case "is-external-storage-manager":
         break;
       default:
         return false;
@@ -93,8 +87,6 @@ public class System extends CordovaPlugin {
               case "get-webkit-info":
                 getWebkitInfo();
                 break;
-              case "clear-cache":
-                break;
               case "share-file":
                 shareFile(arg1, arg2);
                 break;
@@ -105,13 +97,22 @@ public class System extends CordovaPlugin {
                 getAppInfo();
                 break;
               case "add-shortcut":
-                addShortcut(arg1, arg2, arg3, arg4, arg5);
+                addShortcut(arg1, arg2, arg3, arg4, arg5, arg6);
                 break;
               case "remove-shortcut":
                 removeShortcut(arg1);
                 break;
               case "pin-shortcut":
                 pinShortcut(arg1);
+                break;
+              case "manage-all-files":
+                askToManageAllFiles();
+                break;
+              case "get-android-version":
+                getAndroidVersion();
+                break;
+              case "is-external-storage-manager":
+                isExternalStorageManager();
                 break;
               default:
                 break;
@@ -121,6 +122,35 @@ public class System extends CordovaPlugin {
       );
 
     return true;
+  }
+
+  private void askToManageAllFiles() {
+    if (Build.VERSION.SDK_INT >= 30) {
+      try {
+        Intent intent = new Intent();
+        intent.setAction("android.settings.MANAGE_ALL_FILES_ACCESS_PERMISSION");
+        activity.startActivity(intent);
+        callback.success();
+      } catch (Exception e) {
+        callback.error(e.toString());
+      }
+      return;
+    }
+
+    callback.error("Not supported");
+  }
+
+  private void isExternalStorageManager() {
+    boolean res = false;
+    if (Build.VERSION.SDK_INT >= 30) {
+      res = Environment.isExternalStorageManager();
+    }
+
+    callback.success(res ? 1 : 0);
+  }
+
+  private void getAndroidVersion() {
+    callback.success(Build.VERSION.SDK_INT);
   }
 
   private void getWebkitInfo() {
@@ -163,15 +193,6 @@ public class System extends CordovaPlugin {
       );
 
       return;
-    }
-  }
-
-  private void clearCache() {
-    try {
-      webView.clearCache(true);
-      callback.success();
-    } catch (Exception e) {
-      callback.error(e.toString());
     }
   }
 
@@ -223,11 +244,12 @@ public class System extends CordovaPlugin {
   }
 
   private void addShortcut(
+    String id,
     String label,
     String description,
     String iconSrc,
-    String data,
-    String id
+    String action,
+    String data
   ) {
     try {
       Intent intent;
@@ -246,6 +268,7 @@ public class System extends CordovaPlugin {
         activity
           .getPackageManager()
           .getLaunchIntentForPackage(activity.getPackageName());
+      intent.putExtra("action", action);
       intent.putExtra("data", data);
 
       ShortcutInfoCompat shortcut = new ShortcutInfoCompat.Builder(context, id)

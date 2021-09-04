@@ -5,8 +5,6 @@ import externalFs from './externalFs';
 import path from '../utils/Path';
 import Ftp from './ftp';
 import Url from '../utils/Url';
-import dialogs from '../../components/dialogs';
-import constants from '../constants';
 import Sftp from './sftp';
 
 /**
@@ -18,13 +16,7 @@ async function fsOperation(uri) {
   const protocol = Url.getProtocol(uri);
 
   if (protocol === 'file:') {
-    const match = constants.EXTERNAL_STORAGE.exec(uri);
-    if (!IS_ANDROID_VERSION_5 && match && match[1] !== 'emulated') {
-      uri = await convertToContentUri(uri);
-      return externalOperation(externalFs, res);
-    } else {
-      return internalOperation(internalFs, uri);
-    }
+    return internalOperation(internalFs, uri);
   } else if (protocol === 'content:') {
     return externalOperation(externalFs, uri);
   } else {
@@ -327,47 +319,6 @@ async function fsOperation(uri) {
         .catch(reject);
     });
   }
-}
-
-/**
- *
- * @param {String} uri
- */
-async function convertToContentUri(uri) {
-  const uuid = constants.EXTERNAL_STORAGE.exec(uri)[1];
-  const filePath = Url.join(
-    `content://com.android.externalstorage.documents/tree/${uuid}%3A`,
-    uri.replace(constants.EXTERNAL_STORAGE, '')
-  );
-
-  const canWrite = await (() =>
-    new Promise((resolve, reject) => {
-      sdcard.stats(filePath, (res) => resolve(res.canWrite), reject);
-    }))();
-
-  if (!canWrite) {
-    try {
-      await (() =>
-        new Promise((resolve, reject) => {
-          dialogs
-            .confirm(strings.info.toUpperCase(), strings['allow storage'])
-            .then(() =>
-              sdcard.getStorageAccessPermission(uuid, resolve, reject)
-            )
-            .catch(() => reject(strings['permission denied']));
-        }))();
-    } catch (error) {
-      if (typeof error === 'string') {
-        dialogs.alert(strings.info.toUpperCase(), error);
-        throw new Error(error);
-      } else {
-        dialogs.alert(strings.info.toUpperCase(), error.message);
-        throw error;
-      }
-    }
-  }
-
-  return filePath;
 }
 
 export default fsOperation;

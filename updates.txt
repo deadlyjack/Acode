@@ -1,3 +1,15 @@
+version 1.4.159
+☞ **BREAKING CHANGES, BEFORE UPDATING SAVE YOUR ALL FILES**
+☞ Added SFTP.
+☞ Grant Acode permission to access files system.
+☞ Option to cancel connection if taking a long time.
+☞ Fixed unable to open some SFTP directory with special characters.
+☞ Better file recovery.
+☞ Updated language pack.
+☞ Performance improvement.
+☞ Fixed a major bug that forces the app to crash.
+☞ Bugs fixes.
+
 version 1.3.157
 ☞ **BREAKING CHANGES, BEFORE UPDATING SAVE YOUR ALL FILES**
 ☞ Added SFTP.

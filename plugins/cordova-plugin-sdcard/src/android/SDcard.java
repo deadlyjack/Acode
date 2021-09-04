@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.provider.DocumentsContract;
@@ -40,6 +41,7 @@ public class SDcard extends CordovaPlugin {
 
   private CallbackContext callback;
   private int mode;
+  private int SDK_INT = android.os.Build.VERSION.SDK_INT;
   private int REQUEST_CODE;
   private final int ACCESS_INTENT = 6000;
   private final int DOCUMENT_TREE = 6001;
@@ -175,14 +177,37 @@ public class SDcard extends CordovaPlugin {
   public void getStorageVolumes() {
     try {
       JSONArray result = new JSONArray();
-      for (StorageVolume volume : this.storageManager.getStorageVolumes()) {
-        String name = volume.getDescription(this.context);
-        String uuid = volume.getUuid();
-        JSONObject volumeData = new JSONObject();
-        if (name != null && uuid != null) {
-          volumeData.put("uuid", uuid);
-          volumeData.put("name", name);
 
+      if (SDK_INT >= 24) {
+        for (StorageVolume volume : this.storageManager.getStorageVolumes()) {
+          String name = volume.getDescription(this.context);
+          String uuid = volume.getUuid();
+          JSONObject volumeData = new JSONObject();
+          if (name != null && uuid != null) {
+            volumeData.put("uuid", uuid);
+            volumeData.put("name", name);
+
+            if (SDK_INT >= 30) {
+              File file = volume.getDirectory();
+              String path = file.getAbsolutePath();
+              volumeData.put("path", path);
+            }
+
+            result.put(volumeData);
+          }
+        }
+      } else {
+        File file = Environment.getExternalStorageDirectory();
+        if (
+          Environment.getExternalStorageState(file) == Environment.MEDIA_MOUNTED
+        ) {
+          String name = file.getName();
+          String path = file.getPath();
+          String absolutePath = file.getAbsolutePath();
+          JSONObject volumeData = new JSONObject();
+          volumeData.put("name", name);
+          volumeData.put("path", path);
+          volumeData.put("absolutePath", absolutePath);
           result.put(volumeData);
         }
       }
@@ -196,10 +221,7 @@ public class SDcard extends CordovaPlugin {
   public void getStorageAccess(String SDCardUUID) {
     Intent intent = null;
 
-    if (
-      android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N &&
-      android.os.Build.VERSION.SDK_INT <= 0x0000001c
-    ) {
+    if (SDK_INT >= 24) {
       StorageVolume sdCard = null;
 
       for (StorageVolume volume : this.storageManager.getStorageVolumes()) {
@@ -210,7 +232,11 @@ public class SDcard extends CordovaPlugin {
       }
 
       if (sdCard != null) {
-        intent = sdCard.createAccessIntent(null);
+        if (SDK_INT < 29) {
+          intent = sdCard.createAccessIntent(null);
+        } else if (SDK_INT >= 29) {
+          intent = sdCard.createOpenDocumentTreeIntent();
+        }
       }
     }
 
@@ -257,7 +283,7 @@ public class SDcard extends CordovaPlugin {
       return;
     }
 
-    if (requestCode == DOCUMENT_TREE) {
+    if (requestCode == DOCUMENT_TREE || requestCode == ACCESS_INTENT) {
       if (
         requestCode == ACCESS_INTENT && resultCode == Activity.RESULT_CANCELED
       ) {

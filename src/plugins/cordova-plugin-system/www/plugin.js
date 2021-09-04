@@ -2,9 +2,6 @@ module.exports = {
   getWebviewInfo: function (onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'get-webkit-info', []);
   },
-  clearCache: function (onSuccess, onFail) {
-    cordova.exec(onSuccess, onFail, 'System', 'clear-cache', []);
-  },
   isPowerSaveMode: function (onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'is-powersave-mode', []);
   },
@@ -33,13 +30,15 @@ module.exports = {
     description = shortcut.description;
     icon = shortcut.icon;
     data = shortcut.data;
+    action = shortcut.action;
 
     cordova.exec(onSuccess, onFail, 'System', 'add-shortcut', [
+      id,
       label,
       description,
       icon,
+      action,
       data,
-      id,
     ]);
   },
   removeShortcut: function (id, onSuccess, onFail) {
@@ -47,5 +46,20 @@ module.exports = {
   },
   pinShortcut: function (id, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'pin-shortcut', [id]);
+  },
+  manageAllFiles: function (onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'System', 'manage-all-files', []);
+  },
+  getAndroidVersion: function (onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'System', 'get-android-version', []);
+  },
+  isExternalStorageManager: function (onSuccess, onFail) {
+    cordova.exec(
+      onSuccess,
+      onFail,
+      'System',
+      'is-external-storage-manager',
+      []
+    );
   },
 };

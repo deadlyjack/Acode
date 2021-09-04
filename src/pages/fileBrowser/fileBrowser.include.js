@@ -34,8 +34,7 @@ function FileBrowserInclude(
   mode,
   info,
   buttonText = strings['select folder'],
-  doesOpenLast = true,
-  defaultDir
+  doesOpenLast = true
 ) {
   if (!mode) mode = 'file';
 
@@ -50,10 +49,14 @@ function FileBrowserInclude(
   ];
   let fileBrowserOldState = JSON.parse(localStorage.fileBrowserState || '[]');
   const prompt = dialogs.prompt;
-  /**@type {Array<{name: string, uuid: string, url: string, home: String}>} */
-  let allStorages = JSON.parse(localStorage.storageList || '[]');
-  const saveStoragList = () => {
-    localStorage.storageList = JSON.stringify(allStorages);
+  /**@type {Array<{name: string, uuid: string, url: string, home: String, storageType: String}>} */
+  let storageList = JSON.parse(localStorage.storageList || '[]');
+  const allStorages = [];
+  const updateStorageList = (storage) => {
+    if (!storage.uuid) return;
+    storageList = storageList.filter((s) => s.uuid !== storage.uuid);
+    storageList.push(storage);
+    localStorage.storageList = JSON.stringify(storageList);
   };
 
   if (!info) {
@@ -108,10 +111,9 @@ function FileBrowserInclude(
     };
     const $fbMenu = contextMenu({
       innerHTML: () => {
-        const notice = !localStorage.__fbHelp ? "class='notice'" : '';
-        return `<li action="settings">${strings.settings.capitalize(0)}</li>
-<li action="reload">${strings.reload.capitalize(0)}</li>
-<li action="help" ${notice}>${strings.help.capitalize(0)}</li>`;
+        return `<li action="settings">${strings.settings.capitalize(
+          0
+        )}</li><li action="reload">${strings.reload.capitalize(0)}</li>`;
       },
       ...menuOption,
     });
@@ -181,7 +183,6 @@ function FileBrowserInclude(
       if (action === 'help') {
         localStorage.__fbHelp = true;
         $menuToggler.classList.remove('notice');
-        alert(strings.info.toUpperCase(), strings['file browser help']);
         return;
       }
     };
@@ -204,10 +205,10 @@ function FileBrowserInclude(
           util
             .addPath()
             .then((res) => {
-              allStorages.push(res);
-              localStorage.storageList = JSON.stringify(allStorages);
+              storageList.push(res);
+              localStorage.storageList = JSON.stringify(storageList);
               navigationPop();
-              renderStorages();
+              listAllStorages();
             })
             .catch((err) => {
               helpers.error(err);
@@ -254,6 +255,7 @@ function FileBrowserInclude(
       actionStack.remove('filebrowser');
       $content.removeEventListener('click', handleClick);
       $content.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('resume', reload);
       Acode.exec('check-files');
     };
 
@@ -278,120 +280,57 @@ function FileBrowserInclude(
       };
     }
 
-    renderStorages();
-
-    function renderStorages() {
-      const storageList = [];
-
-      if (!localStorage.fileBrowserInit || !allStorages.length) {
-        fileBrowserOldState = [];
-        recents.clear();
-        dialogs.loader.destroy();
-
-        allStorages.push({
-          name: 'Acode',
-          uuid: helpers.uuid(),
-          uri: '',
-        });
-
-        new Promise((resolve, reject) => {
-          if (IS_ANDROID_VERSION_5)
-            resolve([
-              {
-                name: 'External storage',
-                uuid: helpers.uuid(),
-              },
-            ]);
-          else externalFs.listStorages().then(resolve).catch(reject);
-        }).then((res) => {
-          res.forEach((storage) => {
-            if (allStorages.find((s) => s.uuid === storage.uuid)) return;
-            allStorages.push({
-              ...storage,
-              uri: '',
-              storageType: 'SD',
-            });
-          });
-          saveStoragList();
-          storageList.push(...getStorageList());
-          renderStorages();
-        });
-
-        localStorage.fileBrowserInit = true;
-
-        return;
-      }
-
-      if (!doesOpenLast) {
-        fileBrowserOldState = [];
-      }
-
-      if (Array.isArray(defaultDir) && defaultDir.length) {
-        fileBrowserOldState = [
-          {
-            name: '/',
-            url: '/',
-          },
-          ...defaultDir,
-        ];
-      }
-
-      if (fileBrowserOldState.length > 1) {
-        loadUrl();
-        return;
-      }
-
-      storageList.push(...getStorageList());
-      renderList(storageList);
+    if (doesOpenLast && fileBrowserOldState.length) {
+      navigate(fileBrowserOldState);
+      return;
     }
+    listAllStorages();
 
-    function loadUrl(states) {
-      let state = states || fileBrowserOldState;
-      let currUrl;
-      if (!states) fileBrowserOldState = [];
-
-      for (let i = 0; i < state.length; ++i) {
-        const { url, name } = state[i];
-
-        if (i)
-          actionStack.push({
-            id: currUrl,
-            action,
-          });
-
-        if (i === state.length - 1) loadDir(url, name);
-        else navigationPush(name, url);
-
-        currUrl = url;
-      }
-
-      function action() {
-        navigationPop();
-      }
-    }
-
-    function renderList(list) {
+    async function listAllStorages() {
       if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
+      allStorages.length = 0;
+      let isStorageManager = await new Promise((resolve, reject) => {
+        system.isExternalStorageManager(resolve, reject);
+      });
 
-      navigationPush('/', '/');
-      currentDir.url = '/';
-      currentDir.name = 'File Browser';
-      $page.settitle(strings['file browser']);
-      render(helpers.sortDir(list, appSettings.value.fileBrowser));
-    }
+      if (!isStorageManager && ANDROID_SDK_INT >= 30) {
+        util.pushFolder(allStorages, 'Allow Acode to manage all files', '', {
+          storageType: 'permission',
+          uuid: 'permission',
+        });
+      }
 
-    function resolve(data) {
-      _resolve(data);
-    }
+      if (ANDROID_SDK_INT <= 29 || isStorageManager) {
+        util.pushFolder(
+          allStorages,
+          'Internal storage',
+          cordova.file.externalRootDirectory,
+          {
+            storageType: 'SD',
+            uuid: 'internal-storage',
+          }
+        );
+      }
 
-    /**
-     * @returns {PathData[]}
-     */
-    function getStorageList() {
-      const list = [];
+      try {
+        const res = await externalFs.listStorages();
+        res.forEach((storage) => {
+          if (storageList.find((s) => s.uuid === storage.uuid)) return;
+          let path;
+          if (storage.path && isStorageManager) {
+            path = 'file://' + storage.path;
+          }
+          util.pushFolder(allStorages, storage.name, path || '', {
+            ...storage,
+            storageType: 'SD',
+          });
+        });
+      } catch (err) {}
 
-      allStorages.forEach((storage) => {
-        util.pushFolder(list, storage.name, storage.uri, {
+      storageList.forEach((storage) => {
+        let url = storage.url || /**@drepreceted */ storage['uri'];
+
+        util.pushFolder(allStorages, storage.name, url, {
           storageType: storage.storageType,
           uuid: storage.uuid,
           home: storage.home,
@@ -399,17 +338,25 @@ function FileBrowserInclude(
       });
 
       if (IS_FILE_MODE) {
-        util.pushFolder(list, 'Select document', null, {
+        util.pushFolder(allStorages, 'Select document', null, {
           'open-doc': true,
         });
       }
 
       cachedDir['/'] = {
         name: '/',
-        list,
+        list: allStorages,
       };
 
-      return list;
+      navigationPush('/', '/');
+      currentDir.url = '/';
+      currentDir.name = 'File Browser';
+      $page.settitle(strings['file browser']);
+      render(helpers.sortDir(allStorages, appSettings.value.fileBrowser));
+    }
+
+    function resolve(data) {
+      _resolve(data);
     }
 
     async function loadDir(path = '/', name = strings['file browser']) {
@@ -423,7 +370,7 @@ function FileBrowserInclude(
         name = path.name;
       }
 
-      if (url === '/') return renderStorages();
+      if (url === '/') return listAllStorages();
 
       if (url in cachedDir) {
         update();
@@ -525,14 +472,24 @@ function FileBrowserInclude(
         }
       }
 
+      if (storageType === 'permission') {
+        dialogs
+          .confirm(strings.info.toUpperCase(), strings['manage all files'])
+          .then(() => {
+            document.addEventListener('resume', reload);
+            system.manageAllFiles();
+          });
+        return;
+      }
+
       if (!url && action === 'open' && isDir && !opendoc && !contextMenu) {
         dialogs.loader.hide();
-        util.addPath(name).then((res) => {
+        util.addPath(name, uuid).then((res) => {
           const storage = allStorages.find((storage) => storage.uuid === uuid);
-          storage.uri = res.uri;
+          storage.url = res.uri;
           storage.name = res.name;
           name = res.name;
-          saveStoragList();
+          updateStorageList(storage);
           url = res.uri;
           folder();
         });
@@ -589,7 +546,7 @@ function FileBrowserInclude(
           });
         }
 
-        loadUrl(navigations);
+        navigate(navigations);
       }
 
       function file() {
@@ -642,7 +599,7 @@ function FileBrowserInclude(
 
             case 'edit':
               remoteStorage
-                .edit(allStorages.find((storage) => storage.uuid === uuid))
+                .edit(storageList.find((storage) => storage.uuid === uuid))
                 .then((res) => {
                   updateStorage(res, uuid);
                 })
@@ -720,7 +677,7 @@ function FileBrowserInclude(
           recents.removeFolder(url);
           recents.removeFile(url);
         }
-        allStorages = allStorages.filter((storage) => {
+        storageList = storageList.filter((storage) => {
           if (storage.uuid !== uuid) {
             return true;
           }
@@ -738,19 +695,19 @@ function FileBrowserInclude(
           }
           return false;
         });
-        localStorage.storageList = JSON.stringify(allStorages);
+        localStorage.storageList = JSON.stringify(storageList);
         navigationPop();
-        renderStorages();
+        listAllStorages();
       }
 
       function renameStorage(newname) {
-        allStorages = allStorages.map((storage) => {
+        storageList = storageList.map((storage) => {
           if (storage.uuid === uuid) storage.name = newname;
           return storage;
         });
-        localStorage.storageList = JSON.stringify(allStorages);
+        localStorage.storageList = JSON.stringify(storageList);
         navigationPop();
-        renderStorages();
+        listAllStorages();
       }
 
       function openDoc() {
@@ -800,15 +757,32 @@ function FileBrowserInclude(
         const addButtonNotice =
           !localStorage.__fbAddPath || !localStorage.__fbAddSftp;
 
-        if (!localStorage.__fbHelp) {
-          $menuToggler.classList.add('notice');
-        }
         if (addButtonNotice) {
           $addMenuToggler.classList.add('notice');
         }
       } else {
         $menuToggler.classList.remove('notice');
         $addMenuToggler.classList.remove('notice');
+      }
+    }
+
+    function navigate(states) {
+      if (!Array.isArray(states)) return;
+      let currUrl;
+
+      for (let i = 0; i < states.length; ++i) {
+        const { url, name } = states[i];
+        if (i > 0) {
+          actionStack.push({
+            id: currUrl,
+            action: navigationPop,
+          });
+        }
+
+        if (i === states.length - 1) loadDir(url, name);
+        else navigationPush(name, url);
+
+        currUrl = url;
       }
     }
 
@@ -1041,9 +1015,7 @@ function FileBrowserInclude(
       const ext = helpers.extname(uri);
 
       if (
-        appSettings.defaultSettings.filesNotAllowed.includes(
-          (ext || '').toLowerCase()
-        )
+        appSettings.value.filesNotAllowed.includes((ext || '').toLowerCase())
       ) {
         return false;
       }
@@ -1052,12 +1024,12 @@ function FileBrowserInclude(
 
     function updateStorage(storage, uuid) {
       if (uuid) {
-        allStorages = allStorages.filter((storage) => storage.uuid !== uuid);
+        storageList = storageList.filter((storage) => storage.uuid !== uuid);
       } else {
         uuid = helpers.uuid();
       }
 
-      allStorages.push({
+      storageList.push({
         name: storage.alias,
         uri: storage.url,
         home: storage.home,
@@ -1065,9 +1037,9 @@ function FileBrowserInclude(
         storageType: storage.type,
         type: 'dir',
       });
-      localStorage.storageList = JSON.stringify(allStorages);
+      localStorage.storageList = JSON.stringify(storageList);
       navigationPop();
-      renderStorages();
+      listAllStorages();
     }
 
     function reload() {
