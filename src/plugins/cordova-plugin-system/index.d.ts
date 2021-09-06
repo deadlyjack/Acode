@@ -79,7 +79,34 @@ interface System {
    * @param onFail 
    */
   manageAllFiles(onSuccess: ()=>void, onFail: (err: String)=>void): void;
+  /**
+   * Opens settings to allow to grant the app permission manage all files on device
+   * @param onSuccess 
+   * @param onFail 
+   */
   isExternalStorageManager(onSuccess: (res: Boolean)=>void, onFail: (err: String)=>void): void;
+  /**
+   * Requests user to grant the provided permissions
+   * @param permissions constant value of the permision required @see https://developer.android.com/reference/android/Manifest.permission
+   * @param onSuccess 
+   * @param onFail 
+   */
+  requestPermissions(permissions: String[], onSuccess: (res: Boolean)=>void, onFail: (err: String)=>void):void;
+  /**
+   * Requests user to grant the provided permission
+   * @param permission constant value of the permision required @see https://developer.android.com/reference/android/Manifest.permission
+   * @param onSuccess 
+   * @param onFail 
+   */
+  requestPermission(permission: String, onSuccess: (res: Boolean)=>void, onFail: (err: String)=>void):void;
+  /**
+   * Checks whether the app has provided permission
+   * @param permission constant value of the permision required @see https://developer.android.com/reference/android/Manifest.permission
+   * @param onSuccess 
+   * @param onFail 
+   */
+  hasPermission(permission: String, onSuccess: (res: Boolean)=>void, onFail: (err: String)=>void):void;
+
 }
 
 declare var system: System;

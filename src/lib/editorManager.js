@@ -388,7 +388,7 @@ function EditorManager($sidebar, $header, $body) {
   /**
    *
    * @param {string} filename
-   * @param {newFileOptions} options
+   * @param {NewFileOptions} options
    */
   function addNewFile(filename = 'untitled.txt', options) {
     if (!options) {

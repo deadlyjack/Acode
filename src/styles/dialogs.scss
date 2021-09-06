@@ -103,8 +103,8 @@
   }
 
   &.hide {
-    transition: all 300ms ease;
-    transform: translate(-50%, -50%) scale(0.8) translateZ(0);
+    transition: all 200ms ease-out;
+    transform: translate(-50%, -50%) scale(0.95) translateZ(0);
     opacity: 0;
 
     & + .mask {

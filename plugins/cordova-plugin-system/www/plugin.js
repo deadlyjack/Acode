@@ -62,4 +62,17 @@ module.exports = {
       []
     );
   },
+  requestPermission: function (permission, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'System', 'request-permission', [
+      permission,
+    ]);
+  },
+  requestPermissions: function (permissions, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'System', 'request-permissions', [
+      permissions,
+    ]);
+  },
+  hasPermission: function (permission, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'System', 'has-permission', [permission]);
+  },
 };

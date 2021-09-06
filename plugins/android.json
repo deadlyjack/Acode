@@ -10,9 +10,6 @@
     "cordova-clipboard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-android-permissions": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "cordova-plugin-buildinfo": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },

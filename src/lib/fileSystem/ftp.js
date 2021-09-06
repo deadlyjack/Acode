@@ -1,5 +1,4 @@
 import internalFs from './internalFs';
-import ftpCodes from '../ftpCodes';
 import Url from '../utils/Url';
 import mimeType from 'mime-types';
 
@@ -125,7 +124,7 @@ function Ftp(username, password, hostname, port, security, mode) {
           function error(err) {
             ftp.disconnect();
             const code = getCode(err);
-            if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+            if (code) reject(ftpCodes(code) || err);
             else reject(err);
           }
         })
@@ -155,7 +154,7 @@ function Ftp(username, password, hostname, port, security, mode) {
             finish();
             ftp.disconnect();
             const code = getCode(err);
-            if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+            if (code) reject(ftpCodes(code) || err);
             else reject(err);
           }
         })
@@ -192,7 +191,7 @@ function Ftp(username, password, hostname, port, security, mode) {
             function error(err) {
               ftp.disconnect();
               const code = getCode(err);
-              if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+              if (code) reject(ftpCodes(code) || err);
               else reject(err);
             }
           });
@@ -215,7 +214,7 @@ function Ftp(username, password, hostname, port, security, mode) {
           function error(err) {
             ftp.disconnect();
             const code = getCode(err);
-            if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+            if (code) reject(ftpCodes(code) || err);
             else reject(err);
           }
         })
@@ -243,7 +242,7 @@ function Ftp(username, password, hostname, port, security, mode) {
             ftp.disconnect();
             if (err === 'Error') err = 'Unkown error';
             const code = getCode(err);
-            if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+            if (code) reject(ftpCodes(code) || err);
             else reject(err);
           }
         })
@@ -275,7 +274,7 @@ function Ftp(username, password, hostname, port, security, mode) {
           function error(err) {
             ftp.disconnect();
             const code = getCode(err);
-            if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+            if (code) reject(ftpCodes(code) || err);
             else reject(err);
           }
         })
@@ -298,7 +297,7 @@ function Ftp(username, password, hostname, port, security, mode) {
           function error(err) {
             ftp.disconnect();
             const code = getCode(err);
-            if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+            if (code) reject(ftpCodes(code) || err);
             else reject(err);
           }
         })
@@ -320,7 +319,7 @@ function Ftp(username, password, hostname, port, security, mode) {
           function error(err) {
             ftp.disconnect();
             const code = getCode(err);
-            if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+            if (code) reject(ftpCodes(code) || err);
             else reject(err);
           }
         })
@@ -351,7 +350,7 @@ function Ftp(username, password, hostname, port, security, mode) {
         .catch((err) => {
           ftp.disconnect();
           const code = getCode(err);
-          if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+          if (code) reject(ftpCodes(code) || err);
           else reject(err);
         });
     });
@@ -368,7 +367,7 @@ function Ftp(username, password, hostname, port, security, mode) {
         .catch((err) => {
           ftp.disconnect();
           const code = getCode(err);
-          if (code) reject(code in ftpCodes ? ftpCodes[code] : err);
+          if (code) reject(ftpCodes(code) || err);
           else reject(err);
         });
     });
@@ -407,6 +406,59 @@ function Ftp(username, password, hostname, port, security, mode) {
         })
         .catch(reject);
     });
+  }
+
+  function ftpCodes(code) {
+    switch (code) {
+      case 421:
+        return 'Service not available, closing control connection. This may be a reply to any command if the service knows it must shut down.';
+      case 425:
+        return "Can't open data connection.";
+      case 426:
+        return 'Connection closed; transfer aborted.';
+      case 430:
+        return 'Invalid username or password.';
+      case 434:
+        return 'Requested host unavailable.';
+      case 450:
+        return 'Requested file action not taken.';
+      case 451:
+        return 'Requested action aborted. Local error in processing.';
+      case 452:
+        return 'Requested action not taken. Insufficient storage space in system.File unavailable (e.g., file busy).';
+      case 501:
+        return 'Syntax error in parameters or arguments.';
+      case 502:
+        return 'Command not implemented.';
+      case 503:
+        return 'Bad sequence of commands.';
+      case 504:
+        return 'Command not implemented for that parameter.';
+      case 530:
+        return 'Not logged in.';
+      case 532:
+        return 'Need account for storing files.';
+      case 534:
+        return 'Could Not Connect to Server - Policy Requires SSL';
+      case 550:
+        return 'Requested action not taken. File unavailable (e.g. file not found, no access).';
+      case 551:
+        return 'Requested action aborted. Page type unknown.';
+      case 552:
+        return 'Requested file action aborted. Exceeded storage allocation (for current directory or dataset).';
+      case 553:
+        return 'Requested action not taken. File name not allowed.';
+      case 10054:
+        return 'Connection reset by peer. The connection was forcibly closed by the remote host.';
+      case 10060:
+        return 'Cannot connect to remote server.';
+      case 10061:
+        return 'Cannot connect to remote server. The connection is actively refused by the server.';
+      case 10066:
+        return 'Directory not empty.';
+      case 10068:
+        return 'Too many users, server is full.';
+    }
   }
 }
 

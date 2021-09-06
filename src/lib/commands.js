@@ -300,8 +300,6 @@ const commands = {
     saveFile(editorManager.activeFile, false, toast);
   },
   'save-state'() {
-    if (window.isLoading) return;
-
     const filesToSave = [];
     const folders = [];
     const { activeFile } = editorManager;

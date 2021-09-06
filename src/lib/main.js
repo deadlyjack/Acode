@@ -52,35 +52,39 @@ async function Main() {
     }
   };
 
-  /**
-   * @type {Promotion}
-   */
-  const promotion = await ajax({
+  ajax({
     url: 'https://acode.foxdebug.com/api/getad',
     responseType: 'json',
-  });
-  window.promotion = promotion;
-  if (promotion.image) {
-    const image = await ajax({
-      url: promotion.image,
-      responseType: 'arraybuffer',
-    });
+  }).then((/**@type {Promotion} */ promotion) => {
+    window.promotion = promotion;
+    if (promotion.image) {
+      (async () => {
+        const image = await ajax({
+          url: promotion.image,
+          responseType: 'arraybuffer',
+        });
 
-    if (image instanceof ArrayBuffer) {
-      promotion.image = URL.createObjectURL(new Blob([image]));
+        if (image instanceof ArrayBuffer) {
+          promotion.image = URL.createObjectURL(new Blob([image]));
+        }
+      })();
     }
-  }
+  });
 
-  document.addEventListener('deviceready', initGlobalVariables);
+  document.addEventListener('deviceready', ondeviceready);
 }
 
-async function initGlobalVariables() {
+async function ondeviceready() {
+  const appDir = cordova.file.applicationDirectory;
+  const language = navigator.language.toLowerCase();
+  const oldRURL = window.resolveLocalFileSystemURL;
   const {
     externalCacheDirectory, //
     externalDataDirectory,
     cacheDirectory,
     dataDirectory,
   } = cordova.file;
+  let lang = null;
 
   window.root = tag(window.root);
   window.app = tag(document.body);
@@ -93,9 +97,6 @@ async function initGlobalVariables() {
   window.defaultKeyBindings = keyBindings;
   window.toastQueue = [];
   window.toast = toast;
-  window.ANDROID_SDK_INT = await new Promise((resolve, reject) =>
-    system.getAndroidVersion(resolve, reject)
-  );
   window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
   window.DATA_STORAGE = externalDataDirectory || dataDirectory;
   window.CACHE_STORAGE = externalCacheDirectory || cacheDirectory;
@@ -104,6 +105,9 @@ async function initGlobalVariables() {
   window.gistRecordFile = Url.join(DATA_STORAGE, 'git/.gistfiles');
   window.actionStack = ActionStack();
   window.appSettings = new Settings();
+  window.ANDROID_SDK_INT = await new Promise((resolve, reject) =>
+    system.getAndroidVersion(resolve, reject)
+  );
   window.DOES_SUPPORT_THEME = (() => {
     const $testEl = tag('div', {
       style: {
@@ -141,17 +145,7 @@ async function initGlobalVariables() {
     else return null;
   };
 
-  ondeviceready();
-}
-
-async function ondeviceready() {
-  const appDir = cordova.file.applicationDirectory;
-  const language = navigator.language.toLowerCase();
-  const oldRURL = window.resolveLocalFileSystemURL;
-  const { permissions } = cordova.plugins;
-  const requiredPermissions = [permissions.WRITE_EXTERNAL_STORAGE];
-  let lang = null;
-
+  system.requestPermission('android.permission.WRITE_EXTERNAL_STORAGE');
   localStorage.versionCode = BuildInfo.versionCode;
   document.body.setAttribute('data-version', 'v' + BuildInfo.version);
   document.body.setAttribute('data-small-msg', 'Loading settings...');
@@ -159,14 +153,6 @@ async function ondeviceready() {
   window.resolveLocalFileSystemURL = function (url, ...args) {
     oldRURL.call(this, Url.safe(url), ...args);
   };
-
-  requiredPermissions.forEach((permission, i) => {
-    permissions.checkPermission(permission, (status) => {
-      if (!status.hasPermission) {
-        permissions.requestPermission(requiredPermissions[i], () => {});
-      }
-    });
-  });
 
   if (navigator.app && typeof navigator.app.clearCache === 'function') {
     navigator.app.clearCache();
@@ -256,17 +242,17 @@ async function ondeviceready() {
     './res/ace/src/ext-modelist.js'
   );
   ace.config.set('basePath', './res/ace/src/');
+  window.beautify = ace.require('ace/ext/beautify').beautify;
   window.modelist = ace.require('ace/ext/modelist');
   window.AceMouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
 
   document.body.setAttribute('data-small-msg', 'Initializing GitHub...');
   await git.init();
 
-  window.beautify = ace.require('ace/ext/beautify').beautify;
-  startApp();
+  loadApp();
 }
 
-async function startApp() {
+async function loadApp() {
   //#region declaration
   const $editMenuToggler = tag('span', {
     className: 'icon edit',
@@ -349,7 +335,8 @@ async function startApp() {
     className: 'floating icon keyboard_arrow_up',
     id: 'quicktool-toggler',
   });
-  const actions = constants.COMMANDS;
+  const folders = helpers.parseJSON(localStorage.folders);
+  const files = helpers.parseJSON(localStorage.files) || [];
   let registeredKey = '';
   //#endregion
 
@@ -384,7 +371,128 @@ async function startApp() {
   applySettings.afterRender();
   //#endregion
 
-  editorManager.onupdate = onEditorUpdate;
+  //#region loading-files
+  document.body.setAttribute('data-small-msg', 'Loading files...');
+  if (Array.isArray(folders)) {
+    folders.forEach((folder) => openFolder(folder.url, folder.opts));
+  }
+  for (let file of files) {
+    let text = '';
+    const {
+      cursorPos,
+      isUnsaved,
+      filename,
+      type,
+      uri,
+      id,
+      readOnly,
+      mode,
+      deltedFile,
+    } = file;
+    const render = files.length === 1 || id === localStorage.lastfile;
+
+    try {
+      const fs = await fsOperation(Url.join(CACHE_STORAGE, id));
+      text = await fs.readFile('utf-8');
+    } catch (error) {}
+
+    document.body.setAttribute('data-small-msg', `Loading ${filename}...`);
+
+    if (type === 'git') {
+      gitRecord.get(file.sha).then((record) => {
+        if (record) {
+          editorManager.addNewFile(filename, {
+            type: 'git',
+            text: text || record.data,
+            isUnsaved: isUnsaved,
+            record,
+            render,
+            cursorPos,
+            id,
+          });
+        }
+      });
+    } else if (type === 'gist') {
+      const gist = gistRecord.get(file.recordid, file.isNew);
+      if (gist) {
+        const gistFile = gist.files[filename];
+        editorManager.addNewFile(filename, {
+          type: 'gist',
+          text: text || gistFile.content,
+          isUnsaved,
+          record: gist,
+          render,
+          cursorPos,
+          id,
+        });
+      }
+    } else if (uri) {
+      try {
+        const fs = await fsOperation(uri);
+        if (!text) {
+          text = await fs.readFile('utf-8');
+        } else if (!(await fs.exists()) && !readOnly) {
+          uri = null;
+          isUnsaved = true;
+          dialogs.alert(
+            strings.info.toUpperCase(),
+            strings['file has been deleted'].replace('{file}', filename)
+          );
+        }
+
+        if (text !== null) {
+          editorManager.addNewFile(filename, {
+            uri,
+            render,
+            isUnsaved,
+            cursorPos,
+            readOnly,
+            text,
+            id,
+            mode,
+            deltedFile,
+          });
+        }
+      } catch (error) {
+        continue;
+      }
+    } else {
+      editorManager.addNewFile(filename, {
+        render,
+        isUnsaved,
+        cursorPos,
+        text,
+        id,
+      });
+    }
+  }
+  //#endregion
+
+  if (!editorManager.files.length) {
+    editorManager.addNewFile();
+  }
+  onEditorUpdate();
+  document.body.removeAttribute('data-small-msg');
+  app.classList.remove('loading', 'splash');
+  if (localStorage.count === undefined) localStorage.count = 0;
+  let count = +localStorage.count;
+
+  if (count === constants.RATING_COUNT) askForRating();
+  else if (count === constants.DONATION_COUNT) askForDonation();
+  else ++localStorage.count;
+
+  if (!localStorage.__init) {
+    localStorage.__init = true;
+    if (!BuildInfo.debug) {
+      const title = strings.info.toUpperCase();
+      const body = mustache.render($_hintText, {
+        lang: appSettings.value.lang,
+      });
+      dialogs.box(title, body).wait(12000);
+    }
+  }
+
+  //#region Add event listeners
   app.addEventListener('click', onClickApp);
   $fileMenu.addEventListener('click', handleMenu);
   $mainMenu.addEventListener('click', handleMenu);
@@ -393,51 +501,25 @@ async function startApp() {
   document.addEventListener('backbutton', actionStack.pop);
   document.addEventListener('keydown', handleMainKeyDown);
   document.addEventListener('keyup', handleMainKeyUp);
+  editorManager.onupdate = onEditorUpdate;
+  document.addEventListener('menubutton', $sidebar.toggle);
+  navigator.app.overrideButton('menubutton', true);
+  intent.setNewIntentHandler(intentHandler);
+  intent.getCordovaIntent(intentHandler, (err) => {
+    helpers.error(err);
+    console.log(err);
+  });
   $sidebar.onshow = function () {
     const activeFile = editorManager.activeFile;
     if (activeFile) editorManager.editor.blur();
   };
-
-  document.body.setAttribute('data-small-msg', 'Loading files...');
-  loadFolders();
-  await loadFiles();
-  document.body.removeAttribute('data-small-msg');
-
-  window.intent.setNewIntentHandler(intentHandler);
-  window.intent.getCordovaIntent(intentHandler, function (e) {
-    console.error('Error: Cannot handle open with file intent', e);
-  });
-  document.addEventListener('menubutton', $sidebar.toggle);
-  navigator.app.overrideButton('menubutton', true);
   document.addEventListener('pause', () => {
     Acode.exec('save-state');
   });
   document.addEventListener('resume', () => {
     Acode.exec('check-files');
   });
-
-  setTimeout(() => {
-    app.classList.remove('loading', 'splash');
-    if (localStorage.count === undefined) localStorage.count = 0;
-    let count = +localStorage.count;
-
-    if (count === constants.RATING_COUNT) askForRating();
-    else if (count === constants.DONATION_COUNT) askForDonation();
-    else ++localStorage.count;
-
-    editorManager.onupdate('loading-complete');
-
-    if (!localStorage.__init) {
-      localStorage.__init = true;
-      if (!BuildInfo.debug) {
-        const title = strings.info.toUpperCase();
-        const body = mustache.render($_hintText, {
-          lang: appSettings.value.lang,
-        });
-        dialogs.box(title, body).wait(12000);
-      }
-    }
-  }, 500);
+  //#endregion
 
   /**
    *
@@ -464,126 +546,15 @@ async function startApp() {
     for (let name in keyBindings) {
       const obj = keyBindings[name];
       const binding = (obj.key || '').toLowerCase();
-      if (binding === key && actions.includes(name) && 'action' in obj)
+      if (
+        binding === key &&
+        constants.COMMANDS.includes(name) &&
+        'action' in obj
+      )
         Acode.exec(obj.action);
     }
 
     registeredKey = null;
-  }
-
-  function loadFiles() {
-    return new Promise((resolve) => {
-      (async () => {
-        const files = helpers.parseJSON(localStorage.files) || [];
-        const lastfile = localStorage.lastfile;
-
-        for (let file of files) {
-          let text = '';
-          const {
-            cursorPos, //
-            isUnsaved,
-            filename,
-            type,
-            uri,
-            id,
-            readOnly,
-            mode,
-            deltedFile,
-          } = file;
-          const render = files.length === 1 || id === lastfile;
-
-          try {
-            const fs = await fsOperation(Url.join(CACHE_STORAGE, id));
-            text = await fs.readFile('utf-8');
-          } catch (error) {}
-
-          document.body.setAttribute(
-            'data-small-msg',
-            `Loading ${filename}...`
-          );
-
-          if (type === 'git') {
-            gitRecord.get(file.sha).then((record) => {
-              if (record) {
-                editorManager.addNewFile(filename, {
-                  type: 'git',
-                  text: text || record.data,
-                  isUnsaved: isUnsaved,
-                  record,
-                  render,
-                  cursorPos,
-                  id,
-                });
-              }
-            });
-          } else if (type === 'gist') {
-            const gist = gistRecord.get(file.recordid, file.isNew);
-            if (gist) {
-              const gistFile = gist.files[filename];
-              editorManager.addNewFile(filename, {
-                type: 'gist',
-                text: text || gistFile.content,
-                isUnsaved,
-                record: gist,
-                render,
-                cursorPos,
-                id,
-              });
-            }
-          } else if (uri) {
-            try {
-              const fs = await fsOperation(uri);
-              if (!text) {
-                text = await fs.readFile('utf-8');
-              } else if (!(await fs.exists()) && !readOnly) {
-                uri = null;
-                isUnsaved = true;
-                dialogs.alert(
-                  strings.info.toUpperCase(),
-                  strings['file has been deleted'].replace('{file}', filename)
-                );
-              }
-
-              if (text) {
-                editorManager.addNewFile(filename, {
-                  uri,
-                  render,
-                  isUnsaved,
-                  cursorPos,
-                  readOnly,
-                  text,
-                  id,
-                  mode,
-                  deltedFile,
-                });
-              }
-            } catch (error) {
-              continue;
-            }
-          } else {
-            editorManager.addNewFile(filename, {
-              render,
-              isUnsaved,
-              cursorPos,
-              text,
-              id,
-            });
-          }
-        }
-
-        if (!editorManager.files.length) {
-          editorManager.addNewFile();
-        }
-        resolve();
-      })();
-    });
-  }
-
-  function loadFolders() {
-    try {
-      const folders = JSON.parse(localStorage.folders);
-      folders.map((folder) => openFolder(folder.url, folder.opts));
-    } catch (error) {}
   }
 
   /**

@@ -110,10 +110,8 @@ interface fileOptions {
     uri: string;
 }
 
-interface newFileOptions {
+interface NewFileOptions {
     uri?: string;
-    filename: string;
-    location?: string;
     text?: string;
     render?: boolean;
     readonly?: boolean;
@@ -361,7 +359,7 @@ interface GistRecord {
 }
 
 interface Manager {
-    addNewFile(filename: string, options: newFileOptions): File;
+    addNewFile(filename: string, options: NewFileOptions): File;
     getFile(checkFor: string | number | Repo | Gist, type: "id" | "name" | "uri" | "git" | "gist"): File;
     switchFile(id: string): void;
     removeFile(id: string | File, force: boolean): void;

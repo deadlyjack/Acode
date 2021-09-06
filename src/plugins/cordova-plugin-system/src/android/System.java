@@ -40,6 +40,8 @@ public class System extends CordovaPlugin {
   private Activity activity;
   private Context context;
   private CallbackContext callback;
+  private int REQ_PERMISSIONS = 1;
+  private int REQ_PERMISSION = 2;
 
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
@@ -55,12 +57,12 @@ public class System extends CordovaPlugin {
     throws JSONException {
     this.callback = callbackContext;
 
-    final String arg1 = getJSONValueString(args, 0);
-    final String arg2 = getJSONValueString(args, 1);
-    final String arg3 = getJSONValueString(args, 2);
-    final String arg4 = getJSONValueString(args, 3);
-    final String arg5 = getJSONValueString(args, 4);
-    final String arg6 = getJSONValueString(args, 5);
+    final String arg1 = getString(args, 0);
+    final String arg2 = getString(args, 1);
+    final String arg3 = getString(args, 2);
+    final String arg4 = getString(args, 3);
+    final String arg5 = getString(args, 4);
+    final String arg6 = getString(args, 5);
 
     switch (action) {
       case "get-webkit-info":
@@ -73,6 +75,9 @@ public class System extends CordovaPlugin {
       case "manage-all-files":
       case "get-android-version":
       case "is-external-storage-manager":
+      case "request-permissions":
+      case "request-permission":
+      case "has-permission":
         break;
       default:
         return false;
@@ -114,6 +119,14 @@ public class System extends CordovaPlugin {
               case "is-external-storage-manager":
                 isExternalStorageManager();
                 break;
+              case "request-permissions":
+                requestPermissions(getJSONArray(args, 0));
+              case "request-permission":
+                requestPermission(arg1);
+                break;
+              case "has-permission":
+                hasPermission(arg1);
+                break;
               default:
                 break;
             }
@@ -122,6 +135,86 @@ public class System extends CordovaPlugin {
       );
 
     return true;
+  }
+
+  private void requestPermissions(JSONArray arr) {
+    try {
+      String[] permissions = checkPermissions(arr);
+
+      if (permissions.length > 0) {
+        cordova.requestPermissions(this, REQ_PERMISSIONS, permissions);
+        return;
+      }
+      callback.success(new JSONArray());
+    } catch (Exception e) {
+      callback.error(e.toString());
+    }
+  }
+
+  private void requestPermission(String permission) {
+    if (permission != null || !permission.equals("")) {
+      cordova.requestPermission(this, REQ_PERMISSION, permission);
+      return;
+    }
+
+    callback.error("No permission passed to request.");
+  }
+
+  private void hasPermission(String permission) {
+    if (permission != null || !permission.equals("")) {
+      int res = 0;
+      if (cordova.hasPermission(permission)) {
+        res = 1;
+      }
+
+      callback.success(res);
+      return;
+    }
+    callback.error("No permission passed to check.");
+  }
+
+  public void onRequestPermissionResult(
+    int code,
+    String[] permissions,
+    int[] resCodes
+  ) {
+    if (code == REQ_PERMISSIONS) {
+      JSONArray resAr = new JSONArray();
+
+      for (int res : resCodes) {
+        if (res == PackageManager.PERMISSION_DENIED) {
+          resAr.put(0);
+        }
+        resAr.put(1);
+      }
+
+      callback.success(resAr);
+      return;
+    }
+
+    if (resCodes[0] == PackageManager.PERMISSION_DENIED) {
+      callback.success(0);
+      return;
+    }
+    callback.success(1);
+  }
+
+  private String[] checkPermissions(JSONArray arr) throws Exception {
+    List<String> list = new ArrayList<String>();
+    for (int i = 0; i < arr.length(); i++) {
+      try {
+        String permission = arr.getString(i);
+        if (permission != null || !permission.equals("")) {
+          throw new Exception("Permission cannot be null or empty");
+        }
+        if (!cordova.hasPermission(permission)) {
+          list.add(permission);
+        }
+      } catch (JSONException e) {}
+    }
+
+    String[] res = new String[list.size()];
+    return list.toArray(res);
   }
 
   private void askToManageAllFiles() {
@@ -349,7 +442,7 @@ public class System extends CordovaPlugin {
     }
   }
 
-  private String getJSONValueString(JSONArray ar, int index) {
+  private String getString(JSONArray ar, int index) {
     try {
       return ar.getString(index);
     } catch (JSONException e) {
@@ -357,11 +450,19 @@ public class System extends CordovaPlugin {
     }
   }
 
-  private int getJSONValueInt(JSONArray ar, int index) {
+  private int getInt(JSONArray ar, int index) {
     try {
       return ar.getInt(index);
     } catch (JSONException e) {
       return 0;
+    }
+  }
+
+  private JSONArray getJSONArray(JSONArray ar, int index) {
+    try {
+      return ar.getJSONArray(index);
+    } catch (JSONException e) {
+      return null;
     }
   }
 }
