@@ -10,9 +10,9 @@ import Sftp from './sftp';
 /**
  *
  * @param {string} uri
- * @returns {Promise<FileSystem>}
+ * @returns {FileSystem}
  */
-async function fsOperation(uri) {
+function fsOperation(uri) {
   const protocol = Url.getProtocol(uri);
 
   if (protocol === 'file:') {

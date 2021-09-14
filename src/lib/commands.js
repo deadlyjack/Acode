@@ -46,7 +46,7 @@ const commands = {
         if (file.isUnsaved) continue;
 
         if (file.uri) {
-          const fs = await fsOperation(file.uri);
+          const fs = fsOperation(file.uri);
 
           if (!(await fs.exists()) && !file.readOnly) {
             file.isUnsaved = true;
@@ -245,7 +245,7 @@ const commands = {
       }
     });
   },
-  rename(file) {
+  async rename(file) {
     file = file || editorManager.activeFile;
 
     if (file.mode === 'single') {
@@ -253,35 +253,30 @@ const commands = {
       return;
     }
 
-    dialogs
-      .prompt(strings.rename, file.filename, 'filename', {
-        match: constants.FILE_NAME_REGEX,
-      })
-      .then((newname) => {
-        if (!newname || newname === file.filename) return;
-        newname = helpers.removeLineBreaks(newname);
-        const uri = file.uri;
-        if (uri) {
-          fsOperation(uri)
-            .then((fs) => {
-              return fs.renameTo(newname);
-            })
-            .then((newUri) => {
-              file.uri = newUri;
-              file.filename = newname;
+    const newname = dialogs.prompt(strings.rename, file.filename, 'filename', {
+      match: constants.FILE_NAME_REGEX,
+    });
 
-              openFolder.updateItem(uri, newUri, newname);
-              toast(strings['file renamed']);
-            })
-            .catch((err) => {
-              helpers.error(err);
-              console.error(err);
-            });
-        } else {
-          file.filename = newname;
-          // if (file.type === 'regular') toast(strings['file renamed']);
-        }
-      });
+    if (!newname || newname === file.filename) return;
+    newname = helpers.removeLineBreaks(newname);
+    const { uri } = file;
+    if (uri) {
+      const fs = fsOperation(uri);
+      try {
+        const newUri = await fs.renameTo(newname);
+        file.uri = newUri;
+        file.filename = newname;
+
+        openFolder.updateItem(uri, newUri, newname);
+        toast(strings['file renamed']);
+      } catch (err) {
+        helpers.error(err);
+        console.error(err);
+      }
+    } else {
+      file.filename = newname;
+      // if (file.type === 'regular') toast(strings['file renamed']);
+    }
   },
   replace() {
     this.find();

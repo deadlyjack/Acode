@@ -1,3 +1,10 @@
+version 1.4.162
+☞ Bugs fixes.
+☞ Updated language pack
+
+version 1.4.161
+☞ Fixed app not opening Android 5.
+
 version 1.4.160
 ☞ Fixed app not opening without internet.
 

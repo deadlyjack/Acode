@@ -130,7 +130,7 @@ class Settings {
     if (this.#initialized) return;
     this.#initialized = true;
 
-    const fs = await fsOperation(this.settingsFile);
+    const fs = fsOperation(this.settingsFile);
 
     if (!(await fs.exists())) {
       await this.#save();
@@ -155,11 +155,11 @@ class Settings {
   }
 
   async #save() {
-    const fs = await fsOperation(this.settingsFile);
+    const fs = fsOperation(this.settingsFile);
     const settingsText = JSON.stringify(this.value, undefined, 4);
 
     if (!(await fs.exists())) {
-      const dirFs = await fsOperation(DATA_STORAGE);
+      const dirFs = fsOperation(DATA_STORAGE);
       await dirFs.createFile('settings.json');
     }
 

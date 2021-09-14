@@ -16,7 +16,6 @@ export default {
   VIBRATION_TIME: 30,
   CUSTOM_THEME: 'body[theme="custom"]',
   PAYPAL: 'https://paypal.me/deadlyjack',
-  BUY_ME_A_COFFEE: 'https://buymeacoffee.com/ajitkumar.dev',
   PATREON: 'https://patreon.com/foxdebug',
   PAID_VERSION:
     'https://play.google.com/store/apps/details?id=com.foxdebug.acode',

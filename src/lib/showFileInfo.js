@@ -12,7 +12,7 @@ import helpers from './utils/helpers';
  */
 export default async function showFileInfo(url) {
   if (!url) url = editorManager.activeFile.uri;
-  const fs = await fsOperation(url);
+  const fs = fsOperation(url);
   const stats = await fs.stats();
   const value = await fs.readFile('utf-8');
 

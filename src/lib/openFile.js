@@ -5,7 +5,7 @@ import fsOperation from './fileSystem/fsOperation';
 
 /**
  *
- * @param {string|fileOptions} file
+ * @param {string & fileOptions} file
  * @param {object} data
  */
 
@@ -23,7 +23,7 @@ export default async function openFile(file, data = {}) {
     }
 
     dialogs.loader.create('', strings['loading'] + '...');
-    const fs = await fsOperation(uri);
+    const fs = fsOperation(uri);
     const fileInfo = await fs.stats();
     const name = fileInfo.name || file.name || uri;
     const settings = appSettings.value;

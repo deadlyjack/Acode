@@ -8,9 +8,7 @@ import dialogs from '../components/dialogs';
 import git from './git';
 import constants from './constants';
 import fsOperation from './fileSystem/fsOperation';
-import path from './utils/Path';
 import Url from './utils/Url';
-import URLParse from 'url-parse';
 import openFolder from './openFolder';
 
 /**
@@ -63,7 +61,7 @@ async function run(
 
   if (runFile && extension === 'svg') {
     try {
-      const fs = await fsOperation(activeFile.uri);
+      const fs = fsOperation(activeFile.uri);
       const res = await fs.readFile();
       const blob = new Blob([new Uint8Array(res)], {
         type: mimeType.lookup(extension),
@@ -82,7 +80,7 @@ async function run(
 
     if (folder) {
       const { url } = folder;
-      const fs = await fsOperation(Url.join(url, 'index.html'));
+      const fs = fsOperation(Url.join(url, 'index.html'));
 
       try {
         if (await fs.exists()) {
@@ -302,8 +300,8 @@ async function run(
                 const id = file.record.sha + encodeURIComponent(reqPath);
                 const cacheFile = id.hashCode() + '.' + ext;
                 const uri = Url.join(CACHE_STORAGE, cacheFile);
-                const cacheDirFs = await fsOperation(CACHE_STORAGE);
-                const cacheFileFs = await fsOperation(uri);
+                const cacheDirFs = fsOperation(CACHE_STORAGE);
+                const cacheFileFs = fsOperation(uri);
 
                 if (await cacheFileFs.exists()) {
                   sendFile(uri, reqId);
@@ -378,7 +376,7 @@ async function run(
     sendText(text, id);
   }
 
-  function sendFile(path, id) {
+  async function sendFile(path, id) {
     if (isLoading) {
       queue.push(() => {
         sendFile(path, id);
@@ -391,21 +389,17 @@ async function run(
     if (/s?ftp:/.test(protocol)) {
       const cacheFile = Url.join(CACHE_STORAGE, path.hashCode());
       isLoading = true;
-      fsOperation(path)
-        .then((fs) => {
-          return fs.readFile(); // Because reading the remote file will create cache file
-        })
-        .then(() => {
-          send(cacheFile, mimetype); // send the created file here
-        })
-        .catch(() => {
-          error(id);
-        })
-        .finally(() => {
-          isLoading = false;
-          const action = queue.splice(-1, 1)[0];
-          if (typeof action === 'function') action();
-        });
+      const fs = fsOperation(path);
+      try {
+        await fs.readFile(); // Because reading the remote file will create cache file
+        send(cacheFile, mimetype); // send the created file here
+      } catch (err) {
+        error(id);
+      }
+
+      isLoading = false;
+      const action = queue.splice(-1, 1)[0];
+      if (typeof action === 'function') action();
     } else if (protocol === 'content:') {
       sdcard.formatUri(
         path,
@@ -431,23 +425,21 @@ async function run(
     }
   }
 
-  function sendFileContent(url, id, mime, processText) {
-    fsOperation(url)
-      .then((fs) => {
-        return fs.readFile('utf-8');
-      })
-      .then((text) => {
-        text = processText ? processText(text) : text;
-        if (mime === MIMETYPE_HTML) {
-          sendHTML(text, id);
-        } else {
-          sendText(text, id, mime);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        error(id);
-      });
+  async function sendFileContent(url, id, mime, processText) {
+    const fs = fsOperation(url);
+
+    if (!(await fs.exists())) {
+      error(id);
+      return;
+    }
+
+    let text = await fs.readFile('utf-8');
+    text = processText ? processText(text) : text;
+    if (mime === MIMETYPE_HTML) {
+      sendHTML(text, id);
+    } else {
+      sendText(text, id, mime);
+    }
   }
 
   function sendText(text, id, mimeType, processText) {
@@ -484,7 +476,7 @@ run.checkRunnable = async function () {
       const folder = openFolder.find(activeFile.uri);
       if (folder) {
         const url = Url.join(folder.url, 'index.html');
-        const fs = await fsOperation(url);
+        const fs = fsOperation(url);
         if (await fs.exists()) {
           return url;
         }

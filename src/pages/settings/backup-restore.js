@@ -77,9 +77,9 @@ function backupRestore() {
       const backupDirname = 'Backup';
       const backupDir = Url.join(backupStorage, backupDirname);
       const backupFile = Url.join(backupDir, backupFilename);
-      const backupStorageFS = await fsOperation(backupStorage);
-      const backupDirFS = await fsOperation(backupDir);
-      const backupFileFS = await fsOperation(backupFile);
+      const backupStorageFS = fsOperation(backupStorage);
+      const backupDirFS = fsOperation(backupDir);
+      const backupFileFS = fsOperation(backupFile);
 
       if (!(await backupDirFS.exists())) {
         await backupStorageFS.createDirectory(backupDirname);
@@ -93,7 +93,7 @@ function backupRestore() {
         const url = URLParse(storage.uri, true);
         const keyFile = decodeURIComponent(url.query['keyFile'] || '');
         if (keyFile) {
-          const srcFs = await fsOperation(keyFile);
+          const srcFs = fsOperation(keyFile);
           storage.keyFileData = await srcFs.readFile('utf-8');
         }
       }
@@ -129,7 +129,7 @@ function backupRestore() {
 
 backupRestore.restore = async function (url) {
   try {
-    let fs = await fsOperation(url);
+    let fs = fsOperation(url);
     let backup = await fs.readFile('utf8');
 
     try {
@@ -142,7 +142,7 @@ backupRestore.restore = async function (url) {
     }
 
     try {
-      fs = await fsOperation(window.KEYBINDING_FILE);
+      fs = fsOperation(window.KEYBINDING_FILE);
       await fs.writeFile(JSON.stringify(backup.keyBindings, undefined, 2));
     } catch (error) {}
 
@@ -159,9 +159,9 @@ backupRestore.restore = async function (url) {
           const filename = Url.basename(decodeURIComponent(keyFile));
           const newKeyFile = Url.join(DATA_STORAGE, filename);
 
-          const fs = await fsOperation(newKeyFile);
+          const fs = fsOperation(newKeyFile);
           if (!(await fs.exists())) {
-            const dirFs = await fsOperation(DATA_STORAGE);
+            const dirFs = fsOperation(DATA_STORAGE);
             await dirFs.createFile(filename);
           }
           await fs.writeFile(keyFileData);
@@ -180,8 +180,8 @@ backupRestore.restore = async function (url) {
     localStorage.storageList = JSON.stringify(storedStorageList);
 
     const settingsDir = Url.dirname(appSettings.settingsFile);
-    const settingsFileFS = await fsOperation(settingsDir);
-    fs = await fsOperation(appSettings.settingsFile);
+    const settingsFileFS = fsOperation(settingsDir);
+    fs = fsOperation(appSettings.settingsFile);
 
     if (!(await fs.exists())) {
       await settingsFileFS.createFile(Url.basename(appSettings.settingsFile));

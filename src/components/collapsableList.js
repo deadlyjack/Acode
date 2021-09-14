@@ -68,11 +68,42 @@ function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
     if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper, state);
   }
 
-  $mainWrapper.$title = $title;
-  $mainWrapper.$ul = $ul;
-  $mainWrapper.ontoggle = options.ontoggle || (() => {});
-  $mainWrapper.collapse = collapse;
-  $mainWrapper.uncollapse = uncollapse;
+  Object.defineProperties($mainWrapper, {
+    $title: {
+      get() {
+        return $title;
+      },
+    },
+    $ul: {
+      get() {
+        return $ul;
+      },
+    },
+    ontoggle: {
+      get() {
+        return options.ontoggle;
+      },
+      set(fun) {
+        if (typeof fun === 'function') options.ontoggle = fun;
+      },
+    },
+    collapse: {
+      get() {
+        return collapse || (() => {});
+      },
+      set(fun) {
+        if (typeof fun === 'function') collapse = fun;
+      },
+    },
+    uncollapse: {
+      get() {
+        return uncollapse || (() => {});
+      },
+      set(fun) {
+        if (typeof fun === 'function') uncollapse = fun;
+      },
+    },
+  });
 
   return $mainWrapper;
 }

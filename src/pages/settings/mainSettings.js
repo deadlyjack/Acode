@@ -10,6 +10,7 @@ import backupRestore from './backup-restore';
 import themeSetting from '../themeSetting/themeSetting';
 import $_ad from '../../views/ad.hbs';
 import otherSettings from './otherSettings';
+import $_socialLinks from '../../views/social-links.hbs';
 
 export default function settingsMain() {
   const $page = Page(strings.settings.capitalize());
@@ -115,5 +116,6 @@ export default function settingsMain() {
     };
     $settingsList.append($ad);
   }
+  $settingsList.appendChild(tag.parse($_socialLinks));
   document.body.append($page);
 }

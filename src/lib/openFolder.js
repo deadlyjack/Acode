@@ -267,26 +267,22 @@ function openFolder(_path, opts = {}) {
 
         return dialogs
           .confirm(strings.warging, msg)
-          .then((res) => {
+          .then(() => {
             loading.start();
-            return fsOperation(url);
-          })
-          .then((fs) => {
+            const fs = fsOperation(url);
             if (helpers.isDir(type)) return fs.deleteDir();
             else if (helpers.isFile(type)) return fs.deleteFile();
           })
-          .then((res) => {
+          .then(() => {
             recents.removeFile(url);
             if (helpers.isFile(type)) {
               $target.remove();
               const file = editorManager.getFile(url, 'uri');
-              if (file) {
-                file.isUnsaved = true;
-              }
+              if (file) file.uri = null;
               editorManager.onupdate('delete-file');
             } else {
               recents.removeFolder(url);
-              updateUriToAllActiveFiles(url, null);
+              helpers.updateUriOfAllActiveFiles(url, null);
               $target.parentElement.remove();
               editorManager.onupdate('delete-folder');
             }
@@ -303,7 +299,7 @@ function openFolder(_path, opts = {}) {
             loading.start();
             newName = newname;
             if (newName !== name) {
-              const fs = await fsOperation(url);
+              const fs = fsOperation(url);
               const newUrl = await fs.renameTo(newName);
               newName = Url.basename(newUrl);
               $target.querySelector(':scope>.text').textContent = newName;
@@ -318,7 +314,7 @@ function openFolder(_path, opts = {}) {
                   file.filename = newName;
                 }
               } else {
-                updateUriToAllActiveFiles(url, newUrl);
+                helpers.updateUriOfAllActiveFiles(url, newUrl);
 
                 //Reloading the folder by collasping and expanding the folder
                 $target.click(); //collaspe
@@ -343,96 +339,95 @@ function openFolder(_path, opts = {}) {
         CASE += src === 'collapsed' ? 1 : 0;
         CASE += target === 'collapsed' ? 1 : 0;
 
-        return fsOperation(clipBoard.url)
-          .then((fs) => {
-            if (clipBoard.action === 'cut') return fs.moveTo(url);
-            else return fs.copyTo(url);
-          })
-          .then((newUrl) => {
-            /**
-             * CASES:
-             * CASE 111: src is file and parent is collapsed where target is also collapsed
-             * CASE 110: src is file and parent is collapsed where target is uncollapsed
-             * CASE 101: src is file and parent is uncollapsed where target is collapsed
-             * CASE 100: src is file and parent is uncollapsed where target is also uncollapsed
-             * CASE 011: src is directory and parent is collapsed where target is also collapsed
-             * CASE 001: src is directory and parent is uncollapsed where target is also collapsed
-             * CASE 010: src is directory and parent is collapsed where target is also uncollapsed
-             * CASE 000: src is directory and parent is uncollapsed where target is also uncollapsed
-             */
+        return (async () => {
+          const fs = fsOperation(clipBoard.url);
+          let newUrl;
+          if (clipBoard.action === 'cut') newUrl = await fs.moveTo(url);
+          else newUrl = await fs.copyTo(url);
+          /**
+           * CASES:
+           * CASE 111: src is file and parent is collapsed where target is also collapsed
+           * CASE 110: src is file and parent is collapsed where target is uncollapsed
+           * CASE 101: src is file and parent is uncollapsed where target is collapsed
+           * CASE 100: src is file and parent is uncollapsed where target is also uncollapsed
+           * CASE 011: src is directory and parent is collapsed where target is also collapsed
+           * CASE 001: src is directory and parent is uncollapsed where target is also collapsed
+           * CASE 010: src is directory and parent is collapsed where target is also uncollapsed
+           * CASE 000: src is directory and parent is uncollapsed where target is also uncollapsed
+           */
 
-            if (clipBoard.action === 'cut') {
-              //move
+          if (clipBoard.action === 'cut') {
+            //move
 
-              if (helpers.isFile(srcType)) {
-                const file = editorManager.getFile(clipBoard.url, 'uri');
-                file.uri = newUrl;
-              } else if (helpers.isDir(srcType)) {
-                updateUriToAllActiveFiles(clipBoard.url, newUrl);
-              }
-
-              switch (CASE) {
-                case '111':
-                case '011':
-                  break;
-
-                case '110':
-                  appendTile($target, createFileTile(srcName, newUrl));
-                  break;
-
-                case '101':
-                  $src.remove();
-                  break;
-
-                case '100':
-                  appendTile($target, createFileTile(srcName, newUrl));
-                  $src.remove();
-                  break;
-
-                case '001':
-                  $src.parentElement.remove();
-                  break;
-
-                case '010':
-                  appendList($target, createFolderTile(srcName, newUrl));
-                  break;
-
-                case '000':
-                  appendList($target, createFolderTile(srcName, newUrl));
-                  $src.parentElement.remove();
-                  break;
-
-                default:
-                  break;
-              }
-            } else {
-              //copy
-
-              switch (CASE) {
-                case '111':
-                case '101':
-                case '011':
-                case '001':
-                  break;
-
-                case '110':
-                case '100':
-                  appendTile($target, createFileTile(srcName, newUrl));
-                  break;
-
-                case '010':
-                case '000':
-                  appendList($target, createFolderTile(srcName, newUrl));
-                  break;
-
-                default:
-                  break;
-              }
+            if (helpers.isFile(srcType)) {
+              const file = editorManager.getFile(clipBoard.url, 'uri');
+              file.uri = newUrl;
+            } else if (helpers.isDir(srcType)) {
+              helpers.updateUriOfAllActiveFiles(clipBoard.url, newUrl);
             }
 
-            toast(strings.success);
-            clipBoard = null;
-          });
+            switch (CASE) {
+              case '111':
+              case '011':
+                break;
+
+              case '110':
+                appendTile($target, createFileTile(srcName, newUrl));
+                break;
+
+              case '101':
+                $src.remove();
+                break;
+
+              case '100':
+                appendTile($target, createFileTile(srcName, newUrl));
+                $src.remove();
+                break;
+
+              case '001':
+                $src.parentElement.remove();
+                break;
+
+              case '010':
+                appendList($target, createFolderTile(srcName, newUrl));
+                break;
+
+              case '000':
+                appendList($target, createFolderTile(srcName, newUrl));
+                $src.parentElement.remove();
+                break;
+
+              default:
+                break;
+            }
+          } else {
+            //copy
+
+            switch (CASE) {
+              case '111':
+              case '101':
+              case '011':
+              case '001':
+                break;
+
+              case '110':
+              case '100':
+                appendTile($target, createFileTile(srcName, newUrl));
+                break;
+
+              case '010':
+              case '000':
+                appendList($target, createFolderTile(srcName, newUrl));
+                break;
+
+              default:
+                break;
+            }
+          }
+
+          toast(strings.success);
+          clipBoard = null;
+        })();
 
       case 'new file':
       case 'new folder':
@@ -452,9 +447,7 @@ function openFolder(_path, opts = {}) {
           .then((res) => {
             loading.start();
             newName = res;
-            return fsOperation(url);
-          })
-          .then((fs) => {
+            const fs = fsOperation(url);
             if (action === 'new file') return fs.createFile(newName);
             else return fs.createDirectory(newName);
           })
@@ -483,7 +476,7 @@ function openFolder(_path, opts = {}) {
         return (async () => {
           loading.start();
           const file = await FileBrowser('file', strings['insert file']);
-          let fs = await fsOperation(file.url);
+          let fs = fsOperation(file.url);
           let data = await fs.readFile();
           const stats = await fs.stats();
 
@@ -493,33 +486,16 @@ function openFolder(_path, opts = {}) {
           const name = stats.name;
           const fileUrl = Url.join(url, name);
 
-          fs = await fsOperation(url);
+          fs = fsOperation(url);
 
           try {
             await fs.createFile(name);
           } catch (error) {}
 
-          fs = await fsOperation(fileUrl);
+          fs = fsOperation(fileUrl);
           await fs.writeFile(data);
           appendTile($target, createFileTile(name, fileUrl));
         })();
-    }
-
-    function updateUriToAllActiveFiles(oldUrl, newUrl) {
-      const files = editorManager.files;
-      const { url } = Url.parse(oldUrl);
-
-      for (let file of files) {
-        const fileUrl = Url.parse(file.uri).url;
-        if (new RegExp('^' + url).test(fileUrl)) {
-          if (newUrl) {
-            file.uri = Url.join(newUrl, file.filename);
-          } else {
-            file.uri = null;
-            file.isUnsaved = true;
-          }
-        }
-      }
     }
 
     /**
@@ -592,7 +568,7 @@ function openFolder(_path, opts = {}) {
       if (saveState) listState[url] = true;
 
       try {
-        const fs = await fsOperation(url);
+        const fs = fsOperation(url);
         let entries = await fs.lsDir();
         entries = helpers.sortDir(
           entries,

@@ -658,4 +658,28 @@ export default {
     }
     return url;
   },
+  /**
+   * Updates uri of all active which matches the oldUrl as location
+   * of the file
+   * @param {String} oldUrl
+   * @param {String} newUrl
+   */
+  updateUriOfAllActiveFiles(oldUrl, newUrl) {
+    const files = editorManager.files;
+    const { url } = Url.parse(oldUrl);
+
+    for (let file of files) {
+      if (!file.uri) continue;
+      const fileUrl = Url.parse(file.uri).url;
+      if (new RegExp('^' + url).test(fileUrl)) {
+        if (newUrl) {
+          file.uri = Url.join(newUrl, file.filename);
+        } else {
+          file.uri = null;
+        }
+      }
+    }
+
+    editorManager.onupdate('file-delete');
+  },
 };

@@ -1,14 +1,15 @@
+import './login.scss';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
 import _template from './login.hbs';
-import './login.scss';
 import helpers from '../../lib/utils/helpers';
 import gitHub from '../github/gitHub';
-import fs from '../../lib/fileSystem/internalFs';
 import constants from '../../lib/constants';
+import Url from '../../lib/utils/Url';
+import fsOperation from '../../lib/fileSystem/fsOperation';
 
-export default function GithubLoginInclude() {
+export default async function GithubLoginInclude() {
   const $page = Page('Github Login');
   const $content = tag.parse(mustache.render(_template, strings));
   const $form = $content.get('.form');
@@ -19,7 +20,10 @@ export default function GithubLoginInclude() {
     className: 'icon help',
     href: constants.GITHUB_TOKEN,
   });
-  fs.deleteFile(cordova.file.externalDataDirectory + '.github');
+  const fs = fsOperation(Url.join(DATA_STORAGE, '.github'));
+  if (await fs.exists()) {
+    fs.deleteDir();
+  }
 
   $page.get('header').append($info);
   $page.append($content);
@@ -36,11 +40,13 @@ export default function GithubLoginInclude() {
     actionStack.remove('github login');
   };
 
-  $page.setMessage = function (msg) {
-    $errorMsg.textContent = msg;
-  };
+  Object.defineProperty($page, 'setMessage', {
+    value(msg) {
+      $errorMsg.textContent = msg;
+    },
+  });
 
-  document.body.appendChild($page);
+  app.appendChild($page);
 
   function storeCredentials(e) {
     e.preventDefault();
@@ -50,8 +56,6 @@ export default function GithubLoginInclude() {
     if (token) localStorage.setItem('token', credentials.encrypt(token));
     else return ($errorMsg.textContent = 'Please enter GitHub token!');
 
-    gitHub({
-      $loginPage: $page,
-    });
+    gitHub($page);
   }
 }

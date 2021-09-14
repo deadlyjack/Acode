@@ -27,15 +27,15 @@ function gitHub() {
  **/
 async function init() {
   const url = Url.join(DATA_STORAGE, 'git/');
-  const fs = await fsOperation(url);
+  const fs = fsOperation(url);
 
   if (!(await fs.exists())) {
-    const dataFs = await fsOperation(DATA_STORAGE);
+    const dataFs = fsOperation(DATA_STORAGE);
     await dataFs.createDirectory('git');
   }
 
-  const gitFileFs = await fsOperation(gitRecordFile);
-  const gistFileFs = await fsOperation(gistRecordFile);
+  const gitFileFs = fsOperation(gitRecordFile);
+  const gistFileFs = fsOperation(gistRecordFile);
   let gitRecord = {};
   let gistRecord = {};
   if (await gitFileFs.exists()) {

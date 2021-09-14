@@ -20,9 +20,6 @@ export default function AboutInclude() {
         ...BuildInfo,
         webview,
         PERSONAL_EMAIL: constants.PERSONAL_EMAIL,
-        PAYPAL: constants.PAYPAL,
-        PATREON: constants.PATREON,
-        BUY_ME_A_COFFEE: constants.BUY_ME_A_COFFEE,
       })
     );
     actionStack.push({

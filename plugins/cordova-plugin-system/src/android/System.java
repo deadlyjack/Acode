@@ -139,6 +139,15 @@ public class System extends CordovaPlugin {
 
   private void requestPermissions(JSONArray arr) {
     try {
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        int[] res = new int[arr.length()];
+        for (int i = 0; i < res.length; ++i) {
+          res[i] = 1;
+        }
+        callback.success(1);
+        return;
+      }
+
       String[] permissions = checkPermissions(arr);
 
       if (permissions.length > 0) {
@@ -152,9 +161,18 @@ public class System extends CordovaPlugin {
   }
 
   private void requestPermission(String permission) {
-    if (permission != null || !permission.equals("")) {
-      cordova.requestPermission(this, REQ_PERMISSION, permission);
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+      callback.success(1);
       return;
+    }
+
+    if (permission != null || !permission.equals("")) {
+      if (!cordova.hasPermission(permission)) {
+        cordova.requestPermission(this, REQ_PERMISSION, permission);
+        return;
+      }
+
+      callback.success(1);
     }
 
     callback.error("No permission passed to request.");
@@ -180,7 +198,6 @@ public class System extends CordovaPlugin {
   ) {
     if (code == REQ_PERMISSIONS) {
       JSONArray resAr = new JSONArray();
-
       for (int res : resCodes) {
         if (res == PackageManager.PERMISSION_DENIED) {
           resAr.put(0);
@@ -192,11 +209,14 @@ public class System extends CordovaPlugin {
       return;
     }
 
-    if (resCodes[0] == PackageManager.PERMISSION_DENIED) {
+    if (
+      resCodes.length >= 1 && resCodes[0] == PackageManager.PERMISSION_DENIED
+    ) {
       callback.success(0);
       return;
     }
     callback.success(1);
+    return;
   }
 
   private String[] checkPermissions(JSONArray arr) throws Exception {

@@ -675,6 +675,34 @@ textarea {
   }
 }
 
+#social-links {
+  position: relative;
+  height: 60px;
+  font-size: 1.2em;
+  width: 100%;
+  text-align: center;
+
+  &::after {
+    display: block;
+    width: 100%;
+    content: attr(title);
+    text-align: center;
+    font-size: 0.5em;
+    text-transform: none;
+  }
+
+  a {
+    display: inline-flex;
+    min-height: 40px;
+    min-width: 40px;
+    text-shadow: 0 0 5px white;
+
+    &.github {
+      color: black;
+    }
+  }
+}
+
 #header-toggler {
   display: none;
   top: 10px;

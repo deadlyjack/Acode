@@ -105,9 +105,13 @@ async function ondeviceready() {
   window.gistRecordFile = Url.join(DATA_STORAGE, 'git/.gistfiles');
   window.actionStack = ActionStack();
   window.appSettings = new Settings();
-  window.ANDROID_SDK_INT = await new Promise((resolve, reject) =>
-    system.getAndroidVersion(resolve, reject)
-  );
+  try {
+    window.ANDROID_SDK_INT = await new Promise((resolve, reject) =>
+      system.getAndroidVersion(resolve, reject)
+    );
+  } catch (error) {
+    window.ANDROID_SDK_INT = parseInt(device.version);
+  }
   window.DOES_SUPPORT_THEME = (() => {
     const $testEl = tag('div', {
       style: {
@@ -158,14 +162,14 @@ async function ondeviceready() {
     navigator.app.clearCache();
   }
 
-  if (!BuildInfo.debug) {
-    setTimeout(() => {
-      if (document.body.classList.contains('loading'))
-        alert(
-          'Something went wrong! Please clear app data and restart the app or wait.'
-        );
-    }, 1000 * 30);
-  }
+  // if (!BuildInfo.debug) {
+  //   setTimeout(() => {
+  //     if (document.body.classList.contains('loading'))
+  //       alert(
+  //         'Something went wrong! Please clear app data and restart the app or wait.'
+  //       );
+  //   }, 1000 * 30);
+  // }
 
   setTimeout(() => {
     if (document.body.classList.contains('loading'))
@@ -187,7 +191,7 @@ async function ondeviceready() {
     window.location.reload();
   }
 
-  document.body.setAttribute('data-small-msg', 'Loading modules...');
+  document.body.setAttribute('data-small-msg', 'Loading custom theme...');
   document.head.append(
     tag('style', {
       id: 'custom-theme',
@@ -201,7 +205,7 @@ async function ondeviceready() {
   document.body.setAttribute('data-small-msg', 'Loading language...');
   try {
     const languageFile = `${appDir}www/lang/${appSettings.value.lang}.json`;
-    const fs = await fsOperation(languageFile);
+    const fs = fsOperation(languageFile);
     const text = await fs.readFile('utf-8');
     window.strings = helpers.parseJSON(text);
   } catch (error) {
@@ -211,7 +215,7 @@ async function ondeviceready() {
 
   document.body.setAttribute('data-small-msg', 'Loading styles...');
   try {
-    const fs = await fsOperation(Url.join(appDir, 'www/css/build/'));
+    const fs = fsOperation(Url.join(appDir, 'www/css/build/'));
     const styles = await fs.lsDir();
     await helpers.loadStyles(...styles.map((style) => style.url));
   } catch (error) {
@@ -221,7 +225,7 @@ async function ondeviceready() {
 
   document.body.setAttribute('data-small-msg', 'Loading keybindings...');
   try {
-    const fs = await fsOperation(KEYBINDING_FILE);
+    const fs = fsOperation(KEYBINDING_FILE);
     const content = await fs.readFile('utf-8');
     const bindings = helpers.parseJSON(content);
     if (bindings) {
@@ -392,7 +396,7 @@ async function loadApp() {
     const render = files.length === 1 || id === localStorage.lastfile;
 
     try {
-      const fs = await fsOperation(Url.join(CACHE_STORAGE, id));
+      const fs = fsOperation(Url.join(CACHE_STORAGE, id));
       text = await fs.readFile('utf-8');
     } catch (error) {}
 
@@ -428,7 +432,7 @@ async function loadApp() {
       }
     } else if (uri) {
       try {
-        const fs = await fsOperation(uri);
+        const fs = fsOperation(uri);
         if (!text) {
           text = await fs.readFile('utf-8');
         } else if (!(await fs.exists()) && !readOnly) {
@@ -472,8 +476,10 @@ async function loadApp() {
     editorManager.addNewFile();
   }
   onEditorUpdate();
-  document.body.removeAttribute('data-small-msg');
-  app.classList.remove('loading', 'splash');
+  setTimeout(() => {
+    document.body.removeAttribute('data-small-msg');
+    app.classList.remove('loading', 'splash');
+  }, 1000);
   if (localStorage.count === undefined) localStorage.count = 0;
   let count = +localStorage.count;
 
@@ -493,6 +499,7 @@ async function loadApp() {
   }
 
   //#region Add event listeners
+  editorManager.onupdate = onEditorUpdate;
   app.addEventListener('click', onClickApp);
   $fileMenu.addEventListener('click', handleMenu);
   $mainMenu.addEventListener('click', handleMenu);
@@ -501,7 +508,6 @@ async function loadApp() {
   document.addEventListener('backbutton', actionStack.pop);
   document.addEventListener('keydown', handleMainKeyDown);
   document.addEventListener('keyup', handleMainKeyUp);
-  editorManager.onupdate = onEditorUpdate;
   document.addEventListener('menubutton', $sidebar.toggle);
   navigator.app.overrideButton('menubutton', true);
   intent.setNewIntentHandler(intentHandler);

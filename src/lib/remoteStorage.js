@@ -182,7 +182,7 @@ export default {
             const home = await connection.pwd();
             let localKeyFile = '';
             if (keyFile) {
-              let fs = await fsOperation(keyFile);
+              let fs = fsOperation(keyFile);
               const rawData = await fs.readFile();
               const text = new TextDecoder('utf-8').decode(
                 new Uint8Array(rawData)
@@ -192,12 +192,12 @@ export default {
               //To solve permission error
               const filename = keyFile.hashCode();
               localKeyFile = Url.join(DATA_STORAGE, filename);
-              fs = await fsOperation(localKeyFile);
+              fs = fsOperation(localKeyFile);
               const exists = await fs.exists();
               if (exists) {
                 await fs.writeFile(text);
               } else {
-                let fs = await fsOperation(DATA_STORAGE);
+                let fs = fsOperation(DATA_STORAGE);
                 await fs.createFile(filename, text);
               }
             }

@@ -1,24 +1,25 @@
+import './gitHub.scss';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import helpers from '../../lib/utils/helpers';
 import GithubLogin from '../login/login';
 import Page from '../../components/page';
-
 import _template from './gitHub.hbs';
 import _menu from './menu.hbs';
-import './gitHub.scss';
 import contextMenu from '../../components/contextMenu';
-import fs from '../../lib/fileSystem/internalFs';
 import dialogs from '../../components/dialogs';
 import git from '../../lib/git';
 import Repos from '../repos/repos';
 import Gists from '../gists/gists';
+import fsOperation from '../../lib/fileSystem/fsOperation';
+import Url from '../../lib/utils/Url';
 
 /**
  *
- * @param {object} options
+ * @param {object} $loginPage
  */
-function gitHubInclude(options = {}) {
+async function gitHubInclude($loginPage) {
+  let $page;
   const $search = tag('span', {
     className: 'icon search hidden',
   });
@@ -28,13 +29,12 @@ function gitHubInclude(options = {}) {
       action: 'toggle-menu',
     },
   });
-  const $page = Page('Github');
   const { credentials } = helpers;
 
   const github = git.GitHub();
   const user = github.getUser();
-  const githubFile = cordova.file.externalDataDirectory + '.github';
-  const gitProfile = cordova.file.externalDataDirectory + '.git';
+  const githubFile = Url.join(DATA_STORAGE, '.github');
+  const gitProfile = Url.join(DATA_STORAGE, '.git');
   const $cm = contextMenu(mustache.render(_menu, strings), {
     top: '8px',
     right: '8px',
@@ -43,17 +43,15 @@ function gitHubInclude(options = {}) {
   });
 
   $cm.addEventListener('click', handleClick);
-  $page.querySelector('header').append($search, $menuToggler);
 
-  fs.readFile(gitProfile)
-    .then((res) => {
-      const text = credentials.decrypt(helpers.decodeText(res.data));
-      const profile = JSON.parse(text || '{}');
-      render(profile);
-    })
-    .catch((err) => {
-      loadProfile();
-    });
+  const fs = fsOperation(gitProfile);
+  if (await fs.exists()) {
+    const text = await fs.readFile('utf-8');
+    const profile = helpers.credentials.decrypt(text);
+    render(helpers.parseJSON(profile));
+  } else {
+    loadProfile();
+  }
 
   /**
    *
@@ -96,9 +94,11 @@ function gitHubInclude(options = {}) {
   }
 
   function render(profile) {
+    if (!$page) $page = Page('Github');
     const $content = content(profile);
     $page.append($content);
     app.appendChild($page);
+    $page.querySelector('header').append($search, $menuToggler);
 
     actionStack.push({
       id: 'github',
@@ -111,42 +111,44 @@ function gitHubInclude(options = {}) {
 
     $content.addEventListener('click', handleClick);
 
-    if (options.$loginPage) options.$loginPage.hide();
+    if ($loginPage) $loginPage.hide();
   }
 
-  function loadProfile(onload) {
+  async function loadProfile(onload) {
     dialogs.loader.create('GitHub', strings.loading + '...');
-    user
-      .getProfile()
-      .then((res) => {
-        const profile = res.data;
-        const data = credentials.encrypt(JSON.stringify(profile));
-        fs.writeFile(gitProfile, data, true, false).catch((err) => {
-          toast(strings.error);
-          console.error(err);
-        });
-        if (onload) onload(profile);
-        else render(profile);
-      })
-      .catch((err) => {
-        if (err.response.data) {
-          console.error(err.response.data.message);
-          if (err.response.status === 401) logout();
-          if (options.$loginPage) {
-            options.$loginPage.setMessage(err.response.data.message);
-          } else {
-            GithubLogin();
-          }
-        } else {
-          if (options.$loginPage) {
-            options.$loginPage.setMessage(err.response.statusText);
-          }
-          logout();
+    try {
+      const profile = await user.getProfile();
+      const { data: profileData } = profile;
+      const data = credentials.encrypt(JSON.stringify(profileData));
+      try {
+        const fs = fsOperation(gitProfile);
+        if (!(await fs.exists())) {
+          const dataFs = fsOperation(DATA_STORAGE);
+          await dataFs.createFile('.git');
         }
-      })
-      .finally(() => {
-        dialogs.loader.destroy();
-      });
+        await fs.writeFile(data);
+      } catch (error) {}
+
+      if (typeof onload === 'function') onload(profileData);
+      else render(profileData);
+    } catch (err) {
+      if (err.response.data) {
+        console.error(err.response.data.message);
+        if (err.response.status === 401) logout();
+        if ($loginPage) {
+          $loginPage.setMessage(err.response.data.message);
+        } else {
+          GithubLogin();
+        }
+      } else {
+        if ($loginPage) {
+          $loginPage.setMessage(err.response.statusText);
+        }
+        logout();
+      }
+    }
+
+    dialogs.loader.destroy();
   }
 
   /**
@@ -167,15 +169,16 @@ function gitHubInclude(options = {}) {
     );
   }
 
-  function logout(onlogout) {
+  async function logout(onlogout) {
     if (localStorage.username) delete localStorage.username;
     if (localStorage.password) delete localStorage.password;
     if (localStorage.token) delete localStorage.token;
-    Promise.all([fs.deleteFile(githubFile), fs.deleteFile(gitProfile)]).finally(
-      () => {
-        if (onlogout) onlogout();
-      }
-    );
+
+    try {
+      await fsOperation(gitProfile).deleteFile();
+      await fsOperation(githubFile).deleteFile();
+    } catch (error) {}
+    if (onlogout) onlogout();
   }
 }
 

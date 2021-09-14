@@ -44,10 +44,11 @@ export default {
   /**
    *
    * @param  {...string} pathnames
+   * @returns {String}
    */
   join(...pathnames) {
     if (pathnames.length < 2)
-      throw new Error('Required at least two parameters');
+      throw new Error('Join(), requires atleast two parameters');
 
     let { url, query } = this.parse(pathnames[0]);
 

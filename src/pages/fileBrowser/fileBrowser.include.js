@@ -67,7 +67,7 @@ function FileBrowserInclude(
     }
   }
 
-  return new Promise((_resolve, reject) => {
+  return new Promise((resolve, reject) => {
     //#region Declaration
     const $menuToggler = tag('i', {
       className: 'icon more_vert',
@@ -148,10 +148,8 @@ function FileBrowserInclude(
     $content.addEventListener('click', handleClick);
     $content.addEventListener('contextmenu', handleContextMenu);
     $page.append($content);
-    $page
-      .querySelector('header')
-      .append($search, $addMenuToggler, $menuToggler);
-    document.body.append($page);
+    $page.get('header').append($search, $addMenuToggler, $menuToggler);
+    app.append($page);
 
     actionStack.push({
       id: 'filebrowser',
@@ -169,7 +167,7 @@ function FileBrowserInclude(
       $fbMenu.hide();
       const action = e.target.getAttribute('action');
       if (action === 'settings') {
-        filesSettings(refresh);
+        filesSettings(reload);
         return;
       }
 
@@ -256,7 +254,6 @@ function FileBrowserInclude(
       $content.removeEventListener('click', handleClick);
       $content.removeEventListener('contextmenu', handleContextMenu);
       document.removeEventListener('resume', reload);
-      Acode.exec('check-files');
     };
 
     if (IS_FOLDER_MODE) {
@@ -355,20 +352,9 @@ function FileBrowserInclude(
       render(helpers.sortDir(allStorages, appSettings.value.fileBrowser));
     }
 
-    function resolve(data) {
-      _resolve(data);
-    }
-
-    async function loadDir(path = '/', name = strings['file browser']) {
+    async function loadDir(url = '/', name = strings['file browser']) {
       const id = helpers.uuid();
-      let url = path;
-
-      progress[id] = false;
-
-      if (typeof path === 'object') {
-        url = path.url;
-        name = path.name;
-      }
+      progress[id] = true;
 
       if (url === '/') return listAllStorages();
 
@@ -384,18 +370,19 @@ function FileBrowserInclude(
           dialogs.loader.create(name, strings.loading + '...', {
             timeout: 10000,
             callback() {
-              loadDir('/', '/');
-              progress[id] = true;
+              dialogs.loader.destroy();
+              navigationPush('/', '/');
+              progress[id] = false;
             },
           });
         }, 100);
 
         try {
           const { fileBrowser } = appSettings.value;
-          const fs = await fsOperation(url);
+          const fs = fsOperation(url);
           let list = await fs.lsDir();
 
-          if (progress[id]) {
+          if (!progress[id]) {
             delete progress[id];
             return;
           }
@@ -416,6 +403,11 @@ function FileBrowserInclude(
           update();
           render(list);
         } catch (err) {
+          if (!progress[id]) {
+            delete progress[id];
+            return;
+          }
+
           actionStack.remove(currentDir.url);
           helpers.error(err, url);
           console.error(err);
@@ -446,9 +438,9 @@ function FileBrowserInclude(
     /**
      *
      * @param {MouseEvent} e
-     * @param {"contextmenu"} [contextMenu]
+     * @param {"contextmenu"} [isContextMenu]
      */
-    function handleClick(e, contextMenu) {
+    function handleClick(e, isContextMenu) {
       /**
        * @type {HTMLElement}
        */
@@ -482,7 +474,7 @@ function FileBrowserInclude(
         return;
       }
 
-      if (!url && action === 'open' && isDir && !opendoc && !contextMenu) {
+      if (!url && action === 'open' && isDir && !opendoc && !isContextMenu) {
         dialogs.loader.hide();
         util.addPath(name, uuid).then((res) => {
           const storage = allStorages.find((storage) => storage.uuid === uuid);
@@ -497,7 +489,7 @@ function FileBrowserInclude(
       }
 
       if (opendoc) action = 'open-doc';
-      if (contextMenu) action = 'contextmenu';
+      if (isContextMenu) action = 'contextmenu';
 
       switch (action) {
         case 'navigation':
@@ -631,45 +623,41 @@ function FileBrowserInclude(
         }
       }
 
-      function renameFile(newname) {
-        fsOperation(url)
-          .then((fs) => {
-            return fs.renameTo(newname);
-          })
-          .then((newUrl) => {
-            openFolder.updateItem(url, newUrl, newname);
-            toast(strings.success);
-            delete cachedDir[currentDir.url];
-            loadDir(currentDir);
-          })
-          .catch((err) => {
-            helpers.error(err);
-            console.error(err);
-          });
+      async function renameFile(newname) {
+        const fs = fsOperation(url);
+        try {
+          const newUrl = await fs.renameTo(newname);
+          openFolder.updateItem(url, newUrl, newname);
+          toast(strings.success);
+          reload();
+        } catch (err) {
+          helpers.error(err);
+          console.error(err);
+        }
       }
 
-      function removeFile() {
-        fsOperation(url)
-          .then((fs) => {
-            if (helpers.isFile(type)) return fs.deleteFile();
-            if (helpers.isDir(type)) return fs.deleteDir();
-          })
-          .then(() => {
-            recents.removeFile(url);
-            if (helpers.isDir(type)) {
-              recents.removeFolder(url);
-              openFolder.removeItem(url);
-              openFolder.removeFolders(url);
-            }
-
-            delete cachedDir[url];
-            reload();
-            toast(strings.success);
-          })
-          .catch((err) => {
-            console.error(err);
-            helpers.error(err);
-          });
+      async function removeFile() {
+        try {
+          const fs = fsOperation(url);
+          if (helpers.isFile(type)) await fs.deleteFile();
+          if (helpers.isDir(type)) await fs.deleteDir();
+          recents.removeFile(url);
+          if (helpers.isDir(type)) {
+            helpers.updateUriOfAllActiveFiles(url);
+            recents.removeFolder(url);
+            openFolder.removeItem(url);
+            openFolder.removeFolders(url);
+          } else {
+            const openedFile = editorManager.getFile(url, 'uri');
+            if (openedFile) openedFile.uri = null;
+          }
+          delete cachedDir[url];
+          reload();
+          toast(strings.success);
+        } catch (err) {
+          console.error(err);
+          helpers.error(err);
+        }
       }
 
       function removeStorage() {
@@ -682,15 +670,13 @@ function FileBrowserInclude(
             return true;
           }
 
-          if (storage.uri) {
-            const parsedUrl = URLParse(storage.uri, true);
+          if (storage.url) {
+            const parsedUrl = URLParse(storage.url, true);
             const keyFile = decodeURIComponent(
               parsedUrl.query['keyFile'] || ''
             );
             if (keyFile) {
-              fsOperation(keyFile).then((fs) => {
-                fs.deleteFile();
-              });
+              fsOperation(keyFile).deleteFile();
             }
           }
           return false;
@@ -734,11 +720,6 @@ function FileBrowserInclude(
       handleClick(e, true);
     }
 
-    function refresh() {
-      cachedDir = {};
-      loadDir(currentDir.url, currentDir.name);
-    }
-
     function render(list) {
       const $list = tag.parse(
         mustache.render(_list, {
@@ -752,7 +733,7 @@ function FileBrowserInclude(
       $content.append($list);
       $list.focus();
 
-      //Adding notication icon to let user know about new feature
+      //Adding notification to icon to let user know about new feature
       if (currentDir.url === '/') {
         const addButtonNotice =
           !localStorage.__fbAddPath || !localStorage.__fbAddSftp;
@@ -895,7 +876,7 @@ function FileBrowserInclude(
         entryName = helpers.removeLineBreaks(entryName);
 
         try {
-          const fs = await fsOperation(url);
+          const fs = fsOperation(url);
           if (arg === 'folder') await fs.createDirectory(entryName);
           if (arg === 'file') await fs.createFile(entryName);
           updateAddedFolder(url);
@@ -931,14 +912,12 @@ function FileBrowserInclude(
         );
 
         try {
-          const fs = await fsOperation(url);
+          const fs = fsOperation(url);
           dialogs.loader.create(projectName, strings.loading + '...');
           await fs.createDirectory(projectName);
           newUrl = Url.join(url, projectName, '/');
           const files = Object.keys(project); // All project files
-          await new Promise((resolve, reject) => {
-            createProject(resolve, reject, files); // Creating project
-          });
+          await createProject(files); // Creating project
         } catch (err) {
           helpers.error(err);
           console.error(err);
@@ -947,67 +926,43 @@ function FileBrowserInclude(
         dialogs.loader.destroy();
       }
 
-      function createProject(resolve, reject, files) {
+      async function createProject(files) {
+        // checking if it's the last file
         if (!files.length) {
-          // checking if it's the last file
           updateAddedFolder(url);
           reload();
-          toast(strings.success); // notifies when project is created
-          resolve();
+          return;
         }
         cturl = '';
         const file = files.pop();
-        createFile(file)
-          .then(() => {
-            createProject(resolve, reject, files);
-          })
-          .catch(reject);
+        await createFile(file);
+        return await createProject(files);
       }
 
       function createFile(fileurl) {
         const paths = fileurl.split('/');
         const filename = paths.pop();
-
-        return new Promise((resolve, reject) => {
-          createDir(resolve, reject, project, fileurl, filename, paths);
-        });
+        return createDir(project, fileurl, filename, paths);
       }
 
-      function createDir(resolve, reject, project, fileurl, filename, paths) {
+      async function createDir(project, fileurl, filename, paths) {
         const lclUrl = Url.join(newUrl, cturl);
+        const fs = fsOperation(lclUrl);
 
         if (paths.length === 0) {
-          return fsOperation(lclUrl)
-            .then((fs) => {
-              const data = project[fileurl].replace(/<%name%>/g, projectName);
-              return fs.createFile(filename, data);
-            })
-            .then(resolve)
-            .catch(reject);
+          const data = project[fileurl].replace(/<%name%>/g, projectName);
+          await fs.createFile(filename, data);
+          return;
         }
 
         const name = paths.splice(0, 1)[0];
         const toCreate = Url.join(lclUrl, name);
-
-        fsOperation(lclUrl)
-          .then((fs) => {
-            if (alreadyCreated.includes(toCreate)) return Promise.resolve();
-            return fs.createDirectory(name);
-          })
-          .then((res) => {
-            if (!alreadyCreated.includes(toCreate))
-              alreadyCreated.push(toCreate);
-            cturl += name + '/';
-            return createDir(
-              resolve,
-              reject,
-              project,
-              fileurl,
-              filename,
-              paths
-            );
-          })
-          .catch(reject);
+        if (!alreadyCreated.includes(toCreate)) {
+          await fs.createDirectory(name);
+          alreadyCreated.push(toCreate);
+        }
+        cturl += name + '/';
+        return await createDir(project, fileurl, filename, paths);
       }
     }
 
