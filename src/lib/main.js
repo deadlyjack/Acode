@@ -84,7 +84,7 @@ async function ondeviceready() {
     cacheDirectory,
     dataDirectory,
   } = cordova.file;
-  let lang = null;
+  let lang = 'en-us';
 
   window.root = tag(window.root);
   window.app = tag(document.body);
@@ -107,7 +107,7 @@ async function ondeviceready() {
   window.appSettings = new Settings();
   try {
     window.ANDROID_SDK_INT = await new Promise((resolve, reject) =>
-      system.getAndroidVersion(resolve, reject)
+      system.getAndroidVersion(resolve, reject),
     );
   } catch (error) {
     window.ANDROID_SDK_INT = parseInt(device.version);
@@ -162,20 +162,11 @@ async function ondeviceready() {
     navigator.app.clearCache();
   }
 
-  // if (!BuildInfo.debug) {
-  //   setTimeout(() => {
-  //     if (document.body.classList.contains('loading'))
-  //       alert(
-  //         'Something went wrong! Please clear app data and restart the app or wait.'
-  //       );
-  //   }, 1000 * 30);
-  // }
-
   setTimeout(() => {
     if (document.body.classList.contains('loading'))
       document.body.setAttribute(
         'data-small-msg',
-        'This is taking unexpectedly long time!'
+        'This is taking unexpectedly long time!',
       );
   }, 1000 * 10);
 
@@ -197,9 +188,9 @@ async function ondeviceready() {
       id: 'custom-theme',
       textContent: helpers.jsonToCSS(
         constants.CUSTOM_THEME,
-        appSettings.value.customTheme
+        appSettings.value.customTheme,
       ),
-    })
+    }),
   );
 
   document.body.setAttribute('data-small-msg', 'Loading language...');
@@ -209,8 +200,7 @@ async function ondeviceready() {
     const text = await fs.readFile('utf-8');
     window.strings = helpers.parseJSON(text);
   } catch (error) {
-    alert('Unable to start app.');
-    navigator.app.exit();
+    alert('Unable to load language file.');
   }
 
   document.body.setAttribute('data-small-msg', 'Loading styles...');
@@ -219,8 +209,7 @@ async function ondeviceready() {
     const styles = await fs.lsDir();
     await helpers.loadStyles(...styles.map((style) => style.url));
   } catch (error) {
-    alert('Unable to start app.');
-    navigator.app.exit();
+    alert('Unable to load styles.');
   }
 
   document.body.setAttribute('data-small-msg', 'Loading keybindings...');
@@ -243,7 +232,7 @@ async function ondeviceready() {
     './res/ace/src/ext-code_lens.js',
     './res/ace/src/ext-emmet.js',
     './res/ace/src/ext-beautify.js',
-    './res/ace/src/ext-modelist.js'
+    './res/ace/src/ext-modelist.js',
   );
   ace.config.set('basePath', './res/ace/src/');
   window.beautify = ace.require('ace/ext/beautify').beautify;
@@ -310,7 +299,7 @@ async function loadApp() {
           file_encoding: file.encoding,
           file_read_only: !file.editable,
           file_info: !!file.uri,
-        })
+        }),
       );
     },
   });
@@ -440,7 +429,7 @@ async function loadApp() {
           isUnsaved = true;
           dialogs.alert(
             strings.info.toUpperCase(),
-            strings['file has been deleted'].replace('{file}', filename)
+            strings['file has been deleted'].replace('{file}', filename),
           );
         }
 

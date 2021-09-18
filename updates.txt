@@ -1,3 +1,9 @@
+version 1.4.163
+☞ Fixed bug in opening file from GitHub.
+☞ Fixed app not opening other language.
+☞ Fixed unable to rename file form edit menu.
+☞ Other minor bugs fixes.
+
 version 1.4.162
 ☞ Bugs fixes.
 ☞ Updated language pack

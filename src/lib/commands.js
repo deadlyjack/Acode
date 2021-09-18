@@ -53,7 +53,7 @@ const commands = {
             file.uri = null;
             dialogs.alert(
               strings.info.toUpperCase(),
-              strings['file has been deleted'].replace('{file}', file.filename)
+              strings['file has been deleted'].replace('{file}', file.filename),
             );
             editorManager.onupdate('file-changed');
             continue;
@@ -66,7 +66,7 @@ const commands = {
             try {
               await dialogs.confirm(
                 strings.warning.toUpperCase(),
-                file.filename + strings['file changed']
+                file.filename + strings['file changed'],
               );
 
               const cursorPos = editor.getCursorPosition();
@@ -171,7 +171,7 @@ const commands = {
         {
           match: constants.FILE_NAME_REGEX,
           required: true,
-        }
+        },
       )
       .then((filename) => {
         if (filename) {
@@ -253,9 +253,14 @@ const commands = {
       return;
     }
 
-    const newname = dialogs.prompt(strings.rename, file.filename, 'filename', {
-      match: constants.FILE_NAME_REGEX,
-    });
+    let newname = await dialogs.prompt(
+      strings.rename,
+      file.filename,
+      'filename',
+      {
+        match: constants.FILE_NAME_REGEX,
+      },
+    );
 
     if (!newname || newname === file.filename) return;
     newname = helpers.removeLineBreaks(newname);

@@ -13,6 +13,7 @@ export default {
    * @returns {Promise<String>}
    */
   addFtp(...args) {
+    let stopConnection = false;
     return new Promise((resolve, reject) => {
       (async () => {
         try {
@@ -29,8 +30,19 @@ export default {
           const mode = active ? 'active' : 'passive';
           const ftp = Ftp(username, password, hostname, port, security, mode);
           try {
-            dialogs.loader.create('', strings.connecting + '...');
+            dialogs.loader.create('', strings.connecting + '...', {
+              timeout: 10000,
+              callback() {
+                stopConnection = true;
+              },
+            });
             const home = await ftp.homeDirectory();
+
+            if (stopConnection) {
+              stopConnection = false;
+              return;
+            }
+
             const url = Url.formate({
               protocol: 'ftp:',
               username,
@@ -48,6 +60,7 @@ export default {
               url,
               alias,
               type: 'ftp',
+              home: null,
             };
 
             if (home !== '/') {
@@ -57,6 +70,11 @@ export default {
             resolve(res);
             dialogs.loader.destroy();
           } catch (err) {
+            if (stopConnection) {
+              stopConnection = false;
+              return;
+            }
+
             dialogs.loader.destroy();
             await helpers.error(err);
             const res = this.addFtp(
@@ -66,7 +84,7 @@ export default {
               alias,
               port,
               security,
-              mode
+              mode,
             );
             res.then(resolve);
             console.error(err);
@@ -156,6 +174,7 @@ export default {
    * @returns {Promise<String>}
    */
   addSftp(...args) {
+    let stopConnection = false;
     return new Promise((resolve, reject) => {
       (async () => {
         try {
@@ -171,7 +190,12 @@ export default {
           } = await prompt(...args);
           const authType = usePassword ? 'password' : 'keyFile';
 
-          dialogs.loader.create('', strings.connecting + '...');
+          dialogs.loader.create('', strings.connecting + '...', {
+            timeout: 10000,
+            callback() {
+              stopConnection = true;
+            },
+          });
           const connection = Sftp(hostname, parseInt(port), username, {
             password,
             keyFile,
@@ -180,12 +204,18 @@ export default {
 
           try {
             const home = await connection.pwd();
+
+            if (stopConnection) {
+              stopConnection = false;
+              return;
+            }
+
             let localKeyFile = '';
             if (keyFile) {
               let fs = fsOperation(keyFile);
               const rawData = await fs.readFile();
               const text = new TextDecoder('utf-8').decode(
-                new Uint8Array(rawData)
+                new Uint8Array(rawData),
               );
 
               //Original key file sometimes gives permission error
@@ -223,6 +253,11 @@ export default {
             });
             dialogs.loader.destroy();
           } catch (err) {
+            if (stopConnection) {
+              stopConnection = false;
+              return;
+            }
+
             dialogs.loader.destroy();
             await helpers.error(err);
             const con = this.addSftp(
@@ -233,7 +268,7 @@ export default {
               passPhrase,
               port,
               alias,
-              authType
+              authType,
             );
             con.then(resolve);
             console.error(err);
@@ -252,7 +287,7 @@ export default {
       passPhrase,
       port,
       alias,
-      authType = 'password'
+      authType = 'password',
     ) {
       port = port || 22;
 
@@ -379,7 +414,7 @@ export default {
         name,
         port,
         security,
-        mode
+        mode,
       );
     }
 
@@ -401,7 +436,7 @@ export default {
         passPhrase,
         port,
         name,
-        password ? 'password' : 'key'
+        password ? 'password' : 'key',
       );
     }
 

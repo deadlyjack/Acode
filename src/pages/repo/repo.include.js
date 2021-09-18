@@ -29,8 +29,14 @@ export default function RepoInclude(owner, repoName) {
       action: 'search',
     },
   });
-  let cachedTree = {};
-  let currentTree = {};
+  let cachedTree = {
+    '/': {
+      name: '/',
+      sha: '/',
+      list: [],
+    },
+  };
+  let currentTree = { list: [], name: '', sha: '', scroll: 0 };
   let branch;
   const branches = [];
   const input1 = {
@@ -103,9 +109,17 @@ export default function RepoInclude(owner, repoName) {
     repo
       .getSha(branch, '')
       .then((res) => {
-        const list = res.data;
-        $page = Page(repoName);
-        render(list, repoName, 'root');
+        const list = transofrmRepoList(res.data);
+        $page = Page(repoName + ` (${branch})`, {
+          lead: tag('span', {
+            className: 'icon clearclose',
+            attr: {
+              action: 'close',
+            },
+          }),
+        });
+        cachedTree['/'].list = list;
+        navigate('/', '/');
         actionStack.setMark();
         actionStack.push({
           id: 'repo',
@@ -151,73 +165,130 @@ export default function RepoInclude(owner, repoName) {
     performeAction(action, $el);
   }
 
-  function render(list, name, sha) {
-    $page.settitle(repoName + ` (${branch})`);
-
-    if (!(sha in cachedTree)) {
-      list.map((entry) => {
-        const { size, type } = entry;
-        entry.size = (size / 1024).toFixed(2) + 'KB';
-        if (!entry.name && entry.path) entry.name = entry.path;
-        entry.isDirectory = type === 'dir' || type === 'tree';
-        entry.isFile = !entry.isDirectory;
-        entry.type = entry.isDirectory
-          ? 'folder'
-          : helpers.getIconForFile(entry.name);
-      });
-    }
-
-    list = helpers.sortDir(list, {
-      showHiddenFiles: 'on',
-      sortByName: 'on',
-    });
-    const $oldList = $content.querySelector('.list');
+  /**
+   *
+   * @param {{list: Array<Object>, scroll: Number}} param0
+   */
+  function render({ list, scroll = 0 }) {
+    const $oldList = $content.get('.list');
     if ($oldList) $oldList.remove();
     const $list = tag.parse(
       mustache.render(_list, {
         msg: strings['empty folder message'],
         list,
-      })
+      }),
     );
     $content.append($list);
-    if (sha in cachedTree) $list.scrollTop = cachedTree[sha].scroll || 0;
-    navigate(name, sha);
+    $list.scrollTop = scroll;
+  }
 
-    if (!(sha in cachedTree)) {
-      currentTree = {
-        list,
-        name,
-        sha,
-      };
-      cachedTree[sha] = currentTree;
-    } else {
-      currentTree = cachedTree[sha];
+  /**
+   *
+   * @param {String} name
+   * @param {String} sha
+   */
+  async function navigate(name, sha) {
+    const $nav = $navigation.get(`[sha="${sha}"]`);
+    const $old = $navigation.get('.active');
+    if ($old) $old.classList.remove('active');
+
+    if ($nav) {
+      let $topNav;
+      let oldsha = null;
+      while (($topNav = $navigation.lastChild) !== $nav) {
+        const sha = $topNav.getAttribute('sha');
+        actionStack.remove(sha);
+        $topNav.remove();
+        path.pop();
+
+        if (oldsha && oldsha in cachedTree) {
+          delete cachedTree[oldsha];
+        }
+
+        oldsha = sha;
+      }
+
+      $nav.classList.add('active');
+      const tree = await getTree(name, sha);
+      if (tree) {
+        render(tree);
+        currentTree = tree;
+        return;
+      }
+      render({ list: [], scroll: 0 });
+      return;
+    }
+
+    const tree = await getTree(name, sha);
+    if (tree) {
+      const $list = $content.get('.list');
+      if ($list) currentTree.scroll = $list.scrollTop;
+
+      path.push(name);
+      $navigation.append(
+        tag('span', {
+          className: 'nav active',
+          attr: {
+            sha,
+            action: 'navigate',
+            text: name,
+            name,
+          },
+        }),
+      );
+      $navigation.scrollLeft = $navigation.scrollWidth;
+
+      const { sha: csha, name: cname } = currentTree;
+      if (csha && cname) {
+        actionStack.push({
+          id: sha,
+          action: function () {
+            navigate(cname, csha);
+          },
+        });
+      }
+
+      render(tree);
+      cachedTree[sha] = tree;
+      currentTree = tree;
     }
   }
 
-  function navigate(name, sha, options = {}) {
-    path.push(name);
-    let $nav = $navigation.querySelector(`[sha="${sha}"]`);
-    const $old = $navigation.querySelector('.active');
-
-    if ($old) $old.classList.remove('active');
-    if ($nav) {
-      $nav.classList.add('active');
-    } else {
-      $nav = tag('span', {
-        className: 'nav active',
-        attr: {
-          sha,
-          action: 'navigate',
-          text: name,
-          name,
-          ...options,
-        },
-      });
-      $navigation.append($nav);
+  async function getTree(name, sha) {
+    if (sha in cachedTree) {
+      return cachedTree[sha];
     }
 
-    $navigation.scrollLeft = $navigation.scrollWidth;
+    let tree = null;
+    dialogs.loader.create(repoName, strings.loading + '...');
+    try {
+      const res = await repo.getTree(sha);
+      let { tree: list } = res.data;
+      list = transofrmRepoList(list);
+      tree = { list, name, sha, scroll: 0 };
+    } catch (err) {
+      error(err);
+    }
+    dialogs.loader.destroy();
+    return tree;
+  }
+
+  function transofrmRepoList(list) {
+    list.map((entry) => {
+      const { size, type } = entry;
+      entry.size = (size / 1024).toFixed(2) + 'KB';
+      if (!entry.name && entry.path) entry.name = entry.path;
+      entry.isDirectory = type === 'dir' || type === 'tree';
+      entry.isFile = !entry.isDirectory;
+      entry.type = entry.isDirectory
+        ? 'folder'
+        : helpers.getIconForFile(entry.name);
+    });
+
+    return helpers.sortDir(list, {
+      showHiddenFiles: 'on',
+      sortByName: 'on',
+    });
   }
 
   /**
@@ -230,65 +301,26 @@ export default function RepoInclude(owner, repoName) {
     const name = $el.getAttribute('name');
 
     switch (action) {
-      case 'folder':
-        folder();
+      case 'close':
+        $page.hide();
+        break;
+      case 'navigate':
+        navigate(name, sha);
         break;
 
       case 'file':
         file();
         break;
 
-      case 'navigate':
-        folder();
-        break;
-
       case 'info':
-        //jshint ignore:start
-        import(/* webpackChunkName: "repo-info" */ '../info/info').then(
-          (res) => {
-            res.default(repoName, owner);
-          }
-        );
-        //jshint ignore:end
+        import('../info/info').then((res) => {
+          res.default(repoName, owner);
+        });
         break;
 
       case 'search':
         searchBar($content.get('.list'));
         break;
-    }
-
-    function folder() {
-      currentTree.scroll = $content.querySelector('.list').scrollTop;
-
-      const { sha: csha, list: clist, name: cname } = currentTree;
-      if (sha in cachedTree) {
-        render(cachedTree[sha].list, name, sha);
-      } else {
-        dialogs.loader.create(repoName, strings.loading + '...');
-        repo
-          .getTree(sha)
-          .then((res) => {
-            const data = res.data;
-            render(data.tree, name, sha);
-          })
-          .catch(error)
-          .finally(dialogs.loader.destroy);
-      }
-
-      actionStack.push({
-        id: csha,
-        action: function () {
-          render(clist, cname, csha);
-          if (action === 'folder') {
-            const $nav = $navigation.lastChild;
-            if ($nav) {
-              path.pop();
-              path.pop();
-              $nav.remove();
-            }
-          }
-        },
-      });
     }
 
     function file() {
