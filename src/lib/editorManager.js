@@ -29,7 +29,7 @@ function EditorManager($sidebar, $header, $body) {
    */
   let $openFileList;
   let checkTimeout = null;
-  let TIMEOUT_VALUE = 300;
+  let TIMEOUT_VALUE = 500;
   let lastHeight = innerHeight;
   let editorState = 'blur';
   let preventScrollbarV = false;
@@ -127,6 +127,10 @@ function EditorManager($sidebar, $header, $body) {
     moveOpenFileList,
     sidebar: $sidebar,
     container: $container,
+    scroll: {
+      $vScrollbar,
+      $hScrollbar,
+    },
     get state() {
       return editorState;
     },
@@ -156,7 +160,7 @@ function EditorManager($sidebar, $header, $body) {
 
   $hScrollbar.onshow = $vScrollbar.onshow = updateFloatingButton.bind(
     {},
-    false
+    false,
   );
   $hScrollbar.onhide = $vScrollbar.onhide = updateFloatingButton.bind({}, true);
 
@@ -181,14 +185,16 @@ function EditorManager($sidebar, $header, $body) {
       const { activeFile } = manager;
       (async () => {
         const changed = await activeFile.isChanged();
-        if (!changed) return;
-        activeFile.writeToCache();
-        if (activeFile.markChanged) {
-          activeFile.isUnsaved = true;
-          manager.onupdate('file-changed');
-          return;
+        if (!changed) {
+          activeFile.isUnsaved = false;
+        } else {
+          activeFile.writeToCache();
+          if (activeFile.markChanged) {
+            activeFile.isUnsaved = true;
+          }
+          activeFile.markChanged = true;
         }
-        activeFile.markChanged = true;
+        manager.onupdate('file-changed');
       })();
     }, TIMEOUT_VALUE);
   });
@@ -372,7 +378,7 @@ function EditorManager($sidebar, $header, $body) {
           $quickToolToggler.classList.add('hide');
           timeoutQuicktoolToggler = setTimeout(
             () => $quickToolToggler.remove(),
-            300
+            300,
           );
         }
         if ($headerToggler.isConnected) {
@@ -470,7 +476,7 @@ function EditorManager($sidebar, $header, $body) {
         return id;
       },
       set id(newId) {
-        this.renameCacheFile(newId);
+        this.updateChangeFile(newId);
         id = newId;
       },
       setMode(mode) {
@@ -500,7 +506,7 @@ function EditorManager($sidebar, $header, $body) {
             style: {
               paddingRight: '5px',
             },
-          })
+          }),
         );
       },
       get uri() {
@@ -518,6 +524,8 @@ function EditorManager($sidebar, $header, $body) {
         }
 
         uri = newUri;
+        this.type = 'regular';
+        this.readOnly = false;
         setSubText(this);
         manager.onupdate('file-uri');
       },
@@ -580,19 +588,23 @@ function EditorManager($sidebar, $header, $body) {
         this.uri = null;
       },
       async writeToCache() {
-        const cacheFs = fsOperation(Url.join(CACHE_STORAGE, id));
+        const cacheFs = fsOperation(Url.join(CACHE_STORAGE, this.id));
         const exists = await cacheFs.exists();
 
         if (!exists) {
           const dirFs = fsOperation(CACHE_STORAGE);
-          await dirFs.createFile(id);
+          await dirFs.createFile(this.id);
         }
 
         let data = text;
         if (this.session) {
           data = this.session.getValue();
         }
-        await cacheFs.writeFile(data);
+        try {
+          await cacheFs.writeFile(data);
+        } catch (error) {
+          console.error(error);
+        }
       },
       async removeCacheFile() {
         try {
@@ -600,7 +612,7 @@ function EditorManager($sidebar, $header, $body) {
           fs.deleteFile();
         } catch (error) {}
       },
-      async renameCacheFile(cacheNewName) {
+      async updateChangeFile(cacheNewName) {
         try {
           const fs = fsOperation(Url.join(CACHE_STORAGE, this.id));
           fs.renameTo(cacheNewName);
@@ -613,10 +625,27 @@ function EditorManager($sidebar, $header, $body) {
           }
           return true;
         }
-        const fs = fsOperation(this.uri);
-        const oldText = await fs.readFile('utf-8');
-        const text = this.session.getValue();
-        return oldText !== text;
+
+        let fs;
+        const protocol = Url.getProtocol(this.uri);
+        if (/s?ftp:/.test(protocol)) {
+          const cacheFile = Url.join(
+            CACHE_STORAGE,
+            protocol.slice(0, -1) + this.id,
+          );
+          fs = fsOperation(cacheFile);
+        } else {
+          fs = fsOperation(this.uri);
+        }
+
+        try {
+          const oldText = await fs.readFile('utf-8');
+          const text = this.session.getValue();
+          return oldText !== text;
+        } catch (error) {
+          console.log(error);
+          return false;
+        }
       },
     };
 

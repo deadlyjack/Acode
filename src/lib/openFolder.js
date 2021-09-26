@@ -576,7 +576,7 @@ function openFolder(_path, opts = {}) {
             sortByName: true,
             showHiddenFiles: true,
           },
-          true
+          true,
         );
         entries.map((entry) => {
           const name = entry.name || Path.basename(entry.url);
@@ -591,7 +591,6 @@ function openFolder(_path, opts = {}) {
       } catch (err) {
         this.collapse();
         helpers.error(err);
-        console.error(err);
       }
       loading.stop();
     }

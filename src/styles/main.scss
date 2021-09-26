@@ -35,6 +35,67 @@ body {
     transition: none !important;
     box-shadow: none !important;
   }
+
+  &:not(.loading).title-loading {
+    &.title-loading-hide {
+      &::after {
+        background-image: none;
+        transform: translateX(-50%) translateY(-100%) scale3d(0.5, 0.5, 1);
+        opacity: 0;
+        animation: hide-loader 100ms ease-in 1;
+        @keyframes hide-loader {
+          from {
+            transform: translateX(-50%) translateY(0) scale3d(1, 1, 1);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(-50%) translateY(-100%) scale3d(0.5, 0.5, 1);
+            opacity: 0;
+          }
+        }
+      }
+    }
+
+    &::after {
+      content: '';
+      background-color: #3333ff;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      position: fixed;
+      height: 40px;
+      width: 40px;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-image: url(./res/tail-spin.svg);
+      background-image: var(--tail-spin);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 30px;
+      box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 4px 0 var(--box-shadow-color);
+      border: solid 1px transparent;
+      border: solid 1px var(--popup-border-color);
+      animation: appear 100ms ease-out 1;
+      box-sizing: border-box;
+      z-index: 999;
+
+      @keyframes appear {
+        from {
+          transform: translateX(-50%) translateY(-100%) scale3d(0.5, 0.5, 1);
+          opacity: 0.5;
+        }
+        to {
+          transform: translateX(-50%) translateY(0) scale3d(1, 1, 1);
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .main {
+    position: relative;
+  }
 }
 
 a {
@@ -576,10 +637,6 @@ textarea {
   height: 30px;
 }
 
-.main {
-  position: relative;
-}
-
 .hr {
   display: flex;
   align-items: center;
@@ -658,20 +715,9 @@ textarea {
   color: white;
   color: var(--text-main-color);
   transition: all 300ms ease;
-  animation: floating-btn 300ms ease 1;
 
   &.hide {
     opacity: 0 !important;
-  }
-
-  @keyframes floating-btn {
-    0% {
-      opacity: 0;
-    }
-
-    100% {
-      opacity: 1;
-    }
   }
 }
 

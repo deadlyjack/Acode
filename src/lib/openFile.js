@@ -5,13 +5,13 @@ import fsOperation from './fileSystem/fsOperation';
 
 /**
  *
- * @param {string & fileOptions} file
+ * @param {String & fileOptions} file
  * @param {object} data
  */
 
 export default async function openFile(file, data = {}) {
   try {
-    let uri = typeof file === 'object' && 'uri' in file ? file.uri : file;
+    let uri = file.uri || file;
     if (!uri && typeof uri !== 'string') return;
 
     const existingFile = editorManager.getFile(uri, 'uri');
@@ -22,7 +22,7 @@ export default async function openFile(file, data = {}) {
       return;
     }
 
-    dialogs.loader.create('', strings['loading'] + '...');
+    helpers.showTitleLoader();
     const fs = fsOperation(uri);
     const fileInfo = await fs.stats();
     const name = fileInfo.name || file.name || uri;
@@ -44,7 +44,7 @@ export default async function openFile(file, data = {}) {
 
     if (text) {
       // If file is not opened and has unsaved text
-      dialogs.loader.destroy();
+      helpers.remoteTitleLoader();
       createEditor(true, text);
       return;
     }
@@ -53,23 +53,26 @@ export default async function openFile(file, data = {}) {
     // Checks for valid file
     const ext = helpers.extname(name);
     if (appSettings.isFileAllowed(ext)) {
-      dialogs.loader.destroy();
+      helpers.remoteTitleLoader();
       return alert(
         strings.notice.toUpperCase(),
-        `'${ext}' ${strings['file is not supported']}`
+        `'${ext}' ${strings['file is not supported']}`,
       );
     } else if (fileInfo.length * 0.000001 > settings.maxFileSize) {
-      dialogs.loader.destroy();
+      helpers.remoteTitleLoader();
       return alert(
         strings.error.toUpperCase(),
-        strings['file too large'].replace('{size}', settings.maxFileSize + 'MB')
+        strings['file too large'].replace(
+          '{size}',
+          settings.maxFileSize + 'MB',
+        ),
       );
     }
 
     const binData = await fs.readFile();
-    dialogs.loader.destroy();
     const fileContent = helpers.decodeText(binData);
 
+    helpers.remoteTitleLoader();
     if (helpers.isBinary(fileContent) && /image/i.test(fileInfo.type)) {
       const blob = new Blob([binData]);
       dialogs.box(name, `<img src='${URL.createObjectURL(blob)}'>`);
@@ -80,8 +83,7 @@ export default async function openFile(file, data = {}) {
     if (mode !== 'single') recents.addFile(uri);
     return;
   } catch (error) {
-    dialogs.loader.destroy();
+    helpers.remoteTitleLoader();
     console.error(error);
-    helpers.error(error);
   }
 }

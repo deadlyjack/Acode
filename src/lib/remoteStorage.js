@@ -10,90 +10,79 @@ export default {
   /**
    *
    * @param  {...any} args [username, password, hostname, port, ftps, active, name]
-   * @returns {Promise<String>}
    */
-  addFtp(...args) {
+  async addFtp(...args) {
     let stopConnection = false;
-    return new Promise((resolve, reject) => {
-      (async () => {
-        try {
-          const {
-            username, //
-            password, //
-            hostname, //
-            port, //
-            ftps, //
-            active, //
-            alias, //
-          } = await prompt(...args);
-          const security = ftps ? 'ftps' : 'ftp';
-          const mode = active ? 'active' : 'passive';
-          const ftp = Ftp(username, password, hostname, port, security, mode);
-          try {
-            dialogs.loader.create('', strings.connecting + '...', {
-              timeout: 10000,
-              callback() {
-                stopConnection = true;
-              },
-            });
-            const home = await ftp.homeDirectory();
+    const {
+      username, //
+      password,
+      hostname,
+      port,
+      ftps,
+      active,
+      alias,
+    } = await prompt(...args);
+    const security = ftps ? 'ftps' : 'ftp';
+    const mode = active ? 'active' : 'passive';
+    const ftp = Ftp(username, password, hostname, port, security, mode);
+    try {
+      dialogs.loader.create(strings['add ftp'], strings.connecting + '...', {
+        timeout: 10000,
+        callback() {
+          stopConnection = true;
+        },
+      });
+      const home = await ftp.homeDirectory();
 
-            if (stopConnection) {
-              stopConnection = false;
-              return;
-            }
+      if (stopConnection) {
+        stopConnection = false;
+        return;
+      }
 
-            const url = Url.formate({
-              protocol: 'ftp:',
-              username,
-              password,
-              hostname,
-              port,
-              path: '/',
-              query: {
-                mode,
-                security,
-              },
-            });
+      const url = Url.formate({
+        protocol: 'ftp:',
+        username,
+        password,
+        hostname,
+        port,
+        path: '/',
+        query: {
+          mode,
+          security,
+        },
+      });
 
-            const res = {
-              url,
-              alias,
-              type: 'ftp',
-              home: null,
-            };
+      const res = {
+        url,
+        alias,
+        name: alias,
+        type: 'ftp',
+        home: null,
+      };
 
-            if (home !== '/') {
-              res.home = home;
-            }
+      if (home !== '/') {
+        res.home = home;
+      }
+      dialogs.loader.destroy();
+      return res;
+    } catch (err) {
+      if (stopConnection) {
+        stopConnection = false;
+        return;
+      }
 
-            resolve(res);
-            dialogs.loader.destroy();
-          } catch (err) {
-            if (stopConnection) {
-              stopConnection = false;
-              return;
-            }
-
-            dialogs.loader.destroy();
-            await helpers.error(err);
-            const res = this.addFtp(
-              username,
-              password,
-              hostname,
-              alias,
-              port,
-              security,
-              mode,
-            );
-            res.then(resolve);
-            console.error(err);
-          }
-        } catch (err) {
-          reject(err);
-        }
-      })();
-    });
+      dialogs.loader.destroy();
+      await helpers.error(err);
+      return await this.addFtp(
+        username,
+        password,
+        hostname,
+        alias,
+        port,
+        security,
+        mode,
+      );
+    }
 
     function prompt(username, password, hostname, alias, port, security, mode) {
       port = port || 21;
@@ -171,113 +160,101 @@ export default {
   },
   /**
    * @param {...any} args [hostname, username, keyFile, password, passphrase, port, name]
-   * @returns {Promise<String>}
    */
-  addSftp(...args) {
+  async addSftp(...args) {
     let stopConnection = false;
-    return new Promise((resolve, reject) => {
-      (async () => {
-        try {
-          const {
-            hostname,
-            username,
-            keyFile,
-            password,
-            passPhrase,
-            port,
-            alias,
-            usePassword,
-          } = await prompt(...args);
-          const authType = usePassword ? 'password' : 'keyFile';
 
-          dialogs.loader.create('', strings.connecting + '...', {
-            timeout: 10000,
-            callback() {
-              stopConnection = true;
-            },
-          });
-          const connection = Sftp(hostname, parseInt(port), username, {
-            password,
-            keyFile,
-            passPhrase,
-          });
+    const {
+      hostname,
+      username,
+      keyFile,
+      password,
+      passPhrase,
+      port,
+      alias,
+      usePassword,
+    } = await prompt(...args);
+    const authType = usePassword ? 'password' : 'keyFile';
 
-          try {
-            const home = await connection.pwd();
-
-            if (stopConnection) {
-              stopConnection = false;
-              return;
-            }
-
-            let localKeyFile = '';
-            if (keyFile) {
-              let fs = fsOperation(keyFile);
-              const rawData = await fs.readFile();
-              const text = new TextDecoder('utf-8').decode(
-                new Uint8Array(rawData),
-              );
-
-              //Original key file sometimes gives permission error
-              //To solve permission error
-              const filename = keyFile.hashCode();
-              localKeyFile = Url.join(DATA_STORAGE, filename);
-              fs = fsOperation(localKeyFile);
-              const exists = await fs.exists();
-              if (exists) {
-                await fs.writeFile(text);
-              } else {
-                let fs = fsOperation(DATA_STORAGE);
-                await fs.createFile(filename, text);
-              }
-            }
-
-            const url = Url.formate({
-              protocol: 'sftp:',
-              hostname,
-              username,
-              password,
-              port,
-              path: '/',
-              query: {
-                keyFile: localKeyFile,
-                passPhrase,
-              },
-            });
-
-            resolve({
-              alias,
-              url,
-              type: 'sftp',
-              home,
-            });
-            dialogs.loader.destroy();
-          } catch (err) {
-            if (stopConnection) {
-              stopConnection = false;
-              return;
-            }
-
-            dialogs.loader.destroy();
-            await helpers.error(err);
-            const con = this.addSftp(
-              hostname,
-              username,
-              keyFile,
-              password,
-              passPhrase,
-              port,
-              alias,
-              authType,
-            );
-            con.then(resolve);
-            console.error(err);
-          }
-        } catch (err) {
-          reject(err);
-        }
-      })();
+    dialogs.loader.create(strings['add sftp'], strings.connecting + '...', {
+      timeout: 10000,
+      callback() {
+        stopConnection = true;
+      },
     });
+    const connection = Sftp(hostname, parseInt(port), username, {
+      password,
+      keyFile,
+      passPhrase,
+    });
+
+    try {
+      const home = await connection.pwd();
+
+      if (stopConnection) {
+        stopConnection = false;
+        return;
+      }
+
+      let localKeyFile = '';
+      if (keyFile) {
+        let fs = fsOperation(keyFile);
+        const rawData = await fs.readFile();
+        const text = new TextDecoder('utf-8').decode(new Uint8Array(rawData));
+
+        //Original key file sometimes gives permission error
+        //To solve permission error
+        const filename = keyFile.hashCode();
+        localKeyFile = Url.join(DATA_STORAGE, filename);
+        fs = fsOperation(localKeyFile);
+        const exists = await fs.exists();
+        if (exists) {
+          await fs.writeFile(text);
+        } else {
+          let fs = fsOperation(DATA_STORAGE);
+          await fs.createFile(filename, text);
+        }
+      }
+
+      const url = Url.formate({
+        protocol: 'sftp:',
+        hostname,
+        username,
+        password,
+        port,
+        path: '/',
+        query: {
+          keyFile: localKeyFile,
+          passPhrase,
+        },
+      });
+      dialogs.loader.destroy();
+      return {
+        alias,
+        name: alias,
+        url,
+        type: 'sftp',
+        home,
+      };
+    } catch (err) {
+      if (stopConnection) {
+        stopConnection = false;
+        return;
+      }
+
+      dialogs.loader.destroy();
+      await helpers.error(err);
+      return await this.addSftp(
+        hostname,
+        username,
+        keyFile,
+        password,
+        passPhrase,
+        port,
+        alias,
+        authType,
+      );
+    }
 
     function prompt(
       hostname,
@@ -386,8 +363,8 @@ export default {
       return dialogs.multiPrompt(strings['add sftp'], inputs);
     }
   },
-  edit({ name, storageType, uri }) {
-    let { username, password, hostname, port, query } = URLParse(uri, true);
+  edit({ name, storageType, url }) {
+    let { username, password, hostname, port, query } = URLParse(url, true);
 
     if (username) {
       username = decodeURIComponent(username);
@@ -440,6 +417,6 @@ export default {
       );
     }
 
-    return Promise.resolve({});
+    return null;
   },
 };

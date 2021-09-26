@@ -236,7 +236,6 @@ const commands = {
           render: true,
         }).catch((err) => {
           helpers.error(err);
-          console.error(err);
         });
       } else if (helpers.isDir(type)) {
         openFolder(res.val.url, res.val.opts);
@@ -276,7 +275,6 @@ const commands = {
         toast(strings['file renamed']);
       } catch (err) {
         helpers.error(err);
-        console.error(err);
       }
     } else {
       file.filename = newname;

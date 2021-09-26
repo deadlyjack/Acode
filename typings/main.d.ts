@@ -143,7 +143,7 @@ interface Scrollbar extends HTMLElement {
     /**Displays the scrollbar and hides after 3 seconds of inactivity. */
     render(): void;
     /**Resize the scrollbar dimension value. */
-    resize(): void;
+    resize(render: Boolean): void;
     /**Callback function called when scrollbar is rendered. */
     onhide(): void;
     /**Callback function called when scrollbar is removed. */
@@ -358,6 +358,11 @@ interface GistRecord {
     reset(): void;
 }
 
+interface EditorScroll{
+    readonly $vScrollbar: Scrollbar;
+    readonly $hScrollbar: Scrollbar;
+}
+
 interface Manager {
     addNewFile(filename: String, options: NewFileOptions): File;
     getFile(checkFor: String | number | Repo | Gist, type: "id" | "name" | "uri" | "git" | "gist"): File;
@@ -373,6 +378,7 @@ interface Manager {
     moveOpenFileList(): void;
     sidebar: HTMLDivElement;
     container: HTMLDivElement;
+    readonly scroll: EditorScroll;
     readonly TIMEOUT_VALUE: number;
     readonly openFileList: HTMLElement;
 }
@@ -542,6 +548,7 @@ declare var strings: Strings;
 declare var Acode: Acode;
 declare var AceMouseEvent: any;
 
+declare var ASSETS_DIRECTORY: String;
 declare var CACHE_STORAGE: String;
 declare var DATA_STORAGE: String;
 declare var DOES_SUPPORT_THEME: boolean;
@@ -574,5 +581,7 @@ declare var gistRecordFile: String;
 declare var root: HTMLDivElement;
 declare var saveInterval: Number;
 declare var toastQueue: Array<HTMLElement>;
+declare var __sftpBusy: Boolean;
+declare var __sftpTaskQueue: Array<()=>void>;
 declare var keyBindings: (name: String)=>String;
 declare var toast: (String)=>void;

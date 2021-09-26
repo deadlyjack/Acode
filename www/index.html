@@ -16,7 +16,20 @@
     <script src="./js/createKeyboardEvent.js"></script>
     <script src="cordova.js"></script>
     <script defer src="./js/build/main.build.js"></script>
-    <title>Acode</title>
+    <title>com.foxdebug.acodefree</title>
+
+    <script>
+      var color = localStorage.getItem('__primary_color');
+      var __bg_color = '#9999ff';
+      if (color) {
+        __bg_color = color;
+      } else if (document.title == 'com.foxdebug.acode') {
+        __bg_color = '#20202c';
+      }
+
+      document.querySelector(':root').style.cssText =
+        '--bg-color: ' + __bg_color;
+    </script>
 
     <style>
       :root {
@@ -33,7 +46,8 @@
         background-position: center;
         background-repeat: no-repeat;
         background-size: 180px;
-        background-color: #313131;
+        background-color: #9999ff;
+        background-color: var(--bg-color);
         position: fixed;
         top: 0;
         right: 0;
@@ -42,7 +56,7 @@
         z-index: 999999;
         text-align: center;
         line-height: 150vh;
-        color: white;
+        color: rgb(209, 209, 209);
         letter-spacing: 2.4px;
         font-size: 1.2rem;
         font-weight: 600;
@@ -57,11 +71,10 @@
         content: attr(data-small-msg);
         margin: 15px auto;
         z-index: 999999;
-        color: white;
+        color: rgb(209, 209, 209);
         font-size: 1rem;
         width: 90vw;
         text-align: center;
-        color: #bd988a;
       }
     </style>
   </head>

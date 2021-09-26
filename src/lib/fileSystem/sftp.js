@@ -72,7 +72,7 @@ class SFTP {
           this.#keyFile,
           this.#passPhrase,
           resolve,
-          reject
+          reject,
         );
         return;
       }
@@ -83,7 +83,7 @@ class SFTP {
         this.#username,
         this.#password,
         resolve,
-        reject
+        reject,
       );
     });
   }
@@ -115,7 +115,7 @@ class SFTP {
           window.__sftpBusy = true;
           sftp.exec(
             `ls -gaAG --full-time "${this.#safeName(
-              dirname
+              dirname,
             )}" | awk '{$2=\"\"; print $0}'`,
             (res) => {
               window.__sftpBusy = false;
@@ -132,7 +132,7 @@ class SFTP {
             (err) => {
               window.__sftpBusy = false;
               reject(err);
-            }
+            },
           );
         })();
       }, reject);
@@ -166,7 +166,7 @@ class SFTP {
           window.__sftpBusy = true;
 
           const cmd = `[[ -f "${this.#safeName(
-            filename
+            filename,
           )}" ]] && echo "Already exists" || touch "${filename}"`;
           sftp.exec(
             cmd,
@@ -188,7 +188,7 @@ class SFTP {
             (err) => {
               window.__sftpBusy = false;
               reject(err);
-            }
+            },
           );
         })();
       });
@@ -234,7 +234,7 @@ class SFTP {
             (err) => {
               window.__sftpBusy = false;
               reject(err);
-            }
+            },
           );
         })();
       });
@@ -273,7 +273,7 @@ class SFTP {
               (err) => {
                 window.__sftpBusy = false;
                 reject(err);
-              }
+              },
             );
           } catch (err) {
             reject(err);
@@ -322,7 +322,7 @@ class SFTP {
             (err) => {
               window.__sftpBusy = false;
               reject(err);
-            }
+            },
           );
         })();
       });
@@ -351,7 +351,7 @@ class SFTP {
           }
           window.__sftpBusy = true;
           const cmd = `cp -r "${this.#safeName(filename)}" "${this.#safeName(
-            dest
+            dest,
           )}"`;
           sftp.exec(
             cmd,
@@ -367,7 +367,7 @@ class SFTP {
             (err) => {
               window.__sftpBusy = false;
               reject(err);
-            }
+            },
           );
         })();
       }, reject);
@@ -406,7 +406,7 @@ class SFTP {
           }
           window.__sftpBusy = true;
           const cmd = `mv "${this.#safeName(filename)}" "${this.#safeName(
-            newname
+            newname,
           )}"`;
           sftp.exec(
             cmd,
@@ -416,7 +416,7 @@ class SFTP {
                 resolve(
                   move
                     ? Url.join(fullNewname, Url.basename(filename))
-                    : fullNewname
+                    : fullNewname,
                 );
                 return;
               }
@@ -426,7 +426,7 @@ class SFTP {
             (err) => {
               window.__sftpBusy = false;
               reject(err);
-            }
+            },
           );
         })();
       }, reject);
@@ -460,7 +460,7 @@ class SFTP {
           }
           window.__sftpBusy = true;
           const cmd = `rm ${type === 'dir' ? '-rf' : ''} "${this.#safeName(
-            filename
+            filename,
           )}"`;
           sftp.exec(
             cmd,
@@ -476,7 +476,7 @@ class SFTP {
             (err) => {
               window.__sftpBusy = false;
               reject(err);
-            }
+            },
           );
         })();
       }, reject);
@@ -517,7 +517,7 @@ class SFTP {
             (err) => {
               window.__sftpBusy = false;
               reject(err);
-            }
+            },
           );
         })();
       }, reject);
@@ -560,6 +560,7 @@ class SFTP {
   }
 
   #parseFile(item, dirname) {
+    if (!item) return null;
     const PERMISSIONS = 0;
     const SIZE = 2;
     const MODIFIED_DATE = 3;
@@ -686,7 +687,10 @@ class SFTP {
    * @returns {String}
    */
   #getLocalname(filename) {
-    return Url.join(CACHE_STORAGE, Url.join(this.#base, filename).hashCode());
+    return Url.join(
+      CACHE_STORAGE,
+      'sftp' + Url.join(this.#base, filename).hashCode(),
+    );
   }
 }
 

@@ -13,6 +13,17 @@ export default function loadPolyFill() {
     });
   }
 
+  if (!DOMTokenList.prototype.replace) {
+    DOMTokenList.prototype.replace = function (a, b) {
+      if (this.contains(a)) {
+        this.add(b);
+        this.remove(a);
+        return true;
+      }
+      return false;
+    };
+  }
+
   if (!HTMLElement.prototype.append) {
     HTMLElement.prototype.append = function (...nodes) {
       nodes.map((node) => this.appendChild(node));

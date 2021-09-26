@@ -41,7 +41,7 @@ function actions(action) {
           key: 9,
           keyCode: 9,
           shiftKey,
-        })
+        }),
       );
       break;
 
@@ -80,18 +80,13 @@ function actions(action) {
         if ($searchRow1) {
           removeSearchRow2();
         }
-        $footer
-          .get('[action=more]')
-          .classList.replace('arrow_drop_up', 'arrow_drop_down');
+        moreIconDown();
         $footer.appendChild(tag.parse($_row2));
         incFooterHeightBy(1);
       } else {
-        $footer
-          .get('[action=more]')
-          .classList.replace('arrow_drop_down', 'arrow_drop_up');
         removeRow2();
       }
-      editor.resize(true);
+      resizeEditor();
       break;
 
     case 'moveline-up':
@@ -168,7 +163,7 @@ function actions(action) {
     } else {
       removeSearchRow2();
     }
-    editor.resize(true);
+    resizeEditor();
   }
 
   function toggleQuickTools() {
@@ -180,8 +175,6 @@ function actions(action) {
     } else {
       disableQuickTools();
     }
-
-    editor.resize(true);
   }
 
   function enableQuickTools() {
@@ -193,13 +186,19 @@ function actions(action) {
 
     if (quickToolsState > 2) quickToolsState = 1;
 
-    if (quickToolsState == 2) $footer.append($row1, $row2);
-    else $footer.append($row1);
+    if (quickToolsState == 2) {
+      $footer.append($row1, $row2);
+      moreIconDown();
+    } else {
+      $footer.append($row1);
+    }
 
     root.setAttribute('quicktools', 'enabled');
     incFooterHeightBy(quickToolsState);
-    if (editorManager.activeFile && editorManager.activeFile.isUnsaved)
+    if (editorManager.activeFile && editorManager.activeFile.isUnsaved) {
       $row1.querySelector("[action='save']").classList.add('notice');
+    }
+    resizeEditor();
   }
 
   function disableQuickTools() {
@@ -217,11 +216,29 @@ function actions(action) {
     }
 
     root.removeAttribute('quicktools');
+    resizeEditor();
   }
 
   function removeRow2() {
     $footer.removeChild($row2);
     incFooterHeightBy(-1);
+    moreIconUp();
+  }
+
+  function moreIconUp() {
+    $footer
+      .get('[action=more]')
+      .classList.replace('arrow_drop_down', 'arrow_drop_up');
+  }
+  function moreIconDown() {
+    $footer
+      .get('[action=more]')
+      .classList.replace('arrow_drop_up', 'arrow_drop_down');
+  }
+
+  function resizeEditor() {
+    editor.resize(true);
+    editorManager.scroll.$vScrollbar.resize(false);
   }
 
   function removeSearchRow2() {
@@ -254,7 +271,7 @@ function actions(action) {
     if (regex) {
       const value = editor.getValue();
       const offset = editor.session.doc.positionToIndex(
-        editor.selection.anchor
+        editor.selection.anchor,
       );
       let last = (regex.lastIndex = 0);
       let m;

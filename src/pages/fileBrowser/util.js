@@ -15,7 +15,7 @@ export default {
       name: name,
       isDirectory: true,
       parent: true,
-      type: 'folder',
+      type: 'dir',
       ...extra,
     });
   },
@@ -50,7 +50,7 @@ export default {
                 },
                 (err) => {
                   helpers.error(err);
-                }
+                },
               );
             },
           },

@@ -1,3 +1,4 @@
+import dialogs from '../../components/dialogs';
 import openFile from '../../lib/openFile';
 import openFolder from '../../lib/openFolder';
 import helpers from '../../lib/utils/helpers';
@@ -25,7 +26,7 @@ function FileBrowser(mode, info, buttonText, doesOpenLast, ...args) {
         FileBrowser(mode, info, buttonText, doesOpenLast, ...args)
           .then(resolve)
           .catch(reject);
-      }
+      },
     );
   });
 }
@@ -56,14 +57,15 @@ FileBrowser.openFile = (res) => {
 };
 
 FileBrowser.openFileError = (err) => {
+  console.error(err);
   const ERROR = strings.error.toUpperCase();
   if (err.code) {
-    alert(
+    dialogs.alert(
       ERROR,
-      `${strings['unable to open file']}. ${helpers.errorMessage(err.code)}`
+      `${strings['unable to open file']}. ${helpers.errorMessage(err.code)}`,
     );
   } else if (err.code !== 0) {
-    alert(ERROR, strings['unable to open file']);
+    dialogs.alert(ERROR, strings['unable to open file']);
   }
 };
 
@@ -88,14 +90,15 @@ FileBrowser.openFolder = (res) => {
 };
 
 FileBrowser.openFolderError = (err) => {
+  console.error(err);
   const ERROR = strings.error.toUpperCase();
   if (err.code) {
-    alert(
+    dialogs.alert(
       ERROR,
-      `${strings['unable to open folder']}. ${helpers.errorMessage(err.code)}`
+      `${strings['unable to open folder']}. ${helpers.errorMessage(err.code)}`,
     );
   } else if (err.code !== 0) {
-    alert(ERROR, strings['unable to open folder']);
+    dialogs.alert(ERROR, strings['unable to open folder']);
   }
 };
 

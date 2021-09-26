@@ -81,7 +81,6 @@ export default function RepoInclude(owner, repoName) {
     })
     .catch((err) => {
       helpers.error(err);
-      console.error(err);
       dialogs.loader.destroy();
     });
 
@@ -97,7 +96,6 @@ export default function RepoInclude(owner, repoName) {
       .then(getRepo)
       .catch((err) => {
         helpers.error(err);
-        console.error(err);
       })
       .finally(() => {
         dialogs.loader.destroy();
@@ -141,7 +139,6 @@ export default function RepoInclude(owner, repoName) {
       })
       .catch((err) => {
         helpers.error(err);
-        console.error(err);
       })
       .finally(() => {
         dialogs.loader.destroy();
@@ -189,8 +186,6 @@ export default function RepoInclude(owner, repoName) {
    */
   async function navigate(name, sha) {
     const $nav = $navigation.get(`[sha="${sha}"]`);
-    const $old = $navigation.get('.active');
-    if ($old) $old.classList.remove('active');
 
     if ($nav) {
       let $topNav;
@@ -208,7 +203,6 @@ export default function RepoInclude(owner, repoName) {
         oldsha = sha;
       }
 
-      $nav.classList.add('active');
       const tree = await getTree(name, sha);
       if (tree) {
         render(tree);
@@ -227,7 +221,7 @@ export default function RepoInclude(owner, repoName) {
       path.push(name);
       $navigation.append(
         tag('span', {
-          className: 'nav active',
+          className: 'nav',
           attr: {
             sha,
             action: 'navigate',

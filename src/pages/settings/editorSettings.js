@@ -143,7 +143,7 @@ export default function editorSettings() {
           .then((res) => {
             res = parseInt(res);
             if (isNaN(res) || (res < 1000 && res !== 0))
-              return alert(strings.info, strings['invalid value']);
+              return dialogs.alert(strings.info, strings['invalid value']);
             appSettings.update({
               autosave: res,
             });
@@ -293,7 +293,7 @@ export default function editorSettings() {
             ],
             {
               default: values.cursorControllerSize,
-            }
+            },
           )
           .then((res) => {
             appSettings.update({

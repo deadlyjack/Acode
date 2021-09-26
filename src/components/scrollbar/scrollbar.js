@@ -12,7 +12,9 @@ import tag from 'html-tag-js';
  * @returns {Scrollbar}
  */
 export default function ScrollBar(options) {
-  if (!options || !options.parent) throw new Error('Parent element required.');
+  if (!options || !options.parent) {
+    throw new Error('ScrollBar.js: Parent element required.');
+  }
   options.direction = options.direction || 'right';
 
   const $cursor = tag('span', {

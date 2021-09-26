@@ -20,7 +20,7 @@ import openFolder from './openFolder';
 async function run(
   isConsole = false,
   target = appSettings.value.previewMode,
-  runFile = false
+  runFile = false,
 ) {
   if (!Acode.$runBtn.isConnected && !isConsole) return;
 
@@ -69,7 +69,6 @@ async function run(
 
       dialogs.box(filename, `<img src='${URL.createObjectURL(blob)}'>`);
     } catch (err) {
-      console.error(err);
       helpers.error(err);
     }
     return;
@@ -93,7 +92,6 @@ async function run(
 
         next();
       } catch (err) {
-        console.error(err);
         helpers.error(err);
         return;
       }
@@ -117,7 +115,7 @@ async function run(
     isConsole = true;
     target = '_blank';
     filename = 'console.html';
-    pathName = `${cordova.file.applicationDirectory}www/`;
+    pathName = `${ASSETS_DIRECTORY}www/`;
     port = constants.CONSOLE_PORT;
   }
 
@@ -145,7 +143,7 @@ async function run(
         },
         () => {
           startServer();
-        }
+        },
       );
     } else startServer();
   }
@@ -165,7 +163,7 @@ async function run(
           run();
         }
       },
-      port
+      port,
     );
 
     webserver.onRequest((req) => {
@@ -176,20 +174,19 @@ async function run(
         reqPath = 'index.html';
       }
 
-      const assets = `${cordova.file.applicationDirectory}www`;
       const ext = helpers.extname(reqPath);
       let url = null;
 
       switch (reqPath) {
         case CONSOLE_SCRIPT:
-          url = `${assets}/js/build/${
+          url = `${ASSETS_DIRECTORY}/js/build/${
             appSettings.console || 'console'
           }.build.js`;
           sendFileContent(url, reqId, 'application/javascript');
           break;
 
         case ESPRISMA_SCRIPT:
-          url = `${assets}/js/esprisma.js`;
+          url = `${ASSETS_DIRECTORY}/js/esprisma.js`;
           sendFileContent(url, reqId, 'application/javascript');
           break;
 
@@ -205,7 +202,7 @@ async function run(
           break;
 
         case CONSOLE_STYLE:
-          url = `${assets}/css/console.css`;
+          url = `${ASSETS_DIRECTORY}/css/console.css`;
           sendFileContent(url, reqId, 'text/css');
           break;
 
@@ -232,13 +229,13 @@ async function run(
                 EDITOR_SCRIPT,
               }),
               reqId,
-              MIMETYPE_HTML
+              MIMETYPE_HTML,
             );
             return;
           }
 
           if (reqPath === 'favicon.ico') {
-            sendIco(assets, reqId);
+            sendIco(ASSETS_DIRECTORY, reqId);
             return;
           }
         }
@@ -248,7 +245,7 @@ async function run(
             sendText(
               activeFile.session.getValue(),
               reqId,
-              mimeType.lookup(filename)
+              mimeType.lookup(filename),
             );
           } else {
             error(reqId);
@@ -294,7 +291,7 @@ async function run(
                 const gitFile = await git.getGitFile(file.record, reqPath);
                 const data = helpers.b64toBlob(
                   gitFile,
-                  mimeType.lookup(reqPath)
+                  mimeType.lookup(reqPath),
                 );
 
                 const id = file.record.sha + encodeURIComponent(reqPath);
@@ -314,7 +311,7 @@ async function run(
                 sendFile(uri, reqId);
               } catch (err) {
                 if (reqPath === 'favicon.ico') {
-                  sendIco(assets, reqId);
+                  sendIco(ASSETS_DIRECTORY, reqId);
                 } else {
                   error(reqId);
                 }
@@ -324,7 +321,7 @@ async function run(
                 sendText(
                   file.session.getValue(),
                   reqId,
-                  mimeType.lookup(file.filename)
+                  mimeType.lookup(file.filename),
                 );
               } else if (url) {
                 sendFile(url, reqId);
@@ -387,7 +384,10 @@ async function run(
     const ext = Url.extname(path);
     const mimetype = mimeType.lookup(ext);
     if (/s?ftp:/.test(protocol)) {
-      const cacheFile = Url.join(CACHE_STORAGE, path.hashCode());
+      const cacheFile = Url.join(
+        CACHE_STORAGE,
+        protocol.slice(0, -1) + path.hashCode(),
+      );
       isLoading = true;
       const fs = fsOperation(path);
       try {
@@ -408,7 +408,7 @@ async function run(
         },
         () => {
           error(id);
-        }
+        },
       );
     } else {
       send(path, mimetype);
@@ -464,7 +464,7 @@ async function run(
     cordova.InAppBrowser.open(
       `http://localhost:${port}/` + filename,
       target,
-      options
+      options,
     );
   }
 }

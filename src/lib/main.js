@@ -11,6 +11,7 @@ import '../styles/overrideAceStyle.scss';
 import 'core-js/stable';
 import 'html-tag-js/dist/polyfill';
 import Irid from 'irid';
+import ajax from '@deadlyjack/ajax';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import git from './git';
@@ -34,7 +35,6 @@ import loadPolyFill from './utils/polyfill';
 import Url from './utils/Url';
 import applySettings from './applySettings';
 import fsOperation from './fileSystem/fsOperation';
-import ajax from './utils/ajax';
 import run from './run';
 import toast from '../components/toast';
 import $_menu from '../views/menu.hbs';
@@ -75,7 +75,6 @@ async function Main() {
 }
 
 async function ondeviceready() {
-  const appDir = cordova.file.applicationDirectory;
   const language = navigator.language.toLowerCase();
   const oldRURL = window.resolveLocalFileSystemURL;
   const {
@@ -97,6 +96,7 @@ async function ondeviceready() {
   window.defaultKeyBindings = keyBindings;
   window.toastQueue = [];
   window.toast = toast;
+  window.ASSETS_DIRECTORY = Url.join(cordova.file.applicationDirectory, 'www');
   window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
   window.DATA_STORAGE = externalDataDirectory || dataDirectory;
   window.CACHE_STORAGE = externalCacheDirectory || cacheDirectory;
@@ -195,7 +195,7 @@ async function ondeviceready() {
 
   document.body.setAttribute('data-small-msg', 'Loading language...');
   try {
-    const languageFile = `${appDir}www/lang/${appSettings.value.lang}.json`;
+    const languageFile = `${ASSETS_DIRECTORY}/lang/${appSettings.value.lang}.json`;
     const fs = fsOperation(languageFile);
     const text = await fs.readFile('utf-8');
     window.strings = helpers.parseJSON(text);
@@ -205,7 +205,7 @@ async function ondeviceready() {
 
   document.body.setAttribute('data-small-msg', 'Loading styles...');
   try {
-    const fs = fsOperation(Url.join(appDir, 'www/css/build/'));
+    const fs = fsOperation(Url.join(ASSETS_DIRECTORY, '/css/build/'));
     const styles = await fs.lsDir();
     await helpers.loadStyles(...styles.map((style) => style.url));
   } catch (error) {
@@ -221,7 +221,7 @@ async function ondeviceready() {
       window.customKeyBindings = bindings;
     }
   } catch (error) {
-    helpers.resetKeyBindings();
+    await helpers.resetKeyBindings();
   }
 
   document.body.setAttribute('data-small-msg', 'Loading editor...');
@@ -502,7 +502,6 @@ async function loadApp() {
   intent.setNewIntentHandler(intentHandler);
   intent.getCordovaIntent(intentHandler, (err) => {
     helpers.error(err);
-    console.log(err);
   });
   $sidebar.onshow = function () {
     const activeFile = editorManager.activeFile;
@@ -649,7 +648,7 @@ function onClickApp(e) {
   }
 }
 
-function restoreTheme(darken) {
+async function restoreTheme(darken) {
   if (darken && document.body.classList.contains('loading')) return;
 
   let theme = DOES_SUPPORT_THEME ? appSettings.value.appTheme : 'default';
@@ -693,6 +692,27 @@ function restoreTheme(darken) {
   }
 
   document.body.setAttribute('theme-type', type);
+  const style = getComputedStyle(app);
+  const loaderFile = Url.join(ASSETS_DIRECTORY, 'res/tail-spin.svg');
+  const textColor = style.getPropertyValue('--text-main-color').trim();
+  const svgName = '__tail-spin__.svg';
+  const img = Url.join(DATA_STORAGE, svgName);
+
+  localStorage.__primary_color = style.getPropertyValue('--primary-color');
+  try {
+    let fs = fsOperation(loaderFile);
+    const svg = await fs.readFile('utf-8');
+
+    fs = fsOperation(img);
+    if (!(await fs.exists())) {
+      await fsOperation(DATA_STORAGE).createFile(svgName);
+    }
+    const text = svg.replace(/#fff/g, textColor);
+    await fs.writeFile(text);
+    app.style.cssText = `--tail-spin: url(${img})`;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function askForDonation() {

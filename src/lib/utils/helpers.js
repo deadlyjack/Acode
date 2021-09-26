@@ -2,12 +2,12 @@ import Cryptojs from 'crypto-js';
 import constants from '../constants';
 import dialogs from '../../components/dialogs';
 import keyBindings from '../keyBindings';
-import fs from '../fileSystem/internalFs';
 import tag from 'html-tag-js';
-import ajax from './ajax';
+import ajax from '@deadlyjack/ajax';
 import path from './Path';
 import Url from './Url';
 import Uri from './Uri';
+import fsOperation from '../fileSystem/fsOperation';
 
 const credentials = {
   key: 'xkism2wq3)(I#$MNkds0)*(73am)(*73_L:w3k[*(#WOd983jkdssap sduy*&T#W3elkiu8983hKLUYs*(&y))',
@@ -23,6 +23,13 @@ const credentials = {
 
 export default {
   credentials,
+  showTitleLoader() {
+    app.classList.remove('title-loading-hide');
+    app.classList.add('title-loading');
+  },
+  remoteTitleLoader() {
+    app.classList.add('title-loading-hide');
+  },
   /**
    * Get extension name
    * @param {String} pathname
@@ -251,17 +258,9 @@ export default {
    * @param {FileEntry[]} list
    * @param {object} fileBrowser settings
    * @param {boolean | function(string):boolean} [readOnly]
-   * @param {string} [origin]
-   * @param {string} [uuid]
+   * @param {'both'|'file'|'folder'}
    */
-  sortDir(
-    list,
-    fileBrowser,
-    readOnly = false,
-    origin = null,
-    uuid = null,
-    mode = 'both'
-  ) {
+  sortDir(list, fileBrowser, readOnly = false, mode = 'both') {
     const dir = [];
     const file = [];
     const sortByName = fileBrowser.sortByName;
@@ -274,7 +273,11 @@ export default {
     }
 
     for (let item of list) {
+      let hidden;
+
       item.name = decodeURL(item.name || path.basename(item.url || ''));
+      hidden = item.name[0] === '.';
+
       if (typeof item.readOnly !== 'boolean') item.readOnly = readOnly;
       if (typeof item.canWrite !== 'boolean') item.canWrite = !readOnly;
       if (typeof item.isDirectory !== 'boolean') {
@@ -283,9 +286,7 @@ export default {
       if (!item.type) item.type = item.isDirectory ? 'dir' : 'file';
       if (!item.url) item.url = item.url || item.uri;
       if (item.isFile) item.disabled = !getEnabled(item.name);
-      if (origin) item.origin = origin;
-      if (uuid) item.uuid = uuid;
-      if ((item.name[0] === '.' && showHiddenFile) || item.name[0] !== '.') {
+      if ((hidden && showHiddenFile) || !hidden) {
         if (item.isDirectory) {
           dir.push(item);
         } else if (item.isFile) {
@@ -347,6 +348,8 @@ export default {
    * @returns {PromiseLike<void>}
    */
   error(err, ...args) {
+    console.error(err, ...args);
+
     if (err.code === 0) {
       this.toast(err);
       return;
@@ -483,7 +486,7 @@ export default {
   /**
    * Resets key binding
    */
-  resetKeyBindings() {
+  async resetKeyBindings() {
     const customKeyBindings = {};
     for (let binding in keyBindings) {
       const { key, readOnly, description } = keyBindings[binding];
@@ -493,12 +496,15 @@ export default {
           key,
         };
     }
-    fs.writeFile(
-      KEYBINDING_FILE,
-      JSON.stringify(customKeyBindings, undefined, 2),
-      true,
-      false
-    );
+    const fs = fsOperation(KEYBINDING_FILE);
+    if (!(await fs.exists())) {
+      fsOperation(DATA_STORAGE).createFile(Url.basename(KEYBINDING_FILE));
+    }
+    try {
+      fs.writeFile(JSON.stringify(customKeyBindings, undefined, 2));
+    } catch (error) {
+      console.log(error);
+    }
   },
   /**
    * Loads script files to app
@@ -651,7 +657,7 @@ export default {
       if (regex.test(url)) {
         url = url.replace(
           regex,
-          `${uuid.name}/${url.slice(-1) === '/' ? '/' : ''}`
+          `${uuid.name}${url.startsWith('/') ? '' : '/'}`,
         );
         break;
       }

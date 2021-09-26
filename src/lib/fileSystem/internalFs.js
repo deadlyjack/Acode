@@ -1,4 +1,4 @@
-import ajax from '../utils/ajax';
+import ajax from '@deadlyjack/ajax';
 import Url from '../utils/Url';
 export default {
   /**
@@ -47,7 +47,7 @@ export default {
               file.write(data);
             });
           },
-          reject
+          reject,
         );
       } else {
         window.resolveLocalFileSystemURL(
@@ -66,10 +66,10 @@ export default {
                   file.write(data);
                 });
               },
-              reject
+              reject,
             );
           },
-          reject
+          reject,
         );
       }
     });
@@ -91,7 +91,7 @@ export default {
             entry.removeRecursively(resolve, reject);
           }
         },
-        reject
+        reject,
       );
     });
   },
@@ -134,7 +134,7 @@ export default {
                 fileReader.readAsArrayBuffer(file);
               }, reject);
             },
-            reject
+            reject,
           );
         });
     });
@@ -157,7 +157,7 @@ export default {
             fs.moveTo(parent, newname, () => resolve(newUrl), reject);
           }, reject);
         },
-        reject
+        reject,
       );
     });
   },
@@ -179,10 +179,10 @@ export default {
               create: true,
             },
             () => resolve(Url.join(path, dirname)),
-            reject
+            reject,
           );
         },
-        reject
+        reject,
       );
     });
   },
@@ -211,7 +211,7 @@ export default {
             dest,
             undefined,
             (entry) => resolve(decodeURL(entry.nativeURL)),
-            reject
+            reject,
           );
         })
         .catch(reject);
@@ -226,7 +226,7 @@ export default {
           stats.uri = filename;
           resolve(stats);
         },
-        reject
+        reject,
       );
     });
   },
@@ -261,13 +261,13 @@ export default {
                   } else {
                     reject(err);
                   }
-                }
+                },
               );
             },
-            reject
+            reject,
           );
         },
-        reject
+        reject,
       );
     });
   },
@@ -286,7 +286,7 @@ export default {
         (err) => {
           if (err.code === 1) resolve(false);
           reject(err);
-        }
+        },
       );
     });
   },

@@ -1,40 +1,31 @@
 body {
+  --tail-spin: url(./res/tail-spin.svg);
   --primary-color: #9999ff;
-  --secondary-color: white;
+  --secondary-color: #ffffff;
   --accent-color: #3399ff;
   --text-color: #252525;
-  --text-main-color: white;
+  --text-main-color: #ffffff;
   --a-color: #615efd;
-  --border-color: rgba(122, 122, 122, 0.227);
+  --border-color: #7a7a7a3a;
   --error-text-color: #ffb95c;
-
-  --active-icon-color: rgba(0, 0, 0, 0.2);
-
-  --popup-border-color: transparent;
-
-  --box-shadow-color: rgba(0, 0, 0, 0.2);
-
+  --active-icon-color: #00000033;
+  --popup-border-color: #00000000;
+  --box-shadow-color: #00000033;
   --button-background-color: #3399ff;
   --button-active-color: #2c8ef0;
-  --button-text-color: white;
-
+  --button-text-color: #ffffff;
   --scrollbar-color: #0005;
-
-  --menu-background-color: white;
+  --menu-background-color: #ffffff;
   --menu-text-color: #252525;
   --menu-icon-color: #9999ff;
-
-  --dialogbox-background-color: white;
+  --dialogbox-background-color: #ffffff;
   --dialogbox-text-color: #252525;
   --dialogbox-selected-option-color: #a90000;
   --dialogbox-border-radius: 4px;
-
   --header-height: 45px;
   --statusbar-height: 25px;
   --footer-height: 40px;
-
   --distance: 10px;
-
   --command-palette-background-color: var(--primary-color);
   --command-palette-text-color: var(--text-main-color);
   --command-palette-border: none;
@@ -42,61 +33,54 @@ body {
   &[theme='dark'] {
     --primary-color: #313131;
     --secondary-color: #252525;
-    --text-color: white;
-    --text-main-color: white;
+    --text-color: #ffffff;
+    --text-main-color: #ffffff;
     --accent-color: #3399ff;
     --a-color: #b5b4e9;
     --border-color: rgba(255, 255, 255, 0.133);
-
     --menu-background-color: #313131;
-    --menu-text-color: white;
-    --menu-icon-color: white;
-
+    --menu-text-color: #ffffff;
+    --menu-icon-color: #ffffff;
     --dialogbox-background-color: #313131;
-    --dialogbox-text-color: white;
+    --dialogbox-text-color: #ffffff;
     --dialogbox-selected-option-color: gold;
   }
 
   &[theme='black'] {
     --primary-color: #000000;
     --secondary-color: #000000;
-    --text-color: white;
-    --text-main-color: white;
+    --text-color: #ffffff;
+    --text-main-color: #ffffff;
     --accent-color: #383838;
     --a-color: #b5b4e9;
     --border-color: rgba(255, 255, 255, 0.133);
-
     --menu-background-color: #000000;
-    --menu-text-color: white;
-    --menu-icon-color: white;
-
+    --menu-text-color: #ffffff;
+    --menu-icon-color: #ffffff;
     --dialogbox-background-color: #000000;
-    --dialogbox-text-color: white;
+    --dialogbox-text-color: #ffffff;
     --dialogbox-selected-option-color: rgb(121, 103, 0);
-
-    --box-shadow-color: transparent;
+    --box-shadow-color: rgba(0, 0, 0, 0);
     --popup-border-color: rgba(255, 255, 255, 0.4);
     --active-icon-color: rgba(255, 255, 255, 0.2);
-
     --command-palette-border: solid 0.5px var(--border-color);
   }
 
   &[theme='ocean'] {
     --primary-color: #20202c;
     --secondary-color: #262635;
-    --text-color: white;
-    --text-main-color: white;
+    --text-color: #ffffff;
+    --text-main-color: #ffffff;
     --accent-color: #3399ff;
     --a-color: #b5b4e9;
-    --border-color: rgba(255, 255, 255, 0.133);
-
+    --border-color: #ffffff22;
     --menu-background-color: #20202c;
-    --menu-text-color: white;
-    --menu-icon-color: white;
-
+    --menu-text-color: #ffffff;
+    --menu-icon-color: #ffffff;
     --dialogbox-background-color: #20202c;
-    --dialogbox-text-color: white;
-    --dialogbox-selected-option-color: gold;
+    --dialogbox-text-color: #ffffff;
+    --dialogbox-selected-option-color: #ffd700;
+    --box-shadow-color: #00000080;
   }
 
   &[theme='bump'] {
@@ -106,16 +90,13 @@ body {
     --text-main-color: #ececec;
     --accent-color: #f2a365;
     --a-color: #b5b4e9;
-    --border-color: rgba(255, 255, 255, 0.133);
-
+    --border-color: #ffffff22;
     --menu-background-color: #303841;
     --menu-text-color: #ececec;
     --menu-icon-color: #ececec;
-
     --dialogbox-background-color: #303841;
     --dialogbox-text-color: #ececec;
-    --dialogbox-selected-option-color: gold;
-
+    --dialogbox-selected-option-color: #ffd700;
     --button-background-color: #f2a365;
     --button-active-color: #d4894f;
     --button-text-color: #ececec;
@@ -128,16 +109,13 @@ body {
     --text-main-color: #ffbd69;
     --accent-color: #ff6363;
     --a-color: #b5b4e9;
-    --border-color: rgba(255, 255, 255, 0.133);
-
+    --border-color: #ffffff22;
     --menu-background-color: #202040;
     --menu-text-color: #ffbd69;
     --menu-icon-color: #ffbd69;
-
     --dialogbox-background-color: #202040;
     --dialogbox-text-color: #ffbd69;
     --dialogbox-selected-option-color: #3399ff;
-
     --button-background-color: #ff6363;
     --button-active-color: #a06334;
     --button-text-color: #ffbd69;
@@ -150,16 +128,13 @@ body {
     --text-main-color: #00fff5;
     --accent-color: #00adb5;
     --a-color: #b5b4e9;
-    --border-color: rgba(255, 255, 255, 0.133);
-
+    --border-color: #ffffff22;
     --menu-background-color: #222831;
     --menu-text-color: #00fff5;
     --menu-icon-color: #00fff5;
-
     --dialogbox-background-color: #222831;
     --dialogbox-text-color: #00fff5;
     --dialogbox-selected-option-color: #3399ff;
-
     --button-background-color: #00adb5;
     --button-active-color: #008e95;
     --button-text-color: #00fff5;
@@ -172,16 +147,13 @@ body {
     --text-main-color: #f6e9e9;
     --accent-color: #e16428;
     --a-color: #b5b4e9;
-    --border-color: rgba(255, 255, 255, 0.133);
-
+    --border-color: #ffffff22;
     --menu-background-color: #363333;
     --menu-text-color: #f6e9e9;
     --menu-icon-color: #f6e9e9;
-
     --dialogbox-background-color: #363333;
     --dialogbox-text-color: #f6e9e9;
     --dialogbox-selected-option-color: #3399ff;
-
     --button-background-color: #e16428;
     --button-active-color: #009199;
     --button-text-color: #f6e9e9;
@@ -194,16 +166,13 @@ body {
     --text-main-color: #f1bbd5;
     --accent-color: #a12559;
     --a-color: #b5b4e9;
-    --border-color: rgba(255, 255, 255, 0.133);
-
+    --border-color: #ffffff22;
     --menu-background-color: #3b0944;
     --menu-text-color: #f1bbd5;
     --menu-icon-color: #f1bbd5;
-
     --dialogbox-background-color: #3b0944;
     --dialogbox-text-color: #f1bbd5;
     --dialogbox-selected-option-color: #3399ff;
-
     --button-background-color: #a12559;
     --button-active-color: #009199;
     --button-text-color: #f1bbd5;
@@ -216,30 +185,26 @@ body {
     --text-main-color: #90b8f8;
     --accent-color: #5f85db;
     --a-color: #b5b4e9;
-    --border-color: rgba(255, 255, 255, 0.133);
-
+    --border-color: #ffffff22;
     --menu-background-color: #363b4e;
     --menu-text-color: #90b8f8;
     --menu-icon-color: #90b8f8;
-
     --dialogbox-background-color: #363b4e;
     --dialogbox-text-color: #90b8f8;
     --dialogbox-selected-option-color: #3399ff;
-
     --button-background-color: #5f85db;
     --button-active-color: #009199;
     --button-text-color: #90b8f8;
   }
 
   &[theme='light'] {
-    --primary-color: white;
-    --secondary-color: white;
+    --primary-color: #ffffff;
+    --secondary-color: #ffffff;
     --text-color: #333e59;
     --text-main-color: #333e59;
     --accent-color: #3399ff;
     --a-color: #686795;
-    --border-color: rgba(0, 0, 0, 0.133);
-
+    --border-color: #00000022;
     --menu-icon-color: #333e59;
   }
 }

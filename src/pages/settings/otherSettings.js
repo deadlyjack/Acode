@@ -74,9 +74,7 @@ export default function otherSettings() {
             appSettings.value.lang = res;
             appSettings.update();
             internalFs
-              .readFile(
-                `${cordova.file.applicationDirectory}www/lang/${res}.json`
-              )
+              .readFile(`${ASSETS_DIRECTORY}/lang/${res}.json`)
               .then((res) => {
                 const text = helpers.decodeText(res.data);
                 window.strings = JSON.parse(text);
@@ -95,7 +93,10 @@ export default function otherSettings() {
             if (res === 'edit') {
               actionStack.pop();
               actionStack.pop();
-              openFile(KEYBINDING_FILE);
+              openFile(KEYBINDING_FILE, {
+                render: true,
+                isUnsaved: false,
+              });
             } else {
               helpers.resetKeyBindings();
             }
@@ -109,7 +110,7 @@ export default function otherSettings() {
             ['browser', 'in app', ['none', strings['not set']]],
             {
               default: values.previewMode,
-            }
+            },
           )
           .then((res) => {
             if (res === values.previewMode) return;

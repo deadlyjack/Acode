@@ -55,6 +55,10 @@ function Ftp(username, password, hostname, port, security, mode) {
 
   return fs;
 
+  function getLocalFilename(pathname) {
+    return Url.join(CACHE_STORAGE, 'ftp' + pathname.hashCode());
+  }
+
   function connect(mode) {
     return new Promise((resolve, reject) => {
       if (Ftp.busy === 'write') {
@@ -79,7 +83,7 @@ function Ftp(username, password, hostname, port, security, mode) {
           (err) => {
             ftp.disconnect();
             reject('cannot connect to ftp: ' + err);
-          }
+          },
         );
       }
     });
@@ -134,7 +138,7 @@ function Ftp(username, password, hostname, port, security, mode) {
 
   function writeFile(pathname, data) {
     return new Promise((resolve, reject) => {
-      const cacheFile = Url.join(CACHE_STORAGE, pathname.hashCode());
+      const cacheFile = getLocalFilename(pathname);
       const originalPathname = pathname;
       pathname = Url.pathname(pathname);
 
@@ -177,7 +181,7 @@ function Ftp(username, password, hostname, port, security, mode) {
 
   function deleteFile(pathname) {
     return new Promise((resolve, reject) => {
-      const cacheFile = Url.join(CACHE_STORAGE, pathname.hashCode());
+      const cacheFile = getLocalFilename(pathname);
       pathname = Url.pathname(pathname);
       connect()
         .then((res) => {
@@ -224,7 +228,7 @@ function Ftp(username, password, hostname, port, security, mode) {
 
   function readFile(pathname) {
     return new Promise((resolve, reject) => {
-      const cacheFile = Url.join(CACHE_STORAGE, pathname.hashCode());
+      const cacheFile = getLocalFilename(pathname);
       pathname = Url.pathname(pathname);
       connect('read')
         .then((res) => {

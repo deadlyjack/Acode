@@ -1,3 +1,11 @@
+version 1.4.164
+☞ Added option to close the file in the menu.
+☞ Added option to reset remote connections.
+☞ Performance improvement.
+☞ Fixed bug in SFTP.
+☞ Fixed bug keybindings not loading.
+☞ UI improvements.
+
 version 1.4.163
 ☞ Fixed bug in opening file from GitHub.
 ☞ Fixed app not opening other language.

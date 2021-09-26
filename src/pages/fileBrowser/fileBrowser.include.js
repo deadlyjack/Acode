@@ -23,6 +23,19 @@ import remoteStorage from '../../lib/remoteStorage';
 import URLParse from 'url-parse';
 
 /**
+ * @typedef {{url: String, name: String}} Location
+ */
+
+/**
+ * @typedef Storage
+ * @property {String} name
+ * @property {String} uuid
+ * @property {String} url
+ * @property {'dir'} type
+ * @property {'permission'|'ftp'|'sftp'|'sd'} storageType
+ */
+
+/**
  *
  * @param {import('./fileBrowser').BrowseMode} [mode='file']
  * @param {function(string):boolean} [buttonText] button text or function to check extension
@@ -30,34 +43,18 @@ import URLParse from 'url-parse';
  * @param {boolean} [doesOpenLast]
  * @returns {Promise<import('./fileBrowser').SelectedFile>}
  */
-function FileBrowserInclude(
-  mode,
-  info,
-  buttonText = strings['select folder'],
-  doesOpenLast = true
-) {
-  if (!mode) mode = 'file';
+function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
+  mode = mode || 'file';
+  buttonText = buttonText || strings['select folder'];
 
   const IS_FOLDER_MODE = ['folder', 'both'].includes(mode);
   const IS_FILE_MODE = ['file', 'both'].includes(mode);
-
-  let fileBrowserState = [
-    {
-      url: '/',
-      name: '/',
-    },
-  ];
-  let fileBrowserOldState = JSON.parse(localStorage.fileBrowserState || '[]');
-  const prompt = dialogs.prompt;
-  /**@type {Array<{name: string, uuid: string, url: string, home: String, storageType: String}>} */
-  let storageList = JSON.parse(localStorage.storageList || '[]');
+  const storedState = helpers.parseJSON(localStorage.fileBrowserState) || [];
+  /**@type {Array<Location>} */
+  const state = [];
+  /**@type {Array<Storage>} */
   const allStorages = [];
-  const updateStorageList = (storage) => {
-    if (!storage.uuid) return;
-    storageList = storageList.filter((s) => s.uuid !== storage.uuid);
-    storageList.push(storage);
-    localStorage.storageList = JSON.stringify(storageList);
-  };
+  let storageList = JSON.parse(localStorage.storageList || '[]');
 
   if (!info) {
     if (mode !== 'both') {
@@ -100,9 +97,9 @@ function FileBrowserInclude(
       mustache.render(_template, {
         type: mode,
         info,
-      })
+      }),
     );
-    const $navigation = $content.querySelector('.navigation');
+    const $navigation = $content.get('.navigation');
     const menuOption = {
       top: '8px',
       right: '8px',
@@ -111,9 +108,11 @@ function FileBrowserInclude(
     };
     const $fbMenu = contextMenu({
       innerHTML: () => {
-        return `<li action="settings">${strings.settings.capitalize(
-          0
-        )}</li><li action="reload">${strings.reload.capitalize(0)}</li>`;
+        return `
+        <li action="settings">${strings.settings.capitalize(0)}</li>
+        <li action="refresh">${strings['reset connections'].capitalize(0)}</li>
+        <li action="reload">${strings.reload.capitalize(0)}</li>
+        `;
       },
       ...menuOption,
     });
@@ -133,12 +132,13 @@ function FileBrowserInclude(
       },
       ...((menuOption.toggle = $addMenuToggler) && menuOption),
     });
-    const root = 'file:///storage/';
     const progress = {};
     let cachedDir = {};
     let currentDir = {
-      url: '/',
-      name: strings['file browser'],
+      url: null,
+      name: null,
+      list: [],
+      scroll: 0,
     };
     let folderOption;
     //#endregion
@@ -172,15 +172,24 @@ function FileBrowserInclude(
       }
 
       if (action === 'reload') {
-        const { url, name } = currentDir;
+        const { url } = currentDir;
         if (url in cachedDir) delete cachedDir[url];
-        loadDir(url, name);
+        reload();
         return;
       }
 
-      if (action === 'help') {
-        localStorage.__fbHelp = true;
-        $menuToggler.classList.remove('notice');
+      if (action === 'refresh') {
+        ftp.disconnect(
+          () => {},
+          () => {},
+        );
+        sftp.close(
+          () => {},
+          () => {},
+        );
+        __sftpTaskQueue.length = 0;
+        __sftpBusy = false;
+        toast(strings.success);
         return;
       }
     };
@@ -205,12 +214,10 @@ function FileBrowserInclude(
             .then((res) => {
               storageList.push(res);
               localStorage.storageList = JSON.stringify(storageList);
-              navigationPop();
-              listAllStorages();
+              reload();
             })
             .catch((err) => {
               helpers.error(err);
-              console.error(err);
             });
           break;
 
@@ -225,14 +232,16 @@ function FileBrowserInclude(
                 strings['feature not available'],
                 () => {
                   window.open(constants.PAID_VERSION, '_system');
-                }
+                },
               );
               break;
             }
           }
 
           remoteStorage[action]()
-            .then(updateStorage)
+            .then((storage) => {
+              updateStorage(storage);
+            })
             .catch((err) => {
               if (err) console.error(err);
             });
@@ -277,163 +286,11 @@ function FileBrowserInclude(
       };
     }
 
-    if (doesOpenLast && fileBrowserOldState.length) {
-      navigate(fileBrowserOldState);
+    if (doesOpenLast && storedState.length) {
+      loadStates(storedState);
       return;
     }
-    listAllStorages();
-
-    async function listAllStorages() {
-      if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
-      allStorages.length = 0;
-      let isStorageManager = await new Promise((resolve, reject) => {
-        system.isExternalStorageManager(resolve, reject);
-      });
-
-      if (!isStorageManager && ANDROID_SDK_INT >= 30) {
-        util.pushFolder(allStorages, 'Allow Acode to manage all files', '', {
-          storageType: 'permission',
-          uuid: 'permission',
-        });
-      }
-
-      if (ANDROID_SDK_INT <= 29 || isStorageManager) {
-        util.pushFolder(
-          allStorages,
-          'Internal storage',
-          cordova.file.externalRootDirectory,
-          {
-            storageType: 'SD',
-            uuid: 'internal-storage',
-          }
-        );
-      }
-
-      try {
-        const res = await externalFs.listStorages();
-        res.forEach((storage) => {
-          if (storageList.find((s) => s.uuid === storage.uuid)) return;
-          let path;
-          if (storage.path && isStorageManager) {
-            path = 'file://' + storage.path;
-          }
-          util.pushFolder(allStorages, storage.name, path || '', {
-            ...storage,
-            storageType: 'SD',
-          });
-        });
-      } catch (err) {}
-
-      storageList.forEach((storage) => {
-        let url = storage.url || /**@drepreceted */ storage['uri'];
-
-        util.pushFolder(allStorages, storage.name, url, {
-          storageType: storage.storageType,
-          uuid: storage.uuid,
-          home: storage.home,
-        });
-      });
-
-      if (IS_FILE_MODE) {
-        util.pushFolder(allStorages, 'Select document', null, {
-          'open-doc': true,
-        });
-      }
-
-      cachedDir['/'] = {
-        name: '/',
-        list: allStorages,
-      };
-
-      navigationPush('/', '/');
-      currentDir.url = '/';
-      currentDir.name = 'File Browser';
-      $page.settitle(strings['file browser']);
-      render(helpers.sortDir(allStorages, appSettings.value.fileBrowser));
-    }
-
-    async function loadDir(url = '/', name = strings['file browser']) {
-      const id = helpers.uuid();
-      progress[id] = true;
-
-      if (url === '/') return listAllStorages();
-
-      if (url in cachedDir) {
-        update();
-        const item = cachedDir[url];
-        render(item.list);
-        const $list = tag.get('#list');
-        $list.scrollTop = item.scroll;
-        name = item.name;
-      } else {
-        const timeout = setTimeout(() => {
-          dialogs.loader.create(name, strings.loading + '...', {
-            timeout: 10000,
-            callback() {
-              dialogs.loader.destroy();
-              navigationPush('/', '/');
-              progress[id] = false;
-            },
-          });
-        }, 100);
-
-        try {
-          const { fileBrowser } = appSettings.value;
-          const fs = fsOperation(url);
-          let list = await fs.lsDir();
-
-          if (!progress[id]) {
-            delete progress[id];
-            return;
-          }
-
-          delete progress[id];
-          list = helpers.sortDir(
-            list,
-            fileBrowser,
-            testFileType,
-            null,
-            null,
-            mode
-          );
-          cachedDir[url] = {
-            name,
-            list,
-          };
-          update();
-          render(list);
-        } catch (err) {
-          if (!progress[id]) {
-            delete progress[id];
-            return;
-          }
-
-          actionStack.remove(currentDir.url);
-          helpers.error(err, url);
-          console.error(err);
-        }
-
-        clearTimeout(timeout);
-        dialogs.loader.destroy();
-      }
-
-      function update() {
-        if (url === root) {
-          $addMenuToggler.classList.add('disabled');
-          if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
-        } else {
-          $addMenuToggler.classList.remove('disabled');
-          if (IS_FOLDER_MODE) folderOption.classList.remove('disabled');
-        }
-
-        currentDir.url = url;
-        currentDir.name = name;
-        const $list = tag.get('#list');
-        if ($list) $list.scrollTop = 0;
-        navigationPush(name, url);
-        $page.settitle(name);
-      }
-    }
+    navigate('/', '/');
 
     /**
      *
@@ -449,7 +306,7 @@ function FileBrowserInclude(
       if (!action) return;
 
       let url = $el.data_url;
-      let name = $el.getAttribute('name');
+      let name = $el.data_name || $el.getAttribute('name');
       const opendoc = $el.hasAttribute('open-doc');
       const uuid = $el.getAttribute('uuid');
       const type = $el.getAttribute('type');
@@ -481,7 +338,7 @@ function FileBrowserInclude(
           storage.url = res.uri;
           storage.name = res.name;
           name = res.name;
-          updateStorageList(storage);
+          updateStorage(storage, false);
           url = res.uri;
           folder();
         });
@@ -496,7 +353,7 @@ function FileBrowserInclude(
           folder();
           break;
         case 'contextmenu':
-          cmhandle();
+          cmhandler();
           break;
         case 'open':
           if (isDir) folder();
@@ -512,20 +369,11 @@ function FileBrowserInclude(
           navigateToHome();
           return;
         }
-        const $list = tag.get('#list');
-        const currentUrl = currentDir.url;
-        cachedDir[currentUrl].scroll = $list ? $list.scrollTop : 0;
-        actionStack.push({
-          id: currentUrl,
-          action: function () {
-            navigationPop();
-          },
-        });
-        loadDir(url, name);
+        navigate(url, name);
       }
 
       function navigateToHome() {
-        const navigations = [{ url: '/', name: '' }];
+        const navigations = [];
         const dirs = home.split('/');
         const { url: parsedUrl, query } = Url.parse(url);
         let path = '';
@@ -538,7 +386,7 @@ function FileBrowserInclude(
           });
         }
 
-        navigate(navigations);
+        loadStates(navigations);
       }
 
       function file() {
@@ -550,7 +398,7 @@ function FileBrowserInclude(
         });
       }
 
-      function cmhandle() {
+      function cmhandler() {
         if (appSettings.value.vibrateOnTap) {
           navigator.vibrate(constants.VIBRATION_TIME);
         }
@@ -575,7 +423,7 @@ function FileBrowserInclude(
               dialogs
                 .confirm(
                   strings.warning.toUpperCase(),
-                  strings['delete {name}'].replace('{name}', name)
+                  strings['delete {name}'].replace('{name}', name),
                 )
                 .then(remove);
               break;
@@ -592,8 +440,11 @@ function FileBrowserInclude(
             case 'edit':
               remoteStorage
                 .edit(storageList.find((storage) => storage.uuid === uuid))
-                .then((res) => {
-                  updateStorage(res, uuid);
+                .then((storage) => {
+                  if (storage) {
+                    storage.uuid = uuid;
+                    updateStorage(storage);
+                  }
                 })
                 .catch((err) => {
                   if (err) console.error(err);
@@ -632,7 +483,6 @@ function FileBrowserInclude(
           reload();
         } catch (err) {
           helpers.error(err);
-          console.error(err);
         }
       }
 
@@ -655,7 +505,6 @@ function FileBrowserInclude(
           reload();
           toast(strings.success);
         } catch (err) {
-          console.error(err);
           helpers.error(err);
         }
       }
@@ -673,7 +522,7 @@ function FileBrowserInclude(
           if (storage.url) {
             const parsedUrl = URLParse(storage.url, true);
             const keyFile = decodeURIComponent(
-              parsedUrl.query['keyFile'] || ''
+              parsedUrl.query['keyFile'] || '',
             );
             if (keyFile) {
               fsOperation(keyFile).deleteFile();
@@ -682,8 +531,7 @@ function FileBrowserInclude(
           return false;
         });
         localStorage.storageList = JSON.stringify(storageList);
-        navigationPop();
-        listAllStorages();
+        reload();
       }
 
       function renameStorage(newname) {
@@ -692,8 +540,7 @@ function FileBrowserInclude(
           return storage;
         });
         localStorage.storageList = JSON.stringify(storageList);
-        navigationPop();
-        listAllStorages();
+        reload();
       }
 
       function openDoc() {
@@ -710,8 +557,7 @@ function FileBrowserInclude(
           },
           (err) => {
             helpers.error(err);
-            console.error(err);
-          }
+          },
         );
       }
     }
@@ -720,133 +566,184 @@ function FileBrowserInclude(
       handleClick(e, true);
     }
 
-    function render(list) {
-      const $list = tag.parse(
-        mustache.render(_list, {
-          msg: strings['empty folder message'],
-          list,
-        })
-      );
+    async function listAllStorages() {
+      if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
+      allStorages.length = 0;
+      let isStorageManager = await new Promise((resolve, reject) => {
+        system.isExternalStorageManager(resolve, reject);
+      });
 
-      const $oldList = $content.querySelector('#list');
-      if ($oldList) $oldList.remove();
-      $content.append($list);
-      $list.focus();
-
-      //Adding notification to icon to let user know about new feature
-      if (currentDir.url === '/') {
-        const addButtonNotice =
-          !localStorage.__fbAddPath || !localStorage.__fbAddSftp;
-
-        if (addButtonNotice) {
-          $addMenuToggler.classList.add('notice');
-        }
-      } else {
-        $menuToggler.classList.remove('notice');
-        $addMenuToggler.classList.remove('notice');
+      if (!isStorageManager && ANDROID_SDK_INT >= 30) {
+        util.pushFolder(allStorages, 'Allow Acode to manage all files', '', {
+          storageType: 'permission',
+          uuid: 'permission',
+        });
       }
-    }
 
-    function navigate(states) {
-      if (!Array.isArray(states)) return;
-      let currUrl;
+      if (ANDROID_SDK_INT <= 29 || isStorageManager) {
+        util.pushFolder(
+          allStorages,
+          'Internal storage',
+          cordova.file.externalRootDirectory,
+          {
+            uuid: 'internal-storage',
+          },
+        );
+      }
 
-      for (let i = 0; i < states.length; ++i) {
-        const { url, name } = states[i];
-        if (i > 0) {
-          actionStack.push({
-            id: currUrl,
-            action: navigationPop,
+      try {
+        const res = await externalFs.listStorages();
+        res.forEach((storage) => {
+          if (storageList.find((s) => s.uuid === storage.uuid)) return;
+          let path;
+          if (storage.path && isStorageManager) {
+            path = 'file://' + storage.path;
+          }
+          util.pushFolder(allStorages, storage.name, path || '', {
+            ...storage,
+            storageType: 'sd',
           });
+        });
+      } catch (err) {}
+
+      storageList.forEach((storage) => {
+        let url = storage.url || /**@drepreceted */ storage['uri'];
+
+        util.pushFolder(allStorages, storage.name, url, {
+          storageType: storage.storageType,
+          uuid: storage.uuid,
+          home: storage.home,
+        });
+      });
+
+      if (IS_FILE_MODE) {
+        util.pushFolder(allStorages, 'Select document', null, {
+          'open-doc': true,
+        });
+      }
+
+      return allStorages;
+    }
+
+    /**
+     * Gets directory for given url for rendering
+     * @param {String} url
+     * @param {String} name
+     * @returns {Promise<{name: String, url: String, list: [], scroll: Number}>}
+     */
+    async function getDir(url, name) {
+      const { fileBrowser } = appSettings.value;
+      let list = null;
+      let error = false;
+
+      if (url in cachedDir) {
+        return cachedDir[url];
+      } else {
+        if (url === '/') {
+          list = await listAllStorages();
+        } else {
+          const id = helpers.uuid();
+
+          progress[id] = true;
+          const timeout = setTimeout(() => {
+            dialogs.loader.create(name, strings.loading + '...', {
+              timeout: 10000,
+              callback() {
+                dialogs.loader.destroy();
+                navigate('/', '/');
+                progress[id] = false;
+              },
+            });
+          }, 100);
+
+          const fs = fsOperation(url);
+          try {
+            list = await fs.lsDir();
+          } catch (err) {
+            if (progress[id]) {
+              helpers.error(err, url);
+            } else {
+              console.error(err);
+            }
+          }
+
+          error = !progress[id];
+
+          delete progress[id];
+          clearTimeout(timeout);
+          dialogs.loader.destroy();
         }
-
-        if (i === states.length - 1) loadDir(url, name);
-        else navigationPush(name, url);
-
-        currUrl = url;
+        if (error) return null;
+        return {
+          url,
+          name,
+          scroll: 0,
+          list: helpers.sortDir(list, fileBrowser, testFileType, mode),
+        };
       }
     }
 
-    function navigationPush(name, url) {
-      const id = `nav_${url.hashCode()}`;
-      const $old = $navigation.querySelector('.active');
-      let $nav = tag.get(`#${id}`);
+    /**
+     * Navigates to specific directory
+     * @param {String} url
+     * @param {String} name
+     */
+    async function navigate(url, name, assignBackButton = true) {
+      if (!url) {
+        throw new Error('navigate(url, name): "url" is required.');
+      }
 
-      if ($old) $old.classList.remove('active');
+      if (!name) {
+        throw new Error('navigate(url, name): "name" is required.');
+      }
+
+      if (url === '/') {
+        if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
+      } else {
+        if (IS_FOLDER_MODE) folderOption.classList.remove('disabled');
+      }
+
+      const $nav = tag.get(`#${getNavId(url)}`);
 
       //If navigate to previous directories, clear the rest navigation
       if ($nav) {
         let $topNav;
         while (($topNav = $navigation.lastChild) !== $nav) {
-          const url = $topNav.getAttribute('url');
+          const url = $topNav.data_url;
           actionStack.remove(url);
           $topNav.remove();
         }
 
-        while ((fileBrowserState.slice(-1)[0] || { url }).url !== url) {
-          fileBrowserState.pop();
+        while (1) {
+          const location = state.slice(-1)[0];
+          if (!location || location.url === url) break;
+          state.pop();
         }
+        localStorage.fileBrowserState = JSON.stringify(state);
 
-        localStorage.fileBrowserState = JSON.stringify(fileBrowserState);
-        actionStack.remove(url);
-        return $nav.classList.add('active');
-      }
-
-      if (name && doesOpenLast) {
-        fileBrowserState.push({
-          name,
-          url,
-        });
-        localStorage.fileBrowserState = JSON.stringify(fileBrowserState);
-      }
-
-      $nav = tag('span', {
-        className: 'nav active',
-        id: `${id}`,
-        data_url: url,
-        data_name: name,
-        attr: {
-          action: 'navigation',
-          text: name,
-        },
-        tabIndex: -1,
-      });
-
-      $navigation.append($nav);
-      $navigation.scrollLeft = $navigation.scrollWidth;
-    }
-
-    function navigationPop() {
-      if (doesOpenLast) {
-        fileBrowserState.pop();
-        localStorage.fileBrowserState = JSON.stringify(fileBrowserState);
-      }
-      const $nav = $navigation.lastChild.previousElementSibling;
-      if ($nav) {
-        const url = $nav.data_url;
-        const name = $nav.data_name;
-        navigationPush(name, url);
-        loadDir(url, name);
-      }
-    }
-
-    function updateAddedFolder(url) {
-      if (cachedDir[url]) delete cachedDir[url];
-      if (cachedDir[currentDir.url]) delete cachedDir[currentDir.url];
-
-      const regex = new RegExp(Url.parse(url).url);
-
-      for (let folder of addedFolder) {
-        if (folder.url === url) {
-          folder.remove();
-        } else if (regex.test(currentDir.url)) {
-          folder.reload();
+        const dir = await getDir(url, name);
+        if (dir) {
+          render(dir);
         }
+        return;
+      }
+
+      const dir = await getDir(url, name);
+      if (dir) {
+        const { url: curl, name: cname } = currentDir;
+        let action;
+        if (doesOpenLast) pushState({ name, url });
+        if (curl && cname && assignBackButton) {
+          action = () => {
+            navigate(curl, cname, false);
+          };
+        }
+        pushToNavbar(name, url, action);
+        render(dir);
       }
     }
 
     /**
-     *
      * @param {"file"|"folder"|"project"} arg
      */
     async function create(arg) {
@@ -867,7 +764,7 @@ function FileBrowserInclude(
           val = 'untitled.txt';
         }
 
-        let entryName = await prompt(title, val, 'filename', {
+        let entryName = await dialogs.prompt(title, val, 'filename', {
           match: constants.FILE_NAME_REGEX,
           required: true,
         });
@@ -883,7 +780,6 @@ function FileBrowserInclude(
           reload();
         } catch (err) {
           helpers.error(err);
-          console.error(err);
         }
 
         return;
@@ -908,7 +804,7 @@ function FileBrowserInclude(
           {
             required: true,
             match: constants.FILE_NAME_REGEX,
-          }
+          },
         );
 
         try {
@@ -920,7 +816,6 @@ function FileBrowserInclude(
           await createProject(files); // Creating project
         } catch (err) {
           helpers.error(err);
-          console.error(err);
         }
 
         dialogs.loader.destroy();
@@ -966,6 +861,102 @@ function FileBrowserInclude(
       }
     }
 
+    /**
+     *  Pushes a navigation button to navbar
+     * @param {String} id
+     * @param {String} name
+     * @param {String} url
+     */
+    function pushToNavbar(name, url, action) {
+      $navigation.append(
+        tag('span', {
+          id: getNavId(url),
+          className: 'nav',
+          data_url: url,
+          data_name: name,
+          attr: {
+            action: 'navigation',
+            text: name,
+          },
+          tabIndex: -1,
+        }),
+      );
+      $navigation.scrollLeft = $navigation.scrollWidth;
+
+      if (action && !actionStack.has(url)) {
+        actionStack.push({
+          id: url,
+          action,
+        });
+      }
+    }
+
+    /**
+     * Loads up given states
+     * @param {Array<Location>} states
+     */
+    function loadStates(states) {
+      if (!Array.isArray(states)) return;
+
+      const backNavigation = [];
+      const { url, name } = states.pop();
+      let { url: lastUrl, name: lastName } = currentDir;
+
+      while (states.length) {
+        const location = states.splice(0, 1)[0];
+        const { url, name } = location;
+        let action;
+
+        if (doesOpenLast) pushState({ name, url });
+        if (lastUrl && lastName) {
+          backNavigation.push([lastUrl, lastName]);
+          action = () => {
+            const [url, name] = backNavigation.pop();
+            navigate(url, name, false);
+          };
+        }
+        pushToNavbar(name, url, action);
+        lastUrl = url;
+        lastName = name;
+      }
+
+      currentDir = { url: lastUrl, name: lastName };
+      navigate(url, name);
+    }
+
+    /**
+     *
+     * @param {String} url
+     */
+    function getNavId(url) {
+      return `nav_${url.hashCode()}`;
+    }
+
+    /**
+     * Updates folders that are added in sidebar
+     * @param {String} url
+     */
+    function updateAddedFolder(url) {
+      if (cachedDir[url]) delete cachedDir[url];
+      if (cachedDir[currentDir.url]) delete cachedDir[currentDir.url];
+
+      const regex = new RegExp(Url.parse(url).url);
+
+      for (let folder of addedFolder) {
+        if (folder.url === url) {
+          folder.remove();
+        } else if (regex.test(currentDir.url)) {
+          folder.reload();
+        }
+      }
+    }
+
+    /**
+     * Check if file is allowed or not and returns `true` if allowed
+     * else returns `false`.
+     * @param {String} uri
+     * @returns
+     */
     function testFileType(uri) {
       const ext = helpers.extname(uri);
 
@@ -977,30 +968,80 @@ function FileBrowserInclude(
       return true;
     }
 
-    function updateStorage(storage, uuid) {
-      if (uuid) {
-        storageList = storageList.filter((storage) => storage.uuid !== uuid);
+    /**
+     *
+     * @param {Storage} storage
+     * @param {Boolean} doesRleoad
+     */
+    function updateStorage(storage, doesRleoad = true) {
+      if (storage.uuid) {
+        storageList = storageList.filter((s) => s.uuid !== storage.uuid);
       } else {
-        uuid = helpers.uuid();
+        storage.uuid = helpers.uuid();
       }
 
-      storageList.push({
-        name: storage.alias,
-        uri: storage.url,
-        home: storage.home,
-        uuid,
-        storageType: storage.type,
-        type: 'dir',
-      });
+      if (!storage.type) {
+        storage.type = 'dir';
+      }
+
+      if (!storage.storageType) {
+        storage.storageType = storage.type;
+      }
+
+      storageList.push(storage);
       localStorage.storageList = JSON.stringify(storageList);
-      navigationPop();
-      listAllStorages();
+      if (doesRleoad) reload();
+    }
+
+    function render(dir) {
+      const { list, scroll } = dir;
+      const $list = tag.parse(
+        mustache.render(_list, {
+          msg: strings['empty folder message'],
+          list,
+        }),
+      );
+
+      const $oldList = $content.get('#list');
+      if ($oldList) {
+        const { url } = currentDir;
+        if (url && cachedDir[url]) {
+          cachedDir[url].scroll = $oldList.scrollTop;
+        }
+        $oldList.remove();
+      }
+      $content.append($list);
+      $list.scrollTop = scroll;
+      $list.focus();
+
+      //Adding notification to icon to let user know about new feature
+      if (currentDir.url === '/') {
+        const addButtonNotice =
+          !localStorage.__fbAddPath || !localStorage.__fbAddSftp;
+
+        if (addButtonNotice) {
+          $addMenuToggler.classList.add('notice');
+        }
+      } else {
+        $menuToggler.classList.remove('notice');
+        $addMenuToggler.classList.remove('notice');
+      }
+
+      currentDir = dir;
+      cachedDir[dir.url] = dir;
     }
 
     function reload() {
       const { url, name } = currentDir;
       delete cachedDir[url];
-      loadDir(url, name);
+      navigate(url, name);
+    }
+
+    function pushState({ url, name }) {
+      if (!url || !name) return;
+      if (state.find((l) => l.url === url)) return;
+      state.push({ url, name });
+      localStorage.fileBrowserState = JSON.stringify(state);
     }
   });
 }

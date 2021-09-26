@@ -29,7 +29,7 @@ function fsOperation(uri) {
 
     let { username, password, hostname, pathname, port, query } = UrlParse(
       uri,
-      true
+      true,
     );
 
     if (username) {
@@ -176,8 +176,8 @@ function fsOperation(uri) {
       renameTo(newname) {
         return fs.rename(url, Url.join(Url.dirname(url), newname));
       },
-      exists() {
-        return fs.ls(url, true);
+      async exists() {
+        return !!(await fs.ls(url, true));
       },
       stats() {
         return fs.stats(url);
@@ -277,7 +277,7 @@ function fsOperation(uri) {
               if (res === 'TRUE') resolve(true);
               else resolve(false);
             },
-            reject
+            reject,
           );
         });
       },
