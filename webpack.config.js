@@ -3,7 +3,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const noModule = {
-  mode: 'production',
+  mode: 'development',
   entry: {
     main: './src/lib/main.js',
     console: './src/lib/console.js',
