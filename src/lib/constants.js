@@ -94,6 +94,7 @@ export default {
     'id-id': 'Indonesian',
     'uz-uz': "O'zbekcha",
     'ru-ru': 'Русский',
+    'pl-pl': "Polski",
     'pt-br': 'Português',
     'tr-tr': 'Türkçe',
     'uk-ua': 'Українська',
