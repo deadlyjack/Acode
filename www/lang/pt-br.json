@@ -207,6 +207,6 @@
   "line height": "Altura da linha",
   "preview info": "Se você quiser executar o arquivo ativo, toque e segure o ícone de reprodução.",
   "manage all files": "Permita que o editor Acode gerencie todos os arquivos nas configurações para editar arquivos em seu dispositivo facilmente.",
-  "close file": "Close file",
-  "reset connections": "Reset connections"
+  "close file": "Fechar arquivo",
+  "reset connections": "Reiniciar conexões"
 }
