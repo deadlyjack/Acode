@@ -87,22 +87,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-intent": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-intent"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-sdcard": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-sdcard"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-inappbrowser": {
     "source": {
       "type": "local",
@@ -115,6 +99,22 @@
     "source": {
       "type": "local",
       "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-system"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-sdcard": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-sdcard"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-intent": {
+    "source": {
+      "type": "local",
+      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-intent"
     },
     "is_top_level": true,
     "variables": {}

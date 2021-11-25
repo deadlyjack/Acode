@@ -18,8 +18,10 @@ import quickTools from './handlers/quickTools';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import path from './utils/Path';
 import showFileInfo from './showFileInfo';
+import checkFiles from './checkFiles';
+import saveState from './saveState';
 
-const commands = {
+export default {
   'close-all-tabs'() {
     for (let file of editorManager.files) {
       editorManager.removeFile(file);
@@ -38,53 +40,8 @@ const commands = {
     clipboardAction('cut');
   },
   'check-files'() {
-    (async () => {
-      const files = editorManager.files;
-      const { editor } = editorManager;
-
-      for (let file of files) {
-        if (file.isUnsaved) continue;
-
-        if (file.uri) {
-          const fs = fsOperation(file.uri);
-
-          if (!(await fs.exists()) && !file.readOnly) {
-            file.isUnsaved = true;
-            file.uri = null;
-            dialogs.alert(
-              strings.info.toUpperCase(),
-              strings['file has been deleted'].replace('{file}', file.filename),
-            );
-            editorManager.onupdate('file-changed');
-            continue;
-          }
-
-          const text = await fs.readFile('utf-8');
-          const loadedText = file.session.getValue();
-
-          if (text !== loadedText) {
-            try {
-              await dialogs.confirm(
-                strings.warning.toUpperCase(),
-                file.filename + strings['file changed'],
-              );
-
-              const cursorPos = editor.getCursorPosition();
-              editorManager.switchFile(file.id);
-
-              file.markChanged = false;
-              file.session.setValue(text);
-              editor.gotoLine(cursorPos.row, cursorPos.column);
-              editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
-            } catch (error) {}
-          }
-        }
-      }
-
-      if (!editorManager.activeFile) {
-        app.focus();
-      }
-    })();
+    if (!appSettings.value.checkFiles) return;
+    checkFiles();
   },
   'disable-fullscreen'() {
     app.classList.remove('fullscreen-mode');
@@ -278,7 +235,6 @@ const commands = {
       }
     } else {
       file.filename = newname;
-      // if (file.type === 'regular') toast(strings['file renamed']);
     }
   },
   replace() {
@@ -298,55 +254,7 @@ const commands = {
     saveFile(editorManager.activeFile, false, toast);
   },
   'save-state'() {
-    const filesToSave = [];
-    const folders = [];
-    const { activeFile } = editorManager;
-    const { editor } = editorManager;
-    const { files } = editorManager;
-    for (let file of files) {
-      if (file.id === constants.DEFAULT_FILE_SESSION) {
-        continue;
-      }
-
-      const edit = {
-        id: file.id,
-        filename: file.filename,
-        type: file.type,
-        uri: file.uri,
-        isUnsaved: file.isUnsaved,
-        readOnly: file.readOnly,
-        mode: file.mode,
-        deltedFile: file.deltedFile,
-        cursorPos: editor.getCursorPosition(),
-      };
-
-      if (edit.type === 'git') edit.sha = file.record.sha;
-      else if (edit.type === 'gist') {
-        edit.recordid = file.record.id;
-        edit.isNew = file.record.isNew;
-      }
-
-      filesToSave.push(edit);
-    }
-
-    addedFolder.forEach((folder) => {
-      const { url, reloadOnResume, saveState, title } = folder;
-      folders.push({
-        url,
-        opts: {
-          saveState,
-          reloadOnResume,
-          name: title,
-        },
-      });
-    });
-
-    if (activeFile) {
-      localStorage.setItem('lastfile', activeFile.id);
-    }
-
-    localStorage.files = JSON.stringify(filesToSave);
-    localStorage.folders = JSON.stringify(folders);
+    saveState();
   },
   'save-as'(toast) {
     saveFile(editorManager.activeFile, true, toast);
@@ -396,5 +304,3 @@ const commands = {
     Acode.$editMenuToggler.click();
   },
 };
-
-export default commands;

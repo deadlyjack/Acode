@@ -598,6 +598,8 @@ textarea {
   border-radius: 4px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 8px var(--box-shadow-color);
+  border: none;
+  border: var(--clipboard-menu-border);
   color: #252525;
   color: var(--text-color);
   z-index: 4;
@@ -741,7 +743,7 @@ textarea {
     display: inline-flex;
     min-height: 40px;
     min-width: 40px;
-    text-shadow: 0 0 5px white;
+    text-shadow: 0 0 1px white;
 
     &.github {
       color: black;

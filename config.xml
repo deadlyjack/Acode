@@ -52,9 +52,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
                 <data android:mimeType="text/*"/>
                 <data android:mimeType="xml/*" />
-                <data android:mimeType="application/css" />
-                <data android:mimeType="media/ts" />
-                <data android:mimeType="application/js" />
+                <data android:scheme="file" android:pathPattern=".*\\.js" />
+                <data android:scheme="file" android:pathPattern=".*\\.ts" />
+                <data android:scheme="file" android:pathPattern=".*\\.css" />
+                <data android:scheme="file" android:pathPattern=".*\\.dart" />
+                <data android:scheme="file" android:pathPattern=".*\\.jsx" />
+                <data android:scheme="file" android:pathPattern=".*\\.py" />
+                <data android:scheme="file" android:pathPattern=".*\\.c" />
+                <data android:scheme="file" android:pathPattern=".*\\.cpp" />
             </intent-filter>
         </config-file>
 

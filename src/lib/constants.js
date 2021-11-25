@@ -94,7 +94,7 @@ export default {
     'id-id': 'Indonesian',
     'uz-uz': "O'zbekcha",
     'ru-ru': 'Русский',
-    'pl-pl': "Polski",
+    'pl-pl': 'Polski',
     'pt-br': 'Português',
     'tr-tr': 'Türkçe',
     'uk-ua': 'Українська',
@@ -154,6 +154,7 @@ export default {
     textmate: scheme('textmate', 'light'),
     tomorrow: scheme('tomorrow', 'light'),
     xcode: scheme('xcode', 'light'),
+    one_dark: scheme('one_dark', 'dark'),
   },
 
   /**

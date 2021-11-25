@@ -141,6 +141,9 @@ async function ondeviceready() {
         return strings['unsaved files close app'];
       }
     },
+    setLoadingMessage(message) {
+      document.body.setAttribute('data-small-msg', message);
+    },
   };
   window.keyBindings = (name) => {
     if (customKeyBindings && name in window.customKeyBindings)
@@ -152,7 +155,7 @@ async function ondeviceready() {
   system.requestPermission('android.permission.WRITE_EXTERNAL_STORAGE');
   localStorage.versionCode = BuildInfo.versionCode;
   document.body.setAttribute('data-version', 'v' + BuildInfo.version);
-  document.body.setAttribute('data-small-msg', 'Loading settings...');
+  Acode.setLoadingMessage('Loading settings...');
 
   window.resolveLocalFileSystemURL = function (url, ...args) {
     oldRURL.call(this, Url.safe(url), ...args);
@@ -173,7 +176,7 @@ async function ondeviceready() {
   if (language in constants.langList) {
     lang = language;
   }
-  document.body.setAttribute('data-small-msg', 'Loading settings...');
+  Acode.setLoadingMessage('Loading settings...');
   await appSettings.init(lang);
 
   if (localStorage.versionCode < 150) {
@@ -182,7 +185,7 @@ async function ondeviceready() {
     window.location.reload();
   }
 
-  document.body.setAttribute('data-small-msg', 'Loading custom theme...');
+  Acode.setLoadingMessage('Loading custom theme...');
   document.head.append(
     tag('style', {
       id: 'custom-theme',
@@ -193,7 +196,7 @@ async function ondeviceready() {
     }),
   );
 
-  document.body.setAttribute('data-small-msg', 'Loading language...');
+  Acode.setLoadingMessage('Loading language...');
   try {
     const languageFile = `${ASSETS_DIRECTORY}/lang/${appSettings.value.lang}.json`;
     const fs = fsOperation(languageFile);
@@ -203,7 +206,7 @@ async function ondeviceready() {
     alert('Unable to load language file.');
   }
 
-  document.body.setAttribute('data-small-msg', 'Loading styles...');
+  Acode.setLoadingMessage('Loading styles...');
   try {
     const fs = fsOperation(Url.join(ASSETS_DIRECTORY, '/css/build/'));
     const styles = await fs.lsDir();
@@ -212,7 +215,7 @@ async function ondeviceready() {
     alert('Unable to load styles.');
   }
 
-  document.body.setAttribute('data-small-msg', 'Loading keybindings...');
+  Acode.setLoadingMessage('Loading keybindings...');
   try {
     const fs = fsOperation(KEYBINDING_FILE);
     const content = await fs.readFile('utf-8');
@@ -224,7 +227,7 @@ async function ondeviceready() {
     await helpers.resetKeyBindings();
   }
 
-  document.body.setAttribute('data-small-msg', 'Loading editor...');
+  Acode.setLoadingMessage('Loading editor...');
   await helpers.loadScripts(
     './res/ace/src/ace.js',
     './res/ace/emmet-core.js',
@@ -239,7 +242,7 @@ async function ondeviceready() {
   window.modelist = ace.require('ace/ext/modelist');
   window.AceMouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
 
-  document.body.setAttribute('data-small-msg', 'Initializing GitHub...');
+  Acode.setLoadingMessage('Initializing GitHub...');
   await git.init();
 
   loadApp();
@@ -365,7 +368,7 @@ async function loadApp() {
   //#endregion
 
   //#region loading-files
-  document.body.setAttribute('data-small-msg', 'Loading files...');
+  Acode.setLoadingMessage('Loading files...');
   if (Array.isArray(folders)) {
     folders.forEach((folder) => openFolder(folder.url, folder.opts));
   }
@@ -389,7 +392,7 @@ async function loadApp() {
       text = await fs.readFile('utf-8');
     } catch (error) {}
 
-    document.body.setAttribute('data-small-msg', `Loading ${filename}...`);
+    Acode.setLoadingMessage(`Loading ${filename}...`);
 
     if (type === 'git') {
       gitRecord.get(file.sha).then((record) => {

@@ -208,5 +208,6 @@
   "preview info": "Если вы хотите запустить активный файл, нажмите и удерживайте значок воспроизведения.",
   "manage all files": "Allow Acode editor to manage all files in settings to edit files on your device easily.",
   "close file": "Close file",
-  "reset connections": "Reset connections"
+  "reset connections": "Reset connections",
+  "check file changes": "Check file changes"
 }

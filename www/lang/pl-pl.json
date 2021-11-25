@@ -207,5 +207,6 @@
   "preview info": "Jeśli chcesz uruchomić aktualnie wybrany plik, kliknij i przytrzymaj ikonę odtwarzania.",
   "manage all files": "Zezwól Acode zarządzać wszystkimi plikami w ustawieniach, aby z łatwością edytować pliki na twoim urządzeniu.",
   "close file": "Zamknij plik",
-  "reset connections": "Zresetuj połączenia"
+  "reset connections": "Zresetuj połączenia",
+  "check file changes": "Check file changes"
 }

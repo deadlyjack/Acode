@@ -1,3 +1,5 @@
 {
-  "exclude": ["**/node_modules", "**/platforms", "**/plugings", "**/www"]
+  "include": [
+    "src/**/*"
+  ]
 }

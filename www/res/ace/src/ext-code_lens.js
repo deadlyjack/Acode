@@ -226,7 +226,7 @@ dom.importCssString("\
 .ace_dark > .ace_codeLens > a:hover {\
     color: #4e94ce;\
 }\
-", "");
+", "codelense.css", false);
 
 });                (function() {
                     window.require(["ace/ext/code_lens"], function(m) {

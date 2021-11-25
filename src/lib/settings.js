@@ -95,6 +95,7 @@ class Settings {
       showConsole: true,
       customThemeMode: 'dark',
       lineHeight: 2,
+      checkFiles: true,
       customTheme: {
         '--primary-color': 'rgb(153,153,255)',
         '--secondary-color': 'rgb(255,255,255)',

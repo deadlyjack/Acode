@@ -207,5 +207,6 @@
   "preview info": "如果你想執行目前的檔案，請長按執行按鈕",
   "manage all files": "允許Acode管理設定中的所有檔案，以便輕鬆編輯裝置上的檔案Allow Acode editor to manage all files in settings to edit files on your device easily.",
   "close file": "關閉檔案",
-  "reset connections": "重置連線"
+  "reset connections": "重置連線",
+  "check file changes": "Check file changes"
 }

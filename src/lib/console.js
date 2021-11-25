@@ -115,7 +115,7 @@ import loadPolyFill from './utils/polyfill';
         if (allMetas[i].name === 'viewport') {
           allMetas[i].setAttribute(
             'content',
-            'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'
+            'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0',
           );
           get = true;
           break;
@@ -134,7 +134,7 @@ import loadPolyFill from './utils/polyfill';
         if (allMetas[i].name === 'viewport') {
           allMetas[i].setAttribute(
             'content',
-            'user-scalable=yes, maximum-scale=2'
+            'user-scalable=yes, maximum-scale=2',
           );
         }
       }
@@ -259,7 +259,7 @@ import loadPolyFill from './utils/polyfill';
       (val) => {
         status = 'rejected';
         value = val;
-      }
+      },
     );
 
     Object.defineProperties(result, {
@@ -345,7 +345,7 @@ import loadPolyFill from './utils/polyfill';
           (parameter +=
             param.type === 'RestElement'
               ? '...' + param.argument.name
-              : param.name + ',')
+              : param.name + ','),
       );
       parameter = parameter.replace(/,$/, '');
       parameter += ')' + (type === 'arrow' ? '=>' : '') + '{...}';
@@ -470,7 +470,7 @@ import loadPolyFill from './utils/polyfill';
         clean
           .replace('.run_', '')
           .replace(/\)$/, '')
-          .replace(location.origin, '')
+          .replace(location.origin, ''),
       );
       clean =
         clean.length > 35 ? '...' + clean.substr(clean.length - 32) : clean;
@@ -525,12 +525,38 @@ import loadPolyFill from './utils/polyfill';
   }
 
   console = {
-    log,
-    error,
-    count,
+    //TODO:
+    assert(condition) {},
     clear,
-    warn: error,
+    count,
+    //TODO:
+    countReset(hash) {},
+    //TODO:
+    debug(...args) {},
+    //TODO:
+    dir(arg) {},
+    //TODO:
+    dirxml(arg) {},
+    //TODO:
+    error,
+    group(arg) {},
+    //TODO:
+    groupCollapsed(arg) {},
+    //TODO:
+    groupEnd(arg) {},
     info: log,
+    log,
+    //TODO:
+    table(arg) {},
+    //TODO:
+    time(arg) {},
+    //TODO:
+    timeEnd(arg) {},
+    //TODO:
+    timeLog(arg) {},
+    //TODO:
+    trace(arg) {},
+    warn: error,
   };
 
   function execute(code) {

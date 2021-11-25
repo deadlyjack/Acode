@@ -1,7 +1,7 @@
-define("ace/snippets/html", ["require", "exports", "module"], function (require, exports, module) {
-	"use strict";
+define("ace/snippets/html",["require","exports","module"], function(require, exports, module) {
+"use strict";
 
-	exports.snippetText = "# Some useful Unicode entities\n\
+exports.snippetText = "# Some useful Unicode entities\n\
 # Non-Breaking Space\n\
 snippet nbs\n\
 	&nbsp;\n\
@@ -237,9 +237,7 @@ snippet button:s\n\
 snippet button:r\n\
 	<button type=\"reset\">${1}</button>\n\
 snippet canvas\n\
-	<canvas>\n\
-		${1}\n\
-	</canvas>\n\
+	<canvas id=\"${1:canvas}\"></canvas>\n\
 snippet caption\n\
 	<caption>${1}</caption>\n\
 snippet cite\n\
@@ -424,7 +422,7 @@ snippet head\n\
 	<head>\n\
 		<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />\n\
 \n\
-		<title>${1}</title>\n\
+		<title>${1:`substitute(Filename('', 'Page Title'), '^.', '\\u&', '')`}</title>\n\
 		${2}\n\
 	</head>\n\
 snippet header\n\
@@ -462,11 +460,11 @@ snippet html5\n\
 	<html>\n\
 		<head>\n\
 			<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />\n\
-			<meta name=\"${1}\" content=\"${2}\">\n\
-			<title>${3}</title>\n\
+			<title>${1:`substitute(Filename('', 'Page Title'), '^.', '\\u&', '')`}</title>\n\
+			${2:meta}\n\
 		</head>\n\
 		<body>\n\
-			${4}\n\
+			${3:body}\n\
 		</body>\n\
 	</html>\n\
 snippet xhtml5\n\
@@ -474,11 +472,11 @@ snippet xhtml5\n\
 	<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\
 		<head>\n\
 			<meta http-equiv=\"content-type\" content=\"application/xhtml+xml; charset=utf-8\" />\n\
-			<meta name=\"${1}\" content=\"${2}\">\n\
-			<title>${3}</title>\n\
+			<title>${1:`substitute(Filename('', 'Page Title'), '^.', '\\u&', '')`}</title>\n\
+			${2:meta}\n\
 		</head>\n\
 		<body>\n\
-			${4}\n\
+			${3:body}\n\
 		</body>\n\
 	</html>\n\
 snippet i\n\
@@ -821,7 +819,7 @@ snippet thead\n\
 snippet time\n\
 	<time datetime=\"${1}\" pubdate=\"${2:$1}>${3:$1}</time>\n\
 snippet title\n\
-	<title>${1}</title>\n\
+	<title>${1:`substitute(Filename('', 'Page Title'), '^.', '\\u&', '')`}</title>\n\
 snippet tr\n\
 	<tr>\n\
 		${1}\n\
@@ -853,17 +851,17 @@ snippet ul+\n\
 snippet var\n\
 	<var>${1}</var>\n\
 snippet video\n\
-	<video src=\"${1} height=\"${2}\" width=\"${3}\" preload=\"${5:none}\" autoplay=\"${6:autoplay}>${7}</video>${8}\n\
+	<video src=\"${1}\" height=\"${2}\" width=\"${3}\" preload=\"${5:none}\" autoplay=\"${6:autoplay}\">${7}</video>${8}\n\
 snippet wbr\n\
 	<wbr />${1}\n\
 ";
-	exports.scope = "html";
+exports.scope = "html";
 
-});
-(function () {
-	window.require(["ace/snippets/html"], function (m) {
-		if (typeof module == "object" && typeof exports == "object" && module) {
-			module.exports = m;
-		}
-	});
-})();
+});                (function() {
+                    window.require(["ace/snippets/html"], function(m) {
+                        if (typeof module == "object" && typeof exports == "object" && module) {
+                            module.exports = m;
+                        }
+                    });
+                })();
+            

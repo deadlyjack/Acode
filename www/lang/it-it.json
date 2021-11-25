@@ -207,5 +207,6 @@
   "preview info": "Se vuoi eseguire il file corrente clicca e tieni premuto il tasto play.",
   "manage all files": "Da il permesso di gestire i file nelle impostazioni a Acode editor per modificare facilmente i file sul tuo dispositivo.",
   "close file": "Close file",
-  "reset connections": "Reset connections"
+  "reset connections": "Reset connections",
+  "check file changes": "Check file changes"
 }

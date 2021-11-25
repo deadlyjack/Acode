@@ -9,10 +9,12 @@ var VBScriptHighlightRules = function() {
     var keywordMapper = this.createKeywordMapper({
         "keyword.control.asp":  "If|Then|Else|ElseIf|End|While|Wend|For|To|Each|Case|Select|Return"
             + "|Continue|Do|Until|Loop|Next|With|Exit|Function|Property|Type|Enum|Sub|IIf|Class",
-        "storage.type.asp": "Dim|Call|Const|Redim|Set|Let|Get|New|Randomize|Option|Explicit",
+        "storage.type.asp": "Dim|Call|Const|Redim|Set|Let|Get|New|Randomize|Option|Explicit|Preserve|Erase|Execute|ExecuteGlobal",
         "storage.modifier.asp": "Private|Public|Default",
-        "keyword.operator.asp": "Mod|And|Not|Or|Xor|as",
+        "keyword.operator.asp": "Mod|And|Not|Or|Xor|As|Eqv|Imp|Is",
         "constant.language.asp": "Empty|False|Nothing|Null|True",
+        "variable.language.vb.asp": "Me",
+        "support.class.vb.asp": "RegExp",
         "support.class.asp": "Application|ObjectContext|Request|Response|Server|Session",
         "support.class.collection.asp": "Contents|StaticObjects|ClientCertificate|Cookies|Form|QueryString|ServerVariables",
         "support.constant.asp": "TotalBytes|Buffer|CacheControl|Charset|ContentType|Expires|ExpiresAbsolute"
@@ -30,13 +32,17 @@ var VBScriptHighlightRules = function() {
             + "|Trim|Maths|Mid|Minute|Month|MonthName|MsgBox|Now|Oct|Remove|RemoveAll|Replace"
             + "|RGB|Right|Rnd|Round|ScriptEngine|ScriptEngineBuildVersion|ScriptEngineMajorVersion"
             + "|ScriptEngineMinorVersion|Second|SetLocale|Sgn|Sin|Space|Split|Sqr|StrComp|String|StrReverse"
-            + "|Tan|Time|Timer|TimeSerial|TimeValue|TypeName|UBound|UCase|Unescape|VarType|Weekday|WeekdayName|Year",
-        "support.type.vb.asp": "vbtrue|vbfalse|vbcr|vbcrlf|vbformfeed|vblf|vbnewline|vbnullchar|vbnullstring|"
-            + "int32|vbtab|vbverticaltab|vbbinarycompare|vbtextcomparevbsunday|vbmonday|vbtuesday|vbwednesday"
-            + "|vbthursday|vbfriday|vbsaturday|vbusesystemdayofweek|vbfirstjan1|vbfirstfourdays|vbfirstfullweek"
-            + "|vbgeneraldate|vblongdate|vbshortdate|vblongtime|vbshorttime|vbobjecterror|vbEmpty|vbNull|vbInteger"
+            + "|Tan|Time|Timer|TimeSerial|TimeValue|TypeName|UBound|UCase|Unescape|VarType|Weekday|WeekdayName|Year"
+            + "|AscB|AscW|ChrB|ChrW|InStrB|LeftB|LenB|MidB|RightB|Abs|GetUILanguage",
+        "support.type.vb.asp": "vbTrue|vbFalse|vbCr|vbCrLf|vbFormFeed|vbLf|vbNewLine|vbNullChar|vbNullString"
+            + "|vbTab|vbVerticalTab|vbBinaryCompare|vbTextCompare|vbSunday|vbMonday|vbTuesday|vbWednesday"
+            + "|vbThursday|vbFriday|vbSaturday|vbUseSystemDayOfWeek|vbFirstJan1|vbFirstFourDays|vbFirstFullWeek"
+            + "|vbGeneralDate|vbLongDate|vbShortDate|vbLongTime|vbShortTime|vbObjectError|vbEmpty|vbNull|vbInteger"
             + "|vbLong|vbSingle|vbDouble|vbCurrency|vbDate|vbString|vbObject|vbError|vbBoolean|vbVariant"
-            + "|vbDataObject|vbDecimal|vbByte|vbArray"
+            + "|vbDataObject|vbDecimal|vbByte|vbArray|vbOKOnly|vbOKCancel|vbAbortRetryIgnore|vbYesNoCancel|vbYesNo"
+            + "|vbRetryCancel|vbCritical|vbQuestion|vbExclamation|vbInformation|vbDefaultButton1|vbDefaultButton2"
+            + "|vbDefaultButton3|vbDefaultButton4|vbApplicationModal|vbSystemModal|vbOK|vbCancel|vbAbort|vbRetry|vbIgnore|vbYes|vbNo"
+            + "|vbUseDefault"
     }, "identifier", true);
 
     this.$rules = {
@@ -78,7 +84,7 @@ var VBScriptHighlightRules = function() {
         },
         {
             token: "storage.type.asp",
-            regex: "On Error Resume Next|On Error GoTo",
+            regex: "On\\s+Error\\s+(?:Resume\\s+Next|GoTo)\\b",
             caseInsensitive: true
         },
         {
@@ -106,7 +112,7 @@ var VBScriptHighlightRules = function() {
         },
         {
             token: ["keyword.operator.asp"],
-            regex: "\\-|\\+|\\*\\/|\\>|\\<|\\=|\\&"
+            regex: "\\-|\\+|\\*|\\/|\\>|\\<|\\=|\\&|\\\\|\\^"
         }
     ],
     "state_3": [
@@ -145,7 +151,7 @@ var VBScriptHighlightRules = function() {
     "comment": [
         {
             token: "comment.line.apostrophe.asp",
-            regex: "$|(?=(?:%>))",
+            regex: "$",
             next: "start"
         },
         {
@@ -208,28 +214,39 @@ oop.inherits(FoldMode, BaseFoldMode);
         "wend": -1
     };
 
+    this.foldingStartMarker = /(?:\s|^)(class|function|sub|if|select|do|for|while|with|property|else|elseif)\b/i;
+    this.foldingStopMarker = /\b(end|loop|next|wend)\b/i;
+
     this.getFoldWidgetRange = function (session, foldStyle, row) {
         var line = session.getLine(row);
-        var match = /(\w+)\b/i.exec(line);
-        var keyword = match && match[1].toLowerCase();
-
-        if (keyword && this.indentKeywords.hasOwnProperty(keyword)) {
-            return this.vbsBlock(session, row, match.index + 1);
+        var isStart = this.foldingStartMarker.test(line);
+        var isEnd = this.foldingStopMarker.test(line);
+        if (isStart || isEnd) {
+            var match = (isEnd) ? this.foldingStopMarker.exec(line) : this.foldingStartMarker.exec(line);
+            var keyword = match && match[1].toLowerCase();
+            if (keyword) {
+                var type = session.getTokenAt(row, match.index + 2).type;
+                if (type === "keyword.control.asp" || type === "storage.type.function.asp")
+                    return this.vbsBlock(session, row, match.index + 2);
+            }
         }
     };
     this.getFoldWidget = function(session, foldStyle, row) {
         var line = session.getLine(row);
-        var match = /^\s*(\w+)\b/i.exec(line);
-        var keyword = match && match[1].toLowerCase();
-
-        if (keyword && this.indentKeywords.hasOwnProperty(keyword)) {
-            if (this.indentKeywords[keyword] == -1)
-                return "";
-            if (keyword == "if" && !/then\s*$/i.test(line))
-                return "";
-            return "start";
+        var isStart = this.foldingStartMarker.test(line);
+        var isEnd = this.foldingStopMarker.test(line);
+        if (isStart && !isEnd) {
+            var match = this.foldingStartMarker.exec(line);
+            var keyword = match && match[1].toLowerCase();
+            if (keyword) {
+                var type = session.getTokenAt(row, match.index + 2).type;
+                if (type == "keyword.control.asp" || type == "storage.type.function.asp") {
+                    if (keyword == "if" && !/then\s*('|$)/i.test(line))
+                        return "";
+                    return "start";
+                }
+            }
         }
-
         return "";
     };
 
@@ -262,12 +279,10 @@ oop.inherits(FoldMode, BaseFoldMode);
             return;
 
         var firstRange = stream.getCurrentTokenRange();
-        var modifiers = '';
         switch (val) {
             case "property":
             case "sub":
             case "function":
-                modifiers = "(?:(?:Private|Public(?:\\s+Default)?)\\s+)?";
             case "if":
             case "select":
             case "do":
@@ -276,10 +291,10 @@ oop.inherits(FoldMode, BaseFoldMode);
             case "while":
             case "with":
                 var line = session.getLine(row);
-                var singleLineCondition = /^\s*(If)\s+(.)*\s+Then\s+(\S)+/i.test(line);
+                var singleLineCondition = /^\s*If\s+.*\s+Then(?!')\s+(?!')\S/i.test(line);
                 if (singleLineCondition)
                     return;
-                var checkToken = new RegExp("^\\s*"+ modifiers + val, "i");
+                var checkToken = new RegExp("(?:^|\\s)" + val, "i");
                 var endTest = /^\s*End\s(If|Sub|Select|Function|Class|With|Property)\s*/i.test(line);
                 if (!checkToken.test(line) && !endTest) {
                     return;
@@ -328,7 +343,6 @@ oop.inherits(FoldMode, BaseFoldMode);
 
         stream.step = dir === -1 ? stream.stepBackward : stream.stepForward;
         while(token = stream.step()) {
-            modifiers = '';
             var outputRange = null;
             var ignore = false;
             if (token.type != "keyword.control.asp" && token.type != "storage.type.function.asp")
@@ -340,7 +354,6 @@ oop.inherits(FoldMode, BaseFoldMode);
                 case "property":
                 case "sub":
                 case "function":
-                    modifiers = "(?:(?:Private|Public(?:\\sDefault)?)\\s+)?";
                 case "if":
                 case "select":
                 case "do":
@@ -349,13 +362,13 @@ oop.inherits(FoldMode, BaseFoldMode);
                 case "while":
                 case "with":
                     var line = session.getLine(stream.getCurrentTokenRow());
-                    var singleLineCondition = /^\s*(If)\s+(.)*\s+Then\s+(\S)+/i.test(line);
+                    var singleLineCondition = /^\s*If\s+.*\s+Then(?!')\s+(?!')\S/i.test(line);
                     if (singleLineCondition) {
                         level = 0;
                         ignore = true;
                     }
-                    var checkToken = new RegExp("^\\s*" + modifiers + val, "i");
-                    if (!checkToken.test(line)) {
+                    var checkToken = new RegExp("^\\s* end\\s+" + val, "i");
+                    if (checkToken.test(line)) {
                         level = 0;
                         ignore = true;
                     }
@@ -507,7 +520,6 @@ oop.inherits(Mode, TextMode);
 
     function getNetIndentLevel(tokens, line, indentKeywords) {
         var level = 0;
-        var modifiers = '';
         for (var i = 0; i < tokens.length; i++) {
             var token = tokens[i];
             if (token.type == "keyword.control.asp" || token.type == "storage.type.function.asp") {
@@ -517,21 +529,16 @@ oop.inherits(Mode, TextMode);
                         case "property":
                         case "sub":
                         case "function":
-                            modifiers = "(?:(?:Private|Public(?:\\s+Default)?)\\s+)?";
                         case "select":
                         case "do":
                         case "for":
                         case "class":
                         case "while":
                         case "with":
-                            var checkToken = new RegExp("^\\s*" + modifiers + val,"i");
-                            if (checkToken.test(line)) {
-                                level += indentKeywords[val];
-                            }
-                            break;
                         case "if":
-                            var singleLineCondition = /^\s*(If)\s+(.)*\s+Then\s+(\S)+/i.test(line);
-                            if (!singleLineCondition)
+                            var checkToken = new RegExp("^\\s* end\\s+" + val, "i");
+                            var singleLineCondition = /^\s*If\s+.*\s+Then(?!')\s+(?!')\S/i.test(line);
+                            if (!singleLineCondition && !checkToken.test(line))
                                 level += indentKeywords[val];
                             break;
                         default:

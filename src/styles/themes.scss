@@ -7,6 +7,7 @@ body {
   --text-main-color: #ffffff;
   --a-color: #615efd;
   --border-color: #7a7a7a3a;
+  --border: none;
   --error-text-color: #ffb95c;
   --active-icon-color: #00000033;
   --popup-border-color: #00000000;
@@ -29,6 +30,7 @@ body {
   --command-palette-background-color: var(--primary-color);
   --command-palette-text-color: var(--text-main-color);
   --command-palette-border: none;
+  --clipboard-menu-border: none;
 
   &[theme='dark'] {
     --primary-color: #313131;
@@ -37,7 +39,7 @@ body {
     --text-main-color: #ffffff;
     --accent-color: #3399ff;
     --a-color: #b5b4e9;
-    --border-color: rgba(255, 255, 255, 0.133);
+    --border-color: #e6e6e6;
     --menu-background-color: #313131;
     --menu-text-color: #ffffff;
     --menu-icon-color: #ffffff;
@@ -53,17 +55,19 @@ body {
     --text-main-color: #ffffff;
     --accent-color: #383838;
     --a-color: #b5b4e9;
-    --border-color: rgba(255, 255, 255, 0.133);
+    --border-color: #7c7c7c;
+    --border: solid 1px var(--border-color);
     --menu-background-color: #000000;
     --menu-text-color: #ffffff;
     --menu-icon-color: #ffffff;
     --dialogbox-background-color: #000000;
     --dialogbox-text-color: #ffffff;
     --dialogbox-selected-option-color: rgb(121, 103, 0);
-    --box-shadow-color: rgba(0, 0, 0, 0);
+    --box-shadow-color: rgb(0, 0, 0);
     --popup-border-color: rgba(255, 255, 255, 0.4);
     --active-icon-color: rgba(255, 255, 255, 0.2);
-    --command-palette-border: solid 0.5px var(--border-color);
+    --command-palette-border: var(--border);
+    --clipboard-menu-border: var(--border);
   }
 
   &[theme='ocean'] {
@@ -73,7 +77,7 @@ body {
     --text-main-color: #ffffff;
     --accent-color: #3399ff;
     --a-color: #b5b4e9;
-    --border-color: #ffffff22;
+    --border-color: #7a7aa3;
     --menu-background-color: #20202c;
     --menu-text-color: #ffffff;
     --menu-icon-color: #ffffff;
@@ -90,7 +94,7 @@ body {
     --text-main-color: #ececec;
     --accent-color: #f2a365;
     --a-color: #b5b4e9;
-    --border-color: #ffffff22;
+    --border-color: #6b7888;
     --menu-background-color: #303841;
     --menu-text-color: #ececec;
     --menu-icon-color: #ececec;
@@ -109,7 +113,7 @@ body {
     --text-main-color: #ffbd69;
     --accent-color: #ff6363;
     --a-color: #b5b4e9;
-    --border-color: #ffffff22;
+    --border-color: #5d5d97;
     --menu-background-color: #202040;
     --menu-text-color: #ffbd69;
     --menu-icon-color: #ffbd69;
@@ -128,7 +132,7 @@ body {
     --text-main-color: #00fff5;
     --accent-color: #00adb5;
     --a-color: #b5b4e9;
-    --border-color: #ffffff22;
+    --border-color: #5a6575;
     --menu-background-color: #222831;
     --menu-text-color: #00fff5;
     --menu-icon-color: #00fff5;
@@ -147,7 +151,7 @@ body {
     --text-main-color: #f6e9e9;
     --accent-color: #e16428;
     --a-color: #b5b4e9;
-    --border-color: #ffffff22;
+    --border-color: #756f6f;
     --menu-background-color: #363333;
     --menu-text-color: #f6e9e9;
     --menu-icon-color: #f6e9e9;
@@ -166,7 +170,7 @@ body {
     --text-main-color: #f1bbd5;
     --accent-color: #a12559;
     --a-color: #b5b4e9;
-    --border-color: #ffffff22;
+    --border-color: #8c3a9b;
     --menu-background-color: #3b0944;
     --menu-text-color: #f1bbd5;
     --menu-icon-color: #f1bbd5;
@@ -185,7 +189,7 @@ body {
     --text-main-color: #90b8f8;
     --accent-color: #5f85db;
     --a-color: #b5b4e9;
-    --border-color: #ffffff22;
+    --border-color: #757b86;
     --menu-background-color: #363b4e;
     --menu-text-color: #90b8f8;
     --menu-icon-color: #90b8f8;

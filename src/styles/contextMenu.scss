@@ -15,11 +15,6 @@ body.no-animation {
   max-height: calc(100vh - 38px);
   overflow-y: auto;
   user-select: none;
-
-  & + .mask {
-    z-index: 110;
-  }
-
   background-color: white;
   background-color: var(--menu-background-color);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
@@ -33,6 +28,10 @@ body.no-animation {
   padding: 0;
   border: solid 1px transparent;
   border: solid 1px var(--popup-border-color);
+
+  & + .mask {
+    z-index: 110;
+  }
 
   hr {
     border: none;

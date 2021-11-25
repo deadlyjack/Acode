@@ -1,3 +1,5 @@
+import mustache from 'mustache';
+import contextMenuHTML from '../views/context-menu.hbs';
 import list from '../components/collapsableList';
 import clipboardAction from './clipboard';
 import tag from 'html-tag-js';
@@ -45,8 +47,14 @@ function EditorManager($sidebar, $header, $body) {
    * @type {AceAjax.Editor}
    */
   const editor = ace.edit($container);
-  const readOnlyContent = `<span action="copy">${strings.copy}</span><span action="select all">${strings['select all']}<span>`;
-  const fullContent = `<span action="copy">${strings.copy}</span><span action="cut">${strings.cut}</span><span action="paste">${strings.paste}</span><span action="select all">${strings['select all']}</span>`;
+  const readOnlyContent = mustache.render(contextMenuHTML, {
+    ...strings,
+    readOnly: true,
+  });
+  const fullContent = mustache.render(contextMenuHTML, {
+    ...strings,
+    readOnly: false,
+  });
   const scrollbarSize = appSettings.value.scrollbarSize;
   const $vScrollbar = ScrollBar({
     width: scrollbarSize,

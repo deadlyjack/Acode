@@ -208,5 +208,6 @@
   "preview info": "如果想要运行活动文件，按住 play 图标",
   "manage all files": "允许 Acode 在设置中管理所有文件以方便编辑此设备上的文件。",
   "close file": "Close file",
-  "reset connections": "Reset connections"
+  "reset connections": "Reset connections",
+  "check file changes": "Check file changes"
 }

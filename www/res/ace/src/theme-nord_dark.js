@@ -91,7 +91,7 @@ box-shadow: inset -1px 0 0 0 #434c5eb3;\
 exports.$selectionColorConflict = true;
 
 var dom = require("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
+dom.importCssString(exports.cssText, exports.cssClass, false);
 });                (function() {
                     window.require(["ace/theme/nord_dark"], function(m) {
                         if (typeof module == "object" && typeof exports == "object" && module) {

@@ -207,5 +207,6 @@
   "preview info": "If you want run the active file, tap and hold on play icon.",
   "manage all files": "Allow Acode editor to manage all files in settings to edit files on your device easily.",
   "close file": "Close file",
-  "reset connections": "Reset connections"
+  "reset connections": "Reset connections",
+  "check file changes": "Check file changes"
 }

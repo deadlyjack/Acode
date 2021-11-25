@@ -151,7 +151,7 @@ color: #000;\
 ";
 
 var dom = require("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
+dom.importCssString(exports.cssText, exports.cssClass, false);
 
 });                (function() {
                     window.require(["ace/theme/chaos"], function(m) {

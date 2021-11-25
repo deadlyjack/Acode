@@ -207,5 +207,6 @@
   "preview info": "Wenn Sie eine aktive Datei starten möchten, tippen und halten Sie das Wiedergabe-Symbol.",
   "manage all files": "Erlauben Sie Acode eine Verwaltung aller Dateien in den Einstellungen, um Dateien auf Ihrem Gerät einfach zu bearbeiten.",
   "close file": "Datei schließen",
-  "reset connections": "Verbindungen zurücksetzen"
+  "reset connections": "Verbindungen zurücksetzen",
+  "check file changes": "Check file changes"
 }

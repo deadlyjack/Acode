@@ -1,7 +1,8 @@
 #! /bin/bash
 
 platform="$1"
-mode="$2"
+app="$2"
+mode="$3"
 webpackmode="development"
 cordovamode=""
 
@@ -15,15 +16,21 @@ then
 mode="d"
 fi
 
-if [ "$mode" = "p" ]
+if [ -z "$app" ]
 then
+app="paid"
+fi
+
+if [ "$mode" = "p" ] || [ "$mode" = "prod" ]
+then
+mode = "p"
 webpackmode="production"
 cordovamode="--release"
 fi
 
 RED='\033[1;34m'
 NC='\033[0m'
-script1="node ./utils/config.js $mode"
+script1="node ./utils/config.js $mode $app"
 script2="webpack --progress --mode $webpackmode "
 script3="cordova build $platform $cordovamode"
 eval "
@@ -34,4 +41,3 @@ $script2&&
 echo \"${RED}$script3${NC}\";
 $script3
 "
-eval "yarn config-build d && webpack --progress --mode development"

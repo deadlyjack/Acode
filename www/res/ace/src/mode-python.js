@@ -343,10 +343,10 @@ var PythonHighlightRules = function() {
             regex: "\\s+"
         }, {
             token: "string",
-            regex: "'(.)*'"
+            regex: "'[^']*'"
         }, {
             token: "string",
-            regex: '"(.)*"'
+            regex: '"[^"]*"'
         }, {
             token: "function.support",
             regex: "(!s|!r|!a)"

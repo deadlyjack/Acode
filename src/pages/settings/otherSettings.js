@@ -53,6 +53,12 @@ export default function otherSettings() {
       icon: 'code',
       checkbox: values.showConsole,
     },
+    {
+      key: 'check-files',
+      text: strings['check file changes'],
+      icon: 'file_copy',
+      checkbox: values.showConsole,
+    },
   ];
 
   gen.listItems($settingsList, settingsOptions, changeSetting);
@@ -127,6 +133,11 @@ export default function otherSettings() {
 
       case 'show-console':
         this.value = values.showConsole = !values.showConsole;
+        appSettings.update();
+        break;
+
+      case 'check-files':
+        this.value = values.checkFiles = !values.checkFiles;
         appSettings.update();
         break;
 

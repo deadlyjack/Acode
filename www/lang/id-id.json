@@ -209,5 +209,6 @@
   "preview info": "Jika Anda ingin menjalankan berkas aktif, ketuk dan tahan ikon putar.",
   "manage all files": "Izinkan editor Acode untuk mengelola semua file dalam pengaturan untuk mengedit berkas di perangkat Anda dengan mudah.",
   "close file": "Tutup berkas",
-  "reset connections": "Setel ulang koneksi"
+  "reset connections": "Setel ulang koneksi",
+  "check file changes": "Check file changes"
 }

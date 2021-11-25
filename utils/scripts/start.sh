@@ -1,7 +1,8 @@
 #! /bin/bash
 
 platform="$1"
-mode="$2"
+app="$2"
+mode="$3"
 webpackmode="development"
 cordovamode=""
 
@@ -15,6 +16,11 @@ then
 mode="d"
 fi
 
+if [ -z "$app" ]
+then
+app="paid"
+fi
+
 if [ "$mode" = "p" ]
 then
 webpackmode="production"
@@ -23,7 +29,7 @@ fi
 
 RED='\033[1;34m'
 NC='\033[0m'
-script1="node ./utils/config.js $mode"
+script1="node ./utils/config.js $mode $app"
 script2="webpack --progress --mode $webpackmode "
 script3="cordova run $platform $cordovamode"
 eval "
