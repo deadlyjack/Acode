@@ -12,7 +12,7 @@
   "choose color": "选择颜色",
   "clear": "清空",
   "close app": "关闭应用程序?",
-  "commit message": "Commit message",
+  "commit message": "提交说明",
   "console": "控制台",
   "conflict error": "冲突！请等待另一个 Commit 提交完成.",
   "copy": "复制",
@@ -207,6 +207,6 @@
   "line height": "行高",
   "preview info": "如果想要运行活动文件，按住 play 图标",
   "manage all files": "允许 Acode 在设置中管理所有文件以方便编辑此设备上的文件。",
-  "close file": "Close file",
-  "reset connections": "Reset connections"
+  "close file": "关闭文件",
+  "reset connections": "重置连接"
 }
