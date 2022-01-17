@@ -96,6 +96,7 @@ export default {
     'ru-ru': 'Русский',
     'pl-pl': 'Polski',
     'pt-br': 'Português',
+    'pu-in': "Punjabi (ਪੰਜਾਬੀ)",
     'tr-tr': 'Türkçe',
     'uk-ua': 'Українська',
     'hi-in': 'हिंदी',

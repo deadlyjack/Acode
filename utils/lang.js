@@ -2,9 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const yargs = require('yargs');
 const readline = require('readline');
-const args = yargs
-              .alias('a', 'all')
-              .argv;
+const args = yargs.alias('a', 'all').argv;
 
 const dir = path.resolve(__dirname, '../www/lang');
 const read = readline.createInterface({
