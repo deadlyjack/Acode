@@ -28,7 +28,7 @@ export default function CustomThemeInclude() {
       attr: {
         action: 'set-theme',
       },
-    })
+    }),
   );
 
   render();
@@ -89,7 +89,7 @@ export default function CustomThemeInclude() {
             appSettings.reset('customTheme');
             render();
             updateTheme();
-          }
+          },
         );
       }
     }
@@ -113,7 +113,7 @@ export default function CustomThemeInclude() {
   function updateTheme() {
     tag.get('#custom-theme').textContent = helpers.jsonToCSS(
       constants.CUSTOM_THEME,
-      appSettings.value.customTheme
+      appSettings.value.customTheme,
     );
 
     window.restoreTheme();

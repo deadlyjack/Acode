@@ -10,7 +10,6 @@ import '../styles/help.scss';
 import '../styles/overrideAceStyle.scss';
 import 'core-js/stable';
 import 'html-tag-js/dist/polyfill';
-import Irid from 'irid';
 import ajax from '@deadlyjack/ajax';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
@@ -40,6 +39,8 @@ import toast from '../components/toast';
 import $_menu from '../views/menu.hbs';
 import $_fileMenu from '../views/file-menu.hbs';
 import $_hintText from '../views/hint-txt.hbs';
+import Icon from '../components/icon';
+import restoreTheme from './restoreTheme';
 
 loadPolyFill.apply(window);
 window.onload = Main;
@@ -206,15 +207,6 @@ async function ondeviceready() {
     alert('Unable to load language file.');
   }
 
-  Acode.setLoadingMessage('Loading styles...');
-  try {
-    const fs = fsOperation(Url.join(ASSETS_DIRECTORY, '/css/build/'));
-    const styles = await fs.lsDir();
-    await helpers.loadStyles(...styles.map((style) => style.url));
-  } catch (error) {
-    alert('Unable to load styles.');
-  }
-
   Acode.setLoadingMessage('Loading keybindings...');
   try {
     const fs = fsOperation(KEYBINDING_FILE);
@@ -263,12 +255,7 @@ async function loadApp() {
       action: 'toggle-sidebar',
     },
   });
-  const $menuToggler = tag('span', {
-    className: 'icon more_vert',
-    attr: {
-      action: 'toggle-menu',
-    },
-  });
+  const $menuToggler = Icon('more_vert', 'toggle-menu');
   const $header = tile({
     type: 'header',
     text: 'Acode',
@@ -302,6 +289,7 @@ async function loadApp() {
           file_encoding: file.encoding,
           file_read_only: !file.editable,
           file_info: !!file.uri,
+          file_eol: file.eol,
         }),
       );
     },
@@ -634,7 +622,7 @@ function onClickApp(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    window.open(el.href, '_system');
+    system.openInBrowser(el.href);
   }
 
   function checkIfInsideAncher() {
@@ -648,73 +636,6 @@ function onClickApp(e) {
     }
 
     return false;
-  }
-}
-
-async function restoreTheme(darken) {
-  if (darken && document.body.classList.contains('loading')) return;
-
-  let theme = DOES_SUPPORT_THEME ? appSettings.value.appTheme : 'default';
-  const themeList = constants.appThemeList;
-  let themeData = themeList[theme];
-  let type = themeData.type;
-
-  if (!themeData || (!themeData.isFree && IS_FREE_VERSION)) {
-    theme = 'default';
-    themeData = themeList[theme];
-    appSettings.value.appTheme = theme;
-    appSettings.update();
-  }
-
-  if (type === 'custom') {
-    const color = appSettings.value.customTheme['--primary-color'];
-    themeData.primary = Irid(color).toHexString();
-    themeData.darken = Irid(themeData.primary).darken(0.4).toHexString();
-
-    type = appSettings.value.customThemeMode;
-  }
-
-  let hexColor = darken ? themeData.darken : themeData.primary;
-
-  app.setAttribute('theme', theme);
-
-  if (type === 'dark') {
-    NavigationBar.backgroundColorByHexString(hexColor, false);
-    StatusBar.backgroundColorByHexString(hexColor);
-    StatusBar.styleLightContent();
-  } else {
-    StatusBar.backgroundColorByHexString(hexColor);
-
-    if (theme === 'default') {
-      NavigationBar.backgroundColorByHexString(hexColor, false);
-      StatusBar.styleLightContent();
-    } else {
-      NavigationBar.backgroundColorByHexString(hexColor, true);
-      StatusBar.styleDefault();
-    }
-  }
-
-  document.body.setAttribute('theme-type', type);
-  const style = getComputedStyle(app);
-  const loaderFile = Url.join(ASSETS_DIRECTORY, 'res/tail-spin.svg');
-  const textColor = style.getPropertyValue('--text-main-color').trim();
-  const svgName = '__tail-spin__.svg';
-  const img = Url.join(DATA_STORAGE, svgName);
-
-  localStorage.__primary_color = style.getPropertyValue('--primary-color');
-  try {
-    let fs = fsOperation(loaderFile);
-    const svg = await fs.readFile('utf-8');
-
-    fs = fsOperation(img);
-    if (!(await fs.exists())) {
-      await fsOperation(DATA_STORAGE).createFile(svgName);
-    }
-    const text = svg.replace(/#fff/g, textColor);
-    await fs.writeFile(text);
-    app.style.cssText = `--tail-spin: url(${img})`;
-  } catch (error) {
-    console.error(error);
   }
 }
 
@@ -737,7 +658,7 @@ function askForDonation() {
     })
     .then((res) => {
       localStorage.dontAskForDonation = true;
-      window.open(res, '_system');
+      system.openInBrowser(res);
       resetCount();
     });
 }

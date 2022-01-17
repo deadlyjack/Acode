@@ -688,4 +688,24 @@ export default {
 
     editorManager.onupdate('file-delete');
   },
+  /**
+   * Checks whether given objects are equal or not
+   * @param {Object} obj1
+   * @param {Object} obj2
+   * @returns
+   */
+  areEqual(obj1, obj2) {
+    if (obj1 === obj2) return true;
+    if (obj1 == null || obj2 == null) return false;
+    if (obj1.constructor !== obj2.constructor) return false;
+
+    for (let key in obj1) {
+      if (!obj2.hasOwnProperty(key)) return false;
+      if (obj1[key] === obj2[key]) continue;
+      if (typeof obj1[key] !== 'object') return false;
+      if (!this.isObjectEqual(obj1[key], obj2[key])) return false;
+    }
+
+    return true;
+  },
 };

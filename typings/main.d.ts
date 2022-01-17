@@ -55,6 +55,7 @@ interface Settings {
   customThemeMode: 'light' | 'dark';
   lineHeight: number;
   checkFiles: boolean;
+  desktopMode: boolean;
 }
 
 interface AppSettings {
@@ -204,6 +205,10 @@ interface File {
    * Checks if file is changed or not
    */
   isChanged(): Promise<boolean>;
+  /**
+   * gets and sets new line mode of deocument
+   */
+  eol: 'unix' | 'windows' | 'auto';
 }
 
 interface FileStatus {

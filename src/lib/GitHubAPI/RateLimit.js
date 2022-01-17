@@ -11,25 +11,25 @@ import Requestable from './Requestable';
  * RateLimit allows users to query their rate-limit status
  */
 class RateLimit extends Requestable {
-   /**
-    * construct a RateLimit
-    * @param {Requestable.auth} auth - the credentials to authenticate to GitHub
-    * @param {string} [apiBase] - the base Github API URL
-    * @return {Promise} - the promise for the http request
-    */
-   constructor(auth, apiBase) {
-      super(auth, apiBase);
-   }
+  /**
+   * construct a RateLimit
+   * @param {Requestable.auth} auth - the credentials to authenticate to GitHub
+   * @param {string} [apiBase] - the base Github API URL
+   * @return {Promise} - the promise for the http request
+   */
+  constructor(auth, apiBase) {
+    super(auth, apiBase);
+  }
 
-   /**
-    * Query the current rate limit
-    * @see https://developer.github.com/v3/rate_limit/
-    * @param {Requestable.callback} [cb] - will receive the rate-limit data
-    * @return {Promise} - the promise for the http request
-    */
-   getRateLimit(cb) {
-      return this._request('GET', '/rate_limit', null, cb);
-   }
+  /**
+   * Query the current rate limit
+   * @see https://developer.github.com/v3/rate_limit/
+   * @param {Requestable.callback} [cb] - will receive the rate-limit data
+   * @return {Promise} - the promise for the http request
+   */
+  getRateLimit(cb) {
+    return this._request('GET', '/rate_limit', null, cb);
+  }
 }
 
 export default RateLimit;

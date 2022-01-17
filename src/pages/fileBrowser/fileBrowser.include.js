@@ -207,18 +207,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
           break;
 
         case 'add-path':
-          localStorage.__fbAddPath = true;
-          $addMenuToggler.classList.remove('notice');
-          util
-            .addPath()
-            .then((res) => {
-              storageList.push(res);
-              localStorage.storageList = JSON.stringify(storageList);
-              reload();
-            })
-            .catch((err) => {
-              helpers.error(err);
-            });
+          addStorage();
           break;
 
         case 'addFtp':
@@ -231,7 +220,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
                 strings.info.toUpperCase(),
                 strings['feature not available'],
                 () => {
-                  window.open(constants.PAID_VERSION, '_system');
+                  system.openInBrowser(constants.PAID_VERSION);
                 },
               );
               break;
@@ -293,7 +282,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
     navigate('/', '/');
 
     /**
-     *
+     * Called when any file folder is clicked
      * @param {MouseEvent} e
      * @param {"contextmenu"} [isContextMenu]
      */
@@ -321,13 +310,26 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
         }
       }
 
-      if (storageType === 'permission') {
-        dialogs
-          .confirm(strings.info.toUpperCase(), strings['manage all files'])
-          .then(() => {
-            document.addEventListener('resume', reload);
-            system.manageAllFiles();
-          });
+      /**@deprecated not used anymore */
+      // if (storageType === 'permission') {
+      //   dialogs
+      //     .confirm(strings.info.toUpperCase(), strings['manage all files'])
+      //     .then(() => {
+      //       document.addEventListener('resume', reload);
+      //       system.manageAllFiles();
+      //     });
+      //   return;
+      // }
+
+      if (storageType === 'notification') {
+        switch (uuid) {
+          case 'addstorage':
+            addStorage();
+            break;
+
+          default:
+            break;
+        }
         return;
       }
 
@@ -569,27 +571,28 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
     async function listAllStorages() {
       if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
       allStorages.length = 0;
-      let isStorageManager = await new Promise((resolve, reject) => {
-        system.isExternalStorageManager(resolve, reject);
-      });
+      /**@deprecated not using from next user as google doesn't allow it anymore */
+      // let isStorageManager = await new Promise((resolve, reject) => {
+      //   system.isExternalStorageManager(resolve, reject);
+      // });
 
-      if (!isStorageManager && ANDROID_SDK_INT >= 30) {
-        util.pushFolder(allStorages, 'Allow Acode to manage all files', '', {
-          storageType: 'permission',
-          uuid: 'permission',
-        });
-      }
+      // if (!isStorageManager && ANDROID_SDK_INT >= 30) {
+      //   util.pushFolder(allStorages, 'Allow Acode to manage all files', '', {
+      //     storageType: 'permission',
+      //     uuid: 'permission',
+      //   });
+      // }
 
-      if (ANDROID_SDK_INT <= 29 || isStorageManager) {
-        util.pushFolder(
-          allStorages,
-          'Internal storage',
-          cordova.file.externalRootDirectory,
-          {
-            uuid: 'internal-storage',
-          },
-        );
-      }
+      // if (ANDROID_SDK_INT <= 29 || isStorageManager) {
+      //   util.pushFolder(
+      //     allStorages,
+      //     'Internal storage',
+      //     cordova.file.externalRootDirectory,
+      //     {
+      //       uuid: 'internal-storage',
+      //     },
+      //   );
+      // }
 
       try {
         const res = await externalFs.listStorages();
@@ -615,6 +618,13 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
           home: storage.home,
         });
       });
+
+      if (!allStorages.length) {
+        util.pushFolder(allStorages, strings['add a storage'], '', {
+          storageType: 'notification',
+          uuid: 'addstorage',
+        });
+      }
 
       if (IS_FILE_MODE) {
         util.pushFolder(allStorages, 'Select document', null, {
@@ -1042,6 +1052,24 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       if (state.find((l) => l.url === url)) return;
       state.push({ url, name });
       localStorage.fileBrowserState = JSON.stringify(state);
+    }
+
+    /**
+     * Adds a new storage and refresh location
+     */
+    function addStorage() {
+      localStorage.__fbAddPath = true;
+      $addMenuToggler.classList.remove('notice');
+      util
+        .addPath()
+        .then((res) => {
+          storageList.push(res);
+          localStorage.storageList = JSON.stringify(storageList);
+          reload();
+        })
+        .catch((err) => {
+          helpers.error(err);
+        });
     }
   });
 }

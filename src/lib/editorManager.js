@@ -595,6 +595,26 @@ function EditorManager($sidebar, $header, $body) {
         }
         this.uri = null;
       },
+      get eol() {
+        return /\r/.test(this.session.getValue()) ? 'windows' : 'unix';
+      },
+      /**
+       * Returns end of line of the file
+       * @param {'windows'|'unix'} EOL
+       */
+      set eol(EOL) {
+        if (this.eol === EOL) return;
+
+        let text = this.session.getValue();
+        if (EOL === 'windows') {
+          text = text.replace(/(?<!\r)\n/g, '\r\n');
+        } else {
+          text = text.replace(/\r/g, '');
+        }
+        this.session.setValue(text);
+        // this.isUnsaved = true;
+        // manager.onupdate('file-update');
+      },
       async writeToCache() {
         const cacheFs = fsOperation(Url.join(CACHE_STORAGE, this.id));
         const exists = await cacheFs.exists();
@@ -647,7 +667,7 @@ function EditorManager($sidebar, $header, $body) {
         }
 
         try {
-          const oldText = await fs.readFile('utf-8');
+          const oldText = await fs.readFile(this.encoding);
           const text = this.session.getValue();
           return oldText !== text;
         } catch (error) {

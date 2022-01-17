@@ -7,26 +7,10 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-statusbar": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-statusbar@2.4.3"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-vibration": {
     "source": {
       "type": "registry",
       "id": "cordova-plugin-vibration"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-navigationbar-color": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-navigationbar-color@0.1.0"
     },
     "is_top_level": true,
     "variables": {}
@@ -55,14 +39,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-webserver": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdb1/cordova/acode/node_modules/cordova-plugin-webserver"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-whitelist": {
     "source": {
       "type": "registry",
@@ -74,31 +50,7 @@
   "cordova-plugin-ftp": {
     "source": {
       "type": "local",
-      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-ftp"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-sftp": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-sftp"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-inappbrowser": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-inappbrowser"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-system": {
-    "source": {
-      "type": "local",
-      "path": "/mnt/sdc1/cordova/acode/node_modules/cordova-plugin-system"
+      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-ftp"
     },
     "is_top_level": true,
     "variables": {}
@@ -115,6 +67,30 @@
     "source": {
       "type": "local",
       "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-intent"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-sftp": {
+    "source": {
+      "type": "local",
+      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-sftp"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-webserver": {
+    "source": {
+      "type": "local",
+      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-webserver"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-system": {
+    "source": {
+      "type": "local",
+      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-system"
     },
     "is_top_level": true,
     "variables": {}

@@ -40,14 +40,13 @@ export default function help() {
       const subject = 'feedback - Acode editor';
       const textBody = helpers.getFeedbackBody('<br/>%0A');
       const email = constants.FEEDBACK_EMAIL;
-      window.open(
+      system.openInBrowser(
         `mailto:${email}?subject=${subject}&body=${textBody}`,
-        '_system'
       );
     } else if (this.key === 'help') {
-      window.open('https://t.me/foxdebug_acode', '_system');
+      system.openInBrowser('https://t.me/foxdebug_acode');
     } else if (this.key === 'faqs') {
-      window.open('https://acode.foxdebug.com/faqs', '_system');
+      system.openInBrowser('https://acode.foxdebug.com/faqs');
     }
   }
 

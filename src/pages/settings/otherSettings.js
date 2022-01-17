@@ -33,8 +33,7 @@ export default function otherSettings() {
       key: 'previewMode',
       text: strings['preview mode'],
       icon: 'play_arrow',
-      subText:
-        values.previewMode === 'none' ? strings['not set'] : values.previewMode,
+      subText: values.previewMode,
     },
     {
       key: 'keybindings',
@@ -46,12 +45,6 @@ export default function otherSettings() {
       text: strings['confirm on exit'],
       icon: 'exit_to_app',
       checkbox: values.confirmOnExit,
-    },
-    {
-      key: 'show-console',
-      text: strings['show console'],
-      icon: 'code',
-      checkbox: values.showConsole,
     },
     {
       key: 'check-files',
@@ -111,28 +104,19 @@ export default function otherSettings() {
 
       case 'previewMode':
         dialogs
-          .select(
-            this.text,
-            ['browser', 'in app', ['none', strings['not set']]],
-            {
-              default: values.previewMode,
-            },
-          )
+          .select(this.text, ['browser', 'inapp'], {
+            default: values.previewMode,
+          })
           .then((res) => {
             if (res === values.previewMode) return;
             appSettings.value.previewMode = res;
             appSettings.update();
-            this.changeSubText(res === 'none' ? strings['not set'] : res);
+            this.changeSubText(res);
           });
         break;
 
       case 'confirm-on-exit':
         this.value = values.confirmOnExit = !values.confirmOnExit;
-        appSettings.update();
-        break;
-
-      case 'show-console':
-        this.value = values.showConsole = !values.showConsole;
         appSettings.update();
         break;
 

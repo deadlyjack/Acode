@@ -158,10 +158,11 @@ export default {
   },
 
   /**
+   * 
    * @type {AppThemeList}
    */
   appThemeList: {
-    custom: scheme('custom', 'custom', false),
+    custom: scheme('custom', 'dark', false),
     atticus: scheme('atticus', 'dark', false, '#201e1e', '#363333'),
     bump: scheme('bump', 'dark', false, '#1c2126', '#303841'),
     bling: scheme('bling', 'dark', false, '#131326', '#202040'),
@@ -171,7 +172,7 @@ export default {
     ocean: scheme('ocean', 'dark', false, '#13131a', '#20202c'),
     tomyris: scheme('tomyris', 'dark', false, '#230528', '#3b0944'),
     menes: scheme('menes', 'dark', false, '#1f2226', '#353941'),
-    default: scheme('default', 'light', true, '#5c5c99', '#9999ff'),
+    default: scheme('default', 'dark', true, '#5c5c99', '#9999ff'),
     light: scheme('light', 'light', false, '#999999', '#ffffff'),
   },
 };

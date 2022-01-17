@@ -43,7 +43,6 @@ export default function loadPolyFill() {
       return null;
     };
   }
-
   Object.defineProperty(String.prototype, 'hashCode', {
     value: function () {
       let hash = 0;

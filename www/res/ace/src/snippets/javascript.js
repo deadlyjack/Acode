@@ -159,7 +159,7 @@ snippet sing\n\
 # class\n\
 snippet class\n\
 regex /^\\s*/clas{0,2}/\n\
-	class ${1:class} {\n\
+	class ${1:className} {\n\
 		$40$0\n\
 	}\n\
 # \n\

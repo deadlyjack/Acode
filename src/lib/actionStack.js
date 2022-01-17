@@ -35,7 +35,7 @@ function ActionStack() {
           dialogs
             .confirm(
               strings.alert.toUpperCase(),
-              strings['close app'].capitalize(0)
+              strings['close app'].capitalize(0),
             )
             .then(closeApp);
         }

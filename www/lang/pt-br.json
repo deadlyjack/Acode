@@ -209,5 +209,10 @@
   "manage all files": "Permita que o editor Acode gerencie todos os arquivos nas configurações para editar arquivos em seu dispositivo facilmente.",
   "close file": "Fechar arquivo",
   "reset connections": "Reiniciar conexões",
-  "check file changes": "Check file changes"
+  "check file changes": "Check file changes",
+  "open in browser": "Open in browser",
+  "desktop mode": "Desktop mode",
+  "toggle console": "Toggle console",
+  "new line mode": "New line mode",
+  "add a storage": "Add a storage"
 }

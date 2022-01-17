@@ -11,6 +11,7 @@ import Gists from '../gists/gists';
 import git from '../../lib/git';
 import constants from '../../lib/constants';
 import searchBar from '../../components/searchbar';
+import Icon from '../../components/icon';
 
 /**
  *
@@ -33,12 +34,7 @@ function GistFilesInclude(gist) {
     msg: strings['empty folder message'],
   };
   const $content = tag.parse(mustache.render(_template, views));
-  const $menuToggler = tag('span', {
-    className: 'icon more_vert',
-    attr: {
-      action: 'toggle-menu',
-    },
-  });
+  const $menuToggler = Icon('more_vert', 'toggle-menu');
   const $cm = contextMenu(mustache.render(_menu, strings), {
     top: '8px',
     right: '8px',
@@ -129,7 +125,7 @@ function GistFilesInclude(gist) {
       dialogs
         .confirm(
           strings.warning,
-          strings['delete {name}'].replace('{name}', filename)
+          strings['delete {name}'].replace('{name}', filename),
         )
         .then(() => {
           if (filename) {
@@ -154,7 +150,7 @@ function GistFilesInclude(gist) {
       dialogs
         .confirm(
           strings.warning,
-          strings['delete {name}'].replace('{name}', 'Gist: ' + gist.id)
+          strings['delete {name}'].replace('{name}', 'Gist: ' + gist.id),
         )
         .then(() => {
           const Gist = git.GitHub().getGist(gist.id);

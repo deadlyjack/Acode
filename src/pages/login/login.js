@@ -3,7 +3,7 @@ function GithubLogin() {
     (res) => {
       const GithubLogin = res.default;
       GithubLogin();
-    }
+    },
   );
 }
 

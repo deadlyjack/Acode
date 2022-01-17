@@ -36,7 +36,7 @@ export default function Info(repo, owner) {
             id: 'info-page',
             className: 'main',
             innerHTML: text,
-          })
+          }),
         );
       } else {
         $page.hide();

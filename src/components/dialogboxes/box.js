@@ -70,7 +70,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
       tag('div', {
         className: 'button-container',
         children: cancelBtn ? [cancelBtn, okBtn] : [okBtn],
-      })
+      }),
     );
   }
 

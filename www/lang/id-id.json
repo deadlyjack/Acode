@@ -210,5 +210,10 @@
   "manage all files": "Izinkan editor Acode untuk mengelola semua file dalam pengaturan untuk mengedit berkas di perangkat Anda dengan mudah.",
   "close file": "Tutup berkas",
   "reset connections": "Setel ulang koneksi",
-  "check file changes": "Check file changes"
+  "check file changes": "Check file changes",
+  "open in browser": "Open in browser",
+  "desktop mode": "Desktop mode",
+  "toggle console": "Toggle console",
+  "new line mode": "New line mode",
+  "add a storage": "Add a storage"
 }

@@ -21,27 +21,27 @@ import tag from 'html-tag-js';
 
 /**
  *
- * @param {string|contextMenuOptions} arg1
- * @param {contextMenuOptions} [arg2]
+ * @param {string|contextMenuOptions} content
+ * @param {contextMenuOptions} [options]
  * @returns {HTMLElement & contextMenuObj}
  */
-function contextMenu(arg1, arg2) {
-  if (!arg2 && typeof arg1 === 'object') {
-    arg2 = arg1;
-    arg1 = null;
-  } else if (!arg2) {
-    arg2 = {};
+function contextMenu(content, options) {
+  if (!options && typeof content === 'object') {
+    options = content;
+    content = null;
+  } else if (!options) {
+    options = {};
   }
 
   const $el = tag('ul', {
     className: 'context-menu scroll',
-    innerHTML: arg1 || '',
+    innerHTML: content || '',
     style: {
-      top: arg2.top || 'auto',
-      left: arg2.left || 'auto',
-      right: arg2.right || 'auto',
-      bottom: arg2.bottom || 'auto',
-      transformOrigin: arg2.transformOrigin || null,
+      top: options.top || 'auto',
+      left: options.left || 'auto',
+      right: options.right || 'auto',
+      bottom: options.bottom || 'auto',
+      transformOrigin: options.transformOrigin || null,
     },
   });
   const $mask = tag('span', {
@@ -50,7 +50,7 @@ function contextMenu(arg1, arg2) {
     onmousedown: hide,
   });
 
-  if (!arg2.innerHTML) addTabindex();
+  if (!options.innerHTML) addTabindex();
 
   function show() {
     actionStack.push({
@@ -60,19 +60,19 @@ function contextMenu(arg1, arg2) {
     $el.onshow();
     $el.classList.remove('hide');
 
-    if (arg2.innerHTML) {
-      $el.innerHTML = arg2.innerHTML.call($el);
+    if (options.innerHTML) {
+      $el.innerHTML = options.innerHTML.call($el);
       addTabindex();
     }
 
-    if (arg2.toggle) {
-      const client = arg2.toggle.getBoundingClientRect();
-      if (!arg2.top && !arg2.bottom) $el.style.top = client.top + 'px';
-      if (!arg2.left && !arg2.right)
+    if (options.toggle) {
+      const client = options.toggle.getBoundingClientRect();
+      if (!options.top && !options.bottom) $el.style.top = client.top + 'px';
+      if (!options.left && !options.right)
         $el.style.right = innerWidth - client.right + 'px';
     }
 
-    document.body.append($el, $mask);
+    app.append($el, $mask);
 
     const $firstChild = $el.firstChild;
     if ($firstChild && $firstChild.focus) $firstChild.focus();
@@ -99,12 +99,12 @@ function contextMenu(arg1, arg2) {
     for (let $el of children) $el.tabIndex = '0';
   }
 
-  if (arg2.toggle) arg2.toggle.addEventListener('click', toggle);
+  if (options.toggle) options.toggle.addEventListener('click', toggle);
 
   $el.hide = hide;
   $el.show = show;
-  $el.onshow = arg2.onshow || (() => {});
-  $el.onhide = arg2.onhide || (() => {});
+  $el.onshow = options.onshow || (() => {});
+  $el.onhide = options.onhide || (() => {});
 
   return $el;
 }

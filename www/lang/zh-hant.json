@@ -208,5 +208,10 @@
   "manage all files": "允許Acode管理設定中的所有檔案，以便輕鬆編輯裝置上的檔案Allow Acode editor to manage all files in settings to edit files on your device easily.",
   "close file": "關閉檔案",
   "reset connections": "重置連線",
-  "check file changes": "Check file changes"
+  "check file changes": "Check file changes",
+  "open in browser": "Open in browser",
+  "desktop mode": "Desktop mode",
+  "toggle console": "Toggle console",
+  "new line mode": "New line mode",
+  "add a storage": "Add a storage"
 }

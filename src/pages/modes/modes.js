@@ -25,7 +25,7 @@ function Modes() {
     const $list = tag.parse(
       mustache.render(_list, {
         modes,
-      })
+      }),
     );
     //#endregion
 

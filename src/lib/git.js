@@ -74,7 +74,7 @@ function error(err) {
 function Record(owner, sha, name, data, repo, path, branch) {
   if (!owner || !sha || !name || !repo) {
     throw new Error(
-      'Could not create Record because one or more paramert value is not valid'
+      'Could not create Record because one or more paramert value is not valid',
     );
   }
   const _record = {
@@ -136,7 +136,7 @@ function Record(owner, sha, name, data, repo, path, branch) {
                 _path,
                 data,
                 `Rename ${name} to ${str}`,
-                {}
+                {},
               );
             }
 
@@ -247,7 +247,7 @@ function GitRecord(obj) {
       (err) => {
         if (err.code) FileError(err.code);
         console.error(err);
-      }
+      },
     );
     return record;
   }

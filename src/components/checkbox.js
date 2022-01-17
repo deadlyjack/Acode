@@ -19,7 +19,7 @@ function Checkbox(text, checked, name, id, type) {
       name,
       id,
       type,
-    })
+    }),
   );
 
   const $input = $checkbox.get('input');

@@ -23,7 +23,7 @@ function select(type) {
   const lineHeight = editor.renderer.lineHeight;
   const $cm = controls.menu;
   const $cursor = editor.container.querySelector(
-    '.ace_cursor-layer>.ace_cursor'
+    '.ace_cursor-layer>.ace_cursor',
   );
   const $start = controls.start;
   const $end = controls.end;
@@ -161,7 +161,7 @@ function select(type) {
     }
 
     const $singleMode = editor.container.querySelector(
-      '.ace_marker-layer>.ace_selection.ace_br15'
+      '.ace_marker-layer>.ace_selection.ace_br15',
     );
     const cursor = $cursor.getBoundingClientRect();
     const scrollTop = editor.renderer.getScrollTop();
@@ -190,10 +190,10 @@ function select(type) {
       }
     } else {
       const $clientStart = editor.container.querySelector(
-        '.ace_marker-layer>.ace_selection.ace_br1.ace_start'
+        '.ace_marker-layer>.ace_selection.ace_br1.ace_start',
       );
       const $clientEnd = editor.container.querySelector(
-        '.ace_marker-layer>.ace_selection.ace_br12'
+        '.ace_marker-layer>.ace_selection.ace_br12',
       );
 
       if ($clientStart && $clientEnd) {

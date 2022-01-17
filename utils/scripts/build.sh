@@ -32,12 +32,15 @@ RED='\033[1;34m'
 NC='\033[0m'
 script1="node ./utils/config.js $mode $app"
 script2="webpack --progress --mode $webpackmode "
-script3="cordova build $platform $cordovamode"
+script3="node ./utils/loadStyles.js"
+script4="cordova build $platform $cordovamode"
 eval "
 echo \"${RED}$script1${NC}\";
 $script1;
 echo \"${RED}$script2${NC}\";
 $script2&&
 echo \"${RED}$script3${NC}\";
-$script3
+$script3;
+echo \"${RED}$script4${NC}\";
+$script4
 "

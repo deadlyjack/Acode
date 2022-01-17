@@ -1,4 +1,8 @@
 version 1.4.164
+☞ Added new in app browser with more features.
+☞ Added all console methods like time, timeEnd, info, etc.
+
+version 1.4.164
 ☞ Added option to close the file in the menu.
 ☞ Added option to reset remote connections.
 ☞ Performance improvement.

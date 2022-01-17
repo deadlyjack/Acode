@@ -11,7 +11,7 @@ export default function AboutInclude() {
 
   system.getWebviewInfo(
     (res) => render(res),
-    (err) => render()
+    (err) => render(),
   );
 
   function render(webview) {
@@ -20,7 +20,7 @@ export default function AboutInclude() {
         ...BuildInfo,
         webview,
         PERSONAL_EMAIL: constants.PERSONAL_EMAIL,
-      })
+      }),
     );
     actionStack.push({
       id: 'about',

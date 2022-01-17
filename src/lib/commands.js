@@ -68,6 +68,16 @@ export default {
         editorManager.onupdate('encoding');
       });
   },
+  async eol() {
+    const eol = await dialogs.select(
+      strings['new line mode'],
+      ['unix', 'windows'],
+      {
+        default: editorManager.activeFile.eol,
+      },
+    );
+    editorManager.activeFile.eol = eol;
+  },
   exit() {
     navigator.app.exitApp();
   },

@@ -37,13 +37,13 @@ export default function () {
       '\tconsole.log(0.2 + 0.1 === 0.3);\n' +
       "\tconsole.log('I love Acode editor')\n" +
       '}\n' +
-      'foo();'
+      'foo();',
   );
   editor.gotoLine(8);
   $themePreview.append(
     tag('div', {
       id: 'theme-preview-header',
-    })
+    }),
   );
   $themePreview.classList.add(appSettings.value.editorFont);
 
@@ -181,10 +181,10 @@ export default function () {
           'Hi dear user, dark modes are available in paid version of the app. ' +
             '<strong>DO NOT PANIC!</strong> The project is open source, you can build your own apk with all ' +
             'the features you need. Please support this project by ' +
-            'buying the paid version.'
+            'buying the paid version.',
         )
         .onhide(() => {
-          window.open(link, '_system');
+          system.openInBrowser(link);
         });
       return;
     }

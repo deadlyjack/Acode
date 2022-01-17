@@ -11,7 +11,7 @@ header {
     color: white;
     color: var(--text-main-color);
 
-    > *:nth-child(2) {
+    > .text {
       pointer-events: unset !important;
       margin: auto;
       font-weight: bold;
@@ -49,7 +49,7 @@ header {
     opacity: 0.6;
   }
 
-  > *:nth-child(2) {
+  > .text {
     flex: 1;
     white-space: nowrap;
     overflow: hidden;

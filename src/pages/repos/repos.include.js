@@ -13,6 +13,7 @@ import fs from '../../lib/fileSystem/internalFs';
 import dialogs from '../../components/dialogs';
 import git from '../../lib/git';
 import searchBar from '../../components/searchbar';
+import Icon from '../../components/icon';
 
 function ReposInclude() {
   const $search = tag('span', {
@@ -21,12 +22,7 @@ function ReposInclude() {
       action: 'search',
     },
   });
-  const $menuToggler = tag('span', {
-    className: 'icon more_vert',
-    attr: {
-      action: 'toggle-menu',
-    },
-  });
+  const $menuToggler = Icon('more_vert', 'toggle-menu');
   const $page = Page('Repositories');
   const { credentials } = helpers;
   /**
@@ -116,7 +112,7 @@ function ReposInclude() {
         loadRepos();
         break;
       case 'open':
-        window.open($el.parentElement.getAttribute('data-url'), '_system');
+        system.openInBrowser($el.parentElement.getAttribute('data-url'));
         break;
     }
   }

@@ -4,7 +4,7 @@
   }
 
   .tile {
-    &[storageType='permission'] {
+    &[storageType='notification'] {
       background-color: #9999ff;
       background-color: var(--primary-color);
       color: white;

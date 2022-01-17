@@ -29,6 +29,7 @@ class Settings {
    */
   #defaultSettings;
   #initialized = false;
+  #oldSettings;
 
   constructor() {
     this.methods = {
@@ -78,7 +79,7 @@ class Settings {
       beautify: ['*'],
       linting: false,
       autoCorrect: true,
-      previewMode: 'none',
+      previewMode: 'inapp',
       showSpaces: false,
       openFileListPos: 'header',
       quickTools: true,
@@ -96,6 +97,7 @@ class Settings {
       customThemeMode: 'dark',
       lineHeight: 2,
       checkFiles: true,
+      desktopMode: false,
       customTheme: {
         '--primary-color': 'rgb(153,153,255)',
         '--secondary-color': 'rgb(255,255,255)',
@@ -135,7 +137,8 @@ class Settings {
 
     if (!(await fs.exists())) {
       await this.#save();
-      this.value = this.#defaultSettings;
+      this.value = { ...this.#defaultSettings };
+      this.#oldSettings = { ...this.#defaultSettings };
       this.value.lang = lang;
       return;
     }
@@ -165,8 +168,15 @@ class Settings {
     }
 
     await fs.writeFile(settingsText);
+    this.#oldSettings = { ...this.value };
   }
 
+  /**
+   *
+   * @param {Object} settings
+   * @param {Boolean} showToast
+   * @param {Boolean} saveFile
+   */
   async update(settings = null, showToast = true, saveFile = true) {
     if (typeof settings === 'boolean') {
       showToast = settings;
@@ -177,9 +187,15 @@ class Settings {
 
     for (let key in settings) {
       if (key in this.value) this.value[key] = settings[key];
-      if (Array.isArray(this.methods[`update:${key}`]))
-        for (let cb of this.methods[`update:${key}`])
+    }
+
+    const changedSettings = this.#getChangedKeys();
+    for (let key of changedSettings) {
+      if (Array.isArray(this.methods[`update:${key}`])) {
+        for (let cb of this.methods[`update:${key}`]) {
           onupdate.push(cb.bind(this.value, this.value[key]));
+        }
+      }
     }
 
     if (saveFile) await this.#save();
@@ -239,6 +255,24 @@ class Settings {
    */
   isFileAllowed(ext = '') {
     return this.value.filesNotAllowed.includes(ext.toLowerCase());
+  }
+
+  /**
+   * Returns changed settings
+   * @returns {Array<String>}
+   */
+  #getChangedKeys() {
+    const keys = [];
+    for (let key in this.#oldSettings) {
+      const value = this.#oldSettings[key];
+      if (typeof value === 'object') {
+        if (!helpers.areEqual(value, this.value[key])) keys.push(key);
+        continue;
+      }
+
+      if (value !== this.value[key]) keys.push(key);
+    }
+    return keys;
   }
 }
 

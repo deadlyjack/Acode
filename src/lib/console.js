@@ -1,250 +1,291 @@
 import 'core-js/stable';
+import 'html-tag-js/dist/polyfill';
+import tag from 'html-tag-js';
+import * as esprima from 'esprima';
 import loadPolyFill from './utils/polyfill';
 
 (function () {
   loadPolyFill.apply(window);
 
-  if (!HTMLElement.prototype.append) {
-    HTMLElement.prototype.append = function (...node) {
-      for (let el of node) this.appendChild(el);
-    };
-  }
-
   if (window.consoleLoaded) return;
-  const inputContainer = document.createElement('c-input');
-  const input = document.createElement('textarea');
-  const toggler = document.createElement('c-toggler');
-  const errId = '_c_error' + new Date().getMilliseconds();
-  const consoleElement = document.createElement('c-console');
-  const counter = {};
-  const _console = console;
-  const tagsToReplace = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-  };
-  let isFocused = false;
-  let flag;
-
-  input.id = '__c-input';
-  inputContainer.appendChild(input);
-
-  toggler.innerHTML = '&#9888;';
-  toggler.style.transform = `translate(2px, ${innerHeight / 2}px)`;
-
-  input.onblur = function () {
-    setTimeout(() => {
-      isFocused = false;
-    }, 0);
-  };
-
-  toggler.onclick = toggleConsole;
-
-  toggler.ontouchstart = function () {
-    document.addEventListener('touchmove', touchmove, {
-      passive: false,
-    });
-
-    document.ontouchend = function (e) {
-      document.removeEventListener('touchmove', touchmove, {
-        passive: 'false',
-      });
-      document.ontouchend = null;
-    };
-  };
-
-  consoleElement.appendChild(inputContainer);
-
-  consoleElement.onclick = function (e) {
-    const el = e.target;
-    const action = el.getAttribute('action');
-
-    switch (action) {
-      case 'use code':
-        const value = el.getAttribute('data-code');
-
-        input.value = value;
-        input.focus();
-        break;
-
-      default:
-        break;
+  const originalConsole = console;
+  const $input = tag('textarea', {
+    id: '__c-input',
+    onblur(){
+      setTimeout(() => {
+        isFocused = false;
+      }, 0);
     }
-  };
-
-  if (!window.consoleLoaded) {
-    window.addEventListener('load', loadConsole);
-    window.addEventListener('error', function (err) {
-      console.error(err);
-    });
-  } else {
-    if (document.readyState === 'complete') {
-      loadConsole();
-    } else {
-      document.addEventListener('readystatechange', function () {
-        if (this.readyState === 'complete') loadConsole();
-      });
-    }
-  }
-
-  window.consoleLoaded = true;
-
-  function touchmove(e) {
-    e.preventDefault();
-    toggler.style.transform = 'translate('
-      .concat(e.touches[0].clientX - 20, 'px, ')
-      .concat(e.touches[0].clientY - 20, 'px)');
-  }
-
-  function loadConsole() {
-    if (sessionStorage.getItem('__mode') === 'console') {
-      toggleConsole();
-    } else {
-      if (!toggler.isConnected) {
-        document.body.appendChild(toggler);
-      }
-      setInterval(() => {
-        if (!toggler.isConnected) document.body.appendChild(toggler);
-      }, 1000);
-    }
-    const allMetas = document.querySelectorAll('meta');
-
-    if (sessionStorage.getItem('_$mode') === 'mobile') {
-      let get = false;
-      for (let i = 0; i < allMetas.length; ++i) {
-        if (allMetas[i].name === 'viewport') {
-          allMetas[i].setAttribute(
-            'content',
-            'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0',
-          );
-          get = true;
+  });
+  const $inputContainer = tag('c-input', {
+    child: $input
+  });
+  const $console = tag('c-console', {
+    child: $inputContainer,
+    onclick(e){
+      const el = e.target;
+      const action = el.getAttribute('action');
+  
+      switch (action) {
+        case 'use code':
+          const value = el.getAttribute('data-code');
+  
+          $input.value = value;
+          $input.focus();
           break;
-        }
+  
+        default:
+          break;
       }
+    }
+  });
+  const counter = {};
+  const timers = {};
+  let isFocused = false;
 
-      if (!get) {
-        const metaTag = document.createElement('meta');
-        metaTag.name = 'viewport';
-        metaTag.content =
-          'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
-        document.getElementsByTagName('head')[0].appendChild(metaTag);
+  if (!tag.get('c-console')) {
+    const $style = tag('style');
+    $style.textContent = css();
+    document.head.append($style);
+    window.addEventListener('error', onError);
+    
+    if (sessionStorage.getItem('__mode') === 'console') {
+      showConsole();
+      return;
+    }
+
+    sessionStorage.setItem('__console_available', true);
+    document.addEventListener('showconsole', showConsole);
+    document.addEventListener('hideconsole', hideConsole);
+  }
+
+  if (!window.__objs) window.__objs = {};
+
+  console = {
+    assert(condition, msg, ...substituion) {
+      if (!condition) {
+        log('error', getStack(new Error()), msg, ...substituion);
       }
-    } else if (window.__mode === 'desktop') {
-      for (let i = 0; i < allMetas.length; ++i) {
-        if (allMetas[i].name === 'viewport') {
-          allMetas[i].setAttribute(
-            'content',
-            'user-scalable=yes, maximum-scale=2',
-          );
-        }
+    },
+    clear() {
+      if (isFocused) $input.focus();
+      $console.textContent = '';
+      $console.appendChild($inputContainer);
+    },
+    count(hash = 'default') {
+      if (!counter[hash]) {
+        counter[hash] = 1;
+      } else {
+        ++counter[hash];
+      }
+      log('log', getStack(new Error()),`${hash}: ${counter[hash]}`);
+    },
+    countReset(hash) {
+      delete counter[hash];
+    },
+    debug(...args) {
+      log('log', getStack(new Error()), ...args);
+    },
+    dir(...args) {
+      log('log', getStack(new Error()), ...args);
+    },
+    dirxml(...args) {
+      log('log', getStack(new Error()), ...args);
+    },
+    error(...args) {
+      originalConsole.error(...args);
+      log('error', getStack(new Error()), ...args);
+    },
+    group(...args) {
+      log('log', getStack(new Error()), ...args);
+    },
+    groupCollapsed(...args) {
+      log('log', getStack(new Error()), ...args);
+    },
+    groupEnd(...args) {
+      log('log', getStack(new Error()), ...args);
+    },
+    info(...args) {
+      originalConsole.info(...args);
+      log('info', getStack(new Error()), ...args);
+    },
+    log(msg, ...substituion) {
+      originalConsole.log(msg,...substituion);
+      log('log', getStack(new Error()), msg, ...substituion);
+    },
+    table(...args) {
+      log('log', getStack(new Error()), ...args);
+    },
+    time(label = 'default') {
+      if (typeof label !== 'string') {
+        throw new TypeError('label must be a string');
+      }
+      timers[label] = new Date().getTime();
+    },
+    timeEnd(label = 'default') {
+      if (typeof label !== 'string') {
+        throw new TypeError('label must be a string');
+      }
+      if (!timers[label]) {
+        throw new Error(`No such label: ${label}`);
+      }
+      const time = new Date().getTime() - timers[label];
+      log('log', getStack(new Error()), `${label}: ${time}ms`);
+      delete timers[label];
+    },
+    timeLog(label = 'default') {
+      if (typeof label !== 'string') {
+        throw new TypeError('label must be a string');
+      }
+      if (!timers[label]) {
+        throw new Error(`No such label: ${label}`);
+      }
+      const time = new Date().getTime() - timers[label];
+      log('log', getStack(new Error()), `${label}: ${time}ms`);
+    },
+    trace(...args) {
+      log('trace', getStack(new Error()), ...args);
+    },
+    warn(msg, ...substituion) {
+      originalConsole.warn(msg, ...substituion);
+      log('warn', getStack(new Error()), msg, ...substituion);
+    },
+  };
+
+  function showConsole(){
+    tag.get('html').append($console);
+    $input.addEventListener('keydown', onCodeInput);
+  }
+
+  function hideConsole(){
+    $console.remove();
+    $input.removeEventListener('keydown', onCodeInput);
+  }
+
+  function onCodeInput(e) {
+    const key = e.key;
+    isFocused = true;
+    if (key === 'Enter') {	
+      const regex = /[\[|{\(\)\}\]]/g;
+      let code = this.value.trim();
+      let isOdd = (code.length - code.replace(regex, '').length) % 2;
+
+      if (!code || isOdd) return;
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      log('code', {}, code);
+      $input.value = '';
+      const res = execute(code);
+      if(res.type === 'error'){
+        log('error', getStack(new Error()), res.value);
+      }else{
+        log('log', getStack(new Error()), res.value);
       }
     }
   }
 
-  function toggleConsole() {
-    if (consoleElement.isConnected) {
-      consoleElement.remove();
-    } else {
-      document.body.appendChild(consoleElement);
-      if (!flag) {
-        input.addEventListener('keydown', function (e) {
-          const key = e.keyCode || e.which;
-          isFocused = true;
-          if (key === 13) {
-            const regex = /[\[|{\(\)\}\]]/g;
-            let code = this.value.trim();
-            let isOdd = (code.length - code.replace(regex, '').length) % 2;
+  function getBody(obj, ...keys) {
+    if (
+      obj instanceof Promise &&
+      !('[[PromiseStatus]]' in obj)
+    ) obj = getPromiseStatus(obj);
 
-            if (!code || isOdd) return;
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
+    let value = objValue(obj, ...keys);
+    const $group = tag('c-group');
+    const $toggler = tag('c-type', {
+      attr: {
+        type: 'body-toggler',
+      },
+      textContent: value ? value.constructor.name : value + ''
+    });
 
-            const $code = document.createElement('c-code');
+    if(value instanceof Object){
+      $toggler.onclick = function(){
+        if (this.classList.contains('__show-data')) {
+          this.classList.remove('__show-data');
+          $group.textContent = null;
+          return;
+        }
+  
+        this.classList.toggle('__show-data');
+  
+        const possibleKeys = [
+          ...Object.keys(value),
+          ...Object.getOwnPropertyNames(value),
+          ...Object.keys(value['__proto__'] || {}),
+        ];
 
-            $code.textContent =
-              code.length > 50 ? code.substr(0, 50) + '...' : code;
-            $code.setAttribute('data-code', code);
-            $code.setAttribute('action', 'use code');
-            input.value = '';
-            console.log(errId + 'code', $code.outerHTML);
-            execute(code);
-          }
-        });
-        flag = true;
+        for(let key in value){
+          possibleKeys.push(key);
+        }
+
+        if(value['__proto__']) possibleKeys.push('__proto__');
+        if(value['prototype']) possibleKeys.push('prototype');
+
+        [...new Set(possibleKeys)]
+        .forEach(key => $group.append(
+          appendProperties(obj, ...keys, key)
+        ));
+      };
+      $toggler.textContent = value.constructor.name;
+    }else{
+      const $val = getElement(value);
+      $val.textContent = (value ?? value + '').toString();
+      $group.append($val);
+    }
+
+    return [$toggler, $group];
+  }
+
+  function appendProperties(obj, ...keys) {
+    const key = keys.pop();
+    const value = objValue(obj, ...keys);
+    const getter = value.__lookupGetter__(key);
+    const $key = tag('c-key', {
+      textContent: key + ':',	
+    });
+    let $val;
+
+    if(getter){
+      $val = tag('c-span', {
+        style: {
+          textDecoration: 'underline',
+          color: '#39f',
+          margin: '0 10px'
+        },
+        textContent: `...`,
+        onclick(){
+          const $val = getVal(value[key]);
+          this.parentElement.replaceChild($val, this);
+        }
+      });
+    }else{
+      $val = getVal(value[key]);
+    }
+    
+    return tag('c-line', {
+      children: [$key, $val],
+    });
+
+    function getVal(val) {
+      const type = typeof val;
+      const $val = getElement(type);
+      if (type === 'object' && val !== null) {
+        $val.append(...getBody(obj, ...keys, key));
+      } else {
+        if (type === 'function') {
+          val = parseFuntion(val);
+        }
+        $val.textContent = val + '';
       }
+      return $val;
     }
   }
 
-  function getBody(obj) {
-    const toggler = document.createElement('c-type');
-    const group = document.createElement('c-group');
-
-    if (obj instanceof Promise) obj = getPromiseStatus(obj);
-
-    toggler.onclick = function () {
-      if (this.classList.contains('__show-data')) {
-        this.classList.remove('__show-data');
-        group.textContent = null;
-        return;
-      }
-
-      this.classList.toggle('__show-data');
-
-      let keys = [
-        ...Object.keys(obj),
-        ...Object.getOwnPropertyNames(obj),
-        '__proto__',
-        'prototype',
-      ];
-
-      keys = [...new Set(keys)];
-
-      for (let key in obj) {
-        if (!keys.includes(key)) append(key);
-      }
-
-      for (let key of keys) {
-        append(key);
-      }
-
-      function append(key, isProto) {
-        if (!(key in obj)) return;
-        let val = obj[key];
-        const $key = document.createElement('c-key');
-        const type = typeof val;
-        const $val = getElement(type);
-        if (type === 'object' && val !== null) {
-          $val.append(...getBody(val));
-        } else {
-          if (type === 'function') {
-            val = parseFuntion(val);
-          }
-          $val.textContent = escapeHTML(val + '');
-        }
-
-        $key.textContent = key + ':';
-        if (isProto) $key.setAttribute('type', 'proto');
-        const $line = document.createElement('c-line');
-        $line.append($key, $val);
-        group.append($line);
-      }
-    };
-    toggler.setAttribute('type', 'body-toggler');
-    toggler.textContent = (obj.constructor && obj.constructor.name) || 'Object';
-
-    return [toggler, group];
-
-    // return `<c-type action="toggle-body" class="__show-data">${type}</c-type><c-group>${data}</c-group>`;
-
-    function replaceTag(tag) {
-      return tagsToReplace[tag] || tag;
-    }
-
-    function escapeHTML(str) {
-      if (!str) return;
-      return str.replace(/[&<>]/g, replaceTag);
-    }
+  function objValue(obj, ...keys){
+    return keys.reduce((acc, key) => acc[key], obj);
   }
 
   function getPromiseStatus(obj) {
@@ -275,36 +316,9 @@ import loadPolyFill from './utils/polyfill';
   }
 
   function getElement(type) {
-    const el = document.createElement('c-text');
-    switch (type) {
-      case 'boolean':
-        el.classList.add('__c-boolean');
-        break;
-
-      case 'function':
-        el.classList.add('__c-function');
-        break;
-
-      case 'bigint':
-      case 'number':
-        el.classList.add('__c-number');
-        break;
-
-      case 'string':
-        el.classList.add('__c-string');
-        break;
-
-      case 'symbol':
-        el.classList.add('__c-symbol');
-        break;
-
-      case 'object':
-      case 'undefined':
-        el.classList.add('__c-undefined');
-        break;
-    }
-
-    return el;
+    return tag('c-text', {
+      className: `__c-${type}`,
+    });
   }
 
   function parseFuntion(data) {
@@ -355,221 +369,209 @@ import loadPolyFill from './utils/polyfill';
     return str;
   }
 
-  function log() {
-    _console.log(...arguments);
-
-    let clean = null;
-    let error = null;
-    let args = Object.values(arguments);
-    let mode = 'normal';
-    let qoutes = '';
-    if (arguments.length === 0) {
-      args = [undefined];
-    }
-    if (arguments[0] === errId + 'error') {
-      error = arguments[1];
-      qoutes = 'no-qoutes';
-      const filename = error.filename || 'console';
-      args = [errId, error.message];
-      clean = filename;
-      if (error.lineno) clean += ':' + error.lineno;
-      if (error.colno) clean += ':' + error.colno;
-    } else if (arguments[0] === errId + 'log') {
-      clean = mode = 'console';
-      args.splice(0, 1);
-    } else if (arguments[0] === errId + 'code') {
-      mode = 'code';
-      args.splice(0, 1);
-    } else {
-      const err = getErrorObject();
-      const caller_line =
-        err.stack.split('\n')[arguments[0] === errId ? 4 : 3] || 'at console';
-      const index = caller_line.indexOf('at ');
-      clean = caller_line.slice(index + 2, caller_line.length);
-    }
-
-    if (mode === 'normal' && Array.isArray(clean)) {
-      let tmpclean = /\/\.run_(.+):(\d+):(\d+)/.exec(clean);
-
-      if (!tmpclean) {
-        clean = /^(.+):(\d+):(\d+)/.exec(clean.split('/').slice(-1));
-      } else {
-        clean = tmpclean;
+  /**
+   * Prints to the console.
+   * @param {'log'|'error'|'warn'|'code'|'trace'|'table'} mode
+   * @param {{stack: string, location: string}} options
+   * @param  {...any} args 
+   */
+  function log(mode, options, ...args) {
+    let location = options.location || 'console';
+    const $messages = tag('c-message',{
+      attr: {
+        'log-level': mode
       }
+    });
 
-      const clean1 = clean[1].split(',');
+    args = format(args);
 
-      if (clean1.length >= 2) {
-        clean[1] = clean1.pop();
-      }
-      clean = clean[1] + ':' + clean[2] + ':' + clean[3];
+    if(args.length === 1 && args[0] instanceof Error){
+      args.unshift(args[0].message);
     }
-    let flag = false;
-    const messages = document.createElement('c-message');
+
 
     for (let arg of args) {
-      const type = typeof arg;
-      let msg, extras;
-      if (mode === 'code') {
-        messages.innerHTML = arg;
-      } else if (type !== 'object' || arg === null) {
-        if (arg === errId) {
-          messages.classList.add('error');
-          continue;
-        }
+      const typeofArg = typeof arg;
+      arg = (arg ?? arg + '');
+      
+      let $msg;
+      if(mode === 'code') {
+        $msg = tag('c-code');
+        $msg.textContent = arg.length > 50 ? arg.substring(0, 50) + '...' : arg;
+        $msg.setAttribute('data-code', arg);
+        $msg.setAttribute('action', 'use code');
+      }else{
+        $msg = getElement(typeofArg);
 
-        if (flag) {
-          messages.lastElementChild.setAttribute('style', arg);
-          flag = false;
-          continue;
+        switch (typeofArg) {
+          case 'object':
+            $msg.append(...getBody(arg));
+            break;
+          case 'function':
+            $msg.innerHTML = parseFuntion(arg);
+            $msg.append(tag('c-line', {
+              children: getBody(arg),
+            }));
+            break;
+          default:
+            $msg.innerHTML = arg;
+            break;
         }
-
-        msg = getElement(type);
-        if (type === 'function') {
-          const fun = arg;
-          arg = parseFuntion(arg);
-          extras = getBody(fun);
-        }
-
-        const valid =
-          ['code', 'console'].indexOf(args[0]) > -1
-            ? args.length > 2
-            : args.length > 1;
-
-        if (type === 'undefined' || type === 'string' || arg === null) {
-          arg = arg + '';
-        } else {
-          arg = arg.toString();
-        }
-        if (/^%c/.test(arg) && valid) {
-          flag = true;
-          msg.textContent = arg.replace(/%[a-zA-Z]/, '');
-        } else {
-          msg.textContent = arg;
-        }
-
-        if (qoutes && type === 'string') msg.classList.add(qoutes);
-
-        if (extras) {
-          const $line = document.createElement('c-line');
-          $line.append(...extras);
-          msg.append($line);
-        }
-      } else {
-        if (flag) flag = false;
-        let body = getBody(arg);
-        msg = document.createElement('c-text');
-        msg.append(...body);
       }
-      if (msg) messages.appendChild(msg);
+      $messages.appendChild($msg);
     }
 
-    if (clean) {
-      const stack = document.createElement('c-stack');
-      clean = decodeURI(
-        clean
-          .replace('.run_', '')
-          .replace(/\)$/, '')
-          .replace(location.origin, ''),
-      );
-      clean =
-        clean.length > 35 ? '...' + clean.substr(clean.length - 32) : clean;
-      stack.innerHTML = `<c-date>${new Date().toLocaleString()}</c-date><c-trace>${clean}</c-trace>`;
-      messages.appendChild(stack);
-    } else if (mode === 'code') {
-      messages.style.marginBottom = '0';
-      messages.style.border = 'none';
+    if (location) {
+      const $stack = tag('c-stack');
+      $stack.innerHTML = `<c-date>${new Date().toLocaleString()}</c-date><c-trace>${location}</c-trace>`;
+      $messages.appendChild($stack);
     }
-    consoleElement.insertBefore(messages, inputContainer);
 
-    while (consoleElement.childElementCount - 100 > 0)
-      consoleElement.firstElementChild.remove();
-  }
+    $console.insertBefore($messages, $inputContainer);
 
-  function error() {
-    _console.error(...arguments);
-    if (arguments.length === 0) return;
-    const error = arguments[0];
-    if (arguments[0] instanceof Error || arguments[0] instanceof ErrorEvent) {
-      log(errId + 'error', error);
-      return;
-    }
-    const args = Object.values(arguments);
-    args.unshift(errId);
-    log(...args);
-  }
-
-  function count() {
-    const hash = (arguments[0] || 'default') + '';
-
-    if (!counter[hash]) {
-      counter[hash] = 1;
-    } else {
-      ++counter[hash];
-    }
-    log(`${hash}: ${counter[hash]}`);
-  }
-
-  function clear() {
-    if (isFocused) input.focus();
-    consoleElement.textContent = '';
-    consoleElement.appendChild(inputContainer);
-  }
-
-  function getErrorObject() {
-    try {
-      throw Error('');
-    } catch (err) {
-      return err;
+    while ($console.childElementCount > 100){
+      $console.firstElementChild.remove();
     }
   }
 
-  console = {
-    //TODO:
-    assert(condition) {},
-    clear,
-    count,
-    //TODO:
-    countReset(hash) {},
-    //TODO:
-    debug(...args) {},
-    //TODO:
-    dir(arg) {},
-    //TODO:
-    dirxml(arg) {},
-    //TODO:
-    error,
-    group(arg) {},
-    //TODO:
-    groupCollapsed(arg) {},
-    //TODO:
-    groupEnd(arg) {},
-    info: log,
-    log,
-    //TODO:
-    table(arg) {},
-    //TODO:
-    time(arg) {},
-    //TODO:
-    timeEnd(arg) {},
-    //TODO:
-    timeLog(arg) {},
-    //TODO:
-    trace(arg) {},
-    warn: error,
-  };
+  /**
+   *
+   * @param {Array<any>} args
+   * @returns
+   */
+  function format(args) {
+    if (args.length <= 1) return args;
+
+    const originalArgs = [].concat(args);
+    const styles = [];
+    let msg = args.splice(0, 1)[0];
+
+    if (typeof msg !== 'string') return originalArgs;
+
+    let matched = matchRegex(msg);
+    let match;
+    while ((match = matched.next())) {
+      if (match.done) break;
+      let value = '';
+      const specifier = match.value[0];
+      const pos = match.value.index;
+      
+      if(!args.length){
+        value = specifier;
+      }else{
+        value = args.splice(0, 1)[0];
+        if ([undefined, null].includes(value)) {
+          value = value + '';
+        }
+  
+        switch (specifier) {
+          case '%c':
+            styles.push({
+              value,
+              pos
+            });
+            value = '';
+            break;
+          case '%s':
+            if (typeof value === 'object') {
+              value = value.constructor.name;
+            }
+            break;
+          case '%o':
+          case '%O':
+            let id = new Date().getMilliseconds() + '';
+            window.__objs[id] = value;
+            value = `<c-object onclick='console.log(window.__objs[${id}])'>Object</c-object>`;
+            break;
+          case '%d':
+          case '%i':
+            value = parseInt(value);
+            break;
+          case '%f':
+            value = parseFloat(value);
+            break;
+          default:
+            break;
+        }
+      }
+      msg = msg.substring(0, pos) + escapeHTML(value) + msg.substring(pos + 2);
+      matched = matchRegex(msg);
+    }
+
+    if(styles.length){
+      const toBeStyled = [];
+      let remainingMsg = msg;
+      styles.reverse().forEach((style, i) => {
+        toBeStyled.push(remainingMsg.substring(style.pos));
+        remainingMsg = msg.substring(0, style.pos);
+        if(i === styles.length - 1) toBeStyled.push(msg.substring(0, style.pos));
+      });
+      msg = toBeStyled.map((str, i) => {
+        if(i === toBeStyled.length - 1) return str;
+        const {value} = styles[i];
+        return `<c-span style="${value}">${str}</c-span>`;
+      }).reverse().join('');
+    }
+
+    msg.replace(/%%[oOsdifc]/g, '%');
+
+    args.unshift(msg);
+    return args;
+
+    /**
+     *
+     * @param {string} str
+     * @returns {IterableIterator<RegExpMatchArray>}
+     */
+    function matchRegex(str) {
+      return str.matchAll(/(?<!%)%[oOsdifc]/g);
+    }
+  }
+
+  /**
+   * Gets the stack trace of the current call
+   * @param {Error} error 
+   * @returns 
+   */
+  function getStack(error){
+    let stack = error.stack.split('\n');
+    stack.splice(1, 1);
+    let regExecRes = /<(.*)>:(\d+):(\d+)/.exec(stack[1]) || [];
+    let src = '';
+    const location = regExecRes[1];
+    const lineno = regExecRes[2];
+    const colno = regExecRes[3];
+
+    if(location && lineno){
+      src = escapeHTML(`${location} ${lineno}${colno ? ':' + colno : ''}`);
+    }else{
+      const res = /\((.*)\)/.exec(stack[1])
+      src = res && res[1] ? res[1] : '';
+    }
+    const index = src.indexOf(')');
+    src = src.split('/').pop().substring(0, index < 0 ? undefined : index);
+    if(src.length > 50) src = '...' + src.substring(src.length - 50);
+
+    return {
+      location: src,
+      stack: stack.join('\n'),
+    }
+  }
 
   function execute(code) {
+    let res = null;
     try {
       const parsed = esprima.parse(code, {
         range: true,
       }).body;
-      doStuff(parsed);
+      res = execParsedCode(parsed);
     } catch (e) {
-      doStuff([]);
+      res = execParsedCode([]);
     }
 
-    function doStuff(parsed) {
+    return res;
+
+    function execParsedCode(parsed) {
       let extra = '';
       parsed.map((st) => {
         if (st.type === 'VariableDeclaration') {
@@ -582,29 +584,361 @@ import loadPolyFill from './utils/polyfill';
       });
 
       if (extra) {
-        const script = document.createElement('script');
+        const script = tag('script');
         script.textContent = extra;
         document.body.appendChild(script);
         document.body.removeChild(script);
-        exec(code);
+        return exec(code);
       } else {
-        exec(code);
+        return exec(code);
       }
     }
 
     function exec(code) {
+      let res = null;
       try {
-        let res = window.eval(code);
-        console.log(errId + 'log', res);
+        res = {type: 'result', value: window.eval(code)};
       } catch (error) {
-        console.error(error);
+        res = {type: 'error', value: error};
       }
+
+      return res;
     }
   }
 
-  if (!window.consoleLoaded) {
-    window.addEventListener('error', function (err) {
-      console.error(err);
-    });
+  function onError(err) {
+    const error = err.error;
+    console.error(error.message, error);
+  }
+
+  function escapeHTML(str) {
+    if (typeof str !== 'string') return str;
+    const tags = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '%': '&#37;',
+    };
+    return str.replace(new RegExp(`[${Object.keys(tags)}]`, 'g'), char => tags[char]) || '';
+  }
+
+  function css() {
+    return `c-toggler {
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      height: 40px;
+      width: 40px;
+      background-color: #99f;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      transform-origin: center;
+      border-radius: 50%;
+      color: #fff;
+      box-shadow: -2px 2px 8px rgba(0, 0, 0, .4);
+      z-index: 99999
+  }
+  
+  c-object{
+      color: #9999ff;
+      text-decoration: underline;
+  }
+  
+  c-toggler:active {
+      box-shadow: -1px 1px 4px rgba(0, 0, 0, .4)
+  }
+  
+  c-line {
+      display: block;
+  }
+  
+  c-console {
+      box-sizing: border-box;
+      padding-top: 65px;
+      overflow-y: auto;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background-color: #313131;
+      z-index: 99998;
+      animation: --page-transition .1s ease 1;
+      color: #eeeeee;
+      font-family: "Roboto", sans-serif;
+  }
+  
+  c-console br:last-of-type {
+      display: none;
+  }
+  
+  c-console textarea {
+      color: white;
+      caret-color: currentColor !important;
+      background-color: inherit;
+  }
+  
+  c-input {
+      display: flex;
+      width: 100%;
+      height: fit-content;
+  }
+  
+  c-input::before {
+      content: '>>';
+      margin: 0 5px;
+      height: 100%;
+  }
+  
+  #__c-input {
+      position: relative;
+      width: 100%;
+      border: none;
+      background-color: transparent;
+      overflow: scroll;
+      resize: none;
+      height: 200px;
+  }
+
+  #__c-input:focus {
+    outline: none;
+  }
+  
+  c-console::before {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      background-color: inherit;
+      z-index: 999999;
+      content: 'Console';
+      display: flex;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      font-weight: 900;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+      margin-bottom: 10px;
+      color: white;
+      font-size: medium;
+  }
+  
+  c-message {
+      position: relative;
+      display: flex;
+      border-bottom: solid 1px rgba(204, 204, 204, 0.4);
+      margin-bottom: 35px;
+      font-size: .9rem;
+      flex-wrap: wrap;
+  }
+  
+  c-code {
+      position: relative;
+      color: rgb(214, 211, 211);
+      font-size: 1em;
+      font-family: 'Courier New', Courier, monospace;
+      overflow-x: auto;
+      white-space: pre;
+      marginBottom: 0px;
+      border: 'none';
+  }
+  
+  c-code::after {
+      content: 'use';
+      background-color: #666;
+      color: inherit;
+      border-radius: 4px;
+      padding: 0 0.4rem;
+      font-size: 0.6rem;
+  }
+  
+  c-code::before {
+      content: '>>';
+      padding: 0 5px;
+      font-style: italic;
+  }
+  
+  c-key {
+      font-size: 0.9rem;
+      color: #cc66ff;
+  }
+  
+  c-message[log-level=error] {
+      border-bottom: solid 1px rgba(255, 255, 255, 0.4);
+      background-color: #422;
+      color: inherit;
+  }
+  
+  c-message[log-level=error]::after {
+      background-color: #cc4343;
+      color: inherit
+  }
+  
+  c-message[log-level=warn] {
+      border-bottom: solid 1px rgba(255, 255, 255, 0.4);
+      background-color: #633;
+      color: inherit;
+  }
+  
+  c-message[log-level=warn]::after {
+      background-color: #cc6969;
+      color: inherit
+  }
+  
+  c-stack:not(:empty) {
+      content: attr(data-stack);
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      display: flex;
+      height: 20px;
+      align-items: center;
+      justify-content: space-between;
+      width: 100vw;
+      background-color: inherit;
+      padding: 0 5px;
+      box-sizing: border-box;
+      font-size: .8rem;
+      color: inherit;
+  }
+  
+  c-text {
+      padding: 2px;
+      white-space: pre;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      overflow: auto;
+      box-sizing: border-box;
+      max-width: 100vw;
+      font-size: 0.9rem;
+      width: 100%;
+      padding-left: 10px;
+  }
+  
+  c-text.__c-boolean {
+      color: rgb(130, 80, 177);
+  }
+  
+  c-text.__c-number {
+      color: rgb(97, 88, 221);
+  }
+  
+  c-text.__c-symbol {
+      color: rgb(111, 89, 172);
+  }
+  
+  c-text.__c-function {
+      color: rgb(145, 136, 168);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+  }
+  
+  c-text.__c-function::before {
+      content: 'ƒ';
+      margin: 0 2px;
+      font-style: italic;
+      color: #9999ff;
+  }
+  
+  c-text.__c-object,
+  c-text.__c-undefined {
+      color: rgb(118, 163, 118);
+  }
+  
+  c-text.__c-string {
+      color: rgb(59, 161, 59);
+  }
+  
+  c-text.__c-string:not(.no-qoutes)::before {
+      content: '"';
+      margin-right: 2px;
+  }
+  
+  c-text.__c-string:not(.no-qoutes)::after {
+      content: '"';
+      margin-left: 2px;
+  }
+  
+  c-message.error c-text {
+      overflow: unset;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: white;
+  }
+  
+  c-group {
+      display: none;
+      margin-left: 14px;
+  }
+  
+  c-type[type="body-toggler"].__show-data+c-group {
+      display: block;
+  }
+  
+  c-type[type="body-toggler"]::before {
+      display: inline-block;
+      content: '▸';
+      margin-right: 2.5px;
+  }
+  
+  c-type[type="body-toggler"]::after {
+      content: '{...}';
+  }
+  
+  c-type[type="body-toggler"].__show-data::before {
+      content: '▾';
+  }
+  
+  c-type[type="body-toggler"].__show-data::after {
+      display: none;
+  }
+
+  c-table {
+      display: table;
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      font-size: 0.9rem;
+      color: rgb(214, 211, 211);
+      border: solid 1px rgba(204, 204, 204, 0.4);
+  }
+
+  c-table c-row {
+      display: table-row;
+      border-bottom: solid 1px rgba(204, 204, 204, 0.4);
+  }
+
+  c-table c-row:last-child {
+      border-bottom: none;
+  }
+
+  c-table c-row:first-child {
+      font-weight: bold;
+  }
+
+  c-table c-cell {
+      display: table-cell;
+      padding: 5px;
+      border-bottom: solid 1px rgba(204, 204, 204, 0.4);
+  }
+
+  c-table c-cell:not(:last-child) {
+    border-left: solid 1px rgba(204, 204, 204, 0.4);
+  }
+  
+  @keyframes --page-transition {
+      0% {
+          opacity: 0;
+          transform: translate3d(0, 50%, 0)
+      }
+  
+      100% {
+          opacity: 1;
+          transform: translate3d(0, 0, 0)
+      }
+  }`;
   }
 })();

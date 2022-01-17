@@ -1,5 +1,5 @@
 import mimeType from 'mime-types';
-import marked from 'marked';
+import * as marked from 'marked';
 import mustache from 'mustache';
 import $_console from '../views/console.hbs';
 import $_markdown from '../views/markdown.hbs';
@@ -14,7 +14,7 @@ import openFolder from './openFolder';
 /**
  * Starts the server and run the active file in browser
  * @param {Boolean} isConsole
- * @param {"_blank"|"_system"} target
+ * @param {"inapp"|"browser"} target
  * @param {Boolean} runFile
  */
 async function run(
@@ -43,9 +43,6 @@ async function run(
   let EXECUTING_SCRIPT = uuid + '_script.js';
   const MIMETYPE_HTML = mimeType.lookup('html');
   const CONSOLE_SCRIPT = uuid + '_console.js';
-  const ESPRISMA_SCRIPT = uuid + '_esprisma.js';
-  const EDITOR_SCRIPT = uuid + '_editor.js';
-  const CONSOLE_STYLE = uuid + '_console.css';
   const MARKDOWN_STYLE = uuid + '_md.css';
   const queue = [];
 
@@ -113,28 +110,14 @@ async function run(
   function runConsole() {
     if (!isConsole) EXECUTING_SCRIPT = activeFile.filename;
     isConsole = true;
-    target = '_blank';
+    target = 'inapp';
     filename = 'console.html';
     pathName = `${ASSETS_DIRECTORY}www/`;
     port = constants.CONSOLE_PORT;
   }
 
   function start() {
-    if (target === 'none' && extension !== 'js') {
-      dialogs
-        .select(strings['preview mode'], ['browser', 'in app'])
-        .then((res) => {
-          target = res === 'browser' ? '_system' : '_blank';
-          run();
-        });
-    } else {
-      target = target === 'browser' ? '_system' : '_blank';
-      run();
-    }
-  }
-
-  function run() {
-    if (target === '_system') {
+    if (target === 'browser') {
       system.isPowerSaveMode(
         (res) => {
           if (res)
@@ -150,7 +133,6 @@ async function run(
 
   function startServer() {
     webserver.stop();
-
     webserver.start(
       () => {
         openBrowser();
@@ -160,179 +142,168 @@ async function run(
           openBrowser();
         } else {
           ++port;
-          run();
+          start();
         }
       },
       port,
     );
 
-    webserver.onRequest((req) => {
-      const reqId = req.requestId;
-      let reqPath = req.path.substr(1);
+    webserver.onRequest(handleRequest);
+  }
 
-      if (reqPath === '/') {
-        reqPath = 'index.html';
-      }
+  function handleRequest(req) {
+    const reqId = req.requestId;
+    let reqPath = req.path.substr(1);
 
-      const ext = helpers.extname(reqPath);
-      let url = null;
+    if (reqPath === '/') {
+      reqPath = 'index.html';
+    }
 
-      switch (reqPath) {
-        case CONSOLE_SCRIPT:
-          url = `${ASSETS_DIRECTORY}/js/build/${
-            appSettings.console || 'console'
-          }.build.js`;
-          sendFileContent(url, reqId, 'application/javascript');
-          break;
+    const ext = helpers.extname(reqPath);
+    let url = null;
 
-        case ESPRISMA_SCRIPT:
-          url = `${ASSETS_DIRECTORY}/js/esprisma.js`;
-          sendFileContent(url, reqId, 'application/javascript');
-          break;
+    switch (reqPath) {
+      case CONSOLE_SCRIPT:
+        url = `${ASSETS_DIRECTORY}/js/build/${
+          appSettings.console || 'console'
+        }.build.js`;
+        sendFileContent(url, reqId, 'application/javascript');
+        break;
 
-        case EDITOR_SCRIPT:
-          sendText('', reqId, 'application/javascript');
-          break;
+      case EXECUTING_SCRIPT:
+        let text;
+        if (extension === 'js') text = activeFile.session.getValue();
+        else text = '';
+        sendText(text, reqId, 'application/javascript');
+        break;
 
-        case EXECUTING_SCRIPT:
-          let text;
-          if (extension === 'js') text = activeFile.session.getValue();
-          else text = '';
-          sendText(text, reqId, 'application/javascript');
-          break;
+      case MARKDOWN_STYLE:
+        url = appSettings.value.markdownStyle;
+        if (url) sendFileContent(url, reqId, 'text/css');
+        else sendText('img {max-width: 100%;}', reqId, 'text/css');
+        break;
 
-        case CONSOLE_STYLE:
-          url = `${ASSETS_DIRECTORY}/css/console.css`;
-          sendFileContent(url, reqId, 'text/css');
-          break;
+      default:
+        sendByExt();
+        break;
+    }
 
-        case MARKDOWN_STYLE:
-          url = appSettings.value.markdownStyle;
-          if (url) sendFileContent(url, reqId, 'text/css');
-          else sendText('img {max-width: 100%;}', reqId, 'text/css');
-          break;
-
-        default:
-          sendByExt();
-          break;
-      }
-
-      async function sendByExt() {
-        if (isConsole) {
-          if (reqPath === 'console.html') {
-            sendText(
-              mustache.render($_console, {
-                CONSOLE_SCRIPT,
-                CONSOLE_STYLE,
-                ESPRISMA_SCRIPT,
-                EXECUTING_SCRIPT,
-                EDITOR_SCRIPT,
-              }),
-              reqId,
-              MIMETYPE_HTML,
-            );
-            return;
-          }
-
-          if (reqPath === 'favicon.ico') {
-            sendIco(ASSETS_DIRECTORY, reqId);
-            return;
-          }
-        }
-
-        if (activeFile.mode === 'single') {
-          if (filename === reqPath) {
-            sendText(
-              activeFile.session.getValue(),
-              reqId,
-              mimeType.lookup(filename),
-            );
-          } else {
-            error(reqId);
-          }
+    async function sendByExt() {
+      if (isConsole) {
+        if (reqPath === 'console.html') {
+          sendText(
+            mustache.render($_console, {
+              CONSOLE_SCRIPT,
+              EXECUTING_SCRIPT,
+            }),
+            reqId,
+            MIMETYPE_HTML,
+          );
           return;
         }
 
-        let url = activeFile.uri;
-        let file = null;
-
-        if (pathName) {
-          url = Url.join(pathName, reqPath);
-          file = editorManager.getFile(url, 'uri');
-        } else if (activeFile.type === 'git') {
-          file = activeFile;
+        if (reqPath === 'favicon.ico') {
+          sendIco(ASSETS_DIRECTORY, reqId);
+          return;
         }
+      }
 
-        switch (ext) {
-          case 'htm':
-          case 'html':
-            if (file) {
-              sendHTML(file.session.getValue(), reqId);
-            } else {
-              sendFileContent(url, reqId, MIMETYPE_HTML);
-            }
-            break;
+      if (activeFile.mode === 'single') {
+        if (filename === reqPath) {
+          sendText(
+            activeFile.session.getValue(),
+            reqId,
+            mimeType.lookup(filename),
+          );
+        } else {
+          error(reqId);
+        }
+        return;
+      }
 
-          case 'md':
-            if (file) {
-              const html = marked(file.session.getValue());
-              const doc = mustache.render($_markdown, {
-                html,
-                filename,
-                MARKDOWN_STYLE,
-              });
-              sendText(doc, reqId, MIMETYPE_HTML);
-            }
-            break;
+      let url = activeFile.uri;
+      let file = null;
 
-          default:
-            if (file && file.type === 'git') {
-              try {
-                const gitFile = await git.getGitFile(file.record, reqPath);
-                const data = helpers.b64toBlob(
-                  gitFile,
-                  mimeType.lookup(reqPath),
-                );
+      if (pathName) {
+        url = Url.join(pathName, reqPath);
+        file = editorManager.getFile(url, 'uri');
+      } else if (activeFile.type === 'git') {
+        file = activeFile;
+      }
 
-                const id = file.record.sha + encodeURIComponent(reqPath);
-                const cacheFile = id.hashCode() + '.' + ext;
-                const uri = Url.join(CACHE_STORAGE, cacheFile);
-                const cacheDirFs = fsOperation(CACHE_STORAGE);
-                const cacheFileFs = fsOperation(uri);
+      switch (ext) {
+        case 'htm':
+        case 'html':
+          if (file) {
+            sendHTML(file.session.getValue(), reqId);
+          } else {
+            sendFileContent(url, reqId, MIMETYPE_HTML);
+          }
+          break;
 
-                if (await cacheFileFs.exists()) {
-                  sendFile(uri, reqId);
-                  break;
-                }
+        case 'md':
+          if (file) {
+            const html = marked(file.session.getValue());
+            const doc = mustache.render($_markdown, {
+              html,
+              filename,
+              MARKDOWN_STYLE,
+            });
+            sendText(doc, reqId, MIMETYPE_HTML);
+          }
+          break;
 
-                await cacheDirFs.createFile(cacheFile);
-                await cacheFileFs.writeFile(data);
+        default:
+          if (file && file.type === 'git') {
+            try {
+              const gitFile = await git.getGitFile(file.record, reqPath);
+              const data = helpers.b64toBlob(
+                gitFile,
+                mimeType.lookup(reqPath),
+              );
 
+              const id = file.record.sha + encodeURIComponent(reqPath);
+              const cacheFile = id.hashCode() + '.' + ext;
+              const uri = Url.join(CACHE_STORAGE, cacheFile);
+              const cacheDirFs = fsOperation(CACHE_STORAGE);
+              const cacheFileFs = fsOperation(uri);
+
+              if (await cacheFileFs.exists()) {
                 sendFile(uri, reqId);
-              } catch (err) {
-                if (reqPath === 'favicon.ico') {
-                  sendIco(ASSETS_DIRECTORY, reqId);
-                } else {
-                  error(reqId);
-                }
+                break;
               }
-            } else {
-              if (file && file.isUnsaved) {
-                sendText(
-                  file.session.getValue(),
-                  reqId,
-                  mimeType.lookup(file.filename),
-                );
-              } else if (url) {
-                sendFile(url, reqId);
+
+              await cacheDirFs.createFile(cacheFile);
+              await cacheFileFs.writeFile(data);
+
+              sendFile(uri, reqId);
+            } catch (err) {
+              if (reqPath === 'favicon.ico') {
+                sendIco(ASSETS_DIRECTORY, reqId);
               } else {
                 error(reqId);
               }
             }
-            break;
-        }
+          } else {
+            if (file && file.isUnsaved) {
+              sendText(
+                file.session.getValue(),
+                reqId,
+                mimeType.lookup(file.filename),
+              );
+            } else if (url) {
+              if (reqPath === 'favicon.ico') {
+                sendIco(ASSETS_DIRECTORY, reqId);
+              } else {
+                sendFile(url, reqId);
+              }
+            } else {
+              error(reqId);
+            }
+          }
+          break;
       }
-    });
+    }
   }
 
   function error(id) {
@@ -353,12 +324,13 @@ async function run(
    * @param {string} id
    */
   function sendHTML(text, id) {
-    if (appSettings.value.showConsole) {
+    if (target === 'inapp' || appSettings.value.showConsole) {
       const js = `<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <script src="/${EDITOR_SCRIPT}" crossorigin="anonymous"></script>
-      <script src="/${CONSOLE_SCRIPT}" crossorigin="anonymous"></script>
-      <script src="/${ESPRISMA_SCRIPT}" crossorigin="anonymous"></script>
-      <link rel="stylesheet" href="/${CONSOLE_STYLE}">`;
+      <script class="${uuid}" src="/${CONSOLE_SCRIPT}" crossorigin="anonymous"></script>
+      <script class="${uuid}">setTimeout(function(){
+        var scripts = document.querySelectorAll('.${uuid}');
+        scripts.forEach(function(el){document.head.removeChild(el)});
+      }, 0);</script>`;
       text = text.replace(/><\/script>/g, ' crossorigin="anonymous"></script>');
       const part = text.split('<head>');
       if (part.length === 2) {
@@ -453,19 +425,13 @@ async function run(
   }
 
   function openBrowser() {
-    const theme = appSettings.value.appTheme;
-    const themeData = constants.appThemeList[theme];
-    const themeColor = themeData.primary.toUpperCase();
-    const color =
-      themeData.type === 'dark' || theme === 'default' ? '#ffffff' : '#313131';
-    const options = `background=${isConsole ? '#313131' : '#ffffff'},location=${
-      isConsole ? 'no' : 'yes'
-    },hideurlbar=yes,cleardata=yes,clearsessioncache=yes,hardwareback=yes,clearcache=yes,toolbarcolor=${themeColor},navigationbuttoncolor=${color},closebuttoncolor=${color},clearsessioncache=yes,zoom=no`;
-    cordova.InAppBrowser.open(
-      `http://localhost:${port}/` + filename,
-      target,
-      options,
-    );
+    const src = `http://localhost:${port}/${filename}`;
+    if (target === 'browser') {
+      system.openInBrowser(src);
+      return;
+    }
+
+    system.inAppBrowser(src, filename, !isConsole);
   }
 }
 

@@ -1,5 +1,8 @@
 {
-  "include": [
-    "src/**/*"
+  "exclude": [
+    "**/node_modules",
+    "**/platforms",
+    "**/plugings",
+    "**/www"
   ]
 }

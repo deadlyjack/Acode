@@ -208,5 +208,10 @@
   "manage all files": "Zezwól Acode zarządzać wszystkimi plikami w ustawieniach, aby z łatwością edytować pliki na twoim urządzeniu.",
   "close file": "Zamknij plik",
   "reset connections": "Zresetuj połączenia",
-  "check file changes": "Check file changes"
+  "check file changes": "Check file changes",
+  "open in browser": "Open in browser",
+  "desktop mode": "Desktop mode",
+  "toggle console": "Toggle console",
+  "new line mode": "New line mode",
+  "add a storage": "Add a storage"
 }

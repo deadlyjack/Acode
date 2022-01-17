@@ -11,15 +11,11 @@ import dialogs from '../../components/dialogs';
 import git from '../../lib/git';
 import contextMenu from '../../components/contextMenu';
 import searchBar from '../../components/searchbar';
+import Icon from '../../components/icon';
 
 export default function RepoInclude(owner, repoName) {
   let $page;
-  const $menuToggler = tag('span', {
-    className: 'icon more_vert',
-    attr: {
-      action: 'toggle-menu',
-    },
-  });
+  const $menuToggler = Icon('more_vert', 'toggle-menu');
   const $content = tag.parse(_template);
   const $navigation = $content.querySelector('.navigation');
   const repo = git.GitHub().getRepo(owner, repoName);
@@ -307,7 +303,7 @@ export default function RepoInclude(owner, repoName) {
         break;
 
       case 'info':
-        import('../info/info').then((res) => {
+        import(/* webpackChunkName: 'info' */ '../info/info').then((res) => {
           res.default(repoName, owner);
         });
         break;

@@ -9,7 +9,7 @@ export default {
         (uri) => {
           internalFs.readFile(uri).then(resolve).catch(reject);
         },
-        reject
+        reject,
       );
     });
   },
@@ -23,7 +23,7 @@ export default {
           content,
           true,
           (res) => resolve(res),
-          (err) => reject(err)
+          (err) => reject(err),
         );
         return;
       }
@@ -32,7 +32,7 @@ export default {
         filename,
         content,
         (res) => resolve(res),
-        (err) => reject(err)
+        (err) => reject(err),
       );
     });
 
@@ -58,7 +58,7 @@ export default {
         src,
         dest,
         (res) => resolve(res),
-        (err) => reject(err)
+        (err) => reject(err),
       );
     });
   },
@@ -69,7 +69,7 @@ export default {
         src,
         dest,
         (res) => resolve(res),
-        (err) => reject(err)
+        (err) => reject(err),
       );
     });
   },
@@ -79,7 +79,7 @@ export default {
       sdcard.delete(
         filename,
         (res) => resolve(res),
-        (err) => reject(err)
+        (err) => reject(err),
       );
     });
   },
@@ -95,11 +95,11 @@ export default {
               res,
               data,
               () => resolve(res),
-              (err) => reject(err)
+              (err) => reject(err),
             );
           resolve(res);
         },
-        (err) => reject(err)
+        (err) => reject(err),
       );
     });
   },
@@ -110,7 +110,7 @@ export default {
         parent,
         dirname,
         (res) => resolve(res),
-        (err) => reject(err)
+        (err) => reject(err),
       );
     });
   },
@@ -127,7 +127,7 @@ export default {
         src,
         newname,
         (res) => resolve(res),
-        (err) => reject(err)
+        (err) => reject(err),
       );
     });
   },
@@ -146,7 +146,7 @@ export default {
             'INFO',
             `<p>Follow below steps to allow Acode to modify <strong>${
               name || 'SD card'
-            }</strong>.<p><br>` + '<img src="./res/imgs/steps.jpg">'
+            }</strong>.<p><br>` + '<img src="./res/imgs/steps.jpg">',
           )
           .onhide(next);
       } else {
@@ -164,7 +164,7 @@ export default {
           },
           (err) => {
             reject(err);
-          }
+          },
         );
       }
     });
@@ -174,7 +174,7 @@ export default {
     return new Promise((resolve, reject) => {
       sdcard.listStorages(
         (res) => resolve(res),
-        (err) => reject(err)
+        (err) => reject(err),
       );
     });
   },
@@ -196,10 +196,10 @@ export default {
               stats.uri = res;
               resolve(stats);
             },
-            reject
+            reject,
           );
         },
-        reject
+        reject,
       );
     });
   },

@@ -13,6 +13,7 @@ import Repos from '../repos/repos';
 import Gists from '../gists/gists';
 import fsOperation from '../../lib/fileSystem/fsOperation';
 import Url from '../../lib/utils/Url';
+import Icon from '../../components/icon';
 
 /**
  *
@@ -23,12 +24,7 @@ async function gitHubInclude($loginPage) {
   const $search = tag('span', {
     className: 'icon search hidden',
   });
-  const $menuToggler = tag('span', {
-    className: 'icon more_vert',
-    attr: {
-      action: 'toggle-menu',
-    },
-  });
+  const $menuToggler = Icon('more_vert', 'toggle-menu');
   const { credentials } = helpers;
 
   const github = git.GitHub();
@@ -88,7 +84,7 @@ async function gitHubInclude($loginPage) {
         });
         break;
       case 'open':
-        window.open($el.getAttribute('data-value'), '_system');
+        system.openInBrowser($el.getAttribute('data-value'));
         break;
     }
   }
@@ -98,7 +94,7 @@ async function gitHubInclude($loginPage) {
     const $content = content(profile);
     $page.append($content);
     app.appendChild($page);
-    $page.querySelector('header').append($search, $menuToggler);
+    $page.get('header').append($search, $menuToggler);
 
     actionStack.push({
       id: 'github',
@@ -165,7 +161,7 @@ async function gitHubInclude($loginPage) {
       mustache.render(_template, {
         ...strings,
         ...profile,
-      })
+      }),
     );
   }
 

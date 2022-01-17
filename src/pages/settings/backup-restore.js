@@ -11,7 +11,7 @@ import Uri from '../../lib/utils/Uri';
 
 function backupRestore() {
   const $page = Page(
-    strings.backup.capitalize() + '/' + strings.restore.capitalize()
+    strings.backup.capitalize() + '/' + strings.restore.capitalize(),
   );
   const settingsList = tag('div', {
     className: 'main list',
@@ -63,13 +63,13 @@ function backupRestore() {
       const settings = appSettings.value;
       const keyBindings = window.customKeyBindings;
       const storageList = JSON.parse(localStorage.storageList || '[]').filter(
-        (s) => /s?ftp/.test(s.storageType)
+        (s) => /s?ftp/.test(s.storageType),
       );
 
       const backupStorage = (
         await FileBrowser(
           'folder', //
-          strings['select folder']
+          strings['select folder'],
         )
       ).url;
 
@@ -108,7 +108,9 @@ function backupRestore() {
 
       dialogs.alert(
         strings.success.toUpperCase(),
-        `${strings['backup successful']}\n${Uri.getVirtualAddress(backupFile)}.`
+        `${strings['backup successful']}\n${Uri.getVirtualAddress(
+          backupFile,
+        )}.`,
       );
     } catch (error) {
       console.error(error);
@@ -122,7 +124,7 @@ function backupRestore() {
         backupRestore.restore(data.uri);
       },
       helpers.toast,
-      'application/octet-stream'
+      'application/octet-stream',
     );
   }
 }
@@ -137,7 +139,7 @@ backupRestore.restore = async function (url) {
     } catch (error) {
       dialogs.alert(
         strings.error.toUpperCase(),
-        strings['invalid backup file']
+        strings['invalid backup file'],
       );
     }
 

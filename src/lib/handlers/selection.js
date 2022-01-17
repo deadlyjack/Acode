@@ -126,7 +126,7 @@ function enableSingleMode() {
   const selectedText = editor.getCopyText();
   if (selectedText) return;
   const $cursor = editor.container.querySelector(
-    '.ace_cursor-layer>.ace_cursor'
+    '.ace_cursor-layer>.ace_cursor',
   );
   const $cm = controls.menu;
   const lineHeight = editor.renderer.lineHeight;

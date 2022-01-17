@@ -13,7 +13,7 @@
         color: #6a737d !important;
 
         &::before {
-          content: "\f00e"
+          content: '\f00e';
         }
 
         &[private] {
@@ -45,7 +45,7 @@
     }
 
     .private {
-      >.text::after {
+      > .text::after {
         content: 'private';
         font-size: 0.6em;
         border-radius: 4px;

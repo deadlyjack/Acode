@@ -14,6 +14,7 @@ import git from '../../lib/git';
 import GistFiles from '../gistFiles/gistFiles';
 import constants from '../../lib/constants';
 import searchBar from '../../components/searchbar';
+import Icon from '../../components/icon';
 
 function GistsInclude(callbackGists) {
   const $search = tag('span', {
@@ -22,12 +23,7 @@ function GistsInclude(callbackGists) {
       action: 'search',
     },
   });
-  const $menuToggler = tag('span', {
-    className: 'icon more_vert',
-    attr: {
-      action: 'toggle-menu',
-    },
-  });
+  const $menuToggler = Icon('more_vert', 'toggle-menu');
   const $page = Page('Gists');
   const { credentials } = helpers;
   /**
@@ -82,7 +78,7 @@ function GistsInclude(callbackGists) {
       mustache.render(_template, {
         gists,
         msg: strings['empty folder message'],
-      })
+      }),
     );
 
     $content.addEventListener('click', handleClick);
@@ -118,7 +114,7 @@ function GistsInclude(callbackGists) {
         break;
 
       case 'open':
-        window.open($el.parentElement.getAttribute('data-url'), '_system');
+        system.openInBrowser($el.parentElement.getAttribute('data-url'));
         break;
 
       case 'reload':
@@ -154,7 +150,7 @@ function GistsInclude(callbackGists) {
             {
               match: constants.FILE_NAME_REGEX,
               required: true,
-            }
+            },
           );
         })
         .then((filename) => {

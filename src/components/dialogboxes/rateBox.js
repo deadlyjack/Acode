@@ -28,9 +28,8 @@ function rateBox() {
 
     setTimeout(() => {
       if (val === 5) {
-        window.open(
+        system.openInBrowser(
           `https://play.google.com/store/apps/details?id=${BuildInfo.packageName}`,
-          '_system'
         );
         localStorage.dontAskForRating = true;
       } else {
@@ -39,9 +38,8 @@ function rateBox() {
         const textBody =
           stars + '</br>%0A' + helpers.getFeedbackBody('</br>%0A');
         const email = constants.FEEDBACK_EMAIL;
-        window.open(
+        system.openInBrowser(
           `mailto:${email}?subject=${subject}&body=${textBody}`,
-          '_system'
         );
       }
       ++localStorage.count;

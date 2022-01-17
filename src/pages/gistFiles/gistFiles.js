@@ -7,7 +7,7 @@ function GistFiles(gist) {
     (res) => {
       const GistFiles = res.default;
       GistFiles(gist);
-    }
+    },
   );
 }
 
