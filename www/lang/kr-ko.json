@@ -123,12 +123,10 @@
   "new project": "신규 프로젝트",
   "format": "포맷",
   "project name": "프로젝트 이름",
-  "support us": "Acode 앱을 위해 patreon통하여 후원해주세요.",
   "unsupported device": "사용자의 디바이스는 지원하지 않습니다",
   "vibrate on tap": "tap 할 때 진동",
   "copy command is not supported by ftp.": "FTP에서 Copy명령은 지원되지 않습니다",
   "support title": "Acode 후원",
-  "support text": "Acode는 여러분의 후원이 필요합니다! 소액의 $5를 기부하여 여러분의 성의보여주십쇼.",
   "exit fullscreen": "풀스크린 종료",
   "fullscreen": "풀 스크린",
   "animation": "애니메이션",
@@ -213,5 +211,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

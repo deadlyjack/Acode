@@ -164,9 +164,11 @@ async function run(
 
     switch (reqPath) {
       case CONSOLE_SCRIPT:
-        url = `${ASSETS_DIRECTORY}/js/build/${
-          appSettings.console || 'console'
-        }.build.js`;
+        if(isConsole || appSettings.value.console === 'legacy'){
+          url = `${ASSETS_DIRECTORY}/js/build/console.build.js`;
+        }else{
+          url = `${DATA_STORAGE}/eruda.js`;
+        }
         sendFileContent(url, reqId, 'application/javascript');
         break;
 
@@ -325,12 +327,25 @@ async function run(
    */
   function sendHTML(text, id) {
     if (target === 'inapp' || appSettings.value.showConsole) {
-      const js = `<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      const js = `<!-- Injected code, this is not present in original code --><meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <script class="${uuid}" src="/${CONSOLE_SCRIPT}" crossorigin="anonymous"></script>
-      <script class="${uuid}">setTimeout(function(){
-        var scripts = document.querySelectorAll('.${uuid}');
-        scripts.forEach(function(el){document.head.removeChild(el)});
-      }, 0);</script>`;
+      <script class="${uuid}">
+        if(window.eruda){
+          eruda.init({
+            theme: 'dark'
+          });
+
+          eruda._shadowRoot.querySelector('.eruda-entry-btn').style.display = 'none';
+          
+          sessionStorage.setItem('__console_available', true);
+          document.addEventListener('showconsole', function () {eruda.show()});
+          document.addEventListener('hideconsole', function () {eruda.hide()});
+        }
+        setTimeout(function(){
+          var scripts = document.querySelectorAll('.${uuid}');
+          scripts.forEach(function(el){document.head.removeChild(el)});
+        }, 0);
+      </script><!-- Injected code, this is not present in original code -->`;
       text = text.replace(/><\/script>/g, ' crossorigin="anonymous"></script>');
       const part = text.split('<head>');
       if (part.length === 2) {

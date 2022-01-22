@@ -154,8 +154,8 @@ async function gitHubInclude($loginPage) {
    */
   function content(profile) {
     if (profile) {
-      profile.total_repos = profile.total_private_repos + profile.public_repos;
-      profile.total_gists = profile.private_gists + profile.public_gists;
+      profile.total_repos = (profile.total_private_repos ?? 0) + profile.public_repos;
+      profile.total_gists = (profile.private_gists ?? 0) + profile.public_gists;
     }
     return tag.parse(
       mustache.render(_template, {

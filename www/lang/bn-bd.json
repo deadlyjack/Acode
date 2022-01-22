@@ -123,12 +123,10 @@
   "new project": "নতুন প্রজেক্ট",
   "format": "সাজান",
   "project name": "প্রোজেক্ট এর নাম ",
-  "support us": "Acode ডেভেলপমেন্ট সহায়তা করুন , পৃষ্ঠপোষক হয়ে যান",
   "unsupported device": "আপনার ডিভাইসটি এই থিম সাপোর্ট করেনা।",
   "vibrate on tap": "Vibrate on tap",
   "copy command is not supported by ftp.": "Copy command is not supported by FTP.",
   "support title": "Acode কে সমর্থন করুন",
-  "support text": "Acode এর আপনার সমর্থন প্রয়োজন! $5 এর একটি ছোট পরিমাণ দান করে আপনার সমর্থন দেখান।",
   "exit fullscreen": "Exit fullscreen",
   "fullscreen": "fullscreen",
   "animation": "অ্যানিমেশন",
@@ -213,5 +211,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

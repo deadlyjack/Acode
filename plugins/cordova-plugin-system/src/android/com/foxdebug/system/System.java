@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.view.View;
@@ -33,6 +34,7 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,6 +49,7 @@ public class System extends CordovaPlugin {
   private int REQ_PERMISSION = 2;
   private int themeColor = 0xFF000000;
   private String themeType = "dark";
+  private CallbackContext intentHandler;
 
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
@@ -86,6 +89,9 @@ public class System extends CordovaPlugin {
       case "open-in-browser":
       case "launch-app":
         break;
+      case "set-intent-handler":
+        setIntentHandler(callbackContext);
+        return true;
       case "set-ui-theme":
         this.cordova.getActivity()
           .runOnUiThread(
@@ -540,6 +546,9 @@ public class System extends CordovaPlugin {
         );
         return;
       }
+      decorView.setSystemUiVisibility(
+        uiOptions & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+      );
     }
   }
 
@@ -555,7 +564,69 @@ public class System extends CordovaPlugin {
         decorView.setSystemUiVisibility(uiOptions | 0x80000000 | 0x00000010);
         return;
       }
+      decorView.setSystemUiVisibility(uiOptions | 0x80000000 & ~0x00000010);
     }
+  }
+
+  private void setIntentHandler(CallbackContext callbackContext) {
+    intentHandler = callbackContext;
+  }
+
+  @Override
+  public void onNewIntent(Intent intent) {
+    if (intentHandler != null) {
+      PluginResult result = new PluginResult(
+        PluginResult.Status.OK,
+        getIntentJson(intent)
+      );
+      result.setKeepCallback(true);
+      intentHandler.sendPluginResult(result);
+    }
+  }
+
+  private JSONObject getIntentJson(Intent intent) {
+    JSONObject json = new JSONObject();
+    try {
+      json.put("action", intent.getAction());
+      json.put("data", intent.getDataString());
+      json.put("type", intent.getType());
+      json.put("package", intent.getPackage());
+      json.put("extras", getExtrasJson(intent.getExtras()));
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return json;
+  }
+
+  private JSONObject getExtrasJson(Bundle extras) {
+    JSONObject json = new JSONObject();
+    if (extras != null) {
+      for (String key : extras.keySet()) {
+        try {
+          Object value = extras.get(key);
+          if (value instanceof String) {
+            json.put(key, (String) value);
+          } else if (value instanceof Integer) {
+            json.put(key, (Integer) value);
+          } else if (value instanceof Long) {
+            json.put(key, (Long) value);
+          } else if (value instanceof Double) {
+            json.put(key, (Double) value);
+          } else if (value instanceof Float) {
+            json.put(key, (Float) value);
+          } else if (value instanceof Boolean) {
+            json.put(key, (Boolean) value);
+          } else if (value instanceof Bundle) {
+            json.put(key, getExtrasJson((Bundle) value));
+          } else {
+            json.put(key, value.toString());
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return json;
   }
 
   private Uri getContentProviderUri(String fileUri) {

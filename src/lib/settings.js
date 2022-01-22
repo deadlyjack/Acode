@@ -71,7 +71,7 @@ class Settings {
       editorTheme: /free/.test(BuildInfo.packageName)
         ? 'ace/theme/nord_dark'
         : 'ace/theme/dracula',
-      appTheme: /free/.test(BuildInfo.packageName) ? 'default' : 'ocean',
+      appTheme: /free/.test(BuildInfo.packageName) ? 'dark' : 'ocean',
       textWrap: true,
       softTab: true,
       tabSize: 2,
@@ -98,6 +98,7 @@ class Settings {
       lineHeight: 2,
       checkFiles: true,
       desktopMode: false,
+      console: 'legacy',
       customTheme: {
         '--primary-color': 'rgb(153,153,255)',
         '--secondary-color': 'rgb(255,255,255)',

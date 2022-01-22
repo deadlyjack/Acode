@@ -1,0 +1,53 @@
+#donate-page{
+  overflow: auto;
+  
+  .products{
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+
+    .col{
+      display: flex;
+      flex-direction: column;
+      width: 42.5%;
+      max-width: 450px;
+      margin: 10px 5% 10px 2.5%;
+      
+      &:nth-child(2n+1){
+        margin: 10px 2.5% 10px 5%;
+      }
+    }
+
+    .product{
+      width: 100%;
+      margin-bottom: 10%;
+      border-radius: 4px;
+      box-shadow: 0 0 10px 0 rgba(0,0,0,0.2);
+      background-color: rgb(51, 153, 255);
+      background-color: var(--primary-color);
+      overflow: hidden;
+      height: fit-content;
+      min-height: 200px;
+      
+      
+      img{
+        width: 100%;
+        min-height: 167px;
+        height: auto;
+      }
+  
+      .product-info{
+        margin-top: -4px;
+  
+        p{
+          padding: 10px;
+          box-sizing: border-box;
+          font-size: 0.8em;
+          color: rgb(37, 37, 37);
+          color: var(--text-color);
+        }
+      }
+    }
+  }
+
+}

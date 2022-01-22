@@ -43,114 +43,118 @@ import loadPolyFill from './utils/polyfill';
   const timers = {};
   let isFocused = false;
 
+  if (!window.__objs) window.__objs = {};
+
   if (!tag.get('c-console')) {
     const $style = tag('style');
     $style.textContent = css();
     document.head.append($style);
     window.addEventListener('error', onError);
+    assignCustomConsole();
     
     if (sessionStorage.getItem('__mode') === 'console') {
       showConsole();
       return;
     }
-
+    
+    $console.setAttribute('title', 'Console');
     sessionStorage.setItem('__console_available', true);
     document.addEventListener('showconsole', showConsole);
     document.addEventListener('hideconsole', hideConsole);
   }
 
-  if (!window.__objs) window.__objs = {};
-
-  console = {
-    assert(condition, msg, ...substituion) {
-      if (!condition) {
-        log('error', getStack(new Error()), msg, ...substituion);
-      }
-    },
-    clear() {
-      if (isFocused) $input.focus();
-      $console.textContent = '';
-      $console.appendChild($inputContainer);
-    },
-    count(hash = 'default') {
-      if (!counter[hash]) {
-        counter[hash] = 1;
-      } else {
-        ++counter[hash];
-      }
-      log('log', getStack(new Error()),`${hash}: ${counter[hash]}`);
-    },
-    countReset(hash) {
-      delete counter[hash];
-    },
-    debug(...args) {
-      log('log', getStack(new Error()), ...args);
-    },
-    dir(...args) {
-      log('log', getStack(new Error()), ...args);
-    },
-    dirxml(...args) {
-      log('log', getStack(new Error()), ...args);
-    },
-    error(...args) {
-      originalConsole.error(...args);
-      log('error', getStack(new Error()), ...args);
-    },
-    group(...args) {
-      log('log', getStack(new Error()), ...args);
-    },
-    groupCollapsed(...args) {
-      log('log', getStack(new Error()), ...args);
-    },
-    groupEnd(...args) {
-      log('log', getStack(new Error()), ...args);
-    },
-    info(...args) {
-      originalConsole.info(...args);
-      log('info', getStack(new Error()), ...args);
-    },
-    log(msg, ...substituion) {
-      originalConsole.log(msg,...substituion);
-      log('log', getStack(new Error()), msg, ...substituion);
-    },
-    table(...args) {
-      log('log', getStack(new Error()), ...args);
-    },
-    time(label = 'default') {
-      if (typeof label !== 'string') {
-        throw new TypeError('label must be a string');
-      }
-      timers[label] = new Date().getTime();
-    },
-    timeEnd(label = 'default') {
-      if (typeof label !== 'string') {
-        throw new TypeError('label must be a string');
-      }
-      if (!timers[label]) {
-        throw new Error(`No such label: ${label}`);
-      }
-      const time = new Date().getTime() - timers[label];
-      log('log', getStack(new Error()), `${label}: ${time}ms`);
-      delete timers[label];
-    },
-    timeLog(label = 'default') {
-      if (typeof label !== 'string') {
-        throw new TypeError('label must be a string');
-      }
-      if (!timers[label]) {
-        throw new Error(`No such label: ${label}`);
-      }
-      const time = new Date().getTime() - timers[label];
-      log('log', getStack(new Error()), `${label}: ${time}ms`);
-    },
-    trace(...args) {
-      log('trace', getStack(new Error()), ...args);
-    },
-    warn(msg, ...substituion) {
-      originalConsole.warn(msg, ...substituion);
-      log('warn', getStack(new Error()), msg, ...substituion);
-    },
-  };
+  function assignCustomConsole() {
+    window.console = {
+      assert(condition, msg, ...substituion) {
+        if (!condition) {
+          log('error', getStack(new Error()), msg, ...substituion);
+        }
+      },
+      clear() {
+        if (isFocused) $input.focus();
+        $console.textContent = '';
+        $console.appendChild($inputContainer);
+      },
+      count(hash = 'default') {
+        if (!counter[hash]) {
+          counter[hash] = 1;
+        } else {
+          ++counter[hash];
+        }
+        log('log', getStack(new Error()),`${hash}: ${counter[hash]}`);
+      },
+      countReset(hash) {
+        delete counter[hash];
+      },
+      debug(...args) {
+        log('log', getStack(new Error()), ...args);
+      },
+      dir(...args) {
+        log('log', getStack(new Error()), ...args);
+      },
+      dirxml(...args) {
+        log('log', getStack(new Error()), ...args);
+      },
+      error(...args) {
+        originalConsole.error(...args);
+        log('error', getStack(new Error()), ...args);
+      },
+      group(...args) {
+        log('log', getStack(new Error()), ...args);
+      },
+      groupCollapsed(...args) {
+        log('log', getStack(new Error()), ...args);
+      },
+      groupEnd(...args) {
+        log('log', getStack(new Error()), ...args);
+      },
+      info(...args) {
+        originalConsole.info(...args);
+        log('info', getStack(new Error()), ...args);
+      },
+      log(msg, ...substituion) {
+        originalConsole.log(msg,...substituion);
+        log('log', getStack(new Error()), msg, ...substituion);
+      },
+      table(...args) {
+        log('log', getStack(new Error()), ...args);
+      },
+      time(label = 'default') {
+        if (typeof label !== 'string') {
+          throw new TypeError('label must be a string');
+        }
+        timers[label] = new Date().getTime();
+      },
+      timeEnd(label = 'default') {
+        if (typeof label !== 'string') {
+          throw new TypeError('label must be a string');
+        }
+        if (!timers[label]) {
+          throw new Error(`No such label: ${label}`);
+        }
+        const time = new Date().getTime() - timers[label];
+        log('log', getStack(new Error()), `${label}: ${time}ms`);
+        delete timers[label];
+      },
+      timeLog(label = 'default') {
+        if (typeof label !== 'string') {
+          throw new TypeError('label must be a string');
+        }
+        if (!timers[label]) {
+          throw new Error(`No such label: ${label}`);
+        }
+        const time = new Date().getTime() - timers[label];
+        log('log', getStack(new Error()), `${label}: ${time}ms`);
+      },
+      trace(...args) {
+        log('trace', getStack(new Error()), ...args);
+      },
+      warn(msg, ...substituion) {
+        originalConsole.warn(msg, ...substituion);
+        log('warn', getStack(new Error()), msg, ...substituion);
+      },
+    };
+  }
 
   function showConsole(){
     tag.get('html').append($console);
@@ -211,15 +215,17 @@ import loadPolyFill from './utils/polyfill';
   
         this.classList.toggle('__show-data');
   
-        const possibleKeys = [
-          ...Object.keys(value),
-          ...Object.getOwnPropertyNames(value),
-          ...Object.keys(value['__proto__'] || {}),
-        ];
+        const possibleKeys = [];
 
         for(let key in value){
           possibleKeys.push(key);
         }
+
+        possibleKeys.push(...[ 
+          ...Object.keys(value),
+          ...Object.getOwnPropertyNames(value),
+          ...Object.keys(value['__proto__'] || {}),
+        ])
 
         if(value['__proto__']) possibleKeys.push('__proto__');
         if(value['prototype']) possibleKeys.push('prototype');
@@ -608,7 +614,7 @@ import loadPolyFill from './utils/polyfill';
 
   function onError(err) {
     const error = err.error;
-    console.error(error.message, error);
+    log("error", getStack(error), error);
   }
 
   function escapeHTML(str) {
@@ -656,7 +662,6 @@ import loadPolyFill from './utils/polyfill';
   
   c-console {
       box-sizing: border-box;
-      padding-top: 65px;
       overflow-y: auto;
       position: fixed;
       top: 0;
@@ -665,9 +670,13 @@ import loadPolyFill from './utils/polyfill';
       width: 100vw;
       background-color: #313131;
       z-index: 99998;
-      animation: --page-transition .1s ease 1;
       color: #eeeeee;
       font-family: "Roboto", sans-serif;
+  }
+
+  c-console[title]{
+    padding-top: 65px;
+    animation: --page-transition .1s ease 1;
   }
   
   c-console br:last-of-type {
@@ -706,14 +715,14 @@ import loadPolyFill from './utils/polyfill';
     outline: none;
   }
   
-  c-console::before {
+  c-console[title]::before {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       background-color: inherit;
       z-index: 999999;
-      content: 'Console';
+      content: attr(title);
       display: flex;
       height: 44px;
       align-items: center;

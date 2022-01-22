@@ -10,7 +10,7 @@ import Url from '../../lib/utils/Url';
 import fsOperation from '../../lib/fileSystem/fsOperation';
 
 export default async function GithubLoginInclude() {
-  const $page = Page('Github Login');
+  const $page = Page(strings['github login']);
   const $content = tag.parse(mustache.render(_template, strings));
   const $form = $content.get('.form');
   const $input = $content.get('input');

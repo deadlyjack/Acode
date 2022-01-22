@@ -123,12 +123,10 @@
   "new project": "Yeni Proje",
   "format": "Biçimlendir",
   "project name": "Proje Adı",
-  "support us": "Acode Gelişimini Destekleyin, Patreon olun.",
   "unsupported device": "Cihazınız temayı desteklemiyor",
   "vibrate on tap": "Tıklamayla vibratör",
   "copy command is not supported by ftp.": "Kopyalama komutu FTP tarafından desteklenmiyor.",
   "support title": "Acode'ı destekle",
-  "support text": "Acode desteğinize İhtiyacı Var! 5 $'lık küçük bir miktar bağışlayarak desteğinizi gösterin.",
   "exit fullscreen": "Tüm-Ekran modunu kapat",
   "fullscreen": "tüm-ekran",
   "animation": "animasyon",
@@ -213,5 +211,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

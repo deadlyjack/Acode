@@ -11,6 +11,9 @@ import themeSetting from '../themeSetting/themeSetting';
 import $_ad from '../../views/ad.hbs';
 import otherSettings from './otherSettings';
 import $_socialLinks from '../../views/social-links.hbs';
+import dialogs from '../../components/dialogs';
+import rateBox from '../../components/dialogboxes/rateBox';
+import Donate from '../donate/donate';
 
 export default function settingsMain() {
   const $page = Page(strings.settings.capitalize());
@@ -72,6 +75,15 @@ export default function settingsMain() {
       text: strings['other settings'],
       icon: 'tune',
     },
+    {
+      key: 'donate',
+      text: strings.support,
+      icon: 'favorite',
+    },{
+      key: 'rateapp',
+      text: strings['rate acode'],
+      icon: 'googleplay'
+    }
   ];
   gen.listItems($settingsList, settingsOptions, changeSetting);
 
@@ -101,12 +113,21 @@ export default function settingsMain() {
       case 'backup-restore':
         backupRestore();
         break;
+
+      case 'donate':
+        Donate();
+        break;
+
+      case 'rateapp':
+        rateBox();
+        break;
     }
   }
 
   $page.appendChild($settingsList);
   if (window.promotion && !localStorage.hideAd) {
     const $ad = tag.parse(mustache.render($_ad, window.promotion));
+    $ad.style.marginTop = '10px';
     $ad.onclick = function (e) {
       const action = e.target.getAttribute('action');
       if (action === 'close') {

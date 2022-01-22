@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<widget id="com.foxdebug.acode" android-versionCode="164" version="1.4.164"
+<widget id="com.foxdebug.acode" android-versionCode="168" version="1.4.168"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -52,19 +52,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
                 <data android:mimeType="text/*"/>
                 <data android:mimeType="xml/*" />
-                <data android:scheme="file" android:pathPattern=".*\\.js" />
-                <data android:scheme="file" android:pathPattern=".*\\.ts" />
-                <data android:scheme="file" android:pathPattern=".*\\.css" />
-                <data android:scheme="file" android:pathPattern=".*\\.dart" />
-                <data android:scheme="file" android:pathPattern=".*\\.jsx" />
-                <data android:scheme="file" android:pathPattern=".*\\.py" />
-                <data android:scheme="file" android:pathPattern=".*\\.c" />
-                <data android:scheme="file" android:pathPattern=".*\\.cpp" />
             </intent-filter>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
             <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
             <uses-permission android:name="android.permission.VIBRATE" />
         </config-file>

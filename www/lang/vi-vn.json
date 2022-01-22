@@ -123,12 +123,10 @@
   "new project": "Dự Án Mới",
   "format": "Định Dạng",
   "project name": "Project name",
-  "support us": "Hỗ trợ phát triển Acode, trở thành người của Acode.",
   "unsupported device": "Thiết bị của bạn không hổ trợ giao diện này.",
   "vibrate on tap": "Rung khi nhấn",
   "copy command is not supported by ftp.": "Lệnh sao chép không được FTP hỗ trợ.",
   "support title": "Hổ Trợ Acode",
-  "support text": "Acode cần sự hỗ trợ của bạn! Thể hiện sự ủng hộ của bạn bằng cách quyên góp một số tiền nhỏ là 5 đô.",
   "exit fullscreen": "Thoát Toàn Màn Hình",
   "fullscreen": "Toàn màn hình",
   "animation": "Hiệu Ứng",
@@ -213,5 +211,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

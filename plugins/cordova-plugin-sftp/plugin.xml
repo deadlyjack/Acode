@@ -17,11 +17,11 @@
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="Sftp">
-                <param name="android-package" value="com.foxdebug.sftp" />
+                <param name="android-package" value="com.foxdebug.sftp.Sftp" />
             </feature>
         </config-file>
 
-        <source-file src="src/android/Sftp.java" target-dir="src/com/foxdebug/sftp/" />
+        <source-file src="src/com/foxdebug/sftp/Sftp.java" target-dir="src/com/foxdebug/sftp" />
     </platform>
 
     <framework src="commons-io:commons-io:2.11.0" />

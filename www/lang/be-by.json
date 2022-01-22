@@ -123,12 +123,10 @@
   "new project": "Новы праект",
   "format": "фармат",
   "project name": "Назва праекта",
-  "support us": "Падтрымайце распрацоўку Acode на Рatreon.",
   "unsupported device": "Ваша прылада не падтрымлівае тэмы.",
   "vibrate on tap": "Вібрацыя пры націсканні",
   "copy command is not supported by ftp.": "Капіяванне не падтрымліваецца для FTP.",
   "support title": "Падтрымка Acode",
-  "support text": "Acode патрэбная ваша падтрымка! Падтрымайце праект невялічкай сумай $5.",
   "exit fullscreen": "Выйсці з поўнаэкраннага рэжыму",
   "fullscreen": "поўнаэкранны рэжым",
   "animation": "анімацыя",
@@ -213,5 +211,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

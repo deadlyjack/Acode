@@ -28,8 +28,8 @@ webpackmode="production"
 cordovamode="--release"
 fi
 
-RED='\033[1;34m'
-NC='\033[0m'
+RED=''
+NC=''
 script1="node ./utils/config.js $mode $app"
 script2="webpack --progress --mode $webpackmode "
 script3="node ./utils/loadStyles.js"

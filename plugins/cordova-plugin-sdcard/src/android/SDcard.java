@@ -39,7 +39,6 @@ import org.json.JSONObject;
 
 public class SDcard extends CordovaPlugin {
 
-  private CallbackContext callback;
   private int mode;
   private int SDK_INT = android.os.Build.VERSION.SDK_INT;
   private int REQUEST_CODE;
@@ -53,6 +52,7 @@ public class SDcard extends CordovaPlugin {
   private Activity activity;
   private ContentResolver contentResolver;
   private DocumentFile originalRootFile;
+  private CallbackContext activityResultCallback;
 
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
@@ -69,8 +69,6 @@ public class SDcard extends CordovaPlugin {
     final CallbackContext callbackContext
   )
     throws JSONException {
-    this.callback = callbackContext;
-
     String arg1 = null, arg2 = null, arg3 = null, arg4 = null;
     int argLen = args.length();
 
@@ -82,46 +80,46 @@ public class SDcard extends CordovaPlugin {
 
     switch (action) {
       case "create directory":
-        this.createDir(arg1, arg2);
+        createDir(arg1, arg2, callbackContext);
         break;
       case "create file":
-        this.createFile(arg1, arg2);
+        createFile(arg1, arg2, callbackContext);
         break;
       case "open document file":
-        this.openDocumentFile(arg1);
+        openDocumentFile(arg1, callbackContext);
         break;
       case "get image":
-        this.getImage(arg1);
+        getImage(arg1, callbackContext);
         break;
       case "list volumes":
-        this.getStorageVolumes();
+        getStorageVolumes(callbackContext);
         break;
       case "storage permission":
-        this.getStorageAccess(arg1);
+        getStorageAccess(arg1, callbackContext);
         break;
       case "write":
-        this.writeFile(formatUri(arg1), arg2, args.getBoolean(2));
+        writeFile(formatUri(arg1), arg2, args.getBoolean(2), callbackContext);
         break;
       case "rename":
-        this.rename(arg1, arg2);
+        rename(arg1, arg2, callbackContext);
         break;
       case "delete":
-        this.delete(formatUri(arg1));
+        delete(formatUri(arg1), callbackContext);
         break;
       case "copy":
-        this.copy(arg1, arg2);
+        copy(arg1, arg2, callbackContext);
         break;
       case "move":
-        this.move(arg1, arg2);
+        move(arg1, arg2, callbackContext);
         break;
       case "getpath":
-        this.getPath(formatUri(arg1), arg2);
+        getPath(formatUri(arg1), arg2, callbackContext);
         break;
       case "exists":
-        this.exists(formatUri(arg1));
+        exists(formatUri(arg1), callbackContext);
         break;
       case "format uri":
-        this.callback.success(formatUri(arg1));
+        callbackContext.success(formatUri(arg1));
         break;
       case "list directory":
         if (arg1.contains(SAPERATOR)) {
@@ -130,11 +128,11 @@ public class SDcard extends CordovaPlugin {
           arg2 = splittedStr[1];
         }
 
-        this.listDir(arg1, arg2);
+        listDir(arg1, arg2, callbackContext);
 
         break;
       case "stats":
-        this.getStats(arg1);
+        getStats(arg1, callbackContext);
         break;
       default:
         return false;
@@ -157,24 +155,29 @@ public class SDcard extends CordovaPlugin {
     }
   }
 
-  public void openDocumentFile(String mimeType) {
+  public void openDocumentFile(
+    String mimeType,
+    CallbackContext callbackContext
+  ) {
     Intent intent = new Intent();
     if (mimeType == null) mimeType = "*/*";
     intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
     intent.addCategory(Intent.CATEGORY_OPENABLE);
     intent.setType(mimeType);
+    activityResultCallback = callbackContext;
     cordova.startActivityForResult(this, intent, this.OPEN_DOCUMENT);
   }
 
-  public void getImage(String mimeType) {
+  public void getImage(String mimeType, CallbackContext callback) {
     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
     if (mimeType == null) mimeType = "image/*";
 
     intent.setType(mimeType);
+    activityResultCallback = callback;
     cordova.startActivityForResult(this, intent, this.PICK_FROM_GALLARY);
   }
 
-  public void getStorageVolumes() {
+  public void getStorageVolumes(CallbackContext callback) {
     try {
       JSONArray result = new JSONArray();
 
@@ -212,14 +215,15 @@ public class SDcard extends CordovaPlugin {
         }
       }
 
-      this.callback.success(result);
+      callback.success(result);
     } catch (JSONException e) {
-      this.error(e.toString());
+      callback.error(e.toString());
     }
   }
 
-  public void getStorageAccess(String SDCardUUID) {
+  public void getStorageAccess(String SDCardUUID, CallbackContext callback) {
     Intent intent = null;
+    activityResultCallback = callback;
 
     if (SDK_INT >= 24) {
       StorageVolume sdCard = null;
@@ -256,7 +260,7 @@ public class SDcard extends CordovaPlugin {
     if (requestCode == PICK_FROM_GALLARY) {
       if (resultCode == Activity.RESULT_OK) {
         Uri uri = data.getData();
-        callback.success(uri.toString());
+        activityResultCallback.success(uri.toString());
       }
       return;
     }
@@ -274,9 +278,9 @@ public class SDcard extends CordovaPlugin {
           res.put("filename", file.getName());
           res.put("canWrite", file.canWrite());
           res.put("uri", uri.toString());
-          callback.success(res);
+          activityResultCallback.success(res);
         } catch (JSONException e) {
-          error(e.toString());
+          activityResultCallback.error(e.toString());
         }
       }
 
@@ -287,25 +291,27 @@ public class SDcard extends CordovaPlugin {
       if (
         requestCode == ACCESS_INTENT && resultCode == Activity.RESULT_CANCELED
       ) {
-        error("Canceled");
+        activityResultCallback.error("Canceled");
         return;
       }
 
       try {
         Uri uri = data.getData();
         if (uri == null) {
-          error("Empty uri");
+          activityResultCallback.error("Empty uri");
         } else {
           takePermission(uri);
           DocumentFile file = DocumentFile.fromTreeUri(context, uri);
           if (file != null && file.canWrite()) {
-            callback.success(uri.toString());
+            activityResultCallback.success(uri.toString());
           } else {
-            error("No write permisson: " + uri.toString());
+            activityResultCallback.error(
+              "No write permisson: " + uri.toString()
+            );
           }
         }
       } catch (Exception e) {
-        error(e.toString());
+        activityResultCallback.error(e.toString());
       }
 
       return;
@@ -315,9 +321,9 @@ public class SDcard extends CordovaPlugin {
   private void writeFile(
     final String filename,
     final String content,
-    final Boolean isBinary
+    final Boolean isBinary,
+    final CallbackContext callback
   ) {
-    final CallbackContext callback = this.callback;
     final Context context = this.context;
 
     cordova
@@ -374,25 +380,30 @@ public class SDcard extends CordovaPlugin {
       );
   }
 
-  private void createDir(String parent, String name) {
-    create(parent, name, Document.MIME_TYPE_DIR);
+  private void createDir(String parent, String name, CallbackContext callback) {
+    create(parent, name, Document.MIME_TYPE_DIR, callback);
   }
 
-  private void createFile(String parent, String name) {
+  private void createFile(
+    String parent,
+    String name,
+    CallbackContext callback
+  ) {
     String mimeType = URLConnection.guessContentTypeFromName(name);
     String ext = FilenameUtils.getExtension(name);
-
-    Log.d("ACODE", "filename: " + name + "\next: " + ext);
 
     if (mimeType == null && ext != null) mimeType =
       "text/" + ext; else mimeType = "text/plain";
 
-    Log.d("ACODE", "mimeType: " + mimeType);
-
-    create(parent, name, mimeType);
+    create(parent, name, mimeType, callback);
   }
 
-  private void create(String parent, String name, String mimeType) {
+  private void create(
+    String parent,
+    String name,
+    String mimeType,
+    CallbackContext callback
+  ) {
     try {
       String srcUri = null, docId = null;
       Uri parentUri = null;
@@ -424,16 +435,22 @@ public class SDcard extends CordovaPlugin {
       }
 
       docId = DocumentsContract.getDocumentId(newDocumentUri);
-      if (newDocumentUri != null) callback.success(
-        srcUri + SAPERATOR + docId
-      ); else error("Unable to create " + parent);
+      if (newDocumentUri != null) {
+        callback.success(srcUri + SAPERATOR + docId);
+      } else {
+        callback.error("Unable to create " + parent);
+      }
     } catch (Exception e) {
       Log.e("CREATE_FILE", "Unable to create file", e);
-      error(e.toString());
+      callback.error(e.toString());
     }
   }
 
-  private void rename(String filename, String newFile) {
+  private void rename(
+    String filename,
+    String newFile,
+    CallbackContext callback
+  ) {
     String srcUri = null, docId = null;
     Uri fileUri = null;
     if (filename.contains(SAPERATOR)) {
@@ -453,15 +470,15 @@ public class SDcard extends CordovaPlugin {
         docId = DocumentsContract.getDocumentId(file.getUri());
         callback.success(srcUri + SAPERATOR + docId);
       } else {
-        error("Unable to rename: " + filename);
+        callback.error("Unable to rename: " + filename);
       }
     } catch (Exception e) {
       Log.e("RENAME_DOCUMENT_FILE", "Unable to rename file", e);
-      error(e.toString());
+      callback.error(e.toString());
     }
   }
 
-  private void delete(String filename) {
+  private void delete(String filename, CallbackContext callback) {
     ContentResolver contentResolver = context.getContentResolver();
     Uri fileUri = Uri.parse(filename);
 
@@ -471,21 +488,22 @@ public class SDcard extends CordovaPlugin {
         fileUri
       );
 
-      if (fileDeleted) this.callback.success(filename); else this.error(
-          "Unable to delete file " + filename
-        );
+      if (fileDeleted) {
+        callback.success(filename);
+      } else {
+        callback.error("Unable to delete file " + filename);
+      }
     } catch (FileNotFoundException e) {
-      this.error(e.toString());
+      callback.error(e.toString());
     }
   }
 
-  private void move(String src, String dest) {
+  private void move(String src, String dest, final CallbackContext callback) {
     final ContentResolver contentResolver = this.context.getContentResolver();
     final String splittedStr[] = src.split(SAPERATOR, 2);
     final String rootUri = splittedStr[0];
     final String srcId = splittedStr[1];
     final String destId = dest.split(SAPERATOR, 2)[1];
-    final CallbackContext callback = this.callback;
 
     cordova
       .getThreadPool()
@@ -514,12 +532,11 @@ public class SDcard extends CordovaPlugin {
       );
   }
 
-  private void copy(String src, String dest) {
+  private void copy(String src, String dest, final CallbackContext callback) {
     final String splittedStr[] = src.split(SAPERATOR, 2);
     final String srcUri = splittedStr[0];
     final String srcId = splittedStr[1];
     final String destId = dest.split(SAPERATOR, 2)[1];
-    final CallbackContext callback = this.callback;
 
     cordova
       .getThreadPool()
@@ -529,11 +546,13 @@ public class SDcard extends CordovaPlugin {
           public void run() {
             try {
               Uri newUri = copy(srcUri, srcId, destId);
-              if (newUri == null) callback.error(
-                "Unable to copy " + src
-              ); else callback.success(
-                srcUri + SAPERATOR + DocumentsContract.getDocumentId(newUri)
-              );
+              if (newUri == null) {
+                callback.error("Unable to copy " + src);
+              } else {
+                callback.success(
+                  srcUri + SAPERATOR + DocumentsContract.getDocumentId(newUri)
+                );
+              }
             } catch (Exception e) {
               callback.error(e.toString());
             }
@@ -618,7 +637,11 @@ public class SDcard extends CordovaPlugin {
     }
   }
 
-  private void listDir(String src, String parentDocId) {
+  private void listDir(
+    String src,
+    String parentDocId,
+    CallbackContext callback
+  ) {
     Uri srcUri = Uri.parse(src);
     ContentResolver contentResolver = context.getContentResolver();
 
@@ -662,7 +685,7 @@ public class SDcard extends CordovaPlugin {
 
       callback.success(result);
     } catch (JSONException e) {
-      error(e.toString());
+      callback.error(e.toString());
     } finally {
       if (c != null) {
         try {
@@ -680,7 +703,7 @@ public class SDcard extends CordovaPlugin {
     return DocumentsContract.Document.MIME_TYPE_DIR.equals(mimeType);
   }
 
-  private void getStats(String filename) {
+  private void getStats(String filename, CallbackContext callback) {
     String fileUri = formatUri(filename);
 
     try {
@@ -700,7 +723,7 @@ public class SDcard extends CordovaPlugin {
 
       callback.success(result);
     } catch (Exception e) {
-      error(e.getMessage());
+      callback.error(e.getMessage());
     }
   }
 
@@ -711,11 +734,11 @@ public class SDcard extends CordovaPlugin {
     return DocumentsContract.buildDocumentUriUsingTree(srcUri, docId);
   }
 
-  private void exists(String path) {
+  private void exists(String path, CallbackContext callback) {
     DocumentFile file = DocumentFile.fromSingleUri(context, Uri.parse(path));
 
     if (file == null) {
-      error("Unable to get file");
+      callback.error("Unable to get file");
     } else {
       if (file.exists()) {
         callback.success("TRUE");
@@ -725,24 +748,28 @@ public class SDcard extends CordovaPlugin {
     }
   }
 
-  private void error(String err) {
+  private void error(String err, CallbackContext callback) {
     callback.error("ERROR: " + err);
   }
 
-  private void getPath(String uriString, String src) {
-    DocumentFile file = geRelativetDocumentFile(uriString, src);
+  private void getPath(String uriString, String src, CallbackContext callback) {
+    try {
+      DocumentFile file = geRelativetDocumentFile(uriString, src);
 
-    if (file == null) {
-      error("Unable to get file");
-    } else {
-      Uri uri = file.getUri();
-      String path = uri.getPath();
-
-      if (path != null) {
-        callback.success(uri.toString());
+      if (file == null) {
+        callback.error("Unable to get file");
       } else {
-        error("Unable to get path");
+        Uri uri = file.getUri();
+        String path = uri.getPath();
+
+        if (path != null) {
+          callback.success(uri.toString());
+        } else {
+          callback.error("Unable to get path");
+        }
       }
+    } catch (Exception e) {
+      callback.error(e.getMessage());
     }
   }
 
@@ -752,8 +779,7 @@ public class SDcard extends CordovaPlugin {
 
     file = DocumentFile.fromTreeUri(context, Uri.parse(uri));
     if (!file.canWrite()) {
-      error("No write permission");
-      return null;
+      throw new RuntimeException("Cnnot write file");
     }
 
     paths.addAll(Arrays.asList(filename.split("/")));

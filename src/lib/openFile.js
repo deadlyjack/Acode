@@ -44,7 +44,7 @@ export default async function openFile(file, data = {}) {
 
     if (text) {
       // If file is not opened and has unsaved text
-      helpers.remoteTitleLoader();
+      helpers.removeTitleLoader();
       createEditor(true, text);
       return;
     }
@@ -53,13 +53,13 @@ export default async function openFile(file, data = {}) {
     // Checks for valid file
     const ext = helpers.extname(name);
     if (appSettings.isFileAllowed(ext)) {
-      helpers.remoteTitleLoader();
+      helpers.removeTitleLoader();
       return alert(
         strings.notice.toUpperCase(),
         `'${ext}' ${strings['file is not supported']}`,
       );
     } else if (fileInfo.length * 0.000001 > settings.maxFileSize) {
-      helpers.remoteTitleLoader();
+      helpers.removeTitleLoader();
       return alert(
         strings.error.toUpperCase(),
         strings['file too large'].replace(
@@ -72,7 +72,7 @@ export default async function openFile(file, data = {}) {
     const binData = await fs.readFile();
     const fileContent = helpers.decodeText(binData);
 
-    helpers.remoteTitleLoader();
+    helpers.removeTitleLoader();
     if (helpers.isBinary(fileContent) && /image/i.test(fileInfo.type)) {
       const blob = new Blob([binData]);
       dialogs.box(name, `<img src='${URL.createObjectURL(blob)}'>`);
@@ -83,7 +83,7 @@ export default async function openFile(file, data = {}) {
     if (mode !== 'single') recents.addFile(uri);
     return;
   } catch (error) {
-    helpers.remoteTitleLoader();
+    helpers.removeTitleLoader();
     console.error(error);
   }
 }

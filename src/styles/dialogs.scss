@@ -8,7 +8,7 @@
   max-height: 80vh;
   width: 100vw;
   max-width: 320px;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   background-color: var(--dialogbox-background-color);
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 16px var(--box-shadow-color);
@@ -72,7 +72,7 @@
 
     li {
       &.selected span {
-        color: #a90000 !important;
+        color: rgb(169, 0, 0) !important;
         color: var(--dialogbox-selected-option-color) !important;
       }
 
@@ -91,14 +91,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #252525;
+      color: rgb(37, 37, 37);
       color: var(--dialogbox-text-color);
     }
   }
 
   & + .mask {
     z-index: 111;
-    background-color: black;
+    background-color: rgb(0, 0, 0);
     opacity: 0.4;
   }
 
@@ -116,7 +116,7 @@
     display: flex;
     align-items: center;
     font-size: 1.25em;
-    color: #252525;
+    color: rgb(37, 37, 37);
     color: var(--text-color);
     word-wrap: break-word;
 
@@ -142,7 +142,7 @@
       margin: auto;
 
       .picker_selector {
-        border: solid 1px #252525;
+        border: solid 1px rgb(37, 37, 37);
         border: solid 1px var(--dialogbox-text-color);
         box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
         box-shadow: 0 0 2px 0 var(--box-shadow-color);
@@ -172,7 +172,7 @@
 
         input {
           text-align: center;
-          background-color: black !important;
+          background-color: rgb(0, 0, 0) !important;
           mix-blend-mode: difference;
           color: unset !important;
         }
@@ -194,7 +194,7 @@
         height: 30px;
         width: 30px;
         border-radius: 50%;
-        border: solid 4px #252525;
+        border: solid 4px rgb(37, 37, 37);
         border: solid 4px var(--dialogbox-text-color);
         border-bottom: solid 4px rgba($color: #000000, $alpha: 0) !important;
         margin: 15px;
@@ -257,7 +257,7 @@
     max-width: 300px;
     background-color: inherit;
     border: none;
-    color: #252525;
+    color: rgb(37, 37, 37);
     color: var(--dialogbox-text-color);
     border-bottom: solid 1px currentColor;
     text-indent: 0;
@@ -269,7 +269,7 @@
     }
 
     &:focus {
-      border-bottom: solid 1px #3399ff;
+      border-bottom: solid 1px rgb(51, 153, 255);
       border-bottom: solid 1px var(--accent-color);
     }
   }
@@ -281,7 +281,7 @@
   }
 
   .error-msg {
-    color: #ffb95c !important;
+    color: rgb(255, 185, 92) !important;
     color: var(--error-text-color) !important;
     height: fit-content;
 

@@ -38,23 +38,23 @@
         margin: 0 auto;
         width: 30%;
         height: 2px;
-        background-color: black;
+        background-color: rgb(0, 0, 0);
         animation: move ease 1s infinite;
         border-radius: 1px;
 
         @keyframes move {
           0% {
-            background-color: black;
+            background-color: rgb(0, 0, 0);
             transform: scale3d(0, 1, 1);
           }
 
           50% {
-            background-color: white;
+            background-color: rgb(255, 255, 255);
             transform: scale3d(4, 1, 1);
           }
 
           100% {
-            background-color: black;
+            background-color: rgb(0, 0, 0);
             transform: scale3d(0, 1, 1);
           }
         }
@@ -102,7 +102,7 @@
       padding-right: 5px;
       font-family: 'Roboto', sans-serif;
       font-weight: bolder;
-      color: #252525;
+      color: rgb(37, 37, 37);
       color: var(--text-color);
       font-weight: 900;
       text-transform: uppercase;
@@ -255,7 +255,7 @@ ul {
 
     &::after {
       content: attr(empty-msg);
-      color: #252525;
+      color: rgb(37, 37, 37);
       color: var(--text-color);
       text-align: center;
       font-weight: 900;

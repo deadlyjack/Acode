@@ -124,12 +124,10 @@
   "new project": "新项目",
   "format": "格式",
   "project name": "项目名",
-  "support us": "支持 Acode 项目发展，成为 patreon。",
   "unsupported device": "您的设备不支持应用主题。",
   "vibrate on tap": "点按时震动",
   "copy command is not supported by ftp.": "FTP 不支持复制操作.",
   "support title": "支持 Acode",
-  "support text": "Acode 需要你的支持，向 Acode 捐赠 $5.",
   "exit fullscreen": "退出全屏",
   "fullscreen": "全屏",
   "animation": "动画效果",
@@ -214,5 +212,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

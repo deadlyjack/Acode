@@ -4,11 +4,11 @@ header {
     z-index: 98;
     height: 45px;
     height: var(--header-height);
-    background-color: #9999ff;
+    background-color: rgb(153, 153, 255);
     background-color: var(--primary-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     box-shadow: 0 2px 4px var(--box-shadow-color);
-    color: white;
+    color: rgb(255, 255, 255);
     color: var(--text-main-color);
 
     > .text {
@@ -31,7 +31,7 @@ header {
 
   &.select {
     pointer-events: none;
-    border: solid 2px gold;
+    border: solid 2px rgb(255, 215, 0);
     background-color: inherit !important;
   }
 

@@ -123,12 +123,10 @@
   "new project": "Nový projekt",
   "format": "formátovat",
   "project name": "Jméno projektu",
-  "support us": "Podpoř vývoj Acode, staň se patronem.",
   "unsupported device": "Vaše zařízení nepodporuje témata.",
   "vibrate on tap": "Vibrovat při doteku",
   "copy command is not supported by ftp.": "Povel copy není serverem FTP podporován.",
   "support title": "Podpora Acode",
-  "support text": "Acode potřebuje Vaši podporu! Už částkou okolo 5$ dáte najevo jak mnoho Vám na nás záleží.",
   "exit fullscreen": "Opustit režim celé obrazovky",
   "fullscreen": "režim celé obrazovky",
   "animation": "animace",
@@ -213,5 +211,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

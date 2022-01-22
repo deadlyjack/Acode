@@ -24,11 +24,15 @@ const credentials = {
 export default {
   credentials,
   showTitleLoader() {
-    app.classList.remove('title-loading-hide');
-    app.classList.add('title-loading');
+    setTimeout(() => {
+      app.classList.remove('title-loading-hide');
+      app.classList.add('title-loading');
+    }, 0);
   },
-  remoteTitleLoader() {
-    app.classList.add('title-loading-hide');
+  removeTitleLoader() {
+    setTimeout(() => {
+      app.classList.add('title-loading-hide');
+    }, 0);
   },
   /**
    * Get extension name
@@ -315,7 +319,7 @@ export default {
     }
   },
   /**
-   *
+   * Gets error message from error object
    * @param {Error} err
    * @param  {...string} args
    */

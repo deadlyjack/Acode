@@ -5,9 +5,9 @@
   padding: 0;
   margin: 0;
   border-radius: 0 0 4px 4px;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   background-color: var(--secondary-color);
-  color: #252525;
+  color: rgb(37, 37, 37);
   color: var(--text-color);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 4px var(--box-shadow-color);
@@ -32,12 +32,12 @@
     text-overflow: ellipsis;
 
     &.active {
-      background-color: #3399ff;
-      color: white;
+      background-color: rgb(51, 153, 255);
+      color: rgb(255, 255, 255);
     }
 
     &:not(:last-child) {
-      border-bottom: solid 1px #cccccc;
+      border-bottom: solid 1px rgb(204, 204, 204);
     }
   }
 
@@ -56,7 +56,7 @@
       height: 18px;
       width: 18px;
       border-radius: 50%;
-      border: solid 4px #252525;
+      border: solid 4px rgb(37, 37, 37);
       border: solid 4px var(--text-color);
       border-bottom: solid 4px rgba($color: #000000, $alpha: 0) !important;
       margin: auto;

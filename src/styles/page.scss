@@ -38,7 +38,7 @@ body {
             height: 40px;
             display: flex;
             border-radius: 20px;
-            border: solid 1px white;
+            border: solid 1px rgb(255, 255, 255);
             border: solid 1px var(--text-main-color);
           }
         }
@@ -199,7 +199,7 @@ body {
         &::after {
           content: attr(data-empty-msg);
           font-weight: 900;
-          color: #999999;
+          color: rgb(153, 153, 153);
           height: fit-content;
           max-width: 60vw;
           margin: auto;
@@ -222,7 +222,7 @@ body {
       left: 0;
       width: 100%;
       z-index: 98;
-      background-color: #9999ff;
+      background-color: rgb(153, 153, 255);
       background-color: var(--primary-color);
       padding: 0 1px;
       box-sizing: border-box;
@@ -315,7 +315,7 @@ div.page {
   transform: rotate(0) translate3d(0, 0, 0);
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   background-color: var(--secondary-color);
   z-index: 108;
 
@@ -362,9 +362,9 @@ div.page {
           border-radius: 4px;
           padding: 2.5px;
           box-sizing: border-box;
-          border: solid 1px #333333;
-          background-color: #999999;
-          color: white;
+          border: solid 1px rgb(51, 51, 51);
+          background-color: rgb(153, 153, 153);
+          color: rgb(255, 255, 255);
           box-sizing: border-box;
           white-space: nowrap;
           word-break: keep-all;

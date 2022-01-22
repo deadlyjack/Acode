@@ -56,6 +56,7 @@ interface Settings {
   lineHeight: number;
   checkFiles: boolean;
   desktopMode: boolean;
+  console: 'legacy' | 'eruda';
 }
 
 interface AppSettings {

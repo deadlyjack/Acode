@@ -123,12 +123,10 @@
   "new project": "新規プロジェクト",
   "format": "フォーマット",
   "project name": "プロジェクト名",
-  "support us": "Patreonになり、Acodeの開発をサポートします。",
   "unsupported device": "お使いのデバイスはテーマをサポートしていません。",
   "vibrate on tap": "タップ時に振動させる",
   "copy command is not supported by ftp.": "FTPではCopyコマンドはサポートされていません。",
   "support title": "Acodeをサポート",
-  "support text": "Acodeはあなたのサポートが必要です！5ドルという少額な寄付で、支援する心を示してください。",
   "exit fullscreen": "フルスクリーンを終了",
   "fullscreen": "フルスクリーン",
   "animation": "アニメーション",
@@ -213,5 +211,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

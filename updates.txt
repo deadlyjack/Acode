@@ -1,6 +1,8 @@
-version 1.4.164
-☞ Added new in app browser with more features.
+version 1.4.168
+☞ Added new in app browser.
 ☞ Added all console methods like time, timeEnd, info, etc.
+☞ New Punjabi Translation by NiceSapien.
+☞ Added Eruda console. Select from other settings.
 
 version 1.4.164
 ☞ Added option to close the file in the menu.

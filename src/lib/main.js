@@ -58,7 +58,7 @@ async function Main() {
     responseType: 'json',
   }).then((/**@type {Promotion} */ promotion) => {
     window.promotion = promotion;
-    if (promotion.image) {
+    if (promotion?.image) {
       (async () => {
         const image = await ajax({
           url: promotion.image,
@@ -70,7 +70,10 @@ async function Main() {
         }
       })();
     }
-  });
+  })
+    .catch(err => {
+      console.log(err);
+    });
 
   document.addEventListener('deviceready', ondeviceready);
 }
@@ -86,6 +89,7 @@ async function ondeviceready() {
   } = cordova.file;
   let lang = 'en-us';
 
+  iap.startConnection();
   window.root = tag(window.root);
   window.app = tag(document.body);
   window.addedFolder = [];
@@ -221,15 +225,15 @@ async function ondeviceready() {
 
   Acode.setLoadingMessage('Loading editor...');
   await helpers.loadScripts(
-    './res/ace/src/ace.js',
-    './res/ace/emmet-core.js',
-    './res/ace/src/ext-language_tools.js',
-    './res/ace/src/ext-code_lens.js',
-    './res/ace/src/ext-emmet.js',
-    './res/ace/src/ext-beautify.js',
-    './res/ace/src/ext-modelist.js',
+    './js/ace/ace.js',
+    './js/emmet-core.js',
+    './js/ace/ext-language_tools.js',
+    './js/ace/ext-code_lens.js',
+    './js/ace/ext-emmet.js',
+    './js/ace/ext-beautify.js',
+    './js/ace/ext-modelist.js',
   );
-  ace.config.set('basePath', './res/ace/src/');
+  ace.config.set('basePath', './js/ace/');
   window.beautify = ace.require('ace/ext/beautify').beautify;
   window.modelist = ace.require('ace/ext/modelist');
   window.AceMouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
@@ -378,7 +382,7 @@ async function loadApp() {
     try {
       const fs = fsOperation(Url.join(CACHE_STORAGE, id));
       text = await fs.readFile('utf-8');
-    } catch (error) {}
+    } catch (error) { }
 
     Acode.setLoadingMessage(`Loading ${filename}...`);
 
@@ -460,12 +464,6 @@ async function loadApp() {
     document.body.removeAttribute('data-small-msg');
     app.classList.remove('loading', 'splash');
   }, 1000);
-  if (localStorage.count === undefined) localStorage.count = 0;
-  let count = +localStorage.count;
-
-  if (count === constants.RATING_COUNT) askForRating();
-  else if (count === constants.DONATION_COUNT) askForDonation();
-  else ++localStorage.count;
 
   if (!localStorage.__init) {
     localStorage.__init = true;
@@ -490,10 +488,7 @@ async function loadApp() {
   document.addEventListener('keyup', handleMainKeyUp);
   document.addEventListener('menubutton', $sidebar.toggle);
   navigator.app.overrideButton('menubutton', true);
-  intent.setNewIntentHandler(intentHandler);
-  intent.getCordovaIntent(intentHandler, (err) => {
-    helpers.error(err);
-  });
+  system.setIntentHandler(intentHandler);
   $sidebar.onshow = function () {
     const activeFile = editorManager.activeFile;
     if (activeFile) editorManager.editor.blur();
@@ -637,36 +632,4 @@ function onClickApp(e) {
 
     return false;
   }
-}
-
-function askForDonation() {
-  if (localStorage.dontAskForDonation) return resetCount();
-
-  //TODO: Add currency to donate
-  const options = [[constants.PAYPAL + '/5usd', 'PayPal', 'paypal']];
-
-  if (IS_FREE_VERSION)
-    options.push([
-      constants.PAID_VERSION,
-      'Download paid version',
-      'googleplay',
-    ]);
-
-  dialogs
-    .select(strings['support text'], options, {
-      onCancel: resetCount,
-    })
-    .then((res) => {
-      localStorage.dontAskForDonation = true;
-      system.openInBrowser(res);
-      resetCount();
-    });
-}
-
-function resetCount() {
-  localStorage.count = -10;
-}
-
-function askForRating() {
-  if (!localStorage.dontAskForRating) rateBox();
 }

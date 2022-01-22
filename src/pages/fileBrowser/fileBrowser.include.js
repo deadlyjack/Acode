@@ -180,12 +180,12 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
 
       if (action === 'refresh') {
         ftp.disconnect(
-          () => {},
-          () => {},
+          () => { },
+          () => { },
         );
         sftp.close(
-          () => {},
-          () => {},
+          () => { },
+          () => { },
         );
         __sftpTaskQueue.length = 0;
         __sftpBusy = false;
@@ -214,17 +214,6 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
         case 'addSftp':
           if (action === 'addSftp') {
             localStorage.__fbAddSftp = true;
-
-            if (IS_FREE_VERSION) {
-              dialogs.alert(
-                strings.info.toUpperCase(),
-                strings['feature not available'],
-                () => {
-                  system.openInBrowser(constants.PAID_VERSION);
-                },
-              );
-              break;
-            }
           }
 
           remoteStorage[action]()
@@ -309,17 +298,6 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
           url = $url.textContent;
         }
       }
-
-      /**@deprecated not used anymore */
-      // if (storageType === 'permission') {
-      //   dialogs
-      //     .confirm(strings.info.toUpperCase(), strings['manage all files'])
-      //     .then(() => {
-      //       document.addEventListener('resume', reload);
-      //       system.manageAllFiles();
-      //     });
-      //   return;
-      // }
 
       if (storageType === 'notification') {
         switch (uuid) {
@@ -571,28 +549,22 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
     async function listAllStorages() {
       if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
       allStorages.length = 0;
-      /**@deprecated not using from next user as google doesn't allow it anymore */
-      // let isStorageManager = await new Promise((resolve, reject) => {
-      //   system.isExternalStorageManager(resolve, reject);
-      // });
 
-      // if (!isStorageManager && ANDROID_SDK_INT >= 30) {
-      //   util.pushFolder(allStorages, 'Allow Acode to manage all files', '', {
-      //     storageType: 'permission',
-      //     uuid: 'permission',
-      //   });
-      // }
-
-      // if (ANDROID_SDK_INT <= 29 || isStorageManager) {
-      //   util.pushFolder(
-      //     allStorages,
-      //     'Internal storage',
-      //     cordova.file.externalRootDirectory,
-      //     {
-      //       uuid: 'internal-storage',
-      //     },
-      //   );
-      // }
+      if (ANDROID_SDK_INT <= 29) {
+        const dirList = await fsOperation(cordova.file.externalRootDirectory)
+          .lsDir()
+          .catch(err => { console.log(err) });
+        if (dirList.length) {
+          util.pushFolder(
+            allStorages,
+            'Internal storage',
+            cordova.file.externalRootDirectory,
+            {
+              uuid: 'internal-storage',
+            },
+          );
+        }
+      }
 
       try {
         const res = await externalFs.listStorages();
@@ -607,7 +579,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
             storageType: 'sd',
           });
         });
-      } catch (err) {}
+      } catch (err) { }
 
       storageList.forEach((storage) => {
         let url = storage.url || /**@drepreceted */ storage['uri'];

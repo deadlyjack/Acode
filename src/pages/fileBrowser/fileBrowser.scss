@@ -5,9 +5,9 @@
 
   .tile {
     &[storageType='notification'] {
-      background-color: #9999ff;
+      background-color: rgb(153, 153, 255);
       background-color: var(--primary-color);
-      color: white;
+      color: rgb(255, 255, 255);
       color: var(--text-main-color);
       height: 40px;
       text-align: center;
@@ -27,7 +27,7 @@
         left: 50%;
         content: attr(storageType);
         transform: translate(-50%, -50%);
-        color: white;
+        color: rgb(255, 255, 255);
         font-size: 0.6rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -76,7 +76,7 @@
         .text::after {
           content: 'Read only';
           font-size: 0.6em;
-          color: white;
+          color: rgb(255, 255, 255);
           background-color: rgb(62, 100, 138);
           border-radius: 4px;
           padding: 5px;

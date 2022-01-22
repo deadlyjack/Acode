@@ -43,7 +43,7 @@ main .ace_editor {
   z-index: 108 !important;
 
   .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
-    background-color: #9999ff;
+    background-color: rgb(153, 153, 255);
     background-color: var(--command-palette-background-color);
   }
 
@@ -76,9 +76,9 @@ main .ace_editor {
   }
 
   .ace_editor {
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     background-color: var(--secondary-color);
-    color: #252525;
+    color: rgb(37, 37, 37);
     color: var(--text-color);
 
     box-shadow: 0 16px 16px rgba(0, 0, 0, 0.2);
@@ -87,7 +87,7 @@ main .ace_editor {
     border: var(--command-palette-border);
 
     .ace_cursor {
-      color: #252525;
+      color: rgb(37, 37, 37);
       color: var(--text-color);
     }
   }

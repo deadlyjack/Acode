@@ -123,12 +123,10 @@
   "new project": "Nuevo Proyecto",
   "format": "Formato",
   "project name": "Nombre del Proyecto",
-  "support us": "Apoye el desarrollo de Acode, sea un Patreon.",
   "unsupported device": "Su dispositivo no es compatible con el tema.",
   "vibrate on tap": "Vibrar al tocar",
   "copy command is not supported by ftp.": "Comando de copia no es compatible con FTP.",
   "support title": "Apoye Acode",
-  "support text": "¡Acode necesita tu apoyo! Muestra tu apoyo al donar una cantidad tan pequeña como $5.",
   "exit fullscreen": "Salir de pantalla completa",
   "fullscreen": "pantalla completa",
   "animation": "animación",
@@ -213,5 +211,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

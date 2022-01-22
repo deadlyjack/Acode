@@ -15,7 +15,7 @@ body.no-animation {
   max-height: calc(100vh - 38px);
   overflow-y: auto;
   user-select: none;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   background-color: var(--menu-background-color);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 4px var(--box-shadow-color);
@@ -48,7 +48,7 @@ body.no-animation {
 
     &.notice::after {
       content: '•';
-      color: #ffda0c;
+      color: rgb(255, 218, 12);
       font-size: 1.2em;
       margin-left: 2.5px;
       text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
@@ -65,7 +65,7 @@ body.no-animation {
     .text {
       flex: 1;
       text-transform: capitalize;
-      color: #252525;
+      color: rgb(37, 37, 37);
       color: var(--menu-text-color);
 
       .value {
@@ -76,7 +76,7 @@ body.no-animation {
     }
 
     .icon {
-      color: #9999ff;
+      color: rgb(153, 153, 255);
       color: var(--menu-icon-color);
     }
 

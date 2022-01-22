@@ -23,8 +23,6 @@ export default {
       /^content:\/\/com\.((?![:<>"\/\\\|\?\*]).)*\.documents\/tree\//;
     const SINGLE_URI =
       /^content:\/\/com\.(((?![:<>"\/\\\|\?\*]).)*)\.documents\/document/;
-    const PRIMARY =
-      /^content:\/\/com\.android\.externalstorage\.documents\/document\/primary/;
 
     if (DOC_PROVIDER.test(contentUri)) {
       if (TREE_URI.test(contentUri)) {
@@ -88,7 +86,7 @@ export default {
       const storageList = JSON.parse(localStorage.storageList || '[]');
 
       for (let storage of storageList) {
-        if (storage.uri === rootUri) {
+        if ((storage.uri ?? storage.url) === rootUri) {
           const id = rootUri.split('/').pop();
           let filePath = docId.replace(decodeURL(id), '');
           if (filePath.startsWith('/')) filePath = filePath.slice(1);

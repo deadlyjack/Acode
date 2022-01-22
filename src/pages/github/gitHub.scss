@@ -2,7 +2,7 @@
   .list-item {
     .octicon {
       font-size: 1.8em;
-      color: #6a737d !important;
+      color: rgb(106, 115, 125) !important;
     }
   }
 
@@ -56,9 +56,9 @@
           align-items: center;
           padding: 0 6px;
           font-size: 0.8em;
-          background-color: white;
+          background-color: rgb(255, 255, 255);
           background-color: var(--text-main-color);
-          color: #9999ff;
+          color: rgb(153, 153, 255);
           color: var(--primary-color);
           border-radius: 4px;
           margin-left: 4px;

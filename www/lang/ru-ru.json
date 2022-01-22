@@ -124,12 +124,10 @@
   "new project": "Новый проект",
   "format": "Формат",
   "project name": "Название проекта",
-  "support us": "Поддержи Acode, стань патроном.",
   "unsupported device": "Это устройство не поддерживает тему.",
   "vibrate on tap": "Вибрация при нажатии",
   "copy command is not supported by ftp.": "Копирование не поддерживается в режиме FTP",
   "support title": "Поддержи Acode",
-  "support text": "Acode нуждается в вашей поддержке! Покажите свою поддержку, пожертвовав небольшую сумму в размере 3$",
   "exit fullscreen": "Выйти из полноэкранного режима",
   "fullscreen": "Полноэкранный режим",
   "animation": "Анимация",
@@ -214,5 +212,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

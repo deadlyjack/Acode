@@ -27,7 +27,7 @@ function Page(title, options = {}) {
         action: 'go-back',
       },
     });
-  const header = tile({
+  const $header = tile({
     type: 'header',
     text: title,
     lead: leadBtn,
@@ -35,7 +35,7 @@ function Page(title, options = {}) {
   });
   const $page = tag('div', {
     className: 'page',
-    child: header,
+    child: $header,
   });
   let onhide;
 
@@ -49,7 +49,7 @@ function Page(title, options = {}) {
   if (!window.pageCount) window.pageCount = 0;
   if (!pageCount++) document.body.replaceChild($placeholder, root);
 
-  header.classList.add('light');
+  $header.classList.add('light');
 
   Object.defineProperties($page, {
     onhide: {
@@ -65,14 +65,45 @@ function Page(title, options = {}) {
     },
     settitle: {
       value(text) {
-        header.text = text;
+        $header.text = text;
       },
     },
     header: {
       get() {
-        return header;
+        return $header;
       },
     },
+    innerHTML: {
+      set(html) {
+        
+        [...$page.children].forEach($i=>{
+          if($i !== $header && !$i.classList.contains('main')) $i.remove();
+        });
+
+        const $main = $page.querySelector('.main');
+        const $content = tag.parse(html);
+        if($content.classList.contains('main')){
+          if($main) {
+            $main.replaceWith($content);
+            return;
+          }
+          $page.append($content);
+        }else{
+          if($main){
+            $main.innerHTML = html;
+            return;
+          }
+
+          $page.append(tag('div', {
+            className: 'main',
+            child: $content,
+          }));
+        }
+      },
+      get(){
+        return $page.querySelector('main').innerHTML;
+      }
+    }
   });
   return $page;
 

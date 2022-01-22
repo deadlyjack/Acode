@@ -123,12 +123,10 @@
   "new project": "Project အသစ်",
   "format": "format",
   "project name": "Project နာမည်",
-  "support us": "ကျွန်တော် Acode ကို patreon မှာထောက်ပံ့ပေးပါခင်ဗျာ။",
   "unsupported device": "ခင်ဗျား Device မှာ ယခု Theme ကိုမထောက်ပံ့ပါ။",
   "vibrate on tap": "ထိထားရင်တုန်ပါ",
   "copy command is not supported by ftp.": "FTPမှာကူယူတာကိုမထောက်ပံ့ပါ။",
   "support title": "Acode ကိုထောက်ပံ့ပါ ❤️",
-  "support text": "Acode ကခင်ဗျားထောက်ပံ့မှုကိုလိုအပ်ပါတယ်။ 5$ (6660ကျပ်) လောက်သာထောက်ပံ့ခြင်းဖြင့် ခင်ဗျားရဲ့မေတ္တာတရားကိုပြဿနိုင်ပါတယ်။",
   "exit fullscreen": "မျက်နှာပြင်အပြည့်မှထွက်မည်",
   "fullscreen": "မျက်နှာပြင်အပြည့်",
   "animation": "အထူးပြုလုပ်ချက်",
@@ -213,5 +211,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }

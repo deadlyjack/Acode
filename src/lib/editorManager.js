@@ -51,7 +51,7 @@ function EditorManager($sidebar, $header, $body) {
     ...strings,
     readOnly: true,
   });
-  const fullContent = mustache.render(contextMenuHTML, {
+  const fullContent = () => mustache.render(contextMenuHTML, {
     ...strings,
     readOnly: false,
   });
@@ -78,7 +78,9 @@ function EditorManager($sidebar, $header, $body) {
     }),
     menu: tag('div', {
       className: 'clipboard-contextmneu',
-      innerHTML: fullContent,
+      get innerHTML(){
+        return fullContent();
+      }
     }),
     color: tag('span', {
       className: 'icon color',
@@ -88,7 +90,9 @@ function EditorManager($sidebar, $header, $body) {
     }),
     vScrollbar: $vScrollbar,
     hScrollbar: $hScrollbar,
-    fullContent,
+    get fullContent(){
+      return fullContent();
+    },
     readOnlyContent,
     get size() {
       return cursorControllerSize;

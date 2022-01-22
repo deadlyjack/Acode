@@ -1,15 +1,9 @@
 module.exports = {
   copy: function (srcPathname, destPathname, onSuccess, onFail) {
-    cordova.exec(onSuccess, onFail, 'SDcard', 'copy', [
-      srcPathname,
-      destPathname,
-    ]);
+    cordova.exec(onSuccess, onFail, 'SDcard', 'copy', [srcPathname, destPathname]);
   },
   createDir: function (pathname, dir, onSuccess, onFail) {
-    cordova.exec(onSuccess, onFail, 'SDcard', 'create directory', [
-      pathname,
-      dir,
-    ]);
+    cordova.exec(onSuccess, onFail, 'SDcard', 'create directory', [pathname, dir]);
   },
   createFile: function (pathname, file, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'SDcard', 'create file', [pathname, file]);
@@ -36,34 +30,16 @@ module.exports = {
     cordova.exec(onSuccess, onFail, 'SDcard', 'list directory', [src]);
   },
   move: function (srcPathname, destPathname, onSuccess, onFail) {
-    cordova.exec(onSuccess, onFail, 'SDcard', 'move', [
-      srcPathname,
-      destPathname,
-    ]);
+    cordova.exec(onSuccess, onFail, 'SDcard', 'move', [srcPathname, destPathname]);
   },
   openDocumentFile: function (onSuccess, onFail, mimeType) {
-    cordova.exec(
-      onSuccess,
-      onFail,
-      'SDcard',
-      'open document file',
-      mimeType ? [mimeType] : [],
-    );
+    cordova.exec(onSuccess, onFail, 'SDcard', 'open document file', mimeType ? [mimeType] : []);
   },
   getImage: function (onSuccess, onFail, mimeType) {
-    cordova.exec(
-      onSuccess,
-      onFail,
-      'SDcard',
-      'get image',
-      mimeType ? [mimeType] : [],
-    );
+    cordova.exec(onSuccess, onFail, 'SDcard', 'get image', mimeType ? [mimeType] : []);
   },
   rename: function (pathname, newFilename, onSuccess, onFail) {
-    cordova.exec(onSuccess, onFail, 'SDcard', 'rename', [
-      pathname,
-      newFilename,
-    ]);
+    cordova.exec(onSuccess, onFail, 'SDcard', 'rename', [pathname, newFilename]);
   },
   write: function (filename, content, isBinary, onSuccess, onFail) {
     if (typeof isBinary === 'function') {
@@ -72,13 +48,9 @@ module.exports = {
       isBinary = false;
     }
 
-    cordova.exec(onSuccess, onFail, 'SDcard', 'write', [
-      filename,
-      content,
-      isBinary,
-    ]);
+    cordova.exec(onSuccess, onFail, 'SDcard', 'write', [filename, content, isBinary]);
   },
   stats: function (filename, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'SDcard', 'stats', [filename]);
-  },
+  }
 };

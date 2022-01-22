@@ -12,9 +12,9 @@ body.no-animation {
   width: 70vw;
   max-width: 350px;
   height: 100vh;
-  background-color: #9999ff;
+  background-color: rgb(153, 153, 255);
   background-color: var(--primary-color);
-  color: white;
+  color: rgb(255, 255, 255);
   color: var(--text-main-color);
   overflow: hidden;
   box-sizing: border-box;
@@ -36,7 +36,7 @@ body.no-animation {
 
     &::after {
       content: attr(empty-msg);
-      color: white;
+      color: rgb(255, 255, 255);
       color: var(--text-main-color);
       font-weight: 900;
       opacity: 0.5;
@@ -90,7 +90,7 @@ body.no-animation {
 
       .tile:active {
         > *:nth-child(2) {
-          color: gold;
+          color: rgb(255, 215, 0);
         }
       }
 
@@ -101,7 +101,7 @@ body.no-animation {
 
         &.active {
           > *:nth-child(2) {
-            color: gold;
+            color: rgb(255, 215, 0);
           }
         }
       }

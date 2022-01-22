@@ -1,8 +1,8 @@
+import './customTheme.scss';
 import tag from 'html-tag-js';
 import Mustache from 'mustache';
 import template from './customTheme.hbs';
 import Page from '../../components/page';
-import './customTheme.scss';
 import color from '../../components/dialogboxes/color';
 import helpers from '../../lib/utils/helpers';
 import constants from '../../lib/constants';

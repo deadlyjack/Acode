@@ -55,6 +55,7 @@ public class BrowserDialog extends Dialog {
 
     if (webView.canGoBack()) {
       webView.goBack();
+      url = webView.getOriginalUrl();
     } else {
       dismiss();
     }

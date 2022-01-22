@@ -11,7 +11,6 @@ const exec = promisify(require('child_process').exec);
   const arg = process.argv[2];
   const arg2 = process.argv[3];
   const platformsDir = path.resolve(__dirname, '../platforms/');
-  const wbcpath = path.resolve(__dirname, '../webpack.config.js');
   const babelrcpath = path.resolve(__dirname, '../.babelrc');
   const configpath = path.resolve(__dirname, '../config.xml');
   const htmlpath = path.resolve(__dirname, '../www/index.html');
@@ -30,7 +29,6 @@ const exec = promisify(require('child_process').exec);
 </resources>`;
 
   try {
-    let wbc = fs.readFileSync(wbcpath, 'utf-8');
     let babelrcText = fs.readFileSync(babelrcpath, 'utf-8');
     let config = fs.readFileSync(configpath, 'utf-8');
     let html = fs.readFileSync(htmlpath, 'utf-8');
@@ -41,10 +39,8 @@ const exec = promisify(require('child_process').exec);
     babelrc = JSON.parse(babelrcText);
 
     if (arg === 'd') {
-      wbc = wbc.replace(/mode: '.*'/g, "mode: 'development'");
       babelrc.compact = false;
     } else if (arg === 'p') {
-      wbc = wbc.replace(/mode: '.*'/g, "mode: 'production'");
       babelrc.compact = true;
     }
 
@@ -56,7 +52,6 @@ const exec = promisify(require('child_process').exec);
       id = ID_PAID;
     }
 
-    fs.writeFileSync(wbcpath, wbc, 'utf8');
     fs.writeFileSync(babelrcpath, babelrcText, 'utf8');
 
     if (currentId !== id) {
@@ -70,14 +65,21 @@ const exec = promisify(require('child_process').exec);
       fs.writeFileSync(logopath, logo, 'utf8');
       fs.writeFileSync(configpath, config, 'utf8');
 
+
       for (let platform of platforms) {
         if (!platform) continue;
+
+        let version;
+        if (platform === 'android') {
+          version = '@9';
+        }
+
         promises.push(
           (async () => {
             console.log(
               `|--- Reinstalling platform ${platform.toUpperCase()} ---|`,
             );
-            const { stderr } = await exec(`yarn clean ${platform}`);
+            const { stderr } = await exec(`yarn clean ${platform} ${platform + version}`);
             if (stderr) console.error(stderr);
             else console.log('DONE!');
           })(),

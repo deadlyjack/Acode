@@ -6,6 +6,9 @@ import constants from '../../lib/constants';
 import helpers from '../../lib/utils/helpers';
 import openFile from '../../lib/openFile';
 import internalFs from '../../lib/fileSystem/internalFs';
+import fsOperation from '../../lib/fileSystem/fsOperation';
+import ajax from '@deadlyjack/ajax';
+import Url from '../../lib/utils/Url';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -52,6 +55,12 @@ export default function otherSettings() {
       icon: 'file_copy',
       checkbox: values.showConsole,
     },
+    {
+      key: 'console',
+      text: strings.console.capitalize(),
+      subText: values.console,
+      icon: 'code',
+    }
   ];
 
   gen.listItems($settingsList, settingsOptions, changeSetting);
@@ -123,6 +132,32 @@ export default function otherSettings() {
       case 'check-files':
         this.value = values.checkFiles = !values.checkFiles;
         appSettings.update();
+        break;
+
+      case 'console':
+        dialogs.select(strings['console'], ['legacy', 'eruda'], {
+          default: values.console,
+        })
+        .then(res=>{
+          if (res === values.console) return;
+          (async ()=>{
+            if(res === 'eruda'){
+              const fs = fsOperation(Url.join(DATA_STORAGE, 'eruda.js'));
+              if(!(await fs.exists())){
+                dialogs.loader.create(
+                  strings['downloading file'].replace('{file}', 'eruda.js'), 
+                  strings['downloading...']
+                );
+                const erudaScript = await ajax({url: constants.ERUDA_CDN, responseType: 'text'});
+                await fsOperation(DATA_STORAGE).createFile('eruda.js', erudaScript);
+                dialogs.loader.destroy();
+              }
+            }
+            appSettings.value.console = res;
+            appSettings.update();
+            this.changeSubText(res);
+          })();
+        });
         break;
 
       default:

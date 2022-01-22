@@ -123,12 +123,10 @@
   "new project": "Új projekt",
   "format": "formázás",
   "project name": "Projekt neve",
-  "support us": "Támogasd az Acode fejlesztését, legyél patreon.",
   "unsupported device": "Az eszköz nem támogatja a témát.",
   "vibrate on tap": "Rezgés érintésre",
   "copy command is not supported by ftp.": "Az FTP nem támogatja a másolást.",
   "support title": "Támogassa az Acode-ot",
-  "support text": "Az Acode-nak szüksége van a támogatására! Támogasson akár csak 5 dollár adománozásval.",
   "exit fullscreen": "Kilépés a teljes képernyőből",
   "fullscreen": "teljes képernyő",
   "animation": "animáció",
@@ -213,5 +211,12 @@
   "desktop mode": "Desktop mode",
   "toggle console": "Toggle console",
   "new line mode": "New line mode",
-  "add a storage": "Add a storage"
+  "add a storage": "Add a storage",
+  "rate acode": "Rate Acode",
+  "github login": "Github Login",
+  "support": "Support",
+  "donate": "Donate {amount}",
+  "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
+  "downloading file": "Downloading {file}",
+  "downloading...": "Downloading..."
 }
