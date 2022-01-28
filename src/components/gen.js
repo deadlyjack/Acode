@@ -30,11 +30,11 @@ function listTileGen(options) {
       text === '{{saperate}}'
         ? tag('hr')
         : tag('li', {
-            child: tag('span', {
-              className: 'text',
-              textContent: text,
-            }),
-          });
+          child: tag('span', {
+            className: 'text',
+            textContent: text,
+          }),
+        });
     menuoptions[key] = item;
   });
 
@@ -83,10 +83,13 @@ function listItems(settingsList, settingsOptions, changeSetting) {
       child: $text,
     });
     const $tmp = tag(setting.type || 'div', {
-      className: 'list-item',
+      className: 'list-item' + (setting.sake ? ' sake' : ''),
       children: [
         tag('i', {
           className: `icon ${setting.icon || 'no-icon'}`,
+          style: {
+            color: setting.color || '',
+          }
         }),
         $container,
       ],

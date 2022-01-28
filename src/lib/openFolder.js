@@ -82,7 +82,7 @@ function openFolder(_path, opts = {}) {
     $root.$ul.oncontextmenu =
     $root.$title.onclick =
     $root.$title.oncontextmenu =
-      handleItems;
+    handleItems;
 
   addedFolder.push({
     url: _path,
@@ -329,9 +329,9 @@ function openFolder(_path, opts = {}) {
         srcType = $src.data_type;
         src = $src.isConnected
           ? (helpers.isFile(srcType)
-              ? $src.parentElement
-              : $src.parentElement.parentElement
-            ).previousElementSibling.getAttribute('state')
+            ? $src.parentElement
+            : $src.parentElement.parentElement
+          ).previousElementSibling.getAttribute('state')
           : 'uncollapsed';
         srcName = $src.data_name;
 
@@ -344,6 +344,7 @@ function openFolder(_path, opts = {}) {
           let newUrl;
           if (clipBoard.action === 'cut') newUrl = await fs.moveTo(url);
           else newUrl = await fs.copyTo(url);
+          const newName = (await fsOperation(newUrl).stats()).name;
           /**
            * CASES:
            * CASE 111: src is file and parent is collapsed where target is also collapsed
@@ -361,7 +362,7 @@ function openFolder(_path, opts = {}) {
 
             if (helpers.isFile(srcType)) {
               const file = editorManager.getFile(clipBoard.url, 'uri');
-              file.uri = newUrl;
+              if (file) file.uri = newUrl;
             } else if (helpers.isDir(srcType)) {
               helpers.updateUriOfAllActiveFiles(clipBoard.url, newUrl);
             }
@@ -372,7 +373,7 @@ function openFolder(_path, opts = {}) {
                 break;
 
               case '110':
-                appendTile($target, createFileTile(srcName, newUrl));
+                appendTile($target, createFileTile(newName, newUrl));
                 break;
 
               case '101':
@@ -380,7 +381,7 @@ function openFolder(_path, opts = {}) {
                 break;
 
               case '100':
-                appendTile($target, createFileTile(srcName, newUrl));
+                appendTile($target, createFileTile(newName, newUrl));
                 $src.remove();
                 break;
 
@@ -389,11 +390,11 @@ function openFolder(_path, opts = {}) {
                 break;
 
               case '010':
-                appendList($target, createFolderTile(srcName, newUrl));
+                appendList($target, createFolderTile(newName, newUrl));
                 break;
 
               case '000':
-                appendList($target, createFolderTile(srcName, newUrl));
+                appendList($target, createFolderTile(newName, newUrl));
                 $src.parentElement.remove();
                 break;
 
@@ -412,12 +413,12 @@ function openFolder(_path, opts = {}) {
 
               case '110':
               case '100':
-                appendTile($target, createFileTile(srcName, newUrl));
+                appendTile($target, createFileTile(newName, newUrl));
                 break;
 
               case '010':
               case '000':
-                appendList($target, createFolderTile(srcName, newUrl));
+                appendList($target, createFolderTile(newName, newUrl));
                 break;
 
               default:
@@ -490,7 +491,7 @@ function openFolder(_path, opts = {}) {
 
           try {
             await fs.createFile(name);
-          } catch (error) {}
+          } catch (error) { }
 
           fs = fsOperation(fileUrl);
           await fs.writeFile(data);
@@ -608,12 +609,10 @@ openFolder.updateHeight = function () {
 
   let totalFolder = addedFolder.length - 1;
   for (let folder of addedFolder) {
-    folder.$node.style.maxHeight = `calc(100% - ${
-      totalFolder * 30 + activeFileListHeight
-    }px)`;
-    folder.$node.style.height = `calc(100% - ${
-      totalFolder * 30 + activeFileListHeight
-    }px)`;
+    folder.$node.style.maxHeight = `calc(100% - ${totalFolder * 30 + activeFileListHeight
+      }px)`;
+    folder.$node.style.height = `calc(100% - ${totalFolder * 30 + activeFileListHeight
+      }px)`;
   }
 };
 

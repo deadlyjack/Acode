@@ -428,6 +428,7 @@ class SFTP {
   async stats(filename) {
     filename = this.#safeName(filename);
     const file = await this.ls(filename, true);
+    if (!file) return null;
 
     return {
       name: file.name,

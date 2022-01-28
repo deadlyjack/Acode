@@ -79,7 +79,9 @@ export default function settingsMain() {
       key: 'donate',
       text: strings.support,
       icon: 'favorite',
-    },{
+      color: 'orangered',
+      sake: true
+    }, {
       key: 'rateapp',
       text: strings['rate acode'],
       icon: 'googleplay'

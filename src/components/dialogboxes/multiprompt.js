@@ -2,18 +2,25 @@ import tag from 'html-tag-js';
 import autosize from 'autosize';
 import inputhints from '../inputhints';
 import Checkbox from '../checkbox';
+import alert from './alert';
 
 /**
  *
  * @param {string} message
  * @param {Array<Input|Array<Input>>} inputs
+ * @param {String} help
  * @returns {Promise<Strings>}
  */
-function multiPrompt(message, inputs) {
+function multiPrompt(message, inputs, help) {
   return new Promise((resolve, reject) => {
-    const $title = tag('span', {
+    const $title = tag('div', {
       className: 'title',
-      textContent: message,
+      child: tag('span', {
+        textContent: message
+      }),
+      style: {
+        justifyContent: 'space-between',
+      }
     });
     const $body = tag('div', {
       className: 'message scroll',
@@ -75,6 +82,20 @@ function multiPrompt(message, inputs) {
         }),
       ],
     });
+
+    if (/^https?:/.test(help)) {
+      $title.append(tag('a', {
+        href: help,
+        className: 'icon help',
+      }));
+    } else {
+      $title.append(tag('span', {
+        className: 'icon help',
+        onclick: () => {
+          alert(strings.info, help);
+        }
+      }));
+    }
 
     inputs.map((input) => {
       if (Array.isArray(input)) createGroup(input);

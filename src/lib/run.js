@@ -78,6 +78,8 @@ async function run(
       const { url } = folder;
       const fs = fsOperation(Url.join(url, 'index.html'));
 
+      console.log('stats', fs.stats());
+
       try {
         if (await fs.exists()) {
           filename = 'index.html';
@@ -164,9 +166,9 @@ async function run(
 
     switch (reqPath) {
       case CONSOLE_SCRIPT:
-        if(isConsole || appSettings.value.console === 'legacy'){
+        if (isConsole || appSettings.value.console === 'legacy') {
           url = `${ASSETS_DIRECTORY}/js/build/console.build.js`;
-        }else{
+        } else {
           url = `${DATA_STORAGE}/eruda.js`;
         }
         sendFileContent(url, reqId, 'application/javascript');

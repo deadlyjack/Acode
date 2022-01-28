@@ -80,9 +80,7 @@ public class System extends CordovaPlugin {
       case "add-shortcut":
       case "remove-shortcut":
       case "pin-shortcut":
-      case "manage-all-files":
       case "get-android-version":
-      case "is-external-storage-manager":
       case "request-permissions":
       case "request-permission":
       case "has-permission":
@@ -143,17 +141,12 @@ public class System extends CordovaPlugin {
               case "pin-shortcut":
                 pinShortcut(arg1);
                 break;
-              case "manage-all-files":
-                askToManageAllFiles();
-                break;
               case "get-android-version":
                 getAndroidVersion();
                 break;
-              case "is-external-storage-manager":
-                isExternalStorageManager();
-                break;
               case "request-permissions":
                 requestPermissions(getJSONArray(args, 0));
+                break;
               case "request-permission":
                 requestPermission(arg1);
                 break;
@@ -274,31 +267,6 @@ public class System extends CordovaPlugin {
 
     String[] res = new String[list.size()];
     return list.toArray(res);
-  }
-
-  private void askToManageAllFiles() {
-    if (Build.VERSION.SDK_INT >= 30) {
-      try {
-        Intent intent = new Intent();
-        intent.setAction("android.settings.MANAGE_ALL_FILES_ACCESS_PERMISSION");
-        activity.startActivity(intent);
-        callback.success();
-      } catch (Exception e) {
-        callback.error(e.toString());
-      }
-      return;
-    }
-
-    callback.error("Not supported");
-  }
-
-  private void isExternalStorageManager() {
-    boolean res = false;
-    if (Build.VERSION.SDK_INT >= 30) {
-      res = Environment.isExternalStorageManager();
-    }
-
-    callback.success(res ? 1 : 0);
   }
 
   private void getAndroidVersion() {

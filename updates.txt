@@ -1,4 +1,9 @@
-version 1.4.168
+version 1.5.1
+☞ Added ability to refresh in in-app-browser.
+☞ Url is now visible in the in-app browser.
+☞ Fixed other minor bugs.
+
+version 1.5.0
 ☞ Added new in app browser.
 ☞ Added all console methods like time, timeEnd, info, etc.
 ☞ New Punjabi Translation by NiceSapien.

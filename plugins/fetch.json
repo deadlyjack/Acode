@@ -71,10 +71,10 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-sdcard": {
+  "cordova-plugin-iap": {
     "source": {
       "type": "local",
-      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-sdcard"
+      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-iap"
     },
     "is_top_level": true,
     "variables": {}
@@ -87,10 +87,10 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-iap": {
+  "cordova-plugin-sdcard": {
     "source": {
-      "type": "local",
-      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-iap"
+      "type": "registry",
+      "id": "cordova-plugin-sdcard"
     },
     "is_top_level": true,
     "variables": {}

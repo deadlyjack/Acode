@@ -20,11 +20,9 @@
 
     <script>
       var color = localStorage.getItem('__primary_color');
-      var __bg_color = '#313131';
+      var __bg_color = '#20202c';
       if (color) {
         __bg_color = color;
-      } else if (document.title == 'com.foxdebug.acode') {
-        __bg_color = '#20202c';
       }
 
       document.querySelector(':root').style.cssText =

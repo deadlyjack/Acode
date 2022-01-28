@@ -8,9 +8,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.text.TextUtils.TruncateAt;
 import android.util.Base64;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
@@ -22,7 +24,9 @@ import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.foxdebug.system.Base64Icons;
 
 public class BrowserDialog extends Dialog {
@@ -38,6 +42,8 @@ public class BrowserDialog extends Dialog {
   String themeType = "light";
   int backgroundColor = 0xFF000000;
   int textColor = 0xFFFFFFFF;
+  Bitmap browserIcon;
+  TextView urlText;
 
   public BrowserDialog(Context context, int theme) {
     super(context, theme);
@@ -54,8 +60,10 @@ public class BrowserDialog extends Dialog {
     }
 
     if (webView.canGoBack()) {
+      icon.setImageBitmap(browserIcon);
       webView.goBack();
       url = webView.getOriginalUrl();
+      urlText.setText(url);
     } else {
       dismiss();
     }
@@ -64,6 +72,26 @@ public class BrowserDialog extends Dialog {
   public void init() {
     this.requestWindowFeature(Window.FEATURE_NO_TITLE);
     this.setCancelable(true);
+
+    browserIcon =
+      convertBase64ToBitmap(
+        themeType.equals("light")
+          ? Base64Icons.BROWSER_DARK
+          : Base64Icons.BROWSER
+      );
+
+    SwipeRefreshLayout swipeRefreshLayout = new SwipeRefreshLayout(context);
+    swipeRefreshLayout.setLayoutParams(
+      new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+    );
+    swipeRefreshLayout.setOnRefreshListener(
+      new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+          webView.reload();
+        }
+      }
+    );
 
     //main
     LinearLayout main = new LinearLayout(context);
@@ -74,7 +102,7 @@ public class BrowserDialog extends Dialog {
     title.setOrientation(LinearLayout.HORIZONTAL);
     title.setBackgroundColor(backgroundColor);
     title.setLayoutParams(
-      new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 120)
+      new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 120)
     );
     title.setHorizontalGravity(Gravity.LEFT);
     title.setVerticalGravity(Gravity.TOP);
@@ -83,20 +111,27 @@ public class BrowserDialog extends Dialog {
     icon = new ImageView(context);
     icon.setLayoutParams(new LinearLayout.LayoutParams(120, 120, 0));
     icon.setPadding(30, 30, 30, 30);
+    icon.setImageBitmap(browserIcon);
 
-    //title text
-    titleText = new TextView(context);
-    titleText.setText("Browser");
-    titleText.setTextColor(textColor);
-    titleText.setTextSize(12);
-    titleText.setGravity(Gravity.CENTER_VERTICAL);
-    titleText.setLayoutParams(
+    //title heading
+    LinearLayout titleHeading = new LinearLayout(context);
+    titleHeading.setOrientation(LinearLayout.VERTICAL);
+    titleHeading.setLayoutParams(
       new LinearLayout.LayoutParams(
         LayoutParams.FILL_PARENT,
         LayoutParams.MATCH_PARENT,
         1
       )
     );
+
+    //title text
+    titleText = createTextView("Browser", 14);
+
+    //url text
+    urlText = createTextView("", 10);
+
+    titleHeading.addView(titleText);
+    if (showButtons) titleHeading.addView(urlText);
 
     //toggle console icon
     ImageButton toggleConsoleButton = createIcon(
@@ -158,7 +193,7 @@ public class BrowserDialog extends Dialog {
     );
 
     title.addView(icon);
-    title.addView(titleText);
+    title.addView(titleHeading);
     if (showButtons) {
       title.addView(toggleDesktopModeButton);
       title.addView(openInBrowserButton);
@@ -193,7 +228,20 @@ public class BrowserDialog extends Dialog {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
           setUrl(url);
+          icon.setImageBitmap(browserIcon);
           return false;
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+          super.onPageStarted(view, url, favicon);
+          swipeRefreshLayout.setRefreshing(true);
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+          super.onPageFinished(view, url);
+          swipeRefreshLayout.setRefreshing(false);
         }
 
         @Override
@@ -234,9 +282,29 @@ public class BrowserDialog extends Dialog {
     settings.setAllowContentAccess(true);
     settings.setDisplayZoomControls(false);
 
+    swipeRefreshLayout.addView(webView);
     main.addView(title);
-    main.addView(webView);
+    main.addView(swipeRefreshLayout);
     setContentView(main);
+  }
+
+  private TextView createTextView(String text, int fontSize) {
+    TextView textView = new TextView(context);
+    textView.setEllipsize(TruncateAt.END);
+    textView.setSingleLine(true);
+    textView.setHorizontallyScrolling(true);
+    textView.setText(text);
+    textView.setTextColor(textColor);
+    textView.setTextSize(fontSize);
+    textView.setGravity(Gravity.CENTER_VERTICAL);
+    textView.setLayoutParams(
+      new LinearLayout.LayoutParams(
+        LayoutParams.FILL_PARENT,
+        LayoutParams.MATCH_PARENT,
+        1
+      )
+    );
+    return textView;
   }
 
   public void setTheme(int bgColor, String type) {
@@ -320,6 +388,7 @@ public class BrowserDialog extends Dialog {
 
   public void setUrl(String url) {
     this.url = url;
+    urlText.setText(url);
     webView.loadUrl(url);
   }
 
@@ -341,7 +410,6 @@ public class BrowserDialog extends Dialog {
   }
 
   private ImageButton createIcon(String icon, String contentDescription) {
-    byte[] decodedIcon = Base64.decode(icon, Base64.DEFAULT);
     ImageButton button = new ImageButton(context);
     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
       100,
@@ -351,15 +419,23 @@ public class BrowserDialog extends Dialog {
     params.gravity = Gravity.CENTER_VERTICAL;
     params.setMargins(0, 0, 10, 0);
     button.setBackgroundDrawable(null);
-    button.setImageBitmap(
-      BitmapFactory.decodeByteArray(decodedIcon, 0, decodedIcon.length)
-    );
+    button.setImageBitmap(convertBase64ToBitmap(icon));
     button.setContentDescription(contentDescription);
     button.setLayoutParams(params);
     button.setMaxHeight(24);
     button.setMaxWidth(24);
     button.setAdjustViewBounds(true);
     return button;
+  }
+
+  private Bitmap convertBase64ToBitmap(String icon) {
+    byte[] decodedIcon = Base64.decode(icon, Base64.DEFAULT);
+    Bitmap bitmap = BitmapFactory.decodeByteArray(
+      decodedIcon,
+      0,
+      decodedIcon.length
+    );
+    return bitmap;
   }
 
   private void setActive(View view, boolean active) {

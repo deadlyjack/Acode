@@ -793,6 +793,25 @@ textarea {
   }
 }
 
+.sake{
+  animation: sake 3s ease-out infinite;
+}
+
+@keyframes sake {
+  90%{
+    transform: translate3d(0, 0, 0);
+  }
+  93%{
+    transform: translate3d(-10px, 0, 0);
+  }
+  97%{
+    transform: translate3d(10px, 0, 0);
+  }
+  100%{
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @keyframes move-around {
   0% {
     transform: scaleX(1) translate3d(-100px, 0, 0);

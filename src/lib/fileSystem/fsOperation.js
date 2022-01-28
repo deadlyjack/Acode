@@ -264,6 +264,8 @@ function fsOperation(uri) {
         return fs.copy(url, dest);
       },
       moveTo(dest) {
+        const src = Url.dirname(url);
+        if (Url.areSame(src, dest)) return Promise.resolve(url);
         return fs.move(url, dest);
       },
       renameTo(newname) {

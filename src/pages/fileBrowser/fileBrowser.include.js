@@ -187,11 +187,11 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
           () => { },
           () => { },
         );
-        __sftpTaskQueue.length = 0;
-        __sftpBusy = false;
         toast(strings.success);
         return;
       }
+
+      checkAndSetNotification();
     };
 
     $addMenu.onclick = function (e) {
@@ -207,6 +207,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
           break;
 
         case 'add-path':
+          localStorage.__fbAddPath = true;
           addStorage();
           break;
 
@@ -228,6 +229,8 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
         default:
           break;
       }
+
+      checkAndSetNotification();
     };
 
     $search.onclick = function () {
@@ -546,24 +549,49 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       handleClick(e, true);
     }
 
+    function checkAndSetNotification() {
+      const addButtonNotice = !localStorage.__fbAddPath || !localStorage.__fbAddSftp;
+
+      if (addButtonNotice) {
+        $addMenuToggler.classList.add('notice');
+      } else {
+        $addMenuToggler.classList.remove('notice');
+      }
+    }
+
     async function listAllStorages() {
+      let hasInternalStorage = true;
       if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
       allStorages.length = 0;
 
-      if (ANDROID_SDK_INT <= 29) {
-        const dirList = await fsOperation(cordova.file.externalRootDirectory)
-          .lsDir()
-          .catch(err => { console.log(err) });
-        if (dirList.length) {
-          util.pushFolder(
-            allStorages,
-            'Internal storage',
-            cordova.file.externalRootDirectory,
-            {
-              uuid: 'internal-storage',
-            },
-          );
+      if (ANDROID_SDK_INT == 29) {
+        const rootDirName = cordova.file.externalRootDirectory;
+        const testDirName = 'Acode_Test_file' + helpers.uuid();
+        const testDirFs = fsOperation(Url.join(rootDirName, testDirName));
+
+        try {
+          await fsOperation(rootDirName).createDirectory(testDirName);
+          await testDirFs.createFile('test' + helpers.uuid());
+
+          hasInternalStorage = !!(await testDirFs.lsDir()).length;
+        } catch (error) {
+          console.error(error);
+        } finally {
+          testDirFs.deleteDir();
         }
+      } else if (ANDROID_SDK_INT > 29) {
+        hasInternalStorage = false;
+      }
+
+      if (hasInternalStorage) {
+        util.pushFolder(
+          allStorages,
+          'Internal storage',
+          cordova.file.externalRootDirectory,
+          {
+            uuid: 'internal-storage',
+          },
+        );
       }
 
       try {
@@ -997,13 +1025,8 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       $list.focus();
 
       //Adding notification to icon to let user know about new feature
-      if (currentDir.url === '/') {
-        const addButtonNotice =
-          !localStorage.__fbAddPath || !localStorage.__fbAddSftp;
-
-        if (addButtonNotice) {
-          $addMenuToggler.classList.add('notice');
-        }
+      if (dir.url === '/') {
+        checkAndSetNotification();
       } else {
         $menuToggler.classList.remove('notice');
         $addMenuToggler.classList.remove('notice');
@@ -1030,8 +1053,6 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
      * Adds a new storage and refresh location
      */
     function addStorage() {
-      localStorage.__fbAddPath = true;
-      $addMenuToggler.classList.remove('notice');
       util
         .addPath()
         .then((res) => {

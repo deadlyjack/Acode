@@ -54,7 +54,7 @@ export default {
               );
             },
           },
-        ])
+        ], 'https://acode.foxdebug.com/faqs/224761680')
         .then((values) => {
           const { name, uri } = values;
           resolve({

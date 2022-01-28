@@ -27,6 +27,20 @@ export default {
       return this.pathname(url).split('/').pop();
     }
   },
+
+  /**
+   * Checks if given urls are same or not
+   * @param  {...String} urls 
+   */
+  areSame(...urls) {
+    let firstUrl = urls[0];
+    if (firstUrl.endsWith('/')) firstUrl = firstUrl.slice(0, -1);
+    return urls.every(url => {
+      if (url.endsWith('/')) url = url.slice(0, -1);
+      return firstUrl === url;
+    });
+  },
+
   /**
    *
    * @param {String} url

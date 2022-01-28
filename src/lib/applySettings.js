@@ -6,15 +6,6 @@ export default {
     //animation
     if (!appSettings.value.animation) app.classList.add('no-animation');
 
-    //apply theme
-    if (
-      /free/.test(BuildInfo.packageName) &&
-      appSettings.value.appTheme === 'dark'
-    ) {
-      appSettings.value.appTheme = 'default';
-      appSettings.update();
-    }
-
     //full-screen
     if (appSettings.value.fullscreen) Acode.exec('enable-fullscreen');
 
