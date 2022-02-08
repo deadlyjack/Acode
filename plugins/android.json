@@ -8,40 +8,40 @@
   },
   "installed_plugins": {
     "cordova-clipboard": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-buildinfo": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-device": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-file": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-ftp": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-iap": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
-    },
-    "cordova-plugin-sftp": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
-    },
-    "cordova-plugin-system": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
-    },
-    "cordova-plugin-vibration": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
-    },
-    "cordova-plugin-webserver": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
-    },
-    "cordova-plugin-whitelist": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-sdcard": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-sftp": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-vibration": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-webserver": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-system": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },
   "dependent_plugins": {}

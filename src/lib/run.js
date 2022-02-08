@@ -337,11 +337,17 @@ async function run(
             theme: 'dark'
           });
 
-          eruda._shadowRoot.querySelector('.eruda-entry-btn').style.display = 'none';
+          ${target === 'inapp'
+          ? "eruda._shadowRoot.querySelector('.eruda-entry-btn').style.display = 'none';"
+          : ""}
           
           sessionStorage.setItem('__console_available', true);
           document.addEventListener('showconsole', function () {eruda.show()});
           document.addEventListener('hideconsole', function () {eruda.hide()});
+        }else if(document.querySelector('c-toggler')){
+          ${target === 'inapp'
+          ? "document.querySelector('c-toggler').style.display = 'none';"
+          : ""}
         }
         setTimeout(function(){
           var scripts = document.querySelectorAll('.${uuid}');

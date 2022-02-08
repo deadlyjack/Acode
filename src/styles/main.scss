@@ -359,6 +359,7 @@ a.icon {
   &:focus {
     border: solid 1px rgba(255, 238, 0, 0.5);
     box-sizing: border-box;
+    height: calc(100% - 2px);
   }
 
   &.disabled {
@@ -406,6 +407,13 @@ a.icon {
 footer {
   &.button-container,
   .button-container {
+    overflow-x: auto;
+
+    .section{
+      max-width: 100%;
+      min-width: 100%;
+    }
+
     background-color: #9999ff;
     background-color: var(--primary-color);
     color: white;
@@ -413,6 +421,7 @@ footer {
   }
 }
 
+.section,
 .button-container {
   display: flex;
   min-height: 40px;

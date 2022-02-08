@@ -382,12 +382,13 @@ public class System extends CordovaPlugin {
   }
 
   private void inAppBrowser(String url, String title, boolean showButtons) {
+    //FIX: requestFeature() must be called before adding content
     BrowserDialog browserDialog = new BrowserDialog(
       context,
-      android.R.style.Theme_NoTitleBar
+      themeColor,
+      themeType,
+      showButtons
     );
-    browserDialog.setShowButtons(showButtons);
-    browserDialog.setTheme(themeColor, themeType);
     browserDialog.show(url, title);
   }
 

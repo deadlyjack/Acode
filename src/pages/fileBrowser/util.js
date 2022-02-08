@@ -1,4 +1,6 @@
+import tag from 'html-tag-js';
 import dialogs from '../../components/dialogs';
+import fsOperation from '../../lib/fileSystem/fsOperation';
 import helpers from '../../lib/utils/helpers';
 
 export default {
@@ -29,16 +31,8 @@ export default {
       dialogs
         .multiPrompt(strings['add path'], [
           {
-            id: 'name',
-            placeholder: 'Name',
-            type: 'text',
-            required: true,
-            value: name,
-            autofocus: !name,
-          },
-          {
             id: 'uri',
-            placeholder: 'select path',
+            placeholder: strings['select folder'],
             type: 'text',
             required: true,
             readOnly: true,
@@ -46,6 +40,11 @@ export default {
               sdcard.getStorageAccessPermission(
                 uuid,
                 (res) => {
+                  const $name = tag.get('#name');
+                  if (!$name.value && res) {
+                    const name = window.decodeURIComponent(res).split('/').pop();
+                    $name.value = name ?? '';
+                  }
                   this.value = res;
                 },
                 (err) => {
@@ -53,6 +52,13 @@ export default {
                 },
               );
             },
+          },
+          {
+            id: 'name',
+            placeholder: strings['folder name'],
+            type: 'text',
+            required: true,
+            value: name,
           },
         ], 'https://acode.foxdebug.com/faqs/224761680')
         .then((values) => {

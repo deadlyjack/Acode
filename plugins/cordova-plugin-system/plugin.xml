@@ -41,6 +41,5 @@
     <framework src="commons-io:commons-io:2.11.0" />
     <framework src="androidx.core:core:1.6.0" />
     <framework src="androidx.core:core-google-shortcuts:1.0.0" />
-    <framework src="androidx.swiperefreshlayout:swiperefreshlayout:1.1.0" />
   </platform>
 </plugin>

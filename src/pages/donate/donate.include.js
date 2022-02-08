@@ -8,7 +8,9 @@ import ajax from '@deadlyjack/ajax';
 import helpers from '../../lib/utils/helpers';
 import dialogs from '../../components/dialogs';
 
-export default function DonateInclude(){
+//TODO: fix (-1 means, user is not logged in to any google account)
+
+export default function DonateInclude() {
   const BASE_URL = "https://acode.foxdebug.com/res/";
   const $page = Page(strings.support);
 
@@ -23,18 +25,18 @@ export default function DonateInclude(){
 
   app.append($page);
 
-  iap.setPurchaseUpdatedListener(purchases=> {
-    if(Array.isArray(purchases)){
-      (async function(){
+  iap.setPurchaseUpdatedListener(purchases => {
+    if (Array.isArray(purchases)) {
+      (async function () {
         const promises = [];
-        for(let purchase of purchases){
+        for (let purchase of purchases) {
           promises.push(
-            new Promise((resolve, reject)=>{
-              iap.consume(purchase.purchaseToken, resCode=>{
+            new Promise((resolve, reject) => {
+              iap.consume(purchase.purchaseToken, resCode => {
                 purchase.consumed = resCode === iap.OK ? true : false;
                 purchase.consumeCode = resCode;
                 resolve(purchase);
-              }, err=>{
+              }, err => {
                 reject(err);
               });
             })
@@ -42,14 +44,14 @@ export default function DonateInclude(){
         }
 
         const settledPromises = await Promise.allSettled(promises);
-        const rejectedPromise = settledPromises.find(promise=>promise.status === 'rejected');
+        const rejectedPromise = settledPromises.find(promise => promise.status === 'rejected');
         let msg = "";
-        if(rejectedPromise){
+        if (rejectedPromise) {
           msg = "Something went wrong.\n";
           msg += `Error: ${rejectedPromise.reason}\n`;
           msg += `Code: ${rejectedPromise.value.resCode}`;
-        }else{
-          const blob = await ajax({url: BASE_URL+"6.jpeg", responseType: "blob"}).catch(err=>{
+        } else {
+          const blob = await ajax({ url: BASE_URL + "6.jpeg", responseType: "blob" }).catch(err => {
             helpers.error(err);
           });
           const url = URL.createObjectURL(blob);
@@ -60,23 +62,23 @@ export default function DonateInclude(){
         dialogs.alert(strings.info.toUpperCase(), msg);
       })();
     }
-  }, err=>{
-    if(err !== iap.USER_CANCELED) dialogs.alert(strings.error.toUpperCase(), err);
+  }, err => {
+    if (err !== iap.USER_CANCELED) dialogs.alert(strings.error.toUpperCase(), err);
   });
 
   app.onclick = function (e) {
     const $target = e.target;
-    if(!($target instanceof HTMLElement)) return;
+    if (!($target instanceof HTMLElement)) return;
     const action = $target.getAttribute('action');
     let value;
 
     switch (action) {
       case 'donate':
         value = $target.getAttribute('value');
-        iap.purchase(value, purchase=>{
+        iap.purchase(value, purchase => {
           console.log(purchase);
-        }, err=>{
-          if(err !== iap.USER_CANCELED) dialogs.alert(strings.error.toUpperCase(), err);
+        }, err => {
+          if (err !== iap.USER_CANCELED) dialogs.alert(strings.error.toUpperCase(), err);
         });
         break;
       default:
@@ -86,33 +88,33 @@ export default function DonateInclude(){
 
   helpers.showTitleLoader();
 
-  (async function render(){
+  (async function render() {
 
-    let products = await new Promise((resolve, reject)=>{
-      iap.getProducts(constants.SKULIST, products=>{
+    let products = await new Promise((resolve, reject) => {
+      iap.getProducts(constants.SKULIST, products => {
         resolve(products);
-      }, err=>{
+      }, err => {
         reject(err);
       });
     });
 
-    products = products.sort((a, b)=>{
+    products = products.sort((a, b) => {
       const aPrice = parseFloat(a.price.replace(/[^0-9.]/g, ''));
       const bPrice = parseFloat(b.price.replace(/[^0-9.]/g, ''));
       return aPrice - bPrice;
     });
 
-    products = products.map(product=> {
-      product.image = `${BASE_URL}${(product.productId === 'bronze' ? '1.jpeg': '2.jpeg')}`;
+    products = products.map(product => {
+      product.image = `${BASE_URL}${(product.productId === 'bronze' ? '1.jpeg' : '2.jpeg')}`;
       product.donate = strings.donate.replace('{amount}', product.price);
       return product;
     });
 
     const col1 = [];
     const col2 = [];
-    products.forEach((product, i)=>{
+    products.forEach((product, i) => {
       const html = mustache.render(productHBS, product)
-      if(i%2 === 0){
+      if (i % 2 === 0) {
         col1.push(html);
         return;
       }
@@ -125,11 +127,11 @@ export default function DonateInclude(){
     });
 
   })()
-  .catch(error=>{
-    actionStack.pop();
-    helpers.error(error);
-  })
-  .finally(()=>{
-    helpers.removeTitleLoader();
-  });
+    .catch(error => {
+      actionStack.pop();
+      helpers.error(error);
+    })
+    .finally(() => {
+      helpers.removeTitleLoader();
+    });
 }

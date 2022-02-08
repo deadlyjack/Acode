@@ -1,10 +1,19 @@
+version 1.5.2
+☞ Fixed in-app browser force closing on android 6.0.
+☞ Console toggler visible when preview mode set to browser.
+☞ Removed swipe to refresh due to issue in scrolling of nested elements in HTML.
+☞ Updated in-app browser UI, fixed UI bug in older Android.
+☞ Users can edit URLs in the in-app browser.
+☞ New symbols keys in the quick toolbar.
+☞ Minor bug fixes.
+
 version 1.5.1
 ☞ Added ability to refresh in in-app-browser.
 ☞ Url is now visible in the in-app browser.
 ☞ Fixed other minor bugs.
 
 version 1.5.0
-☞ Added new in app browser.
+☞ Added new in-app browser.
 ☞ Added all console methods like time, timeEnd, info, etc.
 ☞ New Punjabi Translation by NiceSapien.
 ☞ Added Eruda console. Select from other settings.
@@ -19,9 +28,9 @@ version 1.4.164
 
 version 1.4.163
 ☞ Fixed bug in opening file from GitHub.
-☞ Fixed app not opening other language.
-☞ Fixed unable to rename file form edit menu.
-☞ Other minor bugs fixes.
+☞ Fixed app not opening another language.
+☞ Fixed unable to rename the file from the edit menu.
+☞ Other minor bug fixes.
 
 version 1.4.162
 ☞ Bugs fixes.
@@ -74,11 +83,11 @@ version 1.1.15.140
 ☞ Minor bug fixes.
 
 version 1.1.14.137
-☞ Added option to disable console.
+☞ Added option to disable the console.
 ☞ Added option disable confirmation on exit the app.
 ☞ Fixed unable to preview HTML or Js file.
 ☞ Fixed unable to open gist files.
-☞ Fixed Esc key not working in editor.
+☞ Fixed Esc key not working in the editor.
 ☞ Other minor bug fixes.
 
 version 1.1.14.134
@@ -92,20 +101,20 @@ version 1.1.14.132
 ☞ Close all tab (Ctrl-Shift-Q)
 ☞ Scrollbar now works with mouse
 ☞ Added option to disable teardrop (cursor controller)
-☞ Added Belarusian language
-☞ Fixed scrollbar behaviour
+☞ Added the Belarusian language
+☞ Fixed scrollbar behavior
 ☞ GUI improvement
 ☞ Performance improvement
 ☞ Small bugs fix
 
 version 1.1.14.131
-☞ Fixed scrollbar behaviour
+☞ Fixed scrollbar behavior
 ☞ GUI improvement
 ☞ Performance improvement
 ☞ Small bugs fix
 
 version 1.1.14.129
-☞ Added Vietnamese language
+☞ Added the Vietnamese language
 ☞ Added scrollbar
 ☞ Small bugs fix
 
@@ -115,8 +124,8 @@ version 1.1.14.127
 
 version 1.1.14.126
 ☞ Fixed laggy sidebar
-☞ Added option for disabling print margin
-☞ Fixed editor not working properly after renaming file.
+☞ Added option for disabling the print margin
+☞ Fixed editor not working properly after renaming a file.
 
 version 1.1.14.125
 ☞ Bugs fixes
@@ -128,7 +137,7 @@ version 1.1.14.125
 version 1.1.14.115
 ☞ Bugs fixes
 ☞ Option to disable floating button
-☞ Remembers state of quicktools
+☞ Remembers state of quick tools
 
 version 1.1.14.111
 ☞ Bugs fixes
@@ -138,20 +147,20 @@ version 1.1.14.111
 ☞ Smaller APK size
 
 version 0.1.14.110
-☞ Backup and restore settings, key bindings and ftp accounts
+☞ Backup and restore settings, key bindings and FTP accounts
 ☞ Fixed file showing unsaved even file has no changes
-☞ Exit full screen mode using notification
+☞ Exit full-screen mode using notification
 ☞ Bugs fixes
 
 version 0.1.13.108
 ☞ Added Bangla language
-☞ Fixed file not saving to external file
+☞ Fixed file not saving to an external file
 ☞ Bugs fixes
 
 version 0.1.13.107
-SFTP, JavaScript smart completion and GIT implementation will take more time than expected
-☞ Added french language
-☞ Toggling full screen form settings will save full screen state
+SFTP, JavaScript smart completion, and GIT implementation will take more time than expected
+☞ Added the French language
+☞ Toggling full-screen form settings will save full-screen state
 ☞ Option to toggle quick tools is moved to settings
 ☞ Long tap will enable context menu if no text is selected
 ☞ Fixed GitHub preview
@@ -163,12 +172,12 @@ version 0.1.12.105
 ☞ Other minor bugs fixes
 
 version 0.1.12.104
-☞ Now you can browse FTP and open specific directory using file browser
-☞ Toggle full screen mode (F11)
+☞ Now you can browse FTP and open a specific directory using the file browser
+☞ Toggle full-screen mode (F11)
 ☞ Toggle main menu (F3)
 ☞ Toggle edit menu (F4)
 ☞ Toggle sidebar (Ctrl-B)
-☞ Improved accessibility using physical keyboard
+☞ Improved accessibility using a physical keyboard
 ☞ Option disable vibration
 ☞ Bugs fixes
 
@@ -177,23 +186,23 @@ version 0.1.11.103
 ☞ Bugs fixes
 
 version 0.1.10.100
-☞ Added Turkish language by ibrahim
-☞ Added Spanish language by DouZerr
+☞ Added the Turkish language by Ibrahim
+☞ Added the Spanish language by DouZerr
 ☞ New Smali language support
-☞ Show suggestions when app first opens
+☞ Show suggestions when the app first opens
 ☞ Bugs fixes
 
 version 0.0.9.98
-☞ Added new app themes (atticus, bump, bling, moon, ocean, tomyris)
+☞ Added new app themes (Atticus, bump, bling, moon, ocean, tomyris)
 ☞ Added O'zbekcha language support (Thanks to TILON)
 ☞ Removed PHP support
-☞ Create and run Vue, Angular, AngularJS and React projects
+☞ Create and run Vue, Angular, AngularJS, and React projects
 ☞ Now edit remote files using FTP
 ☞ Open folder by tapping on sidenav if empty
-☞ Shows error message if editor is unable to open
+☞ Shows error message if the editor is unable to open
 ☞ Minor UI improvement
 ☞ Performance improvement
-☞ Fixed bug (deleting character from backwards)
+☞ Fixed bug (a deleting character from backward)
 ☞ Bugs fixes
 
 version 0.0.9.92
@@ -206,7 +215,7 @@ version 0.0.9.90
 ☞ Disabled text context-menu (unrecoverable bug)
 ☞ Added Fira code font
 ☞ Updated Ace editor to 1.4.8
-☞ You can now see Promise result in console
+☞ You can now see the Promise result in the console
 ☞ Soft keyboard backspace issue solved
 ☞ Disabled native cursor controller
 ☞ Bugs fix
@@ -218,7 +227,7 @@ version 0.0.8.89
 ☞ Bugs fix
 
 version 0.0.8.88
-☞ Fix cannot edit file opened from termux
+☞ Fixed, cannot edit file opened from termux
 ☞ Bugs fix
 
 version 0.0.8.87
@@ -227,8 +236,8 @@ version 0.0.8.87
 version 0.0.8.86
 ☞ Added Japanese language (thanks to wappo56)
 ☞ Reorder tabs by dragging themes
-☞ Improved UI for sidenav
-☞ Keyboard shortcut works even if editor is not focused
+☞ Improved UI for side nav
+☞ Keyboard shortcut works even if the editor is not focused
 ☞ Improved JS console
 ☞ Hide quick tools
 
@@ -249,21 +258,21 @@ version 0.0.8.82
 ☞ Fixed files not loading when previewing git Project
 
 version 0.0.8.81
-☞ Project is now open source - https://github.com/deadlyjack/code-editor
+☞ The project is now open-source - https://github.com/deadlyjack/acode
 ☞ Fixed tab and arrow keys (quick tool) not working
-☞ Fixed issue with linking css and js file
+☞ Fixed issue with linking CSS and js file
 ☞ Bugs fixes
 
 version 0.0.8.80
 ☞ Select GitHub-branch to edit
-☞ Add new branch to repository
+☞ Add a new branch to the repository
 ☞ Edit keybindings
 ☞ Bugs fixes
 
 version 0.0.7.78
 ☞ Select syntax highlighter for specific file
 ☞ Select file encoding
-☞ New file menu (cut, copy, paste and rename)
+☞ New file menu (cut, copy, paste, and rename)
 ☞ Bugs fixes
 
 version 0.0.7.77

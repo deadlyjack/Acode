@@ -5,7 +5,12 @@ import $_row1 from '../../views/footer/row1.hbs';
 import $_row2 from '../../views/footer/row2.hbs';
 import searchSettings from '../../pages/settings/searchSettings';
 
-function actions(action) {
+/**
+ * Performs quick actions
+ * @param {string} action 
+ * @param {string} value 
+ */
+function actions(action, value) {
   const search = mustache.render($_search, strings);
   const $footer = root.get('#quick-tools');
   const editor = editorManager.editor;
@@ -27,6 +32,9 @@ function actions(action) {
     editor.focus();
 
   switch (action) {
+    case 'key':
+      editor.insert(value);
+      break;
     case 'pallete':
       editor.execCommand('openCommandPallete');
       break;
@@ -193,6 +201,14 @@ function actions(action) {
       $footer.append($row1);
     }
 
+    if (localStorage.quickToolRow1ScrollLeft) {
+      $row1.scrollLeft = parseInt(localStorage.quickToolRow1ScrollLeft);
+    }
+
+    if (localStorage.quickToolRow2ScrollLeft) {
+      $row2.scrollLeft = parseInt(localStorage.quickToolRow2ScrollLeft);
+    }
+
     root.setAttribute('quicktools', 'enabled');
     incFooterHeightBy(quickToolsState);
     if (editorManager.activeFile && editorManager.activeFile.isUnsaved) {
@@ -206,6 +222,8 @@ function actions(action) {
     let $row1 = $footer.querySelector('#row1');
     let $row2 = $footer.querySelector('#row2');
     localStorage.quickToolsState = height;
+    localStorage.quickToolRow1ScrollLeft = $row1.scrollLeft;
+    localStorage.quickToolRow2ScrollLeft = $row2.scrollLeft;
     if ($row1) {
       $row1.remove();
       incFooterHeightBy(-1);
@@ -301,11 +319,12 @@ function clickListener(e) {
 
   const el = e.target;
   const action = el.getAttribute('action');
+  const value = el.getAttribute('value');
 
   if (!action) return;
 
   e.preventDefault();
-  actions(action);
+  actions(action, value);
 }
 
 function incFooterHeightBy(factor) {

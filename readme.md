@@ -11,7 +11,7 @@ Note: This project is not organised and it is very hard understand the project s
      height="80">](https://f-droid.org/packages/com.foxdebug.acode/)
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
      alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=com.foxdebug.acode)
+     height="80">](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree)
 
 ## Project structure
 

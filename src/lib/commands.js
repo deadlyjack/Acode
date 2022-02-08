@@ -95,7 +95,7 @@ export default {
 
     let pos = editor.getCursorPosition();
     const tmp = editorManager.onupdate;
-    editorManager.onupdate = () => {};
+    editorManager.onupdate = () => { };
     beautify(file.session);
     editorManager.onupdate = tmp;
     editor.selection.moveCursorToPosition(pos);

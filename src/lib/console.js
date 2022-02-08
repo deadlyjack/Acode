@@ -7,11 +7,11 @@ import loadPolyFill from './utils/polyfill';
 (function () {
   loadPolyFill.apply(window);
 
-  if (window.consoleLoaded) return;
+  let consoleVisible = false;
   const originalConsole = console;
   const $input = tag('textarea', {
     id: '__c-input',
-    onblur(){
+    onblur() {
       setTimeout(() => {
         isFocused = false;
       }, 0);
@@ -20,20 +20,45 @@ import loadPolyFill from './utils/polyfill';
   const $inputContainer = tag('c-input', {
     child: $input
   });
+  const $toggler = tag('c-toggler', {
+    style: {
+      transform: `translate(2px, ${innerHeight / 2}px)`
+    },
+    onclick() {
+      consoleVisible = !consoleVisible;
+      if (consoleVisible) {
+        showConsole();
+      } else {
+        hideConsole();
+      }
+    },
+    ontouchstart() {
+      document.addEventListener('touchmove', touchmove, {
+        passive: false,
+      });
+
+      document.ontouchend = function (e) {
+        document.removeEventListener('touchmove', touchmove, {
+          passive: 'false',
+        });
+        document.ontouchend = null;
+      };
+    }
+  });
   const $console = tag('c-console', {
     child: $inputContainer,
-    onclick(e){
+    onclick(e) {
       const el = e.target;
       const action = el.getAttribute('action');
-  
+
       switch (action) {
         case 'use code':
           const value = el.getAttribute('data-code');
-  
+
           $input.value = value;
           $input.focus();
           break;
-  
+
         default:
           break;
       }
@@ -51,16 +76,24 @@ import loadPolyFill from './utils/polyfill';
     document.head.append($style);
     window.addEventListener('error', onError);
     assignCustomConsole();
-    
+
     if (sessionStorage.getItem('__mode') === 'console') {
       showConsole();
       return;
     }
-    
+
+    tag.get('html').append($toggler);
     $console.setAttribute('title', 'Console');
     sessionStorage.setItem('__console_available', true);
     document.addEventListener('showconsole', showConsole);
     document.addEventListener('hideconsole', hideConsole);
+  }
+
+  function touchmove(e) {
+    e.preventDefault();
+    $toggler.style.transform = 'translate('
+      .concat(e.touches[0].clientX - 20, 'px, ')
+      .concat(e.touches[0].clientY - 20, 'px)');
   }
 
   function assignCustomConsole() {
@@ -81,7 +114,7 @@ import loadPolyFill from './utils/polyfill';
         } else {
           ++counter[hash];
         }
-        log('log', getStack(new Error()),`${hash}: ${counter[hash]}`);
+        log('log', getStack(new Error()), `${hash}: ${counter[hash]}`);
       },
       countReset(hash) {
         delete counter[hash];
@@ -113,7 +146,7 @@ import loadPolyFill from './utils/polyfill';
         log('info', getStack(new Error()), ...args);
       },
       log(msg, ...substituion) {
-        originalConsole.log(msg,...substituion);
+        originalConsole.log(msg, ...substituion);
         log('log', getStack(new Error()), msg, ...substituion);
       },
       table(...args) {
@@ -156,12 +189,12 @@ import loadPolyFill from './utils/polyfill';
     };
   }
 
-  function showConsole(){
+  function showConsole() {
     tag.get('html').append($console);
     $input.addEventListener('keydown', onCodeInput);
   }
 
-  function hideConsole(){
+  function hideConsole() {
     $console.remove();
     $input.removeEventListener('keydown', onCodeInput);
   }
@@ -169,7 +202,7 @@ import loadPolyFill from './utils/polyfill';
   function onCodeInput(e) {
     const key = e.key;
     isFocused = true;
-    if (key === 'Enter') {	
+    if (key === 'Enter') {
       const regex = /[\[|{\(\)\}\]]/g;
       let code = this.value.trim();
       let isOdd = (code.length - code.replace(regex, '').length) % 2;
@@ -182,9 +215,9 @@ import loadPolyFill from './utils/polyfill';
       log('code', {}, code);
       $input.value = '';
       const res = execute(code);
-      if(res.type === 'error'){
+      if (res.type === 'error') {
         log('error', getStack(new Error()), res.value);
-      }else{
+      } else {
         log('log', getStack(new Error()), res.value);
       }
     }
@@ -205,38 +238,38 @@ import loadPolyFill from './utils/polyfill';
       textContent: value ? value.constructor.name : value + ''
     });
 
-    if(value instanceof Object){
-      $toggler.onclick = function(){
+    if (value instanceof Object) {
+      $toggler.onclick = function () {
         if (this.classList.contains('__show-data')) {
           this.classList.remove('__show-data');
           $group.textContent = null;
           return;
         }
-  
+
         this.classList.toggle('__show-data');
-  
+
         const possibleKeys = [];
 
-        for(let key in value){
+        for (let key in value) {
           possibleKeys.push(key);
         }
 
-        possibleKeys.push(...[ 
+        possibleKeys.push(...[
           ...Object.keys(value),
           ...Object.getOwnPropertyNames(value),
           ...Object.keys(value['__proto__'] || {}),
         ])
 
-        if(value['__proto__']) possibleKeys.push('__proto__');
-        if(value['prototype']) possibleKeys.push('prototype');
+        if (value['__proto__']) possibleKeys.push('__proto__');
+        if (value['prototype']) possibleKeys.push('prototype');
 
         [...new Set(possibleKeys)]
-        .forEach(key => $group.append(
-          appendProperties(obj, ...keys, key)
-        ));
+          .forEach(key => $group.append(
+            appendProperties(obj, ...keys, key)
+          ));
       };
       $toggler.textContent = value.constructor.name;
-    }else{
+    } else {
       const $val = getElement(value);
       $val.textContent = (value ?? value + '').toString();
       $group.append($val);
@@ -250,11 +283,11 @@ import loadPolyFill from './utils/polyfill';
     const value = objValue(obj, ...keys);
     const getter = value.__lookupGetter__(key);
     const $key = tag('c-key', {
-      textContent: key + ':',	
+      textContent: key + ':',
     });
     let $val;
 
-    if(getter){
+    if (getter) {
       $val = tag('c-span', {
         style: {
           textDecoration: 'underline',
@@ -262,15 +295,15 @@ import loadPolyFill from './utils/polyfill';
           margin: '0 10px'
         },
         textContent: `...`,
-        onclick(){
+        onclick() {
           const $val = getVal(value[key]);
           this.parentElement.replaceChild($val, this);
         }
       });
-    }else{
+    } else {
       $val = getVal(value[key]);
     }
-    
+
     return tag('c-line', {
       children: [$key, $val],
     });
@@ -290,7 +323,7 @@ import loadPolyFill from './utils/polyfill';
     }
   }
 
-  function objValue(obj, ...keys){
+  function objValue(obj, ...keys) {
     return keys.reduce((acc, key) => acc[key], obj);
   }
 
@@ -362,10 +395,10 @@ import loadPolyFill from './utils/polyfill';
       let parameter = '(';
       params.map(
         (param) =>
-          (parameter +=
-            param.type === 'RestElement'
-              ? '...' + param.argument.name
-              : param.name + ','),
+        (parameter +=
+          param.type === 'RestElement'
+            ? '...' + param.argument.name
+            : param.name + ','),
       );
       parameter = parameter.replace(/,$/, '');
       parameter += ')' + (type === 'arrow' ? '=>' : '') + '{...}';
@@ -383,7 +416,7 @@ import loadPolyFill from './utils/polyfill';
    */
   function log(mode, options, ...args) {
     let location = options.location || 'console';
-    const $messages = tag('c-message',{
+    const $messages = tag('c-message', {
       attr: {
         'log-level': mode
       }
@@ -391,7 +424,7 @@ import loadPolyFill from './utils/polyfill';
 
     args = format(args);
 
-    if(args.length === 1 && args[0] instanceof Error){
+    if (args.length === 1 && args[0] instanceof Error) {
       args.unshift(args[0].message);
     }
 
@@ -399,14 +432,14 @@ import loadPolyFill from './utils/polyfill';
     for (let arg of args) {
       const typeofArg = typeof arg;
       arg = (arg ?? arg + '');
-      
+
       let $msg;
-      if(mode === 'code') {
+      if (mode === 'code') {
         $msg = tag('c-code');
         $msg.textContent = arg.length > 50 ? arg.substring(0, 50) + '...' : arg;
         $msg.setAttribute('data-code', arg);
         $msg.setAttribute('action', 'use code');
-      }else{
+      } else {
         $msg = getElement(typeofArg);
 
         switch (typeofArg) {
@@ -435,7 +468,7 @@ import loadPolyFill from './utils/polyfill';
 
     $console.insertBefore($messages, $inputContainer);
 
-    while ($console.childElementCount > 100){
+    while ($console.childElementCount > 100) {
       $console.firstElementChild.remove();
     }
   }
@@ -461,15 +494,15 @@ import loadPolyFill from './utils/polyfill';
       let value = '';
       const specifier = match.value[0];
       const pos = match.value.index;
-      
-      if(!args.length){
+
+      if (!args.length) {
         value = specifier;
-      }else{
+      } else {
         value = args.splice(0, 1)[0];
         if ([undefined, null].includes(value)) {
           value = value + '';
         }
-  
+
         switch (specifier) {
           case '%c':
             styles.push({
@@ -504,17 +537,17 @@ import loadPolyFill from './utils/polyfill';
       matched = matchRegex(msg);
     }
 
-    if(styles.length){
+    if (styles.length) {
       const toBeStyled = [];
       let remainingMsg = msg;
       styles.reverse().forEach((style, i) => {
         toBeStyled.push(remainingMsg.substring(style.pos));
         remainingMsg = msg.substring(0, style.pos);
-        if(i === styles.length - 1) toBeStyled.push(msg.substring(0, style.pos));
+        if (i === styles.length - 1) toBeStyled.push(msg.substring(0, style.pos));
       });
       msg = toBeStyled.map((str, i) => {
-        if(i === toBeStyled.length - 1) return str;
-        const {value} = styles[i];
+        if (i === toBeStyled.length - 1) return str;
+        const { value } = styles[i];
         return `<c-span style="${value}">${str}</c-span>`;
       }).reverse().join('');
     }
@@ -539,7 +572,7 @@ import loadPolyFill from './utils/polyfill';
    * @param {Error} error 
    * @returns 
    */
-  function getStack(error){
+  function getStack(error) {
     let stack = error.stack.split('\n');
     stack.splice(1, 1);
     let regExecRes = /<(.*)>:(\d+):(\d+)/.exec(stack[1]) || [];
@@ -548,15 +581,15 @@ import loadPolyFill from './utils/polyfill';
     const lineno = regExecRes[2];
     const colno = regExecRes[3];
 
-    if(location && lineno){
+    if (location && lineno) {
       src = escapeHTML(`${location} ${lineno}${colno ? ':' + colno : ''}`);
-    }else{
+    } else {
       const res = /\((.*)\)/.exec(stack[1])
       src = res && res[1] ? res[1] : '';
     }
     const index = src.indexOf(')');
     src = src.split('/').pop().substring(0, index < 0 ? undefined : index);
-    if(src.length > 50) src = '...' + src.substring(src.length - 50);
+    if (src.length > 50) src = '...' + src.substring(src.length - 50);
 
     return {
       location: src,
@@ -603,9 +636,9 @@ import loadPolyFill from './utils/polyfill';
     function exec(code) {
       let res = null;
       try {
-        res = {type: 'result', value: window.eval(code)};
+        res = { type: 'result', value: window.eval(code) };
       } catch (error) {
-        res = {type: 'error', value: error};
+        res = { type: 'error', value: error };
       }
 
       return res;
@@ -630,21 +663,21 @@ import loadPolyFill from './utils/polyfill';
 
   function css() {
     return `c-toggler {
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAE9JREFUOMtjYBh0gBHO+k+cSkYilcPVMpHqpIHRwIgUFERp+I8SekQ5CY8WXH7AqYWJyGglqIERV3QykaYcV7DiSSwsODw8yJIGdTPQIAQAg9gKJl7UINwAAAAASUVORK5CYII=);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 24px;
       position: fixed;
       top: 0;
       left: 0;
-      display: flex;
-      height: 40px;
-      width: 40px;
-      background-color: #99f;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
+      height: 30px;
+      width: 30px;
+      background-color: #fff;
       transform-origin: center;
       border-radius: 50%;
-      color: #fff;
       box-shadow: -2px 2px 8px rgba(0, 0, 0, .4);
-      z-index: 99999
+      z-index: 99999;
+      opacity: 0.5;
   }
   
   c-object{
@@ -825,6 +858,7 @@ import loadPolyFill from './utils/polyfill';
       font-size: 0.9rem;
       width: 100%;
       padding-left: 10px;
+      white-space: break-spaces;
   }
   
   c-text.__c-boolean {

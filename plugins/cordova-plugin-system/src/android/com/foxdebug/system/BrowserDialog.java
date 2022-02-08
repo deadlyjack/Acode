@@ -10,23 +10,29 @@ import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils.TruncateAt;
 import android.util.Base64;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.foxdebug.system.Base64Icons;
 
 public class BrowserDialog extends Dialog {
@@ -38,16 +44,41 @@ public class BrowserDialog extends Dialog {
   boolean desktopMode = false;
   boolean consoleEnabled = false;
   boolean showButtons = true;
-  String url;
+  String url = "";
+  String title = "Browser";
   String themeType = "light";
   int backgroundColor = 0xFF000000;
   int textColor = 0xFFFFFFFF;
   Bitmap browserIcon;
   TextView urlText;
+  int padding = 5;
+  int titleHeight = 45;
+  int titleTextHeight = 35;
+  int fontSize = 5;
+  int imageSize = 35;
 
-  public BrowserDialog(Context context, int theme) {
-    super(context, theme);
+  public BrowserDialog(
+    Context context,
+    int bgColor,
+    String type,
+    boolean showButtons
+  ) {
+    super(context, android.R.style.Theme_NoTitleBar);
     this.context = context;
+    this.showButtons = showButtons;
+
+    this.padding = this.dpToPixels(this.padding);
+    this.titleHeight = this.dpToPixels(this.titleHeight);
+    this.imageSize = this.dpToPixels(this.imageSize);
+    this.titleTextHeight = this.dpToPixels(this.titleTextHeight);
+    this.fontSize = this.dpToPixels(this.fontSize);
+
+    Log.d("BrowserDialog", "fontSize: 5dp = " + this.fontSize + "px");
+
+    this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    this.setCancelable(true);
+    this.setTheme(bgColor, type);
+    this.init();
   }
 
   public void onBackPressed() {
@@ -63,16 +94,12 @@ public class BrowserDialog extends Dialog {
       icon.setImageBitmap(browserIcon);
       webView.goBack();
       url = webView.getOriginalUrl();
-      urlText.setText(url);
     } else {
       dismiss();
     }
   }
 
   public void init() {
-    this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    this.setCancelable(true);
-
     browserIcon =
       convertBase64ToBitmap(
         themeType.equals("light")
@@ -80,58 +107,59 @@ public class BrowserDialog extends Dialog {
           : Base64Icons.BROWSER
       );
 
-    SwipeRefreshLayout swipeRefreshLayout = new SwipeRefreshLayout(context);
-    swipeRefreshLayout.setLayoutParams(
-      new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-    );
-    swipeRefreshLayout.setOnRefreshListener(
-      new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-          webView.reload();
-        }
-      }
-    );
-
     //main
     LinearLayout main = new LinearLayout(context);
     main.setOrientation(LinearLayout.VERTICAL);
+    main.setFocusable(true);
+    main.setFocusableInTouchMode(true);
 
     //title
-    LinearLayout title = new LinearLayout(context);
-    title.setOrientation(LinearLayout.HORIZONTAL);
-    title.setBackgroundColor(backgroundColor);
-    title.setLayoutParams(
-      new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 120)
+    LinearLayout titleLayout = new LinearLayout(context);
+    titleLayout.setOrientation(LinearLayout.HORIZONTAL);
+    titleLayout.setBackgroundColor(backgroundColor);
+    titleLayout.setLayoutParams(
+      new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.titleHeight)
     );
-    title.setHorizontalGravity(Gravity.LEFT);
-    title.setVerticalGravity(Gravity.TOP);
+    titleLayout.setHorizontalGravity(Gravity.LEFT);
+    titleLayout.setVerticalGravity(Gravity.TOP);
+
+    //stack progressbar on top of icon
+    //progress bar
+    ProgressBar progressBar = new ProgressBar(
+      context,
+      null,
+      android.R.attr.progressBarStyle
+    );
+    progressBar.setLayoutParams(
+      new LinearLayout.LayoutParams(this.imageSize, this.imageSize, 0)
+    );
 
     //icon
     icon = new ImageView(context);
-    icon.setLayoutParams(new LinearLayout.LayoutParams(120, 120, 0));
-    icon.setPadding(30, 30, 30, 30);
-    icon.setImageBitmap(browserIcon);
-
-    //title heading
-    LinearLayout titleHeading = new LinearLayout(context);
-    titleHeading.setOrientation(LinearLayout.VERTICAL);
-    titleHeading.setLayoutParams(
-      new LinearLayout.LayoutParams(
-        LayoutParams.FILL_PARENT,
-        LayoutParams.MATCH_PARENT,
-        1
-      )
+    icon.setLayoutParams(
+      new LinearLayout.LayoutParams(this.imageSize, this.imageSize, 0)
     );
+    icon.setPadding(this.padding, this.padding, this.padding, this.padding);
+    icon.setImageBitmap(browserIcon);
+    icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+    //stack progressbar on top of icon
+    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+      LayoutParams.WRAP_CONTENT,
+      LayoutParams.WRAP_CONTENT
+    );
+    FrameLayout frame = new FrameLayout(context);
+    params.gravity = Gravity.CENTER_VERTICAL;
+    frame.setLayoutParams(params);
+    frame.addView(icon);
+    frame.addView(progressBar);
 
     //title text
-    titleText = createTextView("Browser", 14);
-
-    //url text
-    urlText = createTextView("", 10);
-
-    titleHeading.addView(titleText);
-    if (showButtons) titleHeading.addView(urlText);
+    if (showButtons) {
+      titleText = createEditText(title);
+    } else {
+      titleText = createTextView(title);
+    }
 
     //toggle console icon
     ImageButton toggleConsoleButton = createIcon(
@@ -192,15 +220,17 @@ public class BrowserDialog extends Dialog {
       }
     );
 
-    title.addView(icon);
-    title.addView(titleHeading);
+    titleLayout.addView(frame);
+    titleLayout.addView(titleText);
     if (showButtons) {
-      title.addView(toggleDesktopModeButton);
-      title.addView(openInBrowserButton);
+      titleLayout.addView(toggleDesktopModeButton);
+      titleLayout.addView(openInBrowserButton);
     }
 
     //webview
     webView = new WebView(context);
+    webView.setFocusable(true);
+    webView.setFocusableInTouchMode(true);
     webView.setLayoutParams(
       new LinearLayout.LayoutParams(
         LayoutParams.MATCH_PARENT,
@@ -213,7 +243,7 @@ public class BrowserDialog extends Dialog {
         @Override
         public void onReceivedTitle(WebView view, String title) {
           super.onReceivedTitle(view, title);
-          titleText.setText(title);
+          setTitle(title);
         }
 
         @Override
@@ -229,19 +259,23 @@ public class BrowserDialog extends Dialog {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
           setUrl(url);
           icon.setImageBitmap(browserIcon);
+          // show progress bar
+          progressBar.setVisibility(View.VISIBLE);
           return false;
         }
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
           super.onPageStarted(view, url, favicon);
-          swipeRefreshLayout.setRefreshing(true);
+          // show progress bar
+          progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
           super.onPageFinished(view, url);
-          swipeRefreshLayout.setRefreshing(false);
+          // hide progress bar
+          progressBar.setVisibility(View.GONE);
         }
 
         @Override
@@ -253,18 +287,18 @@ public class BrowserDialog extends Dialog {
             new ValueCallback<String>() {
               @Override
               public void onReceiveValue(String value) {
-                title.post(
+                titleLayout.post(
                   new Runnable() {
                     @Override
                     public void run() {
                       if (!value.equals("null")) {
                         if (
                           toggleConsoleButton.getParent() == null
-                        ) title.addView(toggleConsoleButton);
+                        ) titleLayout.addView(toggleConsoleButton);
                         return;
                       }
 
-                      title.removeView(toggleConsoleButton);
+                      titleLayout.removeView(toggleConsoleButton);
                     }
                   }
                 );
@@ -282,32 +316,96 @@ public class BrowserDialog extends Dialog {
     settings.setAllowContentAccess(true);
     settings.setDisplayZoomControls(false);
 
-    swipeRefreshLayout.addView(webView);
-    main.addView(title);
-    main.addView(swipeRefreshLayout);
+    main.addView(titleLayout);
+    main.addView(webView);
     setContentView(main);
   }
 
-  private TextView createTextView(String text, int fontSize) {
+  private TextView createTextView(String text) {
     TextView textView = new TextView(context);
-    textView.setEllipsize(TruncateAt.END);
-    textView.setSingleLine(true);
-    textView.setHorizontallyScrolling(true);
+    setTextViewProperties(textView, this.titleHeight);
     textView.setText(text);
-    textView.setTextColor(textColor);
-    textView.setTextSize(fontSize);
-    textView.setGravity(Gravity.CENTER_VERTICAL);
-    textView.setLayoutParams(
-      new LinearLayout.LayoutParams(
-        LayoutParams.FILL_PARENT,
-        LayoutParams.MATCH_PARENT,
-        1
-      )
-    );
     return textView;
   }
 
-  public void setTheme(int bgColor, String type) {
+  private EditText createEditText(String text) {
+    EditText editText = new EditText(context);
+    GradientDrawable background = new GradientDrawable();
+
+    int radius = this.titleTextHeight / 2;
+    background.setCornerRadius(radius);
+    background.setColor(themeType.equals("light") ? 0x11000000 : 0x11ffffff);
+    editText.setBackground(background);
+
+    setTextViewProperties(editText, this.titleTextHeight);
+    editText.setText(text);
+    editText.setPadding(radius, 0, radius, 0);
+    editText.setTextSize(this.fontSize < 10 ? 10 : this.fontSize);
+    editText.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_URI);
+    editText.setImeOptions(EditorInfo.IME_ACTION_GO);
+
+    editText.setOnFocusChangeListener(
+      new View.OnFocusChangeListener() {
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+          if (hasFocus) {
+            titleText.setText(url);
+          } else {
+            titleText.setText(title);
+          }
+        }
+      }
+    );
+
+    editText.setOnEditorActionListener(
+      new EditText.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(
+          TextView v,
+          int actionId,
+          android.view.KeyEvent event
+        ) {
+          if (
+            actionId == EditorInfo.IME_ACTION_GO ||
+            event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+          ) {
+            String url = v.getText().toString();
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+              title = url;
+              setUrl(url);
+              editText.clearFocus();
+              InputMethodManager imm = (InputMethodManager) getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+              imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+              return true;
+            }
+          }
+          return false;
+        }
+      }
+    );
+
+    return editText;
+  }
+
+  private TextView setTextViewProperties(TextView textView, int height) {
+    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+      LayoutParams.FILL_PARENT,
+      height,
+      1
+    );
+    params.gravity = Gravity.CENTER_VERTICAL;
+    textView.setMaxLines(1);
+    textView.setEllipsize(TruncateAt.END);
+    textView.setSingleLine(true);
+    textView.setHorizontallyScrolling(true);
+    textView.setTextColor(textColor);
+    textView.setLayoutParams(params);
+    textView.setGravity(Gravity.CENTER_VERTICAL);
+    return textView;
+  }
+
+  private void setTheme(int bgColor, String type) {
     try {
       if (type != null) themeType = type;
       textColor = type.equals("light") ? 0xFF000000 : 0xFFFFFFFF;
@@ -367,10 +465,6 @@ public class BrowserDialog extends Dialog {
     }
   }
 
-  public void setShowButtons(boolean show) {
-    showButtons = show;
-  }
-
   private void setDesktopMode(boolean enabled) {
     final WebSettings webSettings = webView.getSettings();
 
@@ -388,11 +482,12 @@ public class BrowserDialog extends Dialog {
 
   public void setUrl(String url) {
     this.url = url;
-    urlText.setText(url);
+    setTitle(url);
     webView.loadUrl(url);
   }
 
   public void setTitle(String title) {
+    this.title = title;
     titleText.setText(title);
   }
 
@@ -403,7 +498,6 @@ public class BrowserDialog extends Dialog {
   }
 
   public void show(String url, String title) {
-    init();
     setUrl(url);
     setTitle(title);
     super.show();
@@ -412,19 +506,17 @@ public class BrowserDialog extends Dialog {
   private ImageButton createIcon(String icon, String contentDescription) {
     ImageButton button = new ImageButton(context);
     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-      100,
-      100,
+      this.imageSize,
+      this.imageSize,
       0
     );
     params.gravity = Gravity.CENTER_VERTICAL;
-    params.setMargins(0, 0, 10, 0);
+    params.setMargins(0, 0, this.dpToPixels(2), 0);
     button.setBackgroundDrawable(null);
     button.setImageBitmap(convertBase64ToBitmap(icon));
     button.setContentDescription(contentDescription);
     button.setLayoutParams(params);
-    button.setMaxHeight(24);
-    button.setMaxWidth(24);
-    button.setAdjustViewBounds(true);
+    button.setScaleType(ImageView.ScaleType.FIT_CENTER);
     return button;
   }
 
@@ -443,10 +535,16 @@ public class BrowserDialog extends Dialog {
     border.setCornerRadius(8);
     border.setColor(0x00FFFFFF); //white background
     border.setStroke(4, 0xFF3399ff); //black border with full opacity
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-      view.setBackgroundDrawable(active ? border : null);
-    } else {
-      view.setBackground(active ? border : null);
-    }
+    view.setBackground(active ? border : null);
+  }
+
+  private int dpToPixels(int dipValue) {
+    int value = (int) TypedValue.applyDimension(
+      TypedValue.COMPLEX_UNIT_DIP,
+      (float) dipValue,
+      this.context.getResources().getDisplayMetrics()
+    );
+
+    return value;
   }
 }

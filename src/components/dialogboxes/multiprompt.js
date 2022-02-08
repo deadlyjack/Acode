@@ -88,7 +88,7 @@ function multiPrompt(message, inputs, help) {
         href: help,
         className: 'icon help',
       }));
-    } else {
+    } else if (typeof help === 'string') {
       $title.append(tag('span', {
         className: 'icon help',
         onclick: () => {
