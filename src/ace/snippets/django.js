@@ -15,6 +15,9 @@ snippet auto\n\
 	${1:FIELDNAME} = models.AutoField(${2})\n\
 snippet bool\n\
 	${1:FIELDNAME} = models.BooleanField(${2:default=True})\n\
+snippet block\n\
+	{% block ${1:container} %}\n\
+	{% endblock %}\n\
 snippet char\n\
 	${1:FIELDNAME} = models.CharField(max_length=${2}${3:, blank=True})\n\
 snippet comma\n\
@@ -33,12 +36,20 @@ snippet filepath\n\
 	${1:FIELDNAME} = models.FilePathField(path=${2:\"/abs/path/to/dir\"}${3:, max_length=100}${4:, match=\"*.ext\"}${5:, recursive=True}${6:, blank=True, })\n\
 snippet float\n\
 	${1:FIELDNAME} = models.FloatField(${2})\n\
+snippet for\n\
+	{% for ${1:obj} in ${2:objs} %}\n\
+	{% endfor %}\n\
+snippet if\n\
+	{% if ${1} %}\n\
+	{% endif %}\n\
 snippet image\n\
 	${1:FIELDNAME} = models.ImageField(upload_to=${2:path/for/upload}${3:, height_field=height, width_field=width}${4:, max_length=100})\n\
 snippet int\n\
 	${1:FIELDNAME} = models.IntegerField(${2})\n\
 snippet ip\n\
 	${1:FIELDNAME} = models.IPAddressField(${2})\n\
+snippet loads\n\
+	{% load ${1:static} %}\n\
 snippet nullbool\n\
 	${1:FIELDNAME} = models.NullBooleanField(${2})\n\
 snippet posint\n\
@@ -49,6 +60,8 @@ snippet slug\n\
 	${1:FIELDNAME} = models.SlugField(max_length=${2:50}${3:, blank=True})\n\
 snippet smallint\n\
 	${1:FIELDNAME} = models.SmallIntegerField(${2})\n\
+snippet tag:static\n\
+	{% ${1:static} '${2}' %}\n\
 snippet text\n\
 	${1:FIELDNAME} = models.TextField(${2:blank=True})\n\
 snippet time\n\
