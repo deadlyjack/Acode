@@ -219,5 +219,9 @@
   "donation message": "Il y a des gens qui ne font pas de don parce qu'ils supposent que tout le mmonde le fait et il y a ceux qui reprennent le flambeau et courent avec.  Merci d'être ce genre de personne et pour votre don aimable et réconfortant.",
   "downloading file": "Téléchargement de {file}",
   "downloading...": "Téléchargement...",
-  "folder name": "Folder name"
+  "folder name": "Folder name",
+  "keyboard mode": "Keyboard mode",
+  "code": "No suggestions",
+  "normal": "Show suggestions",
+  "app settings": "App settings"
 }

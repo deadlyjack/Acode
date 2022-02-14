@@ -1,3 +1,12 @@
+version 1.5.3
+☞ Disable keyboard suggestions in settings.
+☞ Users can now select a file(s) to upload in the in-app browser.
+☞ Fixed bug, user unable to change color data of custom theme.
+☞ Fixed bug, incorrect name of folder when select folder using 'Add path' option.
+☞ Click the website icon to refresh.
+☞ The console will appear when the user previews the code browser from the in-app browser.
+☞ Fixed minor bugs.
+
 version 1.5.2
 ☞ Fixed in-app browser force closing on android 6.0.
 ☞ Console toggler visible when preview mode set to browser.
@@ -16,19 +25,19 @@ version 1.5.0
 ☞ Added new in-app browser.
 ☞ Added all console methods like time, timeEnd, info, etc.
 ☞ New Punjabi Translation by NiceSapien.
-☞ Added Eruda console. Select from other settings.
+☞ Added new Eruda console. Select from other settings.
 
 version 1.4.164
 ☞ Added option to close the file in the menu.
 ☞ Added option to reset remote connections.
 ☞ Performance improvement.
 ☞ Fixed bug in SFTP.
-☞ Fixed bug keybindings not loading.
+☞ Fixed bug, keybindings not loading.
 ☞ UI improvements.
 
 version 1.4.163
 ☞ Fixed bug in opening file from GitHub.
-☞ Fixed app not opening another language.
+☞ Fixed, app not opening another language.
 ☞ Fixed unable to rename the file from the edit menu.
 ☞ Other minor bug fixes.
 
@@ -55,12 +64,12 @@ version 1.3.156
 ☞ Better file recovery.
 ☞ Updated language pack.
 ☞ Performance improvement.
-☞ Fixed a major bug that forces the app to crash.
+☞ Fixed a bug that forces the app to crash.
 ☞ Bugs fixes.
 
 version 1.2.149
 ☞ Fixed unable to open document.
-☞ Fixed app crashing on Android 11.
+☞ Fixed bug, app crashing on Android 11.
 ☞ Updated language pack.
 ☞ Custom theme.
 ☞ Bugs fixes.
@@ -70,7 +79,7 @@ version 1.2.143
 ☞ Now you can preview SVG files.
 ☞ Now you can insert images/files to a project folder.
 ☞ Refactored version semantics.
-☞ Remembers last visited directory.
+☞ Files now remember the last visited directory.
 ☞ Bugs fixes
 
 version 1.1.15.141
@@ -87,7 +96,7 @@ version 1.1.14.137
 ☞ Added option disable confirmation on exit the app.
 ☞ Fixed unable to preview HTML or Js file.
 ☞ Fixed unable to open gist files.
-☞ Fixed Esc key not working in the editor.
+☞ Fixed, Esc key not working in the editor.
 ☞ Other minor bug fixes.
 
 version 1.1.14.134
@@ -98,7 +107,7 @@ version 1.1.14.133
 
 version 1.1.14.132
 ☞ Close current tab (Ctrl-Q)
-☞ Close all tab (Ctrl-Shift-Q)
+☞ Close all open tabs (Ctrl-Shift-Q)
 ☞ Scrollbar now works with mouse
 ☞ Added option to disable teardrop (cursor controller)
 ☞ Added the Belarusian language
@@ -125,7 +134,7 @@ version 1.1.14.127
 version 1.1.14.126
 ☞ Fixed laggy sidebar
 ☞ Added option for disabling the print margin
-☞ Fixed editor not working properly after renaming a file.
+☞ Fixed editor not working after renaming a file.
 
 version 1.1.14.125
 ☞ Bugs fixes
@@ -137,7 +146,7 @@ version 1.1.14.125
 version 1.1.14.115
 ☞ Bugs fixes
 ☞ Option to disable floating button
-☞ Remembers state of quick tools
+☞ Remembers the state of quick tools
 
 version 1.1.14.111
 ☞ Bugs fixes
@@ -147,7 +156,7 @@ version 1.1.14.111
 ☞ Smaller APK size
 
 version 0.1.14.110
-☞ Backup and restore settings, key bindings and FTP accounts
+☞ Backup and restore settings, key bindings, and FTP accounts
 ☞ Fixed file showing unsaved even file has no changes
 ☞ Exit full-screen mode using notification
 ☞ Bugs fixes
@@ -158,10 +167,9 @@ version 0.1.13.108
 ☞ Bugs fixes
 
 version 0.1.13.107
-SFTP, JavaScript smart completion, and GIT implementation will take more time than expected
+SFTP, JavaScript completion, and GIT implementation will take more time than expected
 ☞ Added the French language
 ☞ Toggling full-screen form settings will save full-screen state
-☞ Option to toggle quick tools is moved to settings
 ☞ Long tap will enable context menu if no text is selected
 ☞ Fixed GitHub preview
 ☞ Bugs fixes
@@ -252,7 +260,7 @@ version 0.0.8.84
 ☞ Bugs fixes
 
 version 0.0.8.82
-☞ Categorised themes into light and dark mode (thanks to biraj795)
+☞ Categorized themes into light and dark mode (thanks to biraj795)
 ☞ Fixed unable to move console toggler
 ☞ Fixed font not loading
 ☞ Fixed files not loading when previewing git Project

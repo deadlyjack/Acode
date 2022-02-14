@@ -50,13 +50,13 @@ interface Settings {
   cursorControllerSize: 'none' | 'small' | 'large';
   scrollbarSize: number;
   confirmOnExit: boolean;
-  showConsole: boolean;
   customTheme: Map<string, string>;
   customThemeMode: 'light' | 'dark';
   lineHeight: number;
   checkFiles: boolean;
   desktopMode: boolean;
   console: 'legacy' | 'eruda';
+  keyboardMode: 'CODE' | 'NORMAL';
 }
 
 interface AppSettings {

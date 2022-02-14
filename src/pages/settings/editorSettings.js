@@ -26,11 +26,6 @@ export default function editorSettings() {
 
   const settingsOptions = [
     {
-      key: 'animation',
-      text: strings.animation.capitalize(),
-      checkbox: values.animation,
-    },
-    {
       key: 'autosave',
       text: strings.autosave.capitalize(),
       subText: values.autosave ? values.autosave + '' : strings.no,
@@ -89,11 +84,6 @@ export default function editorSettings() {
       key: 'editorFont',
       text: strings['editor font'],
       subText: values.editorFont,
-    },
-    {
-      key: 'vibrateOnTap',
-      text: strings['vibrate on tap'],
-      checkbox: values.vibrateOnTap,
     },
     {
       key: 'floatingButton',
@@ -264,14 +254,6 @@ export default function editorSettings() {
         else Acode.exec('disable-fullscreen');
 
         this.value = values.fullscreen;
-        break;
-
-      case 'animation':
-        appSettings.update({
-          animation: !values.animation,
-        });
-        app.classList.toggle('no-animation');
-        this.value = values.animation;
         break;
 
       case 'floatingButton':

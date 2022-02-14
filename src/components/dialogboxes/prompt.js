@@ -97,6 +97,7 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
       action: hidePrompt,
     });
 
+    system.setInputType("NORMAL");
     window.restoreTheme(true);
     app.append(promptDiv, mask);
     input.focus();
@@ -113,6 +114,7 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
 
     function hide() {
       actionStack.remove('prompt');
+      system.setInputType(appSettings.value.keyboardMode);
       hidePrompt();
     }
   });

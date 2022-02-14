@@ -1,6 +1,5 @@
 import tag from 'html-tag-js';
 import dialogs from '../../components/dialogs';
-import fsOperation from '../../lib/fileSystem/fsOperation';
 import helpers from '../../lib/utils/helpers';
 
 export default {
@@ -42,7 +41,7 @@ export default {
                 (res) => {
                   const $name = tag.get('#name');
                   if (!$name.value && res) {
-                    const name = window.decodeURIComponent(res).split('/').pop();
+                    const name = window.decodeURIComponent(res)?.split(':').pop()?.split('/').pop();
                     $name.value = name ?? '';
                   }
                   this.value = res;

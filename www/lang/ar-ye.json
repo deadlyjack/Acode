@@ -219,5 +219,9 @@
   "donation message": "There are people who don’t donate because they assume everyone else is, and there are those who take up the torch and run with it. Thank you for being the latter, and for your kind and heartwarming donation.",
   "downloading file": "Downloading {file}",
   "downloading...": "Downloading...",
-  "folder name": "Folder name"
+  "folder name": "Folder name",
+  "keyboard mode": "Keyboard mode",
+  "code": "No suggestions",
+  "normal": "Show suggestions",
+  "app settings": "App settings"
 }

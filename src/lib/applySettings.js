@@ -33,6 +33,8 @@ export default {
         });
       }, autoSave);
     }
+
+    system.setInputType(appSettings.value.keyboardMode);
   },
   afterRender() {
     //quick-tools

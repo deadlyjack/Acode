@@ -12,7 +12,7 @@ import Url from '../../lib/utils/Url';
 
 export default function otherSettings() {
   const values = appSettings.value;
-  const $page = Page(strings['other settings'].capitalize());
+  const $page = Page(strings['app settings'].capitalize());
   const $settingsList = tag('div', {
     className: 'main list',
   });
@@ -27,40 +27,49 @@ export default function otherSettings() {
 
   const settingsOptions = [
     {
+      key: 'animation',
+      text: strings.animation.capitalize(),
+      checkbox: values.animation,
+    },
+    {
       key: 'language',
       text: strings['change language'],
       subText: strings.lang,
-      icon: 'translate',
     },
     {
       key: 'previewMode',
       text: strings['preview mode'],
-      icon: 'play_arrow',
       subText: values.previewMode,
     },
     {
       key: 'keybindings',
       text: strings['key bindings'],
-      icon: 'keyboard_hide',
     },
     {
       key: 'confirm-on-exit',
       text: strings['confirm on exit'],
-      icon: 'exit_to_app',
       checkbox: values.confirmOnExit,
     },
     {
       key: 'check-files',
       text: strings['check file changes'],
-      icon: 'file_copy',
       checkbox: values.showConsole,
     },
     {
       key: 'console',
       text: strings.console.capitalize(),
       subText: values.console,
-      icon: 'code',
-    }
+    },
+    {
+      key: 'keyboardMode',
+      text: strings['keyboard mode'],
+      subText: strings[values.keyboardMode.toLocaleLowerCase()],
+    },
+    {
+      key: 'vibrateOnTap',
+      text: strings['vibrate on tap'],
+      checkbox: values.vibrateOnTap,
+    },
   ];
 
   gen.listItems($settingsList, settingsOptions, changeSetting);
@@ -72,6 +81,14 @@ export default function otherSettings() {
       lanuguages.push([lang, langList[lang]]);
     }
     switch (this.key) {
+      case 'animation':
+        appSettings.update({
+          animation: !values.animation,
+        });
+        app.classList.toggle('no-animation');
+        this.value = values.animation;
+        break;
+
       case 'language':
         dialogs
           .select(this.text, lanuguages, {
@@ -138,29 +155,47 @@ export default function otherSettings() {
         dialogs.select(strings['console'], ['legacy', 'eruda'], {
           default: values.console,
         })
-        .then(res=>{
-          if (res === values.console) return;
-          (async ()=>{
-            if(res === 'eruda'){
-              const fs = fsOperation(Url.join(DATA_STORAGE, 'eruda.js'));
-              if(!(await fs.exists())){
-                dialogs.loader.create(
-                  strings['downloading file'].replace('{file}', 'eruda.js'), 
-                  strings['downloading...']
-                );
-                const erudaScript = await ajax({url: constants.ERUDA_CDN, responseType: 'text'});
-                await fsOperation(DATA_STORAGE).createFile('eruda.js', erudaScript);
-                dialogs.loader.destroy();
+          .then(res => {
+            if (res === values.console) return;
+            (async () => {
+              if (res === 'eruda') {
+                const fs = fsOperation(Url.join(DATA_STORAGE, 'eruda.js'));
+                if (!(await fs.exists())) {
+                  dialogs.loader.create(
+                    strings['downloading file'].replace('{file}', 'eruda.js'),
+                    strings['downloading...']
+                  );
+                  const erudaScript = await ajax({ url: constants.ERUDA_CDN, responseType: 'text' });
+                  await fsOperation(DATA_STORAGE).createFile('eruda.js', erudaScript);
+                  dialogs.loader.destroy();
+                }
               }
-            }
-            appSettings.value.console = res;
-            appSettings.update();
-            this.changeSubText(res);
-          })();
-        });
+              appSettings.value.console = res;
+              appSettings.update();
+              this.changeSubText(res);
+            })();
+          });
         break;
 
+      case 'keyboardMode':
+        dialogs.select(strings['keyboard mode'], [
+          ['CODE', strings.code],
+          ['NORMAL', strings.normal],
+        ], {
+          default: values.keyboardMode,
+        })
+          .then(res => {
+            if (res === values.keyboardMode) return;
+            system.setInputType(res);
+            appSettings.value.keyboardMode = res;
+            appSettings.update();
+            this.changeSubText(strings[res.toLocaleLowerCase()]);
+          });
+
       default:
+        settings[this.key] = !values[this.key];
+        appSettings.update(settings);
+        this.value = values[this.key];
         break;
     }
   }

@@ -78,8 +78,6 @@ async function run(
       const { url } = folder;
       const fs = fsOperation(Url.join(url, 'index.html'));
 
-      console.log('stats', fs.stats());
-
       try {
         if (await fs.exists()) {
           filename = 'index.html';
@@ -328,43 +326,40 @@ async function run(
    * @param {string} id
    */
   function sendHTML(text, id) {
-    if (target === 'inapp' || appSettings.value.showConsole) {
-      const js = `<!-- Injected code, this is not present in original code --><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <script class="${uuid}" src="/${CONSOLE_SCRIPT}" crossorigin="anonymous"></script>
-      <script class="${uuid}">
-        if(window.eruda){
-          eruda.init({
-            theme: 'dark'
-          });
+    const js = `<!-- Injected code, this is not present in original code --><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script class="${uuid}" src="/${CONSOLE_SCRIPT}" crossorigin="anonymous"></script>
+    <script class="${uuid}">
+      if(window.eruda){
+        eruda.init({
+          theme: 'dark'
+        });
 
-          ${target === 'inapp'
-          ? "eruda._shadowRoot.querySelector('.eruda-entry-btn').style.display = 'none';"
-          : ""}
-          
-          sessionStorage.setItem('__console_available', true);
-          document.addEventListener('showconsole', function () {eruda.show()});
-          document.addEventListener('hideconsole', function () {eruda.hide()});
-        }else if(document.querySelector('c-toggler')){
-          ${target === 'inapp'
-          ? "document.querySelector('c-toggler').style.display = 'none';"
-          : ""}
-        }
-        setTimeout(function(){
-          var scripts = document.querySelectorAll('.${uuid}');
-          scripts.forEach(function(el){document.head.removeChild(el)});
-        }, 0);
-      </script><!-- Injected code, this is not present in original code -->`;
-      text = text.replace(/><\/script>/g, ' crossorigin="anonymous"></script>');
-      const part = text.split('<head>');
-      if (part.length === 2) {
-        text = `${part[0]}<head>${js}${part[1]}`;
-      } else if (/<html>/i.test(text)) {
-        text = text.replace('<html>', `<html><head>${js}</head>`);
-      } else {
-        text = `<head>${js}</head>` + text;
+        ${target === 'inapp'
+        ? "eruda._shadowRoot.querySelector('.eruda-entry-btn').style.display = 'none';"
+        : ""}
+        
+        sessionStorage.setItem('__console_available', true);
+        document.addEventListener('showconsole', function () {eruda.show()});
+        document.addEventListener('hideconsole', function () {eruda.hide()});
+      }else if(document.querySelector('c-toggler')){
+        ${target === 'inapp'
+        ? "document.querySelector('c-toggler').style.display = 'none';"
+        : ""}
       }
+      setTimeout(function(){
+        var scripts = document.querySelectorAll('.${uuid}');
+        scripts.forEach(function(el){document.head.removeChild(el)});
+      }, 0);
+    </script><!-- Injected code, this is not present in original code -->`;
+    text = text.replace(/><\/script>/g, ' crossorigin="anonymous"></script>');
+    const part = text.split('<head>');
+    if (part.length === 2) {
+      text = `${part[0]}<head>${js}${part[1]}`;
+    } else if (/<html>/i.test(text)) {
+      text = text.replace('<html>', `<html><head>${js}</head>`);
+    } else {
+      text = `<head>${js}</head>` + text;
     }
-
     sendText(text, id);
   }
 
@@ -454,7 +449,10 @@ async function run(
       return;
     }
 
-    system.inAppBrowser(src, filename, !isConsole);
+    const browser = system.inAppBrowser(src, filename, !isConsole);
+    browser.onOpenExternalBrowser = () => {
+      target = "browser";
+    }
   }
 }
 

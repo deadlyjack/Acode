@@ -108,6 +108,7 @@ function multiPrompt(message, inputs, help) {
     });
 
     window.restoreTheme(true);
+    system.setInputType("NORMAL");
     document.body.append($promptDiv, $mask);
     const $focusEl = [...$body.getAll('input[autofocus]')].pop();
     if ($focusEl) $focusEl.focus();
@@ -123,6 +124,7 @@ function multiPrompt(message, inputs, help) {
 
     function hide() {
       actionStack.remove('prompt');
+      system.setInputType(appSettings.value.keyboardMode);
       hidePrompt();
     }
 

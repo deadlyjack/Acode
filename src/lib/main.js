@@ -29,7 +29,6 @@ import arrowkeys from './handlers/arrowkeys';
 import commands from './commands';
 import keyBindings from './keyBindings';
 import quickTools from './handlers/quickTools';
-import rateBox from '../components/dialogboxes/rateBox';
 import loadPolyFill from './utils/polyfill';
 import Url from './utils/Url';
 import applySettings from './applySettings';
@@ -38,7 +37,6 @@ import run from './run';
 import toast from '../components/toast';
 import $_menu from '../views/menu.hbs';
 import $_fileMenu from '../views/file-menu.hbs';
-import $_hintText from '../views/hint-txt.hbs';
 import Icon from '../components/icon';
 import restoreTheme from './restoreTheme';
 
@@ -464,17 +462,6 @@ async function loadApp() {
     document.body.removeAttribute('data-small-msg');
     app.classList.remove('loading', 'splash');
   }, 1000);
-
-  if (!localStorage.__init) {
-    localStorage.__init = true;
-    if (!BuildInfo.debug) {
-      const title = strings.info.toUpperCase();
-      const body = mustache.render($_hintText, {
-        lang: appSettings.value.lang,
-      });
-      dialogs.box(title, body).wait(12000);
-    }
-  }
 
   //#region Add event listeners
   editorManager.onupdate = onEditorUpdate;

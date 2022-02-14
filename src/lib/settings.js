@@ -93,12 +93,12 @@ class Settings {
       scrollbarSize: 20,
       cursorControllerSize: 'small',
       confirmOnExit: true,
-      showConsole: true,
       customThemeMode: 'dark',
       lineHeight: 2,
       checkFiles: true,
       desktopMode: false,
       console: 'legacy',
+      keyboardMode: 'CODE',
       customTheme: {
         '--primary-color': 'rgb(153,153,255)',
         '--secondary-color': 'rgb(255,255,255)',

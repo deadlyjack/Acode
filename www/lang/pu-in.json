@@ -219,5 +219,9 @@
   "donation message": "ਅਜਿਹੇ ਲੋਕ ਹਨ ਜੋ ਦਾਨ ਨਹੀਂ ਕਰਦੇ ਕਿਉਂਕਿ ਉਹ ਮੰਨਦੇ ਹਨ ਕਿ ਹਰ ਕੋਈ ਹੈ, ਅਤੇ ਅਜਿਹੇ ਲੋਕ ਹਨ ਜੋ ਟਾਰਚ ਨੂੰ ਚੁੱਕਦੇ ਹਨ ਅਤੇ ਇਸ ਨਾਲ ਦੌੜਦੇ ਹਨ। ਤੁਹਾਡੇ ਦਿਆਲੂ ਅਤੇ ਦਿਲਕਸ਼ ਦਾਨ ਲਈ ਤੁਹਾਡਾ ਧੰਨਵਾਦ।",
   "downloading file": "ਡਾਊਨਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ {file}",
   "downloading...": "ਡਾਊਨਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
-  "folder name": "Folder name"
+  "folder name": "Folder name",
+  "keyboard mode": "Keyboard mode",
+  "code": "No suggestions",
+  "normal": "Show suggestions",
+  "app settings": "App settings"
 }

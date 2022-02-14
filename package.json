@@ -76,6 +76,8 @@
     "node-sass": "^7.0.1",
     "path-browserify": "^1.0.1",
     "postcss-loader": "^6.2.1",
+    "prettier": "2.5.1",
+    "prettier-plugin-java": "^1.6.1",
     "raw-loader": "^4.0.2",
     "sass-loader": "^12.4.0",
     "style-loader": "^3.1.0",
