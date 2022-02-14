@@ -53,7 +53,7 @@ export default function otherSettings() {
     {
       key: 'check-files',
       text: strings['check file changes'],
-      checkbox: values.showConsole,
+      checkbox: values.checkFiles,
     },
     {
       key: 'console',
@@ -191,11 +191,15 @@ export default function otherSettings() {
             appSettings.update();
             this.changeSubText(strings[res.toLocaleLowerCase()]);
           });
+        break;
+
+      case 'vibrateOnTap':
+        this.value = !values.vibrateOnTap;
+        values.vibrateOnTap = this.value;
+        appSettings.update();
+        break;
 
       default:
-        settings[this.key] = !values[this.key];
-        appSettings.update(settings);
-        this.value = values[this.key];
         break;
     }
   }
