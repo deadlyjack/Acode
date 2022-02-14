@@ -222,13 +222,13 @@ function actions(action, value) {
     let $row1 = $footer.querySelector('#row1');
     let $row2 = $footer.querySelector('#row2');
     localStorage.quickToolsState = height;
-    localStorage.quickToolRow1ScrollLeft = $row1.scrollLeft;
-    localStorage.quickToolRow2ScrollLeft = $row2.scrollLeft;
     if ($row1) {
+      localStorage.quickToolRow1ScrollLeft = $row1.scrollLeft;
       $row1.remove();
       incFooterHeightBy(-1);
     }
     if ($row2) {
+      localStorage.quickToolRow2ScrollLeft = $row2.scrollLeft;
       $row2.remove();
       incFooterHeightBy(-1);
     }

@@ -51,37 +51,45 @@ export default function settingsMain() {
 
   const settingsOptions = [
     {
-      key: 'editor',
-      text: strings['editor settings'],
-      icon: 'text_format',
-    },
-    {
-      key: 'theme',
-      text: strings.theme,
-      icon: 'color_lenspalette',
-    },
-    {
+      index: 0,
       key: 'about',
       text: strings.about,
       icon: 'acode',
     },
     {
-      key: 'backup-restore',
-      text: strings.backup.capitalize() + '/' + strings.restore.capitalize(),
-      icon: 'cached',
-    },
-    {
-      key: 'other-settings',
-      text: strings['other settings'],
-      icon: 'tune',
-    },
-    {
+      index: 1,
       key: 'donate',
       text: strings.support,
       icon: 'favorite',
       color: 'orangered',
       sake: true
-    }, {
+    },
+    {
+      index: 2,
+      key: 'editor-settings',
+      text: strings['editor settings'],
+      icon: 'text_format',
+    },
+    {
+      index: 3,
+      key: 'app-settings',
+      text: strings['app settings'],
+      icon: 'tune',
+    },
+    {
+      index: 4,
+      key: 'theme',
+      text: strings.theme,
+      icon: 'color_lenspalette',
+    },
+    {
+      index: 5,
+      key: 'backup-restore',
+      text: strings.backup.capitalize() + '/' + strings.restore.capitalize(),
+      icon: 'cached',
+    },
+    {
+      index: 6,
       key: 'rateapp',
       text: strings['rate acode'],
       icon: 'googleplay'
@@ -96,7 +104,7 @@ export default function settingsMain() {
       lanuguages.push([lang, langList[lang]]);
     }
     switch (this.key) {
-      case 'editor':
+      case 'editor-settings':
         editorSettings();
         break;
 
@@ -108,7 +116,7 @@ export default function settingsMain() {
         About();
         break;
 
-      case 'other-settings':
+      case 'app-settings':
         otherSettings();
         break;
 

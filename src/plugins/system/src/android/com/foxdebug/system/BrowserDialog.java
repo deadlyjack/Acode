@@ -1,5 +1,6 @@
 package com.foxdebug.system;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -34,39 +35,47 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.foxdebug.system.Base64Icons;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
 
 public class BrowserDialog extends Dialog {
 
-  Context context;
-  WebView webView;
-  TextView titleText;
-  ImageView icon;
-  boolean desktopMode = false;
-  boolean consoleEnabled = false;
-  boolean showButtons = true;
-  String url = "";
-  String title = "Browser";
-  String themeType = "light";
-  int backgroundColor = 0xFF000000;
-  int textColor = 0xFFFFFFFF;
-  Bitmap browserIcon;
-  TextView urlText;
-  int padding = 5;
-  int titleHeight = 45;
-  int titleTextHeight = 35;
-  int fontSize = 5;
-  int imageSize = 35;
+  public int FILE_SELECT_CODE = 1;
+  public ValueCallback<Uri[]> webViewFilePathCallback;
+  private CallbackContext callbackContext;
+  private CordovaPlugin plugin;
+  private Context context;
+  private WebView webView;
+  private TextView titleText;
+  private ImageButton icon;
+  private boolean desktopMode = false;
+  private boolean consoleEnabled = false;
+  private boolean showButtons = true;
+  private String url = "";
+  private String title = "Browser";
+  private String themeType = "light";
+  private int backgroundColor = 0xFF000000;
+  private int textColor = 0xFFFFFFFF;
+  private Bitmap browserIcon;
+  private TextView urlText;
+  private int padding = 5;
+  private int titleHeight = 45;
+  private int titleTextHeight = 35;
+  private int fontSize = 5;
+  private int imageSize = 35;
 
   public BrowserDialog(
-    Context context,
+    CordovaPlugin plugin,
     int bgColor,
     String type,
-    boolean showButtons
+    boolean showButtons,
+    CallbackContext callbackContext
   ) {
-    super(context, android.R.style.Theme_NoTitleBar);
-    this.context = context;
+    super(plugin.cordova.getContext(), android.R.style.Theme_NoTitleBar);
+    this.callbackContext = callbackContext;
+    this.plugin = plugin;
+    this.context = plugin.cordova.getContext();
     this.showButtons = showButtons;
-
     this.padding = this.dpToPixels(this.padding);
     this.titleHeight = this.dpToPixels(this.titleHeight);
     this.imageSize = this.dpToPixels(this.imageSize);
@@ -135,13 +144,16 @@ public class BrowserDialog extends Dialog {
     );
 
     //icon
-    icon = new ImageView(context);
-    icon.setLayoutParams(
-      new LinearLayout.LayoutParams(this.imageSize, this.imageSize, 0)
+    icon = createIcon(browserIcon, "Favicon");
+    icon.setOnClickListener(
+      new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          //refresh webview
+          webView.reload();
+        }
+      }
     );
-    icon.setPadding(this.padding, this.padding, this.padding, this.padding);
-    icon.setImageBitmap(browserIcon);
-    icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
     //stack progressbar on top of icon
     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -216,6 +228,9 @@ public class BrowserDialog extends Dialog {
           dismiss();
           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
           context.startActivity(browserIntent);
+          if (callbackContext != null) {
+            callbackContext.success("onOpenExternalBrowser: " + url);
+          }
         }
       }
     );
@@ -251,8 +266,42 @@ public class BrowserDialog extends Dialog {
           super.onReceivedIcon(view, favicon);
           icon.setImageBitmap(favicon);
         }
+
+        public boolean onShowFileChooser(
+          WebView webView,
+          ValueCallback<Uri[]> filePathCallback,
+          WebChromeClient.FileChooserParams fileChooserParams
+        ) {
+          if (webViewFilePathCallback != null) {
+            webViewFilePathCallback.onReceiveValue(null);
+          }
+
+          Intent selectDocument = new Intent(Intent.ACTION_GET_CONTENT);
+          Boolean isMultiple =
+            (
+              fileChooserParams.getMode() ==
+              WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
+            );
+
+          webViewFilePathCallback = filePathCallback;
+          selectDocument.addCategory(Intent.CATEGORY_OPENABLE);
+          selectDocument.setType("*/*");
+
+          if (isMultiple) {
+            selectDocument.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+          }
+
+          plugin.cordova.startActivityForResult(
+            plugin,
+            Intent.createChooser(selectDocument, "Select File"),
+            FILE_SELECT_CODE
+          );
+
+          return true;
+        }
       }
     );
+
     webView.setWebViewClient(
       new WebViewClient() {
         @Override
@@ -494,7 +543,7 @@ public class BrowserDialog extends Dialog {
   @Override
   public void dismiss() {
     super.dismiss();
-    webView.destroy();
+    if (webView != null) webView.destroy();
   }
 
   public void show(String url, String title) {
@@ -504,6 +553,10 @@ public class BrowserDialog extends Dialog {
   }
 
   private ImageButton createIcon(String icon, String contentDescription) {
+    return createIcon(convertBase64ToBitmap(icon), contentDescription);
+  }
+
+  private ImageButton createIcon(Bitmap icon, String contentDescription) {
     ImageButton button = new ImageButton(context);
     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
       this.imageSize,
@@ -513,7 +566,7 @@ public class BrowserDialog extends Dialog {
     params.gravity = Gravity.CENTER_VERTICAL;
     params.setMargins(0, 0, this.dpToPixels(2), 0);
     button.setBackgroundDrawable(null);
-    button.setImageBitmap(convertBase64ToBitmap(icon));
+    button.setImageBitmap(icon);
     button.setContentDescription(contentDescription);
     button.setLayoutParams(params);
     button.setScaleType(ImageView.ScaleType.FIT_CENTER);

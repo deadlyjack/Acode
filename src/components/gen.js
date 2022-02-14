@@ -70,6 +70,9 @@ function listItems(settingsList, settingsOptions, changeSetting) {
   const settings = {};
 
   settingsOptions.sort((a, b) => {
+    if (a.index && b.index) {
+      return a.index - b.index;
+    }
     return a.key < b.key ? -1 : 1;
   });
 

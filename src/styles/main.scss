@@ -248,6 +248,7 @@ a.icon {
 
       .title {
         font-weight: 500;
+        text-transform: none;
       }
 
       .description {
@@ -296,16 +297,12 @@ a.icon {
   text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-position: center;
+  background-size: 24px;
+  background-repeat: no-repeat;
 
   &.hidden {
     display: none !important;
-  }
-
-  &.app-logo {
-    background-image: url(file:///android_asset/www/res/logo/logo.png);
-    background-position: center;
-    background-size: 24px;
-    background-repeat: no-repeat;
   }
 
   &.color {
@@ -383,9 +380,6 @@ a.icon {
 
   &.foxdebug {
     background-image: url(file:///android_asset/www/res/logo/favicon.ico);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 18px;
   }
 
   &.no-icon {

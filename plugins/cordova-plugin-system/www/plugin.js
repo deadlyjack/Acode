@@ -59,12 +59,33 @@ module.exports = {
     cordova.exec(onSuccess, onFail, 'System', 'launch-app', [app, action, value]);
   },
   inAppBrowser: function (url, title, showButtons) {
-    cordova.exec(null, null, 'System', 'in-app-browser', [url, title, !!showButtons]);
+    var myInAppBrowser = {
+      onOpenExternalBrowser: null,
+      onError: null,
+    };
+
+    cordova.exec(function (data) {
+      try {
+        var dataTag = data.split(':')[0];
+        var dataUrl = data.split(':')[1];
+        if (dataTag === 'onOpenExternalBrowser') {
+          myInAppBrowser.onOpenExternalBrowser(dataUrl);
+        }
+      } catch (error) { }
+    }, function (err) {
+      try {
+        onError(err);
+      } catch (error) { }
+    }, 'System', 'in-app-browser', [url, title, !!showButtons]);
+    return myInAppBrowser;
   },
   setUiTheme: function (theme, type, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'set-ui-theme', [theme, type]);
   },
   setIntentHandler: function (handler, onerror) {
     cordova.exec(handler, onerror, 'System', 'set-intent-handler', []);
+  },
+  setInputType: function (type, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'System', 'set-input-type', [type]);
   }
 };

@@ -2,6 +2,7 @@ package com.foxdebug.system;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -17,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
+import android.text.InputType;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
@@ -42,19 +44,22 @@ import org.json.JSONObject;
 public class System extends CordovaPlugin {
 
   // private WebviewActivity webviewActivity;
+  private BrowserDialog browserDialog;
+  private CallbackContext requestPermissionCallback;
   private Activity activity;
   private Context context;
-  private CallbackContext callback;
   private int REQ_PERMISSIONS = 1;
   private int REQ_PERMISSION = 2;
   private int themeColor = 0xFF000000;
   private String themeType = "dark";
   private CallbackContext intentHandler;
+  private CordovaWebView webView;
 
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
     this.context = cordova.getContext();
     this.activity = cordova.getActivity();
+    this.webView = webView;
   }
 
   public boolean execute(
@@ -63,8 +68,6 @@ public class System extends CordovaPlugin {
     final CallbackContext callbackContext
   )
     throws JSONException {
-    this.callback = callbackContext;
-
     final String arg1 = getString(args, 0);
     final String arg2 = getString(args, 1);
     final String arg3 = getString(args, 2);
@@ -87,6 +90,10 @@ public class System extends CordovaPlugin {
       case "open-in-browser":
       case "launch-app":
         break;
+      case "set-input-type":
+        setInputType(arg1);
+        callbackContext.success();
+        return true;
       case "set-intent-handler":
         setIntentHandler(callbackContext);
         return true;
@@ -95,7 +102,7 @@ public class System extends CordovaPlugin {
           .runOnUiThread(
             new Runnable() {
               public void run() {
-                setUiTheme(arg1, arg2);
+                setUiTheme(arg1, arg2, callbackContext);
               }
             }
           );
@@ -105,7 +112,7 @@ public class System extends CordovaPlugin {
           .runOnUiThread(
             new Runnable() {
               public void run() {
-                inAppBrowser(arg1, arg2, getBoolean(args, 2));
+                inAppBrowser(arg1, arg2, getBoolean(args, 2), callbackContext);
               }
             }
           );
@@ -121,43 +128,51 @@ public class System extends CordovaPlugin {
           public void run() {
             switch (action) {
               case "get-webkit-info":
-                getWebkitInfo();
+                getWebkitInfo(callbackContext);
                 break;
               case "share-file":
-                shareFile(arg1, arg2);
+                shareFile(arg1, arg2, callbackContext);
                 break;
               case "is-powersave-mode":
-                isPowerSaveMode();
+                isPowerSaveMode(callbackContext);
                 break;
               case "get-app-info":
-                getAppInfo();
+                getAppInfo(callbackContext);
                 break;
               case "add-shortcut":
-                addShortcut(arg1, arg2, arg3, arg4, arg5, arg6);
+                addShortcut(
+                  arg1,
+                  arg2,
+                  arg3,
+                  arg4,
+                  arg5,
+                  arg6,
+                  callbackContext
+                );
                 break;
               case "remove-shortcut":
-                removeShortcut(arg1);
+                removeShortcut(arg1, callbackContext);
                 break;
               case "pin-shortcut":
-                pinShortcut(arg1);
+                pinShortcut(arg1, callbackContext);
                 break;
               case "get-android-version":
-                getAndroidVersion();
+                getAndroidVersion(callbackContext);
                 break;
               case "request-permissions":
-                requestPermissions(getJSONArray(args, 0));
+                requestPermissions(getJSONArray(args, 0), callbackContext);
                 break;
               case "request-permission":
-                requestPermission(arg1);
+                requestPermission(arg1, callbackContext);
                 break;
               case "has-permission":
-                hasPermission(arg1);
+                hasPermission(arg1, callbackContext);
                 break;
               case "open-in-browser":
-                openInBrowser(arg1);
+                openInBrowser(arg1, callbackContext);
                 break;
               case "launch-app":
-                launchApp(arg1, arg2, arg3);
+                launchApp(arg1, arg2, arg3, callbackContext);
                 break;
               default:
                 break;
@@ -169,7 +184,7 @@ public class System extends CordovaPlugin {
     return true;
   }
 
-  private void requestPermissions(JSONArray arr) {
+  private void requestPermissions(JSONArray arr, CallbackContext callback) {
     try {
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
         int[] res = new int[arr.length()];
@@ -183,6 +198,7 @@ public class System extends CordovaPlugin {
       String[] permissions = checkPermissions(arr);
 
       if (permissions.length > 0) {
+        requestPermissionCallback = callback;
         cordova.requestPermissions(this, REQ_PERMISSIONS, permissions);
         return;
       }
@@ -192,7 +208,7 @@ public class System extends CordovaPlugin {
     }
   }
 
-  private void requestPermission(String permission) {
+  private void requestPermission(String permission, CallbackContext callback) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
       callback.success(1);
       return;
@@ -200,6 +216,7 @@ public class System extends CordovaPlugin {
 
     if (permission != null || !permission.equals("")) {
       if (!cordova.hasPermission(permission)) {
+        requestPermissionCallback = callback;
         cordova.requestPermission(this, REQ_PERMISSION, permission);
         return;
       }
@@ -210,7 +227,7 @@ public class System extends CordovaPlugin {
     callback.error("No permission passed to request.");
   }
 
-  private void hasPermission(String permission) {
+  private void hasPermission(String permission, CallbackContext callback) {
     if (permission != null || !permission.equals("")) {
       int res = 0;
       if (cordova.hasPermission(permission)) {
@@ -228,6 +245,8 @@ public class System extends CordovaPlugin {
     String[] permissions,
     int[] resCodes
   ) {
+    if (requestPermissionCallback == null) return;
+
     if (code == REQ_PERMISSIONS) {
       JSONArray resAr = new JSONArray();
       for (int res : resCodes) {
@@ -237,17 +256,20 @@ public class System extends CordovaPlugin {
         resAr.put(1);
       }
 
-      callback.success(resAr);
+      requestPermissionCallback.success(resAr);
+      requestPermissionCallback = null;
       return;
     }
 
     if (
       resCodes.length >= 1 && resCodes[0] == PackageManager.PERMISSION_DENIED
     ) {
-      callback.success(0);
+      requestPermissionCallback.success(0);
+      requestPermissionCallback = null;
       return;
     }
-    callback.success(1);
+    requestPermissionCallback.success(1);
+    requestPermissionCallback = null;
     return;
   }
 
@@ -269,11 +291,11 @@ public class System extends CordovaPlugin {
     return list.toArray(res);
   }
 
-  private void getAndroidVersion() {
+  private void getAndroidVersion(CallbackContext callback) {
     callback.success(Build.VERSION.SDK_INT);
   }
 
-  private void getWebkitInfo() {
+  private void getWebkitInfo(CallbackContext callback) {
     PackageInfo info = null;
     JSONObject res = new JSONObject();
 
@@ -316,7 +338,7 @@ public class System extends CordovaPlugin {
     }
   }
 
-  private void isPowerSaveMode() {
+  private void isPowerSaveMode(CallbackContext callback) {
     PowerManager powerManager = (PowerManager) context.getSystemService(
       Context.POWER_SERVICE
     );
@@ -325,7 +347,11 @@ public class System extends CordovaPlugin {
     callback.success(powerSaveMode ? 1 : 0);
   }
 
-  private void shareFile(String fileURI, String filename) {
+  private void shareFile(
+    String fileURI,
+    String filename,
+    CallbackContext callback
+  ) {
     Activity activity = this.activity;
     Context context = this.context;
     Uri uri = this.getContentProviderUri(fileURI);
@@ -341,7 +367,7 @@ public class System extends CordovaPlugin {
     }
   }
 
-  private void getAppInfo() {
+  private void getAppInfo(CallbackContext callback) {
     JSONObject res = new JSONObject();
     try {
       PackageManager pm = activity.getPackageManager();
@@ -363,12 +389,17 @@ public class System extends CordovaPlugin {
     }
   }
 
-  private void openInBrowser(String src) {
+  private void openInBrowser(String src, CallbackContext callback) {
     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(src));
     activity.startActivity(browserIntent);
   }
 
-  private void launchApp(String appId, String action, String value) {
+  private void launchApp(
+    String appId,
+    String action,
+    String value,
+    CallbackContext callback
+  ) {
     Intent intent = context
       .getPackageManager()
       .getLaunchIntentForPackage(appId);
@@ -381,15 +412,48 @@ public class System extends CordovaPlugin {
     callback.success("Launched " + appId);
   }
 
-  private void inAppBrowser(String url, String title, boolean showButtons) {
-    //FIX: requestFeature() must be called before adding content
+  private void inAppBrowser(
+    String url,
+    String title,
+    boolean showButtons,
+    CallbackContext callback
+  ) {
     BrowserDialog browserDialog = new BrowserDialog(
-      context,
+      this,
       themeColor,
       themeType,
-      showButtons
+      showButtons,
+      callback
     );
     browserDialog.show(url, title);
+    this.browserDialog = browserDialog;
+  }
+
+  public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    if (
+      requestCode != browserDialog.FILE_SELECT_CODE ||
+      browserDialog.webViewFilePathCallback == null
+    ) {
+      super.onActivityResult(requestCode, resultCode, intent);
+      return;
+    }
+    ArrayList<Uri> uris = new ArrayList<Uri>();
+    ClipData clipData = intent.getClipData();
+    if (clipData != null) {
+      for (int i = 0; i < clipData.getItemCount(); i++) {
+        ClipData.Item item = clipData.getItemAt(i);
+        Uri uri = item.getUri();
+        uris.add(uri);
+      }
+    } else {
+      Uri uri = intent.getData();
+      uris.add(uri);
+    }
+
+    browserDialog.webViewFilePathCallback.onReceiveValue(
+      uris.toArray(new Uri[uris.size()])
+    );
+    browserDialog.webViewFilePathCallback = null;
   }
 
   private void addShortcut(
@@ -398,7 +462,8 @@ public class System extends CordovaPlugin {
     String description,
     String iconSrc,
     String action,
-    String data
+    String data,
+    CallbackContext callback
   ) {
     try {
       Intent intent;
@@ -434,7 +499,7 @@ public class System extends CordovaPlugin {
     }
   }
 
-  private void pinShortcut(String id) {
+  private void pinShortcut(String id, CallbackContext callback) {
     ShortcutManager shortcutManager = context.getSystemService(
       ShortcutManager.class
     );
@@ -465,7 +530,7 @@ public class System extends CordovaPlugin {
     callback.error("Not suppported");
   }
 
-  private void removeShortcut(String id) {
+  private void removeShortcut(String id, CallbackContext callback) {
     try {
       List<String> list = new ArrayList<String>();
       list.add(id);
@@ -476,7 +541,11 @@ public class System extends CordovaPlugin {
     }
   }
 
-  private void setUiTheme(final String color, final String type) {
+  private void setUiTheme(
+    final String color,
+    final String type,
+    final CallbackContext callback
+  ) {
     if (Build.VERSION.SDK_INT >= 21) {
       final int bgColor = Color.parseColor(color);
       final Window window = activity.getWindow();
@@ -610,13 +679,27 @@ public class System extends CordovaPlugin {
 
   private boolean isPackageInstalled(
     String packageName,
-    PackageManager packageManager
+    PackageManager packageManager,
+    CallbackContext callback
   ) {
     try {
       packageManager.getPackageInfo(packageName, 0);
       return true;
     } catch (PackageManager.NameNotFoundException e) {
       return false;
+    }
+  }
+
+  private void setInputType(String type) {
+    if (type.equals("CODE")) {
+      webView.setInputType(
+        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS |
+        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+      );
+    } else {
+      webView.setInputType(
+        InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL
+      );
     }
   }
 

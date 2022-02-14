@@ -31,13 +31,13 @@ export default function () {
   editor.setReadOnly(true);
   editor.session.setValue(
     'function foo(){\n' +
-      '\tconst array = [1, 1, 2, 3, 5, 5, 1];\n' +
-      '\tconst uniqueArray = [...new Set(array)];\n' +
-      '\tconsole.log(uniqueArray);\n' +
-      '\tconsole.log(0.2 + 0.1 === 0.3);\n' +
-      "\tconsole.log('I love Acode editor')\n" +
-      '}\n' +
-      'foo();',
+    '\tconst array = [1, 1, 2, 3, 5, 5, 1];\n' +
+    '\tconst uniqueArray = [...new Set(array)];\n' +
+    '\tconsole.log(uniqueArray);\n' +
+    '\tconsole.log(0.2 + 0.1 === 0.3);\n' +
+    "\tconsole.log('I love Acode editor')\n" +
+    '}\n' +
+    'foo();',
   );
   editor.gotoLine(8);
   $themePreview.append(
@@ -179,9 +179,7 @@ export default function () {
         .box(
           strings.info.toUpperCase(),
           'Hi dear user, dark modes are available in paid version of the app. ' +
-            '<strong>DO NOT PANIC!</strong> The project is open source, you can build your own apk with all ' +
-            'the features you need. Please support this project by ' +
-            'buying the paid version.',
+          'Please support this project by buying the paid version.',
         )
         .onhide(() => {
           system.openInBrowser(link);
@@ -189,7 +187,7 @@ export default function () {
       return;
     }
 
-    if (type === 'custom') {
+    if (theme.name === 'custom') {
       CustomTheme();
       return;
     }
