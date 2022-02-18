@@ -220,9 +220,9 @@
   "donation message": "Há pessoas que não doam porque assumem que todo mundo doa, e há aqueles que pegam a tocha e correm com ela. Obrigado por ser o último, e por sua doação gentil e comovente.",
   "downloading file": "Baixando {file}",
   "downloading...": "Baixando...",
-  "folder name": "Folder name",
-  "keyboard mode": "Keyboard mode",
-  "code": "No suggestions",
-  "normal": "Show suggestions",
-  "app settings": "App settings"
+  "folder name": "Nome da pasta",
+  "keyboard mode": "Modo do teclado",
+  "code": "Nenhuma sugestão",
+  "normal": "Mostrar sugestões",
+  "app settings": "Configurações do aplicativo"
 }
