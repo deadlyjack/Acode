@@ -67,7 +67,14 @@ snippet fr\n\
 # mutable\n\
 snippet mu\n\
 	mutable\n\
-## \n\
+## boilerplate \n\
+snippet boilerplate\n\
+	#include <${1:stdio.h}>\n\
+	\n\
+	int main(){\n\
+		${2}\n\
+		return 0;\n\
+	};\n\
 ## Class\n\
 # class\n\
 snippet cl\n\

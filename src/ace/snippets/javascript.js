@@ -41,6 +41,9 @@ snippet ife\n\
 	} else {\n\
 		${0}\n\
 	}\n\
+# eventlistener \n\
+snippet addeventlistener\n\
+	addEventListener("${1:click}", ${2})\n\
 # tertiary conditional\n\
 snippet ter\n\
 	${1:/* condition */} ? ${2:a} : ${3:b}\n\
@@ -89,9 +92,13 @@ regex /\\b/st|timeout|setTimeo?u?t?/\n\
 # Get Elements\n\
 snippet gett\n\
 	getElementsBy${1:TagName}(\'${2}\')${3}\n\
+snippet queryall\n\
+	querySelectorAll(\'${1}\')${2}\n\
 # Get Element\n\
 snippet get\n\
-	getElementBy${1:Id}(\'${2}\')${3}\n\
+	getElementById(\'${1}\')${2}\n\
+snippet query\n\
+	querySelector(\'${1}\')${2}\n\
 # console.log (Firebug)\n\
 snippet cl\n\
 	console.log(${1});\n\
