@@ -136,7 +136,7 @@
   "invalid backup file": "Archivo de respaldo inválido",
   "backup file found": "Archivo de respaldo encontrado, ¿quieres restaurar la configuración, atajos de teclado y cuentas-FTP del archivo de respaldo?",
   "welcome back": "Bienvenido de vuelta",
-  "add path": "Añadir dirección"
+  "add path": "Añadir dirección",
   "live autocompletion": "Autocompletado en vivo",
   "file properties": "Propiedades del archivo",
   "path": "Dirección",
