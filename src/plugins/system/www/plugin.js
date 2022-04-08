@@ -58,7 +58,7 @@ module.exports = {
   launchApp: function (app, action, value, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'launch-app', [app, action, value]);
   },
-  inAppBrowser: function (url, title, showButtons) {
+  inAppBrowser: function (url, title, showButtons, disableCache) {
     var myInAppBrowser = {
       onOpenExternalBrowser: null,
       onError: null,
@@ -76,7 +76,7 @@ module.exports = {
       try {
         onError(err);
       } catch (error) { }
-    }, 'System', 'in-app-browser', [url, title, !!showButtons]);
+    }, 'System', 'in-app-browser', [url, title, !!showButtons, disableCache]);
     return myInAppBrowser;
   },
   setUiTheme: function (theme, type, onSuccess, onFail) {

@@ -13,6 +13,7 @@ export default function searchSettings() {
     action: page.hide,
   });
   page.onhide = function () {
+    helpers.hideAd();
     actionStack.remove('settings-search');
   };
 
@@ -64,5 +65,6 @@ export default function searchSettings() {
   }
 
   page.appendChild(settingsList);
-  document.body.append(page);
+  app.append(page);
+  helpers.showAd();
 }

@@ -112,7 +112,13 @@ public class System extends CordovaPlugin {
           .runOnUiThread(
             new Runnable() {
               public void run() {
-                inAppBrowser(arg1, arg2, getBoolean(args, 2), callbackContext);
+                inAppBrowser(
+                  arg1,
+                  arg2,
+                  getBoolean(args, 2),
+                  getBoolean(args, 3),
+                  callbackContext
+                );
               }
             }
           );
@@ -373,6 +379,7 @@ public class System extends CordovaPlugin {
       PackageManager pm = activity.getPackageManager();
       PackageInfo pInfo = pm.getPackageInfo(context.getPackageName(), 0);
       ApplicationInfo appInfo = context.getApplicationInfo();
+      int isDebuggable = appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE;
 
       res.put("firstInstallTime", pInfo.firstInstallTime);
       res.put("lastUpdateTime", pInfo.lastUpdateTime);
@@ -380,6 +387,7 @@ public class System extends CordovaPlugin {
       res.put("packageName", pInfo.packageName);
       res.put("versionName", pInfo.versionName);
       res.put("versionCode", pInfo.getLongVersionCode());
+      res.put("isDebuggable", isDebuggable);
 
       callback.success(res);
     } catch (JSONException e) {
@@ -416,6 +424,7 @@ public class System extends CordovaPlugin {
     String url,
     String title,
     boolean showButtons,
+    Boolean disableCache,
     CallbackContext callback
   ) {
     BrowserDialog browserDialog = new BrowserDialog(
@@ -423,6 +432,7 @@ public class System extends CordovaPlugin {
       themeColor,
       themeType,
       showButtons,
+      disableCache,
       callback
     );
     browserDialog.show(url, title);

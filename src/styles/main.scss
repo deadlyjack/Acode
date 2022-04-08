@@ -106,7 +106,7 @@ a {
 .open-file-list {
   position: absolute;
   top: 44px;
-  top: calc(var(--header-height));
+  top: var(--header-height);
   height: 31px;
   width: 100%;
   background-color: #9999ff;
@@ -399,6 +399,13 @@ a.icon {
 }
 
 footer {
+  .ad-view{
+    height: 40px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
   &.button-container,
   .button-container {
     overflow-x: auto;
@@ -569,8 +576,7 @@ textarea {
   border-radius: 50%;
   background-color: white;
   background-color: var(--text-main-color);
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 0 2px var(--box-shadow-color);
+  border: solid 1px #666;
   z-index: 4;
 
   &.large {
@@ -758,12 +764,21 @@ textarea {
   display: none;
   top: 10px;
   right: 10px;
+  z-index: 1;
+}
+
+#sidebar-toggler {
+  display: none;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
 }
 
 #quicktool-toggler {
   top: auto;
   bottom: 10px;
   right: 10px;
+  z-index: 1;
 }
 
 #toast {

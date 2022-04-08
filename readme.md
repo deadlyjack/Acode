@@ -2,9 +2,7 @@
 
 ![logo](./res/icon/android/ic_launcher-web.png)
 
-This is a hybrid app using Apache Cordova. This app is published on play store. Check it out from [here](https://acode.foxdebug.com).
-
-Note: This project is not organised and it is very hard understand the project structure. I'll try to make it clear as possible.
+Acode is a hybrid app using Apache Cordova. This app is available on the play store. Check it out from [here](https://acode.foxdebug.com).
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
@@ -16,10 +14,10 @@ Note: This project is not organised and it is very hard understand the project s
 ## Project structure
 
 - `src` (directory) contains all raw codes
-- `www` (directory) contains public documents, built javascript and css files, language files and HTML files
-- `utils` (directory) contains the cli tool to manipulate or add string to all languages easily
+- `www` (directory) contains public documents, built javascript and CSS files, language files, and HTML files
+- `utils` (directory) contains the CLI tool to manipulate or add strings to all languages easily
 
-## Multi language support
+## Multi-language support
 
 To add new language, create a new file with language code for android (eg. en-us for english) in [`www/lang/`](https://github.com/deadlyjack/code-editor/tree/master/www/lang) directory. After adding new laguage also add it to [`src/constants.js -> langList`](https://github.com/deadlyjack/code-editor/blob/master/src/lib/constants.js#L89).
 
@@ -34,11 +32,11 @@ yarn lang update
 
 ## How to build
 
-In order to build the app you must have Nodejs, NPM and Apache Cordova installed on your device. Use Cordova CLI to build application.
+To build the APK you need Nodejs, NPM, and Apache Cordova installed on your device. Use Cordova CLI to build the application.
 
-First run `npm install` to install all dependencies, then run `webpack` to build src and then run `cordova build android`.
+Run `npm install` to install all dependencies before building the APK.
 
-If you have installed yarn you can simply run `yarn build-run` to build the apk and run on connect android device or emulator.
+`yarn build <platform (android)> <free|paid> <p|prod|d|dev>`
 
 ## Special thanks to
 

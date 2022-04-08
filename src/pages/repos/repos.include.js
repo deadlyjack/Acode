@@ -75,13 +75,16 @@ function ReposInclude() {
     $content.addEventListener('click', handleClick);
 
     $page.append($content);
-    document.body.appendChild($page);
+
+    app.append($page);
+    helpers.showAd();
 
     actionStack.push({
       id: 'repos',
       action: $page.hide,
     });
     $page.onhide = function () {
+      helpers.hideAd();
       actionStack.remove('repos');
     };
 

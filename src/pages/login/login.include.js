@@ -37,6 +37,7 @@ export default async function GithubLoginInclude() {
   });
 
   $page.onhide = function () {
+    helpers.hideAd();
     actionStack.remove('github login');
   };
 
@@ -46,7 +47,8 @@ export default async function GithubLoginInclude() {
     },
   });
 
-  app.appendChild($page);
+  app.append($page);
+  helpers.showAd();
 
   function storeCredentials(e) {
     e.preventDefault();

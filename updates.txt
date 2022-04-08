@@ -1,6 +1,19 @@
+version 1.5.4
+☞ Remembers read-only mode.
+☞ Remembers code foldings.
+☞ Copy file URL from file info dialog.
+☞ New option to disable caching in in-app-browser.
+☞ New, menu button in full-screen mode.
+☞ Updated SFTP library.
+☞ (Only in free version) Introduced Google Ads, disable it from App settings.
+☞ Performance improvement.
+☞ Fixed, unable to preview MD files.
+☞ Bugs fixes.
+
+
 version 1.5.3
 ☞ Disable keyboard suggestions in settings.
-☞ Users can now select a file(s) to upload in the in-app browser.
+☞ Users can now select a file(s) to upload in in-app-browser.
 ☞ Fixed bug, user unable to change color data of custom theme.
 ☞ Fixed bug, incorrect name of folder when select folder using 'Add path' option.
 ☞ Click the website icon to refresh.

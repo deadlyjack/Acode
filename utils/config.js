@@ -4,6 +4,7 @@ const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
 
 (async () => {
+  const AD_APP_ID = 'ca-app-pub-5911839694379275~4255791238';
   const CONFIG_ID = /id="([a-z.]+")/;
   const HTML_ID = /<title>[a-z.]+<\/title>/;
   const ID_PAID = 'com.foxdebug.acode';
@@ -81,7 +82,18 @@ const exec = promisify(require('child_process').exec);
             );
             const { stderr } = await exec(`yarn clean ${platform} ${platform + version}`);
             if (stderr) console.error(stderr);
-            else console.log('DONE!');
+            else console.log('DONE! Cleaning and reinstalling platform');
+
+            if (id === ID_FREE) {
+              const { stderr: stderr2 } = await exec(`cordova plugin add admob-plus-cordova --save --variable APP_ID_ANDROID="${AD_APP_ID}"`);
+              if (stderr2) console.error(stderr2);
+              else console.log('DONE! Installing admob-plus-cordova');
+            } else {
+              const { stderr: stderr2 } = await exec(`cordova plugin remove admob-plus-cordova --save`);
+              if (stderr2) console.error(stderr2);
+              else console.log('DONE! Removing admob-plus-cordova');
+            }
+
           })(),
         );
       }

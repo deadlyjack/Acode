@@ -63,14 +63,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-sftp": {
-    "source": {
-      "type": "local",
-      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-sftp"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-iap": {
     "source": {
       "type": "local",
@@ -83,6 +75,14 @@
     "source": {
       "type": "registry",
       "id": "cordova-plugin-sdcard"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-sftp": {
+    "source": {
+      "type": "local",
+      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-sftp"
     },
     "is_top_level": true,
     "variables": {}

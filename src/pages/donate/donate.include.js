@@ -13,6 +13,7 @@ import dialogs from '../../components/dialogs';
 export default function DonateInclude() {
   const BASE_URL = "https://acode.foxdebug.com/res/";
   const $page = Page(strings.support);
+  let adShown = false;
 
   actionStack.push({
     id: 'donate page',
@@ -21,6 +22,7 @@ export default function DonateInclude() {
 
   $page.onhide = function () {
     actionStack.remove('donate page');
+    if (adShown) helpers.hideAd();
   };
 
   app.append($page);
@@ -125,7 +127,8 @@ export default function DonateInclude() {
       col1: col1.join(''),
       col2: col2.join(''),
     });
-
+    helpers.showAd();
+    adShown = true;
   })()
     .catch(error => {
       actionStack.pop();

@@ -23,6 +23,8 @@ export default () => {
       recordid: null,
       isNew: null,
       sha: null,
+      editable: file.editable,
+      folds: parseFolds(file.session.getAllFolds()),
     };
 
     if (edit.type === 'git') edit.sha = file.record.sha;
@@ -53,3 +55,18 @@ export default () => {
   localStorage.files = JSON.stringify(filesToSave);
   localStorage.folders = JSON.stringify(folders);
 };
+
+function parseFolds(folds) {
+  const foldsToSave = [];
+
+  for (let fold of folds) {
+    const { range, ranges, placeholder } = fold;
+    foldsToSave.push({
+      range,
+      ranges: parseFolds(ranges),
+      placeholder,
+    });
+  }
+
+  return foldsToSave;
+}

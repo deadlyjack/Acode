@@ -57,6 +57,8 @@ interface Settings {
   desktopMode: boolean;
   console: 'legacy' | 'eruda';
   keyboardMode: 'CODE' | 'NORMAL';
+  showAd: boolean;
+  disableCache: boolean;
 }
 
 interface AppSettings {
@@ -116,6 +118,12 @@ interface fileOptions {
   uri: string;
 }
 
+interface Fold{
+  range: AceAjax.Range;
+  ranges: Array<Fold>;
+  placeholder: string;
+}
+
 interface NewFileOptions {
   uri?: string;
   text?: string;
@@ -127,6 +135,8 @@ interface NewFileOptions {
   onsave(): void;
   isUnsaved: boolean;
   mode: 'single' | 'tree';
+  folds: Array<Fold>;
+  editable: boolean;
 }
 
 interface Controls {

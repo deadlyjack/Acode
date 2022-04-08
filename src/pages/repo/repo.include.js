@@ -1,6 +1,5 @@
 import _template from './repo.hbs';
 import _list from './list.hbs';
-import _menu from './menu.hbs';
 import './repo.scss';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
@@ -9,13 +8,10 @@ import Page from '../../components/page';
 import helpers from '../../lib/utils/helpers';
 import dialogs from '../../components/dialogs';
 import git from '../../lib/git';
-import contextMenu from '../../components/contextMenu';
 import searchBar from '../../components/searchbar';
-import Icon from '../../components/icon';
 
 export default function RepoInclude(owner, repoName) {
   let $page;
-  const $menuToggler = Icon('more_vert', 'toggle-menu');
   const $content = tag.parse(_template);
   const $navigation = $content.querySelector('.navigation');
   const repo = git.GitHub().getRepo(owner, repoName);
@@ -50,12 +46,7 @@ export default function RepoInclude(owner, repoName) {
     match: /^[a-z\-_0-9]+$/i,
   };
   const path = [];
-  const $cm = contextMenu(mustache.render(_menu, strings), {
-    toggle: $menuToggler,
-    top: '8px',
-    right: '8px',
-    transformOrigin: 'top right',
-  });
+  let hideAd = false; // If user select a file to open, hide the ad
 
   dialogs.loader.create(repoName, strings.loading + '...');
   repo
@@ -114,6 +105,13 @@ export default function RepoInclude(owner, repoName) {
         });
         cachedTree['/'].list = list;
         navigate('/', '/');
+
+        $page.addEventListener('click', handleClick);
+        $page.append($content);
+        $page.querySelector('header').append($search);
+        app.append($page);
+        helpers.showAd();
+
         actionStack.setMark();
         actionStack.push({
           id: 'repo',
@@ -121,17 +119,11 @@ export default function RepoInclude(owner, repoName) {
         });
 
         $page.onhide = function () {
-          $cm.removeEventListener('click', handleClick);
+          helpers.hideAd(hideAd);
           $page.removeEventListener('click', handleClick);
           actionStack.clearFromMark();
           actionStack.remove('repo');
         };
-
-        $cm.addEventListener('click', handleClick);
-        $page.addEventListener('click', handleClick);
-        $page.append($content);
-        $page.querySelector('header').append($search, $menuToggler);
-        document.body.appendChild($page);
       })
       .catch((err) => {
         helpers.error(err);
@@ -153,7 +145,6 @@ export default function RepoInclude(owner, repoName) {
     const action = $el.getAttribute('action');
 
     if (!action) return;
-    if (action === 'info') $cm.hide();
 
     performeAction(action, $el);
   }
@@ -302,12 +293,6 @@ export default function RepoInclude(owner, repoName) {
         file();
         break;
 
-      case 'info':
-        import(/* webpackChunkName: 'info' */ '../info/info').then((res) => {
-          res.default(repoName, owner);
-        });
-        break;
-
       case 'search':
         searchBar($content.get('.list'));
         break;
@@ -342,6 +327,7 @@ export default function RepoInclude(owner, repoName) {
               owner,
             });
 
+            hideAd = true;
             editorManager.addNewFile(name, {
               type: 'git',
               record,

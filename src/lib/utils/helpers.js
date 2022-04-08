@@ -214,6 +214,7 @@ export default {
       smarty: /\.(smarty|tpl)$/i,
       sql: /\.sql$/i,
       stylus: /\.(styl|stylus)$/i,
+      svelte: /\.svelte$/i,
       svg: /\.svg$/i,
       swift: /\.swift$/i,
       tcl: /\.tcl$/i,
@@ -711,5 +712,34 @@ export default {
     }
 
     return true;
+  },
+  /**
+   * Displays ad on the current page
+   */
+  showAd() {
+    const { ad } = window;
+    if (
+      (IS_FREE_VERSION && appSettings.value.showAd)
+      && (innerHeight * devicePixelRatio) > 600 && ad
+    ) {
+      const $page = tag.getAll('.page:not(#root)').pop();
+      if ($page) {
+        ad.show();
+        ad.shown = true;
+      }
+    }
+  },
+  /**
+   * Hides the ad
+   * @param {Boolean} [force=false]
+   */
+  hideAd(force = false) {
+    const { ad } = window;
+    if (IS_FREE_VERSION && ad?.shown) {
+      const $pages = tag.getAll('.page:not(#root)');
+      if (force || $pages.length === 1) {
+        ad.hide();
+      }
+    }
   },
 };

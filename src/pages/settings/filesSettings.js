@@ -1,6 +1,7 @@
 import Page from '../../components/page';
 import tag from 'html-tag-js';
 import gen from '../../components/gen';
+import helpers from '../../lib/utils/helpers';
 
 export default function filesSettings(callback) {
   const page = Page(strings.settings.capitalize());
@@ -13,6 +14,7 @@ export default function filesSettings(callback) {
     action: page.hide,
   });
   page.onhide = function () {
+    helpers.hideAd();
     actionStack.remove('settings-theme');
   };
 
@@ -52,5 +54,6 @@ export default function filesSettings(callback) {
   }
 
   page.appendChild(settingsList);
-  document.body.append(page);
+  app.append(page);
+  helpers.showAd();
 }

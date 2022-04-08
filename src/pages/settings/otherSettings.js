@@ -9,6 +9,8 @@ import internalFs from '../../lib/fileSystem/internalFs';
 import fsOperation from '../../lib/fileSystem/fsOperation';
 import ajax from '@deadlyjack/ajax';
 import Url from '../../lib/utils/Url';
+import Box from '../../components/dialogboxes/box';
+import Donate from '../donate/donate';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -22,6 +24,7 @@ export default function otherSettings() {
     action: $page.hide,
   });
   $page.onhide = function () {
+    helpers.hideAd();
     actionStack.remove('other-settings');
   };
 
@@ -70,7 +73,20 @@ export default function otherSettings() {
       text: strings['vibrate on tap'],
       checkbox: values.vibrateOnTap,
     },
+    {
+      key: 'disablecache',
+      text: strings['disable in-app-browser caching'],
+      checkbox: values.disableCache,
+    }
   ];
+
+  if (IS_FREE_VERSION) {
+    settingsOptions.push({
+      key: 'showad',
+      text: strings['show ads'],
+      checkbox: values.showAd,
+    });
+  }
 
   gen.listItems($settingsList, settingsOptions, changeSetting);
 
@@ -199,11 +215,50 @@ export default function otherSettings() {
         appSettings.update();
         break;
 
+      case 'showad':
+        this.value = !values.showAd;
+        appSettings.update({
+          showAd: this.value,
+        });
+
+        if (!this.value) {
+          const box = Box(
+            strings.info.toUpperCase(),
+            `<p>${strings['disable ad message']}</p>`,
+            strings.support,
+            strings.cancel
+          )
+            .ok(() => {
+              Donate();
+              box.hide();
+            })
+            .cancle(() => {
+              box.hide();
+            });
+        }
+
+        if (window.ad) {
+          if (!this.value && window.ad.shown) {
+            helpers.hideAd(true);
+          } else {
+            helpers.showAd();
+          }
+        }
+
+        break;
+
+      case 'disablecache':
+        this.value = !values.disableCache;
+        values.disableCache = this.value;
+        appSettings.update();
+        break;
+
       default:
         break;
     }
   }
 
   $page.appendChild($settingsList);
-  document.body.append($page);
+  app.append($page);
+  helpers.showAd();
 }

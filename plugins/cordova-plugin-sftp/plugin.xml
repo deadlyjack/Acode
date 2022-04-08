@@ -25,5 +25,5 @@
     </platform>
 
     <framework src="commons-io:commons-io:2.11.0" />
-    <framework src="com.sshtools:maverick-synergy:3.0.3-FINAL" />
+    <framework src="com.sshtools:maverick-synergy-client:3.0.6" />
 </plugin>

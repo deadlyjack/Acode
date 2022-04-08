@@ -3,6 +3,7 @@ import gen from '../../components/gen';
 import dialogs from '../../components/dialogs';
 import constants from '../../lib/constants';
 import tag from 'html-tag-js';
+import helpers from '../../lib/utils/helpers';
 
 export default function editorSettings() {
   const $page = Page(strings['editor settings'].capitalize());
@@ -15,6 +16,7 @@ export default function editorSettings() {
     action: $page.hide,
   });
   $page.onhide = function () {
+    helpers.hideAd();
     actionStack.remove('settings-editor');
   };
 
@@ -307,7 +309,6 @@ export default function editorSettings() {
   }
 
   $page.appendChild(settingsList);
-  document.body.append($page);
-
-  document.body.append($page);
+  app.append($page);
+  helpers.showAd();
 }

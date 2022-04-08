@@ -8,6 +8,7 @@ import $_list_item from './list-item.hbs';
 import searchBar from '../../components/searchbar';
 import dialogs from '../../components/dialogs';
 import CustomTheme from '../customTheme/customTheme';
+import helpers from '../../lib/utils/helpers';
 
 export default function () {
   const $page = Page(strings.theme.capitalize());
@@ -56,11 +57,15 @@ export default function () {
     },
   });
 
-  $page.onhide = () => actionStack.remove('appTheme');
+  $page.onhide = () => {
+    helpers.hideAd();
+    actionStack.remove('appTheme');
+  };
   $page.append($container);
   $page.querySelector('header').append($search);
 
   app.append($page);
+  helpers.showAd();
 
   $page.addEventListener('click', clickHandler);
   render();

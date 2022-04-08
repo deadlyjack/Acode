@@ -6,6 +6,8 @@ import Url from './utils/Url';
 import dialogs from '../components/dialogs';
 import helpers from './utils/helpers';
 
+//TODO: enable file sharing
+
 /**
  * Shows file info
  * @param {String} [url]
@@ -52,7 +54,13 @@ export default async function showFileInfo(url) {
         const value = $target.getAttribute('value');
 
         if (action === 'share') {
-          system.shareFile(value, () => {}, console.error);
+          system.shareFile(value, () => { }, console.error);
+          return;
+        }
+
+        if (action === 'copy') {
+          cordova.plugins.clipboard.copy($target.textContent);
+          toast(strings['copied to clipboard']);
         }
       }
     });

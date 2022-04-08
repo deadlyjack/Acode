@@ -14,6 +14,7 @@ import $_socialLinks from '../../views/social-links.hbs';
 import dialogs from '../../components/dialogs';
 import rateBox from '../../components/dialogboxes/rateBox';
 import Donate from '../donate/donate';
+import helpers from '../../lib/utils/helpers';
 
 export default function settingsMain() {
   const $page = Page(strings.settings.capitalize());
@@ -44,9 +45,6 @@ export default function settingsMain() {
     id: 'settings-main',
     action: $page.hide,
   });
-  $page.onhide = function () {
-    actionStack.remove('settings-main');
-  };
   $page.querySelector('header').append($editSettings);
 
   const settingsOptions = [
@@ -135,18 +133,12 @@ export default function settingsMain() {
   }
 
   $page.appendChild($settingsList);
-  if (window.promotion && !localStorage.hideAd) {
-    const $ad = tag.parse(mustache.render($_ad, window.promotion));
-    $ad.style.marginTop = '10px';
-    $ad.onclick = function (e) {
-      const action = e.target.getAttribute('action');
-      if (action === 'close') {
-        this.remove();
-        localStorage.hideAd = true;
-      }
-    };
-    $settingsList.append($ad);
-  }
   $settingsList.appendChild(tag.parse($_socialLinks));
-  document.body.append($page);
+  app.append($page);
+  helpers.showAd();
+
+  $page.onhide = function () {
+    helpers.hideAd();
+    actionStack.remove('settings-main');
+  };
 }

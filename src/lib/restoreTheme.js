@@ -39,7 +39,8 @@ export default async function restoreTheme(darken) {
     const svgName = '__tail-spin__.svg';
     const img = Url.join(DATA_STORAGE, svgName);
 
-    localStorage.__primary_color = style.getPropertyValue('--primary-color');
+    const color = style.getPropertyValue('--primary-color').trim();
+    localStorage.__primary_color = color;
     try {
       let fs = fsOperation(loaderFile);
       const svg = await fs.readFile('utf-8');

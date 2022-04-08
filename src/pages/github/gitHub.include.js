@@ -93,17 +93,18 @@ async function gitHubInclude($loginPage) {
     if (!$page) $page = Page('Github');
     const $content = content(profile);
     $page.append($content);
-    app.appendChild($page);
     $page.get('header').append($search, $menuToggler);
+
+    app.appendChild($page);
+    helpers.showAd();
 
     actionStack.push({
       id: 'github',
-      action: $page.hide,
+      action() {
+        helpers.hideAd();
+        $page.hide();
+      },
     });
-
-    $page.onhide = function () {
-      actionStack.remove('github');
-    };
 
     $content.addEventListener('click', handleClick);
 
@@ -123,7 +124,7 @@ async function gitHubInclude($loginPage) {
           await dataFs.createFile('.git');
         }
         await fs.writeFile(data);
-      } catch (error) {}
+      } catch (error) { }
 
       if (typeof onload === 'function') onload(profileData);
       else render(profileData);
@@ -173,7 +174,7 @@ async function gitHubInclude($loginPage) {
     try {
       await fsOperation(gitProfile).deleteFile();
       await fsOperation(githubFile).deleteFile();
-    } catch (error) {}
+    } catch (error) { }
     if (onlogout) onlogout();
   }
 }

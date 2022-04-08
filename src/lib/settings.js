@@ -39,6 +39,7 @@ class Settings {
 
     this.#defaultSettings = {
       animation: true,
+      appTheme: /free/.test(BuildInfo.packageName) ? 'dark' : 'ocean',
       autosave: 0,
       fileBrowser: {
         showHiddenFiles: false,
@@ -71,7 +72,6 @@ class Settings {
       editorTheme: /free/.test(BuildInfo.packageName)
         ? 'ace/theme/nord_dark'
         : 'ace/theme/dracula',
-      appTheme: /free/.test(BuildInfo.packageName) ? 'dark' : 'ocean',
       textWrap: true,
       softTab: true,
       tabSize: 2,
@@ -80,7 +80,6 @@ class Settings {
       linting: false,
       autoCorrect: true,
       previewMode: 'inapp',
-      showSpaces: false,
       openFileListPos: 'header',
       quickTools: true,
       editorFont: 'default',
@@ -91,6 +90,8 @@ class Settings {
       liveAutoCompletion: true,
       showPrintMargin: false,
       scrollbarSize: 20,
+      showSpaces: false,
+      showAd: true,
       cursorControllerSize: 'small',
       confirmOnExit: true,
       customThemeMode: 'dark',
@@ -99,6 +100,7 @@ class Settings {
       desktopMode: false,
       console: 'legacy',
       keyboardMode: 'CODE',
+      disableCache: false,
       customTheme: {
         '--primary-color': 'rgb(153,153,255)',
         '--secondary-color': 'rgb(255,255,255)',
@@ -152,7 +154,8 @@ class Settings {
           settings[setting] = this.#defaultSettings[setting];
         }
       }
-      this.value = settings;
+      this.value = { ...settings };
+      this.#oldSettings = { ...settings };
       return;
     }
 

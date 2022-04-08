@@ -15,6 +15,7 @@ export default function help() {
     action: page.hide,
   });
   page.onhide = function () {
+    helpers.hideAd();
     actionStack.remove('help');
   };
 
@@ -51,5 +52,6 @@ export default function help() {
   }
 
   page.append(options);
-  document.body.append(page);
+  app.append(page);
+  helpers.showAd();
 }

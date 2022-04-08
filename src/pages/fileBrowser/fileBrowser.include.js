@@ -110,7 +110,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       innerHTML: () => {
         return `
         <li action="settings">${strings.settings.capitalize(0)}</li>
-        <li action="refresh">${strings['reset connections'].capitalize(0)}</li>
+        ${currentDir.url === '/' ? `<li action="refresh">${strings['reset connections'].capitalize(0)}</li>` : ''}
         <li action="reload">${strings.reload.capitalize(0)}</li>
         `;
       },
@@ -140,7 +140,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       list: [],
       scroll: 0,
     };
-    let folderOption;
+    let $folderOption;
     //#endregion
 
     actionStack.setMark();
@@ -149,7 +149,35 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
     $content.addEventListener('contextmenu', handleContextMenu);
     $page.append($content);
     $page.get('header').append($search, $addMenuToggler, $menuToggler);
+
+
+    if (IS_FOLDER_MODE) {
+      const $openFolder = tag('button', {
+        textContent: buttonText,
+      });
+      $folderOption = tag('footer', {
+        children: [
+          tag('div', {
+            className: 'button-container',
+            child: $openFolder,
+          }),
+        ],
+      });
+
+      $page.setAttribute('footer-height', 1);
+      $page.append($folderOption);
+
+      $openFolder.onclick = () => {
+        $page.hide();
+        resolve({
+          type: 'folder',
+          ...currentDir,
+        });
+      };
+    }
+
     app.append($page);
+    helpers.showAd();
 
     actionStack.push({
       id: 'filebrowser',
@@ -239,33 +267,13 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
     };
 
     $page.onhide = function () {
+      helpers.hideAd();
       actionStack.clearFromMark();
       actionStack.remove('filebrowser');
       $content.removeEventListener('click', handleClick);
       $content.removeEventListener('contextmenu', handleContextMenu);
       document.removeEventListener('resume', reload);
     };
-
-    if (IS_FOLDER_MODE) {
-      const openFolder = tag('button', {
-        textContent: buttonText,
-      });
-      folderOption = tag('footer', {
-        className: 'button-container',
-        child: openFolder,
-      });
-
-      $page.setAttribute('footer-height', 1);
-      $page.append(folderOption);
-
-      openFolder.onclick = () => {
-        $page.hide();
-        resolve({
-          type: 'folder',
-          ...currentDir,
-        });
-      };
-    }
 
     if (doesOpenLast && storedState.length) {
       loadStates(storedState);
@@ -561,7 +569,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
 
     async function listAllStorages() {
       let hasInternalStorage = true;
-      if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
+      if (IS_FOLDER_MODE) $folderOption.classList.add('disabled');
       allStorages.length = 0;
 
       if (ANDROID_SDK_INT == 29) {
@@ -708,9 +716,9 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       }
 
       if (url === '/') {
-        if (IS_FOLDER_MODE) folderOption.classList.add('disabled');
+        if (IS_FOLDER_MODE) $folderOption.classList.add('disabled');
       } else {
-        if (IS_FOLDER_MODE) folderOption.classList.remove('disabled');
+        if (IS_FOLDER_MODE) $folderOption.classList.remove('disabled');
       }
 
       const $nav = tag.get(`#${getNavId(url)}`);

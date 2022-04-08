@@ -86,13 +86,14 @@ function GistsInclude(callbackGists) {
     $page.append($content);
     if (!$page.isConnected) {
       app.appendChild($page);
+      helpers.showAd();
       actionStack.push({
         id: 'repos',
-        action: $page.hide,
+        action() {
+          helpers.hideAd();
+          $page.hide();
+        },
       });
-      $page.onhide = function () {
-        actionStack.remove('repos');
-      };
     }
   }
 

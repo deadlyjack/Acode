@@ -9,11 +9,11 @@ import tag from 'html-tag-js';
 function box(titleText, html, hideButtonText, cancelButtonText) {
   let waitFor = 0,
     strOK = hideButtonText || strings.ok,
-    _onclick = () => {},
-    _onhide = () => {},
-    _then = () => {},
+    _onclick = () => { },
+    _onhide = () => { },
+    _then = () => { },
     _onOk = _hide,
-    _onCancel = () => {};
+    _onCancel = () => { };
 
   const promiseLike = {
     hide,
@@ -25,13 +25,13 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
     cancle,
   };
 
-  let cancelBtn,
-    hideButton = typeof hideButtonText === 'boolean' ? hideButtonText : false;
+  let cancelBtn;
+  let hideButton = typeof hideButtonText === 'boolean' ? hideButtonText : false;
 
   if (cancelButtonText) {
     cancelBtn = tag('button', {
       className: 'disabled',
-      textContent: strOK,
+      textContent: cancelButtonText,
       onclick: () => {
         _onCancel();
       },
@@ -95,6 +95,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
     } else {
       okBtn.textContent = strOK;
       okBtn.classList.remove('disabled');
+      cancelBtn?.classList.remove('disabled');
     }
   }
 
@@ -179,7 +180,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
    * @param {function():void} onCancel
    */
   function cancle(onCancel) {
-    _onCancel = oncancel;
+    _onCancel = onCancel;
     return promiseLike;
   }
 

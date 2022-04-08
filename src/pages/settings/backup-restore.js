@@ -22,6 +22,7 @@ function backupRestore() {
     action: $page.hide,
   });
   $page.onhide = function () {
+    helpers.hideAd();
     actionStack.remove('backup-restore');
   };
 
@@ -41,7 +42,8 @@ function backupRestore() {
   gen.listItems(settingsList, settingsOptions, changeSetting);
 
   $page.appendChild(settingsList);
-  document.body.append($page);
+  app.append($page);
+  helpers.showAd();
 
   function changeSetting() {
     switch (this.key) {
@@ -146,7 +148,7 @@ backupRestore.restore = async function (url) {
     try {
       fs = fsOperation(window.KEYBINDING_FILE);
       await fs.writeFile(JSON.stringify(backup.keyBindings, undefined, 2));
-    } catch (error) {}
+    } catch (error) { }
 
     const { settings, storageList } = backup;
     const storedStorageList = JSON.parse(localStorage.storageList || '[]');

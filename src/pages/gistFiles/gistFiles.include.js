@@ -52,19 +52,18 @@ function GistFilesInclude(gist) {
   $cm.addEventListener('click', handleClick);
   $page.append($content);
   $page.querySelector('header').append($search, $menuToggler);
+  $search.onclick = () => searchBar($page.querySelector('.list'));
+
   app.appendChild($page);
-  $search.onclick = () => {
-    searchBar($page.querySelector('.list'));
-  };
+  helpers.showAd();
 
   actionStack.push({
     id: 'gistFiles',
-    action: $page.hide,
+    action() {
+      helpers.hideAd();
+      $page.hide();
+    },
   });
-
-  $page.onhide = function () {
-    actionStack.remove('gistFiles');
-  };
 
   /**
    *

@@ -195,6 +195,20 @@ export default {
     file.editable = !file.editable;
     editorManager.onupdate('read-only');
   },
+  'load-ad': () => {
+    if (admob) {
+      admob
+        .start()
+        .then(async () => {
+          const ad = new admob.BannerAd({
+            adUnitId: 'ca-app-pub-5911839694379275/9157899592', // Prod
+            // adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test
+            position: 'bottom',
+          });
+          window.ad = ad;
+        });
+    }
+  },
   recent() {
     recents.select().then((res) => {
       const { type } = res;

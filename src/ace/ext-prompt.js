@@ -86,7 +86,7 @@ define('ace/autocomplete/popup', [
     popup.setOption('displayIndentGuides', false);
     popup.setOption('dragDelay', 150);
 
-    var noop = function () {};
+    var noop = function () { };
 
     popup.focus = noop;
     popup.$isFocused = true;
@@ -1164,7 +1164,7 @@ define('ace/snippets', [
     };
 
     this.findMatchingSnippet = function (snippetList, before, after) {
-      for (var i = snippetList.length; i--; ) {
+      for (var i = snippetList.length; i--;) {
         var s = snippetList[i];
         if (s.startRe && !s.startRe.test(before)) continue;
         if (s.endRe && !s.endRe.test(after)) continue;
@@ -1279,7 +1279,7 @@ define('ace/snippets', [
           try {
             snippet = JSON.parse(m[1]);
             list.push(snippet);
-          } catch (e) {}
+          } catch (e) { }
         }
         if (m[4]) {
           snippet.content = m[4].replace(/^\t/gm, '');
@@ -2269,6 +2269,7 @@ background: #f0f0f0;\
 
     function mclose() {
       if (!closer) return;
+      mask.removeEventListener('click', close);
       document.removeEventListener('keydown', documentEscListener);
       closer.parentNode.removeChild(closer);
       mask.parentNode.removeChild(mask);
@@ -3063,11 +3064,11 @@ define('ace/ext/prompt', [
         return completions.length > 0
           ? completions
           : [
-              {
-                value: 'No matching commands',
-                error: 1,
-              },
-            ];
+            {
+              value: 'No matching commands',
+              error: 1,
+            },
+          ];
       },
     });
   };
@@ -3107,12 +3108,12 @@ define('ace/ext/prompt', [
         return completions.length > 0
           ? completions
           : [
-              {
-                caption: 'No mode matching',
-                value: 'No mode matching',
-                error: 1,
-              },
-            ];
+            {
+              caption: 'No mode matching',
+              value: 'No mode matching',
+              error: 1,
+            },
+          ];
       },
     });
   };

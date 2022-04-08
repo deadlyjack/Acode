@@ -166,7 +166,7 @@ class Repository extends Requestable {
    * @return {Promise} - the promise for the http request
    */
   listBranches(cb) {
-    return this._request('GET', `/repos/${this.__fullname}/branches`, null, cb);
+    return this._request('GET', `/repos/${this.__fullname}/branches`, { per_page: 100 }, cb);
   }
 
   /**

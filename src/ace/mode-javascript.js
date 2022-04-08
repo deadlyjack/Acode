@@ -487,7 +487,7 @@ define('ace/mode/javascript_highlight_rules', [
       ],
     };
 
-    if (!options || !options.noES6) {
+    if (options?.noES6 ?? false) {
       this.$rules.no_regex.unshift(
         {
           regex: '[{}]',
@@ -533,7 +533,7 @@ define('ace/mode/javascript_highlight_rules', [
         },
       );
 
-      if (!options || options.jsx != false) JSX.call(this);
+      if (options?.jsx ?? true) JSX.call(this);
     }
 
     this.embedRules(DocCommentHighlightRules, 'doc-', [
@@ -690,7 +690,7 @@ define('ace/mode/matching_brace_outdent', [
 
   var Range = require('../range').Range;
 
-  var MatchingBraceOutdent = function () {};
+  var MatchingBraceOutdent = function () { };
 
   (function () {
     this.checkOutdent = function (line, input) {

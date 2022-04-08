@@ -51,28 +51,6 @@ async function Main() {
     }
   };
 
-  ajax({
-    url: 'https://acode.foxdebug.com/api/getad',
-    responseType: 'json',
-  }).then((/**@type {Promotion} */ promotion) => {
-    window.promotion = promotion;
-    if (promotion?.image) {
-      (async () => {
-        const image = await ajax({
-          url: promotion.image,
-          responseType: 'arraybuffer',
-        });
-
-        if (image instanceof ArrayBuffer) {
-          promotion.image = URL.createObjectURL(new Blob([image]));
-        }
-      })();
-    }
-  })
-    .catch(err => {
-      console.log(err);
-    });
-
   document.addEventListener('deviceready', ondeviceready);
 }
 
@@ -188,6 +166,18 @@ async function ondeviceready() {
     window.location.reload();
   }
 
+  if (appSettings.value.showAd) {
+    Acode.exec('load-ad');
+  } else {
+    const loadAd = (value) => {
+      appSettings.off('update:showAd', loadAd);
+      if (value) {
+        Acode.exec('load-ad');
+      }
+    };
+    appSettings.on('update:showAd', loadAd);
+  }
+
   Acode.setLoadingMessage('Loading custom theme...');
   document.head.append(
     tag('style', {
@@ -251,7 +241,7 @@ async function loadApp() {
       action: '',
     },
   });
-  const $toggler = tag('span', {
+  const $navToggler = tag('span', {
     className: 'icon menu',
     attr: {
       action: 'toggle-sidebar',
@@ -261,7 +251,7 @@ async function loadApp() {
   const $header = tile({
     type: 'header',
     text: 'Acode',
-    lead: $toggler,
+    lead: $navToggler,
     tail: $menuToggler,
   });
   const $footer = tag('footer', {
@@ -297,7 +287,7 @@ async function loadApp() {
     },
   });
   const $main = tag('main');
-  const $sidebar = sidenav($main, $toggler);
+  const $sidebar = sidenav($main, $navToggler);
   const $runBtn = tag('span', {
     className: 'icon play_arrow',
     attr: {
@@ -312,6 +302,13 @@ async function loadApp() {
     style: {
       fontSize: '1.2em',
     },
+  });
+  const $floatingNavToggler = tag('span', {
+    className: 'floating icon menu',
+    id: 'sidebar-toggler',
+    onclick() {
+      Acode.exec('toggle-sidebar');
+    }
   });
   const $headerToggler = tag('span', {
     className: 'floating icon keyboard_arrow_left',
@@ -331,6 +328,7 @@ async function loadApp() {
   Acode.$editMenuToggler = $editMenuToggler;
   Acode.$headerToggler = $headerToggler;
   Acode.$quickToolToggler = $quickToolToggler;
+  Acode.$floatingMenuToggler = $floatingNavToggler;
   Acode.$runBtn = $runBtn;
 
   $sidebar.setAttribute('empty-msg', strings['open folder']);
@@ -350,7 +348,7 @@ async function loadApp() {
   //#region rendering
   applySettings.beforeRender();
   window.restoreTheme();
-  root.append($header, $main, $footer, $headerToggler, $quickToolToggler);
+  root.append($header, $main, $footer, $floatingNavToggler, $headerToggler, $quickToolToggler);
   if (!appSettings.value.floatingButton) {
     root.classList.add('hide-floating-button');
   }
@@ -374,6 +372,8 @@ async function loadApp() {
       readOnly,
       mode,
       deltedFile,
+      folds,
+      editable = true,
     } = file;
     const render = files.length === 1 || id === localStorage.lastfile;
 
@@ -395,6 +395,8 @@ async function loadApp() {
             render,
             cursorPos,
             id,
+            folds,
+            editable,
           });
         }
       });
@@ -410,6 +412,8 @@ async function loadApp() {
           render,
           cursorPos,
           id,
+          folds,
+          editable,
         });
       }
     } else if (uri) {
@@ -437,6 +441,8 @@ async function loadApp() {
             id,
             mode,
             deltedFile,
+            folds,
+            editable,
           });
         }
       } catch (error) {
@@ -449,6 +455,8 @@ async function loadApp() {
         cursorPos,
         text,
         id,
+        folds,
+        editable,
       });
     }
   }

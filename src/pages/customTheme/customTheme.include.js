@@ -33,11 +33,17 @@ export default function CustomThemeInclude() {
 
   render();
   app.append($page);
+  helpers.showAd();
 
   actionStack.push({
     id: 'custom-theme',
     action: $page.hide,
   });
+
+  $page.onhide = () => {
+    actionStack.remove('custom-theme');
+    helpers.hideAd();
+  }
 
   $page.addEventListener('click', handleClick);
 

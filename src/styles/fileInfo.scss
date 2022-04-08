@@ -23,11 +23,10 @@
     justify-content: center;
     align-items: center;
     height: 30px;
-    width: fit-content;
+    min-width: fit-content;
     margin: 5px auto;
-    padding: 0 5px;
+    padding: 0 10px;
     border-radius: 20px;
-    max-width: 90%;
     * {
       pointer-events: none;
     }

@@ -1,5 +1,5 @@
 import mimeType from 'mime-types';
-import * as marked from 'marked';
+import { marked } from 'marked';
 import mustache from 'mustache';
 import $_console from '../views/console.hbs';
 import $_markdown from '../views/markdown.hbs';
@@ -229,7 +229,7 @@ async function run(
       if (pathName) {
         url = Url.join(pathName, reqPath);
         file = editorManager.getFile(url, 'uri');
-      } else if (activeFile.type === 'git') {
+      } else if (!activeFile.uri) {
         file = activeFile;
       }
 
@@ -245,7 +245,7 @@ async function run(
 
         case 'md':
           if (file) {
-            const html = marked(file.session.getValue());
+            const html = marked.parse(file.session.getValue());
             const doc = mustache.render($_markdown, {
               html,
               filename,
@@ -449,7 +449,7 @@ async function run(
       return;
     }
 
-    const browser = system.inAppBrowser(src, filename, !isConsole);
+    const browser = system.inAppBrowser(src, filename, !isConsole, appSettings.value.disableCache);
     browser.onOpenExternalBrowser = () => {
       target = "browser";
     }

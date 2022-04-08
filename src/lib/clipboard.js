@@ -5,7 +5,7 @@ import dialogs from '../components/dialogs';
  * @param {string} action
  */
 function clipboardAction(action) {
-  const clipboard = cordova.plugins.clipboard;
+  const { clipboard } = cordova.plugins;
   const editor = editorManager.editor;
   const selectedText = editor.getCopyText();
   const {
@@ -25,7 +25,7 @@ function clipboardAction(action) {
       if (selectedText) {
         clipboard.copy(selectedText);
         update();
-        toast('copied to clipboard');
+        toast(strings['copied to clipboard']);
       }
       break;
     case 'cut':
@@ -34,7 +34,7 @@ function clipboardAction(action) {
         const ranges = editor.selection.getAllRanges();
         ranges.map((range) => editor.remove(range));
         update();
-        toast('copied to clipboard');
+        toast(strings['copied to clipboard']);
       }
       break;
 
@@ -54,9 +54,8 @@ function clipboardAction(action) {
         const x = parseInt((innerWidth - width) / 2);
         const y = parseInt((innerHeight - height) / 2);
         const scale = (/scale(3d)?\(.*\)/.exec(menu.style.transform) || [])[0];
-        menu.style.transform = `translate3d(${x}px, ${y}px, 0px) ${
-          scale || ''
-        }`;
+        menu.style.transform = `translate3d(${x}px, ${y}px, 0px) ${scale || ''
+          }`;
 
         start.remove();
         end.remove();

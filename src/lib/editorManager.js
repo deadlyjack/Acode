@@ -78,7 +78,7 @@ function EditorManager($sidebar, $header, $body) {
     }),
     menu: tag('div', {
       className: 'clipboard-contextmneu',
-      get innerHTML(){
+      get innerHTML() {
         return fullContent();
       }
     }),
@@ -90,7 +90,7 @@ function EditorManager($sidebar, $header, $body) {
     }),
     vScrollbar: $vScrollbar,
     hScrollbar: $hScrollbar,
-    get fullContent(){
+    get fullContent() {
       return fullContent();
     },
     readOnlyContent,
@@ -106,7 +106,7 @@ function EditorManager($sidebar, $header, $body) {
       this.start.classList.add(s);
       this.end.classList.add(s);
     },
-    update: () => {},
+    update: () => { },
     checkForColor: function () {
       const copyTxt = editor.getCopyText();
       const readOnly = editor.getReadOnly();
@@ -130,7 +130,7 @@ function EditorManager($sidebar, $header, $body) {
     getFile,
     switchFile,
     activeFile: null,
-    onupdate: () => {},
+    onupdate: () => { },
     hasUnsavedFiles,
     files: [],
     removeFile,
@@ -465,7 +465,7 @@ function EditorManager($sidebar, $header, $body) {
       controls: false,
       session: ace.createEditSession(text),
       name: filename,
-      editable: true,
+      editable: options.editable ?? true,
       type: options.type || 'regular',
       isUnsaved: options.isUnsaved,
       record: options.record,
@@ -477,7 +477,7 @@ function EditorManager($sidebar, $header, $body) {
           try {
             const settings = JSON.parse(this.session.getValue());
             appSettings.update(settings, false, false);
-          } catch (error) {}
+          } catch (error) { }
           return;
         }
 
@@ -642,13 +642,13 @@ function EditorManager($sidebar, $header, $body) {
         try {
           const fs = fsOperation(Url.join(CACHE_STORAGE, this.id));
           fs.deleteFile();
-        } catch (error) {}
+        } catch (error) { }
       },
       async updateChangeFile(cacheNewName) {
         try {
           const fs = fsOperation(Url.join(CACHE_STORAGE, this.id));
           fs.renameTo(cacheNewName);
-        } catch (error) {}
+        } catch (error) { }
       },
       async isChanged() {
         if (!this.uri || this.readOnly) {
@@ -680,6 +680,12 @@ function EditorManager($sidebar, $header, $body) {
         }
       },
     };
+
+    if (Array.isArray(options.folds)) {
+      file.session.addFolds(
+        parseFolds(options.folds),
+      );
+    }
 
     file.assocTile.classList.add('light');
     if (options.isUnsaved && !options.readOnly) {
@@ -729,6 +735,39 @@ function EditorManager($sidebar, $header, $body) {
   }
 
   /**
+   * 
+   * @param {Array<Fold>} folds 
+   */
+  function parseFolds(folds) {
+    const { Fold } = ace.require('ace/edit_session/fold');
+    const { Range } = ace.require('ace/range');
+    if (!Array.isArray(folds)) return;
+    const foldDataAr = [];
+    folds.forEach(fold => {
+      const { range } = fold;
+      const { start, end } = range;
+      const foldData = new Fold(
+        new Range(
+          start.row,
+          start.column,
+          end.row,
+          end.column
+        ),
+        fold.placeholder,
+      );
+
+      if (fold.ranges.length > 0) {
+        const subFolds = parseFolds(fold.ranges);
+        foldData.subFolds = subFolds;
+        foldData.ranges = subFolds;
+      }
+
+      foldDataAr.push(foldData);
+    });
+    return foldDataAr;
+  }
+
+  /**
    *
    * @param {File} file
    */
@@ -739,9 +778,8 @@ function EditorManager($sidebar, $header, $body) {
       text = 'git • ' + file.record.repo + '/' + file.record.path;
     } else if (file.type === 'gist') {
       const id = file.record.id;
-      text = `gist • ${
-        id.length > 10 ? '...' + id.substring(id.length - 7) : id
-      }`;
+      text = `gist • ${id.length > 10 ? '...' + id.substring(id.length - 7) : id
+        }`;
     } else if (text && !file.readOnly) {
       text = helpers.getVirtualPath(text);
       if (text.length > 30) text = '...' + text.slice(text.length - 27);
@@ -932,22 +970,22 @@ function EditorManager($sidebar, $header, $body) {
         document.onmouseup =
         document.ontouchcancel =
         document.onmouseleave =
-          function (e) {
-            $el.classList.remove('select');
-            $el.style.removeProperty('transform');
-            document.removeEventListener(type, drag, opts);
-            document.ontouchend = document.onmouseup = null;
-            if ($placeholder.isConnected) {
-              $parent.replaceChild($el, $placeholder);
-              updateFileList();
-            }
-            $el.eventAdded = false;
-            document.ontouchend =
-              document.onmouseup =
-              document.ontouchcancel =
-              document.onmouseleave =
-                null;
-          };
+        function (e) {
+          $el.classList.remove('select');
+          $el.style.removeProperty('transform');
+          document.removeEventListener(type, drag, opts);
+          document.ontouchend = document.onmouseup = null;
+          if ($placeholder.isConnected) {
+            $parent.replaceChild($el, $placeholder);
+            updateFileList();
+          }
+          $el.eventAdded = false;
+          document.ontouchend =
+            document.onmouseup =
+            document.ontouchcancel =
+            document.onmouseleave =
+            null;
+        };
 
       function drag(e) {
         e.preventDefault();
@@ -989,15 +1027,15 @@ function EditorManager($sidebar, $header, $body) {
       document.onmouseup =
       document.ontouchmove =
       document.onmousemove =
-        function (e) {
-          document.ontouchend =
-            document.onmouseup =
-            document.ontouchmove =
-            document.onmousemove =
-              null;
-          if (timeout) clearTimeout(timeout);
-          $el.eventAdded = false;
-        };
+      function (e) {
+        document.ontouchend =
+          document.onmouseup =
+          document.ontouchmove =
+          document.onmousemove =
+          null;
+        if (timeout) clearTimeout(timeout);
+        $el.eventAdded = false;
+      };
 
     function updateFileList() {
       const children = [...$parent.children];

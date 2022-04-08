@@ -63,12 +63,14 @@ public class BrowserDialog extends Dialog {
   private int titleTextHeight = 35;
   private int fontSize = 5;
   private int imageSize = 35;
+  private boolean disableCache = false;
 
   public BrowserDialog(
     CordovaPlugin plugin,
     int bgColor,
     String type,
     boolean showButtons,
+    boolean disableCache,
     CallbackContext callbackContext
   ) {
     super(plugin.cordova.getContext(), android.R.style.Theme_NoTitleBar);
@@ -81,6 +83,7 @@ public class BrowserDialog extends Dialog {
     this.imageSize = this.dpToPixels(this.imageSize);
     this.titleTextHeight = this.dpToPixels(this.titleTextHeight);
     this.fontSize = this.dpToPixels(this.fontSize);
+    this.disableCache = disableCache;
 
     Log.d("BrowserDialog", "fontSize: 5dp = " + this.fontSize + "px");
 
@@ -543,7 +546,10 @@ public class BrowserDialog extends Dialog {
   @Override
   public void dismiss() {
     super.dismiss();
-    if (webView != null) webView.destroy();
+    if (webView != null) {
+      if (disableCache) webView.clearCache(true);
+      webView.destroy();
+    }
   }
 
   public void show(String url, String title) {
