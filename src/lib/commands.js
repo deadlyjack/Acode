@@ -196,7 +196,7 @@ export default {
     editorManager.onupdate('read-only');
   },
   'load-ad': () => {
-    if (admob) {
+    if (IS_FREE_VERSION && admob) {
       admob
         .start()
         .then(async () => {

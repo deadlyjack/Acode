@@ -80,9 +80,6 @@ const exec = promisify(require('child_process').exec);
             console.log(
               `|--- Reinstalling platform ${platform.toUpperCase()} ---|`,
             );
-            const { stderr } = await exec(`yarn clean ${platform} ${platform + version}`);
-            if (stderr) console.error(stderr);
-            else console.log('DONE! Cleaning and reinstalling platform');
 
             if (id === ID_FREE) {
               const { stderr: stderr2 } = await exec(`cordova plugin add admob-plus-cordova --save --variable APP_ID_ANDROID="${AD_APP_ID}"`);
@@ -93,6 +90,10 @@ const exec = promisify(require('child_process').exec);
               if (stderr2) console.error(stderr2);
               else console.log('DONE! Removing admob-plus-cordova');
             }
+
+            const { stderr } = await exec(`yarn clean ${platform} ${platform + version}`);
+            if (stderr) console.error(stderr);
+            else console.log('DONE! Cleaning and reinstalling platform');
 
           })(),
         );
