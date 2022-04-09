@@ -225,8 +225,8 @@
   "code": "Nenhuma sugestão",
   "normal": "Mostrar sugestões",
   "app settings": "Configurações do aplicativo",
-  "show ads": "Show Ads",
-  "disable in-app-browser caching": "Disable in-app-browser caching",
-  "disable ad message": "If you wish to disable ads, please consider donating.",
-  "copied to clipboard": "Copied to clipboard"
+  "show ads": "Mostrar Ads",
+  "disable in-app-browser caching": "Desativar o armazenamento de cache do navegador do aplicativo",
+  "disable ad message": "Se você deseja desativar os anúncios, considere doar.",
+  "copied to clipboard": "Copiado para a área de transferência"
 }
