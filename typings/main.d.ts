@@ -57,8 +57,10 @@ interface Settings {
   desktopMode: boolean;
   console: 'legacy' | 'eruda';
   keyboardMode: 'CODE' | 'NORMAL';
+  keyboardMode: 'NO_SUGGESTIONS' | 'NO_SUGGESTIONS_AGGRESSIVE' | 'NORMAL';
   showAd: boolean;
   disableCache: boolean;
+  hideTearDropTimeOut: number;
 }
 
 interface AppSettings {
@@ -125,6 +127,7 @@ interface Fold{
 }
 
 interface NewFileOptions {
+  id?: string;
   uri?: string;
   text?: string;
   render?: boolean;
@@ -137,6 +140,7 @@ interface NewFileOptions {
   mode: 'single' | 'tree';
   folds: Array<Fold>;
   editable: boolean;
+  encoding: string;
 }
 
 interface Controls {

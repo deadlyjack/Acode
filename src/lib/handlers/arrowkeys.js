@@ -22,7 +22,7 @@ export default {
       document.ontouchend =
         document.ontouchcancel =
         document.ontouchstart =
-          null;
+        null;
     };
 
     if (!shiftKey && controls.callBeforeContextMenu)

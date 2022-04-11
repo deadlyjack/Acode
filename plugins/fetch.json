@@ -90,7 +90,7 @@
   "cordova-plugin-system": {
     "source": {
       "type": "local",
-      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-system"
+      "path": "D:\\Github\\deadlyjack\\acode_1.5\\node_modules\\cordova-plugin-system"
     },
     "is_top_level": true,
     "variables": {}

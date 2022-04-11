@@ -469,7 +469,7 @@ function EditorManager($sidebar, $header, $body) {
       type: options.type || 'regular',
       isUnsaved: options.isUnsaved,
       record: options.record,
-      encoding: 'utf-8',
+      encoding: options.encoding || 'utf-8',
       assocTile,
       readOnly: options.readOnly,
       onsave() {

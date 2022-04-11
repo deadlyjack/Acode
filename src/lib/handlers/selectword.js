@@ -235,13 +235,11 @@ function select(type) {
   function update(left = 0, top = 0) {
     const offset = parseFloat(root.style.marginLeft) || 0;
 
-    $start.style.transform = `translate3d(${
-      cpos.start.x + 1 + left - offset
-    }px, ${cpos.start.y + top}px, 0)`;
+    $start.style.transform = `translate3d(${cpos.start.x + 1 + left - offset
+      }px, ${cpos.start.y + top}px, 0)`;
 
-    $end.style.transform = `translate3d(${cpos.end.x + 4 + left - offset}px, ${
-      cpos.end.y + top
-    }px, 0)`;
+    $end.style.transform = `translate3d(${cpos.end.x + 4 + left - offset}px, ${cpos.end.y + top
+      }px, 0)`;
 
     const cm = {
       left: cpos.end.x + left - offset,

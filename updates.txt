@@ -1,6 +1,7 @@
 version 1.5.4
 ☞ Remembers read-only mode.
 ☞ Remembers code foldings.
+☞ Disable/Enable remember opened files and folders.
 ☞ Copy file URL from file info dialog.
 ☞ New option to disable caching in in-app-browser.
 ☞ New menu button in full-screen mode.

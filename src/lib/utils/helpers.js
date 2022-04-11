@@ -739,6 +739,7 @@ export default {
       const $pages = tag.getAll('.page:not(#root)');
       if (force || $pages.length === 1) {
         ad.hide();
+        ad.shown = false;
       }
     }
   },

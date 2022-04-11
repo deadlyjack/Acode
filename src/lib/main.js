@@ -10,7 +10,6 @@ import '../styles/help.scss';
 import '../styles/overrideAceStyle.scss';
 import 'core-js/stable';
 import 'html-tag-js/dist/polyfill';
-import ajax from '@deadlyjack/ajax';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import git from './git';
@@ -21,7 +20,6 @@ import EditorManager from './editorManager';
 import ActionStack from './actionStack';
 import helpers from './utils/helpers';
 import Settings from './settings';
-import dialogs from '../components/dialogs';
 import constants from './constants';
 import intentHandler from './handlers/intent';
 import openFolder from './openFolder';
@@ -39,6 +37,7 @@ import $_menu from '../views/menu.hbs';
 import $_fileMenu from '../views/file-menu.hbs';
 import Icon from '../components/icon';
 import restoreTheme from './restoreTheme';
+import openFiles from './openFiles';
 
 loadPolyFill.apply(window);
 window.onload = Main;
@@ -51,6 +50,16 @@ async function Main() {
     }
   };
 
+  window.addEventListener('resize', () => {
+    if (window.ad?.shown && (innerHeight * devicePixelRatio) < 600) {
+      ad.hide();
+      return;
+    }
+
+    if (window.ad?.shown) {
+      ad.show();
+    }
+  });
   document.addEventListener('deviceready', ondeviceready);
 }
 
@@ -360,111 +369,14 @@ async function loadApp() {
   if (Array.isArray(folders)) {
     folders.forEach((folder) => openFolder(folder.url, folder.opts));
   }
-  for (let file of files) {
-    let text = '';
-    const {
-      cursorPos,
-      isUnsaved,
-      filename,
-      type,
-      uri,
-      id,
-      readOnly,
-      mode,
-      deltedFile,
-      folds,
-      editable = true,
-    } = file;
-    const render = files.length === 1 || id === localStorage.lastfile;
 
-    try {
-      const fs = fsOperation(Url.join(CACHE_STORAGE, id));
-      text = await fs.readFile('utf-8');
-    } catch (error) { }
-
-    Acode.setLoadingMessage(`Loading ${filename}...`);
-
-    if (type === 'git') {
-      gitRecord.get(file.sha).then((record) => {
-        if (record) {
-          editorManager.addNewFile(filename, {
-            type: 'git',
-            text: text || record.data,
-            isUnsaved: isUnsaved,
-            record,
-            render,
-            cursorPos,
-            id,
-            folds,
-            editable,
-          });
-        }
-      });
-    } else if (type === 'gist') {
-      const gist = gistRecord.get(file.recordid, file.isNew);
-      if (gist) {
-        const gistFile = gist.files[filename];
-        editorManager.addNewFile(filename, {
-          type: 'gist',
-          text: text || gistFile.content,
-          isUnsaved,
-          record: gist,
-          render,
-          cursorPos,
-          id,
-          folds,
-          editable,
-        });
-      }
-    } else if (uri) {
-      try {
-        const fs = fsOperation(uri);
-        if (!text) {
-          text = await fs.readFile('utf-8');
-        } else if (!(await fs.exists()) && !readOnly) {
-          uri = null;
-          isUnsaved = true;
-          dialogs.alert(
-            strings.info.toUpperCase(),
-            strings['file has been deleted'].replace('{file}', filename),
-          );
-        }
-
-        if (text !== null) {
-          editorManager.addNewFile(filename, {
-            uri,
-            render,
-            isUnsaved,
-            cursorPos,
-            readOnly,
-            text,
-            id,
-            mode,
-            deltedFile,
-            folds,
-            editable,
-          });
-        }
-      } catch (error) {
-        continue;
-      }
-    } else {
-      editorManager.addNewFile(filename, {
-        render,
-        isUnsaved,
-        cursorPos,
-        text,
-        id,
-        folds,
-        editable,
-      });
-    }
-  }
-  //#endregion
-
-  if (!editorManager.files.length) {
+  if (Array.isArray(files) && files.length) {
+    await openFiles(files);
+  } else {
     editorManager.addNewFile();
   }
+
+  //#endregion
   onEditorUpdate();
   setTimeout(() => {
     document.body.removeAttribute('data-small-msg');

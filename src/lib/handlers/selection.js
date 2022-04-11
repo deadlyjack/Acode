@@ -6,15 +6,15 @@ import tag from 'html-tag-js';
  * @param {HTMLElement} container
  */
 function textControl(editor, container) {
-  const $content = container.querySelector('.ace_scroller'),
-    threshold = 200;
+  const $content = container.querySelector('.ace_scroller');
+  const threshold = 200;
 
-  let counterTimeout,
-    oldPos = editor.getCursorPosition(),
-    count = 0,
-    touch = false,
-    cmFlag = false,
-    move = false;
+  let counterTimeout;
+  let oldPos = editor.getCursorPosition();
+  let count = 0;
+  let touch = false;
+  let cmFlag = false;
+  let move = false;
 
   const clearDoubleclick = () => {
     count = 0;
@@ -114,6 +114,7 @@ function enableSingleMode() {
     left: 0,
     top: 0,
   };
+  let dropRemoveTimeout;
 
   if (controls.size === 'large') {
     margin.left = '-17.5px';
@@ -130,9 +131,13 @@ function enableSingleMode() {
   );
   const $cm = controls.menu;
   const lineHeight = editor.renderer.lineHeight;
-  const lessConent = `<span action="select">${strings.select}</span>${
-    editor.getReadOnly() ? '' : `<span action="paste">${strings.paste}</span>`
-  }<span action="select all">${strings['select all']}<span>`;
+  const lessConent = `
+  <span action="select">${strings.select}</span>
+  ${editor.getReadOnly()
+      ? ''
+      : `<span action="paste">${strings.paste}</span>`
+    }
+  <span action="select all">${strings['select all']}</span>`;
   const $end = controls.end;
   let updateTimeout;
 
@@ -165,7 +170,10 @@ function enableSingleMode() {
     attributes: true,
   });
 
-  if (!$end.isConnected) container.append($end);
+  if (!$end.isConnected) {
+    resetDropRemoveTimeout();
+    container.append($end);
+  }
   $end.ontouchstart = function (e) {
     touchStart.call(this, e);
     e.preventDefault();
@@ -173,9 +181,14 @@ function enableSingleMode() {
     e.stopImmediatePropagation();
   };
 
+  function resetDropRemoveTimeout() {
+    clearTimeout(dropRemoveTimeout);
+    dropRemoveTimeout = setTimeout(hide, appSettings.value.hideTearDropTimeOut);
+  }
+
   function touchStart() {
     const el = this;
-    let showCm = $cm.isConnected;
+    let contextMenuVisible = $cm.isConnected;
     let move = false;
 
     document.ontouchmove = function (e) {
@@ -187,37 +200,39 @@ function enableSingleMode() {
       editor.selection.moveCursorToPosition(pos);
       editor.selection.setSelectionAnchor(pos.row, pos.column);
       editor.renderer.scrollCursorIntoView(pos);
-      if (showCm) $cm.remove();
+      if (contextMenuVisible) $cm.remove();
       move = true;
     };
     document.ontouchend = function () {
       document.ontouchmove = null;
       document.ontouchend = null;
       el.touchStart = null;
-      if (showCm) {
+      if (contextMenuVisible && !move) {
+        $cm.remove();
+        return;
+      }
+      if (contextMenuVisible === move) {
         showContextMenu();
-      } else if (!move) {
-        container.appendChild($cm);
-        controls.checkForColor();
-        updateCm();
       }
     };
   }
 
   function showContextMenu() {
+    clearTimeout(dropRemoveTimeout);
     if (editor.getCopyText()) {
-      $cm.innerHTML =
-        controlscontrols[
-          editor.getReadOnly() ? 'readOnlyContent' : 'fullContent'
-        ];
+      $cm.innerHTML = controls[
+        editor.getReadOnly() ? 'readOnlyContent' : 'fullContent'
+      ];
     } else {
       $cm.innerHTML = lessConent;
     }
+    controls.checkForColor();
     container.appendChild($cm);
     updateCm();
   }
 
   function onchange() {
+    resetDropRemoveTimeout();
     updateTimeout = setTimeout(updateEnd, 0);
   }
 
@@ -233,9 +248,8 @@ function enableSingleMode() {
 
   function update(left = 0, top = 0) {
     const offset = parseFloat(root.style.marginLeft) || 0;
-    $end.style.transform = `translate3d(${cpos.x + 2 + left - offset}px, ${
-      cpos.y + top
-    }px, 0) rotate(45deg)`;
+    $end.style.transform = `translate3d(${cpos.x + 2 + left - offset}px, ${cpos.y + top
+      }px, 0) rotate(45deg)`;
     $end.style.display = 'block';
   }
 
@@ -264,12 +278,12 @@ function enableSingleMode() {
       cm.top += 80;
     }
 
-    $cm.style.transform = `translate3d(${cm.left * scale}px, ${
-      cm.top
-    }px, 0) scale(${scale})`;
+    $cm.style.transform = `translate3d(${cm.left * scale}px, ${cm.top
+      }px, 0) scale(${scale})`;
   }
 
   function callBeforeContextMenu() {
+    clearTimeout(dropRemoveTimeout);
     $end.remove();
     $cm.remove();
 
@@ -284,6 +298,7 @@ function enableSingleMode() {
     editor.off('blur', hide);
     mObserver.disconnect();
     $end.ontouchstart = null;
+    controls.update = null;
   }
 
   function hide() {

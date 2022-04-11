@@ -30,6 +30,7 @@ class Settings {
   #defaultSettings;
   #initialized = false;
   #oldSettings;
+  #keyboardModes = ['NO_SUGGESTIONS', 'NO_SUGGESTIONS_AGGRESSIVE', 'NORMAL'];
 
   constructor() {
     this.methods = {
@@ -99,8 +100,11 @@ class Settings {
       checkFiles: true,
       desktopMode: false,
       console: 'legacy',
-      keyboardMode: 'CODE',
+      keyboardMode: 'NO_SUGGESTIONS',
+      hideTearDropTimeOut: 3000,
       disableCache: false,
+      rememberFiles: true,
+      rememberFolders: true,
       customTheme: {
         '--primary-color': 'rgb(153,153,255)',
         '--secondary-color': 'rgb(255,255,255)',
@@ -152,6 +156,12 @@ class Settings {
       for (let setting in this.#defaultSettings) {
         if (!(setting in settings)) {
           settings[setting] = this.#defaultSettings[setting];
+        }
+
+        if (setting === 'keyboardMode') {
+          if (!this.#keyboardModes.includes(settings[setting])) {
+            settings[setting] = this.#defaultSettings[setting];
+          }
         }
       }
       this.value = { ...settings };

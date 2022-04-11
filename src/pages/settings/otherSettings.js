@@ -66,7 +66,7 @@ export default function otherSettings() {
     {
       key: 'keyboardMode',
       text: strings['keyboard mode'],
-      subText: strings[values.keyboardMode.toLocaleLowerCase()],
+      subText: getModeString(values.keyboardMode),
     },
     {
       key: 'vibrateOnTap',
@@ -77,6 +77,16 @@ export default function otherSettings() {
       key: 'disablecache',
       text: strings['disable in-app-browser caching'],
       checkbox: values.disableCache,
+    },
+    {
+      key: 'remember-files',
+      text: strings['remember opened files'],
+      checkbox: values.rememberFiles,
+    },
+    {
+      key: 'remember-folders',
+      text: strings['remember opened folders'],
+      checkbox: values.rememberFolders,
     }
   ];
 
@@ -195,7 +205,8 @@ export default function otherSettings() {
 
       case 'keyboardMode':
         dialogs.select(strings['keyboard mode'], [
-          ['CODE', strings.code],
+          ['NO_SUGGESTIONS', strings['no suggestions']],
+          ['NO_SUGGESTIONS_AGGRESSIVE', strings['no suggestions aggressive']],
           ['NORMAL', strings.normal],
         ], {
           default: values.keyboardMode,
@@ -205,7 +216,7 @@ export default function otherSettings() {
             system.setInputType(res);
             appSettings.value.keyboardMode = res;
             appSettings.update();
-            this.changeSubText(strings[res.toLocaleLowerCase()]);
+            this.changeSubText(getModeString(res));
           });
         break;
 
@@ -253,6 +264,24 @@ export default function otherSettings() {
         appSettings.update();
         break;
 
+      case 'remember-files':
+        this.value = !values.rememberFiles;
+        values.rememberFiles = this.value;
+        if (!this.value) {
+          delete localStorage.files;
+        }
+        appSettings.update();
+        break;
+
+      case 'remember-folders':
+        this.value = !values.rememberFolders;
+        values.rememberFolders = this.value;
+        if (!this.value) {
+          delete localStorage.folders;
+        }
+        appSettings.update();
+        break;
+
       default:
         break;
     }
@@ -261,4 +290,9 @@ export default function otherSettings() {
   $page.appendChild($settingsList);
   app.append($page);
   helpers.showAd();
+}
+
+
+function getModeString(mode) {
+  return strings[mode.replace(/_/g, ' ').toLocaleLowerCase()]
 }

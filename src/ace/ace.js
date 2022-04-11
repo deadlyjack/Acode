@@ -10564,7 +10564,7 @@ define('ace/edit_session', [
     require('./background_tokenizer').BackgroundTokenizer;
   var SearchHighlight = require('./search_highlight').SearchHighlight;
 
-  var EditSession = function (text, mode, foldData) {
+  var EditSession = function (text, mode) {
     this.$breakpoints = [];
     this.$decorations = [];
     this.$frontMarkers = {};
@@ -10572,7 +10572,7 @@ define('ace/edit_session', [
     this.$markerId = 1;
     this.$undoSelect = true;
 
-    this.$foldData = foldData || [];
+    this.$foldData = [];
     this.id = 'session' + ++EditSession.$uid;
     this.$foldData.toString = function () {
       return this.join('\n');
@@ -24167,8 +24167,8 @@ define('ace/ace', [
     editor.container.env = editor.env = env;
     return editor;
   };
-  exports.createEditSession = function (text, mode, foldData) {
-    var doc = new EditSession(text, mode, foldData);
+  exports.createEditSession = function (text, mode) {
+    var doc = new EditSession(text, mode);
     doc.setUndoManager(new UndoManager());
     return doc;
   };

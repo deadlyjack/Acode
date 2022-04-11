@@ -22,7 +22,7 @@ export default async () => {
         continue;
       }
 
-      const text = await fs.readFile('utf-8');
+      const text = await fs.readFile(file.encoding ?? 'utf-8');
       const loadedText = file.session.getValue();
 
       if (text !== loadedText) {
@@ -39,7 +39,7 @@ export default async () => {
           file.session.setValue(text);
           editor.gotoLine(cursorPos.row, cursorPos.column);
           editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
-        } catch (error) {}
+        } catch (error) { }
       }
     }
   }

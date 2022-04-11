@@ -222,11 +222,14 @@
   "downloading...": "Baixando...",
   "folder name": "Nome da pasta",
   "keyboard mode": "Modo do teclado",
-  "code": "Nenhuma sugestão",
-  "normal": "Mostrar sugestões",
+  "normal": "Normal",
   "app settings": "Configurações do aplicativo",
   "show ads": "Mostrar Ads",
   "disable in-app-browser caching": "Desativar o armazenamento de cache do navegador do aplicativo",
   "disable ad message": "Se você deseja desativar os anúncios, considere doar.",
-  "copied to clipboard": "Copiado para a área de transferência"
+  "copied to clipboard": "Copiado para a área de transferência",
+  "remember opened files": "Remember opened files",
+  "remember opened folders": "Remember opened folders",
+  "no suggestions": "Nenhuma sugestão",
+  "no suggestions aggressive": "No suggestions aggressive"
 }

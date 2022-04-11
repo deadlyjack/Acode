@@ -18,7 +18,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
-import android.text.InputType;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
@@ -701,16 +700,13 @@ public class System extends CordovaPlugin {
   }
 
   private void setInputType(String type) {
-    if (type.equals("CODE")) {
-      webView.setInputType(
-        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS |
-        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-      );
-    } else {
-      webView.setInputType(
-        InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL
-      );
+    int mode = -1;
+    if (type.equals("NO_SUGGESTIONS")) {
+      mode = 0;
+    } else if (type.equals("NO_SUGGESTIONS_AGGRESSIVE")) {
+      mode = 1;
     }
+    webView.setInputType(mode);
   }
 
   private String getString(JSONArray ar, int index) {

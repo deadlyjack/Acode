@@ -221,11 +221,14 @@
   "downloading...": "Downloading...",
   "folder name": "Folder name",
   "keyboard mode": "Keyboard mode",
-  "code": "No suggestions",
-  "normal": "Show suggestions",
+  "normal": "Normal",
   "app settings": "App settings",
   "show ads": "Show Ads",
   "disable in-app-browser caching": "Disable in-app-browser caching",
   "disable ad message": "If you wish to disable ads, please consider donating.",
-  "copied to clipboard": "Copied to clipboard"
+  "copied to clipboard": "Copied to clipboard",
+  "remember opened files": "Remember opened files",
+  "remember opened folders": "Remember opened folders",
+  "no suggestions": "No suggestions",
+  "no suggestions aggressive": "No suggestions aggressive"
 }
