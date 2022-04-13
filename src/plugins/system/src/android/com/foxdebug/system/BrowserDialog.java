@@ -85,8 +85,6 @@ public class BrowserDialog extends Dialog {
     this.fontSize = this.dpToPixels(this.fontSize);
     this.disableCache = disableCache;
 
-    Log.d("BrowserDialog", "fontSize: 5dp = " + this.fontSize + "px");
-
     this.requestWindowFeature(Window.FEATURE_NO_TITLE);
     this.setCancelable(true);
     this.setTheme(bgColor, type);
@@ -229,7 +227,13 @@ public class BrowserDialog extends Dialog {
         @Override
         public void onClick(View v) {
           dismiss();
-          Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+
+          Uri webpage = Uri.parse(url);
+          if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            webpage = Uri.parse("http://" + url);
+          }
+
+          Intent browserIntent = new Intent(Intent.ACTION_VIEW, webpage);
           context.startActivity(browserIntent);
           if (callbackContext != null) {
             callbackContext.success("onOpenExternalBrowser: " + url);
@@ -507,9 +511,6 @@ public class BrowserDialog extends Dialog {
       View decorView = window.getDecorView();
       int uiOptions = decorView.getSystemUiVisibility();
 
-      // 0x80000000 FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
-      // 0x00000010 SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-
       if (themeType.equals("light")) {
         decorView.setSystemUiVisibility(uiOptions | 0x80000000 | 0x00000010);
         return;
@@ -576,6 +577,9 @@ public class BrowserDialog extends Dialog {
     button.setContentDescription(contentDescription);
     button.setLayoutParams(params);
     button.setScaleType(ImageView.ScaleType.FIT_CENTER);
+    button.setAdjustViewBounds(true);
+    int padding = this.dpToPixels(10);
+    button.setPadding(padding, padding, padding, padding);
     return button;
   }
 

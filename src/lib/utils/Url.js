@@ -76,6 +76,9 @@ export default {
         if (protocol === 'content:') {
           let [root, pathname] = contentUri.docId.split(':');
           const newDocId = path.join(pathname, ...pathnames.slice(1));
+          if (/^content:\/\/com.termux/.test(url)) {
+            return `${contentUri.rootUri}::${root}${newDocId}${query}`;
+          }
           return `${contentUri.rootUri}::${root}:${newDocId}${query}`;
         } else {
           return this.join(contentUri.rootUri, ...pathnames.slice(1));

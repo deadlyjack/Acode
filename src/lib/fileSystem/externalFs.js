@@ -2,19 +2,14 @@ import dialogs from '../../components/dialogs';
 import internalFs from './internalFs';
 
 export default {
-  readFile(url) {
+  async readFile(uri) {
+    uri = await this.formatUri(uri);
     return new Promise((resolve, reject) => {
-      sdcard.formatUri(
-        url,
-        (uri) => {
-          internalFs.readFile(uri).then(resolve).catch(reject);
-        },
-        reject,
-      );
+      internalFs.readFile(uri).then(resolve).catch(reject)
     });
   },
 
-  writeFile(filename, content) {
+  async writeFile(filename, content) {
     return new Promise(async (resolve, reject) => {
       if (content instanceof ArrayBuffer) {
         content = await toBase64(content);
@@ -22,8 +17,8 @@ export default {
           filename,
           content,
           true,
-          (res) => resolve(res),
-          (err) => reject(err),
+          resolve,
+          reject,
         );
         return;
       }
@@ -31,8 +26,8 @@ export default {
       sdcard.write(
         filename,
         content,
-        (res) => resolve(res),
-        (err) => reject(err),
+        resolve,
+        reject,
       );
     });
 
@@ -52,39 +47,39 @@ export default {
     }
   },
 
-  copy(src, dest) {
+  async copy(src, dest) {
     return new Promise((resolve, reject) => {
       sdcard.copy(
         src,
         dest,
-        (res) => resolve(res),
-        (err) => reject(err),
+        resolve,
+        reject,
       );
     });
   },
 
-  move(src, dest) {
+  async move(src, dest) {
     return new Promise((resolve, reject) => {
       sdcard.move(
         src,
         dest,
-        (res) => resolve(res),
-        (err) => reject(err),
+        resolve,
+        reject,
       );
     });
   },
 
-  deleteFile(filename) {
+  async deleteFile(filename) {
     return new Promise((resolve, reject) => {
       sdcard.delete(
         filename,
-        (res) => resolve(res),
-        (err) => reject(err),
+        resolve,
+        reject,
       );
     });
   },
 
-  createFile(parent, filename, data) {
+  async createFile(parent, filename, data) {
     return new Promise((resolve, reject) => {
       sdcard.createFile(
         parent,
@@ -95,86 +90,61 @@ export default {
               res,
               data,
               () => resolve(res),
-              (err) => reject(err),
+              reject,
             );
           resolve(res);
         },
-        (err) => reject(err),
+        reject,
       );
     });
   },
 
-  createDir(parent, dirname) {
+  async createDir(parent, dirname) {
     return new Promise((resolve, reject) => {
       sdcard.createDir(
         parent,
         dirname,
-        (res) => resolve(res),
-        (err) => reject(err),
+        resolve,
+        reject,
       );
     });
   },
 
-  listDir(pathname) {
+  async listDir(pathname) {
     return new Promise((resolve, reject) => {
       sdcard.listDir(pathname, resolve, reject);
     });
   },
 
-  renameFile(src, newname) {
+  async renameFile(src, newname) {
     return new Promise((resolve, reject) => {
       sdcard.rename(
         src,
         newname,
-        (res) => resolve(res),
-        (err) => reject(err),
+        resolve,
+        reject,
       );
     });
   },
 
   getStorageAccessPermission(uuid, name) {
     return new Promise((resolve, reject) => {
-      const version = parseInt(device.version);
-      const versionAlpha =
-        typeof device.version === 'string'
-          ? device.version.toLocaleLowerCase()
-          : '';
-      if (version < 7 || version > 9 || ['q', 'r'].includes(versionAlpha)) {
+      setTimeout(() => {
         dialogs.loader.destroy();
-        dialogs
-          .box(
-            'INFO',
-            `<p>Follow below steps to allow Acode to modify <strong>${
-              name || 'SD card'
-            }</strong>.<p><br>` + '<img src="./res/imgs/steps.jpg">',
-          )
-          .onhide(next);
-      } else {
-        next();
-      }
-
-      function next() {
-        setTimeout(() => {
-          dialogs.loader.destroy();
-        }, 100);
-        sdcard.getStorageAccessPermission(
-          uuid,
-          (result) => {
-            resolve(result);
-          },
-          (err) => {
-            reject(err);
-          },
-        );
-      }
+      }, 100);
+      sdcard.getStorageAccessPermission(
+        uuid,
+        resolve,
+        reject,
+      );
     });
   },
 
   listStorages() {
     return new Promise((resolve, reject) => {
       sdcard.listStorages(
-        (res) => resolve(res),
-        (err) => reject(err),
+        resolve,
+        reject,
       );
     });
   },
@@ -185,22 +155,27 @@ export default {
     });
   },
 
-  stats(uri) {
+  async stats(uri) {
+    uri = await this.formatUri(uri);
     return new Promise((resolve, reject) => {
-      sdcard.formatUri(
+      sdcard.stats(
         uri,
-        (res) => {
-          sdcard.stats(
-            uri,
-            (stats) => {
-              stats.uri = res;
-              resolve(stats);
-            },
-            reject,
-          );
+        (stats) => {
+          stats.uri = uri;
+          resolve(stats);
         },
         reject,
       );
     });
   },
+
+  formatUri(uri) {
+    return new Promise((resolve, reject) => {
+      sdcard.formatUri(
+        uri,
+        resolve,
+        reject,
+      );
+    });
+  }
 };

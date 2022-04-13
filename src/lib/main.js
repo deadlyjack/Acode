@@ -209,16 +209,19 @@ async function ondeviceready() {
   }
 
   Acode.setLoadingMessage('Loading keybindings...');
-  try {
-    const fs = fsOperation(KEYBINDING_FILE);
-    const content = await fs.readFile('utf-8');
-    const bindings = helpers.parseJSON(content);
-    if (bindings) {
+  (async () => {
+    try {
+      const fs = fsOperation(KEYBINDING_FILE);
+      const content = await fs.readFile('utf-8');
+      const bindings = helpers.parseJSON(content);
+      if (!bindings) {
+        throw new Error('Empty keybindings file.');
+      }
       window.customKeyBindings = bindings;
+    } catch (error) {
+      helpers.resetKeyBindings();
     }
-  } catch (error) {
-    await helpers.resetKeyBindings();
-  }
+  })();
 
   Acode.setLoadingMessage('Loading editor...');
   await helpers.loadScripts(
@@ -365,13 +368,19 @@ async function loadApp() {
   //#endregion
 
   //#region loading-files
-  Acode.setLoadingMessage('Loading files...');
+  Acode.setLoadingMessage('Loading folders...');
   if (Array.isArray(folders)) {
     folders.forEach((folder) => openFolder(folder.url, folder.opts));
   }
 
   if (Array.isArray(files) && files.length) {
-    await openFiles(files);
+    Acode.setLoadingMessage(`Loading files (0/${files.length})...`);
+    const res = await openFiles(files, (count) => {
+      Acode.setLoadingMessage(`Loading files (${count}/${files.length})...`);
+    });
+    if (res.success === 0) {
+      editorManager.addNewFile();
+    }
   } else {
     editorManager.addNewFile();
   }

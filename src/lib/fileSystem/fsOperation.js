@@ -271,17 +271,14 @@ function fsOperation(uri) {
       renameTo(newname) {
         return fs.renameFile(url, newname);
       },
-      exists() {
-        return new Promise((resolve, reject) => {
-          sdcard.exists(
-            url,
-            (res) => {
-              if (res === 'TRUE') resolve(true);
-              else resolve(false);
-            },
-            reject,
-          );
-        });
+      async exists() {
+        try {
+          const stats = await fs.stats(url);
+          return stats.exists;
+        } catch (error) {
+          console.error('ExternalFs Stats Error', error);
+          return false;
+        }
       },
       stats() {
         return fs.stats(url);

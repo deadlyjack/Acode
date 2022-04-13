@@ -71,7 +71,9 @@ async function saveFile(file, isSaveAs = false) {
     }
   } else {
     const option = await recents.select(
-      [['select-folder', strings['select folder'], 'folder']],
+      [
+        ['select-folder', strings['select folder'], 'folder']
+      ],
       'dir',
       strings['select folder'],
     );
@@ -108,7 +110,9 @@ async function saveFile(file, isSaveAs = false) {
 
       if (!(await fs.exists())) {
         const fileDir = fsOperation(url);
-        await fileDir.createFile(file.filename);
+        await fileDir.createFile(file.filename).catch((err) => {
+          helpers.error("Error creating file", err);
+        });
       }
 
       const openedFile = editorManager.getFile(fileUri, 'uri');
@@ -121,7 +125,9 @@ async function saveFile(file, isSaveAs = false) {
     }
 
     if (!fs) fs = fsOperation(file.uri);
-    await fs.writeFile(data);
+    await fs.writeFile(data).catch((err) => {
+      helpers.error("Error writing file", err);
+    });
     if (file.location) {
       recents.addFolder(file.location);
     }

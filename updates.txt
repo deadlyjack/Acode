@@ -3,12 +3,14 @@ version 1.5.4
 ☞ Remembers code foldings.
 ☞ Disable/Enable remember opened files and folders.
 ☞ Copy file URL from file info dialog.
-☞ New option to disable caching in in-app-browser.
-☞ New menu button in full-screen mode.
+☞ New* option to disable caching in in-app-browser.
+☞ New* menu button in full-screen mode.
 ☞ Updated SFTP library.
-☞ (Only in the free version) Introduced Google Ads, disable it from App settings.
+☞ Introduced Google Ads, disable it from App settings.
 ☞ Performance improvement.
 ☞ Fixed, unable to preview MD files.
+☞ Improved Termux file support.
+☞ Fixed icon size in the in-app browser for some devices.
 ☞ Bugs fixes.
 
 

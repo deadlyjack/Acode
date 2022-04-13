@@ -80,18 +80,26 @@ export default {
    */
   getVirtualAddress(url) {
     try {
-      const { docId, rootUri, isFileUri } = this.parse(url);
-
-      if (isFileUri) return url;
       const storageList = JSON.parse(localStorage.storageList || '[]');
 
+      const matches = [];
       for (let storage of storageList) {
-        if ((storage.uri ?? storage.url) === rootUri) {
-          const id = rootUri.split('/').pop();
-          let filePath = docId.replace(decodeURL(id), '');
-          if (filePath.startsWith('/')) filePath = filePath.slice(1);
-          return `${storage.name}/${filePath}`;
-        }
+        const regex = new RegExp('^' + (storage.uri ?? storage.url));
+        matches.push({
+          regex,
+          charMatched: url.length - url.replace(regex, '').length,
+          storage,
+        });
+      }
+
+      const matched = matches.sort((a, b) => {
+        return b.charMatched - a.charMatched;
+      })[0];
+
+      if (matched) {
+        const { storage, regex } = matched;
+        const { name } = storage;
+        return url.replace(regex, name).replace('::', '/').replace(/\/+/g, '/');
       }
 
       return url;
