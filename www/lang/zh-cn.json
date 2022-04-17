@@ -222,14 +222,14 @@
   "downloading...": "下载中...",
   "folder name": "文件夹名称",
   "keyboard mode": "键盘模式",
-  "normal": "Normal",
+  "normal": "正常",
   "app settings": "应用设置",
-  "show ads": "Show Ads",
-  "disable in-app-browser caching": "Disable in-app-browser caching",
-  "disable ad message": "If you wish to disable ads, please consider donating.",
-  "copied to clipboard": "Copied to clipboard",
-  "remember opened files": "Remember opened files",
-  "remember opened folders": "Remember opened folders",
+  "show ads": "显示广告",
+  "disable in-app-browser caching": "关闭应用内浏览器缓存",
+  "disable ad message": "如果你希望关闭广告，请考虑捐赠。",
+  "copied to clipboard": "复制到剪贴板",
+  "remember opened files": "记住打开过的文件",
+  "remember opened folders": "记住打开过的文件夹",
   "no suggestions": "不显示建议",
-  "no suggestions aggressive": "No suggestions aggressive"
+  "no suggestions aggressive": "不显示激进建议"
 }
