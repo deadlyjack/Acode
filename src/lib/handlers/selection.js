@@ -208,6 +208,7 @@ function enableSingleMode() {
       document.ontouchend = null;
       el.touchStart = null;
       if (contextMenuVisible && !move) {
+        resetDropRemoveTimeout();
         $cm.remove();
         return;
       }

@@ -93,6 +93,9 @@ public class System extends CordovaPlugin {
         setInputType(arg1);
         callbackContext.success();
         return true;
+      case "get-cordova-intent":
+        getCordovaIntent(callbackContext);
+        return true;
       case "set-intent-handler":
         setIntentHandler(callbackContext);
         return true;
@@ -615,8 +618,18 @@ public class System extends CordovaPlugin {
     }
   }
 
+  private void getCordovaIntent(CallbackContext callback) {
+    Intent intent = activity.getIntent();
+    callback.sendPluginResult(
+      new PluginResult(PluginResult.Status.OK, getIntentJson(intent))
+    );
+  }
+
   private void setIntentHandler(CallbackContext callbackContext) {
     intentHandler = callbackContext;
+    PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
+    result.setKeepCallback(true);
+    callbackContext.sendPluginResult(result);
   }
 
   @Override

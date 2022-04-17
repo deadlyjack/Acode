@@ -85,6 +85,9 @@ module.exports = {
   setIntentHandler: function (handler, onerror) {
     cordova.exec(handler, onerror, 'System', 'set-intent-handler', []);
   },
+  getCordovaIntent: function (onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'System', 'get-cordova-intent', []);
+  },
   setInputType: function (type, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'set-input-type', [type]);
   }

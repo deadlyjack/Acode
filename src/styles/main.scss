@@ -732,6 +732,16 @@ textarea {
   }
 }
 
+button{
+  &.floating.icon{
+    z-index: 1;
+    opacity: 1;
+    &:disabled{
+      opacity: 0.2;
+    }
+  }
+}
+
 #social-links {
   position: relative;
   height: 60px;

@@ -22,6 +22,16 @@ interface ShortCut {
   data: String;
 }
 
+interface Intent{
+  action: string;
+  data: string;
+  type: string;
+  package: string;
+  extras: {
+    [key: string]: any;
+  };
+}
+
 interface System {
   /**
    * Get informartion about current webview
@@ -185,6 +195,18 @@ interface System {
    * @param onFail Callback on fail
    */
   setUiTheme(theme: string, type: string, onSuccess:()=>void, onFail: (err: String)=>void): void;
+  /**
+   * Sets intent handler for the app
+   * @param onSuccess 
+   * @param onFail 
+   */
+  setIntentHandler(onSuccess: (intent: Intent)=>void, onFail: (err: String)=>void): void;
+  /**
+   * Gets the launch intent
+   * @param onSuccess 
+   * @param onFail 
+   */
+  getCordovaIntent(onSuccess: (intent: Intent)=>void, onFail: (err: String)=>void): void;
 }
 
 declare var system: System;

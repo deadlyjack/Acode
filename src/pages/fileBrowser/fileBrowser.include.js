@@ -45,7 +45,6 @@ import URLParse from 'url-parse';
  */
 function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
   mode = mode || 'file';
-  buttonText = buttonText || strings['select folder'];
 
   const IS_FOLDER_MODE = ['folder', 'both'].includes(mode);
   const IS_FILE_MODE = ['file', 'both'].includes(mode);
@@ -140,7 +139,10 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       list: [],
       scroll: 0,
     };
-    let $folderOption;
+    /**
+     * @type {HTMLButtonElement}
+     */
+    let $openFolder;
     //#endregion
 
     actionStack.setMark();
@@ -152,28 +154,23 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
 
 
     if (IS_FOLDER_MODE) {
-      const $openFolder = tag('button', {
-        textContent: buttonText,
-      });
-      $folderOption = tag('footer', {
-        children: [
-          tag('div', {
-            className: 'button-container',
-            child: $openFolder,
-          }),
-        ],
+      $openFolder = tag('button', {
+        className: 'floating icon check',
+        style: {
+          bottom: '10px',
+          top: 'unset',
+        },
+        disabled: true,
+        onclick() {
+          $page.hide();
+          resolve({
+            type: 'folder',
+            ...currentDir,
+          });
+        },
       });
 
-      $page.setAttribute('footer-height', 1);
-      $page.append($folderOption);
-
-      $openFolder.onclick = () => {
-        $page.hide();
-        resolve({
-          type: 'folder',
-          ...currentDir,
-        });
-      };
+      $page.append($openFolder);
     }
 
     app.append($page);
@@ -569,7 +566,6 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
 
     async function listAllStorages() {
       let hasInternalStorage = true;
-      if (IS_FOLDER_MODE) $folderOption.classList.add('disabled');
       allStorages.length = 0;
 
       if (ANDROID_SDK_INT == 29) {
@@ -716,9 +712,9 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       }
 
       if (url === '/') {
-        if (IS_FOLDER_MODE) $folderOption.classList.add('disabled');
+        if (IS_FOLDER_MODE) $openFolder.disabled = true;
       } else {
-        if (IS_FOLDER_MODE) $folderOption.classList.remove('disabled');
+        if (IS_FOLDER_MODE) $openFolder.disabled = false;
       }
 
       const $nav = tag.get(`#${getNavId(url)}`);

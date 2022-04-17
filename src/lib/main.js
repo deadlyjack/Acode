@@ -404,7 +404,8 @@ async function loadApp() {
   document.addEventListener('keyup', handleMainKeyUp);
   document.addEventListener('menubutton', $sidebar.toggle);
   navigator.app.overrideButton('menubutton', true);
-  system.setIntentHandler(intentHandler);
+  system.setIntentHandler(intentHandler, intentHandler.onError);
+  system.getCordovaIntent(intentHandler, intentHandler.onError);
   $sidebar.onshow = function () {
     const activeFile = editorManager.activeFile;
     if (activeFile) editorManager.editor.blur();
