@@ -354,9 +354,7 @@ a.icon {
   }
 
   &:focus {
-    border: solid 1px rgba(255, 238, 0, 0.5);
-    box-sizing: border-box;
-    height: calc(100% - 2px);
+    border: rgba(0, 0, 0, 0.1);
   }
 
   &.disabled {

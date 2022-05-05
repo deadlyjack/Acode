@@ -1,18 +1,19 @@
 import Page from '../../components/page';
 import tag from 'html-tag-js';
 import gen from '../../components/gen';
+import helpers from '../../lib/utils/helpers';
 
 export default function searchSettings() {
-  const page = Page(strings.search.capitalize());
+  const $page = Page(strings.search.capitalize());
   const settingsList = tag('div', {
     className: 'main list',
   });
 
   actionStack.push({
     id: 'settings-search',
-    action: page.hide,
+    action: $page.hide,
   });
-  page.onhide = function () {
+  $page.onhide = function () {
     helpers.hideAd();
     actionStack.remove('settings-search');
   };
@@ -64,7 +65,7 @@ export default function searchSettings() {
     }
   }
 
-  page.appendChild(settingsList);
-  app.append(page);
+  $page.appendChild(settingsList);
+  app.append($page);
   helpers.showAd();
 }
