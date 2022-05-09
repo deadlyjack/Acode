@@ -15,11 +15,15 @@ import openFolder from '../lib/openFolder';
  * @returns {HTMLElement & SideBar}
  */
 function sidenav($activator, toggler) {
-  $activator = $activator || app;
   let { innerWidth } = window;
-  let mode = innerWidth > 750 ? 'tab' : 'phone';
-  let width = +(localStorage.sideBarWidth || 250);
+
   const START_THRESHOLD = 20; //Point where to start swip
+  const MIN_WIDTH = 250; //Min width of the side bar
+  const MAX_WIDTH = () => innerWidth * 0.7; //Max width of the side bar
+
+  $activator = $activator || app;
+  let mode = innerWidth > 750 ? 'tab' : 'phone';
+  let width = +(localStorage.sideBarWidth || MIN_WIDTH);
   const $el = tag('div', {
     id: 'sidenav',
     className: mode,
@@ -218,7 +222,9 @@ function sidenav($activator, toggler) {
       resize(deltaX);
     };
     document.ontouchend = () => {
-      width += deltaX;
+      const newWidth = width + deltaX;
+      if (newWidth <= MIN_WIDTH) width = MIN_WIDTH;
+      else if (newWidth >= MAX_WIDTH()) width = MAX_WIDTH();
       localStorage.sideBarWidth = width;
       document.ontouchmove = null;
       document.ontouchend = null;
@@ -229,8 +235,8 @@ function sidenav($activator, toggler) {
 
   function resize(deltaX) {
     const newWidth = width + deltaX;
-    if (newWidth >= innerWidth * 0.75) return;
-    if (newWidth <= 250) return;
+    if (newWidth >= MAX_WIDTH()) return;
+    if (newWidth <= MIN_WIDTH) return;
     setWidth(newWidth);
   }
 
@@ -375,7 +381,7 @@ function sidenav($activator, toggler) {
 
   $el.getwidth = function () {
     const width = innerWidth * 0.7;
-    return mode === 'phone' ? (width >= 350 ? 350 : width) : 250;
+    return mode === 'phone' ? (width >= 350 ? 350 : width) : MIN_WIDTH;
   };
 
   $el.hide = hide;
