@@ -186,80 +186,6 @@ a.icon {
   }
 }
 
-#ad {
-  border-radius: 4px;
-  background-color: white;
-  color: #232323;
-  display: flex;
-  flex-direction: column;
-  width: calc(100% - 10px);
-  max-width: 600px;
-  margin: 0 auto;
-  box-sizing: border-box;
-  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2);
-  box-shadow: 0 0 4px 0 var(--box-shadow-color);
-  padding-bottom: 10px;
-
-  .heading {
-    margin-top: -5px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 1.4rem;
-
-    .text {
-      font-weight: 400;
-      margin: 0 10px;
-    }
-
-    .icon {
-      font-size: 1.2rem;
-      height: 30px;
-      width: 30px;
-      margin: 5px;
-    }
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .ad-body {
-    display: flex;
-
-    .image {
-      min-height: fit-content;
-      min-width: fit-content;
-      margin: auto;
-
-      img {
-        margin: 0 5px;
-        max-width: 100px;
-        border-radius: 4px;
-      }
-    }
-
-    .content {
-      margin-right: 5px;
-      display: flex;
-      flex-direction: column;
-
-      .title {
-        font-weight: 500;
-        text-transform: none;
-      }
-
-      .description {
-        text-transform: none;
-        white-space: pre-wrap;
-        font-size: 0.92rem;
-      }
-    }
-  }
-}
-
 .no-scroll {
   &::-webkit-scrollbar {
     width: 0px;
@@ -396,14 +322,7 @@ a.icon {
   opacity: 0;
 }
 
-footer {
-  .ad-view{
-    height: 40px;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
+footer {  
   &.button-container,
   .button-container {
     overflow-x: auto;
@@ -821,6 +740,10 @@ button{
 
 .sake{
   animation: sake 3s ease-out infinite;
+}
+
+.w-resize{
+  cursor: w-resize;
 }
 
 @keyframes sake {

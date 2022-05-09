@@ -10,12 +10,15 @@ import openFolder from '../lib/openFolder';
 
 /**
  *
- * @param {HTMLElement} [activator]
+ * @param {HTMLElement} [$activator]
  * @param {HTMLElement} [toggler]
  * @returns {HTMLElement & SideBar}
  */
-function sidenav(activator, toggler) {
+function sidenav($activator, toggler) {
+  $activator = $activator || app;
+  let { innerWidth } = window;
   let mode = innerWidth > 750 ? 'tab' : 'phone';
+  let width = +(localStorage.sideBarWidth || 250);
   const START_THRESHOLD = 20; //Point where to start swip
   const $el = tag('div', {
     id: 'sidenav',
@@ -34,38 +37,48 @@ function sidenav(activator, toggler) {
     endY: 0,
     target: null,
   };
-  let width = 250,
-    eventAddedFlag = 0,
-    _innerWidth = innerWidth,
-    openedFolders = [],
-    flag = false,
-    isScrolling = false,
-    scrollTimeout = null;
-  activator = activator || app;
+  const $resizeBar = tag('div', {
+    className: 'w-resize',
+    onmousedown: onresize,
+    ontouchstart: onresize,
+    style: {
+      position: 'fixed',
+      top: 0,
+      left: width + 'px',
+      height: '100vh',
+      width: '5px',
+      marginLeft: '-2.5px',
+      zIndex: 110,
+    }
+  });
+  let openedFolders = [];
+  let flag = false;
+  let isScrolling = false;
+  let scrollTimeout = null;
+  let resizeTimeout = null;
+  let setWidthTimeout = null;
 
-  if (toggler) toggler.addEventListener('click', toggle);
+  toggler?.addEventListener('click', toggle);
+  $activator.addEventListener('touchstart', ontouchstart);
+  window.addEventListener('resize', onWindowResize);
 
-  if (mode === 'phone') activator.addEventListener('touchstart', ontouchstart);
+  if (mode === 'tab' && localStorage.sidebarShown === '1') {
+    show();
+  }
 
-  window.addEventListener('resize', function () {
-    if (_innerWidth !== innerWidth) {
+  function onWindowResize() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      const { innerWidth: currentWidth } = window;
+      if (innerWidth === currentWidth) return;
       hide(true);
-      _innerWidth = innerWidth;
+      innerWidth = currentWidth;
       $el.classList.remove(mode);
       mode = innerWidth > 750 ? 'tab' : 'phone';
       $el.classList.add(mode);
-
-      if (mode === 'phone' && !eventAddedFlag) {
-        activator.addEventListener('touchstart', ontouchstart);
-        eventAddedFlag = 1;
-      } else if (eventAddedFlag) {
-        activator.removeEventListener('touchstart', ontouchstart);
-        eventAddedFlag = 0;
-      }
-
       editorManager.controls.update();
-    }
-  });
+    }, 300);
+  }
 
   function toggle() {
     if ($el.activated) return hide(true);
@@ -73,6 +86,7 @@ function sidenav(activator, toggler) {
   }
 
   function show() {
+    localStorage.sidebarShown = 1;
     $el.activated = true;
     $el.onclick = null;
 
@@ -87,12 +101,8 @@ function sidenav(activator, toggler) {
         action: hideMaster,
       });
     } else {
-      root.style.marginLeft = width + 'px';
-      root.style.width = `calc(100% - ${width}px)`;
-      app.append($el);
-      editorManager.editor.resize(true);
-      editorManager.controls.update();
-
+      setWidth(width);
+      app.append($el, $resizeBar);
       $el.onclick = () => {
         if (!$el.textContent) Acode.exec('open-folder');
       };
@@ -136,6 +146,7 @@ function sidenav(activator, toggler) {
   }
 
   function hide(hideIfTab = false) {
+    localStorage.sidebarShown = 0;
     if (mode === 'phone') {
       actionStack.remove('sidenav');
       hideMaster();
@@ -143,6 +154,7 @@ function sidenav(activator, toggler) {
       $el.activated = false;
       root.style.removeProperty('margin-left');
       root.style.removeProperty('width');
+      $resizeBar.remove();
       $el.remove();
       editorManager.editor.resize(true);
       editorManager.controls.update();
@@ -156,7 +168,7 @@ function sidenav(activator, toggler) {
       $el.activated = false;
       mask.remove();
       $el.remove();
-      activator.style.overflow = null;
+      $activator.style.overflow = null;
     }, 300);
     document.ontouchstart = null;
     resetState();
@@ -172,6 +184,8 @@ function sidenav(activator, toggler) {
   function ontouchstart(e) {
     if (isScrolling) return;
     const { clientX, clientY } = e.touches[0];
+
+    if (mode === 'tab') return;
     $el.style.transition = 'none';
     touch.startX = clientX;
     touch.startY = clientY;
@@ -188,6 +202,36 @@ function sidenav(activator, toggler) {
       passive: false,
     });
     document.ontouchend = ontouchend;
+  }
+
+  /**
+   * 
+   * @param {MouseEvent | TouchEvent} e 
+   * @returns 
+   */
+  function onresize(e) {
+    const { clientX } = e.touches[0] ?? e;
+    let deltaX = 0;
+    document.ontouchmove = (e) => {
+      const { clientX: currentX } = e.touches[0] ?? e;
+      deltaX = currentX - clientX;
+      resize(deltaX);
+    };
+    document.ontouchend = () => {
+      width += deltaX;
+      localStorage.sideBarWidth = width;
+      document.ontouchmove = null;
+      document.ontouchend = null;
+    };
+
+    return;
+  }
+
+  function resize(deltaX) {
+    const newWidth = width + deltaX;
+    if (newWidth >= innerWidth * 0.75) return;
+    if (newWidth <= 250) return;
+    setWidth(newWidth);
   }
 
   /**
@@ -222,7 +266,7 @@ function sidenav(activator, toggler) {
             (touch.totalX > 0 && scroll.scrollLeft > 0) ||
             (touch.totalX < 0 &&
               Math.round(scroll.scrollWidth - scroll.scrollLeft) >
-                scroll.clientWidth)
+              scroll.clientWidth)
           )
             scrollLeft();
         } else {
@@ -230,7 +274,7 @@ function sidenav(activator, toggler) {
             (touch.totalY > 0 && scroll.scrollTop > 0) ||
             (touch.totalY < 0 &&
               Math.round(scroll.scrollHeight - scroll.scrollTop) >
-                scroll.clientHeight)
+              scroll.clientHeight)
           )
             scrollTop();
         }
@@ -248,7 +292,7 @@ function sidenav(activator, toggler) {
     ) {
       if (!$el.isConnected) {
         app.append($el, mask);
-        activator.style.overflow = 'hidden';
+        $activator.style.overflow = 'hidden';
         restoreScrollPos();
       }
 
@@ -317,6 +361,18 @@ function sidenav(activator, toggler) {
     $el.style.transition = null;
   }
 
+  function setWidth(width) {
+    root.style.marginLeft = width + 'px';
+    $el.style.maxWidth = width + 'px';
+    root.style.width = `calc(100% - ${width}px)`;
+    clearTimeout(setWidthTimeout);
+    setWidthTimeout = setTimeout(() => {
+      editorManager?.editor?.resize(true);
+      editorManager?.controls?.update();
+      $resizeBar.style.left = width + 'px';
+    }, 300);
+  }
+
   $el.getwidth = function () {
     const width = innerWidth * 0.7;
     return mode === 'phone' ? (width >= 350 ? 350 : width) : 250;
@@ -324,7 +380,7 @@ function sidenav(activator, toggler) {
 
   $el.hide = hide;
   $el.toggle = toggle;
-  $el.onshow = () => {};
+  $el.onshow = () => { };
 
   return $el;
 }

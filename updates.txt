@@ -1,3 +1,8 @@
+version 1.5.5
+☞ Remembers sidebar state in tablet devices.
+☞ Fixed search settings not closing.
+☞ Bugs fixes.
+
 version 1.5.4
 ☞ Remembers read-only mode.
 ☞ Remembers code foldings.

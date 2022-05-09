@@ -171,7 +171,7 @@ export default {
       cabal: /\.cabal$/i,
       haxe: /\.hx$/i,
       hjson: /\.hjson$/i,
-      html: /\.(html|htm|xhtml|vue|we|wpy)$/i,
+      html: /\.(html|htm|xhtml|we|wpy)$/i,
       ini: /\.(ini|conf|cfg|prefs)$/i,
       io: /\.io$/i,
       javascript: /\.(js|jsm|jsx)$/i,

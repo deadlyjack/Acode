@@ -15,7 +15,6 @@ import configEditor from './aceConfig';
 import ScrollBar from '../components/scrollbar/scrollbar';
 import fsOperation from './fileSystem/fsOperation';
 
-//TODO: Add customizable tools bar
 //TODO: Add option to work multiple files at same time in large display.
 
 /**
@@ -958,34 +957,37 @@ function EditorManager($sidebar, $header, $body) {
       let position;
       let left = $el.offsetLeft;
       let $placeholder = $el.cloneNode(true);
-      let classFlag = false;
 
       $placeholder.style.opacity = '0';
-      if (appSettings.value.vibrateOnTap)
+      if (appSettings.value.vibrateOnTap) {
         navigator.vibrate(constants.VIBRATION_TIME);
-      document.ontouchmove = document.onmousemove = null;
+        $el.classList.add('select');
+        $el.style.transform = `translate3d(${left}px, 0, 0)`;
+        $parent.insertBefore($placeholder, $el);
+      }
       document.addEventListener(type, drag, opts);
+      document.ontouchmove = null;
+      document.onmousemove = null;
+      document.ontouchend = cancelDrag;
+      document.onmouseup = cancelDrag;
+      document.ontouchcancel = cancelDrag;
+      document.onmouseleave = cancelDrag;
 
-      document.ontouchend =
-        document.onmouseup =
-        document.ontouchcancel =
-        document.onmouseleave =
-        function (e) {
-          $el.classList.remove('select');
-          $el.style.removeProperty('transform');
-          document.removeEventListener(type, drag, opts);
-          document.ontouchend = document.onmouseup = null;
-          if ($placeholder.isConnected) {
-            $parent.replaceChild($el, $placeholder);
-            updateFileList();
-          }
-          $el.eventAdded = false;
-          document.ontouchend =
-            document.onmouseup =
-            document.ontouchcancel =
-            document.onmouseleave =
-            null;
-        };
+      function cancelDrag() {
+        $el.classList.remove('select');
+        $el.style.removeProperty('transform');
+        document.removeEventListener(type, drag, opts);
+        document.ontouchend = document.onmouseup = null;
+        if ($placeholder.isConnected) {
+          $parent.replaceChild($el, $placeholder);
+          updateFileList();
+        }
+        $el.eventAdded = false;
+        document.ontouchend = null;
+        document.onmouseup = null;
+        document.ontouchcancel = null;
+        document.onmouseleave = null;
+      }
 
       function drag(e) {
         e.preventDefault();
@@ -1000,11 +1002,7 @@ function EditorManager($sidebar, $header, $body) {
         const $newEl = document.elementFromPoint(end, startY);
 
         $el.style.transform = `translate3d(${left + move}px, 0, 0)`;
-        if (!classFlag) {
-          $el.classList.add('select');
-          $parent.insertBefore($placeholder, $el);
-          classFlag = true;
-        }
+
         if (
           $newEl.classList.contains('tile') &&
           $el !== $newEl &&
