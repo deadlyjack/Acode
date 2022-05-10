@@ -99,7 +99,9 @@ export default {
       if (matched) {
         const { storage, regex } = matched;
         const { name } = storage;
-        return url.replace(regex, name).replace('::', '/').replace(/\/+/g, '/');
+        const [base, paths] = url.split('::')
+        url = base + '/' + paths.split('/').slice(1).join('/');
+        return url.replace(regex, name).replace(/\/+/g, '/');
       }
 
       return url;

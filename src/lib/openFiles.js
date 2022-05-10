@@ -1,5 +1,5 @@
-import dialogs from "../components/dialogs";
 import fsOperation from "./fileSystem/fsOperation";
+import Url from "./utils/Url";
 
 /**
  * 
@@ -22,6 +22,7 @@ export default async function openFiles(files, callback) {
       const render = files.length === 1 || id === localStorage.lastfile;
       let options = {
         ...file,
+        emitUpdate: false,
         render,
       };
 
@@ -45,9 +46,10 @@ export default async function openFiles(files, callback) {
         }
       } else if (uri) {
         const fs = fsOperation(uri);
-        if (!options.text && await fs.exists()) {
+        const exsits = await fs.exists();
+        if (!options.text && exsits) {
           options.text = await fs.readFile(encoding);
-        } else if (!readOnly) {
+        } else if (!readOnly && !exsits) {
           options.isUnsaved = true;
           options.deletedFile = true;
         }

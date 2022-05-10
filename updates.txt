@@ -1,6 +1,8 @@
 version 1.5.5
 ☞ Remembers sidebar state in tablet devices.
 ☞ Fixed search settings not closing.
+☞ Fixed not loading unsaved file content.
+☞ Fixed not displaying correct file path.
 ☞ Bugs fixes.
 
 version 1.5.4

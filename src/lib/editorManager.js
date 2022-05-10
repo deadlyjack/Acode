@@ -615,8 +615,6 @@ function EditorManager($sidebar, $header, $body) {
           text = text.replace(/\r/g, '');
         }
         this.session.setValue(text);
-        // this.isUnsaved = true;
-        // manager.onupdate('file-update');
       },
       async writeToCache() {
         const cacheFs = fsOperation(Url.join(CACHE_STORAGE, this.id));

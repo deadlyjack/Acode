@@ -374,19 +374,19 @@ async function loadApp() {
   }
 
   if (Array.isArray(files) && files.length) {
-    Acode.setLoadingMessage(`Loading files (0/${files.length})...`);
+    Acode.setLoadingMessage(`Loading files (0/${files.length})`);
     const res = await openFiles(files, (count) => {
-      Acode.setLoadingMessage(`Loading files (${count}/${files.length})...`);
+      Acode.setLoadingMessage(`Loading files (${count}/${files.length})`);
     });
     if (res.success === 0) {
       editorManager.addNewFile();
     }
+    onEditorUpdate();
   } else {
     editorManager.addNewFile();
   }
 
   //#endregion
-  onEditorUpdate();
   setTimeout(() => {
     document.body.removeAttribute('data-small-msg');
     app.classList.remove('loading', 'splash');
