@@ -187,7 +187,7 @@ function sidenav($activator, toggler) {
    */
   function ontouchstart(e) {
     if (isScrolling) return;
-    const { clientX, clientY } = e.touches[0];
+    const { clientX, clientY } = getClient(e);
 
     if (mode === 'tab') return;
     $el.style.transition = 'none';
@@ -214,22 +214,31 @@ function sidenav($activator, toggler) {
    * @returns 
    */
   function onresize(e) {
-    const { clientX } = e.touches[0] ?? e;
+    const { clientX } = getClient(e);
     let deltaX = 0;
-    document.ontouchmove = (e) => {
-      const { clientX: currentX } = e.touches[0] ?? e;
+    const onMove = (e) => {
+      const { clientX: currentX } = getClient(e);
       deltaX = currentX - clientX;
       resize(deltaX);
     };
-    document.ontouchend = () => {
+    const onEnd = () => {
       const newWidth = width + deltaX;
       if (newWidth <= MIN_WIDTH) width = MIN_WIDTH;
       else if (newWidth >= MAX_WIDTH()) width = MAX_WIDTH();
+      else width = newWidth;
       localStorage.sideBarWidth = width;
       document.ontouchmove = null;
+      document.onmousemove = null
       document.ontouchend = null;
+      document.onmouseup = null;
+      document.onmouseout = null;
+      document.onmouseleave = null;
     };
-
+    document.ontouchmove = onMove;
+    document.onmousemove = onMove
+    document.ontouchend = onEnd;
+    document.onmouseup = onEnd;
+    document.onmouseleave = onEnd;
     return;
   }
 
@@ -248,7 +257,7 @@ function sidenav($activator, toggler) {
     e.preventDefault();
 
     const [{ clientX, clientY }, scroll] = [
-      e.touches[0],
+      getClient(e),
       touch.target.getParent('.scroll'),
     ];
     touch.endX = clientX;
@@ -377,6 +386,16 @@ function sidenav($activator, toggler) {
       editorManager?.controls?.update();
       $resizeBar.style.left = width + 'px';
     }, 300);
+  }
+
+  /**
+   * 
+   * @param {TouchEvent | MouseEvent} e 
+   * @returns {{clientX: number, clientY: number}}
+   */
+  function getClient(e) {
+    const { clientX, clientY } = (e.touches ?? [])[0] ?? e;
+    return { clientX, clientY };
   }
 
   $el.getwidth = function () {
