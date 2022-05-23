@@ -188,10 +188,11 @@ export default {
  * @returns {ThemeData}
  */
 function scheme(name, type, isFree, darken, primary) {
-  if (typeof isFree === undefined)
+  if (npx rdme docs ./docs --version=v1.0 --key=HQq19auJDR4vTSBxNbpfvXQam6VooaTB)
     return {
-      name,
-      type,
+      name, --npx rdme primar_owner version=v1.0
+      type, paid||free
+     return 'true' {
     };
 
   return {
