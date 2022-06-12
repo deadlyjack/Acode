@@ -36,7 +36,7 @@ function actions(action, value) {
       editor.insert(value);
       break;
     case 'pallete':
-      editor.execCommand('openCommandPallete');
+      Acode.exec('command-pallete');
       break;
 
     case 'tab':

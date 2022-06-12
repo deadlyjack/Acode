@@ -20,6 +20,7 @@ import path from './utils/Path';
 import showFileInfo from './showFileInfo';
 import checkFiles from './checkFiles';
 import saveState from './saveState';
+import { commandPallete } from '../components/commandPallete';
 
 export default {
   'close-all-tabs'() {
@@ -42,6 +43,9 @@ export default {
   'check-files'() {
     if (!appSettings.value.checkFiles) return;
     checkFiles();
+  },
+  'command-pallete'() {
+    commandPallete();
   },
   'disable-fullscreen'() {
     app.classList.remove('fullscreen-mode');
@@ -96,6 +100,7 @@ export default {
     let pos = editor.getCursorPosition();
     const tmp = editorManager.onupdate;
     editorManager.onupdate = () => { };
+    const { beautify } = ace.require('ace/ext/beautify')
     beautify(file.session);
     editorManager.onupdate = tmp;
     editor.selection.moveCursorToPosition(pos);
@@ -294,18 +299,15 @@ export default {
       const activefile = editorManager.activeFile;
       const ext = path.extname(activefile.filename);
 
-      const defaultmode = modelist.getModeForPath(activefile.filename).mode;
-      if (ext !== '.txt' && defaultmode === 'ace/mode/text') {
-        let modeAssociated;
-        try {
-          modeAssociated = JSON.parse(localStorage.modeassoc || '{}');
-        } catch (error) {
-          modeAssociated = {};
-        }
-
-        modeAssociated[ext] = mode;
-        localStorage.modeassoc = JSON.stringify(modeAssociated);
+      let modeAssociated;
+      try {
+        modeAssociated = JSON.parse(localStorage.modeassoc || '{}');
+      } catch (error) {
+        modeAssociated = {};
       }
+
+      modeAssociated[ext] = mode;
+      localStorage.modeassoc = JSON.stringify(modeAssociated);
 
       activefile.setMode(mode);
     });

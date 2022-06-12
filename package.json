@@ -27,12 +27,12 @@
       "cordova-plugin-buildinfo": {},
       "cordova-plugin-device": {},
       "cordova-plugin-whitelist": {},
-      "cordova-plugin-ftp": {},
       "cordova-plugin-webserver": {},
       "cordova-plugin-iap": {},
-      "cordova-plugin-sdcard": {},
       "cordova-plugin-sftp": {},
-      "cordova-plugin-system": {}
+      "cordova-plugin-system": {},
+      "cordova-plugin-sdcard": {},
+      "cordova-plugin-ftp": {}
     },
     "platforms": [
       "android"
@@ -65,7 +65,7 @@
     "cordova-plugin-file": "^6.0.2",
     "cordova-plugin-ftp": "file:src/plugins/ftp",
     "cordova-plugin-iap": "file:src/plugins/iap",
-    "cordova-plugin-sdcard": "^1.1.0",
+    "cordova-plugin-sdcard": "file:src/plugins/sdcard",
     "cordova-plugin-sftp": "file:src/plugins/sftp",
     "cordova-plugin-system": "file:src/plugins/system",
     "cordova-plugin-vibration": "^3.1.1",
@@ -88,6 +88,7 @@
     "@babel/core": "^7.17.8",
     "@babel/runtime": "^7.17.8",
     "@deadlyjack/ajax": "^1.0.9",
+    "ace-builds": "^1.6.0",
     "autosize": "^5.0.0",
     "axios": "^0.26.1",
     "core-js": "^3.21.1",

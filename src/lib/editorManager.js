@@ -14,6 +14,8 @@ import path from './utils/Path';
 import configEditor from './aceConfig';
 import ScrollBar from '../components/scrollbar/scrollbar';
 import fsOperation from './fileSystem/fsOperation';
+import Commands from './ace/commands';
+import addTouchListeners from './ace/touchHandler';
 
 //TODO: Add option to work multiple files at same time in large display.
 
@@ -39,6 +41,7 @@ function EditorManager($sidebar, $header, $body) {
   let cursorControllerSize = appSettings.value.cursorControllerSize;
   let timeoutQuicktoolToggler;
   let timeoutHeaderToggler;
+  const modelist = ace.require('ace/ext/modelist');
   const $container = tag('div', {
     className: 'editor-container',
   });
@@ -159,12 +162,21 @@ function EditorManager($sidebar, $header, $body) {
   $body.appendChild($container);
   setupEditor();
   textControl(editor, $container);
+  controls.menu.ontouchstart = function (e) {
+    preventDefault(e);
+    this.touchStarted = true;
+  };
+
+  controls.menu.ontouchcancel = function (e) {
+    preventDefault(e);
+    this.touchStarted = false;
+  };
+
   controls.menu.ontouchend = function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-    const action = e.target.getAttribute('action');
-    if (action) {
+    preventDefault(e);
+    if (this.touchStarted) {
+      this.touchStarted = false;
+      const action = e.target.getAttribute('action');
       clipboardAction(action);
     }
   };
@@ -211,6 +223,13 @@ function EditorManager($sidebar, $header, $body) {
   });
 
   appSettings.on('update:textWrap', function (value) {
+
+    if (!value) {
+      editor.renderer.setScrollMargin(0, 0, 0, appSettings.value.leftMargin);
+    } else {
+      editor.renderer.setScrollMargin(0, 0, 0, 0);
+    }
+
     for (let file of manager.files) {
       file.session.setUseWrapMode(value);
       if (!value) file.session.on('changeScrollLeft', onscrollleft);
@@ -281,6 +300,12 @@ function EditorManager($sidebar, $header, $body) {
   appSettings.on('update:lineHeight', function (value) {
     editor.container.style.lineHeight = value;
   });
+
+  function preventDefault(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  }
 
   /**
    * Callback function
@@ -362,7 +387,7 @@ function EditorManager($sidebar, $header, $body) {
     const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
     const editorWidth =
       session.getScreenWidth() * renderer.characterWidth - offset;
-    return editorWidth;
+    return editorWidth + appSettings.value.leftMargin;
   }
 
   function updateFloatingButton(show = false) {
@@ -820,9 +845,17 @@ function EditorManager($sidebar, $header, $body) {
   }
 
   function setupEditor() {
-    ace.require('ace/ext/emmet');
+    const Emmet = ace.require('ace/ext/emmet');
+    const CommandManager = ace.require('ace/commands/command_manager').CommandManager;
     const settings = appSettings.value;
 
+    addTouchListeners($container, editor);
+
+    Emmet.setCore(window.emmet);
+    editor.commands = new CommandManager('win', Commands());
+    editor.textInput.onContextMenu = (e) => {
+      e.preventDefault();
+    };
     editor.setFontSize(settings.fontSize);
     editor.setHighlightSelectedWord(true);
 
@@ -838,6 +871,10 @@ function EditorManager($sidebar, $header, $body) {
       scrollPastEnd: 0.5,
       showPrintMargin: settings.showPrintMargin,
     });
+
+    if (!appSettings.value.textWrap) {
+      editor.renderer.setScrollMargin(0, 0, 0, settings.leftMargin);
+    }
 
     editor.container.style.lineHeight = settings.lineHeight || 2;
 

@@ -3,6 +3,5 @@ platforms
 build.json
 www/js/build
 www/css/build
-www/js/ace
 package-lock.json
 keystore.jks

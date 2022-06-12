@@ -4,6 +4,6 @@
     "**/platforms",
     "**/plugings",
     "**/www",
-    "src/ace/**/*"
+    "www/js/ace/**/*"
   ]
 }

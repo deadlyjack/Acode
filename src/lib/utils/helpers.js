@@ -719,7 +719,7 @@ export default {
   showAd() {
     const { ad } = window;
     if (
-      (IS_FREE_VERSION && appSettings.value.showAd)
+      IS_FREE_VERSION
       && (innerHeight * devicePixelRatio) > 600 && ad
     ) {
       const $page = tag.getAll('.page:not(#root)').pop();

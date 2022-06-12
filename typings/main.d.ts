@@ -53,6 +53,7 @@ interface Settings {
   customTheme: Map<string, string>;
   customThemeMode: 'light' | 'dark';
   lineHeight: number;
+  leftMargin: number;
   checkFiles: boolean;
   desktopMode: boolean;
   console: 'legacy' | 'eruda';
@@ -593,7 +594,6 @@ declare var strings: Strings;
  * Handles back button click
  */
 declare var Acode: Acode;
-declare var AceMouseEvent: any;
 
 declare var ASSETS_DIRECTORY: string;
 declare var CACHE_STORAGE: string;
@@ -602,10 +602,6 @@ declare var DOES_SUPPORT_THEME: boolean;
 declare var IS_FREE_VERSION: boolean;
 declare var KEYBINDING_FILE: string;
 declare var ANDROID_SDK_INT: number;
-
-declare var modelist: any;
-declare var beautify: any;
-declare var intent: any;
 
 declare var $placeholder: HTMLElement;
 declare var pageCount: number;
@@ -628,7 +624,5 @@ declare var gistRecordFile: string;
 declare var root: HTMLDivElement;
 declare var saveInterval: number;
 declare var toastQueue: Array<HTMLElement>;
-declare var __sftpBusy: boolean;
-declare var __sftpTaskQueue: Array<() => void>;
 declare var keyBindings: (name: string) => string;
 declare var toast: (string) => void;

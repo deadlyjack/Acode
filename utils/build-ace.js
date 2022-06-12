@@ -1,11 +1,13 @@
 const path = require('path');
 const babeljs = require('@babel/core');
-const glob = require('glob');
 const fs = require('fs');
 
-const aceFiles = glob.sync('./src/ace/**/*.js');
+const aceFiles = [
+  'src/lib/ace/mode-smali.js',
+];
 
 aceFiles.forEach(file => {
+  file = path.resolve(__dirname, '..', file);
   const filename = path.basename(file);
   let fileContent = fs.readFileSync(file, 'utf8');
   if (!/^worker/.test(filename)) {
@@ -18,10 +20,7 @@ aceFiles.forEach(file => {
     console.log(`Skipping ${filename}`);
   }
 
-  const dest = path.resolve(__dirname, '../www/js/', file.replace('./src/', ''));
-  if (!fs.existsSync(path.dirname(dest))) {
-    fs.mkdirSync(path.dirname(dest));
-  }
+  const dest = path.resolve(__dirname, '..', 'www/js/ace/', filename);
 
   fs.writeFile(dest, fileContent, 'utf8', (err) => {
     if (err) {

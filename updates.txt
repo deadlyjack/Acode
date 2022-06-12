@@ -1,3 +1,11 @@
+version 1.5.6
+☞ Saperated all hardcoded modications in ace editor.
+☞ Improved clipboard actions.
+☞ Updated Ace editor.
+☞ Added horizontal padding.
+☞ Changed syntax highlighting is saved.
+☞ Various fixes.
+
 version 1.5.5
 ☞ Remembers sidebar state in tablet devices.
 ☞ Fixed search settings not closing.

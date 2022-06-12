@@ -1,0 +1,24 @@
+#command-pallete{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: 40px;
+  width: 90vw;
+  max-width: 600px;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  background-color: inherit;
+  box-shadow: 0 0 4px black;
+
+  &~.mask{
+    opacity: 0.4;
+  }
+
+  input{
+    width: 100%;
+    border: none;
+  }
+}

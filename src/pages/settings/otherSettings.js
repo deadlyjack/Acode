@@ -90,13 +90,13 @@ export default function otherSettings() {
     }
   ];
 
-  if (IS_FREE_VERSION) {
-    settingsOptions.push({
-      key: 'showad',
-      text: strings['show ads'],
-      checkbox: values.showAd,
-    });
-  }
+  // if (IS_FREE_VERSION) {
+  //   settingsOptions.push({
+  //     key: 'showad',
+  //     text: strings['show ads'],
+  //     checkbox: values.showAd,
+  //   });
+  // }
 
   gen.listItems($settingsList, settingsOptions, changeSetting);
 

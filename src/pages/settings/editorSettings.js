@@ -271,9 +271,9 @@ export default function editorSettings() {
           .select(
             strings['cursor controller size'],
             [
-              [strings.none, 'none'],
-              [strings.small, 'small'],
-              [strings.large, 'large'],
+              ['none', strings.none],
+              ['small', strings.small],
+              ['large', strings.large],
             ],
             {
               default: values.cursorControllerSize,
