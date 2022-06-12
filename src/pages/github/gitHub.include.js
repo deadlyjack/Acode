@@ -172,8 +172,8 @@ async function gitHubInclude($loginPage) {
     if (localStorage.token) delete localStorage.token;
 
     try {
-      await fsOperation(gitProfile).deleteFile();
-      await fsOperation(githubFile).deleteFile();
+      await fsOperation(gitProfile).delete();
+      await fsOperation(githubFile).delete();
     } catch (error) { }
     if (onlogout) onlogout();
   }

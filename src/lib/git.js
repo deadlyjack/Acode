@@ -254,7 +254,7 @@ function GitRecord(obj) {
 
   function remove(sha) {
     delete gitRecord[sha];
-    fs.deleteFile(DATA_STORAGE + 'git/' + sha);
+    fs.delete(DATA_STORAGE + 'git/' + sha);
     save();
   }
 

@@ -12,6 +12,8 @@ class SFTP {
   #passPhrase;
   #base;
   #connectionID;
+  #path;
+  #stat;
 
   /**
    *
@@ -20,7 +22,7 @@ class SFTP {
    * @param {String} username
    * @param {{password?: String, passPhrase?: String, keyFile?: String}} authentication
    */
-  constructor(hostname, port, username, authentication) {
+  constructor(hostname, port = 22, username, authentication) {
     this.#hostname = hostname;
     this.#port = port;
     this.#username = username;
@@ -43,7 +45,16 @@ class SFTP {
     this.#connectionID = `${this.#username}@${this.#hostname}`;
   }
 
-  connect() {
+  async connect() {
+
+    if (!this.#path) {
+      throw new Error('Path is not set');
+    }
+
+    if (!this.#stat) {
+      this.#stat = await this.stat();
+    }
+
     return new Promise((resolve, reject) => {
       if (this.#authenticationType === 'key') {
         sftp.connectUsingKeyFile(
@@ -69,12 +80,15 @@ class SFTP {
     });
   }
 
+  async setPath(path) {
+    this.#path = path;
+  }
+
   /**
    * List directory or get file info
-   * @param {String} dirname
    * @param {boolean} isFile
    */
-  ls(dirname, isFile) {
+  lsDir(isFile) {
     return new Promise((resolve, reject) => {
       sftp.isConnected(async (connectionID) => {
         (async () => {
@@ -89,15 +103,15 @@ class SFTP {
 
           sftp.exec(
             `ls -gaAG --full-time "${this.#safeName(
-              dirname,
+              this.#path,
             )}" | awk '{$2=\"\"; print $0}'`,
             (res) => {
               if (res.code <= 0) {
                 if (isFile) {
-                  resolve(this.#parseFile(res.result, Url.dirname(dirname)));
+                  resolve(this.#parseFile(res.result, Url.dirname(this.#path)));
                   return;
                 }
-                resolve(this.#parseDir(dirname, res.result));
+                resolve(this.#parseDir(this.#path, res.result));
                 return;
               }
               reject(this.#errorCodes(res.code));
@@ -231,10 +245,9 @@ class SFTP {
 
   /**
    * Read the file from server
-   * @param {String} filename
    */
-  readFile(filename) {
-    const localFilename = this.#getLocalname(filename);
+  readFile() {
+    const localFilename = this.#getLocalname(this.#path);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -248,7 +261,7 @@ class SFTP {
           }
 
           sftp.getFile(
-            this.#safeName(filename),
+            this.#safeName(this.#path),
             localFilename,
             async () => {
               try {
@@ -266,8 +279,8 @@ class SFTP {
     });
   }
 
-  copyTo(filename, dest) {
-    const fullDest = Url.join(this.#base, dest, Url.basename(filename));
+  copyTo(dest) {
+    const fullDest = Url.join(this.#base, dest, Url.basename(this.#path));
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -280,7 +293,7 @@ class SFTP {
             }
           }
 
-          const cmd = `cp -r "${this.#safeName(filename)}" "${this.#safeName(
+          const cmd = `cp -r "${this.#safeName(this.#path)}" "${this.#safeName(
             dest,
           )}"`;
           sftp.exec(
@@ -302,17 +315,16 @@ class SFTP {
     });
   }
 
-  moveTo(filename, dest) {
-    return this.rename(filename, dest, true);
+  moveTo(dest) {
+    return this.rename(dest, true);
   }
 
   /**
    * Renames file and directory, it can also be use to move directory or file
-   * @param {String} filename
    * @param {String} newname
    * @param {Boolean} move
    */
-  rename(filename, newname, move) {
+  rename(newname, move) {
     const fullNewname = Url.join(this.#base, newname);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
@@ -326,7 +338,7 @@ class SFTP {
             }
           }
 
-          const cmd = `mv "${this.#safeName(filename)}" "${this.#safeName(
+          const cmd = `mv "${this.#safeName(this.#path)}" "${this.#safeName(
             newname,
           )}"`;
           sftp.exec(
@@ -335,7 +347,7 @@ class SFTP {
               if (res.code <= 0) {
                 resolve(
                   move
-                    ? Url.join(fullNewname, Url.basename(filename))
+                    ? Url.join(fullNewname, Url.basename(this.#path))
                     : fullNewname,
                 );
                 return;
@@ -354,11 +366,10 @@ class SFTP {
 
   /**
    * Delete file or directory
-   * @param {String} filename
-   * @param {'file' | 'dir'} type
    */
-  delete(filename, type) {
-    const fullFilename = Url.join(this.#base, filename);
+  delete() {
+
+    const fullFilename = Url.join(this.#base, this.#path);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -371,7 +382,7 @@ class SFTP {
             }
           }
 
-          const cmd = `rm ${type === 'dir' ? '-rf' : ''} "${this.#safeName(
+          const cmd = `rm ${this.#stat.isDirectory ? '-rf' : ''} "${this.#safeName(
             filename,
           )}"`;
           sftp.exec(
@@ -425,9 +436,11 @@ class SFTP {
     });
   }
 
-  async stats(filename) {
-    filename = this.#safeName(filename);
-    const file = await this.ls(filename, true);
+  async stat() {
+    if (this.#stat) return this.#stat;
+
+    const filename = this.#safeName(this.#path);
+    const file = await this.lsDir(filename, true);
     if (!file) return null;
 
     return {

@@ -2,7 +2,6 @@ import UrlParse from 'url-parse';
 import helpers from '../utils/helpers';
 import internalFs from './internalFs';
 import externalFs from './externalFs';
-import path from '../utils/Path';
 import Ftp from './ftp';
 import Url from '../utils/Url';
 import Sftp from './sftp';
@@ -21,7 +20,6 @@ function fsOperation(uri) {
     return externalOperation(externalFs, uri);
   } else {
     const uuid = helpers.uuid();
-    const uuidRegex = new RegExp(uuid, 'g');
 
     if (/#/.test(uri)) {
       uri = uri.replace(/#/g, uuid);
@@ -31,6 +29,11 @@ function fsOperation(uri) {
       uri,
       true,
     );
+
+    if (pathname) {
+      pathname = decodeURIComponent(pathname);
+      pathname = pathname.replace(new RegExp(uuid, 'g'), '#');
+    }
 
     if (username) {
       username = decodeURIComponent(username);
@@ -45,11 +48,16 @@ function fsOperation(uri) {
     }
 
     if (protocol === 'ftp:') {
+
       let { security, mode } = query;
-      const fs = Ftp(username, password, hostname, port || 21, security, mode);
-      uri = uri.replace(uuidRegex, '#');
-      return ftpOperation(fs, uri);
+      const ftp = Ftp(hostname, username, password, port || 21, security, mode);
+
+      ftp.setPath(pathname);
+
+      return ftpOperation(ftp);
+
     } else if (protocol === 'sftp:') {
+
       let { keyFile, passPhrase } = query;
 
       if (keyFile) {
@@ -60,20 +68,20 @@ function fsOperation(uri) {
         passPhrase = decodeURIComponent(passPhrase);
       }
 
-      if (pathname) {
-        pathname = decodeURIComponent(pathname);
-        pathname = pathname.replace(uuidRegex, '#');
-      }
-
-      const sftpCon = Sftp(hostname, port || 22, username, {
+      const sftp = Sftp(hostname, port || 22, username, {
         password,
         keyFile,
         passPhrase,
       });
 
-      return sftpOperation(sftpCon, pathname);
+      sftp.setPath(pathname);
+
+      return sftpOperation(sftp);
+
     } else {
+
       throw new Error('File system not supported yet.');
+
     }
   }
   /**
@@ -81,58 +89,42 @@ function fsOperation(uri) {
    * @param {RemoteFs} fs
    * @param {string} url
    */
-  function ftpOperation(fs, url) {
-    const { origin, query } = fs.originObject;
-
+  function ftpOperation(fs) {
     return {
       lsDir() {
-        return fs.listDir(url);
+        return fs.listDir();
       },
       readFile(encoding) {
-        return readFile(fs, url, encoding);
+        return readFile(fs.readFile(), encoding);
       },
       writeFile(content) {
-        return fs.writeFile(url, content);
+        return fs.writeFile(content);
       },
-      createFile(name, data) {
-        let pathname = Url.pathname(url);
-
-        data = data || '';
-        name = origin + path.join(pathname, name) + query;
+      createFile(name, data = '') {
         return fs.createFile(name, data);
       },
       createDirectory(name) {
-        let pathname = Url.pathname(url);
-        name = origin + path.join(pathname, name) + query;
         return fs.createDir(name);
       },
-      deleteFile() {
-        return fs.deleteFile(url);
-      },
-      deleteDir() {
-        return fs.deleteDir(url);
+      delete() {
+        return fs.delete();
       },
       copyTo(dest) {
-        return fs.copyTo(url, dest);
+        dest = Url.pathname(dest);
+        return fs.copyTo(dest);
       },
       moveTo(dest) {
-        let pathname = Url.pathname(dest);
-
-        const name = path.basename(url);
-        dest = origin + path.join(pathname, name) + query;
-        return fs.rename(url, dest);
+        dest = Url.pathname(dest);
+        return fs.rename(dest);
       },
       renameTo(newname) {
-        let pathname = Url.pathname(url);
-        const parent = path.dirname(pathname);
-        newname = origin + path.join(parent, newname) + query;
-        return fs.rename(url, newname);
+        return fs.rename(newname);
       },
       exists() {
-        return fs.exists(url);
+        return fs.exists();
       },
-      stats() {
-        return fs.stats(url);
+      stat() {
+        return fs.stat();
       },
     };
   }
@@ -140,47 +132,43 @@ function fsOperation(uri) {
   /**
    *
    * @param {RemoteFs} fs
-   * @param {String} url
    */
-  function sftpOperation(fs, url) {
+  function sftpOperation(fs) {
     return {
       lsDir() {
-        return fs.ls(url);
+        return fs.lsDir();
       },
       readFile(encoding) {
-        return readFile(fs, url, encoding);
+        return readFile(fs.readFile(), encoding);
       },
       writeFile(content) {
-        return fs.writeFile(url, content);
+        return fs.writeFile(content);
       },
-      createFile(filename, data) {
-        return fs.createFile(Url.join(url, filename), data);
+      createFile(name, data) {
+        return fs.createFile(name, data);
       },
-      createDirectory(dirname) {
-        return fs.createDir(Url.join(url, dirname));
+      createDirectory(name) {
+        return fs.createDir(name);
       },
-      deleteFile() {
-        return fs.delete(url, 'file');
-      },
-      deleteDir() {
-        return fs.delete(url, 'dir');
+      delete() {
+        return fs.delete();
       },
       copyTo(dest) {
         dest = Url.pathname(dest);
-        return fs.copyTo(url, dest);
+        return fs.copyTo(dest);
       },
       moveTo(dest) {
         dest = Url.pathname(dest);
-        return fs.moveTo(url, dest);
+        return fs.moveTo(dest);
       },
       renameTo(newname) {
-        return fs.rename(url, Url.join(Url.dirname(url), newname));
+        return fs.rename(newname);
       },
       async exists() {
-        return !!(await fs.ls(url, true));
+        return fs.exists();
       },
-      stats() {
-        return fs.stats(url);
+      stat() {
+        return fs.stat();
       },
     };
   }
@@ -196,7 +184,7 @@ function fsOperation(uri) {
         return listDir(url);
       },
       readFile(encoding) {
-        return readFile(fs, url, encoding);
+        return readFile(fs.readFile(url), encoding);
       },
       writeFile(content) {
         return fs.writeFile(url, content, false, false);
@@ -207,11 +195,8 @@ function fsOperation(uri) {
       createDirectory(name) {
         return fs.createDir(url, name);
       },
-      deleteFile() {
-        return fs.deleteFile(url);
-      },
-      deleteDir() {
-        return fs.deleteFile(url);
+      delete() {
+        return fs.delete(url);
       },
       copyTo(dest) {
         return fs.moveOrCopy('copyTo', url, dest);
@@ -225,7 +210,7 @@ function fsOperation(uri) {
       exists() {
         return fs.exists(url);
       },
-      stats() {
+      stat() {
         return fs.stats(url);
       },
     };
@@ -242,7 +227,7 @@ function fsOperation(uri) {
         return fs.listDir(url);
       },
       readFile(encoding) {
-        return readFile(fs, url, encoding);
+        return readFile(fs.readFile(url), encoding);
       },
       writeFile(content) {
         return fs.writeFile(url, content);
@@ -254,11 +239,8 @@ function fsOperation(uri) {
       createDirectory(name) {
         return fs.createDir(url, name);
       },
-      deleteFile() {
-        return fs.deleteFile(url);
-      },
-      deleteDir() {
-        return fs.deleteFile(url);
+      delete() {
+        return fs.delete(url);
       },
       copyTo(dest) {
         return fs.copy(url, dest);
@@ -280,15 +262,15 @@ function fsOperation(uri) {
           return false;
         }
       },
-      stats() {
+      stat() {
         return fs.stats(url);
       },
     };
   }
 
-  function readFile(fs, url, encoding) {
+  function readFile(file, encoding) {
     return new Promise((resolve, reject) => {
-      fs.readFile(url)
+      file
         .then((res) => {
           const data = res.data;
           if (encoding) {

@@ -477,8 +477,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       async function removeFile() {
         try {
           const fs = fsOperation(url);
-          if (helpers.isFile(type)) await fs.deleteFile();
-          if (helpers.isDir(type)) await fs.deleteDir();
+          await fs.delete();
           recents.removeFile(url);
           if (helpers.isDir(type)) {
             helpers.updateUriOfAllActiveFiles(url);
@@ -513,7 +512,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
               parsedUrl.query['keyFile'] || '',
             );
             if (keyFile) {
-              fsOperation(keyFile).deleteFile();
+              fsOperation(keyFile).delete();
             }
           }
           return false;
@@ -581,7 +580,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
         } catch (error) {
           console.error(error);
         } finally {
-          testDirFs.deleteDir();
+          testDirFs.delete();
         }
       } else if (ANDROID_SDK_INT > 29) {
         hasInternalStorage = false;

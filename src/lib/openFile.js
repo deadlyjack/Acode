@@ -24,7 +24,7 @@ export default async function openFile(file, data = {}) {
 
     helpers.showTitleLoader();
     const fs = fsOperation(uri);
-    const fileInfo = await fs.stats();
+    const fileInfo = await fs.stat();
     const name = fileInfo.name || file.name || uri;
     const settings = appSettings.value;
     const readOnly = fileInfo.canWrite ? false : true;

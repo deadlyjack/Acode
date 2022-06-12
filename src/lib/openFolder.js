@@ -270,8 +270,7 @@ function openFolder(_path, opts = {}) {
           .then(() => {
             loading.start();
             const fs = fsOperation(url);
-            if (helpers.isDir(type)) return fs.deleteDir();
-            else if (helpers.isFile(type)) return fs.deleteFile();
+            return fs.delete();
           })
           .then(() => {
             recents.removeFile(url);

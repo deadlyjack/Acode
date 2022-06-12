@@ -17,7 +17,7 @@ export default async function showFileInfo(url) {
   app.classList.add('title-loading');
   try {
     const fs = fsOperation(url);
-    const stats = await fs.stats();
+    const stats = await fs.stat();
     const value = await fs.readFile('utf-8');
 
     let { name, lastModified, length, uri, type } = stats;
@@ -42,7 +42,7 @@ export default async function showFileInfo(url) {
       options.shareUri = Url.join(CACHE_STORAGE, name);
       const fs = fsOperation(options.shareUri);
       if (await fs.exists()) {
-        await fs.deleteFile();
+        await fs.delete();
       }
       await fsOperation(CACHE_STORAGE).createFile(name, value);
     }
