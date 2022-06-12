@@ -69,10 +69,10 @@ export default {
     });
   },
 
-  async deleteFile(filename) {
+  async delete(name) {
     return new Promise((resolve, reject) => {
       sdcard.delete(
-        filename,
+        name,
         resolve,
         reject,
       );

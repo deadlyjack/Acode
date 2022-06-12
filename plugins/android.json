@@ -19,13 +19,7 @@
     "cordova-plugin-file": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-ftp": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
     "cordova-plugin-iap": {
-      "PACKAGE_NAME": "com.foxdebug.acode"
-    },
-    "cordova-plugin-sdcard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-sftp": {
@@ -41,6 +35,12 @@
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-sdcard": {
+      "PACKAGE_NAME": "com.foxdebug.acode"
+    },
+    "cordova-plugin-ftp": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },

@@ -638,7 +638,7 @@ function EditorManager($sidebar, $header, $body) {
       async removeCacheFile() {
         try {
           const fs = fsOperation(Url.join(CACHE_STORAGE, this.id));
-          fs.deleteFile();
+          fs.delete();
         } catch (error) { }
       },
       async updateChangeFile(cacheNewName) {
@@ -839,6 +839,7 @@ function EditorManager($sidebar, $header, $body) {
       showPrintMargin: settings.showPrintMargin,
     });
 
+    editor.renderer.setScrollMargin(0, 0, 0, settings.leftMargin);
     editor.container.style.lineHeight = settings.lineHeight || 2;
 
     if (!appSettings.value.linting && appSettings.value.linenumbers) {

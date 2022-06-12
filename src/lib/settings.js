@@ -97,6 +97,7 @@ class Settings {
       confirmOnExit: true,
       customThemeMode: 'dark',
       lineHeight: 2,
+      leftMargin: 50,
       checkFiles: true,
       desktopMode: false,
       console: 'legacy',

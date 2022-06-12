@@ -17,5 +17,6 @@
       }
     ]
   ],
-  "compact": false
+  "compact": false,
+  "sourceMaps": "inline"
 }

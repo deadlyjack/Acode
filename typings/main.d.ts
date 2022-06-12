@@ -53,6 +53,7 @@ interface Settings {
   customTheme: Map<string, string>;
   customThemeMode: 'light' | 'dark';
   lineHeight: number;
+  leftMargin: number;
   checkFiles: boolean;
   desktopMode: boolean;
   console: 'legacy' | 'eruda';
@@ -263,7 +264,7 @@ interface ExternalFs {
     data: string,
   ): Promise<'SUCCESS'>;
   createDir(parent: string, path: string): Promise<'SUCCESS'>;
-  deleteFile(filename: string): Promise<'SUCCESS'>;
+  delete(filename: string): Promise<'SUCCESS'>;
   writeFile(filename: string, content: string): Promise<'SUCCESS'>;
   renameFile(src: string, newname: string): Promise<'SUCCESS'>;
   copy(src: string, dest: string): Promise<'SUCCESS'>;
@@ -277,8 +278,7 @@ interface RemoteFs {
   readFile(path: string): Promise<ArrayBuffer | string>;
   createFile(filename: string, data: string): Promise<string>;
   createDir(path: string): Promise<string>;
-  deleteFile(filename: string): Promise<string>;
-  deleteDir(path: string): Promise<string>;
+  delete(name: string): Promise<string>;
   writeFile(filename: string, content: string): Promise<string>;
   rename(src: string, newname: string): Promise<string>;
   copyTo(src: string, dest: string): Promise<string>;
@@ -298,7 +298,7 @@ interface InternalFs {
   moveTo(dest: string): Promise<string>;
   listDir(path: string): Promise<Entry[]>;
   createDir(parent: string, dirname: string): Promise<void>;
-  deleteFile(filename: string): Promise<void>;
+  delete(filename: string): Promise<void>;
   readFile(filename: string): Promise<fileData>;
   writeFile(
     filename: string,
@@ -324,8 +324,7 @@ interface FileSystem {
   writeFile(content: string): Promise<void>;
   createFile(name: string, data: string): Promise<void>;
   createDirectory(name: string): Promise<void>;
-  deleteFile(): Promise<void>;
-  deleteDir(): Promise<void>;
+  delete(): Promise<void>;
   copyTo(dest: string): Promise<string>;
   moveTo(dset: string): Promise<string>;
   renameTo(newName: string): Promise<void>;

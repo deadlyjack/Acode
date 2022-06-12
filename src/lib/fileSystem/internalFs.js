@@ -80,7 +80,7 @@ export default {
    * @param {string} filename
    * @returns {Promise}
    */
-  deleteFile(filename) {
+  delete(filename) {
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURL(
         filename,

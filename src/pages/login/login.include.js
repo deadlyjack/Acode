@@ -22,7 +22,7 @@ export default async function GithubLoginInclude() {
   });
   const fs = fsOperation(Url.join(DATA_STORAGE, '.github'));
   if (await fs.exists()) {
-    fs.deleteDir();
+    fs.delete();
   }
 
   $page.get('header').append($info);

@@ -24,7 +24,7 @@ export default {
     } = await prompt(...args);
     const security = ftps ? 'ftps' : 'ftp';
     const mode = active ? 'active' : 'passive';
-    const ftp = Ftp(username, password, hostname, port, security, mode);
+    const ftp = Ftp(hostname, username, password, port, security, mode);
     try {
       dialogs.loader.create(strings['add ftp'], strings.connecting + '...', {
         timeout: 10000,
@@ -32,7 +32,7 @@ export default {
           stopConnection = true;
         },
       });
-      const home = await ftp.homeDirectory();
+      const home = await ftp.getWorkingDirectory();
 
       if (stopConnection) {
         stopConnection = false;
