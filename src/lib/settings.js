@@ -92,7 +92,7 @@ class Settings {
       showPrintMargin: false,
       scrollbarSize: 20,
       showSpaces: false,
-      showAd: true,
+      // showAd: true,
       cursorControllerSize: 'small',
       confirmOnExit: true,
       customThemeMode: 'dark',

@@ -3,7 +3,7 @@ import tile from '../tile';
 /**
  *
  * @param {string} title
- * @param {string[]} options [value, text, icon, disable?]
+ * @param {string[]} options [value, text, icon, disable?] or string
  * @param {{
  *            onCancel: ()=>void,
  *            hideOnSelect: boolean,

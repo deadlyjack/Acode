@@ -6,6 +6,7 @@ import tag from 'html-tag-js';
  * @param {HTMLElement} container
  */
 function textControl(editor, container) {
+  const { MouseEvent: AceMouseEvent } = ace.require('ace/mouse/mouse_event');
   const $content = container.querySelector('.ace_scroller');
   const threshold = 200;
 
@@ -108,6 +109,7 @@ function textControl(editor, container) {
 }
 
 function enableSingleMode() {
+  const { MouseEvent: AceMouseEvent } = ace.require('ace/mouse/mouse_event');
   const { editor, controls, container } = editorManager;
   const containerClient = container.getBoundingClientRect();
   const margin = {

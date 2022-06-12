@@ -5,44 +5,29 @@ import dialogs from '../components/dialogs';
  * @param {string} action
  */
 function clipboardAction(action) {
-  const { clipboard } = cordova.plugins;
   const editor = editorManager.editor;
-  const selectedText = editor.getCopyText();
   const {
-    menu, //
+    menu,
     fullContent,
     readOnlyContent,
     color,
     start,
     end,
-    update,
   } = editorManager.controls;
 
   if (!['select all', 'color'].includes(action)) menu.remove();
 
   switch (action) {
     case 'copy':
-      if (selectedText) {
-        clipboard.copy(selectedText);
-        update();
-        toast(strings['copied to clipboard']);
-      }
+      editor.execCommand('copy');
       break;
+
     case 'cut':
-      if (selectedText) {
-        clipboard.copy(selectedText);
-        const ranges = editor.selection.getAllRanges();
-        ranges.map((range) => editor.remove(range));
-        update();
-        toast(strings['copied to clipboard']);
-      }
+      editor.execCommand('cut');
       break;
 
     case 'paste':
-      clipboard.paste((text) => {
-        editor.execCommand('paste', text);
-        update();
-      });
+      editor.execCommand('paste');
       break;
 
     case 'select all':

@@ -1,6 +1,11 @@
 @import './searchBar.scss';
 @import './hints.scss';
 @import './fileInfo.scss';
+@import './commandPallete.scss';
+
+:root{
+  --scrollbar-width: 4px;
+}
 
 * {
   margin: 0;
@@ -197,8 +202,8 @@ a.icon {
 .prompt,
 .scroll {
   &::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: var(--scrollbar-width);
+    height: var(--scrollbar-width);
   }
 
   &::-webkit-scrollbar-track {
@@ -208,7 +213,7 @@ a.icon {
   &::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.333);
     background: var(--scrollbar-color);
-    border-radius: 2px;
+    border-radius: calc(var(--scrollbar-width) / 2);
   }
 }
 
@@ -744,6 +749,13 @@ button{
 
 .w-resize{
   cursor: w-resize;
+}
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance:none;
 }
 
 @keyframes sake {

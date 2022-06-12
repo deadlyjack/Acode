@@ -37,9 +37,9 @@
 		({
 			"./bundles/snippets.js": [function (require, module, exports) {
 				/**
-				 * Bundler, used in builder script to statically
-				 * include snippets.json into bundle
-				 */
+				* Bundler, used in builder script to statically
+				* include snippets.json into bundle
+				*/
 				var res = require('../lib/assets/resources');
 				var snippets = require('../lib/snippets.json');
 				res.setVocabulary(snippets, 'system');
@@ -336,9 +336,9 @@
 
 			}, { "./action/main": "action\\main.js", "./assets/caniuse": "assets\\caniuse.js", "./assets/htmlMatcher": "assets\\htmlMatcher.js", "./assets/logger": "assets\\logger.js", "./assets/preferences": "assets\\preferences.js", "./assets/profile": "assets\\profile.js", "./assets/resources": "assets\\resources.js", "./assets/tabStops": "assets\\tabStops.js", "./parser/abbreviation": "parser\\abbreviation.js", "./plugin/file": "plugin\\file.js", "./utils/action": "utils\\action.js", "./utils/common": "utils\\common.js", "./utils/editor": "utils\\editor.js" }], "action\\balance.js": [function (require, module, exports) {
 				/**
-				 * HTML pair matching (balancing) actions
-				 * @constructor
-				 */
+				* HTML pair matching (balancing) actions
+				* @constructor
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -633,9 +633,9 @@
 				});
 			}, { "../assets/htmlMatcher": "assets\\htmlMatcher.js", "../assets/range": "assets\\range.js", "../editTree/css": "editTree\\css.js", "../utils/action": "utils\\action.js", "../utils/common": "utils\\common.js", "../utils/cssSections": "utils\\cssSections.js", "../utils/editor": "utils\\editor.js" }], "action\\base64.js": [function (require, module, exports) {
 				/**
-				 * Encodes/decodes image under cursor to/from base64
-				 * @param {IEmmetEditor} editor
-				 */
+				* Encodes/decodes image under cursor to/from base64
+				* @param {IEmmetEditor} editor
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -785,9 +785,9 @@
 
 			}, { "../plugin/file": "plugin\\file.js", "../utils/action": "utils\\action.js", "../utils/base64": "utils\\base64.js", "../utils/editor": "utils\\editor.js" }], "action\\editPoints.js": [function (require, module, exports) {
 				/**
-				 * Move between next/prev edit points. 'Edit points' are places between tags 
-				 * and quotes of empty attributes in html
-				 */
+				* Move between next/prev edit points. 'Edit points' are places between tags 
+				* and quotes of empty attributes in html
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -904,8 +904,8 @@
 				});
 			}, {}], "action\\evaluateMath.js": [function (require, module, exports) {
 				/**
-				 * Evaluates simple math expression under caret
-				 */
+				* Evaluates simple math expression under caret
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -957,14 +957,14 @@
 
 			}, { "../assets/range": "assets\\range.js", "../utils/action": "utils\\action.js", "../utils/common": "utils\\common.js", "../utils/math": "utils\\math.js" }], "action\\expandAbbreviation.js": [function (require, module, exports) {
 				/**
-				 * 'Expand abbreviation' editor action: extracts abbreviation from current caret 
-				 * position and replaces it with formatted output. 
-				 * <br><br>
-				 * This behavior can be overridden with custom handlers which can perform 
-				 * different actions when 'Expand Abbreviation' action is called.
-				 * For example, a CSS gradient handler that produces vendor-prefixed gradient
-				 * definitions registers its own expand abbreviation handler.  
-				 */
+				* 'Expand abbreviation' editor action: extracts abbreviation from current caret 
+				* position and replaces it with formatted output. 
+				* <br><br>
+				* This behavior can be overridden with custom handlers which can perform 
+				* different actions when 'Expand Abbreviation' action is called.
+				* For example, a CSS gradient handler that produces vendor-prefixed gradient
+				* definitions registers its own expand abbreviation handler.  
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -1147,8 +1147,8 @@
 				});
 			}, { "../assets/handlerList": "assets\\handlerList.js", "../assets/preferences": "assets\\preferences.js", "../assets/range": "assets\\range.js", "../parser/abbreviation": "parser\\abbreviation.js", "../resolver/cssGradient": "resolver\\cssGradient.js", "../utils/action": "utils\\action.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js" }], "action\\incrementDecrement.js": [function (require, module, exports) {
 				/**
-				 * Increment/decrement number under cursor
-				 */
+				* Increment/decrement number under cursor
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -1255,9 +1255,9 @@
 				});
 			}, { "../utils/action": "utils\\action.js", "../utils/common": "utils\\common.js" }], "action\\lineBreaks.js": [function (require, module, exports) {
 				/**
-				 * Actions to insert line breaks. Some simple editors (like browser's 
-				 * &lt;textarea&gt;, for example) do not provide such simple things
-				 */
+				* Actions to insert line breaks. Some simple editors (like browser's 
+				* &lt;textarea&gt;, for example) do not provide such simple things
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -1383,9 +1383,9 @@
 
 			}, { "../assets/htmlMatcher": "assets\\htmlMatcher.js", "../assets/preferences": "assets\\preferences.js", "../assets/resources": "assets\\resources.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js" }], "action\\main.js": [function (require, module, exports) {
 				/**
-				 * Module describes and performs Emmet actions. The actions themselves are
-				 * defined in <i>actions</i> folder
-				 */
+				* Module describes and performs Emmet actions. The actions themselves are
+				* defined in <i>actions</i> folder
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -1624,10 +1624,10 @@
 				});
 			}, { "../utils/common": "utils\\common.js", "./balance": "action\\balance.js", "./base64": "action\\base64.js", "./editPoints": "action\\editPoints.js", "./evaluateMath": "action\\evaluateMath.js", "./expandAbbreviation": "action\\expandAbbreviation.js", "./incrementDecrement": "action\\incrementDecrement.js", "./lineBreaks": "action\\lineBreaks.js", "./mergeLines": "action\\mergeLines.js", "./reflectCSSValue": "action\\reflectCSSValue.js", "./removeTag": "action\\removeTag.js", "./selectItem": "action\\selectItem.js", "./selectLine": "action\\selectLine.js", "./splitJoinTag": "action\\splitJoinTag.js", "./toggleComment": "action\\toggleComment.js", "./updateImageSize": "action\\updateImageSize.js", "./updateTag": "action\\updateTag.js", "./wrapWithAbbreviation": "action\\wrapWithAbbreviation.js" }], "action\\mergeLines.js": [function (require, module, exports) {
 				/**
-				 * Merges selected lines or lines between XHTML tag pairs
-				 * @param {Function} require
-				 * @param {Underscore} _
-				 */
+				* Merges selected lines or lines between XHTML tag pairs
+				* @param {Function} require
+				* @param {Underscore} _
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -1677,9 +1677,9 @@
 				});
 			}, { "../assets/htmlMatcher": "assets\\htmlMatcher.js", "../assets/range": "assets\\range.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js" }], "action\\reflectCSSValue.js": [function (require, module, exports) {
 				/**
-				 * Reflect CSS value: takes rule's value under caret and pastes it for the same 
-				 * rules with vendor prefixes
-				 */
+				* Reflect CSS value: takes rule's value under caret and pastes it for the same 
+				* rules with vendor prefixes
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -1697,7 +1697,7 @@
 					var cssGradient = require('../resolver/cssGradient');
 
 					prefs.define('css.reflect.oldIEOpacity', false, 'Support IE6/7/8 opacity notation, e.g. <code>filter:alpha(opacity=...)</code>.\
-		Note that CSS3 and SVG also provides <code>filter</code> property so this option is disabled by default.')
+	Note that CSS3 and SVG also provides <code>filter</code> property so this option is disabled by default.')
 
 					/**
 					 * @type HandlerList List of registered handlers
@@ -1879,8 +1879,8 @@
 				});
 			}, { "../assets/handlerList": "assets\\handlerList.js", "../assets/preferences": "assets\\preferences.js", "../editTree/css": "editTree\\css.js", "../resolver/css": "resolver\\css.js", "../resolver/cssGradient": "resolver\\cssGradient.js", "../utils/action": "utils\\action.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js" }], "action\\removeTag.js": [function (require, module, exports) {
 				/**
-				 * Gracefully removes tag under cursor
-				 */
+				* Gracefully removes tag under cursor
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -1925,10 +1925,10 @@
 
 			}, { "../assets/htmlMatcher": "assets\\htmlMatcher.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js" }], "action\\selectItem.js": [function (require, module, exports) {
 				/**
-				 * Actions that use stream parsers and tokenizers for traversing:
-				 * -- Search for next/previous items in HTML
-				 * -- Search for next/previous items in CSS
-				 */
+				* Actions that use stream parsers and tokenizers for traversing:
+				* -- Search for next/previous items in HTML
+				* -- Search for next/previous items in CSS
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -2380,8 +2380,8 @@
 				});
 			}, { "../assets/range": "assets\\range.js", "../assets/stringStream": "assets\\stringStream.js", "../editTree/css": "editTree\\css.js", "../parser/xml": "parser\\xml.js", "../utils/action": "utils\\action.js", "../utils/common": "utils\\common.js", "../utils/cssSections": "utils\\cssSections.js", "../utils/editor": "utils\\editor.js" }], "action\\selectLine.js": [function (require, module, exports) {
 				/**
-				 * Select current line (for simple editors like browser's &lt;textarea&gt;)
-				 */
+				* Select current line (for simple editors like browser's &lt;textarea&gt;)
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -2399,10 +2399,10 @@
 				});
 			}, {}], "action\\splitJoinTag.js": [function (require, module, exports) {
 				/**
-				 * Splits or joins tag, e.g. transforms it into a short notation and vice versa:<br>
-				 * &lt;div&gt;&lt;/div&gt; → &lt;div /&gt; : join<br>
-				 * &lt;div /&gt; → &lt;div&gt;&lt;/div&gt; : split
-				 */
+				* Splits or joins tag, e.g. transforms it into a short notation and vice versa:<br>
+				* &lt;div&gt;&lt;/div&gt; → &lt;div /&gt; : join<br>
+				* &lt;div /&gt; → &lt;div&gt;&lt;/div&gt; : split
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -2473,10 +2473,10 @@
 				});
 			}, { "../assets/htmlMatcher": "assets\\htmlMatcher.js", "../assets/profile": "assets\\profile.js", "../assets/resources": "assets\\resources.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js" }], "action\\toggleComment.js": [function (require, module, exports) {
 				/**
-				 * Toggles HTML and CSS comments depending on current caret context. Unlike
-				 * the same action in most editors, this action toggles comment on currently
-				 * matched item—HTML tag or CSS selector—when nothing is selected.
-				 */
+				* Toggles HTML and CSS comments depending on current caret context. Unlike
+				* the same action in most editors, this action toggles comment on currently
+				* matched item—HTML tag or CSS selector—when nothing is selected.
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -2694,9 +2694,9 @@
 				});
 			}, { "../assets/htmlMatcher": "assets\\htmlMatcher.js", "../assets/preferences": "assets\\preferences.js", "../assets/range": "assets\\range.js", "../editTree/css": "editTree\\css.js", "../utils/action": "utils\\action.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js" }], "action\\updateImageSize.js": [function (require, module, exports) {
 				/**
-				 * Automatically updates image size attributes in HTML's &lt;img&gt; element or
-				 * CSS rule
-				 */
+				* Automatically updates image size attributes in HTML's &lt;img&gt; element or
+				* CSS rule
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -2816,9 +2816,9 @@
 				});
 			}, { "../editTree/css": "editTree\\css.js", "../editTree/xml": "editTree\\xml.js", "../plugin/file": "plugin\\file.js", "../utils/action": "utils\\action.js", "../utils/base64": "utils\\base64.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js" }], "action\\updateTag.js": [function (require, module, exports) {
 				/**
-				 * Update Tag action: allows users to update existing HTML tags and add/remove
-				 * attributes or even tag name
-				 */
+				* Update Tag action: allows users to update existing HTML tags and add/remove
+				* attributes or even tag name
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -2960,9 +2960,9 @@
 				});
 			}, { "../editTree/xml": "editTree\\xml.js", "../parser/abbreviation": "parser\\abbreviation.js", "../utils/action": "utils\\action.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js" }], "action\\wrapWithAbbreviation.js": [function (require, module, exports) {
 				/**
-				 * Action that wraps content with abbreviation. For convenience, action is 
-				 * defined as reusable module
-				 */
+				* Action that wraps content with abbreviation. For convenience, action is 
+				* defined as reusable module
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -3026,13 +3026,13 @@
 				});
 			}, { "../assets/htmlMatcher": "assets\\htmlMatcher.js", "../assets/range": "assets\\range.js", "../parser/abbreviation": "parser\\abbreviation.js", "../utils/action": "utils\\action.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js" }], "assets\\caniuse.js": [function (require, module, exports) {
 				/**
-				 * Parsed resources (snippets, abbreviations, variables, etc.) for Emmet.
-				 * Contains convenient method to get access for snippets with respect of
-				 * inheritance. Also provides ability to store data in different vocabularies
-				 * ('system' and 'user') for fast and safe resource update
-				 * @author Sergey Chikuyonok (serge.che@gmail.com)
-				 * @link http://chikuyonok.ru
-				 */
+				* Parsed resources (snippets, abbreviations, variables, etc.) for Emmet.
+				* Contains convenient method to get access for snippets with respect of
+				* inheritance. Also provides ability to store data in different vocabularies
+				* ('system' and 'user') for fast and safe resource update
+				* @author Sergey Chikuyonok (serge.che@gmail.com)
+				* @link http://chikuyonok.ru
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -3044,17 +3044,17 @@
 					var utils = require('../utils/common');
 
 					prefs.define('caniuse.enabled', true, 'Enable support of Can I Use database. When enabled,\
-		CSS abbreviation resolver will look at Can I Use database first before detecting\
-		CSS properties that should be resolved');
+	CSS abbreviation resolver will look at Can I Use database first before detecting\
+	CSS properties that should be resolved');
 
 					prefs.define('caniuse.vendors', 'all', 'A comma-separated list vendor identifiers\
-		(as described in Can I Use database) that should be supported\
-		when resolving vendor-prefixed properties. Set value to <code>all</code>\
-		to support all available properties');
+	(as described in Can I Use database) that should be supported\
+	when resolving vendor-prefixed properties. Set value to <code>all</code>\
+	to support all available properties');
 
 					prefs.define('caniuse.era', 'e-2', 'Browser era, as defined in Can I Use database.\
-		Examples: <code>e0</code> (current version), <code>e1</code> (near future)\
-		<code>e-2</code> (2 versions back) and so on.');
+	Examples: <code>e0</code> (current version), <code>e1</code> (near future)\
+	<code>e-2</code> (2 versions back) and so on.');
 
 					var cssSections = {
 						'border-image': ['border-image'],
@@ -3277,8 +3277,8 @@
 
 			}, { "../utils/common": "utils\\common.js", "./preferences": "assets\\preferences.js" }], "assets\\elements.js": [function (require, module, exports) {
 				/**
-				 * Module that contains factories for element types used by Emmet
-				 */
+				* Module that contains factories for element types used by Emmet
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -3407,11 +3407,11 @@
 				});
 			}, {}], "assets\\handlerList.js": [function (require, module, exports) {
 				/**
-				 * Utility module that provides ordered storage of function handlers. 
-				 * Many Emmet modules' functionality can be extended/overridden by custom
-				 * function. This modules provides unified storage of handler functions, their 
-				 * management and execution
-				 */
+				* Utility module that provides ordered storage of function handlers. 
+				* Many Emmet modules' functionality can be extended/overridden by custom
+				* function. This modules provides unified storage of handler functions, their 
+				* management and execution
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -3521,13 +3521,13 @@
 				});
 			}, { "../utils/common": "utils\\common.js" }], "assets\\htmlMatcher.js": [function (require, module, exports) {
 				/**
-				 * HTML matcher: takes string and searches for HTML tag pairs for given position 
-				 * 
-				 * Unlike “classic” matchers, it parses content from the specified 
-				 * position, not from the start, so it may work even outside HTML documents
-				 * (for example, inside strings of programming languages like JavaScript, Python 
-				 * etc.)
-				 */
+				* HTML matcher: takes string and searches for HTML tag pairs for given position 
+				* 
+				* Unlike “classic” matchers, it parses content from the specified 
+				* position, not from the start, so it may work even outside HTML documents
+				* (for example, inside strings of programming languages like JavaScript, Python 
+				* etc.)
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -3810,8 +3810,8 @@
 				});
 			}, { "./range": "assets\\range.js" }], "assets\\logger.js": [function (require, module, exports) {
 				/**
-				 * Simple logger for Emmet
-				 */
+				* Simple logger for Emmet
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -3829,13 +3829,13 @@
 				})
 			}, {}], "assets\\preferences.js": [function (require, module, exports) {
 				/**
-				 * Common module's preferences storage. This module 
-				 * provides general storage for all module preferences, their description and
-				 * default values.<br><br>
-				 * 
-				 * This module can also be used to list all available properties to create 
-				 * UI for updating properties
-				 */
+				* Common module's preferences storage. This module 
+				* provides general storage for all module preferences, their description and
+				* default values.<br><br>
+				* 
+				* This module can also be used to list all available properties to create 
+				* UI for updating properties
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -4080,9 +4080,9 @@
 				});
 			}, { "../utils/common": "utils\\common.js" }], "assets\\profile.js": [function (require, module, exports) {
 				/**
-				 * Output profile module.
-				 * Profile defines how XHTML output data should look like
-				 */
+				* Output profile module.
+				* Profile defines how XHTML output data should look like
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -4355,8 +4355,8 @@
 
 			}, { "../utils/common": "utils\\common.js", "./preferences": "assets\\preferences.js", "./resources": "assets\\resources.js" }], "assets\\range.js": [function (require, module, exports) {
 				/**
-				 * Helper module to work with ranges
-				 */
+				* Helper module to work with ranges
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -4617,13 +4617,13 @@
 				});
 			}, {}], "assets\\resources.js": [function (require, module, exports) {
 				/**
-				 * Parsed resources (snippets, abbreviations, variables, etc.) for Emmet.
-				 * Contains convenient method to get access for snippets with respect of
-				 * inheritance. Also provides ability to store data in different vocabularies
-				 * ('system' and 'user') for fast and safe resource update
-				 * @author Sergey Chikuyonok (serge.che@gmail.com)
-				 * @link http://chikuyonok.ru
-				 */
+				* Parsed resources (snippets, abbreviations, variables, etc.) for Emmet.
+				* Contains convenient method to get access for snippets with respect of
+				* inheritance. Also provides ability to store data in different vocabularies
+				* ('system' and 'user') for fast and safe resource update
+				* @author Sergey Chikuyonok (serge.che@gmail.com)
+				* @link http://chikuyonok.ru
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -5030,8 +5030,8 @@
 
 			}, { "../assets/logger": "assets\\logger.js", "../resolver/css": "resolver\\css.js", "../utils/common": "utils\\common.js", "../vendor/stringScore": "vendor\\stringScore.js", "./elements": "assets\\elements.js", "./handlerList": "assets\\handlerList.js" }], "assets\\stringStream.js": [function (require, module, exports) {
 				/**
-				 * A trimmed version of CodeMirror's StringStream module for string parsing
-				 */
+				* A trimmed version of CodeMirror's StringStream module for string parsing
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -5283,16 +5283,16 @@
 				});
 			}, {}], "assets\\tabStops.js": [function (require, module, exports) {
 				/**
-				 * Utility module for handling tabstops tokens generated by Emmet's 
-				 * "Expand Abbreviation" action. The main <code>extract</code> method will take
-				 * raw text (for example: <i>${0} some ${1:text}</i>), find all tabstops 
-				 * occurrences, replace them with tokens suitable for your editor of choice and 
-				 * return object with processed text and list of found tabstops and their ranges.
-				 * For sake of portability (Objective-C/Java) the tabstops list is a plain 
-				 * sorted array with plain objects.
-				 * 
-				 * Placeholders with the same are meant to be <i>linked</i> in your editor.
-				 */
+				* Utility module for handling tabstops tokens generated by Emmet's 
+				* "Expand Abbreviation" action. The main <code>extract</code> method will take
+				* raw text (for example: <i>${0} some ${1:text}</i>), find all tabstops 
+				* occurrences, replace them with tokens suitable for your editor of choice and 
+				* return object with processed text and list of found tabstops and their ranges.
+				* For sake of portability (Objective-C/Java) the tabstops list is a plain 
+				* sorted array with plain objects.
+				* 
+				* Placeholders with the same are meant to be <i>linked</i> in your editor.
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -5652,8 +5652,8 @@
 				});
 			}, { "../utils/common": "utils\\common.js", "./resources": "assets\\resources.js", "./stringStream": "assets\\stringStream.js" }], "assets\\tokenIterator.js": [function (require, module, exports) {
 				/**
-				 * Helper class for convenient token iteration
-				 */
+				* Helper class for convenient token iteration
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -5743,31 +5743,31 @@
 				});
 			}, {}], "editTree\\base.js": [function (require, module, exports) {
 				/**
-				 * Abstract implementation of edit tree interface.
-				 * Edit tree is a named container of editable “name-value” child elements, 
-				 * parsed from <code>source</code>. This container provides convenient methods
-				 * for editing/adding/removing child elements. All these update actions are
-				 * instantly reflected in the <code>source</code> code with respect of formatting.
-				 * <br><br>
-				 * For example, developer can create an edit tree from CSS rule and add or 
-				 * remove properties from it–all changes will be immediately reflected in the 
-				 * original source.
-				 * <br><br>
-				 * All classes defined in this module should be extended the same way as in
-				 * Backbone framework: using <code>extend</code> method to create new class and 
-				 * <code>initialize</code> method to define custom class constructor.
-				 * 
-				 * @example
-				 * <pre><code>
-				 * var MyClass = require('editTree/base').EditElement.extend({
-				 *     initialize: function() {
-				 *     // constructor code here
-				 *   }
-				 * });
-				 * 
-				 * var elem = new MyClass(); 
-				 * </code></pre>
-				 */
+				* Abstract implementation of edit tree interface.
+				* Edit tree is a named container of editable “name-value” child elements, 
+				* parsed from <code>source</code>. This container provides convenient methods
+				* for editing/adding/removing child elements. All these update actions are
+				* instantly reflected in the <code>source</code> code with respect of formatting.
+				* <br><br>
+				* For example, developer can create an edit tree from CSS rule and add or 
+				* remove properties from it–all changes will be immediately reflected in the 
+				* original source.
+				* <br><br>
+				* All classes defined in this module should be extended the same way as in
+				* Backbone framework: using <code>extend</code> method to create new class and 
+				* <code>initialize</code> method to define custom class constructor.
+				* 
+				* @example
+				* <pre><code>
+				* var MyClass = require('editTree/base').EditElement.extend({
+				*     initialize: function() {
+				*     // constructor code here
+				*   }
+				* });
+				* 
+				* var elem = new MyClass(); 
+				* </code></pre>
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -6219,10 +6219,10 @@
 				});
 			}, { "../assets/range": "assets\\range.js", "../utils/common": "utils\\common.js", "../vendor/klass": "vendor\\klass.js" }], "editTree\\css.js": [function (require, module, exports) {
 				/**
-				 * CSS EditTree is a module that can parse a CSS rule into a tree with 
-				 * convenient methods for adding, modifying and removing CSS properties. These 
-				 * changes can be written back to string with respect of code formatting.
-				 */
+				* CSS EditTree is a module that can parse a CSS rule into a tree with 
+				* convenient methods for adding, modifying and removing CSS properties. These 
+				* changes can be written back to string with respect of code formatting.
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -6833,10 +6833,10 @@
 				});
 			}, { "../assets/range": "assets\\range.js", "../assets/stringStream": "assets\\stringStream.js", "../assets/tokenIterator": "assets\\tokenIterator.js", "../parser/css": "parser\\css.js", "../utils/common": "utils\\common.js", "../utils/cssSections": "utils\\cssSections.js", "./base": "editTree\\base.js" }], "editTree\\xml.js": [function (require, module, exports) {
 				/**
-				 * XML EditTree is a module that can parse an XML/HTML element into a tree with 
-				 * convenient methods for adding, modifying and removing attributes. These 
-				 * changes can be written back to string with respect of code formatting.
-				 */
+				* XML EditTree is a module that can parse an XML/HTML element into a tree with 
+				* convenient methods for adding, modifying and removing attributes. These 
+				* changes can be written back to string with respect of code formatting.
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -7123,11 +7123,11 @@
 				});
 			}, { "../assets/range": "assets\\range.js", "../parser/xml": "parser\\xml.js", "../utils/common": "utils\\common.js", "./base": "editTree\\base.js" }], "filter\\bem.js": [function (require, module, exports) {
 				/**
-				 * Filter for aiding of writing elements with complex class names as described
-				 * in Yandex's BEM (Block, Element, Modifier) methodology. This filter will
-				 * automatically inherit block and element names from parent elements and insert
-				 * them into child element classes
-				 */
+				* Filter for aiding of writing elements with complex class names as described
+				* in Yandex's BEM (Block, Element, Modifier) methodology. This filter will
+				* automatically inherit block and element names from parent elements and insert
+				* them into child element classes
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -7390,8 +7390,8 @@
 
 			}, { "../assets/preferences": "assets\\preferences.js", "../utils/abbreviation": "utils\\abbreviation.js", "../utils/common": "utils\\common.js", "./html": "filter\\html.js" }], "filter\\comment.js": [function (require, module, exports) {
 				/**
-				 * Comment important tags (with 'id' and 'class' attributes)
-				 */
+				* Comment important tags (with 'id' and 'class' attributes)
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -7500,8 +7500,8 @@
 
 			}, { "../assets/preferences": "assets\\preferences.js", "../utils/abbreviation": "utils\\abbreviation.js", "../utils/common": "utils\\common.js", "../utils/template": "utils\\template.js", "./main": "filter\\main.js" }], "filter\\css.js": [function (require, module, exports) {
 				/**
-				 * Filter for outputting CSS and alike
-				 */
+				* Filter for outputting CSS and alike
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -7532,8 +7532,8 @@
 				});
 			}, {}], "filter\\escape.js": [function (require, module, exports) {
 				/**
-				 * Filter for escaping unsafe XML characters: <, >, &
-				 */
+				* Filter for escaping unsafe XML characters: <, >, &
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -7566,12 +7566,12 @@
 				});
 			}, {}], "filter\\format.js": [function (require, module, exports) {
 				/**
-				 * Generic formatting filter: creates proper indentation for each tree node,
-				 * placing "%s" placeholder where the actual output should be. You can use
-				 * this filter to preformat tree and then replace %s placeholder to whatever you
-				 * need. This filter should't be called directly from editor as a part 
-				 * of abbreviation.
-				 */
+				* Generic formatting filter: creates proper indentation for each tree node,
+				* placing "%s" placeholder where the actual output should be. You can use
+				* this filter to preformat tree and then replace %s placeholder to whatever you
+				* need. This filter should't be called directly from editor as a part 
+				* of abbreviation.
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -7775,8 +7775,8 @@
 				});
 			}, { "../assets/preferences": "assets\\preferences.js", "../assets/resources": "assets\\resources.js", "../utils/abbreviation": "utils\\abbreviation.js", "../utils/common": "utils\\common.js" }], "filter\\haml.js": [function (require, module, exports) {
 				/**
-				 * Filter for producing HAML code from abbreviation.
-				 */
+				* Filter for producing HAML code from abbreviation.
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -7933,8 +7933,8 @@
 				});
 			}, { "../utils/abbreviation": "utils\\abbreviation.js", "../utils/common": "utils\\common.js", "./format": "filter\\format.js" }], "filter\\html.js": [function (require, module, exports) {
 				/**
-				 * Filter that produces HTML tree
-				 */
+				* Filter that produces HTML tree
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -8035,8 +8035,8 @@
 				});
 			}, { "../assets/tabStops": "assets\\tabStops.js", "../utils/abbreviation": "utils\\abbreviation.js", "../utils/common": "utils\\common.js", "./format": "filter\\format.js" }], "filter\\jade.js": [function (require, module, exports) {
 				/**
-				 * Filter for producing Jade code from abbreviation.
-				 */
+				* Filter for producing Jade code from abbreviation.
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -8186,10 +8186,10 @@
 				});
 			}, { "../assets/profile": "assets\\profile.js", "../assets/tabStops": "assets\\tabStops.js", "../utils/abbreviation": "utils\\abbreviation.js", "../utils/common": "utils\\common.js", "./format": "filter\\format.js" }], "filter\\jsx.js": [function (require, module, exports) {
 				/**
-				 * A filter for React.js (JSX):
-				 * ranames attributes like `class` and `for`
-				 * for proper representation in JSX
-				 */
+				* A filter for React.js (JSX):
+				* ranames attributes like `class` and `for`
+				* for proper representation in JSX
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -8217,8 +8217,8 @@
 				});
 			}, {}], "filter\\main.js": [function (require, module, exports) {
 				/**
-				 * Module for handling filters
-				 */
+				* Module for handling filters
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -8342,8 +8342,8 @@
 				});
 			}, { "../assets/profile": "assets\\profile.js", "../assets/resources": "assets\\resources.js", "../utils/common": "utils\\common.js", "./bem": "filter\\bem.js", "./comment": "filter\\comment.js", "./css": "filter\\css.js", "./escape": "filter\\escape.js", "./haml": "filter\\haml.js", "./html": "filter\\html.js", "./jade": "filter\\jade.js", "./jsx": "filter\\jsx.js", "./singleLine": "filter\\singleLine.js", "./slim": "filter\\slim.js", "./trim": "filter\\trim.js", "./xsl": "filter\\xsl.js" }], "filter\\singleLine.js": [function (require, module, exports) {
 				/**
-				 * Output abbreviation on a single line (i.e. no line breaks)
-				 */
+				* Output abbreviation on a single line (i.e. no line breaks)
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -8377,8 +8377,8 @@
 
 			}, { "../utils/abbreviation": "utils\\abbreviation.js" }], "filter\\slim.js": [function (require, module, exports) {
 				/**
-				 * Filter for producing Jade code from abbreviation.
-				 */
+				* Filter for producing Jade code from abbreviation.
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -8568,11 +8568,11 @@
 				});
 			}, { "../assets/preferences": "assets\\preferences.js", "../assets/profile": "assets\\profile.js", "../assets/tabStops": "assets\\tabStops.js", "../utils/abbreviation": "utils\\abbreviation.js", "../utils/common": "utils\\common.js", "./format": "filter\\format.js" }], "filter\\trim.js": [function (require, module, exports) {
 				/**
-				 * Trim filter: removes characters at the beginning of the text
-				 * content that indicates lists: numbers, #, *, -, etc.
-				 * 
-				 * Useful for wrapping lists with abbreviation.
-				 */
+				* Trim filter: removes characters at the beginning of the text
+				* content that indicates lists: numbers, #, *, -, etc.
+				* 
+				* Useful for wrapping lists with abbreviation.
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -8608,9 +8608,9 @@
 
 			}, { "../assets/preferences": "assets\\preferences.js" }], "filter\\xsl.js": [function (require, module, exports) {
 				/**
-				 * Filter for trimming "select" attributes from some tags that contains
-				 * child elements
-				 */
+				* Filter for trimming "select" attributes from some tags that contains
+				* child elements
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -8647,19 +8647,19 @@
 				});
 			}, { "../utils/abbreviation": "utils\\abbreviation.js" }], "generator\\lorem.js": [function (require, module, exports) {
 				/**
-				 * "Lorem ipsum" text generator. Matches <code>lipsum(num)?</code> or 
-				 * <code>lorem(num)?</code> abbreviation.
-				 * This code is based on Django's contribution: 
-				 * https://code.djangoproject.com/browser/django/trunk/django/contrib/webdesign/lorem_ipsum.py
-				 * <br><br>
-				 * Examples to test:<br>
-				 * <code>lipsum</code> – generates 30 words text.<br>
-				 * <code>lipsum*6</code> – generates 6 paragraphs (autowrapped with &lt;p&gt; element) of text.<br>
-				 * <code>ol>lipsum10*5</code> — generates ordered list with 5 list items (autowrapped with &lt;li&gt; tag)
-				 * with text of 10 words on each line.<br>
-				 * <code>span*3>lipsum20</code> – generates 3 paragraphs of 20-words text, each wrapped with &lt;span&gt; element.
-				 * Each paragraph phrase is unique.   
-				 */
+				* "Lorem ipsum" text generator. Matches <code>lipsum(num)?</code> or 
+				* <code>lorem(num)?</code> abbreviation.
+				* This code is based on Django's contribution: 
+				* https://code.djangoproject.com/browser/django/trunk/django/contrib/webdesign/lorem_ipsum.py
+				* <br><br>
+				* Examples to test:<br>
+				* <code>lipsum</code> – generates 30 words text.<br>
+				* <code>lipsum*6</code> – generates 6 paragraphs (autowrapped with &lt;p&gt; element) of text.<br>
+				* <code>ol>lipsum10*5</code> — generates ordered list with 5 list items (autowrapped with &lt;li&gt; tag)
+				* with text of 10 words on each line.<br>
+				* <code>span*3>lipsum20</code> – generates 3 paragraphs of 20-words text, each wrapped with &lt;span&gt; element.
+				* Each paragraph phrase is unique.   
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -8768,8 +8768,8 @@
 
 					prefs.define('lorem.defaultLang', 'en',
 						'Default language of generated dummy text. Currently, <code>en</code>\
-		and <code>ru</code> are supported, but users can add their own syntaxes\
-		see <a href="http://docs.emmet.io/abbreviations/lorem-ipsum/">docs</a>.');
+	and <code>ru</code> are supported, but users can add their own syntaxes\
+	see <a href="http://docs.emmet.io/abbreviations/lorem-ipsum/">docs</a>.');
 					prefs.define('lorem.omitCommonPart', false,
 						'Omit commonly used part (e.g. “Lorem ipsum dolor sit amet“) from generated text.');
 
@@ -8935,17 +8935,17 @@
 
 			}, { "../assets/preferences": "assets\\preferences.js" }], "parser\\abbreviation.js": [function (require, module, exports) {
 				/**
-				 * Emmet abbreviation parser.
-				 * Takes string abbreviation and recursively parses it into a tree. The parsed 
-				 * tree can be transformed into a string representation with 
-				 * <code>toString()</code> method. Note that string representation is defined
-				 * by custom processors (called <i>filters</i>), not by abbreviation parser 
-				 * itself.
-				 * 
-				 * This module can be extended with custom pre-/post-processors to shape-up
-				 * final tree or its representation. Actually, many features of abbreviation 
-				 * engine are defined in other modules as tree processors
-				 */
+				* Emmet abbreviation parser.
+				* Takes string abbreviation and recursively parses it into a tree. The parsed 
+				* tree can be transformed into a string representation with 
+				* <code>toString()</code> method. Note that string representation is defined
+				* by custom processors (called <i>filters</i>), not by abbreviation parser 
+				* itself.
+				* 
+				* This module can be extended with custom pre-/post-processors to shape-up
+				* final tree or its representation. Actually, many features of abbreviation 
+				* engine are defined in other modules as tree processors
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -10419,11 +10419,11 @@
 				});
 			}, {}], "parser\\processor\\attributes.js": [function (require, module, exports) {
 				/**
-				 * Resolves node attribute names: moves `default` attribute value
-				 * from stub to real attribute.
-				 *
-				 * This resolver should be applied *after* resource matcher
-				 */
+				* Resolves node attribute names: moves `default` attribute value
+				* from stub to real attribute.
+				*
+				* This resolver should be applied *after* resource matcher
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -10501,10 +10501,10 @@
 				});
 			}, { "../../utils/common": "utils\\common.js" }], "parser\\processor\\href.js": [function (require, module, exports) {
 				/**
-				 * A preptocessor for &lt;a&gt; tag: tests wrapped content
-				 * for common URL patterns and, if matched, inserts it as 
-				 * `href` attribute
-				 */
+				* A preptocessor for &lt;a&gt; tag: tests wrapped content
+				* for common URL patterns and, if matched, inserts it as 
+				* `href` attribute
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -10518,17 +10518,17 @@
 
 					prefs.define('href.autodetect', true,
 						'Enables or disables automatic URL recognition when wrapping\
-		text with <code>&lt;a&gt;</code> tag. With this option enabled,\
-		if wrapped text matches URL or e-mail pattern it will be automatically\
-		inserted into <code>href</code> attribute.');
+	text with <code>&lt;a&gt;</code> tag. With this option enabled,\
+	if wrapped text matches URL or e-mail pattern it will be automatically\
+	inserted into <code>href</code> attribute.');
 					prefs.define('href.urlPattern', '^(?:(?:https?|ftp|file)://|www\\.|ftp\\.)(?:\\([-A-Z0-9+&@#/%=~_|$?!:,.]*\\)|[-A-Z0-9+&@#/%=~_|$?!:,.])*(?:\\([-A-Z0-9+&@#/%=~_|$?!:,.]*\\)|[A-Z0-9+&@#/%=~_|$])',
 						'RegExp pattern to match wrapped URLs. Matched content will be inserts\
-		as-is into <code>href</code> attribute, only whitespace will be trimmed.');
+	as-is into <code>href</code> attribute, only whitespace will be trimmed.');
 
 					prefs.define('href.emailPattern', '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,5}$',
 						'RegExp pattern to match wrapped e-mails. Unlike <code>href.urlPattern</code>,\
-		wrapped content will be prefixed with <code>mailto:</code> in <code>href</code>\
-		attribute');
+	wrapped content will be prefixed with <code>mailto:</code> in <code>href</code>\
+	attribute');
 
 					return {
 						/**
@@ -10568,10 +10568,10 @@
 				});
 			}, { "../../assets/preferences": "assets\\preferences.js", "../../utils/common": "utils\\common.js", "./pastedContent": "parser\\processor\\pastedContent.js" }], "parser\\processor\\pastedContent.js": [function (require, module, exports) {
 				/**
-				 * Pasted content abbreviation processor. A pasted content is a content that
-				 * should be inserted into implicitly repeated abbreviation nodes.
-				 * This processor powers “Wrap With Abbreviation” action
-				 */
+				* Pasted content abbreviation processor. A pasted content is a content that
+				* should be inserted into implicitly repeated abbreviation nodes.
+				* This processor powers “Wrap With Abbreviation” action
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -10736,9 +10736,9 @@
 				});
 			}, { "../../assets/range": "assets\\range.js", "../../assets/stringStream": "assets\\stringStream.js", "../../utils/abbreviation": "utils\\abbreviation.js", "../../utils/common": "utils\\common.js" }], "parser\\processor\\resourceMatcher.js": [function (require, module, exports) {
 				/**
-				 * Processor function that matches parsed <code>AbbreviationNode</code>
-				 * against resources defined in <code>resource</code> module
-				 */
+				* Processor function that matches parsed <code>AbbreviationNode</code>
+				* against resources defined in <code>resource</code> module
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -10840,8 +10840,8 @@
 				});
 			}, { "../../assets/elements": "assets\\elements.js", "../../assets/resources": "assets\\resources.js", "../../utils/abbreviation": "utils\\abbreviation.js", "../../utils/common": "utils\\common.js" }], "parser\\processor\\tagName.js": [function (require, module, exports) {
 				/**
-				 * Resolves tag names in abbreviations with implied name
-				 */
+				* Resolves tag names in abbreviations with implied name
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -10873,13 +10873,13 @@
 				});
 			}, { "../../resolver/tagName": "resolver\\tagName.js" }], "parser\\xml.js": [function (require, module, exports) {
 				/**
-				 * HTML tokenizer by Marijn Haverbeke
-				 * http://codemirror.net/
-				 * @constructor
-				 * @memberOf __xmlParseDefine
-				 * @param {Function} require
-				 * @param {Underscore} _
-				 */
+				* HTML tokenizer by Marijn Haverbeke
+				* http://codemirror.net/
+				* @constructor
+				* @memberOf __xmlParseDefine
+				* @param {Function} require
+				* @param {Underscore} _
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -11216,19 +11216,19 @@
 
 			}, { "../assets/stringStream": "assets\\stringStream.js" }], "plugin\\file.js": [function (require, module, exports) {
 				/**
-				 * Module for working with file. Shall implement
-				 * IEmmetFile interface.
-				 *
-				 * Since implementation of this module depends
-				 * greatly on current runtime, this module must be
-				 * initialized with actual implementation first
-				 * before use. E.g.
-				 * require('./plugin/file')({
-				 * 	read: function() {...}
-				 * })
-				 *
-				 * By default, this module provides Node.JS implementation
-				 */
+				* Module for working with file. Shall implement
+				* IEmmetFile interface.
+				*
+				* Since implementation of this module depends
+				* greatly on current runtime, this module must be
+				* initialized with actual implementation first
+				* before use. E.g.
+				* require('./plugin/file')({
+				* 	read: function() {...}
+				* })
+				*
+				* By default, this module provides Node.JS implementation
+				*/
 
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
@@ -11439,49 +11439,49 @@
 
 			}, { "../utils/common": "utils\\common.js" }], "resolver\\css.js": [function (require, module, exports) {
 				/**
-				 * Resolver for fast CSS typing. Handles abbreviations with the following 
-				 * notation:<br>
-				 * 
-				 * <code>(-vendor prefix)?property(value)*(!)?</code>
-				 * 
-				 * <br><br>
-				 * <b>Abbreviation handling</b><br>
-				 * 
-				 * By default, Emmet searches for matching snippet definition for provided abbreviation.
-				 * If snippet wasn't found, Emmet automatically generates element with 
-				 * abbreviation's name. For example, <code>foo</code> abbreviation will generate
-				 * <code>&lt;foo&gt;&lt;/foo&gt;</code> output.
-				 * <br><br>
-				 * This module will capture all expanded properties and upgrade them with values, 
-				 * vendor prefixes and !important declarations. All unmatched abbreviations will 
-				 * be automatically transformed into <code>property-name: ${1}</code> snippets. 
-				 * 
-				 * <b>Vendor prefixes<b><br>
-				 * 
-				 * If CSS-property is preceded with dash, resolver should output property with
-				 * all <i>known</i> vendor prefixes. For example, if <code>brad</code> 
-				 * abbreviation generates <code>border-radius: ${value};</code> snippet,
-				 * the <code>-brad</code> abbreviation should generate:
-				 * <pre><code>
-				 * -webkit-border-radius: ${value};
-				 * -moz-border-radius: ${value};
-				 * border-radius: ${value};
-				 * </code></pre>
-				 * Note that <i>o</i> and <i>ms</i> prefixes are omitted since Opera and IE 
-				 * supports unprefixed property.<br><br>
-				 * 
-				 * Users can also provide an explicit list of one-character prefixes for any
-				 * CSS property. For example, <code>-wm-float</code> will produce
-				 * 
-				 * <pre><code>
-				 * -webkit-float: ${1};
-				 * -moz-float: ${1};
-				 * float: ${1};
-				 * </code></pre>
-				 * 
-				 * Although this example looks pointless, users can use this feature to write
-				 * cutting-edge properties implemented by browser vendors recently.  
-				 */
+				* Resolver for fast CSS typing. Handles abbreviations with the following 
+				* notation:<br>
+				* 
+				* <code>(-vendor prefix)?property(value)*(!)?</code>
+				* 
+				* <br><br>
+				* <b>Abbreviation handling</b><br>
+				* 
+				* By default, Emmet searches for matching snippet definition for provided abbreviation.
+				* If snippet wasn't found, Emmet automatically generates element with 
+				* abbreviation's name. For example, <code>foo</code> abbreviation will generate
+				* <code>&lt;foo&gt;&lt;/foo&gt;</code> output.
+				* <br><br>
+				* This module will capture all expanded properties and upgrade them with values, 
+				* vendor prefixes and !important declarations. All unmatched abbreviations will 
+				* be automatically transformed into <code>property-name: ${1}</code> snippets. 
+				* 
+				* <b>Vendor prefixes<b><br>
+				* 
+				* If CSS-property is preceded with dash, resolver should output property with
+				* all <i>known</i> vendor prefixes. For example, if <code>brad</code> 
+				* abbreviation generates <code>border-radius: ${value};</code> snippet,
+				* the <code>-brad</code> abbreviation should generate:
+				* <pre><code>
+				* -webkit-border-radius: ${value};
+				* -moz-border-radius: ${value};
+				* border-radius: ${value};
+				* </code></pre>
+				* Note that <i>o</i> and <i>ms</i> prefixes are omitted since Opera and IE 
+				* supports unprefixed property.<br><br>
+				* 
+				* Users can also provide an explicit list of one-character prefixes for any
+				* CSS property. For example, <code>-wm-float</code> will produce
+				* 
+				* <pre><code>
+				* -webkit-float: ${1};
+				* -moz-float: ${1};
+				* float: ${1};
+				* </code></pre>
+				* 
+				* Although this example looks pointless, users can use this feature to write
+				* cutting-edge properties implemented by browser vendors recently.  
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -12378,9 +12378,9 @@
 				});
 			}, { "../assets/caniuse": "assets\\caniuse.js", "../assets/preferences": "assets\\preferences.js", "../assets/resources": "assets\\resources.js", "../assets/stringStream": "assets\\stringStream.js", "../editTree/css": "editTree\\css.js", "../utils/common": "utils\\common.js", "../utils/template": "utils\\template.js" }], "resolver\\cssGradient.js": [function (require, module, exports) {
 				/**
-				 * 'Expand Abbreviation' handler that parses gradient definition from under 
-				 * cursor and updates CSS rule with vendor-prefixed values.
-				 */
+				* 'Expand Abbreviation' handler that parses gradient definition from under 
+				* cursor and updates CSS rule with vendor-prefixed values.
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -12898,8 +12898,8 @@
 				});
 			}, { "../assets/preferences": "assets\\preferences.js", "../assets/range": "assets\\range.js", "../assets/resources": "assets\\resources.js", "../assets/stringStream": "assets\\stringStream.js", "../editTree/css": "editTree\\css.js", "../utils/common": "utils\\common.js", "../utils/editor": "utils\\editor.js", "./css": "resolver\\css.js", "./gradient/linear": "resolver\\gradient\\linear.js" }], "resolver\\gradient\\linear.js": [function (require, module, exports) {
 				/**
-				 * CSS linear gradient definition
-				 */
+				* CSS linear gradient definition
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -13233,10 +13233,10 @@
 				});
 			}, { "../../assets/stringStream": "assets\\stringStream.js", "../../utils/common": "utils\\common.js" }], "resolver\\tagName.js": [function (require, module, exports) {
 				/**
-				 * Module for resolving tag names: returns best matched tag name for child
-				 * element based on passed parent's tag name. Also provides utility function
-				 * for element type detection (inline, block-level, empty)
-				 */
+				* Module for resolving tag names: returns best matched tag name for child
+				* element based on passed parent's tag name. Also provides utility function
+				* for element type detection (inline, block-level, empty)
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -14412,10 +14412,10 @@
 
 			}, {}], "utils\\abbreviation.js": [function (require, module, exports) {
 				/**
-				 * Utility functions to work with <code>AbbreviationNode</code> as HTML element
-				 * @param {Function} require
-				 * @param {Underscore} _
-				 */
+				* Utility functions to work with <code>AbbreviationNode</code> as HTML element
+				* @param {Function} require
+				* @param {Underscore} _
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -14532,9 +14532,9 @@
 				});
 			}, { "../assets/elements": "assets\\elements.js", "../assets/tabStops": "assets\\tabStops.js", "../resolver/tagName": "resolver\\tagName.js", "../utils/common": "utils\\common.js" }], "utils\\action.js": [function (require, module, exports) {
 				/**
-				 * Utility methods for Emmet actions
-				 * @author Sergey Chikuyonok (serge.che@gmail.com) <http://chikuyonok.ru>
-				 */
+				* Utility methods for Emmet actions
+				* @author Sergey Chikuyonok (serge.che@gmail.com) <http://chikuyonok.ru>
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -14872,9 +14872,9 @@
 				});
 			}, { "../assets/htmlMatcher": "assets\\htmlMatcher.js", "../assets/range": "assets\\range.js", "../assets/resources": "assets\\resources.js", "../editTree/xml": "editTree\\xml.js", "../parser/abbreviation": "parser\\abbreviation.js", "./common": "utils\\common.js", "./cssSections": "utils\\cssSections.js" }], "utils\\base64.js": [function (require, module, exports) {
 				/**
-				 * @author Sergey Chikuyonok (serge.che@gmail.com)
-				 * @link http://chikuyonok.ru
-				 */
+				* @author Sergey Chikuyonok (serge.che@gmail.com)
+				* @link http://chikuyonok.ru
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -14967,9 +14967,9 @@
 				});
 			}, {}], "utils\\comments.js": [function (require, module, exports) {
 				/**
-				 * Utility module for working with comments in source code
-				 * (mostly stripping it from source)
-				 */
+				* Utility module for working with comments in source code
+				* (mostly stripping it from source)
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -15035,8 +15035,8 @@
 				});
 			}, { "../assets/range": "assets\\range.js", "../assets/stringStream": "assets\\stringStream.js", "./common": "utils\\common.js" }], "utils\\common.js": [function (require, module, exports) {
 				/**
-				 * Common utility helper for Emmet
-				 */
+				* Common utility helper for Emmet
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -16254,9 +16254,9 @@
 				});
 			}, { "../assets/htmlMatcher": "assets\\htmlMatcher.js", "../assets/range": "assets\\range.js", "../assets/stringStream": "assets\\stringStream.js", "../editTree/xml": "editTree\\xml.js", "../parser/css": "parser\\css.js", "./comments": "utils\\comments.js", "./common": "utils\\common.js" }], "utils\\editor.js": [function (require, module, exports) {
 				/**
-				 * Utility module used to prepare text for pasting into back-end editor
-				 * @author Sergey Chikuyonok (serge.che@gmail.com) <http://chikuyonok.ru>
-				 */
+				* Utility module used to prepare text for pasting into back-end editor
+				* @author Sergey Chikuyonok (serge.che@gmail.com) <http://chikuyonok.ru>
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -16380,12 +16380,12 @@
 				define(function (require, exports, module) {
 					/*
 					 Source: https://github.com/silentmatt/js-expression-eval
-				
+					
 					 Based on ndef.parser, by Raphael Graf(r@undefined.ch)
 					 http://www.undefined.ch/mparser/index.html
-				
+					
 					 Ported to JavaScript and modified by Matthew Crumley (email@matthewcrumley.com, http://silentmatt.com/)
-				
+					
 					 You are free to use and modify this code in anyway you find useful. Please leave this comment in the code
 					 to acknowledge its original source. If you feel like it, I enjoy hearing about projects that use my code,
 					 but don't feel like you have to let me know or ask permission.
@@ -17285,10 +17285,10 @@
 				});
 			}, {}], "utils\\template.js": [function (require, module, exports) {
 				/**
-				 * A very simple, ERB-style templating. Basically, just as string substitution.
-				 * The reason to not use default Lo-dash’es `_.template()` implementation
-				 * is because it fails to run in CSP-enabled environments (Chrome extension, Atom)
-				 */
+				* A very simple, ERB-style templating. Basically, just as string substitution.
+				* The reason to not use default Lo-dash’es `_.template()` implementation
+				* is because it fails to run in CSP-enabled environments (Chrome extension, Atom)
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);
@@ -17470,23 +17470,23 @@
 				});
 			}, { "../utils/common": "utils\\common.js" }], "vendor\\stringScore.js": [function (require, module, exports) {
 				/*!
-				 * string_score.js: String Scoring Algorithm 0.1.10 
-				 *
-				 * http://joshaven.com/string_score
-				 * https://github.com/joshaven/string_score
-				 *
-				 * Copyright (C) 2009-2011 Joshaven Potter <yourtech@gmail.com>
-				 * Special thanks to all of the contributors listed here https://github.com/joshaven/string_score
-				 * MIT license: http://www.opensource.org/licenses/mit-license.php
-				 *
-				 * Date: Tue Mar 1 2011
+				* string_score.js: String Scoring Algorithm 0.1.10 
+				*
+				* http://joshaven.com/string_score
+				* https://github.com/joshaven/string_score
+				*
+				* Copyright (C) 2009-2011 Joshaven Potter <yourtech@gmail.com>
+				* Special thanks to all of the contributors listed here https://github.com/joshaven/string_score
+				* MIT license: http://www.opensource.org/licenses/mit-license.php
+				*
+				* Date: Tue Mar 1 2011
 				*/
 
 				/**
-				 * Scores a string against another string.
-				 *  'Hello World'.score('he');     //=> 0.5931818181818181
-				 *  'Hello World'.score('Hello');  //=> 0.7318181818181818
-				 */
+				* Scores a string against another string.
+				*  'Hello World'.score('he');     //=> 0.5931818181818181
+				*  'Hello World'.score('Hello');  //=> 0.7318181818181818
+				*/
 				if (typeof module === 'object' && typeof define !== 'function') {
 					var define = function (factory) {
 						module.exports = factory(require, exports, module);

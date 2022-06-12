@@ -13,6 +13,39 @@
     <link rel="stylesheet" href="./res/icons/style.css" />
     <link rel="stylesheet" href="./res/icon-file/style.css" />
     <link rel="stylesheet" href="./res/octicons/style.css" />
+
+    <script>
+
+      if (!String.prototype.startsWith) {
+          Object.defineProperty(String.prototype, 'startsWith', {
+              value: function(search, rawPos) {
+                  var pos = rawPos > 0 ? rawPos|0 : 0;
+                  return this.substring(pos, pos + search.length) === search;
+              }
+          });
+      }
+
+      var __oldAddEventListener = HTMLElement.prototype.addEventListener;
+      HTMLElement.prototype.addEventListener = function(type, listener, useCapture){
+        if(!this.touchListeners){
+          this.touchListeners = {};
+        }
+        if(this.classList.contains('editor-container') && type.startsWith('touch')){
+          if(!this.touchListeners[type]){
+            this.touchListeners[type] = [];
+          }
+          this.touchListeners[type].push({listener:listener, useCapture:useCapture});
+        }
+        __oldAddEventListener.call(this,type,listener,useCapture);
+      }
+    </script>
+
+    <script src="./js/emmet-core.js"></script>
+    <script src="./js/ace/ace.js"></script>
+    <script src="./js/ace/ext-beautify.js"></script>
+    <script src="./js/ace/ext-code_lens.js"></script>
+    <script src="./js/ace/ext-emmet.js"></script>
+    <script src="./js/ace/ext-language_tools.js"></script>
     <script src="./js/createKeyboardEvent.js"></script>
     <script src="cordova.js"></script>
     <script defer src="./js/build/main.build.js"></script>

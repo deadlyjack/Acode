@@ -542,7 +542,7 @@ export default {
     readOnly: true,
   },
   modeSelect: {
-    description: 'Change language mode...',
+    description: 'Change language mode',
     key: 'Ctrl-M',
     readOnly: false,
   },

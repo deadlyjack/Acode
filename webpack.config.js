@@ -80,4 +80,11 @@ function clearOutputDir() {
 
   fs.rmdirSync(css, { recursive: true });
   fs.rmdirSync(js, { recursive: true });
+
+  fs.mkdir(css, (err) => {
+    if (err) console.log(err);
+  });
+  fs.mkdir(js, (err) => {
+    if (err) console.log(err);
+  });
 }

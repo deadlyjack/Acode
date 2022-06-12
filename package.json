@@ -88,6 +88,7 @@
     "@babel/core": "^7.17.8",
     "@babel/runtime": "^7.17.8",
     "@deadlyjack/ajax": "^1.0.9",
+    "ace-builds": "^1.6.0",
     "autosize": "^5.0.0",
     "axios": "^0.26.1",
     "core-js": "^3.21.1",

@@ -9,7 +9,7 @@ import constants from '../constants';
  */
 function select(type) {
   type = type || 'word';
-
+  const { MouseEvent: AceMouseEvent } = ace.require('ace/mouse/mouse_event');
   const { editor, controls, container } = editorManager;
   const containerClient = container.getBoundingClientRect();
   let marginLeft;

@@ -10,6 +10,7 @@ import searchBar from '../../components/searchbar';
 //#endregion
 
 function Modes() {
+  const modelist = ace.require('ace/ext/modelist');
   const actionStack = window.actionStack;
   return new Promise((resolve, reject) => {
     //#region Declaration

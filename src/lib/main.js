@@ -8,6 +8,7 @@ import '../styles/contextMenu.scss';
 import '../styles/dialogs.scss';
 import '../styles/help.scss';
 import '../styles/overrideAceStyle.scss';
+import './ace/modelist';
 import 'core-js/stable';
 import 'html-tag-js/dist/polyfill';
 import tag from 'html-tag-js';
@@ -222,21 +223,6 @@ async function ondeviceready() {
       helpers.resetKeyBindings();
     }
   })();
-
-  Acode.setLoadingMessage('Loading editor...');
-  await helpers.loadScripts(
-    './js/ace/ace.js',
-    './js/emmet-core.js',
-    './js/ace/ext-language_tools.js',
-    './js/ace/ext-code_lens.js',
-    './js/ace/ext-emmet.js',
-    './js/ace/ext-beautify.js',
-    './js/ace/ext-modelist.js',
-  );
-  ace.config.set('basePath', './js/ace/');
-  window.beautify = ace.require('ace/ext/beautify').beautify;
-  window.modelist = ace.require('ace/ext/modelist');
-  window.AceMouseEvent = ace.require('ace/mouse/mouse_event').MouseEvent;
 
   Acode.setLoadingMessage('Initializing GitHub...');
   await git.init();

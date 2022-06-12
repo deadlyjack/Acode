@@ -1,6 +1,6 @@
 import tag from 'html-tag-js';
 import autosize from 'autosize';
-import inputhints from '../inputhints';
+import inputhints from '../inputHints';
 import Checkbox from '../checkbox';
 import alert from './alert';
 
