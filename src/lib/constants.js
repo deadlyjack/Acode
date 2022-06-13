@@ -107,7 +107,7 @@ export default {
     'ja-jp': '日本語',
     'bn-bd': 'বাংলা',
     'cs-cz': 'Čeština',
-    'vi-vn': 'Vietnamese',
+    'vi-vn': 'Tiếng Việt',
     'be-by': 'Беларуская',
     'hu-hu': 'Magyar',
     'ml-in': 'മലയാളം',
