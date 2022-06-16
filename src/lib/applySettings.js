@@ -7,7 +7,7 @@ export default {
     if (!appSettings.value.animation) app.classList.add('no-animation');
 
     //full-screen
-    if (appSettings.value.fullscreen) Acode.exec('enable-fullscreen');
+    if (appSettings.value.fullscreen) acode.exec('enable-fullscreen');
 
     //disable-floating-button
     if (appSettings.value.disableFloatingButton)
@@ -29,7 +29,7 @@ export default {
       saveInterval = setInterval(() => {
         editorManager.files.map((file) => {
           if (!file.readOnly && file.uri && file.isUnsaved && !file.isSaving)
-            Acode.exec('save', false);
+            acode.exec('save', false);
         });
       }, autoSave);
     }

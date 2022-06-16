@@ -19,6 +19,7 @@ export default async () => {
           strings['file has been deleted'].replace('{file}', file.filename),
         );
         editorManager.onupdate('file-changed');
+        editorManager.emit('update', 'file-changed');
         continue;
       }
 

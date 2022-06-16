@@ -39,6 +39,12 @@ import $_fileMenu from '../views/file-menu.hbs';
 import Icon from '../components/icon';
 import restoreTheme from './restoreTheme';
 import openFiles from './openFiles';
+import loadPlugins from './loadPlugins';
+import pluginServer from './handlers/pluginServer';
+import checkPluginsUpdate from './checkPluginsUpdate';
+import plugins from '../pages/plugins/plugins';
+import Acode from './acode';
+import createPluginServer from './createPluginServer';
 
 loadPolyFill.apply(window);
 window.onload = Main;
@@ -91,11 +97,21 @@ async function ondeviceready() {
   window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
   window.DATA_STORAGE = externalDataDirectory || dataDirectory;
   window.CACHE_STORAGE = externalCacheDirectory || cacheDirectory;
+  window.PLUGIN_DIR = Url.join(DATA_STORAGE, 'plugins');
   window.KEYBINDING_FILE = Url.join(DATA_STORAGE, '.key-bindings.json');
   window.gitRecordFile = Url.join(DATA_STORAGE, 'git/.gitfiles');
   window.gistRecordFile = Url.join(DATA_STORAGE, 'git/.gistfiles');
   window.actionStack = ActionStack();
   window.appSettings = new Settings();
+
+  try {
+    if (!(await fsOperation(PLUGIN_DIR).exists())) {
+      await fsOperation(DATA_STORAGE).createDirectory('plugins');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
   try {
     window.ANDROID_SDK_INT = await new Promise((resolve, reject) =>
       system.getAndroidVersion(resolve, reject),
@@ -118,24 +134,7 @@ async function ondeviceready() {
     if (client.height === 0) return false;
     else return true;
   })();
-  window.Acode = {
-    exec(key, val) {
-      if (key in commands) {
-        return commands[key](val);
-      } else {
-        return false;
-      }
-    },
-    get exitAppMessage() {
-      const numFiles = editorManager.hasUnsavedFiles();
-      if (numFiles) {
-        return strings['unsaved files close app'];
-      }
-    },
-    setLoadingMessage(message) {
-      document.body.setAttribute('data-small-msg', message);
-    },
-  };
+  window.acode = new Acode();
   window.keyBindings = (name) => {
     if (customKeyBindings && name in window.customKeyBindings)
       return window.customKeyBindings[name].key;
@@ -146,7 +145,7 @@ async function ondeviceready() {
   system.requestPermission('android.permission.WRITE_EXTERNAL_STORAGE');
   localStorage.versionCode = BuildInfo.versionCode;
   document.body.setAttribute('data-version', 'v' + BuildInfo.version);
-  Acode.setLoadingMessage('Loading settings...');
+  acode.setLoadingMessage('Loading settings...');
 
   window.resolveLocalFileSystemURL = function (url, ...args) {
     oldRURL.call(this, Url.safe(url), ...args);
@@ -167,7 +166,7 @@ async function ondeviceready() {
   if (language in constants.langList) {
     lang = language;
   }
-  Acode.setLoadingMessage('Loading settings...');
+  acode.setLoadingMessage('Loading settings...');
   await appSettings.init(lang);
 
   if (localStorage.versionCode < 150) {
@@ -176,19 +175,36 @@ async function ondeviceready() {
     window.location.reload();
   }
 
+  try {
+    acode.pluginServer = await createPluginServer();
+    acode.pluginServer.setOnRequestHandler(pluginServer);
+    acode.setLoadingMessage('Loading plugins...');
+    loadPlugins()
+      .then(() => {
+        toast('Plugins loaded!');
+      })
+      .catch((error) => {
+        console.error(error);
+        toast('Plugins loading failed!');
+      });
+  } catch (error) {
+    console.error(error);
+    toast('Plugins loading failed!');
+  }
+
   if (appSettings.value.showAd) {
-    Acode.exec('load-ad');
+    acode.exec('load-ad');
   } else {
     const loadAd = (value) => {
       appSettings.off('update:showAd', loadAd);
       if (value) {
-        Acode.exec('load-ad');
+        acode.exec('load-ad');
       }
     };
     appSettings.on('update:showAd', loadAd);
   }
 
-  Acode.setLoadingMessage('Loading custom theme...');
+  acode.setLoadingMessage('Loading custom theme...');
   document.head.append(
     tag('style', {
       id: 'custom-theme',
@@ -199,7 +215,7 @@ async function ondeviceready() {
     }),
   );
 
-  Acode.setLoadingMessage('Loading language...');
+  acode.setLoadingMessage('Loading language...');
   try {
     const languageFile = `${ASSETS_DIRECTORY}/lang/${appSettings.value.lang}.json`;
     const fs = fsOperation(languageFile);
@@ -209,7 +225,7 @@ async function ondeviceready() {
     alert('Unable to load language file.');
   }
 
-  Acode.setLoadingMessage('Loading keybindings...');
+  acode.setLoadingMessage('Loading keybindings...');
   (async () => {
     try {
       const fs = fsOperation(KEYBINDING_FILE);
@@ -224,7 +240,7 @@ async function ondeviceready() {
     }
   })();
 
-  Acode.setLoadingMessage('Initializing GitHub...');
+  acode.setLoadingMessage('Initializing GitHub...');
   await git.init();
 
   loadApp();
@@ -236,7 +252,7 @@ async function loadApp() {
     className: 'icon edit',
     attr: {
       style: 'font-size: 1.2em !important;',
-      action: '',
+      action: 'toggle-edit-menu',
     },
   });
   const $navToggler = tag('span', {
@@ -289,13 +305,13 @@ async function loadApp() {
   const $runBtn = tag('span', {
     className: 'icon play_arrow',
     attr: {
-      action: 'run-file',
+      action: 'run',
     },
     onclick() {
-      Acode.exec('run');
+      run();
     },
     oncontextmenu() {
-      Acode.exec('run-file');
+      run.runFile();
     },
     style: {
       fontSize: '1.2em',
@@ -305,7 +321,7 @@ async function loadApp() {
     className: 'floating icon menu',
     id: 'sidebar-toggler',
     onclick() {
-      Acode.exec('toggle-sidebar');
+      acode.exec('toggle-sidebar');
     }
   });
   const $headerToggler = tag('span', {
@@ -321,14 +337,10 @@ async function loadApp() {
   let registeredKey = '';
   //#endregion
 
-  actionStack.onCloseApp = () => Acode.exec('save-state');
-  Acode.$menuToggler = $menuToggler;
-  Acode.$editMenuToggler = $editMenuToggler;
-  Acode.$headerToggler = $headerToggler;
-  Acode.$quickToolToggler = $quickToolToggler;
-  Acode.$floatingMenuToggler = $floatingNavToggler;
-  Acode.$runBtn = $runBtn;
+  acode.$quickToolToggler = $quickToolToggler;
+  acode.$headerToggler = $headerToggler;
 
+  actionStack.onCloseApp = () => acode.exec('save-state');
   $sidebar.setAttribute('empty-msg', strings['open folder']);
   window.editorManager = EditorManager($sidebar, $header, $main);
 
@@ -340,7 +352,7 @@ async function loadApp() {
     this.classList.toggle('keyboard_arrow_right');
   };
   $quickToolToggler[activationMode] = function () {
-    Acode.exec('toggle-quick-tools');
+    acode.exec('toggle-quick-tools');
   };
 
   //#region rendering
@@ -354,15 +366,15 @@ async function loadApp() {
   //#endregion
 
   //#region loading-files
-  Acode.setLoadingMessage('Loading folders...');
+  acode.setLoadingMessage('Loading folders...');
   if (Array.isArray(folders)) {
     folders.forEach((folder) => openFolder(folder.url, folder.opts));
   }
 
   if (Array.isArray(files) && files.length) {
-    Acode.setLoadingMessage(`Loading files (0/${files.length})`);
+    acode.setLoadingMessage(`Loading files (0/${files.length})`);
     const res = await openFiles(files, (count) => {
-      Acode.setLoadingMessage(`Loading files (${count}/${files.length})`);
+      acode.setLoadingMessage(`Loading files (${count}/${files.length})`);
     });
     if (res.success === 0) {
       editorManager.addNewFile();
@@ -380,6 +392,8 @@ async function loadApp() {
 
   //#region Add event listeners
   editorManager.onupdate = onEditorUpdate;
+  editorManager.on('rename-file', onRenameOrSwitchFile);
+  editorManager.on('switch-file', onRenameOrSwitchFile);
   app.addEventListener('click', onClickApp);
   $fileMenu.addEventListener('click', handleMenu);
   $mainMenu.addEventListener('click', handleMenu);
@@ -397,12 +411,41 @@ async function loadApp() {
     if (activeFile) editorManager.editor.blur();
   };
   document.addEventListener('pause', () => {
-    Acode.exec('save-state');
+    acode.exec('save-state');
   });
   document.addEventListener('resume', () => {
-    Acode.exec('check-files');
+    acode.exec('check-files');
   });
   //#endregion
+
+  checkPluginsUpdate()
+    .then((updates) => {
+      if (!updates.length) return;
+      const $icon = tag('span', {
+        className: 'octicon octicon-bell',
+        style: {
+          fontSize: '1.2rem',
+        },
+        attr: {
+          action: '',
+        },
+        onclick() {
+          plugins(updates);
+          this.remove();
+        }
+      });
+
+      if ($editMenuToggler.isConnected) {
+        $header.insertBefore($icon, $editMenuToggler);
+      } else if ($runBtn.isConnected) {
+        $header.insertBefore($icon, $runBtn);
+      } else {
+        $header.insertBefore($icon, $menuToggler);
+      }
+    })
+    .catch(console.error);
+
+  onRenameOrSwitchFile();
 
   /**
    *
@@ -434,7 +477,7 @@ async function loadApp() {
         constants.COMMANDS.includes(name) &&
         'action' in obj
       )
-        Acode.exec(obj.action);
+        acode.exec(obj.action);
     }
 
     registeredKey = null;
@@ -452,7 +495,7 @@ async function loadApp() {
 
     if ($mainMenu.contains($target)) $mainMenu.hide();
     if ($fileMenu.contains($target)) $fileMenu.hide();
-    Acode.exec(action, value);
+    acode.exec(action, value);
   }
 
   function footerTouchStart(e) {
@@ -473,12 +516,13 @@ async function loadApp() {
     editorManager.editor.focus();
   }
 
-  function onEditorUpdate(type) {
+  function onEditorUpdate() {
     const activeFile = editorManager.activeFile;
     const $save = $footer.querySelector('[action=save]');
 
-    if (!$editMenuToggler.isConnected)
+    if (!$editMenuToggler.isConnected) {
       $header.insertBefore($editMenuToggler, $header.lastChild);
+    }
 
     if (activeFile) {
       if (activeFile.isUnsaved) {
@@ -488,29 +532,29 @@ async function loadApp() {
         activeFile.assocTile.classList.remove('notice');
         if ($save) $save.classList.remove('notice');
       }
-
-      editorManager.editor.setReadOnly(!activeFile.editable);
-
-      if (type !== 'remove-file') {
-        run
-          .checkRunnable()
-          .then((res) => {
-            if (res) {
-              $runBtn.setAttribute('run-file', res);
-              $header.insertBefore($runBtn, $header.lastChild);
-            } else {
-              $runBtn.removeAttribute('run-file');
-              $runBtn.remove();
-            }
-          })
-          .catch((err) => {
-            $runBtn.removeAttribute('run-file');
-            $runBtn.remove();
-          });
-      }
     }
 
-    Acode.exec('save-state');
+    acode.exec('save-state');
+  }
+
+  function onRenameOrSwitchFile() {
+    run
+      .checkRunnable()
+      .then((res) => {
+        if (res) {
+          editorManager.activeFile.canRun = true;
+          $runBtn.setAttribute('run-file', res);
+          $header.insertBefore($runBtn, $header.lastChild);
+        } else {
+          editorManager.activeFile.canRun = false;
+          $runBtn.removeAttribute('run-file');
+          $runBtn.remove();
+        }
+      })
+      .catch((err) => {
+        $runBtn.removeAttribute('run-file');
+        $runBtn.remove();
+      });
   }
 }
 

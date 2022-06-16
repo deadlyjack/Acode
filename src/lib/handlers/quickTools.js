@@ -36,7 +36,7 @@ function actions(action, value) {
       editor.insert(value);
       break;
     case 'pallete':
-      Acode.exec('command-pallete');
+      acode.exec('command-pallete');
       break;
 
     case 'tab':
@@ -80,7 +80,7 @@ function actions(action, value) {
       break;
 
     case 'save':
-      Acode.exec('save');
+      acode.exec('save');
       break;
 
     case 'more':

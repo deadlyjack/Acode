@@ -1,0 +1,16 @@
+{{#.}}
+<div class="list-item" action="open" {{#installed}}data-installed="true"{{/installed}} data-plugin="{{plugin}}">
+  <span 
+    class="icon" 
+    style="background-image: url({{#icon}}{{icon}}{{/icon}}{{^icon}}./res/puzzle.png{{/icon}});"
+  ></span>
+  <div class="container">
+    <div class="text" style="justify-content: space-between;">
+      <a>{{name}}</a>
+    </div>
+    <small class="value">
+      {{#author}}<span action="open" data-href="https://github.com/{{github}}" class="text link">{{name}}</span>{{/author}}
+    </small>
+  </div>
+</div>
+{{/.}}

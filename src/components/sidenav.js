@@ -108,7 +108,7 @@ function sidenav($activator, toggler) {
       setWidth(width);
       app.append($el, $resizeBar);
       $el.onclick = () => {
-        if (!$el.textContent) Acode.exec('open-folder');
+        if (!$el.textContent) acode.exec('open-folder');
       };
     }
 
@@ -325,7 +325,7 @@ function sidenav($activator, toggler) {
     flag = false;
 
     if (e.target === $el && !$el.textContent && touch.totalX === 0) {
-      Acode.exec('open-folder');
+      acode.exec('open-folder');
       resetState();
       return hide();
     } else if (e.target !== mask && touch.totalX === 0) return resetState();

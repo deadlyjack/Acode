@@ -1,0 +1,22 @@
+<div class="main" id="plugin">
+  <div class="header">
+    <div class="info">
+      <span class="logo" style="background-image: url({{icon}})"></span>
+      <div class="desc">
+        <span class="name">{{name}}</span>
+        <span class="version">{{version}} {{#update}}&#8594; v{{update}}{{/update}}</span>
+        <span class="author" action="open">{{author.name}}</span>
+        <div action="github" class="tag">
+          <span>{{#type}}{{type}}{{/type}}{{^type}}free{{/type}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="button-container primary">
+      {{#installed}}<button action="uninstall">{{strings.uninstall}}</button>{{/installed}}
+      {{^installed}}<button action="install">{{strings.install}}</button>{{/installed}}
+      {{#update}}<button action="install">{{strings.update}}</button>{{/update}}
+      {{#isPaid}}<button action="buy">{{#strings}}{{download acode pro}}{{/strings}}</button>{{/isPaid}}
+    </div>
+  </div>
+  <div class="body">{{{body}}}</div>
+</div>

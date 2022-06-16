@@ -21,6 +21,9 @@ function ReposInclude() {
     attr: {
       action: 'search',
     },
+    onclick() {
+      searchBar($page.get('#repos'));
+    },
   });
   const $menuToggler = Icon('more_vert', 'toggle-menu');
   const $page = Page('Repositories');

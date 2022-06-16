@@ -230,5 +230,12 @@
   "remember opened files": "Запамʼятати відкриті файли",
   "remember opened folders": "Запамʼятати відкриті теки",
   "no suggestions": "Нема пропозицій",
-  "no suggestions aggressive": "Без аґресивних пропозицій"
+  "no suggestions aggressive": "Без аґресивних пропозицій",
+  "install": "Install",
+  "installing": "Installing...",
+  "plugins": "Plugins",
+  "recently used": "Recently used",
+  "update": "Update",
+  "uninstall": "Uninstall",
+  "download acode pro": "Download Acode pro"
 }

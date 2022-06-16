@@ -230,5 +230,12 @@
   "remember opened files": "Remember opened files",
   "remember opened folders": "Remember opened folders",
   "no suggestions": "Aucune suggestions",
-  "no suggestions aggressive": "No suggestions aggressive"
+  "no suggestions aggressive": "No suggestions aggressive",
+  "install": "Install",
+  "installing": "Installing...",
+  "plugins": "Plugins",
+  "recently used": "Recently used",
+  "update": "Update",
+  "uninstall": "Uninstall",
+  "download acode pro": "Download Acode pro"
 }

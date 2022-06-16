@@ -61,12 +61,16 @@ async function saveFile(file, isSaveAs = false) {
       await file.record.setData(data);
       file.isUnsaved = false;
       editorManager.onupdate('save-file');
+      editorManager.emit('save-file', file);
+      editorManager.emit('update', 'save-file');
       return;
     }
     if (file.type === 'gist') {
       await file.record.setData(file.name, data);
       file.isUnsaved = false;
       editorManager.onupdate('save-file');
+      editorManager.emit('save-file', file);
+      editorManager.emit('update', 'save-file');
       return;
     }
   } else {
@@ -139,6 +143,8 @@ async function saveFile(file, isSaveAs = false) {
       file.onsave();
       if (url) recents.addFile(file.uri);
       editorManager.onupdate('save-file');
+      editorManager.emit('update', 'save-file');
+      editorManager.emit('save-file', file);
       resetText();
     }, editorManager.TIMEOUT_VALUE + 100);
   } catch (err) {
@@ -197,7 +203,8 @@ async function saveFile(file, isSaveAs = false) {
     const ext = helpers.extname(name || file.filename);
     const beautify = appSettings.value.beautify;
     if (beautify[0] !== '*' && beautify.indexOf(ext) < 0) {
-      Acode.exec('format');
+      editorManager.activeFile.markChanged = false;
+      acode.exec('format');
     }
   }
 }

@@ -1,4 +1,4 @@
-package org.apache.cordova.plugin;
+package com.foxdebug.server;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -6,16 +6,14 @@ import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-public class Webserver extends CordovaPlugin {
+public class Server extends CordovaPlugin {
 
-  public HashMap<String, Object> responses;
-  public CallbackContext onRequestCallbackContext;
-  public NanoHTTPDWebserver nanoHTTPDWebserver;
+  public HashMap<Integer, NanoHTTPDWebserver> servers;
 
   @Override
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
-    this.responses = new HashMap<String, Object>();
+    servers = new HashMap<Integer, NanoHTTPDWebserver>();
   }
 
   @Override
@@ -33,16 +31,16 @@ public class Webserver extends CordovaPlugin {
       }
       return true;
     }
+    if ("setOnRequestHandler".equals(action)) {
+      this.setOnRequestHandler(args, callbackContext);
+      return true;
+    }
     if ("stop".equals(action)) {
       this.stop(args, callbackContext);
       return true;
     }
-    if ("onRequest".equals(action)) {
-      this.onRequest(args, callbackContext);
-      return true;
-    }
-    if ("sendResponse".equals(action)) {
-      this.sendResponse(args, callbackContext);
+    if ("send".equals(action)) {
+      this.send(args, callbackContext);
       return true;
     }
     return false; // Returning false results in a "MethodNotFound" error.
@@ -56,30 +54,42 @@ public class Webserver extends CordovaPlugin {
    */
   private void start(JSONArray args, CallbackContext callbackContext)
     throws JSONException, IOException {
-    int port = 8080;
+    Integer port = 8080;
 
     if (args.length() == 1) {
       port = args.getInt(0);
     }
 
-    if (this.nanoHTTPDWebserver != null) {
-      callbackContext.sendPluginResult(
-        new PluginResult(PluginResult.Status.ERROR, "Server already running")
-      );
+    NanoHTTPDWebserver server = servers.get(port);
+    if (server != null) {
+      callbackContext.success("Server started on port " + port);
       return;
     }
 
     try {
-      this.nanoHTTPDWebserver =
-        new NanoHTTPDWebserver(port, this, cordova.getContext());
-      this.nanoHTTPDWebserver.start();
+      server = new NanoHTTPDWebserver(port, cordova.getContext());
+      server.start();
+      servers.put(port, server);
+      callbackContext.success("Server started on port " + port);
     } catch (Exception e) {
       callbackContext.sendPluginResult(
         new PluginResult(PluginResult.Status.ERROR, e.getMessage())
       );
+    }
+  }
+
+  private void setOnRequestHandler(
+    JSONArray args,
+    CallbackContext callbackContext
+  )
+    throws JSONException {
+    Integer port = args.getInt(0);
+    NanoHTTPDWebserver server = servers.get(port);
+    if (server == null) {
+      callbackContext.error("Server not started on port " + port);
       return;
     }
-    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+    server.onRequestCallbackContext = callbackContext;
   }
 
   /**
@@ -90,10 +100,14 @@ public class Webserver extends CordovaPlugin {
    */
   private void stop(JSONArray args, CallbackContext callbackContext)
     throws JSONException {
-    if (this.nanoHTTPDWebserver != null) {
-      this.nanoHTTPDWebserver.stop();
-      this.nanoHTTPDWebserver = null;
+    Integer port = args.getInt(0);
+    NanoHTTPDWebserver server = servers.get(port);
+    if (server == null) {
+      callbackContext.error("Server not started on port " + port);
+      return;
     }
+    server.stop();
+    servers.remove(port);
     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
   }
 
@@ -104,23 +118,17 @@ public class Webserver extends CordovaPlugin {
    * @param callbackContext
    * @throws JSONException
    */
-  private void sendResponse(JSONArray args, CallbackContext callbackContext)
+  private void send(JSONArray args, CallbackContext callbackContext)
     throws JSONException {
-    this.responses.put(args.getString(0), args.get(1));
+    Integer port = args.getInt(0);
+    NanoHTTPDWebserver server = this.servers.get(port);
+    if (server == null) {
+      callbackContext.sendPluginResult(
+        new PluginResult(PluginResult.Status.ERROR, "Server not running")
+      );
+      return;
+    }
+    server.responses.put(args.getString(1), args.get(2));
     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-  }
-
-  /**
-   * Just register the onRequest and send no result. This is needed to save the
-   * callbackContext to invoke it later
-   *
-   * @param args
-   * @param callbackContext
-   */
-  private void onRequest(JSONArray args, CallbackContext callbackContext) {
-    this.onRequestCallbackContext = callbackContext;
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
-    pluginResult.setKeepCallback(true);
-    this.onRequestCallbackContext.sendPluginResult(pluginResult);
   }
 }

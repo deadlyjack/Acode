@@ -48,7 +48,7 @@ function clipboardAction(action) {
       break;
 
     case 'select':
-      Acode.exec('select-word');
+      acode.exec('select-word');
       break;
 
     case 'color':

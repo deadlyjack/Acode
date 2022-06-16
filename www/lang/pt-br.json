@@ -231,5 +231,12 @@
   "remember opened files": "Lembrar dos arquivos abertos",
   "remember opened folders": "Lembrar das pastas abertas",
   "no suggestions": "Nenhuma sugestão",
-  "no suggestions aggressive": "Nenhuma sugestão agressiva"
+  "no suggestions aggressive": "Nenhuma sugestão agressiva",
+  "install": "Install",
+  "installing": "Installing...",
+  "plugins": "Plugins",
+  "recently used": "Recently used",
+  "update": "Update",
+  "uninstall": "Uninstall",
+  "download acode pro": "Download Acode pro"
 }

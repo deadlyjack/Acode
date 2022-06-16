@@ -16,7 +16,7 @@ export default function Commands() {
       description: 'Close current tab',
       bindKey: bindKey('closeCurrentTab'),
       exec: function () {
-        Acode.exec('close-current-tab');
+        acode.exec('close-current-tab');
       },
     },
     {
@@ -24,7 +24,7 @@ export default function Commands() {
       description: 'Close all tabs',
       bindKey: bindKey('closeAllTabs'),
       exec: function () {
-        Acode.exec('close-all-tabs');
+        acode.exec('close-all-tabs');
       },
     },
     {
@@ -32,8 +32,8 @@ export default function Commands() {
       description: 'Create new file',
       bindKey: bindKey('newFile'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('new-file');
+        if (acode) {
+          acode.exec('new-file');
         }
       },
       readOnly: true,
@@ -43,8 +43,8 @@ export default function Commands() {
       description: 'Open a file',
       bindKey: bindKey('openFile'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('open-file');
+        if (acode) {
+          acode.exec('open-file');
         }
       },
       readOnly: true,
@@ -54,8 +54,8 @@ export default function Commands() {
       description: 'Open a folder',
       bindKey: bindKey('openFolder'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('open-folder');
+        if (acode) {
+          acode.exec('open-folder');
         }
       },
       readOnly: true,
@@ -65,8 +65,8 @@ export default function Commands() {
       description: 'Save current file',
       bindKey: bindKey('saveFile'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('save');
+        if (acode) {
+          acode.exec('save');
         }
       },
       readOnly: true,
@@ -76,8 +76,8 @@ export default function Commands() {
       description: 'Save as current file',
       bindKey: bindKey('saveFileAs'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('save-as');
+        if (acode) {
+          acode.exec('save-as');
         }
       },
       readOnly: true,
@@ -87,8 +87,8 @@ export default function Commands() {
       description: 'Open next file tab',
       bindKey: bindKey('nextFile'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('next-file');
+        if (acode) {
+          acode.exec('next-file');
         }
       },
     },
@@ -97,8 +97,8 @@ export default function Commands() {
       description: 'Open previous file tab',
       bindKey: bindKey('prevFile'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('prev-file');
+        if (acode) {
+          acode.exec('prev-file');
         }
       },
     },
@@ -107,8 +107,8 @@ export default function Commands() {
       description: 'Show settings menu',
       bindKey: bindKey('showSettingsMenu'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('open', 'settings');
+        if (acode) {
+          acode.exec('open', 'settings');
         }
       },
       readOnly: true,
@@ -118,8 +118,8 @@ export default function Commands() {
       description: 'Rename active file',
       bindKey: bindKey('renameFile'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('rename');
+        if (acode) {
+          acode.exec('rename');
         }
       },
       readOnly: true,
@@ -129,8 +129,8 @@ export default function Commands() {
       description: 'Preview HTML and MarkDown',
       bindKey: bindKey('run'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('run');
+        if (acode) {
+          acode.exec('run');
         }
       },
       readOnly: true,
@@ -140,8 +140,8 @@ export default function Commands() {
       description: 'Select word',
       bindKey: bindKey('selectWord'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('select-word');
+        if (acode) {
+          acode.exec('select-word');
         }
       },
       readOnly: true,
@@ -151,8 +151,8 @@ export default function Commands() {
       description: 'Toggle full screen mode',
       bindKey: bindKey('toggleFullscreen'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('toggle-fullscreen');
+        if (acode) {
+          acode.exec('toggle-fullscreen');
         }
       },
     },
@@ -161,8 +161,8 @@ export default function Commands() {
       description: 'Toggle sidebar',
       bindKey: bindKey('toggleSidebar'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('toggle-sidebar');
+        if (acode) {
+          acode.exec('toggle-sidebar');
         }
       },
     },
@@ -171,8 +171,8 @@ export default function Commands() {
       description: 'Toggle main menu',
       bindKey: bindKey('toggleMenu'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('toggle-menu');
+        if (acode) {
+          acode.exec('toggle-menu');
         }
       },
     },
@@ -181,8 +181,8 @@ export default function Commands() {
       description: 'Toggle edit menu',
       bindKey: bindKey('toggleEditMenu'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('toggle-editmenu');
+        if (acode) {
+          acode.exec('toggle-editmenu');
         }
       },
     },
@@ -233,8 +233,8 @@ export default function Commands() {
       description: 'Go to line...',
       bindKey: bindKey('gotoline'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('goto');
+        if (acode) {
+          acode.exec('goto');
         }
       },
       readOnly: true,
@@ -359,8 +359,8 @@ export default function Commands() {
       description: 'Find',
       bindKey: bindKey('find'),
       exec: function () {
-        if (Acode) {
-          Acode.exec('find');
+        if (acode) {
+          acode.exec('find');
         }
       },
       readOnly: true,
@@ -861,8 +861,8 @@ export default function Commands() {
       description: 'Replace',
       bindKey: bindKey('replace'),
       exec: function (editor) {
-        if (Acode) {
-          Acode.exec('replace');
+        if (acode) {
+          acode.exec('replace');
         }
       },
     },
@@ -1291,7 +1291,7 @@ export default function Commands() {
       description: 'Change language mode...',
       bindKey: bindKey('modeSelect'),
       exec: function () {
-        Acode.exec('syntax');
+        acode.exec('syntax');
       },
       readOnly: true,
     },

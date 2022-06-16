@@ -598,8 +598,15 @@ export default {
    * @param {String} [encoding='utf-8']
    */
   decodeText(arrayBuffer, encoding = 'utf-8') {
+
+    const isJson = encoding === 'json';
+    if (isJson) encoding = 'utf-8';
+
     const uint8Array = new Uint8Array(arrayBuffer);
     const result = new TextDecoder(encoding).decode(uint8Array);
+    if (isJson) {
+      return this.parseJSON(result);
+    }
     return result;
   },
   /**
@@ -692,6 +699,7 @@ export default {
     }
 
     editorManager.onupdate('file-delete');
+    editorManager.emit('update', 'file-delete');
   },
   /**
    * Checks whether given objects are equal or not
@@ -743,4 +751,27 @@ export default {
       }
     }
   },
+  /**
+  * Create directory recursively 
+  * @param {string} parent 
+  * @param {Array<string> | string} dir 
+  */
+  async createFileRecursive(parent, dir) {
+    if (typeof dir === 'string') {
+      dir = dir.split('/');
+    }
+    dir = dir.filter(d => d);
+    const cd = dir.shift();
+    const newParent = Url.join(parent, cd);
+    if (!(await fsOperation(newParent).exists())) {
+      if (dir.length) {
+        await fsOperation(parent).createDirectory(cd);
+      } else {
+        await fsOperation(parent).createFile(cd);
+      }
+    }
+    if (dir.length) {
+      await this.createFileRecursive(newParent, dir);
+    }
+  }
 };

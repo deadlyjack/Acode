@@ -39,15 +39,16 @@ function Page(title, options = {}) {
   });
   let onhide;
 
-  if (!window.$placeholder)
+  if (!window.$placeholder) {
     window.$placeholder = tag('div', {
       style: {
         display: 'none',
       },
     });
+  }
 
   if (!window.pageCount) window.pageCount = 0;
-  if (!pageCount++) document.body.replaceChild($placeholder, root);
+  // if (!pageCount++) document.body.replaceChild($placeholder, root);
 
   $header.classList.add('light');
 
@@ -75,21 +76,21 @@ function Page(title, options = {}) {
     },
     innerHTML: {
       set(html) {
-        
-        [...$page.children].forEach($i=>{
-          if($i !== $header && !$i.classList.contains('main')) $i.remove();
+
+        [...$page.children].forEach($i => {
+          if ($i && $i !== $header && !$i?.classList?.contains('main')) $i?.remove();
         });
 
         const $main = $page.querySelector('.main');
         const $content = tag.parse(html);
-        if($content.classList.contains('main')){
-          if($main) {
+        if ($content?.classList?.contains('main')) {
+          if ($main) {
             $main.replaceWith($content);
             return;
           }
           $page.append($content);
-        }else{
-          if($main){
+        } else {
+          if ($main) {
             $main.innerHTML = html;
             return;
           }
@@ -100,7 +101,7 @@ function Page(title, options = {}) {
           }));
         }
       },
-      get(){
+      get() {
         return $page.querySelector('main').innerHTML;
       }
     }
@@ -109,7 +110,7 @@ function Page(title, options = {}) {
 
   function hide() {
     if (!--pageCount) {
-      document.body.replaceChild(root, $placeholder);
+      // document.body.replaceChild(root, $placeholder);
       editorManager.editor.resize(true);
     }
     if ($page.isConnected) {

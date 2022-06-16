@@ -39,14 +39,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-webserver": {
-    "source": {
-      "type": "local",
-      "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-webserver"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-iap": {
     "source": {
       "type": "local",
@@ -91,6 +83,14 @@
     "source": {
       "type": "registry",
       "id": "cordova-plugin-file@^6.0.2"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-server": {
+    "source": {
+      "type": "local",
+      "path": "C:\\Users\\delle\\acode_1.5.5\\node_modules\\cordova-plugin-webserver"
     },
     "is_top_level": true,
     "variables": {}

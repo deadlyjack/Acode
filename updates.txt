@@ -1,7 +1,9 @@
-version 1.5.6
+version 1.6.0
+☞ Supports plugin
+☞ Console can log html code
 ☞ Updated FTP library.
 ☞ Updated SFTP functionality.
-☞ Saperated all hardcoded modications in ace editor.
+☞ Separated all hardcoded modifications in ace editor.
 ☞ Improved clipboard actions.
 ☞ Updated Ace editor.
 ☞ Added horizontal padding.

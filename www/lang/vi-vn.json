@@ -230,5 +230,12 @@
   "remember opened files": "Nhớ các tệp đã mở",
   "remember opened folders": "Nhớ các thư mục đã mửo",
   "no suggestions": "Không có đề xuất",
-  "no suggestions aggressive": "Không có đề xuất một cách tích cực"
+  "no suggestions aggressive": "Không có đề xuất một cách tích cực",
+  "install": "Install",
+  "installing": "Installing...",
+  "plugins": "Plugins",
+  "recently used": "Recently used",
+  "update": "Update",
+  "uninstall": "Uninstall",
+  "download acode pro": "Download Acode pro"
 }

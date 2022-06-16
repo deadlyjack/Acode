@@ -453,7 +453,9 @@ import loadPolyFill from './utils/polyfill';
             }));
             break;
           default:
-            $msg.innerHTML = arg;
+            $msg.innerHTML = tag('textarea', {
+              textContent: arg
+            }).innerHTML;
             break;
         }
       }

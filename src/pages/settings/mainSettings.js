@@ -1,5 +1,4 @@
 import tag from 'html-tag-js';
-import mustache from 'mustache';
 import Page from '../../components/page';
 import gen from '../../components/gen';
 import About from '../about/about';
@@ -8,13 +7,12 @@ import constants from '../../lib/constants';
 import openFile from '../../lib/openFile';
 import backupRestore from './backup-restore';
 import themeSetting from '../themeSetting/themeSetting';
-import $_ad from '../../views/ad.hbs';
 import otherSettings from './otherSettings';
 import $_socialLinks from '../../views/social-links.hbs';
-import dialogs from '../../components/dialogs';
 import rateBox from '../../components/dialogboxes/rateBox';
 import Donate from '../donate/donate';
 import helpers from '../../lib/utils/helpers';
+import plugins from '../plugins/plugins';
 
 export default function settingsMain() {
   const $page = Page(strings.settings.capitalize());
@@ -91,6 +89,12 @@ export default function settingsMain() {
       key: 'rateapp',
       text: strings['rate acode'],
       icon: 'googleplay'
+    },
+    {
+      index: 7,
+      key: 'plugins',
+      text: strings['plugins'],
+      icon: 'extension',
     }
   ];
   gen.listItems($settingsList, settingsOptions, changeSetting);
@@ -128,6 +132,13 @@ export default function settingsMain() {
 
       case 'rateapp':
         rateBox();
+        break;
+
+      case 'plugins':
+        plugins();
+        break;
+
+      default:
         break;
     }
   }

@@ -25,7 +25,7 @@ function ActionStack() {
       const fun = stack.pop();
       if (fun) fun.action();
       else if (appSettings.value.confirmOnExit) {
-        let closeMessage = Acode.exitAppMessage;
+        let closeMessage = acode.exitAppMessage;
 
         if (closeMessage) {
           dialogs

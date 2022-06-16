@@ -146,7 +146,7 @@ export default function editorSettings() {
               saveInterval = setInterval(() => {
                 editorManager.files.map((file) => {
                   if (file.isUnsaved && file.location)
-                    Acode.exec('save', false);
+                    acode.exec('save', false);
                 });
               }, res);
             } else if (saveInterval) {
@@ -243,7 +243,7 @@ export default function editorSettings() {
         break;
 
       case 'quickTools':
-        Acode.exec('toggle-quick-tools');
+        acode.exec('toggle-quick-tools');
         this.value = values.quickTools;
         break;
 
@@ -252,8 +252,8 @@ export default function editorSettings() {
           fullscreen: !values.fullscreen,
         });
 
-        if (values.fullscreen) Acode.exec('enable-fullscreen');
-        else Acode.exec('disable-fullscreen');
+        if (values.fullscreen) acode.exec('enable-fullscreen');
+        else acode.exec('disable-fullscreen');
 
         this.value = values.fullscreen;
         break;

@@ -1,8 +1,9 @@
-package org.apache.cordova.plugin;
+package com.foxdebug.server;
 
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import androidx.documentfile.provider.DocumentFile;
 import fi.iki.elonen.NanoHTTPD;
 import java.io.File;
@@ -15,19 +16,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class NanoHTTPDWebserver extends NanoHTTPD {
 
-  Webserver webserver;
+  public HashMap<String, Object> responses;
+  public CallbackContext onRequestCallbackContext;
   Context context;
 
-  public NanoHTTPDWebserver(int port, Webserver webserver, Context context) {
+  public NanoHTTPDWebserver(int port, Context context) {
     super(port);
-    this.webserver = webserver;
     this.context = context;
+    this.responses = new HashMap<String, Object>();
   }
 
   private String getBodyText(IHTTPSession session) {
@@ -172,10 +175,10 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
             );
           res.addHeader("Accept-Ranges", "bytes");
           res.addHeader("Content-Length", "" + newLen);
-          res.addHeader(
-            "Content-Range",
-            "bytes " + startFrom + "-" + endAt + "/" + fileLen
-          );
+
+          String contentRange =
+            "bytes " + startFrom + "-" + endAt + "/" + fileLen;
+          res.addHeader("Content-Range", contentRange);
           res.addHeader("ETag", etag);
         }
       } else {
@@ -217,6 +220,7 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
         }
       }
     } catch (Exception e) {
+      Log.d("ServeFileError", e.getMessage());
       String type = e.getClass().getName();
       if (type.equals("FileNotFoundException")) res =
         newFixedLengthResponse(
@@ -249,9 +253,9 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
       e.printStackTrace();
     }
     pluginResult.setKeepCallback(true);
-    this.webserver.onRequestCallbackContext.sendPluginResult(pluginResult);
+    this.onRequestCallbackContext.sendPluginResult(pluginResult);
 
-    while (!this.webserver.responses.containsKey(requestUUID)) {
+    while (!this.responses.containsKey(requestUUID)) {
       try {
         Thread.sleep(1);
       } catch (InterruptedException e) {
@@ -259,9 +263,7 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
       }
     }
 
-    JSONObject responseObject = (JSONObject) this.webserver.responses.get(
-        requestUUID
-      );
+    JSONObject responseObject = (JSONObject) this.responses.get(requestUUID);
     Response response = null;
 
     if (responseObject.has("path")) {
@@ -270,13 +272,17 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
         DocumentFile file = getFile(path);
         String mimeType = URLConnection.guessContentTypeFromName(path);
         Response res = serveFile(session.getHeaders(), file, mimeType);
-        Iterator<?> keys = responseObject.getJSONObject("headers").keys();
-        while (keys.hasNext()) {
-          String key = (String) keys.next();
-          res.addHeader(
-            key,
-            responseObject.getJSONObject("headers").getString(key)
-          );
+        JSONObject headers = getJSONObject(responseObject, "headers");
+        // JSONObject headers = responseObject.getJSONObject("headers");
+        if (headers != null) {
+          Iterator<String> keys = headers.keys();
+          while (keys.hasNext()) {
+            String key = (String) keys.next();
+            res.addHeader(
+              key,
+              responseObject.getJSONObject("headers").getString(key)
+            );
+          }
         }
         return res;
       } catch (JSONException e) {
@@ -326,5 +332,13 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
     Uri uri = file.getUri();
     ContentResolver contentResolver = context.getContentResolver();
     return contentResolver.openInputStream(uri);
+  }
+
+  private JSONObject getJSONObject(JSONObject ob, String key) {
+    JSONObject jsonObject = null;
+    try {
+      jsonObject = ob.getJSONObject(key);
+    } catch (JSONException e) {}
+    return jsonObject;
   }
 }

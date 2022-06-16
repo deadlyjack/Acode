@@ -4,6 +4,12 @@ interface Acode {
   $menuToggler: HTMLElement;
   $editMenuToggler: HTMLElement;
   setLoadingMessage(message: string): void;
+  pluginServer: Server;
+  webServer: Server;
+  initPlugin(pluginId: string, baseUrl: string, $page: HTMLElement): void;
+  unmountPlugin(pluginId: string): void;
+  $quickToolToggler: HTMLElement;
+  $headerToggler: HTMLElement;
 }
 
 interface fileBrowserSettings {
@@ -564,10 +570,22 @@ interface KeyBinding {
   action: string;
 }
 
-interface Promotion {
-  image: string;
-  title: string;
-  description: string;
+interface PluginAuthor{
+  name: string;
+  email: string;
+  website?: string;
+  github: string;
+}
+
+interface PluginJson{
+  id: string;
+  name: string;
+  main: string;
+  version: string;
+  readme: string;
+  icon: string;
+  files: Array<string>;
+  authot: PluingAuthor;
 }
 
 /**
@@ -591,11 +609,12 @@ declare var strings: Strings;
 /**
  * Handles back button click
  */
-declare var Acode: Acode;
+declare var acode: Acode;
 
 declare var ASSETS_DIRECTORY: string;
 declare var CACHE_STORAGE: string;
 declare var DATA_STORAGE: string;
+declare var PLUGIN_DIR: string;
 declare var DOES_SUPPORT_THEME: boolean;
 declare var IS_FREE_VERSION: boolean;
 declare var KEYBINDING_FILE: string;

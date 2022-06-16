@@ -22,7 +22,9 @@ async function run(
   target = appSettings.value.previewMode,
   runFile = false,
 ) {
-  if (!Acode.$runBtn.isConnected && !isConsole) return;
+
+  const activeFile = isConsole ? null : editorManager.activeFile;
+  if (!isConsole && !activeFile?.canRun) return;
 
   if (!isConsole && !localStorage.__init_runPreview) {
     localStorage.__init_runPreview = true;
@@ -34,7 +36,6 @@ async function run(
     });
   }
 
-  const activeFile = isConsole ? null : editorManager.activeFile;
   const uuid = helpers.uuid();
 
   let isLoading = false;
@@ -132,23 +133,28 @@ async function run(
   }
 
   function startServer() {
-    webserver.stop();
-    webserver.start(
-      () => {
-        openBrowser();
-      },
-      (err) => {
-        if (err === 'Server already running') {
-          openBrowser();
-        } else {
-          ++port;
-          start();
-        }
-      },
+    let serverHandler = (msg) => {
+      console.log(msg);
+      openBrowser();
+    }
+    if (acode.webServer) {
+      acode.webServer.stop();
+    }
+    acode.webServer = CreateServer(
       port,
+      serverHandler,
+      onError,
     );
+    acode.webServer.setOnRequestHandler(handleRequest);
 
-    webserver.onRequest(handleRequest);
+    function onError(err) {
+      if (err === 'Server already running') {
+        openBrowser();
+      } else {
+        ++port;
+        start();
+      }
+    }
   }
 
   function handleRequest(req) {
@@ -309,7 +315,7 @@ async function run(
   }
 
   function error(id) {
-    webserver.sendResponse(id, {
+    acode.webServer?.send(id, {
       status: 404,
       body: 'File not found!',
     });
@@ -405,7 +411,7 @@ async function run(
     }
 
     function send(path, mimetype) {
-      webserver.sendResponse(id, {
+      acode.webServer?.send(id, {
         status: 200,
         path,
         headers: {
@@ -433,7 +439,7 @@ async function run(
   }
 
   function sendText(text, id, mimeType, processText) {
-    webserver.sendResponse(id, {
+    acode.webServer?.send(id, {
       status: 200,
       body: processText ? processText(text) : text,
       headers: {

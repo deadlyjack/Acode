@@ -150,6 +150,19 @@
         display: flex;
         align-items: center;
 
+        button{
+          background-color: rgb(51, 153, 255);
+          background-color: var(--button-background-color);
+          color: rgb(255, 255, 255);
+          color: var(--button-text-color);
+          border: none;
+          border-radius: 4px;
+          margin: 0 10px;
+          font-size: 0.6rem;
+          padding: 5px;
+          box-sizing: border-box;
+        }
+
         span {
           width: 100%;
           overflow: hidden;

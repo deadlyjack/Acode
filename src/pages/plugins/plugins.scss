@@ -1,0 +1,9 @@
+#plugins{
+  .icon{
+    height: 40px;
+  }
+
+  .list:empty::after{
+    content: 'No plugins found';
+  }
+}

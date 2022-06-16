@@ -1,8 +1,10 @@
 import tag from 'html-tag-js';
 import Commands from '../lib/ace/commands';
+import helpers from '../lib/utils/helpers';
 import inputhints from './inputHints';
 
 export function commandPallete() {
+  const recentlyUsedCommands = RecentlyUsedCommands();
   const commands = Commands();
   const $input = tag('input', {
     type: 'search',
@@ -21,15 +23,23 @@ export function commandPallete() {
   });
 
   inputhints($input, ((setHints) => {
+    recentlyUsedCommands.commands.forEach((name) => {
+      const command = Object.assign({}, commands.find(command => command.name === name));
+      if (command) {
+        command.recentlyUsed = true;
+        commands.unshift(command);
+      }
+    });
     setHints(
-      commands.map(({ name, description, bindKey }) => ({
+      commands.map(({ name, description, bindKey, recentlyUsed }) => ({
         value: name,
-        text: `${description ?? name} <small>${bindKey?.win ?? ''}</small>`,
+        text: `<span ${recentlyUsed ? `data-str='${strings['recently used']}'` : ''}>${description ?? name}</span><small>${bindKey?.win ?? ''}</small>`,
       })),
     );
   }), (value) => {
     const command = commands.find(({ name }) => name === value);
     if (!command) return;
+    recentlyUsedCommands.push(value);
     command.exec(editorManager.editor);
     remove();
   });
@@ -47,5 +57,24 @@ export function commandPallete() {
     window.restoreTheme();
     $mask.remove();
     $pallete.remove();
+  }
+}
+
+function RecentlyUsedCommands() {
+  return {
+    get commands() {
+      return helpers.parseJSON(localStorage.getItem('recentlyUsedCommands')) || [];
+    },
+    push(command) {
+      const commands = this.commands;
+      if (commands.length > 10) {
+        commands.pop();
+      }
+      if (commands.includes(command)) {
+        commands.splice(commands.indexOf(command), 1);
+      }
+      commands.unshift(command);
+      localStorage.setItem('recentlyUsedCommands', JSON.stringify(commands));
+    }
   }
 }

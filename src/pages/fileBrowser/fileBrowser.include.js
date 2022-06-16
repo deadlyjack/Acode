@@ -440,7 +440,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
               break;
 
             case 'info':
-              Acode.exec('file-info', url);
+              acode.exec('file-info', url);
               break;
           }
         });

@@ -41,6 +41,17 @@ function EditorManager($sidebar, $header, $body) {
   let cursorControllerSize = appSettings.value.cursorControllerSize;
   let timeoutQuicktoolToggler;
   let timeoutHeaderToggler;
+  const events = {
+    'switch-file': [],
+    'rename-file': [],
+    'save-file': [],
+    'file-content-changed': [],
+    'update': [],
+    emit(event, ...args) {
+      if (!events[event]) return;
+      events[event].forEach((fn) => fn(...args));
+    }
+  };
   const modelist = ace.require('ace/ext/modelist');
   const $container = tag('div', {
     className: 'editor-container',
@@ -154,6 +165,17 @@ function EditorManager($sidebar, $header, $body) {
     get openFileList() {
       return $openFileList;
     },
+    on(event, callback) {
+      if (!events[event]) return;
+      events[event].push(callback);
+    },
+    off(event, callback) {
+      if (!events[event]) return;
+      events[event] = events[event].filter(c => c !== callback);
+    },
+    emit(event, ...args) {
+      events.emit(event, ...args);
+    }
   };
 
   configEditor(editor);
@@ -210,14 +232,19 @@ function EditorManager($sidebar, $header, $body) {
         const changed = await activeFile.isChanged();
         if (!changed) {
           activeFile.isUnsaved = false;
-        } else {
-          activeFile.writeToCache();
-          if (activeFile.markChanged) {
-            activeFile.isUnsaved = true;
-          }
-          activeFile.markChanged = true;
+          manager.onupdate('file-changed');
+          manager.emit('update', 'file-changed');
         }
-        manager.onupdate('file-changed');
+
+        if (activeFile.markChanged) {
+          activeFile.writeToCache();
+          activeFile.isUnsaved = true;
+          events.emit('file-content-changed', activeFile);
+          manager.onupdate('file-changed');
+          manager.emit('update', 'file-changed');
+        }
+
+        activeFile.markChanged = true;
       })();
     }, TIMEOUT_VALUE);
   });
@@ -391,7 +418,7 @@ function EditorManager($sidebar, $header, $body) {
   }
 
   function updateFloatingButton(show = false) {
-    const { $quickToolToggler, $headerToggler } = Acode;
+    const { $quickToolToggler, $headerToggler } = acode;
 
     if (show) {
       if (scrollBarVisiblityCount) --scrollBarVisiblityCount;
@@ -482,6 +509,8 @@ function EditorManager($sidebar, $header, $body) {
       id = uri.hashCode();
     }
 
+    let editable = options.editable ?? true;
+
     let file = {
       deletedFile: options.deletedFile,
       mode: options.mode,
@@ -489,7 +518,6 @@ function EditorManager($sidebar, $header, $body) {
       controls: false,
       session: ace.createEditSession(text),
       name: filename,
-      editable: options.editable ?? true,
       type: options.type || 'regular',
       isUnsaved: options.isUnsaved,
       record: options.record,
@@ -601,6 +629,7 @@ function EditorManager($sidebar, $header, $body) {
           if (oldExt !== newExt) setupSession(this);
 
           manager.onupdate('file-name');
+          events.emit('rename-file', this);
         })();
       },
       get location() {
@@ -641,20 +670,36 @@ function EditorManager($sidebar, $header, $body) {
         }
         this.session.setValue(text);
       },
-      async writeToCache() {
-        const cacheFs = fsOperation(Url.join(CACHE_STORAGE, this.id));
-        const exists = await cacheFs.exists();
-
-        if (!exists) {
-          const dirFs = fsOperation(CACHE_STORAGE);
-          await dirFs.createFile(this.id);
+      get editable() {
+        return editable;
+      },
+      set editable(value) {
+        if (editable === value) return;
+        editable = value;
+        if (!value) {
+          editor.setReadOnly(true);
+        } else {
+          editor.setReadOnly(false);
         }
 
+        editorManager.onupdate('read-only');
+        editorManager.emit('update', 'read-only');
+      },
+      async writeToCache() {
         let data = text;
         if (this.session) {
           data = this.session.getValue();
         }
+
+        const cacheFs = fsOperation(Url.join(CACHE_STORAGE, this.id));
+
         try {
+          if (!await cacheFs.exists()) {
+            await fsOperation(CACHE_STORAGE)
+              .createFile(this.id, data);
+            return;
+          }
+
           await cacheFs.writeFile(data);
         } catch (error) {
           console.error(error);
@@ -837,6 +882,8 @@ function EditorManager($sidebar, $header, $body) {
         $vScrollbar.remove();
         onscrolltop(false);
         if (!appSettings.value.textWrap) onscrollleft(false);
+        editor.setReadOnly(!file.editable);
+        events.emit('switch-file', file);
         return;
       }
     }
@@ -875,7 +922,7 @@ function EditorManager($sidebar, $header, $body) {
     if (!appSettings.value.textWrap) {
       editor.renderer.setScrollMargin(0, 0, 0, settings.leftMargin);
     }
-    
+
     editor.container.style.lineHeight = settings.lineHeight || 2;
 
     if (!appSettings.value.linting && appSettings.value.linenumbers) {

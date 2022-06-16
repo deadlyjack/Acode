@@ -39,7 +39,7 @@ function textControl(editor, container) {
         start: oldPos,
         end: pos,
       });
-      Acode.exec('select-word');
+      acode.exec('select-word');
     } else {
       if (!editor.isFocused()) editor.focus();
 
@@ -77,7 +77,7 @@ function textControl(editor, container) {
       clearDoubleclick();
       setTimeout(() => {
         if (touch) return;
-        setTimeout(Acode.exec, 0, 'select-word');
+        setTimeout(acode.exec, 0, 'select-word');
         editor.focus();
       }, 0);
     }
@@ -98,7 +98,7 @@ function textControl(editor, container) {
     editor.gotoLine(parseInt(pos.row + 1), parseInt(pos.column + 1));
     cmFlag = true;
 
-    Acode.exec('select-word');
+    acode.exec('select-word');
     editor.focus();
 
     document.ontouchend = function () {

@@ -231,5 +231,12 @@
   "remember opened files": "记住打开过的文件",
   "remember opened folders": "记住打开过的文件夹",
   "no suggestions": "不显示建议",
-  "no suggestions aggressive": "不显示激进建议"
+  "no suggestions aggressive": "不显示激进建议",
+  "install": "Install",
+  "installing": "Installing...",
+  "plugins": "Plugins",
+  "recently used": "Recently used",
+  "update": "Update",
+  "uninstall": "Uninstall",
+  "download acode pro": "Download Acode pro"
 }

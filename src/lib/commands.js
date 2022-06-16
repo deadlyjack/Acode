@@ -21,6 +21,7 @@ import showFileInfo from './showFileInfo';
 import checkFiles from './checkFiles';
 import saveState from './saveState';
 import { commandPallete } from '../components/commandPallete';
+import tag from 'html-tag-js';
 
 export default {
   'close-all-tabs'() {
@@ -70,6 +71,7 @@ export default {
         file.session.setValue(newText);
         file.isUnsaved = false;
         editorManager.onupdate('encoding');
+        editorManager.emit('update', 'encoding');
       });
   },
   async eol() {
@@ -93,16 +95,11 @@ export default {
   find() {
     quickTools.actions('search');
   },
-  format() {
-    const file = editorManager.activeFile;
-    const editor = editorManager.editor;
+  async format() {
+    const { editor } = editorManager;
+    const pos = editor.getCursorPosition();
 
-    let pos = editor.getCursorPosition();
-    const tmp = editorManager.onupdate;
-    editorManager.onupdate = () => { };
-    const { beautify } = ace.require('ace/ext/beautify')
-    beautify(file.session);
-    editorManager.onupdate = tmp;
+    await Acode.format();
     editor.selection.moveCursorToPosition(pos);
   },
   'file-info'(url) {
@@ -198,7 +195,6 @@ export default {
   'read-only'() {
     const file = editorManager.activeFile;
     file.editable = !file.editable;
-    editorManager.onupdate('read-only');
   },
   'load-ad': () => {
     if (IS_FREE_VERSION && admob) {
@@ -274,10 +270,10 @@ export default {
     editorManager.controls.update();
   },
   run() {
-    run();
+    tag.get('[action=run]')?.click();
   },
   'run-file'() {
-    run.runFile();
+    tag.get('[action=run]')?.contextmenu();
   },
   save(toast) {
     saveFile(editorManager.activeFile, false, toast);
@@ -324,9 +320,9 @@ export default {
     editorManager.sidebar.toggle();
   },
   'toggle-menu'() {
-    Acode.$menuToggler.click();
+    tag.get('[action=toggle-menu]')?.click();
   },
   'toggle-editmenu'() {
-    Acode.$editMenuToggler.click();
+    tag.get('[action=toggle-edit-menu')?.click();
   },
 };

@@ -38,6 +38,13 @@
     overflow-x: hidden;
     text-overflow: ellipsis;
 
+    span[data-str]::after{
+      content: attr(data-str);
+      font-size: 0.6rem;
+      opacity: 0.5;
+      margin-left: 10px;
+    }
+
     small:not(:empty){
       margin-left: auto;
       background-color: rgb(255, 255, 255);
