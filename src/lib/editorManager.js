@@ -893,7 +893,8 @@ async function EditorManager($sidebar, $header, $body) {
 
   async function setupEditor() {
     const Emmet = ace.require('ace/ext/emmet');
-    const CommandManager = ace.require('ace/commands/command_manager').CommandManager;
+    const { CommandManager } = ace.require('ace/commands/command_manager');
+    const { KeyBinding } = ace.require('ace/keyboard/keybinding');
     const settings = appSettings.value;
     const commands = await Commands();
 
@@ -901,6 +902,7 @@ async function EditorManager($sidebar, $header, $body) {
 
     Emmet.setCore(window.emmet);
     editor.commands = new CommandManager('win', commands);
+    editor.keyBinding = new KeyBinding(editor);
     editor.textInput.onContextMenu = (e) => {
       e.preventDefault();
     };

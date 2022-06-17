@@ -3,7 +3,7 @@ version 1.6.0
 ☞ Console can log html code
 ☞ Updated FTP library.
 ☞ Updated SFTP functionality.
-☞ Separated all hardcoded modifications in ace editor.
+☞ Separated all hardcoded modifications in the ace editor.
 ☞ Improved clipboard actions.
 ☞ Updated Ace editor.
 ☞ Added horizontal padding.
