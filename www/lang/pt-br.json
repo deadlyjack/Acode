@@ -232,11 +232,11 @@
   "remember opened folders": "Lembrar das pastas abertas",
   "no suggestions": "Nenhuma sugestão",
   "no suggestions aggressive": "Nenhuma sugestão agressiva",
-  "install": "Install",
-  "installing": "Installing...",
+  "install": "Instalar",
+  "installing": "Instalando...",
   "plugins": "Plugins",
-  "recently used": "Recently used",
-  "update": "Update",
-  "uninstall": "Uninstall",
-  "download acode pro": "Download Acode pro"
+  "recently used": "Usado recentemente",
+  "update": "Atualizar",
+  "uninstall": "Desinstalar",
+  "download acode pro": "Baixar Acode pro"
 }
