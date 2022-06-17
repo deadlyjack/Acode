@@ -99,7 +99,7 @@ export default {
     const { editor } = editorManager;
     const pos = editor.getCursorPosition();
 
-    await Acode.format();
+    await acode.format();
     editor.selection.moveCursorToPosition(pos);
   },
   'file-info'(url) {

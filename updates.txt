@@ -1,6 +1,6 @@
 version 1.6.0
 ☞ Supports plugin
-☞ Console can log html code
+☞ The console can log HTML code
 ☞ Updated FTP library.
 ☞ Updated SFTP functionality.
 ☞ Separated all hardcoded modifications in the ace editor.
