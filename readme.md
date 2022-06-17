@@ -38,6 +38,10 @@ Run `npm install` to install all dependencies before building the APK.
 
 `yarn build <platform (android)> <free|paid> <p|prod|d|dev>`
 
+## Develop plugin for Acode
+
+Please read this [documentation](https://acode.foxdebug.com/docs/plugin) on official website.
+
 ## Special thanks to
 
 - [Ace editor](https://ace.c9.io/)

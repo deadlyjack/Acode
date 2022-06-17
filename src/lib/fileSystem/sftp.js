@@ -46,16 +46,7 @@ class SFTP {
   }
 
   async connect() {
-
-    if (!this.#path) {
-      throw new Error('Path is not set');
-    }
-
-    if (!this.#stat) {
-      this.#stat = await this.stat();
-    }
-
-    return new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       if (this.#authenticationType === 'key') {
         sftp.connectUsingKeyFile(
           this.#hostname,
@@ -89,6 +80,9 @@ class SFTP {
    * @param {boolean} isFile
    */
   lsDir(isFile) {
+    if (!this.#path) {
+      throw new Error('Path is not set');
+    }
     return new Promise((resolve, reject) => {
       sftp.isConnected(async (connectionID) => {
         (async () => {
@@ -247,6 +241,9 @@ class SFTP {
    * Read the file from server
    */
   readFile() {
+    if (!this.#path) {
+      throw new Error('Path is not set');
+    }
     const localFilename = this.#getLocalname(this.#path);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
@@ -280,6 +277,9 @@ class SFTP {
   }
 
   copyTo(dest) {
+    if (!this.#path) {
+      throw new Error('Path is not set');
+    }
     const fullDest = Url.join(this.#base, dest, Url.basename(this.#path));
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
@@ -325,6 +325,9 @@ class SFTP {
    * @param {Boolean} move
    */
   rename(newname, move) {
+    if (!this.#path) {
+      throw new Error('Path is not set');
+    }
     const fullNewname = Url.join(this.#base, newname);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
@@ -368,7 +371,6 @@ class SFTP {
    * Delete file or directory
    */
   delete() {
-
     const fullFilename = Url.join(this.#base, this.#path);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
@@ -381,7 +383,7 @@ class SFTP {
               return;
             }
           }
-
+          this.#setStat();
           const cmd = `rm ${this.#stat.isDirectory ? '-rf' : ''} "${this.#safeName(
             filename,
           )}"`;
@@ -437,6 +439,9 @@ class SFTP {
   }
 
   async stat() {
+    if (!this.#path) {
+      throw new Error('Path is not set');
+    }
     if (this.#stat) return this.#stat;
 
     const filename = this.#safeName(this.#path);
@@ -606,6 +611,13 @@ class SFTP {
       CACHE_STORAGE,
       'sftp' + Url.join(this.#base, filename).hashCode(),
     );
+  }
+
+
+  async #setStat() {
+    if (!this.#stat) {
+      this.#stat = await this.stat();
+    }
   }
 }
 

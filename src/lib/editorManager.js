@@ -24,9 +24,9 @@ import addTouchListeners from './ace/touchHandler';
  * @param {HTMLElement} $sidebar
  * @param {HTMLElement} $header
  * @param {HTMLElement} $body
- * @returns {Manager}
+ * @returns {Promise<Manager>}
  */
-function EditorManager($sidebar, $header, $body) {
+async function EditorManager($sidebar, $header, $body) {
   /**
    * @type {Collaspable & HTMLElement}
    */
@@ -182,7 +182,7 @@ function EditorManager($sidebar, $header, $body) {
   $container.classList.add(appSettings.value.editorFont);
   moveOpenFileList();
   $body.appendChild($container);
-  setupEditor();
+  await setupEditor();
   textControl(editor, $container);
   controls.menu.ontouchstart = function (e) {
     preventDefault(e);
@@ -891,15 +891,16 @@ function EditorManager($sidebar, $header, $body) {
     manager.onupdate('switch-file');
   }
 
-  function setupEditor() {
+  async function setupEditor() {
     const Emmet = ace.require('ace/ext/emmet');
     const CommandManager = ace.require('ace/commands/command_manager').CommandManager;
     const settings = appSettings.value;
+    const commands = await Commands();
 
     addTouchListeners($container, editor);
 
     Emmet.setCore(window.emmet);
-    editor.commands = new CommandManager('win', Commands());
+    editor.commands = new CommandManager('win', commands);
     editor.textInput.onContextMenu = (e) => {
       e.preventDefault();
     };

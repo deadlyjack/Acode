@@ -24,7 +24,9 @@ export default async function openFile(file, data = {}) {
 
     helpers.showTitleLoader();
     const fs = fsOperation(uri);
-    const fileInfo = await fs.stat();
+    const fileInfo = await fs.stat().catch((err) => {
+      console.error("Error while getting file info", err);
+    });
     const name = fileInfo.name || file.name || uri;
     const settings = appSettings.value;
     const readOnly = fileInfo.canWrite ? false : true;
@@ -69,7 +71,9 @@ export default async function openFile(file, data = {}) {
       );
     }
 
-    const binData = await fs.readFile();
+    const binData = await fs.readFile().catch((err) => {
+      console.error("Error while reading file", err);
+    });
     const fileContent = helpers.decodeText(binData);
 
     helpers.removeTitleLoader();

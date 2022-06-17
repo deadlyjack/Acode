@@ -12,5 +12,6 @@ export default async function loadPlugins() {
       )
     )
   });
-  return Promise.all(promises);
+  const results = await Promise.all(promises);
+  return results.length;
 }

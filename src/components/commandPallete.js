@@ -3,9 +3,9 @@ import Commands from '../lib/ace/commands';
 import helpers from '../lib/utils/helpers';
 import inputhints from './inputHints';
 
-export function commandPallete() {
+export async function commandPallete() {
   const recentlyUsedCommands = RecentlyUsedCommands();
-  const commands = Commands();
+  const commands = await Commands();
   const $input = tag('input', {
     type: 'search',
     placeholder: 'Type command',

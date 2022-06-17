@@ -90,20 +90,27 @@ public class Ftp extends CordovaPlugin {
 
               if (ftpProfiles.containsKey(ftpId)) {
                 ftp = ftpProfiles.get(ftpId);
-                if (ftp.isConnected()) {
+                reply = ftp.getReplyCode();
+                if (ftp.isConnected() && FTPReply.isPositiveCompletion(reply)) {
+                  Log.d("FTP", "FTPClient (" + ftpId + ") is connected");
                   callback.success(ftpId);
                   return;
                 }
+                Log.d("FTP", "FTPClient (" + ftpId + ") is not connected");
+                ftp.disconnect();
               } else {
+                Log.d("FTP", "Creating new FTPClient (" + ftpId + ")");
                 ftp = new FTPClient();
                 ftpProfiles.put(ftpId, ftp);
               }
 
               ftp.connect(host, port);
-
+              ftp.setControlKeepAliveTimeout(300);
               if (connectionMode.equals("active")) {
+                Log.d("FTP", "Entering Local Active mode");
                 ftp.enterLocalActiveMode();
               } else {
+                Log.d("FTP", "Entering Passive Active mode");
                 ftp.enterLocalPassiveMode();
               }
 
@@ -156,16 +163,24 @@ public class Ftp extends CordovaPlugin {
               }
 
               FTPFile[] files = ftp.listFiles(path);
+              Log.d("FTP", "Listing files in " + path);
+              Log.d("FTP", "Found " + files.length + " files.");
               JSONArray jsonFiles = new JSONArray();
               for (FTPFile file : files) {
                 JSONObject jsonFile = new JSONObject();
-                jsonFile.put("name", file.getName());
+                String filename = file.getName();
+
+                if (filename.equals(".") || filename.equals("..")) {
+                  continue;
+                }
+
+                jsonFile.put("name", filename);
                 jsonFile.put("size", file.getSize());
                 jsonFile.put("isDirectory", file.isDirectory());
                 jsonFile.put("isFile", file.isFile());
                 jsonFile.put("isSymbolicLink", file.isSymbolicLink());
                 jsonFile.put("link", file.getLink());
-                jsonFile.put("url", "");
+                jsonFile.put("url", joinPath(path, filename));
                 jsonFile.put(
                   "lastModified",
                   file.getTimestamp().getTimeInMillis()
@@ -353,7 +368,7 @@ public class Ftp extends CordovaPlugin {
       );
   }
 
-  public void renameFile(JSONArray args, CallbackContext callback) {
+  public void rename(JSONArray args, CallbackContext callback) {
     cordova
       .getThreadPool()
       .execute(
@@ -449,6 +464,13 @@ public class Ftp extends CordovaPlugin {
               outputStream.close();
               inputStream.close();
 
+              if (!ftp.completePendingCommand()) {
+                ftp.logout();
+                ftp.disconnect();
+                callback.error("File transfer failed.");
+                return;
+              }
+
               callback.success();
             } catch (FTPConnectionClosedException e) {
               callback.error(e.getMessage());
@@ -472,15 +494,15 @@ public class Ftp extends CordovaPlugin {
           public void run() {
             try {
               String ftpId = getJSONValueString(args, 0);
-              String path = getJSONValueString(args, 1);
-              String localFilePath = getJSONValueString(args, 2);
+              String localFilePath = getJSONValueString(args, 1);
+              String remoteFilePath = getJSONValueString(args, 2);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
                 return;
               }
 
-              if (path == null || path.isEmpty()) {
+              if (remoteFilePath == null || remoteFilePath.isEmpty()) {
                 callback.error("Path is required.");
                 return;
               }
@@ -490,6 +512,7 @@ public class Ftp extends CordovaPlugin {
                 return;
               }
 
+              Log.d("FTPUpload", "uploadFile: " + localFilePath);
               URI uri = new URI(localFilePath);
               File localFile = new File(uri);
               FTPClient ftp = ftpProfiles.get(ftpId);
@@ -499,7 +522,8 @@ public class Ftp extends CordovaPlugin {
                 return;
               }
 
-              OutputStream outputStream = ftp.storeFileStream(path);
+              Log.d("FTPUpload", "Destination " + remoteFilePath);
+              OutputStream outputStream = ftp.storeFileStream(remoteFilePath);
               if (outputStream == null) {
                 callback.error("File not found.");
                 return;
@@ -513,6 +537,13 @@ public class Ftp extends CordovaPlugin {
               }
               outputStream.close();
               inputStream.close();
+
+              if (!ftp.completePendingCommand()) {
+                ftp.logout();
+                ftp.disconnect();
+                callback.error("File transfer failed.");
+                return;
+              }
 
               callback.success();
             } catch (FTPConnectionClosedException e) {
@@ -908,5 +939,12 @@ public class Ftp extends CordovaPlugin {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  private String joinPath(String p1, String p2) {
+    if (!p1.endsWith("/")) {
+      p1 += "/";
+    }
+    return p1 + p2;
   }
 }

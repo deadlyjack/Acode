@@ -59,10 +59,10 @@ function openFolder(_path, opts = {}) {
   let clipBoard = null;
   const loading = {
     start() {
-      $root.$title.classList.add('loading');
+      $root?.$title?.classList.add('loading');
     },
     stop() {
-      $root.$title.classList.remove('loading');
+      $root?.$title?.classList.remove('loading');
     },
   };
   const $text = $root.$title.querySelector(':scope>span.text');
@@ -347,7 +347,7 @@ function openFolder(_path, opts = {}) {
           let newUrl;
           if (clipBoard.action === 'cut') newUrl = await fs.moveTo(url);
           else newUrl = await fs.copyTo(url);
-          const newName = (await fsOperation(newUrl).stats()).name;
+          const newName = (await fsOperation(newUrl).stat()).name;
           /**
            * CASES:
            * CASE 111: src is file and parent is collapsed where target is also collapsed
@@ -479,26 +479,29 @@ function openFolder(_path, opts = {}) {
       case 'insert-file':
         return (async () => {
           loading.start();
-          const file = await FileBrowser('file', strings['insert file']);
-          let fs = fsOperation(file.url);
-          let data = await fs.readFile();
-          const stats = await fs.stats();
-
-          if (stats.length > 50000000)
-            throw new Error('Unable to insert file large than 50MB.');
-
-          const name = stats.name;
-          const fileUrl = Url.join(url, name);
-
-          fs = fsOperation(url);
-
           try {
-            await fs.createFile(name);
-          } catch (error) { }
+            const file = await FileBrowser('file', strings['insert file']);
+            let fs = fsOperation(file.url);
+            let data = await fs.readFile();
+            const stats = await fs.stat();
 
-          fs = fsOperation(fileUrl);
-          await fs.writeFile(data);
-          appendTile($target, createFileTile(name, fileUrl));
+            if (stats.length > 50000000) {
+              throw new Error('Unable to insert file large than 50MB.');
+            }
+
+            const name = stats.name;
+            const fileUrl = Url.join(url, name);
+
+            fs = fsOperation(url);
+
+            await fs.createFile(name, data);
+            appendTile($target, createFileTile(name, fileUrl));
+          } catch (error) {
+            helpers.error(error);
+          } finally {
+            loading.stop();
+          }
+
         })();
     }
 

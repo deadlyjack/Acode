@@ -15,6 +15,7 @@ class FtpClient {
   #mode;
   #conId;
   #stat;
+  #origin;
 
   constructor(host, username = 'anonymous', password = '', port = 21, security = 'ftp', mode = 'passive', path = '/') {
     if (!host) {
@@ -27,6 +28,18 @@ class FtpClient {
     this.#security = security;
     this.#mode = mode;
     this.#path = path;
+
+    this.#origin = Url.formate({
+      protocol: 'ftp:',
+      hostname: this.#host,
+      password: this.#password,
+      username: this.#username,
+      port: this.#port,
+      query: {
+        security: this.#security,
+        mode: this.#mode
+      }
+    })
   }
 
   async connect() {
@@ -40,10 +53,6 @@ class FtpClient {
         resolve();
       }, reject);
     });
-
-    if (!this.#stat) {
-      this.#stat = await this.#getStat();
-    }
   }
 
   setPath(val) {
@@ -54,7 +63,10 @@ class FtpClient {
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
       ftp.listDirectory(this.#conId, this.#path, (list) => {
-        resolve(list);
+        resolve(list.map((i) => {
+          i.url = Url.join(this.#origin, i.url);
+          return i;
+        }));
       }, reject);
     });
   }
@@ -62,63 +74,47 @@ class FtpClient {
   async readFile() {
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
-      ftp.downloadFile(this.#conId, this.#path, this.#getLocalFilename, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      ftp.downloadFile(this.#conId, this.#path, this.#cacheFile, async () => {
+        const content = await internalFs.readFile(this.#cacheFile);
+        resolve(content);
+      }, reject);
     });
   }
 
   async writeFile(content = '') {
     await this.#connectIfNotConnected();
 
-    const localFile = this.#getLocalFilename;
+    const localFile = this.#cacheFile;
 
     if (!(await internalFs.exists(localFile))) {
       await internalFs.writeFile(localFile, content, true, false);
     }
 
     return new Promise((resolve, reject) => {
-      ftp.uploadFile(this.#conId, this.#getLocalFilename, this.#path, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      ftp.uploadFile(this.#conId, this.#cacheFile, this.#path, () => {
+        resolve(Url.join(this.#origin, this.#path));
+      }, reject);
     });
   }
 
   async createFile(name, content = '') {
     await this.#connectIfNotConnected();
-    const localFile = this.#getLocalFilename;
-    if (!(await internalFs.exists(localFile))) {
-      await internalFs.writeFile(localFile, content, true, false);
-    }
+    const localFile = this.#cacheFile;
+    await internalFs.writeFile(localFile, content, true, false);
+
     return new Promise((resolve, reject) => {
-      ftp.uploadFile(this.#conId, this.#getLocalFilename, Path.join(this.#path, name), (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      ftp.uploadFile(this.#conId, this.#cacheFile, Path.join(this.#path, name), () => {
+        resolve(Url.join(this.#origin, this.#path, name));
+      }, reject);
     });
   }
 
   async createDir(name) {
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
-      ftp.createDirectory(this.#conId, Path.join(this.#path, name), (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      ftp.createDirectory(this.#conId, Path.join(this.#path, name), () => {
+        resolve(Url.join(this.#origin, this.#path, name));
+      }, reject);
     });
   }
 
@@ -133,13 +129,9 @@ class FtpClient {
         deleteOperation = ftp.deleteFile;
       }
 
-      deleteOperation(this.#conId, this.#path, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      deleteOperation(this.#conId, this.#path, () => {
+        resolve(Url.join(this.#origin, this.#path));
+      }, reject);
     });
   }
 
@@ -148,35 +140,31 @@ class FtpClient {
     const path = Path.dirname(this.#path);
     const newPath = Path.join(path, newName);
     return new Promise((resolve, reject) => {
-      ftp.rename(this.#conId, this.#path, newPath, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      ftp.rename(this.#conId, this.#path, newPath, () => {
+        this.#path = newPath;
+        resolve(Url.join(this.#origin, newPath));
+      }, reject);
     });
   }
 
   async moveTo(newPath) {
+    newPath = Path.join(
+      newPath,
+      Path.basename(this.#path),
+    );
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
-      ftp.rename(this.#conId, this.#path, newPath, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      ftp.rename(this.#conId, this.#path, newPath, () => {
+        this.#path = newPath;
+        resolve(Url.join(this.#origin, newPath));
+      }, reject);
     });
   }
 
   async exists() {
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
-      ftp.exists(this.#conId, this.#path, (exists) => {
-        resolve(exists);
-      }, reject);
+      ftp.exists(this.#conId, this.#path, resolve, reject);
     });
   }
 
@@ -205,12 +193,15 @@ class FtpClient {
       ftp.getStat(this.#conId, this.#path, (stat) => {
         this.#stat = stat;
         resolve(stat);
-      }, reject);
+      }, (err) => {
+        console.error('Error while getting stat', err);
+        reject(err);
+      });
     });
   }
 
-  get #getLocalFilename() {
-    return Url.join(CACHE_STORAGE, 'ftp' + this.#path.hashCode());
+  get #cacheFile() {
+    return Url.join(CACHE_STORAGE, 'ftp' + Url.join(this.#origin, this.#path).hashCode());
   }
 
   async #isConnected() {
@@ -224,24 +215,9 @@ class FtpClient {
 
   async #connectIfNotConnected() {
     const isConnected = await this.#isConnected();
-    console.log('isConnected', isConnected);
     if (!isConnected) {
       await this.connect();
     }
-  }
-
-  get #origin() {
-    return Url.formate({
-      protocol: 'ftp:',
-      hostname: this.#host,
-      password: this.#password,
-      username: this.#username,
-      port: this.#port,
-      query: {
-        security: this.#security,
-        mode: this.#mode
-      }
-    })
   }
 }
 

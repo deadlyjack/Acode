@@ -453,9 +453,7 @@ import loadPolyFill from './utils/polyfill';
             }));
             break;
           default:
-            $msg.innerHTML = tag('textarea', {
-              textContent: arg
-            }).innerHTML;
+            $msg.innerHTML = arg;
             break;
         }
       }
@@ -481,7 +479,7 @@ import loadPolyFill from './utils/polyfill';
    * @returns
    */
   function format(args) {
-    if (args.length <= 1) return args;
+    if (args.length <= 1) return [escapeHTML(args[0])];
 
     const originalArgs = [].concat(args);
     const styles = [];
@@ -654,13 +652,9 @@ import loadPolyFill from './utils/polyfill';
 
   function escapeHTML(str) {
     if (typeof str !== 'string') return str;
-    const tags = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '%': '&#37;',
-    };
-    return str.replace(new RegExp(`[${Object.keys(tags)}]`, 'g'), char => tags[char]) || '';
+    return tag('textarea', {
+      textContent: str
+    }).innerHTML;
   }
 
   function css() {

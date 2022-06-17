@@ -115,7 +115,7 @@ function fsOperation(uri) {
       },
       moveTo(dest) {
         dest = Url.pathname(dest);
-        return fs.rename(dest);
+        return fs.moveTo(dest);
       },
       renameTo(newname) {
         return fs.rename(newname);

@@ -63,7 +63,7 @@ function backupRestore() {
   async function backup() {
     try {
       const settings = appSettings.value;
-      const keyBindings = window.customKeyBindings;
+      const keyBindings = await fsOperation(KEYBINDING_FILE).readFile('json');
       const storageList = JSON.parse(localStorage.storageList || '[]').filter(
         (s) => /s?ftp/.test(s.storageType),
       );

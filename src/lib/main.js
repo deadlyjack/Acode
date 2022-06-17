@@ -89,8 +89,6 @@ async function ondeviceready() {
   window.restoreTheme = restoreTheme;
   window.saveInterval = null;
   window.editorManager = null;
-  window.customKeyBindings = null;
-  window.defaultKeyBindings = keyBindings;
   window.toastQueue = [];
   window.toast = toast;
   window.ASSETS_DIRECTORY = Url.join(cordova.file.applicationDirectory, 'www');
@@ -135,12 +133,6 @@ async function ondeviceready() {
     else return true;
   })();
   window.acode = new Acode();
-  window.keyBindings = (name) => {
-    if (customKeyBindings && name in window.customKeyBindings)
-      return window.customKeyBindings[name].key;
-    else if (name in defaultKeyBindings) return defaultKeyBindings[name].key;
-    else return null;
-  };
 
   system.requestPermission('android.permission.WRITE_EXTERNAL_STORAGE');
   localStorage.versionCode = BuildInfo.versionCode;
@@ -180,8 +172,10 @@ async function ondeviceready() {
     acode.pluginServer.setOnRequestHandler(pluginServer);
     acode.setLoadingMessage('Loading plugins...');
     loadPlugins()
-      .then(() => {
-        toast('Plugins loaded!');
+      .then((numberOfPluginLoaded) => {
+        if (numberOfPluginLoaded > 0) {
+          toast(`${numberOfPluginLoaded} plugins loaded.`)
+        }
       })
       .catch((error) => {
         console.error(error);
@@ -224,21 +218,6 @@ async function ondeviceready() {
   } catch (error) {
     alert('Unable to load language file.');
   }
-
-  acode.setLoadingMessage('Loading keybindings...');
-  (async () => {
-    try {
-      const fs = fsOperation(KEYBINDING_FILE);
-      const content = await fs.readFile('utf-8');
-      const bindings = helpers.parseJSON(content);
-      if (!bindings) {
-        throw new Error('Empty keybindings file.');
-      }
-      window.customKeyBindings = bindings;
-    } catch (error) {
-      helpers.resetKeyBindings();
-    }
-  })();
 
   acode.setLoadingMessage('Initializing GitHub...');
   await git.init();
@@ -342,7 +321,7 @@ async function loadApp() {
 
   actionStack.onCloseApp = () => acode.exec('save-state');
   $sidebar.setAttribute('empty-msg', strings['open folder']);
-  window.editorManager = EditorManager($sidebar, $header, $main);
+  window.editorManager = await EditorManager($sidebar, $header, $main);
 
   const fmode = appSettings.value.floatingButtonActivation;
   const activationMode = fmode === 'long tap' ? 'oncontextmenu' : 'onclick';

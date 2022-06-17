@@ -335,7 +335,7 @@ interface FileSystem {
   moveTo(dset: string): Promise<string>;
   renameTo(newName: string): Promise<void>;
   exists(): Promise<boolean>;
-  stats(): Promise<FileStatus>;
+  stat(): Promise<FileStatus>;
 }
 
 interface externalStorageData {
@@ -625,8 +625,6 @@ declare var pageCount: number;
 declare var saveTimeout: number;
 declare var promotion: Promotion;
 declare var appStarted: boolean;
-declare var defaultKeyBindings: Map<string, KeyBinding>;
-declare var customKeyBindings: Map<string, KeyBinding>;
 declare var ace: AceAjax.Ace;
 declare var actionStack: ActionStack;
 declare var addedFolder: Array<Folder>;
@@ -641,5 +639,4 @@ declare var gistRecordFile: string;
 declare var root: HTMLDivElement;
 declare var saveInterval: number;
 declare var toastQueue: Array<HTMLElement>;
-declare var keyBindings: (name: string) => string;
 declare var toast: (string) => void;

@@ -23,7 +23,7 @@ export default async function checkPluginsUpdate() {
           }),
         );
 
-        if (plugin.version !== pluginRemote.version) {
+        if (plugin.version !== pluginRemote?.version) {
           updates.push(plugin.id);
         }
       })(),

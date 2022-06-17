@@ -31,8 +31,8 @@
       "cordova-plugin-sftp": {},
       "cordova-plugin-system": {},
       "cordova-plugin-sdcard": {},
-      "cordova-plugin-ftp": {},
-      "cordova-plugin-server": {}
+      "cordova-plugin-server": {},
+      "cordova-plugin-ftp": {}
     },
     "platforms": [
       "android"
