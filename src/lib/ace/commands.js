@@ -1,3 +1,4 @@
+import fsOperation from "../fileSystem/fsOperation";
 import keyBindings from "../keyBindings";
 import helpers from "../utils/helpers";
 
@@ -12,6 +13,7 @@ export default async function Commands() {
       keyboardShortcuts = bindings;
     }
   } catch (error) {
+    console.error(error);
     helpers.resetKeyBindings();
   }
 

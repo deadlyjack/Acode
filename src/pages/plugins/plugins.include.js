@@ -130,6 +130,16 @@ export default function PluginsInclude(updates) {
       responseType: 'text',
     });
     plugins.all = helpers.parseJSON(file) || [];
+
+    plugins.all.push({
+      name: 'Python local',
+      icon: 'https://172.16.0.167:5500/icon.png',
+      plugin: 'https://172.16.0.1667:5500/plugin.json',
+      autho: {
+        name: 'Ajit Kumar'
+      }
+    });
+
     if (plugins.installed.length) {
       plugins.installed.forEach((localPlugin) => {
         const plugin = plugins.all.find((plugin) => plugin.name === localPlugin.name);
