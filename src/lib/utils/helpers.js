@@ -492,21 +492,16 @@ export default {
    * Resets key binding
    */
   async resetKeyBindings() {
-    const customKeyBindings = {};
-    for (let binding in keyBindings) {
-      const { key, readOnly, description } = keyBindings[binding];
-      if (!readOnly)
-        customKeyBindings[binding] = {
-          description,
-          key,
-        };
-    }
-    const fs = fsOperation(KEYBINDING_FILE);
-    if (!(await fs.exists())) {
-      fsOperation(DATA_STORAGE).createFile(Url.basename(KEYBINDING_FILE));
-    }
     try {
-      fs.writeFile(JSON.stringify(customKeyBindings, undefined, 2));
+      const fs = fsOperation(KEYBINDING_FILE);
+      const fileName = Url.basename(KEYBINDING_FILE);
+      const content = JSON.stringify(keyBindings, undefined, 2);
+      if (!(await fs.exists())) {
+        await fsOperation(DATA_STORAGE)
+          .createFile(fileName, content);
+        return;
+      }
+      await fs.writeFile(content);
     } catch (error) {
       console.log(error);
     }

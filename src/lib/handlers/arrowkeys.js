@@ -1,3 +1,10 @@
+const keyMapping = {
+  37: 'ArrowLeft',
+  38: 'ArrowUp',
+  39: 'ArrowRight',
+  40: 'ArrowDown',
+};
+
 export default {
   interval: null,
   onTouchStart: function (e, footer) {
@@ -57,7 +64,7 @@ export default {
 
     function dispatchEvent() {
       const keyevent = window.createKeyboardEvent('keydown', {
-        key,
+        key: keyMapping[key],
         keyCode: key,
         shiftKey,
       });

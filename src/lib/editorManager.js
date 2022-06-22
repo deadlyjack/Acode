@@ -903,6 +903,9 @@ async function EditorManager($sidebar, $header, $body) {
     Emmet.setCore(window.emmet);
     editor.commands = new CommandManager('win', commands);
     editor.keyBinding = new KeyBinding(editor);
+    editor.setKeyboardHandler(
+      editor.getKeyboardHandler(),
+    );
     editor.textInput.onContextMenu = (e) => {
       e.preventDefault();
     };

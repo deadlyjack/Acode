@@ -1,4 +1,6 @@
 import commands from "./commands";
+import fsOperation from "./fileSystem/fsOperation";
+import Url from "./utils/Url";
 
 export default class Acode {
   #pluginsInit = {};
@@ -42,14 +44,15 @@ export default class Acode {
    * @param {string} baseUrl local plugin url
    * @param {HTMLElement} $page 
    */
-  initPlugin(id, baseUrl, $page) {
+  initPlugin(id, baseUrl, $page, options) {
     if (id in this.#pluginsInit) {
-      this.#pluginsInit[id](baseUrl, $page);
+      this.#pluginsInit[id](baseUrl, $page, options);
     }
   }
   unmountPlugin(id) {
     if (id in this.#pluginUnmount) {
       this.#pluginUnmount[id]();
+      fsOperation(Url.join(CACHE_STORAGE, id)).delete();
     }
   }
   registerFormatter(id, extensions, formatter) {
@@ -65,5 +68,8 @@ export default class Acode {
     if (formatter) {
       await formatter.format();
     }
+  }
+  fsOperation(file) {
+    return fsOperation(file);
   }
 }
