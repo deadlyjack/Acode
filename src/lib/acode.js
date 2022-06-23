@@ -1,5 +1,6 @@
 import commands from "./commands";
 import fsOperation from "./fileSystem/fsOperation";
+import helpers from "./utils/helpers";
 import Url from "./utils/Url";
 
 export default class Acode {
@@ -7,7 +8,7 @@ export default class Acode {
   #pluginUnmount = {};
   #formatter = [{
     id: 'default',
-    extenstions: ['*'],
+    exts: ['*'],
     format: async () => {
       const { beautify } = ace.require('ace/ext/beautify')
       beautify(editorManager.editor.session);
@@ -55,16 +56,17 @@ export default class Acode {
       fsOperation(Url.join(CACHE_STORAGE, id)).delete();
     }
   }
-  registerFormatter(id, extensions, formatter) {
+  registerFormatter(id, extensions, format) {
     this.#formatter.unshift({
       id,
-      extensions,
-      formatter,
+      exts: extensions,
+      format,
     });
   }
   async format() {
     const file = editorManager.activeFile;
-    const formatter = this.#formatter.find((f) => f.extenstions.includes(file.extension || '*'));
+    const ext = helpers.extname(file.name);
+    const formatter = this.#formatter.find((f) => f.exts.includes(ext) || f.exts.includes('*'));
     if (formatter) {
       await formatter.format();
     }
