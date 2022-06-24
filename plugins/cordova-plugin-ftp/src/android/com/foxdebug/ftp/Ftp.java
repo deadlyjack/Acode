@@ -351,10 +351,10 @@ public class Ftp extends CordovaPlugin {
                 return;
               }
 
+              Log.d("FTP", "Deleting directory " + path);
               // delete all files in the directory
               emptyDirectory(path, ftp);
 
-              ftp.removeDirectory(path);
               callback.success();
             } catch (FTPConnectionClosedException e) {
               callback.error(e.getMessage());
@@ -925,20 +925,23 @@ public class Ftp extends CordovaPlugin {
     return res;
   }
 
-  private void emptyDirectory(String directory, FTPClient client) {
-    try {
-      FTPFile[] files = client.listFiles(directory);
-      for (FTPFile file : files) {
-        if (file.isDirectory()) {
-          emptyDirectory(directory + "/" + file.getName(), client);
-        } else {
-          client.deleteFile(directory + "/" + file.getName());
-        }
+  private void emptyDirectory(String directory, FTPClient client)
+    throws FTPConnectionClosedException, IOException {
+    FTPFile[] files = client.listFiles(directory);
+    for (FTPFile file : files) {
+      String filename = file.getName();
+      if (filename.equals(".") || filename.equals("..")) {
+        continue;
       }
-      client.removeDirectory(directory);
-    } catch (IOException e) {
-      e.printStackTrace();
+      if (file.isDirectory()) {
+        Log.d("FTP", "Removing directory: " + file.getName());
+        emptyDirectory(directory + "/" + file.getName(), client);
+      } else {
+        Log.d("FTP", "Removing file: " + file.getName());
+        client.deleteFile(directory + "/" + file.getName());
+      }
     }
+    client.removeDirectory(directory);
   }
 
   private String joinPath(String p1, String p2) {

@@ -116,6 +116,9 @@ class FtpClient {
 
   async delete() {
     await this.#connectIfNotConnected();
+    if (!this.#stat) {
+      await this.#getStat();
+    }
     return new Promise((resolve, reject) => {
       let deleteOperation;
 
@@ -165,9 +168,7 @@ class FtpClient {
   }
 
   async stat() {
-
     if (this.#stat) return this.#stat;
-
     await this.#connectIfNotConnected();
     await this.#getStat();
     return this.#stat;
