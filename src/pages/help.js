@@ -5,16 +5,16 @@ import helpers from '../lib/utils/helpers';
 import constants from '../lib/constants';
 
 export default function help() {
-  const page = Page(strings.help.capitalize());
-  const options = tag('div', {
+  const $page = Page(strings.help.capitalize());
+  const $options = tag('div', {
     className: 'main list',
   });
 
   actionStack.push({
     id: 'help',
-    action: page.hide,
+    action: $page.hide,
   });
-  page.onhide = function () {
+  $page.onhide = function () {
     helpers.hideAd();
     actionStack.remove('help');
   };
@@ -34,7 +34,7 @@ export default function help() {
     },
   ];
 
-  gen.listItems(options, settingsOptions, changeSetting);
+  gen.listItems($options, settingsOptions, changeSetting);
 
   function changeSetting() {
     if (this.key === 'feedback') {
@@ -51,7 +51,7 @@ export default function help() {
     }
   }
 
-  page.append(options);
-  app.append(page);
+  $page.body = $options;
+  app.append($page);
   helpers.showAd();
 }

@@ -149,8 +149,8 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
     $lead.onclick = $page.hide;
     $content.addEventListener('click', handleClick);
     $content.addEventListener('contextmenu', handleContextMenu);
-    $page.append($content);
-    $page.get('header').append($search, $addMenuToggler, $menuToggler);
+    $page.body = $content;
+    $page.header.append($search, $addMenuToggler, $menuToggler);
 
 
     if (IS_FOLDER_MODE) {
@@ -158,7 +158,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
         className: 'floating icon check',
         style: {
           bottom: '10px',
-          top: 'unset',
+          top: 'auto',
         },
         disabled: true,
         onclick() {

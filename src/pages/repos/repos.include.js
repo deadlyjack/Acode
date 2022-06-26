@@ -77,7 +77,7 @@ function ReposInclude() {
 
     $content.addEventListener('click', handleClick);
 
-    $page.append($content);
+    $page.body = $content;
 
     app.append($page);
     helpers.showAd();

@@ -25,8 +25,8 @@ export default async function GithubLoginInclude() {
     fs.delete();
   }
 
-  $page.get('header').append($info);
-  $page.append($content);
+  $page.header.append($info);
+  $page.body = $content;
 
   $input.onclick = () => ($errorMsg.textContent = '');
   $form.onsubmit = storeCredentials;

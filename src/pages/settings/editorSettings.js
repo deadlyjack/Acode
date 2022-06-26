@@ -7,7 +7,7 @@ import helpers from '../../lib/utils/helpers';
 
 export default function editorSettings() {
   const $page = Page(strings['editor settings'].capitalize());
-  const settingsList = tag('div', {
+  const $settingsList = tag('div', {
     className: 'main list',
   });
 
@@ -124,7 +124,7 @@ export default function editorSettings() {
     },
   ];
 
-  gen.listItems(settingsList, settingsOptions, changeSetting);
+  gen.listItems($settingsList, settingsOptions, changeSetting);
 
   function changeSetting() {
     const settings = {};
@@ -308,7 +308,7 @@ export default function editorSettings() {
     }
   }
 
-  $page.appendChild(settingsList);
+  $page.body = $settingsList;
   app.append($page);
   helpers.showAd();
 }

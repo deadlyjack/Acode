@@ -28,12 +28,10 @@ export default function PluginsInclude(updates) {
     installed: [],
   };
   let section = 'installed';
-  $page.append(
-    tag.parse(
-      mustache.render(template, { msg: `${strings.loading}...` }),
-    ),
+  $page.body = tag.parse(
+    mustache.render(template, { msg: `${strings.loading}...` }),
   );
-  $page.querySelector('header').append($search);
+  $page.header.append($search);
 
   actionStack.push({
     id: 'plugins',
@@ -130,6 +128,16 @@ export default function PluginsInclude(updates) {
       responseType: 'text',
     });
     plugins.all = helpers.parseJSON(file) || [];
+
+    // To test and develop plugin, update host in file: '/res/network_security_config.xml:11:43'
+    // plugins.all.push({
+    //   name: 'Python local',
+    //   plugin: 'http://192.168.1.33:5500/plugin.json',
+    //   icon: 'http://192.168.1.33:5500/icon.png',
+    //   author: {
+    //     name: 'DeadlyJack',
+    //   }
+    // })
 
     if (plugins.installed.length) {
       plugins.installed.forEach((localPlugin) => {

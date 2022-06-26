@@ -50,8 +50,8 @@ function GistFilesInclude(gist) {
 
   $content.addEventListener('click', handleClick);
   $cm.addEventListener('click', handleClick);
-  $page.append($content);
-  $page.querySelector('header').append($search, $menuToggler);
+  $page.body = $content;
+  $page.header.append($search, $menuToggler);
   $search.onclick = () => searchBar($page.querySelector('.list'));
 
   app.appendChild($page);

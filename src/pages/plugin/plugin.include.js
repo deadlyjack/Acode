@@ -8,6 +8,7 @@ import { marked } from 'marked';
 import Url from '../../lib/utils/Url';
 import installPlugin from '../../lib/installPlugin';
 import fsOperation from '../../lib/fileSystem/fsOperation';
+import tag from 'html-tag-js';
 
 export default async function PluginInclude(json, installed = false, onInstall, onUninstall) {
   const $page = Page('Plugin');
@@ -151,7 +152,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
 
   function render() {
     const isPaid = ['paid', 'premium', 'pro'].includes(plugin.type) && IS_FREE_VERSION;
-    $page.innerHTML = mustache.render(template, {
+    $page.body = tag.parse(mustache.render(template, {
       ...plugin,
       readme,
       version,
@@ -161,7 +162,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       update,
       strings,
       isPaid,
-    });
+    }));
 
     if (isPaid) {
       const $installBtn = $page.get('[action="install"]');

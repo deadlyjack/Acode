@@ -1,3 +1,6 @@
+import 'core-js/stable';
+import 'html-tag-js/dist/polyfill';
+
 import '../styles/main.scss';
 import '../styles/themes.scss';
 import '../styles/page.scss';
@@ -9,8 +12,7 @@ import '../styles/dialogs.scss';
 import '../styles/help.scss';
 import '../styles/overrideAceStyle.scss';
 import './ace/modelist';
-import 'core-js/stable';
-import 'html-tag-js/dist/polyfill';
+import '../components/WebComponents/components';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import git from './git';
@@ -25,7 +27,6 @@ import constants from './constants';
 import intentHandler from './handlers/intent';
 import openFolder from './openFolder';
 import arrowkeys from './handlers/arrowkeys';
-import commands from './commands';
 import keyBindings from './keyBindings';
 import quickTools from './handlers/quickTools';
 import loadPolyFill from './utils/polyfill';
@@ -299,6 +300,10 @@ async function loadApp() {
   const $floatingNavToggler = tag('span', {
     className: 'floating icon menu',
     id: 'sidebar-toggler',
+    style: {
+      height: '40px',
+      width: '40px',
+    },
     onclick() {
       acode.exec('toggle-sidebar');
     }
@@ -306,6 +311,10 @@ async function loadApp() {
   const $headerToggler = tag('span', {
     className: 'floating icon keyboard_arrow_left',
     id: 'header-toggler',
+    style: {
+      height: '40px',
+      width: '40px',
+    },
   });
   const $quickToolToggler = tag('span', {
     className: 'floating icon keyboard_arrow_up',
@@ -337,7 +346,7 @@ async function loadApp() {
   //#region rendering
   applySettings.beforeRender();
   window.restoreTheme();
-  root.append($header, $main, $footer, $floatingNavToggler, $headerToggler, $quickToolToggler);
+  root.appendOuter($header, $main, $footer, $floatingNavToggler, $headerToggler, $quickToolToggler);
   if (!appSettings.value.floatingButton) {
     root.classList.add('hide-floating-button');
   }

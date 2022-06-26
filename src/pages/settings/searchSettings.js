@@ -5,7 +5,7 @@ import helpers from '../../lib/utils/helpers';
 
 export default function searchSettings() {
   const $page = Page(strings.search.capitalize());
-  const settingsList = tag('div', {
+  const $settingsList = tag('div', {
     className: 'main list',
   });
 
@@ -38,7 +38,7 @@ export default function searchSettings() {
     },
   ];
 
-  gen.listItems(settingsList, settingsOptions, changeSetting);
+  gen.listItems($settingsList, settingsOptions, changeSetting);
 
   function changeSetting() {
     switch (this.key) {
@@ -65,7 +65,7 @@ export default function searchSettings() {
     }
   }
 
-  $page.appendChild(settingsList);
+  $page.body = $settingsList;
   app.append($page);
   helpers.showAd();
 }

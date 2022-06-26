@@ -61,7 +61,7 @@ export default function () {
     helpers.hideAd();
     actionStack.remove('appTheme');
   };
-  $page.append($container);
+  $page.body = $container;
   $page.querySelector('header').append($search);
 
   app.append($page);
@@ -97,8 +97,7 @@ export default function () {
       themeList = constants.editorThemeList;
       defaultValue = (theme) =>
         appSettings.value.editorTheme === `ace/theme/${theme}`;
-    } else if (mode === 'md') {
-    }
+    } else if (mode === 'md') { }
 
     const themes = Object.keys(themeList).sort();
     for (let i = 0; i < themes.length; ++i) {

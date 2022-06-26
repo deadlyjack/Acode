@@ -5,7 +5,7 @@ import helpers from '../../lib/utils/helpers';
 
 export default function filesSettings(callback) {
   const page = Page(strings.settings.capitalize());
-  const settingsList = tag('div', {
+  const $settingsList = tag('div', {
     className: 'main list',
   });
 
@@ -33,7 +33,7 @@ export default function filesSettings(callback) {
     },
   ];
 
-  gen.listItems(settingsList, settingsOptions, changeSetting);
+  gen.listItems($settingsList, settingsOptions, changeSetting);
 
   function changeSetting() {
     switch (this.key) {
@@ -53,7 +53,7 @@ export default function filesSettings(callback) {
     }
   }
 
-  page.appendChild(settingsList);
+  page.body = $settingsList;
   app.append(page);
   helpers.showAd();
 }

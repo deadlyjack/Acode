@@ -107,8 +107,8 @@ export default function RepoInclude(owner, repoName) {
         navigate('/', '/');
 
         $page.addEventListener('click', handleClick);
-        $page.append($content);
-        $page.querySelector('header').append($search);
+        $page.body = $content;
+        $page.header.append($search);
         app.append($page);
         helpers.showAd();
 

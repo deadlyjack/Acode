@@ -92,10 +92,10 @@ async function gitHubInclude($loginPage) {
   function render(profile) {
     if (!$page) $page = Page('Github');
     const $content = content(profile);
-    $page.append($content);
-    $page.get('header').append($search, $menuToggler);
+    $page.body = $content;
+    $page.header.append($search, $menuToggler);
 
-    app.appendChild($page);
+    app.append($page);
     helpers.showAd();
 
     actionStack.push({

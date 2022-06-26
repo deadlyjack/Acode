@@ -23,8 +23,9 @@ function ActionStack() {
     pop() {
       if (window.freeze) return;
       const fun = stack.pop();
-      if (fun) fun.action();
-      else if (appSettings.value.confirmOnExit) {
+      if (fun) {
+        fun.action();
+      } else if (appSettings.value.confirmOnExit) {
         let closeMessage = acode.exitAppMessage;
 
         if (closeMessage) {

@@ -13,7 +13,7 @@ function backupRestore() {
   const $page = Page(
     strings.backup.capitalize() + '/' + strings.restore.capitalize(),
   );
-  const settingsList = tag('div', {
+  const $settingsList = tag('div', {
     className: 'main list',
   });
 
@@ -39,9 +39,9 @@ function backupRestore() {
     },
   ];
 
-  gen.listItems(settingsList, settingsOptions, changeSetting);
+  gen.listItems($settingsList, settingsOptions, changeSetting);
 
-  $page.appendChild(settingsList);
+  $page.body = $settingsList;
   app.append($page);
   helpers.showAd();
 

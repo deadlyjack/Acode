@@ -725,7 +725,7 @@ export default {
       IS_FREE_VERSION
       && (innerHeight * devicePixelRatio) > 600 && ad
     ) {
-      const $page = tag.getAll('.page:not(#root)').pop();
+      const $page = tag.getAll('wc-page:not(#root)').pop();
       if ($page) {
         ad.show();
         ad.shown = true;
@@ -739,7 +739,7 @@ export default {
   hideAd(force = false) {
     const { ad } = window;
     if (IS_FREE_VERSION && ad?.shown) {
-      const $pages = tag.getAll('.page:not(#root)');
+      const $pages = tag.getAll('wc-page:not(#root)');
       if (force || $pages.length === 1) {
         ad.hide();
         ad.shown = false;

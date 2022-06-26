@@ -55,6 +55,6 @@ export default function AboutInclude() {
     };
 
     $page.classList.add('about-us');
-    $page.append($content);
+    $page.body = $content;
   }
 }

@@ -43,7 +43,7 @@ export default function settingsMain() {
     id: 'settings-main',
     action: $page.hide,
   });
-  $page.querySelector('header').append($editSettings);
+  $page.header.append($editSettings);
 
   const settingsOptions = [
     {
@@ -143,7 +143,7 @@ export default function settingsMain() {
     }
   }
 
-  $page.appendChild($settingsList);
+  $page.body = $settingsList;
   $settingsList.appendChild(tag.parse($_socialLinks));
   app.append($page);
   helpers.showAd();

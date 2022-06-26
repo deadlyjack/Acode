@@ -13,7 +13,7 @@ export default function CustomThemeInclude() {
   const $page = Page(`${strings['custom']} ${strings['theme']}`.capitalize());
   let unsaved = false;
 
-  $page.get('header').append(
+  $page.header.append(
     tag('span', {
       className: 'icon historyrestore',
       attr: {
@@ -113,7 +113,7 @@ export default function CustomThemeInclude() {
     const html = Mustache.render(template, { colors });
     const $content = $page.get('#custom-theme');
     if ($content) $content.remove();
-    $page.append(tag.parse(html));
+    $page.body = tag.parse(html);
   }
 
   function updateTheme() {

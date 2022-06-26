@@ -1,6 +1,11 @@
 {
   "presets": [
-    "@babel/preset-env"
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "entry"
+      }
+    ]
   ],
   "env": {
     "test": {
@@ -11,10 +16,7 @@
   },
   "plugins": [
     [
-      "@babel/plugin-transform-runtime",
-      {
-        "regenerator": true
-      }
+      "@babel/plugin-transform-runtime"
     ]
   ],
   "compact": false,

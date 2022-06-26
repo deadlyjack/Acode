@@ -429,11 +429,11 @@ async function EditorManager($sidebar, $header, $body) {
 
         if (appSettings.value.floatingButton) {
           $quickToolToggler.classList.remove('hide');
-          root.append($quickToolToggler);
+          root.appendOuter($quickToolToggler);
         }
 
         $headerToggler.classList.remove('hide');
-        root.append($headerToggler);
+        root.appendOuter($headerToggler);
       }
     } else {
       if (!scrollBarVisiblityCount) {
@@ -1001,7 +1001,7 @@ async function EditorManager($sidebar, $header, $body) {
         onmousedown: checkForDrag,
       });
       if ($list) $openFileList.append(...$list);
-      root.append($openFileList);
+      root.appendOuter($openFileList);
       root.classList.add('top-bar');
     } else {
       $openFileList = list(strings['active files']);

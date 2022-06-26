@@ -7,6 +7,7 @@ import constants from "../../lib/constants";
 import ajax from '@deadlyjack/ajax';
 import helpers from '../../lib/utils/helpers';
 import dialogs from '../../components/dialogs';
+import tag from 'html-tag-js';
 
 //TODO: fix (-1 means, user is not logged in to any google account)
 
@@ -123,10 +124,10 @@ export default function DonateInclude() {
       col2.push(html);
     });
 
-    $page.innerHTML = mustache.render(bodyHBS, {
+    $page.body = tag.parse(mustache.render(bodyHBS, {
       col1: col1.join(''),
       col2: col2.join(''),
-    });
+    }));
     helpers.showAd();
     adShown = true;
   })()

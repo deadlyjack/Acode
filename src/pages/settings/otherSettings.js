@@ -287,7 +287,7 @@ export default function otherSettings() {
     }
   }
 
-  $page.appendChild($settingsList);
+  $page.body = $settingsList;
   app.append($page);
   helpers.showAd();
 }

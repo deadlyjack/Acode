@@ -15,13 +15,11 @@
     <link rel="stylesheet" href="./res/octicons/style.css" />
 
     <script>
+      window._regeneratorRuntime = null;
       if (!String.prototype.startsWith) {
-          Object.defineProperty(String.prototype, 'startsWith', {
-              value: function(search, rawPos) {
-                  var pos = rawPos > 0 ? rawPos|0 : 0;
-                  return this.substring(pos, pos + search.length) === search;
-              }
-          });
+        String.prototype.startsWith = function (needle) {
+          return this.indexOf(needle) === 0;
+        };
       }
 
       var __oldAddEventListener = HTMLElement.prototype.addEventListener;
@@ -126,6 +124,6 @@
 </head>
 
   <body class="loading splash" data-version="">
-    <div id="root" class="page primary"></div>
+    <wc-page id="root" class="primary"></wc-page>
   </body>
 </html>

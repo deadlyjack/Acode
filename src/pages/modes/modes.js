@@ -31,8 +31,8 @@ function Modes() {
     //#endregion
 
     $page.addEventListener('click', handleClick);
-    $page.append($content);
-    $page.querySelector('header').append($search);
+    $page.body = $content;
+    $page.header.append($search);
     document.body.append($page);
 
     setTimeout(() => {

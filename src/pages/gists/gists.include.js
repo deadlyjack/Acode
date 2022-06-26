@@ -41,7 +41,7 @@ function GistsInclude(callbackGists) {
   });
 
   $cm.addEventListener('click', handleClick);
-  $page.querySelector('header').append($search, $menuToggler);
+  $page.header.append($search, $menuToggler);
   $search.onclick = () => {
     searchBar($page.querySelector('.list'));
   };
@@ -83,7 +83,7 @@ function GistsInclude(callbackGists) {
 
     $content.addEventListener('click', handleClick);
 
-    $page.append($content);
+    $page.body = $content;
     if (!$page.isConnected) {
       app.appendChild($page);
       helpers.showAd();
