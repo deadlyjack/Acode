@@ -68,7 +68,6 @@ export default class WCPage extends HTMLElement {
 
   disconnectedCallback() {
     if (typeof this.ondisconnect === 'function') this.ondisconnect();
-    if (typeof this.onhide === 'function') this.onhide();
     for (const cb of this.#on.hide) cb.call(this);
   }
 
@@ -104,6 +103,7 @@ export default class WCPage extends HTMLElement {
 
   hide() {
     this.classList.add('hide');
+    if (typeof this.onhide === 'function') this.onhide();
     setTimeout(() => {
       this.remove();
     }, 150);
