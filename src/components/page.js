@@ -1,5 +1,5 @@
 import tag from "html-tag-js";
-import WCPage from "./WebComponents/WcPage";
+import WCPage from "./WebComponents/wcPage";
 
 /**
  *
