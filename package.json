@@ -101,6 +101,7 @@
     "marked": "^4.0.17",
     "mime-types": "^2.1.35",
     "mustache": "^4.2.0",
+    "sass": "^1.53.0",
     "url-parse": "^1.5.10",
     "utf8": "^3.0.0",
     "vanilla-picker": "^2.11.2",
