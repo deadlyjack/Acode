@@ -1,7 +1,7 @@
 import tag from 'html-tag-js';
 import Commands from '../lib/ace/commands';
 import helpers from '../lib/utils/helpers';
-import inputhints from './inputHints';
+import inputhints from './inputhints';
 
 export async function commandPallete() {
   const recentlyUsedCommands = RecentlyUsedCommands();

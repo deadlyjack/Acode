@@ -231,11 +231,11 @@
   "remember opened folders": "Geöffnete Ordner merken",
   "no suggestions": "Keine Vorschläge",
   "no suggestions aggressive": "Keine aufdringlichen Vorschläge",
-  "install": "Install",
-  "installing": "Installing...",
+  "install": "Installation",
+  "installing": "Installieren...",
   "plugins": "Plugins",
-  "recently used": "Recently used",
-  "update": "Update",
-  "uninstall": "Uninstall",
-  "download acode pro": "Download Acode pro"
+  "recently used": "Kürzlich verwendet",
+  "update": "Aktualisierung",
+  "uninstall": "Deinstallation",
+  "download acode pro": "Acode Pro herunterladen"
 }

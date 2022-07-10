@@ -232,11 +232,11 @@
   "remember opened folders": "记住打开过的文件夹",
   "no suggestions": "不显示建议",
   "no suggestions aggressive": "不显示激进建议",
-  "install": "Install",
-  "installing": "Installing...",
-  "plugins": "Plugins",
-  "recently used": "Recently used",
-  "update": "Update",
-  "uninstall": "Uninstall",
-  "download acode pro": "Download Acode pro"
+  "install": "安装",
+  "installing": "安装中...",
+  "plugins": "插件",
+  "recently used": "最近使用",
+  "update": "更新",
+  "uninstall": "卸载",
+  "download acode pro": "下载 Acode pro"
 }
