@@ -187,16 +187,21 @@ async function ondeviceready() {
     toast('Plugins loading failed!');
   }
 
-  if (appSettings.value.showAd) {
-    acode.exec('load-ad');
-  } else {
-    const loadAd = (value) => {
-      appSettings.off('update:showAd', loadAd);
-      if (value) {
-        acode.exec('load-ad');
-      }
-    };
-    appSettings.on('update:showAd', loadAd);
+  if (IS_FREE_VERSION && admob) {
+    admob
+      .start()
+      .then(async () => {
+        const ad = new admob.BannerAd({
+          adUnitId: 'ca-app-pub-5911839694379275/9157899592', // Production
+          // adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test
+          position: 'bottom',
+        });
+        window.ad = ad;
+      });
+
+    document.addEventListener('admob.banner.size', (event) => {
+      console.log(event);
+    });
   }
 
   acode.setLoadingMessage('Loading custom theme...');
