@@ -739,8 +739,10 @@ export default {
   hideAd(force = false) {
     const { ad } = window;
     if (IS_FREE_VERSION && ad?.shown) {
-      const $pages = tag.getAll('wc-page:not(#root)');
-      if (force || $pages.length === 1) {
+      const $pages = tag.getAll('.page-replacement');
+      const hide = $pages.length === 1;
+
+      if (force || hide) {
         ad.hide();
         ad.shown = false;
       }

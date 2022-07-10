@@ -99,6 +99,11 @@ body {
 
           >header {
             display: flex;
+            justify-content: flex-end;
+
+            .icon {
+              margin: 0;
+            }
           }
         }
 
