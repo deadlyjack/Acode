@@ -40,7 +40,7 @@ Run `npm install` to install all dependencies before building the APK.
 
 ## Develop plugin for Acode
 
-Please read this [documentation](https://acode.foxdebug.com/docs/plugin) on official website.
+Please read this [documentation](https://github.com/deadlyjack/acode-plugin) on official website.
 
 ## Special thanks to
 
