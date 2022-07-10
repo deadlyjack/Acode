@@ -57,11 +57,12 @@ body {
         &.top-bar #sidebar-toggler {
           top: 0;
           left: 0;
-          height: 30px;
-          width: 40px;
+          height: 30px !important;
+          width: 40px !important;
           opacity: 1;
           border-radius: unset;
           border: unset;
+          box-shadow: none !important;
         }
 
         header {

@@ -119,43 +119,48 @@ export default {
   editorThemeList: {
     ambiance: scheme('ambiance', 'dark'),
     chaos: scheme('chaos', 'dark'),
-    clouds_midnight: scheme('clouds_midnight', 'dark'),
+    chrome: scheme('chrome', 'light'),
+    cloud9_day: scheme('cloud9 day', 'light'),
+    cloud9_night: scheme('cloud9 night', 'dark'),
+    cloud9_night_low_color: scheme('cloud9 night low color', 'dark'),
+    clouds: scheme('clouds', 'light'),
+    clouds_midnight: scheme('clouds midnight', 'dark'),
     cobalt: scheme('cobalt', 'dark'),
+    crimson_editor: scheme('crimson editor', 'light'),
+    dawn: scheme('dawn', 'light'),
     dracula: scheme('dracula', 'dark'),
+    dreamweaver: scheme('dreamweaver', 'light'),
+    eclipse: scheme('eclipse', 'light'),
+    github: scheme('github', 'light'),
     gob: scheme('gob', 'dark'),
     gruvbox: scheme('gruvbox', 'dark'),
+    gruvbox_dark_hard: scheme('gruvbox dark hard', 'dark'),
+    gruvbox_light_hard: scheme('gruvbox light hard', 'light'),
     idle_fingers: scheme('idle_fingers', 'dark'),
+    iplastic: scheme('iplastic', 'light'),
+    katzenmilch: scheme('katzenmilch', 'light'),
     kr_theme: scheme('kr_theme', 'dark'),
+    kuroir: scheme('kuroir', 'light'),
     merbivore: scheme('merbivore', 'dark'),
     merbivore_soft: scheme('merbivore_soft', 'dark'),
     mono_industrial: scheme('mono_industrial', 'dark'),
     monokai: scheme('monokai', 'dark'),
     nord_dark: scheme('nord_dark', 'dark'),
+    one_dark: scheme('one_dark', 'dark'),
     pastel_on_dark: scheme('pastel_on_dark', 'dark'),
     solarized_dark: scheme('solarized_dark', 'dark'),
+    solarized_light: scheme('solarized_light', 'light'),
+    sqlserver: scheme('sqlserver', 'light'),
     terminal: scheme('terminal', 'dark'),
+    textmate: scheme('textmate', 'light'),
+    tomorrow: scheme('tomorrow', 'light'),
     tomorrow_night: scheme('tomorrow_night', 'dark'),
     tomorrow_night_blue: scheme('tomorrow_night_blue', 'dark'),
     tomorrow_night_bright: scheme('tomorrow_night_bright', 'dark'),
     tomorrow_night_eighties: scheme('tomorrow_night_eighties', 'dark'),
     twilight: scheme('twilight', 'dark'),
     vibrant_ink: scheme('vibrant_ink', 'dark'),
-    chrome: scheme('chrome', 'light'),
-    clouds: scheme('clouds', 'light'),
-    crimson_editor: scheme('crimson_editor', 'light'),
-    dawn: scheme('dawn', 'light'),
-    dreamweaver: scheme('dreamweaver', 'light'),
-    eclipse: scheme('eclipse', 'light'),
-    github: scheme('github', 'light'),
-    iplastic: scheme('iplastic', 'light'),
-    katzenmilch: scheme('katzenmilch', 'light'),
-    kuroir: scheme('kuroir', 'light'),
-    solarized_light: scheme('solarized_light', 'light'),
-    sqlserver: scheme('sqlserver', 'light'),
-    textmate: scheme('textmate', 'light'),
-    tomorrow: scheme('tomorrow', 'light'),
     xcode: scheme('xcode', 'light'),
-    one_dark: scheme('one_dark', 'dark'),
   },
 
   /**
@@ -188,11 +193,12 @@ export default {
  * @returns {ThemeData}
  */
 function scheme(name, type, isFree, darken, primary) {
-  if (typeof isFree === undefined)
+  if (typeof isFree === undefined) {
     return {
       name,
       type,
     };
+  }
 
   return {
     name,

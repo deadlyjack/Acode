@@ -230,15 +230,10 @@ async function EditorManager($sidebar, $header, $body) {
       const { activeFile } = manager;
       (async () => {
         const changed = await activeFile.isChanged();
-        if (!changed) {
-          activeFile.isUnsaved = false;
-          manager.onupdate('file-changed');
-          manager.emit('update', 'file-changed');
-        }
+        activeFile.isUnsaved = changed;
 
         if (activeFile.markChanged) {
           activeFile.writeToCache();
-          activeFile.isUnsaved = true;
           events.emit('file-content-changed', activeFile);
           manager.onupdate('file-changed');
           manager.emit('update', 'file-changed');
