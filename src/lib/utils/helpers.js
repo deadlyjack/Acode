@@ -462,7 +462,7 @@ export default {
   /**
    * Converts Blob object to text
    * @param {Blob} blob
-   * @returns {String}
+   * @returns {Promise<string>}
    */
   blob2text(blob) {
     return new Promise((resolve, reject) => {

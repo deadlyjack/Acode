@@ -27,7 +27,7 @@ const loader = {
 
     if (oldLoaderDiv) oldLoaderDiv.remove();
 
-    const titleSpan = tag('strong', {
+    const $titleSpan = tag('strong', {
       className: 'title',
       textContent: titleText,
     });
@@ -40,6 +40,9 @@ const loader = {
         tag('div', {
           className: 'message',
           innerHTML: message,
+          style: {
+            whiteSpace: 'pre-wrap',
+          }
         }),
       ],
     });
@@ -48,7 +51,7 @@ const loader = {
       tag('div', {
         className: 'prompt alert',
         id: '__loader',
-        children: [titleSpan, $messageSpan],
+        children: [$titleSpan, $messageSpan],
       });
     const mask =
       tag.get('#__loader-mask') ||
@@ -86,6 +89,15 @@ const loader = {
       window.freeze = true;
       document.body.append($loaderDiv, mask);
       window.restoreTheme(true);
+    }
+
+    return {
+      setTitle(title) {
+        $titleSpan.textContent = title;
+      },
+      setMessage(message) {
+        $messageSpan.get('.message').innerHTML = message;
+      },
     }
   },
   /**

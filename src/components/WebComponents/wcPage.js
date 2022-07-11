@@ -61,14 +61,15 @@ export default class WCPage extends HTMLElement {
   }
 
   connectedCallback() {
+    this.handler.attach();
     this.classList.remove('hide');
     if (typeof this.onconnect === 'function') this.onconnect();
-    for (const cb of this.#on.show) cb.call(this);
+    this.#on.show.forEach(cb => cb.call(this));
   }
 
   disconnectedCallback() {
     if (typeof this.ondisconnect === 'function') this.ondisconnect();
-    for (const cb of this.#on.hide) cb.call(this);
+    this.#on.hide.forEach(cb => cb.call(this));
   }
 
   /**
@@ -106,6 +107,7 @@ export default class WCPage extends HTMLElement {
     if (typeof this.onhide === 'function') this.onhide();
     setTimeout(() => {
       this.remove();
+      this.handler.remove();
     }, 150);
   }
 
@@ -185,18 +187,20 @@ export default class WCPage extends HTMLElement {
 }
 
 class PageHandler {
+  #attached = false;
   $el;
   $replacement;
   onRemove;
 
+  /**
+   * 
+   * @param {HTMLElement} $el 
+   */
   constructor($el) {
     this.$el = $el;
 
     this.onhide = this.onhide.bind(this);
     this.onshow = this.onshow.bind(this);
-
-    this.$el.on('hide', this.onhide);
-    this.$el.on('show', this.onshow);
     this.$replacement = tag('span', { className: 'page-replacement' });
     this.$replacement.handler = this;
   }
@@ -229,6 +233,21 @@ class PageHandler {
   onshow() {
     this.$el.off('show', this.onshow);
     handlePagesForSmoothExprience();
+  }
+
+  remove() {
+    this.#attached = false;
+    this.$el.off('hide', this.onhide);
+    this.$el.off('show', this.onshow);
+    if (this.$el.isConnected) this.$el.remove();
+    if (this.$replacement.isConnected) this.$replacement.remove();
+  }
+
+  attach() {
+    if (this.#attached) return;
+    this.#attached = true;
+    this.$el.on('hide', this.onhide);
+    this.$el.on('show', this.onshow);
   }
 }
 

@@ -88,6 +88,7 @@ function ReposInclude() {
     });
     $page.onhide = function () {
       helpers.hideAd();
+      actionStack.pop();
       actionStack.remove('repos');
     };
 

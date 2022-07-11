@@ -10,10 +10,9 @@ import Url from "./utils/Url";
  * @param {PluginJson} plugin 
  */
 export default async function installPlugin(plugin, host) {
+  const loader = dialogs.loader.create(plugin.name, strings.installing);
   let pluginDir;
   try {
-    dialogs.loader.create(plugin.name, (strings['installing']));
-
     plugin.host = host;
     plugin.installed = true;
 
@@ -39,21 +38,35 @@ export default async function installPlugin(plugin, host) {
         url: mainJs,
         method: 'GET',
         responseType: 'arraybuffer',
+        xhr(xhr) {
+          xhr.onprogress = (e) => {
+            progress(plugin.name, e.loaded / e.total);
+          }
+        }
       }),
       ajax({
         url: Url.join(host, plugin.icon),
         method: 'GET',
         responseType: 'arraybuffer',
+        xhr(xhr) {
+          xhr.onprogress = (e) => {
+            progress('icon', e.loaded / e.total);
+          }
+        }
       }),
       ajax({
         url: Url.join(host, plugin.readme),
         method: 'GET',
         responseType: 'arraybuffer',
+        xhr(xhr) {
+          xhr.onprogress = (e) => {
+            progress('readme', e.loaded / e.total);
+          }
+        }
       }),
     );
 
     const [main, icon, readme] = await Promise.all(readFiles);
-
     await fsOperation(PLUGIN_DIR)
       .createDirectory(plugin.id);
 
@@ -95,6 +108,11 @@ export default async function installPlugin(plugin, host) {
                   url: Url.join(rootDir, file),
                   method: 'GET',
                   responseType: 'arraybuffer',
+                  xhr(xhr) {
+                    xhr.onprogress = (e) => {
+                      progress(file, e.loaded / e.total);
+                    }
+                  }
                 }),
               );
           })(),
@@ -113,5 +131,12 @@ export default async function installPlugin(plugin, host) {
     throw new Error('Cannot install plugin');
   } finally {
     dialogs.loader.destroy();
+  }
+
+  function progress(label, ratio) {
+    const percent = Math.round(ratio * 10000) / 100;
+    loader.setTitle(`${plugin.name}`);
+    loader.setMessage(`file: ${label}
+${strings.installing} ${Math.min(percent, 100)}%`);
   }
 }

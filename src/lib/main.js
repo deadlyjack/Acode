@@ -171,17 +171,6 @@ async function ondeviceready() {
   try {
     acode.pluginServer = await createPluginServer();
     acode.pluginServer.setOnRequestHandler(pluginServer);
-    acode.setLoadingMessage('Loading plugins...');
-    loadPlugins()
-      .then((numberOfPluginLoaded) => {
-        if (numberOfPluginLoaded > 0) {
-          toast(`${numberOfPluginLoaded} plugins loaded.`)
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        toast('Plugins loading failed!');
-      });
   } catch (error) {
     console.error(error);
     toast('Plugins loading failed!');
@@ -372,7 +361,7 @@ async function loadApp() {
     if (res.success === 0) {
       editorManager.addNewFile();
     }
-    onEditorUpdate();
+    onEditorUpdate(false);
   } else {
     editorManager.addNewFile();
   }
@@ -384,6 +373,7 @@ async function loadApp() {
   }, 1000);
 
   //#region Add event listeners
+  root.on('show', mainPageOnShow);
   editorManager.onupdate = onEditorUpdate;
   editorManager.on('rename-file', onRenameOrSwitchFile);
   editorManager.on('switch-file', onRenameOrSwitchFile);
@@ -439,6 +429,14 @@ async function loadApp() {
     .catch(console.error);
 
   onRenameOrSwitchFile();
+
+  //load plugins
+  loadPlugins()
+    .then(() => { })
+    .catch((error) => {
+      console.error(error);
+      toast('Plugins loading failed!');
+    });
 
   /**
    *
@@ -509,7 +507,7 @@ async function loadApp() {
     editorManager.editor.focus();
   }
 
-  function onEditorUpdate() {
+  function onEditorUpdate(saveState = true) {
     const activeFile = editorManager.activeFile;
     const $save = $footer.querySelector('[action=save]');
 
@@ -527,7 +525,7 @@ async function loadApp() {
       }
     }
 
-    acode.exec('save-state');
+    if (saveState) acode.exec('save-state');
   }
 
   function onRenameOrSwitchFile() {
@@ -572,4 +570,9 @@ function onClickApp(e) {
 
     return false;
   }
+}
+
+function mainPageOnShow() {
+  const { editor } = editorManager;
+  editor.resize(true);
 }

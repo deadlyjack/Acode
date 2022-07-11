@@ -636,7 +636,7 @@ declare var gitRecord: GitRecord;
 declare var gistRecord: GistRecord;
 declare var gitRecordFile: string;
 declare var gistRecordFile: string;
-declare var root: HTMLDivElement;
+declare var root: HTMLElement;
 declare var saveInterval: number;
 declare var toastQueue: Array<HTMLElement>;
 declare var toast: (string) => void;

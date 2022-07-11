@@ -79,7 +79,7 @@ async function gitHubInclude($loginPage) {
           let $content = tag.get('#github');
           if ($content) $content.remove();
           $content = content(profile);
-          $page.append($content);
+          $page.body = $content;
           $content.addEventListener('click', handleClick);
         });
         break;
@@ -108,7 +108,9 @@ async function gitHubInclude($loginPage) {
 
     $content.addEventListener('click', handleClick);
 
-    if ($loginPage) $loginPage.hide();
+    if ($loginPage) {
+      $loginPage.hide();
+    }
   }
 
   async function loadProfile(onload) {

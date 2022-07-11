@@ -120,6 +120,7 @@ export default function RepoInclude(owner, repoName) {
 
         $page.onhide = function () {
           helpers.hideAd(hideAd);
+          actionStack.pop();
           $page.removeEventListener('click', handleClick);
           actionStack.clearFromMark();
           actionStack.remove('repo');
@@ -298,57 +299,53 @@ export default function RepoInclude(owner, repoName) {
         break;
     }
 
-    function file() {
-      dialogs.loader.create(name, strings.loading + '...');
-      const ext = helpers.extname(name);
-      const mime = mimeType.lookup(ext);
-      const type = /image/i.test(mime) ? 'blob' : null;
-      repo
-        .getBlob(sha, 'blob')
-        .then(async (res) => {
-          let data = res.data;
-          if (!type) {
-            if (data instanceof Blob) {
-              try {
-                if (data.text) data = await data.text();
-                else data = await helpers.blob2text(data);
-              } catch (error) {
-                console.error(error);
-                dialogs.alert(strings.error, strings['unable to open file']);
-              }
-            }
-            const record = gitRecord.add({
-              sha,
-              data,
-              name,
-              branch,
-              repo: repoName,
-              path: path.slice(1).join('/'),
-              owner,
-            });
+    async function file() {
+      try {
+        helpers.showTitleLoader();
+        const ext = helpers.extname(name);
+        const mime = mimeType.lookup(ext);
+        const type = /image/i.test(mime) ? 'image' : null;
+        const blob = await repo.getBlob(sha, 'blob');
+        let data = blob.data;
 
-            hideAd = true;
-            editorManager.addNewFile(name, {
-              type: 'git',
-              record,
-              text: data,
-              isUnsaved: false,
-            });
+        if (type === 'image') {
+          dialogs.box(name, `<img src='${URL.createObjectURL(data)}'>`);
+          return;
+        }
 
-            $page.hide();
-            window.freeze = false;
-            actionStack.pop();
-            actionStack.pop();
-            window.freeze = true;
-          } else if (type === 'blob') {
-            dialogs.box(name, `<img src='${URL.createObjectURL(data)}'>`);
-          } else {
-            alert(strings.error.toUpperCase(), strings['file not supported']);
+        if (data instanceof Blob) {
+          try {
+            if (data.text) data = await data.text();
+            else data = await helpers.blob2text(data);
+          } catch (error) {
+            console.error(error);
+            dialogs.alert(strings.error, strings['unable to open file']);
           }
-        })
-        .finally(() => {
-          dialogs.loader.destroy();
+        }
+        const record = gitRecord.add({
+          sha,
+          data,
+          name,
+          branch,
+          repo: repoName,
+          path: path.slice(1).join('/'),
+          owner,
         });
+
+        hideAd = true;
+        editorManager.addNewFile(name, {
+          type: 'git',
+          record,
+          text: data,
+          isUnsaved: false,
+        });
+
+        $page.hide();
+      } catch (err) {
+        error(err);
+      } finally {
+        helpers.removeTitleLoader();
+      }
     }
   }
 
