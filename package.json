@@ -29,10 +29,10 @@
       "cordova-plugin-whitelist": {},
       "cordova-plugin-iap": {},
       "cordova-plugin-sftp": {},
-      "cordova-plugin-system": {},
       "cordova-plugin-sdcard": {},
       "cordova-plugin-server": {},
-      "cordova-plugin-ftp": {}
+      "cordova-plugin-ftp": {},
+      "cordova-plugin-system": {}
     },
     "platforms": [
       "android"

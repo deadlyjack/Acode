@@ -55,14 +55,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-system": {
-    "source": {
-      "type": "local",
-      "path": "D:\\Github\\deadlyjack\\acode_1.5\\node_modules\\cordova-plugin-system"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-sdcard": {
     "source": {
       "type": "local",
@@ -91,6 +83,14 @@
     "source": {
       "type": "local",
       "path": "C:\\Users\\delle\\acode_1.5.5\\node_modules\\cordova-plugin-ftp"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-system": {
+    "source": {
+      "type": "local",
+      "path": "C:\\Users\\delle\\acode_1.5.5\\node_modules\\cordova-plugin-system"
     },
     "is_top_level": true,
     "variables": {}
