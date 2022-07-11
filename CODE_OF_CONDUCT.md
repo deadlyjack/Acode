@@ -76,7 +76,7 @@ the consequences for any action they deem in violation of this Code of Conduct:
 Any professional or manipulative findings like easedroppng hackers, maleware bots, or faulty A.I. that breaks code for attacks against citizens cut-off for those programs and users are rendered fictitious businesses spammers using meta-trans-users causing confusion and corruption problems recirculating systems. Without help fixing these misconducts are responsible with talkback in any encryptions Acode intelligence blocking them from entry to another account. Issues and comments are welcome in the community. 
 
 **Consequence**: A private, written warning from community leaders, providing
-clarity around the nature of the violation and an explanation of why the0
+clarity around the nature of the violation and an explanation of why the
 behavior was inappropriate. A public apology may be requested.
 
 ### 2. Warning
