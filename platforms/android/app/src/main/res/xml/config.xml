@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget android-versionCode="196" id="com.foxdebug.acode" version="1.6.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <feature name="Clipboard">
+        <param name="android-package" value="com.verso.cordova.clipboard.Clipboard" />
+    </feature>
+    <feature name="BuildInfo">
+        <param name="android-package" value="org.apache.cordova.buildinfo.BuildInfo" />
+    </feature>
+    <feature name="Device">
+        <param name="android-package" value="org.apache.cordova.device.Device" />
+    </feature>
+    <feature name="File">
+        <param name="android-package" value="org.apache.cordova.file.FileUtils" />
+        <param name="onload" value="true" />
+    </feature>
+    <allow-navigation href="cdvfile:*" />
+    <feature name="Ftp">
+        <param name="android-package" value="com.foxdebug.ftp.Ftp" />
+    </feature>
+    <feature name="Iap">
+        <param name="android-package" value="com.foxdebug.iap.Iap" />
+    </feature>
+    <feature name="SDcard">
+        <param name="android-package" value="com.foxdebug.sdcard.SDcard" />
+    </feature>
+    <feature name="Sftp">
+        <param name="android-package" value="com.foxdebug.sftp.Sftp" />
+    </feature>
+    <feature name="System">
+        <param name="android-package" value="com.foxdebug.system.System" />
+    </feature>
+    <feature name="Whitelist">
+        <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
+        <param name="onload" value="true" />
+    </feature>
+    <feature name="Server">
+        <param name="android-package" value="com.foxdebug.server.Server" />
+    </feature>
+    <name>Acode</name>
+    <description>
+        Light weight code editor and web IDE for android.
+    </description>
+    <author email="ajit@foxdebug.com" href="https://foxdebug.com">
+       Foxdebug
+    </author>
+    <content src="index.html" />
+    <access launch-external="yes" origin="*" />
+    <allow-navigation href="https://*/*" />
+    <allow-navigation href="http://*/*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/colors.xml" />
+    <resource-file src="res/network_security_config.xml" target="/app/src/main/res/xml/network_security_config.xml" />
+    <allow-intent href="market:*" />
+    <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+        <application android:networkSecurityConfig="@xml/network_security_config" />
+        <application android:hardwareAccelerated="true" />
+        <application android:requestLegacyExternalStorage="true" />
+    </edit-config>
+    <config-file parent="./application/activity" target="AndroidManifest.xml">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <action android:name="android.intent.action.EDIT" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.LAUNCHER" />
+            <data android:mimeType="text/*" />
+            <data android:mimeType="xml/*" />
+        </intent-filter>
+    </config-file>
+    <config-file parent="/manifest" target="AndroidManifest.xml">
+        <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
+        <uses-permission android:name="android.permission.VIBRATE" />
+    </config-file>
+    <icon background="@color/ic_launcher_background" density="mdpi" foreground="res/icon/android/mipmap-mdpi/ic_launcher_foreground.png" />
+    <icon background="@color/ic_launcher_background" density="hdpi" foreground="res/icon/android/mipmap-hdpi/ic_launcher_foreground.png" />
+    <icon background="@color/ic_launcher_background" density="xhdpi" foreground="res/icon/android/mipmap-xhdpi/ic_launcher_foreground.png" />
+    <icon background="@color/ic_launcher_background" density="xxhdpi" foreground="res/icon/android/mipmap-xxhdpi/ic_launcher_foreground.png" />
+    <icon background="@color/ic_launcher_background" density="xxxhdpi" foreground="res/icon/android/mipmap-xxxhdpi/ic_launcher_foreground.png" />
+    <hook src="hooks/add-input-type.js" type="before_prepare" />
+    <hook src="hooks/post-process.js" type="before_prepare" />
+    <hook src="hooks/move-files.js" type="before_prepare" />
+    <preference name="loglevel" value="DEBUG" />
+    <preference name="fullscreen" value="false" />
+    <preference name="SplashScreen" value="none" />
+    <preference name="ShowTitle" value="true" />
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="BackgroundColor" value="0xFF313131" />
+    <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+    <preference name="android-minSdkVersion" value="22" />
+    <preference name="android-targetSdkVersion" value="30" />
+    <preference name="AndroidLaunchMode" value="singleTask" />
+    <preference name="prerendered-icon" value="false" />
+    <preference name="androidxEnabled" value="true" />
+</widget>
