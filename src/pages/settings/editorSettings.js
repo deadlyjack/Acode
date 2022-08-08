@@ -216,7 +216,7 @@ export default function editorSettings() {
 
       case 'openFileListPos':
         dialogs
-          .select(this.text, ['sidebar', 'header'], {
+          .select(this.text, [strings.sidebar, strings.header], {
             default: values.openFileListPos,
           })
           .then((res) => {
@@ -230,7 +230,7 @@ export default function editorSettings() {
 
       case 'editorFont':
         dialogs
-          .select(this.text, ['fira-code', 'default'], {
+          .select(this.text, ['fira-code', strings['default font']], {
             default: values.editorFont,
           })
           .then((res) => {

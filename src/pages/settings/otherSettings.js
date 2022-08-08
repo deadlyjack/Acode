@@ -156,7 +156,7 @@ export default function otherSettings() {
 
       case 'previewMode':
         dialogs
-          .select(this.text, ['browser', 'inapp'], {
+          .select(this.text, [strings.browser, strings.inapp], {
             default: values.previewMode,
           })
           .then((res) => {

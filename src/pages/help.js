@@ -22,7 +22,7 @@ export default function help() {
   const settingsOptions = [
     {
       key: 'feedback',
-      text: 'Feedback',
+      text: strings.feedback,
     },
     {
       key: 'help',
@@ -30,7 +30,7 @@ export default function help() {
     },
     {
       key: 'faqs',
-      text: 'FAQs',
+      text: strings.faqs,
     },
   ];
 

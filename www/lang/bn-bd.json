@@ -238,5 +238,11 @@
   "update": "আপডেট করুন",
   "uninstall": "আনইনস্টল করুন",
   "download acode pro": "Acode pro ডাউনলোড করুন",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "faqs": "FAQs",
+  "feedback": "Feedback",
+  "header": "Header",
+  "sidebar": "Sidebar",
+  "inapp": "Inapp",
+  "browser": "Browser"
 }

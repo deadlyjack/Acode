@@ -238,5 +238,11 @@
   "update": "Zaktualizuj",
   "uninstall": "Odinstaluj",
   "download acode pro": "Pobierz Acode Pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "faqs": "FAQs",
+  "feedback": "Feedback",
+  "header": "Header",
+  "sidebar": "Sidebar",
+  "inapp": "Inapp",
+  "browser": "Browser"
 }
