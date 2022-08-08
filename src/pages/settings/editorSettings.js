@@ -230,7 +230,10 @@ export default function editorSettings() {
 
       case 'editorFont':
         dialogs
-          .select(this.text, ['fira-code', strings['default font']], {
+          .select(this.text, [
+            'fira-code',
+            ['default', strings['default font']],
+          ], {
             default: values.editorFont,
           })
           .then((res) => {
