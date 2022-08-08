@@ -216,7 +216,10 @@ export default function editorSettings() {
 
       case 'openFileListPos':
         dialogs
-          .select(this.text, [strings.sidebar, strings.header], {
+          .select(this.text, [
+            ['sidebar', strings.sidebar],
+            ['header', strings.header],
+          ], {
             default: values.openFileListPos,
           })
           .then((res) => {
