@@ -245,5 +245,6 @@
   "header": "Header",
   "sidebar": "Sidebar",
   "inapp": "Inapp",
-  "browser": "Browser"
+  "browser": "Browser",
+  "default font": "Default"
 }
