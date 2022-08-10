@@ -6,7 +6,6 @@
   "app theme": "Тема",
   "autocorrect": "Дозволити автовиправлення?",
   "autosave": "Автозберігання",
-  "beautify on save": "Причепурити під час зберігання",
   "cancel": "Скасувати",
   "change language": "Змінити мову",
   "choose color": "Обрати колір",
@@ -29,7 +28,6 @@
   "empty folder message": "Порожня тека",
   "enter line number": "Уведіть номер рядка",
   "error": "Помилка",
-  "except": "Виняток",
   "failed": "Не вдалося",
   "file already exists": "Файл уже існує",
   "file already exists force": "Файл уже існує. Перезаписати?",
@@ -238,5 +236,11 @@
   "update": "Оновити",
   "uninstall": "Видалити",
   "download acode pro": "Завантажити Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

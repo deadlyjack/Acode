@@ -6,7 +6,6 @@
   "app theme": "Motyw aplikacji",
   "autocorrect": "Aktywować autokorektę?",
   "autosave": "Autozapis",
-  "beautify on save": "Upiększ przy zapisie",
   "cancel": "Anuluj",
   "change language": "Zmień język",
   "choose color": "Wybierz kolor",
@@ -29,7 +28,6 @@
   "empty folder message": "Pusty folder",
   "enter line number": "Wprowadź numer wiersza",
   "error": "Błąd",
-  "except": "Wyjątki",
   "failed": "Niepowodzenie",
   "file already exists": "Plik już istnieje",
   "file already exists force": "Plik istnieje. Nadpisać go?",
@@ -238,5 +236,11 @@
   "update": "Zaktualizuj",
   "uninstall": "Odinstaluj",
   "download acode pro": "Pobierz Acode Pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

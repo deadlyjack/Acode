@@ -60,7 +60,7 @@ export default {
     action: 'rename',
   },
   run: {
-    description: 'Preview HTML and MarkDownOpen previous file tab',
+    description: 'Run current file',
     key: 'F5',
     readOnly: false,
     action: 'run',
@@ -545,5 +545,17 @@ export default {
     description: 'Change language mode',
     key: 'Ctrl-M',
     readOnly: false,
+  },
+  increaseFontSize: {
+    description: 'Increase font size',
+    bindKey: 'Ctrl-+',
+  },
+  decreaseFontSize: {
+    description: 'Decrease font size',
+    bindKey: 'Ctrl+-',
+  },
+  resetFontSize: {
+    description: 'Reset font size',
+    bindKey: 'Ctrl+0|Ctrl-Numpad0',
   },
 };

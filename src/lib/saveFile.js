@@ -199,10 +199,9 @@ async function saveFile(file, isSaveAs = false) {
     return filename;
   }
 
-  function beautifyFile(name) {
-    const ext = helpers.extname(name || file.filename);
-    const beautify = appSettings.value.beautify;
-    if (beautify[0] !== '*' && beautify.indexOf(ext) < 0) {
+  function beautifyFile() {
+    const { formatOnSave } = appSettings.value;
+    if (formatOnSave) {
       editorManager.activeFile.markChanged = false;
       acode.exec('format');
     }

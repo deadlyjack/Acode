@@ -6,7 +6,6 @@
   "app theme": "Uygulama Teması",
   "autocorrect": "Otomatik Düzelt",
   "autosave": "Otomatik Kaydet",
-  "beautify on save": "Kaydettiğinde Güzelleştir",
   "cancel": "İptal",
   "change language": "Dili Değiştir",
   "choose color": "Renk Seç",
@@ -29,7 +28,6 @@
   "empty folder message": "Boş Klasör",
   "enter line number": "Satır numarasını girin",
   "error": "Hata",
-  "except": "istisna",
   "failed": "Başarısız oldu",
   "file already exists": "Dosya zaten var",
   "file already exists force": "Dosya zaten var. Üzerine yazılsın mı?",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

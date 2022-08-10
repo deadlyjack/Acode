@@ -6,7 +6,6 @@
   "app theme": "App Theme",
   "autocorrect": "အလိုအေလ်ာက္အမွားစစ္မည္လား?",
   "autosave": "အလိုအေလ်ာက္သိမ္းဆည္းမည္။",
-  "beautify on save": "ဖိုင္သိမ္းလွ်င္လွေအာင္လုပ္မွာလား?",
   "cancel": "ပယ္ဖ်က္မည္",
   "change language": "ဘာသာစကားေျပာင္းမည္",
   "choose color": "အေရာင္ေ႐ြးပါ",
@@ -29,7 +28,6 @@
   "empty folder message": "Folder မရွိပါ",
   "enter line number": "လိုင္းနံပါတ္ထည့္ပါ",
   "error": "error",
-  "except": "except",
   "failed": "မေအာင္ျမင္ပါ။ထပ္ႀကိဳးစားပါ။",
   "file already exists": "File ရွိၿပီးသားျဖစ္ပါသည္။",
   "file already exists force": "File ရွိၿပီးသားျဖစ္ပါသည္။File ကိုထပ္ေရးမည္လား။",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

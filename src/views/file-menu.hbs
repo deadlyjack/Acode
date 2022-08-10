@@ -48,33 +48,34 @@
   <span class="icon subdirectory_arrow_left"></span>
 </li>
 <hr>
+{{^file_read_only}}
 <li action="insert-color">
   <span class="text">{{insert color}}</span>
   <span class="icon color_lenspalette"></span>
 </li>
 <hr>
+{{#copy_text}}
 <li action="cut">
   <div class="text">
     <span>{{cut}}</span>
   </div>
 </li>
-<li action="copy">
-  <div class="text">
-    <span>{{copy}}</span>
-  </div>
-</li>
+{{/copy_text}}
 <li action="paste">
   <div class="text">
     <span>{{paste}}</span>
   </div>
 </li>
+{{/file_read_only}}
+{{#copy_text}}
+<li action="copy">
+  <div class="text">
+    <span>{{copy}}</span>
+  </div>
+</li>
+{{/copy_text}}
 <li action="select-all">
   <div class="text">
     <span>{{select all}}</span>
-  </div>
-</li>
-<li action="select-word">
-  <div class="text">
-    <span>{{select word}}</span>
   </div>
 </li>

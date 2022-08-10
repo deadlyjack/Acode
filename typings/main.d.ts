@@ -30,6 +30,7 @@ interface Settings {
   fileBrowser: fileBrowserSettings;
   maxFileSize: number;
   filesNotAllowed: string[];
+  formatter: Map<string, string>;
   search: searchSettings;
   lang: string;
   fontSize: string;
@@ -39,7 +40,7 @@ interface Settings {
   softTab: boolean;
   tabSize: number;
   linenumbers: boolean;
-  beautify: Array<string>;
+  formatOnSave: boolean;
   linting: boolean;
   previewMode: 'browser' | 'in app' | 'none';
   showSpaces: boolean;
@@ -53,7 +54,6 @@ interface Settings {
   floatingButton: boolean;
   liveAutoCompletion: boolean;
   showPrintMargin: boolean;
-  cursorControllerSize: 'none' | 'small' | 'large';
   scrollbarSize: number;
   confirmOnExit: boolean;
   customTheme: Map<string, string>;
@@ -67,7 +67,10 @@ interface Settings {
   keyboardMode: 'NO_SUGGESTIONS' | 'NO_SUGGESTIONS_AGGRESSIVE' | 'NORMAL';
   showAd: boolean;
   disableCache: boolean;
-  hideTearDropTimeOut: number;
+  diagonalScrolling: boolean;
+  reverseScrolling: boolean;
+  teardropTimeout: number;
+  teardropSize: 20 | 40 | 60;
 }
 
 interface AppSettings {
@@ -127,7 +130,7 @@ interface fileOptions {
   uri: string;
 }
 
-interface Fold{
+interface Fold {
   range: AceAjax.Range;
   ranges: Array<Fold>;
   placeholder: string;
@@ -570,14 +573,14 @@ interface KeyBinding {
   action: string;
 }
 
-interface PluginAuthor{
+interface PluginAuthor {
   name: string;
   email: string;
   website?: string;
   github: string;
 }
 
-interface PluginJson{
+interface PluginJson {
   id: string;
   name: string;
   main: string;

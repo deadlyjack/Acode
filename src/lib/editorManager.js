@@ -1,17 +1,12 @@
-import mustache from 'mustache';
-import contextMenuHTML from '../views/context-menu.hbs';
 import list from '../components/collapsableList';
-import clipboardAction from './clipboard';
 import tag from 'html-tag-js';
 import tile from '../components/tile';
 import dialogs from '../components/dialogs';
 import helpers from './utils/helpers';
-import textControl from './handlers/selection';
 import constants from './constants';
 import openFolder from './openFolder';
 import Url from './utils/Url';
 import path from './utils/Path';
-import configEditor from './aceConfig';
 import ScrollBar from '../components/scrollbar/scrollbar';
 import fsOperation from './fileSystem/fsOperation';
 import Commands from './ace/commands';
@@ -38,7 +33,6 @@ async function EditorManager($sidebar, $header, $body) {
   let preventScrollbarV = false;
   let preventScrollbarH = false;
   let scrollBarVisiblityCount = 0;
-  let cursorControllerSize = appSettings.value.cursorControllerSize;
   let timeoutQuicktoolToggler;
   let timeoutHeaderToggler;
   const events = {
@@ -60,14 +54,6 @@ async function EditorManager($sidebar, $header, $body) {
    * @type {AceAjax.Editor}
    */
   const editor = ace.edit($container);
-  const readOnlyContent = mustache.render(contextMenuHTML, {
-    ...strings,
-    readOnly: true,
-  });
-  const fullContent = () => mustache.render(contextMenuHTML, {
-    ...strings,
-    readOnly: false,
-  });
   const scrollbarSize = appSettings.value.scrollbarSize;
   const $vScrollbar = ScrollBar({
     width: scrollbarSize,
@@ -82,60 +68,6 @@ async function EditorManager($sidebar, $header, $body) {
     parent: $body,
     direction: 'bottom',
   });
-  const controls = {
-    start: tag('span', {
-      className: 'cursor-control start ' + cursorControllerSize,
-    }),
-    end: tag('span', {
-      className: 'cursor-control end ' + cursorControllerSize,
-    }),
-    menu: tag('div', {
-      className: 'clipboard-contextmneu',
-      get innerHTML() {
-        return fullContent();
-      }
-    }),
-    color: tag('span', {
-      className: 'icon color',
-      attr: {
-        action: 'color',
-      },
-    }),
-    vScrollbar: $vScrollbar,
-    hScrollbar: $hScrollbar,
-    get fullContent() {
-      return fullContent();
-    },
-    readOnlyContent,
-    get size() {
-      return cursorControllerSize;
-    },
-    set size(s) {
-      cursorControllerSize = s;
-
-      const sizes = ['large', 'small', 'none'];
-      this.start.classList.remove(...sizes);
-      this.end.classList.remove(...sizes);
-      this.start.classList.add(s);
-      this.end.classList.add(s);
-    },
-    update: () => { },
-    checkForColor: function () {
-      const copyTxt = editor.getCopyText();
-      const readOnly = editor.getReadOnly();
-
-      if (this.color.isConnected && readOnly) {
-        this.color.remove();
-      } else {
-        if (copyTxt) this.color.style.color = copyTxt;
-
-        if (readOnly) this.color.classList.add('disabled');
-        else this.color.classList.remove('disabled');
-
-        if (!this.color.isConnected) controls.menu.appendChild(this.color);
-      }
-    },
-  };
   /**@type {Manager}*/
   const manager = {
     editor,
@@ -147,7 +79,6 @@ async function EditorManager($sidebar, $header, $body) {
     hasUnsavedFiles,
     files: [],
     removeFile,
-    controls,
     setSubText,
     moveOpenFileList,
     sidebar: $sidebar,
@@ -178,36 +109,17 @@ async function EditorManager($sidebar, $header, $body) {
     }
   };
 
-  configEditor(editor);
   $container.classList.add(appSettings.value.editorFont);
   moveOpenFileList();
   $body.appendChild($container);
   await setupEditor();
-  textControl(editor, $container);
-  controls.menu.ontouchstart = function (e) {
-    preventDefault(e);
-    this.touchStarted = true;
-  };
 
-  controls.menu.ontouchcancel = function (e) {
-    preventDefault(e);
-    this.touchStarted = false;
-  };
-
-  controls.menu.ontouchend = function (e) {
-    preventDefault(e);
-    if (this.touchStarted) {
-      this.touchStarted = false;
-      const action = e.target.getAttribute('action');
-      clipboardAction(action);
-    }
-  };
-
-  $hScrollbar.onshow = $vScrollbar.onshow = updateFloatingButton.bind(
-    {},
-    false,
-  );
+  $hScrollbar.onshow = $vScrollbar.onshow = updateFloatingButton.bind({}, false);
   $hScrollbar.onhide = $vScrollbar.onhide = updateFloatingButton.bind({}, true);
+
+  $body.addEventListener('touchstart', () => {
+    editor.renderer.textarea.value = '';
+  });
 
   window.addEventListener('resize', () => {
     if (innerHeight > lastHeight) {
@@ -282,20 +194,16 @@ async function EditorManager($sidebar, $header, $body) {
 
   appSettings.on('update:openFileListPos', function (value) {
     moveOpenFileList();
-    controls.vScrollbar.resize();
+    $vScrollbar.resize();
   });
 
   appSettings.on('update:showPrintMargin', function (value) {
     editorManager.editor.setOption('showPrintMargin', value);
   });
 
-  appSettings.on('update:cursorControllerSize', function (value) {
-    controls.size = value;
-  });
-
   appSettings.on('update:scrollbarSize', function (value) {
-    controls.vScrollbar.size = value;
-    controls.hScrollbar.size = value;
+    $vScrollbar.size = value;
+    $hScrollbar.size = value;
   });
 
   appSettings.on('update:liveAutoCompletion', function (value) {
@@ -323,12 +231,6 @@ async function EditorManager($sidebar, $header, $body) {
     editor.container.style.lineHeight = value;
   });
 
-  function preventDefault(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-  }
-
   /**
    * Callback function
    * @param {Number} value
@@ -336,7 +238,7 @@ async function EditorManager($sidebar, $header, $body) {
   function onscrollV(value) {
     preventScrollbarV = true;
     const session = editor.getSession();
-    const editorHeight = getEditorHeight();
+    const editorHeight = helpers.getEditorHeight(editor);
     const scroll = editorHeight * value;
 
     session.setScrollTop(scroll);
@@ -353,7 +255,7 @@ async function EditorManager($sidebar, $header, $body) {
   function onscrollH(value) {
     preventScrollbarH = true;
     const session = editor.getSession();
-    const editorWidth = getEditorWidth();
+    const editorWidth = helpers.getEditorWidth(editor);
     const scroll = editorWidth * value;
 
     session.setScrollLeft(scroll);
@@ -370,11 +272,12 @@ async function EditorManager($sidebar, $header, $body) {
   function onscrollleft(render = true) {
     if (preventScrollbarH) return;
     const session = editor.getSession();
-    const editorWidth = getEditorWidth();
+    const editorWidth = helpers.getEditorWidth(editor);
     const factor = (session.getScrollLeft() / editorWidth).toFixed(2);
 
     $hScrollbar.value = factor;
     if (render) $hScrollbar.render();
+    editor._emit('scroll', 'horizontal');
   }
 
   /**
@@ -384,32 +287,12 @@ async function EditorManager($sidebar, $header, $body) {
   function onscrolltop(render = true) {
     if (preventScrollbarV) return;
     const session = editor.getSession();
-    const editorHeight = getEditorHeight();
+    const editorHeight = helpers.getEditorHeight(editor);
     const factor = (session.getScrollTop() / editorHeight).toFixed(2);
 
     $vScrollbar.value = factor;
     if (render) $vScrollbar.render();
-  }
-
-  /**
-   * @returns {number}
-   */
-  function getEditorHeight() {
-    const renderer = editor.renderer;
-    const session = editor.getSession();
-    const offset = (renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5;
-    const editorHeight =
-      session.getScreenLength() * renderer.lineHeight - offset;
-    return editorHeight;
-  }
-
-  function getEditorWidth() {
-    const renderer = editor.renderer;
-    const session = editor.getSession();
-    const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
-    const editorWidth =
-      session.getScreenWidth() * renderer.characterWidth - offset;
-    return editorWidth + appSettings.value.leftMargin;
+    editor._emit('scroll', 'verticle');
   }
 
   function updateFloatingButton(show = false) {
@@ -510,7 +393,6 @@ async function EditorManager($sidebar, $header, $body) {
       deletedFile: options.deletedFile,
       mode: options.mode,
       markChanged: true,
-      controls: false,
       session: ace.createEditSession(text),
       name: filename,
       type: options.type || 'regular',
@@ -788,12 +670,19 @@ async function EditorManager($sidebar, $header, $body) {
       editor.resize(true);
     }, 0);
 
-    file.session.on('changeScrollTop', onscrolltop);
-    if (!appSettings.value.textWrap) {
-      file.session.on('changeScrollLeft', onscrollleft);
-    }
+    // do not move to setupSession because setupSession is called multiple times
+    // for e.g. on rename. so moving it to setupSession will cause multiple event
+    // listeners to be added
+    const { session } = file;
+    session.on('changeScrollTop', onscrolltop);
+    session.on('changeScrollLeft', onscrollleft);
+    session.on('changeFold', onfold);
 
     return file;
+  }
+
+  function onfold(e) {
+    editor._emit('fold', e);
   }
 
   /**
@@ -864,7 +753,6 @@ async function EditorManager($sidebar, $header, $body) {
 
         editor.setSession(file.session);
         if (manager.state === 'focus') editor.focus();
-        setTimeout(controls.update, 100);
 
         $header.text = file.filename;
         setSubText(file);
@@ -888,24 +776,20 @@ async function EditorManager($sidebar, $header, $body) {
 
   async function setupEditor() {
     const Emmet = ace.require('ace/ext/emmet');
-    const { CommandManager } = ace.require('ace/commands/command_manager');
-    const { KeyBinding } = ace.require('ace/keyboard/keybinding');
     const settings = appSettings.value;
     const commands = await Commands();
 
-    addTouchListeners($container, editor);
-
+    addTouchListeners(editor);
     Emmet.setCore(window.emmet);
-    editor.commands = new CommandManager('win', commands);
-    editor.keyBinding = new KeyBinding(editor);
-    editor.setKeyboardHandler(
-      editor.getKeyboardHandler(),
-    );
+    commands.forEach((command) => {
+      editor.commands.addCommand(command);
+    });
+    editor.setFontSize(settings.fontSize);
+    editor.setHighlightSelectedWord(true);
+    editor.container.style.lineHeight = settings.lineHeight;
     editor.textInput.onContextMenu = (e) => {
       e.preventDefault();
     };
-    editor.setFontSize(settings.fontSize);
-    editor.setHighlightSelectedWord(true);
 
     editor.setOptions({
       animatedScroll: false,
@@ -923,8 +807,6 @@ async function EditorManager($sidebar, $header, $body) {
     if (!appSettings.value.textWrap) {
       editor.renderer.setScrollMargin(0, 0, 0, settings.leftMargin);
     }
-
-    editor.container.style.lineHeight = settings.lineHeight || 2;
 
     if (!appSettings.value.linting && appSettings.value.linenumbers) {
       editor.renderer.setMargin(0, 0, -16, 0);
@@ -968,10 +850,8 @@ async function EditorManager($sidebar, $header, $body) {
         });
       }
 
-      session.setOptions({
-        tabSize: settings.tabSize,
-        useSoftTabs: settings.softTab,
-      });
+      session.setTabSize(settings.tabSize);
+      session.setUseSoftTabs(settings.softTab);
       file.setMode(mode);
     }
     file.session.setUseWrapMode(settings.textWrap);
@@ -1175,13 +1055,14 @@ async function EditorManager($sidebar, $header, $body) {
         }
       }
 
+      const { session, assocTile } = file;
       file.removeCacheFile();
-      file.session.off('changeScrollTop', onscrolltop);
-      if (!appSettings.value.textWrap)
-        file.session.off('changeScrollLeft', onscrollleft);
+      session.off('changeScrollTop', onscrolltop);
+      session.off('changeScrollLeft', onscrollleft);
+      session.off('changeFold', onfold);
+      session.destroy();
+      assocTile.remove();
 
-      file.assocTile.remove();
-      file.session.destroy();
       delete file.session;
       delete file.assocTile;
       manager.onupdate('remove-file');

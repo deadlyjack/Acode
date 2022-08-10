@@ -6,7 +6,6 @@
   "app theme": "Тэма праграмы",
   "autocorrect": "Уключыць аўтазамену?",
   "autosave": "аўтазахаванне",
-  "beautify on save": "Выкарыстоўваць пашырэнні пры захаванні",
   "cancel": "скасаваць",
   "change language": "Змяніць мову",
   "choose color": "Абраць колер",
@@ -29,7 +28,6 @@
   "empty folder message": "Пусты каталог",
   "enter line number": "Увядзіце нумар радка",
   "error": "памылка",
-  "except": "выключэнне",
   "failed": "памылка",
   "file already exists": "Файл ужо існуе",
   "file already exists force": "Файл ужо існуе. Перазапісаць?",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

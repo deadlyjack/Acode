@@ -4,7 +4,7 @@ import constants from './constants';
 export default {
   beforeRender() {
     //animation
-    if (!appSettings.value.animation) app.classList.add('no-animation');
+    appSettings.applyAnimationSetting();
 
     //full-screen
     if (appSettings.value.fullscreen) acode.exec('enable-fullscreen');
@@ -14,13 +14,23 @@ export default {
       root.classList.add('disable-floating-button');
 
     //setup vibration
+    let $target;
     app.addEventListener('touchstart', function (e) {
-      const el = e.target;
+      $target = e.target;
+    });
 
-      if (el instanceof HTMLElement && el.hasAttribute('vibrate')) {
-        if (appSettings.value.vibrateOnTap)
+    app.addEventListener('touchmove', function (e) {
+      $target = null;
+    });
+
+    app.addEventListener('touchend', function (e) {
+      if (e.target === $target) {
+        if ($target.hasAttribute('vibrate') && appSettings.value.vibrateOnTap) {
           navigator.vibrate(constants.VIBRATION_TIME);
+        }
       }
+
+      $target = null;
     });
 
     //setup autosave
@@ -38,6 +48,8 @@ export default {
   },
   afterRender() {
     //quick-tools
-    if (appSettings.value.quickTools) quickTools.actions('enable-quick-tools');
+    if (appSettings.value.quickTools) {
+      quickTools.actions('enable-quick-tools');
+    }
   },
 };

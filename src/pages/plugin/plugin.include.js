@@ -9,6 +9,7 @@ import Url from '../../lib/utils/Url';
 import installPlugin from '../../lib/installPlugin';
 import fsOperation from '../../lib/fileSystem/fsOperation';
 import tag from 'html-tag-js';
+import constants from '../../lib/constants';
 
 export default async function PluginInclude(json, installed = false, onInstall, onUninstall) {
   const $page = Page('Plugin');
@@ -144,9 +145,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
         });
     }
     if (action === 'buy') {
-      system.openInBrowser(
-        'https://play.google.com/store/apps/details?id=com.foxdebug.acode'
-      )
+      system.openInBrowser(constants.PAID_VERSION)
     }
   }
 

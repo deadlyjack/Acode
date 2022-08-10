@@ -31,8 +31,8 @@ export default function otherSettings() {
   const settingsOptions = [
     {
       key: 'animation',
-      text: strings.animation.capitalize(),
-      checkbox: values.animation,
+      text: strings.animation,
+      subText: values.animation,
     },
     {
       key: 'language',
@@ -60,7 +60,7 @@ export default function otherSettings() {
     },
     {
       key: 'console',
-      text: strings.console.capitalize(),
+      text: strings.console,
       subText: values.console,
     },
     {
@@ -87,16 +87,13 @@ export default function otherSettings() {
       key: 'remember-folders',
       text: strings['remember opened folders'],
       checkbox: values.rememberFolders,
-    }
+    },
+    {
+      key: 'floatingButton',
+      text: strings['floating button'],
+      checkbox: values.floatingButton,
+    },
   ];
-
-  // if (IS_FREE_VERSION) {
-  //   settingsOptions.push({
-  //     key: 'showad',
-  //     text: strings['show ads'],
-  //     checkbox: values.showAd,
-  //   });
-  // }
 
   gen.listItems($settingsList, settingsOptions, changeSetting);
 
@@ -108,11 +105,20 @@ export default function otherSettings() {
     }
     switch (this.key) {
       case 'animation':
-        appSettings.update({
-          animation: !values.animation,
-        });
-        app.classList.toggle('no-animation');
-        this.value = values.animation;
+        dialogs
+          .select(this.text, [
+            [true, 'True'],
+            [false, 'False'],
+            ['system', 'System'],
+          ], {
+            default: values.animation,
+          })
+          .then((value) => {
+            appSettings.update({
+              animation: value,
+            });
+            this.changeSubText(values.animation);
+          })
         break;
 
       case 'language':
@@ -280,6 +286,14 @@ export default function otherSettings() {
           delete localStorage.folders;
         }
         appSettings.update();
+        break;
+
+      case 'floatingButton':
+        appSettings.update({
+          floatingButton: !values.floatingButton,
+        });
+        root.classList.toggle('hide-floating-button');
+        this.value = values.floatingButton;
         break;
 
       default:

@@ -155,14 +155,6 @@ export default async function Commands() {
       readOnly: true,
     },
     {
-      name: 'centerselection',
-      description: 'Center selection',
-      exec(editor) {
-        editor.centerSelection();
-      },
-      readOnly: true,
-    },
-    {
       name: 'gotoline',
       description: 'Go to line...',
       exec() {
@@ -205,7 +197,6 @@ export default async function Commands() {
           editor.session.remove(range);
         }
         editor.clearSelection();
-        editorManager.controls.update();
       },
       scrollIntoView: 'cursor',
       multiSelectAction: 'forEach',
@@ -216,7 +207,6 @@ export default async function Commands() {
       exec() {
         clipboard.paste((text) => {
           editorManager.editor.$handlePaste(text);
-          editorManager.controls.update();
         });
       },
       scrollIntoView: 'cursor',
@@ -224,14 +214,14 @@ export default async function Commands() {
     {
       name: 'replace',
       description: 'Replace',
-      exec(editor) {
+      exec() {
         acode.exec('replace');
       },
     },
     {
       name: 'openCommandPallete',
       description: 'Open command pallete',
-      exec(editor) {
+      exec() {
         acode.exec('open-command');
       },
       readOnly: true,
@@ -243,6 +233,29 @@ export default async function Commands() {
         acode.exec('syntax');
       },
       readOnly: true,
+    },
+    {
+      name: 'increaseFontSize',
+      description: 'Increase font size',
+      exec: function (editor) {
+        var size = parseInt(editor.getFontSize(), 10) || 12;
+        editor.setFontSize(size + 1);
+      },
+    },
+    {
+      name: 'decreaseFontSize',
+      description: 'Decrease font size',
+      exec: function (editor) {
+        var size = parseInt(editor.getFontSize(), 10) || 12;
+        editor.setFontSize(Math.max(size - 1 || 1));
+      },
+    },
+    {
+      name: 'resetFontSize',
+      description: 'Reset font size',
+      exec: function (editor) {
+        editor.setFontSize(12);
+      },
     },
   ];
 

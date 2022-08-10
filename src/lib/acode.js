@@ -8,10 +8,13 @@ export default class Acode {
   #pluginUnmount = {};
   #formatter = [{
     id: 'default',
+    name: 'Default',
     exts: ['*'],
     format: async () => {
       const { beautify } = ace.require('ace/ext/beautify')
+      const cursorPos = editorManager.editor.getCursorPosition();
       beautify(editorManager.editor.session);
+      editorManager.editor.gotoLine(cursorPos.row + 1, cursorPos.column);
     }
   }];
 
@@ -65,13 +68,24 @@ export default class Acode {
   }
   async format() {
     const file = editorManager.activeFile;
-    const ext = helpers.extname(file.name);
-    const formatter = this.#formatter.find((f) => f.exts.includes(ext) || f.exts.includes('*'));
+    const { getModeForPath } = ace.require('ace/ext/modelist');
+    const { name } = getModeForPath(file.name);
+    const formatterId = appSettings.value.formatter[name];
+    const formatter = this.#formatter.find(({ id }) => id === formatterId);
+
     if (formatter) {
       await formatter.format();
     }
   }
   fsOperation(file) {
     return fsOperation(file);
+  }
+
+  get formatters() {
+    return this.#formatter.map(({ id, name, exts }) => ({
+      id,
+      name: name || id,
+      exts,
+    }));
   }
 }

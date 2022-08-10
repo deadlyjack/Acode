@@ -8,6 +8,7 @@ version 1.6.0
 ☞ Updated Ace editor.
 ☞ Added horizontal padding.
 ☞ Changed syntax highlighting is saved.
+☞ Fixed many keyboard bugs.
 ☞ Various fixes.
 
 version 1.5.5

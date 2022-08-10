@@ -6,7 +6,6 @@
   "app theme": "Téma aplikace",
   "autocorrect": "Povolit automatické opravy?",
   "autosave": "automatické ukládání",
-  "beautify on save": "Zkrášlit při ukládání",
   "cancel": "zrušit",
   "change language": "Změnit jazyk (Change language)",
   "choose color": "Vybrat barvu",
@@ -29,7 +28,6 @@
   "empty folder message": "Prázdná složka",
   "enter line number": "Zadej číslo řádku",
   "error": "chyba",
-  "except": "kromě",
   "failed": "selhalo",
   "file already exists": "Soubor již existuje",
   "file already exists force": "Soubor již existuje. Přepsat?",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

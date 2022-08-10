@@ -55,14 +55,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-sdcard": {
-    "source": {
-      "type": "local",
-      "path": "D:\\Github\\deadlyjack\\acode_1.5\\node_modules\\cordova-plugin-sdcard"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-file": {
     "source": {
       "type": "registry",
@@ -87,12 +79,30 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-system": {
+  "cordova-plugin-sdcard": {
     "source": {
       "type": "local",
-      "path": "C:\\Users\\delle\\acode_1.5.5\\node_modules\\cordova-plugin-system"
+      "path": "D:\\Github\\deadlyjack\\acode\\node_modules\\cordova-plugin-sdcard"
     },
     "is_top_level": true,
     "variables": {}
+  },
+  "cordova-plugin-system": {
+    "source": {
+      "type": "local",
+      "path": "D:\\Github\\deadlyjack\\acode\\node_modules\\cordova-plugin-system"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "admob-plus-cordova": {
+    "source": {
+      "type": "registry",
+      "id": "admob-plus-cordova"
+    },
+    "is_top_level": true,
+    "variables": {
+      "APP_ID_ANDROID": "ca-app-pub-5911839694379275~4255791238"
+    }
   }
 }

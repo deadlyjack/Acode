@@ -1,0 +1,5 @@
+{
+  "extends": "@tsconfig/node10/tsconfig.json",
+  "compilerOptions": {},
+  "include": ["*.ts"]
+}

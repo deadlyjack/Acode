@@ -6,7 +6,6 @@
   "app theme": "앱 테마",
   "autocorrect": "자동 완성 활성화",
   "autosave": "자동 저장",
-  "beautify on save": "파일 확장자",
   "cancel": "취소",
   "change language": "언어 변경",
   "choose color": "생상 선택",
@@ -29,7 +28,6 @@
   "empty folder message": "빈 폴더",
   "enter line number": "라인 번호",
   "error": "오류",
-  "except": "제외",
   "failed": "실패",
   "file already exists": "파일이 이미 존재 합니다.",
   "file already exists force": "파일이 이미 존재 합니다. 덮어쓰시겠습니까?",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

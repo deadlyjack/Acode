@@ -3,7 +3,7 @@ import Commands from '../lib/ace/commands';
 import helpers from '../lib/utils/helpers';
 import inputhints from './inputhints';
 
-export async function commandPallete() {
+export default async function commandPallete() {
   const recentlyUsedCommands = RecentlyUsedCommands();
   const commands = await Commands();
   const $input = tag('input', {

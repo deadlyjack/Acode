@@ -6,7 +6,6 @@
   "app theme": "应用主题",
   "autocorrect": "启用自动校正?",
   "autosave": "自动保存",
-  "beautify on save": "保存时格式化代码文本",
   "cancel": "取消",
   "change language": "更改语言",
   "choose color": "选择颜色",
@@ -29,7 +28,6 @@
   "empty folder message": "空文件夹",
   "enter line number": "输入行号",
   "error": "错误",
-  "except": "这些格式除外",
   "failed": "失败",
   "file already exists": "文件已存在",
   "file already exists force": "文件已存在. 是否覆盖?",
@@ -239,5 +237,11 @@
   "update": "更新",
   "uninstall": "卸载",
   "download acode pro": "下载 Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

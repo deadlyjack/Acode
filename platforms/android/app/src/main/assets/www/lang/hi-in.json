@@ -6,7 +6,6 @@
   "app theme": "एप्लीकेशन का थीम",
   "autocorrect": "स्वत: सुधार सक्षम करें?",
   "autosave": "स्वरक्षण",
-  "beautify on save": "सेव करने से पहले ब्यूटीफाई करे",
   "cancel": "रद्द करें",
   "change language": "भाषा बदलें",
   "choose color": "रंग चुनें",
@@ -29,7 +28,6 @@
   "empty folder message": "खाली फ़ोल्डर",
   "enter line number": "लाइन नंबर दर्ज करें",
   "error": "एरर",
-  "except": "सिवाय",
   "failed": "असफल",
   "file already exists": "फ़ाइल पहले से ही मौजूद है",
   "file already exists force": "फ़ाइल पहले से ही मौजूद है। ओवरराइट करें?",
@@ -239,5 +237,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

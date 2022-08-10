@@ -5,7 +5,7 @@ import tag from 'html-tag-js';
  *
  * @param {Object} options
  * @param {HTMLElement} [options.parent]
- * @param {"top"|"left"|"right"|"bottom"} [options.direction = "right"]
+ * @param {"top"|"left"|"right"|"bottom"} [options.placement = "right"]
  * @param {Number} [options.width]
  * @param {function():void} [options.onscroll]
  * @param {function():void} [options.onscrollend]
@@ -15,10 +15,11 @@ export default function ScrollBar(options) {
   if (!options || !options.parent) {
     throw new Error('ScrollBar.js: Parent element required.');
   }
-  options.direction = options.direction || 'right';
+
+  const { placement = 'right' } = options;
 
   const $cursor = tag('span', {
-    className: 'cursor',
+    className: 'scroll-cursor',
     style: {
       top: 0,
       left: 0,
@@ -32,29 +33,28 @@ export default function ScrollBar(options) {
     children: [$cursor, $thumb],
   });
   const $scrollbar = tag('div', {
-    className: 'scrollbar-container ' + (options.direction || 'right'),
+    className: `scrollbar-container ${placement}`,
     child: $container,
   });
   const config = {
     passive: false,
   };
   const TIMEOUT = 2000;
-  const isVertical =
-    options.direction === 'right' || options.direction === 'left';
+  const isVertical = placement === 'right' || placement === 'left';
   const observer = new MutationObserver(observerCallback);
-  let scroll = 0,
-    touchStartValue = {
-      x: 0,
-      y: 0,
-    },
-    scrollbarSize = 20,
-    height,
-    width,
-    rect,
-    scrollbarTimeoutHide,
-    scrollbarTimeoutRemove,
-    onshow,
-    onhide;
+  let scroll = 0;
+  let touchStartValue = {
+    x: 0,
+    y: 0,
+  };
+  let scrollbarSize = 20;
+  let height;
+  let width;
+  let rect;
+  let scrollbarTimeoutHide;
+  let scrollbarTimeoutRemove;
+  let onshow;
+  let onhide;
 
   if (options.width) scrollbarSize = options.width;
 

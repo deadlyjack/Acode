@@ -40,7 +40,7 @@ async function run(
 
   let isLoading = false;
   let filename, pathName, extension;
-  let port = constants.PORT;
+  let port = appSettings.value.previewPort;
   let EXECUTING_SCRIPT = uuid + '_script.js';
   const MIMETYPE_HTML = mimeType.lookup('html');
   const CONSOLE_SCRIPT = uuid + '_console.js';

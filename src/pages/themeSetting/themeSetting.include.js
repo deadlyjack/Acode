@@ -175,9 +175,6 @@ export default function () {
   function onSelectAppTheme(res, type) {
     const theme = constants.appThemeList[res];
     if (!theme) return;
-
-    const link =
-      'https://play.google.com/store/apps/details?id=com.foxdebug.acode';
     if (!theme.isFree && IS_FREE_VERSION) {
       dialogs
         .box(
@@ -186,7 +183,7 @@ export default function () {
           'Please support this project by buying the paid version.',
         )
         .onhide(() => {
-          system.openInBrowser(link);
+          system.openInBrowser(constants.PAID_VERSION);
         });
       return;
     }

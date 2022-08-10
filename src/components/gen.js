@@ -79,7 +79,7 @@ function listItems(settingsList, settingsOptions, changeSetting) {
   for (let setting of settingsOptions) {
     const $text = tag('span', {
       className: 'text',
-      textContent: setting.text,
+      textContent: `${setting.text}`.capitalize(0),
     });
     const $container = tag('div', {
       className: 'container',
@@ -104,7 +104,7 @@ function listItems(settingsList, settingsOptions, changeSetting) {
     if (setting.subText) {
       $subText = tag('small', {
         className: 'value',
-        textContent: setting.subText || '',
+        textContent: `${setting.subText || ''}`.capitalize(0),
       });
       $container.appendChild($subText);
     } else if (setting.checkbox !== undefined) {

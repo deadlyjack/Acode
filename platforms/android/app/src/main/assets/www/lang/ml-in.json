@@ -6,7 +6,6 @@
   "app theme": "ആപ്പ് പതിപാദം",
   "autocorrect": "ഓട്ടോമാറ്റിക് തിരുത്തൽ പ്രവർത്തനക്ഷമമാക്കുക?",
   "autosave": "ഓട്ടോമാറ്റിക് സൂക്ഷിക്കൽ",
-  "beautify on save": "സംരക്ഷിക്കുമ്പോൾ മനോഹരമാക്കുക",
   "cancel": "റദ്ദാക്കുക",
   "change language": "ഭാഷ മാറ്റുക",
   "choose color": "നിറം തിരഞ്ഞെടുക്കുക",
@@ -29,7 +28,6 @@
   "empty folder message": "ശൂന്യമായ ഫോൾഡർ",
   "enter line number": "ലൈൻ നമ്പർ നൽകുക",
   "error": "പിശക്",
-  "except": "ഒഴികെ",
   "failed": "പരാജയപ്പെട്ടു",
   "file already exists": "ഫയൽ ഇതിനകം നിലവിലുണ്ട്",
   "file already exists force": "ഫയൽ ഇതിനകം നിലവിലുണ്ട്. തിരുത്തിയെഴുതണോ?",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

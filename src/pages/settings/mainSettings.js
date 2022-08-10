@@ -7,7 +7,8 @@ import constants from '../../lib/constants';
 import openFile from '../../lib/openFile';
 import backupRestore from './backup-restore';
 import themeSetting from '../themeSetting/themeSetting';
-import otherSettings from './otherSettings';
+import otherSettings from './appSettings';
+import defaultFormatter from './defaultFormatter';
 import $_socialLinks from '../../views/social-links.hbs';
 import rateBox from '../../components/dialogboxes/rateBox';
 import Donate from '../donate/donate';
@@ -74,29 +75,45 @@ export default function settingsMain() {
     },
     {
       index: 4,
+      key: 'formatter',
+      text: strings.formatter,
+      icon: 'stars',
+    },
+    {
+      index: 5,
       key: 'theme',
       text: strings.theme,
       icon: 'color_lenspalette',
     },
     {
-      index: 5,
+      index: 6,
       key: 'backup-restore',
       text: strings.backup.capitalize() + '/' + strings.restore.capitalize(),
       icon: 'cached',
     },
     {
-      index: 6,
+      index: 7,
       key: 'rateapp',
       text: strings['rate acode'],
       icon: 'googleplay'
     },
     {
-      index: 7,
+      index: 8,
       key: 'plugins',
       text: strings['plugins'],
       icon: 'extension',
     }
   ];
+
+  if (IS_FREE_VERSION) {
+    settingsOptions.push({
+      index: 9,
+      key: 'removeads',
+      text: strings['remove ads'],
+      icon: 'cancel',
+    });
+  }
+
   gen.listItems($settingsList, settingsOptions, changeSetting);
 
   function changeSetting() {
@@ -136,6 +153,14 @@ export default function settingsMain() {
 
       case 'plugins':
         plugins();
+        break;
+
+      case 'formatter':
+        defaultFormatter();
+        break;
+
+      case 'removeads':
+        system.openInBrowser(constants.PAID_VERSION);
         break;
 
       default:

@@ -46,12 +46,19 @@ import checkPluginsUpdate from './checkPluginsUpdate';
 import plugins from '../pages/plugins/plugins';
 import Acode from './acode';
 import createPluginServer from './createPluginServer';
+import ajax from '@deadlyjack/ajax';
 
-loadPolyFill.apply(window);
 window.onload = Main;
 
 async function Main() {
   const oldPreventDefault = TouchEvent.prototype.preventDefault;
+
+  ajax.response = (xhr) => {
+    return xhr.response;
+  };
+
+  loadPolyFill.apply(window);
+
   TouchEvent.prototype.preventDefault = function () {
     if (this.cancelable) {
       oldPreventDefault.bind(this)();
@@ -68,6 +75,7 @@ async function Main() {
       ad.show();
     }
   });
+
   document.addEventListener('deviceready', ondeviceready);
 }
 
@@ -83,8 +91,7 @@ async function ondeviceready() {
   let lang = 'en-us';
 
   iap.startConnection();
-  window.root = tag(window.root);
-  window.app = tag(document.body);
+  window.app = document.body;
   window.addedFolder = [];
   window.fileClipBoard = null;
   window.restoreTheme = restoreTheme;
@@ -136,17 +143,20 @@ async function ondeviceready() {
   window.acode = new Acode();
 
   system.requestPermission('android.permission.WRITE_EXTERNAL_STORAGE');
-  localStorage.versionCode = BuildInfo.versionCode;
+
+  const { versionCode } = BuildInfo;
+
+  if (parseInt(localStorage.versionCode) !== versionCode) {
+    system.clearCache();
+  }
+
+  localStorage.versionCode = versionCode;
   document.body.setAttribute('data-version', 'v' + BuildInfo.version);
   acode.setLoadingMessage('Loading settings...');
 
   window.resolveLocalFileSystemURL = function (url, ...args) {
     oldRURL.call(this, Url.safe(url), ...args);
   };
-
-  if (navigator.app && typeof navigator.app.clearCache === 'function') {
-    navigator.app.clearCache();
-  }
 
   setTimeout(() => {
     if (document.body.classList.contains('loading'))
@@ -270,6 +280,7 @@ async function loadApp() {
           file_read_only: !file.editable,
           file_info: !!file.uri,
           file_eol: file.eol,
+          copy_text: !!editorManager.editor.getCopyText(),
         }),
       );
     },
@@ -316,7 +327,6 @@ async function loadApp() {
   });
   const folders = helpers.parseJSON(localStorage.folders);
   const files = helpers.parseJSON(localStorage.files) || [];
-  let registeredKey = '';
   //#endregion
 
   acode.$quickToolToggler = $quickToolToggler;
@@ -383,8 +393,6 @@ async function loadApp() {
   $footer.addEventListener('touchstart', footerTouchStart);
   $footer.addEventListener('contextmenu', footerOnContextMenu);
   document.addEventListener('backbutton', actionStack.pop);
-  document.addEventListener('keydown', handleMainKeyDown);
-  document.addEventListener('keyup', handleMainKeyUp);
   document.addEventListener('menubutton', $sidebar.toggle);
   navigator.app.overrideButton('menubutton', true);
   system.setIntentHandler(intentHandler, intentHandler.onError);
@@ -437,42 +445,6 @@ async function loadApp() {
       console.error(error);
       toast('Plugins loading failed!');
     });
-
-  /**
-   *
-   * @param {KeyboardEvent} e
-   */
-  function handleMainKeyDown(e) {
-    registeredKey = helpers.getCombination(e);
-  }
-
-  /**
-   *
-   * @param {KeyboardEvent} e
-   */
-  function handleMainKeyUp(e) {
-    let key = helpers.getCombination(e);
-    if (registeredKey && key !== registeredKey) return;
-
-    const { editor } = editorManager;
-
-    const isFocused = editor.textInput.getElement() === document.activeElement;
-    if (key === 'escape' && (!actionStack.length || isFocused))
-      e.preventDefault();
-    if (actionStack.length || isFocused) return;
-    for (let name in keyBindings) {
-      const obj = keyBindings[name];
-      const binding = (obj.key || '').toLowerCase();
-      if (
-        binding === key &&
-        constants.COMMANDS.includes(name) &&
-        'action' in obj
-      )
-        acode.exec(obj.action);
-    }
-
-    registeredKey = null;
-  }
 
   /**
    *

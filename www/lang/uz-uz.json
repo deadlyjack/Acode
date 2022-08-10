@@ -6,7 +6,6 @@
   "app theme": "Ilova mavzusi",
   "autocorrect": "Avtomatik tuzatish yoqilsinmi?",
   "autosave": "Avtomatik saqlash",
-  "beautify on save": "Chiroyli holatda saqlash",
   "cancel": "bekor qilish",
   "change language": "Tilni o'zgartirish",
   "choose color": "Rangni tanlang",
@@ -29,7 +28,6 @@
   "empty folder message": "Ushbu papkada hech narsa yo'q",
   "enter line number": "Qator raqamini kiriting",
   "error": "xatolik",
-  "except": "istisno",
   "failed": "bajarilmadi",
   "file already exists": "Ushbu fayl oldindan mavjud",
   "file already exists force": "Ushbu fayl oldindan mavjud. Baribir yozilsinmi?",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

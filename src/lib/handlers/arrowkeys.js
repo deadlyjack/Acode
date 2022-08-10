@@ -6,70 +6,56 @@ const keyMapping = {
 };
 
 export default {
-  interval: null,
-  onTouchStart: function (e, footer) {
+  timeout: null,
+  time: 300,
+  /**
+   * @param {TouchEvent} e 
+   * @param {*} footer 
+   * @returns 
+   */
+  onTouchStart(e, footer) {
     /**
      * @type {HTMLElement}
      */
     const el = e.target;
     const action = el.getAttribute('action');
+    const { which } = el.dataset;
 
-    if (!action || ['left', 'right', 'up', 'down'].indexOf(action) < 0) return;
+    if (!['left', 'right', 'up', 'down'].includes(action)) return;
 
-    const editor = editorManager.editor;
+    const { editor } = editorManager;
     const $textarea = editor.textInput.getElement();
-    const shiftKey =
-      footer.querySelector('#shift-key').getAttribute('data-state') === 'on'
-        ? true
-        : false;
-    const controls = editorManager.controls;
+    const shiftKey = footer.get('#shift-key').dataset.state === 'on';
+    const dispatchEventWithTimeout = () => {
+      if (this.time > 50) {
+        this.time -= 10;
+      }
 
-    document.ontouchend = document.ontouchcancel = (e) => {
-      this.onTouchEnd();
-      document.ontouchend =
-        document.ontouchcancel =
-        document.ontouchstart =
-        null;
+      this.dispatchKey({ which }, shiftKey, $textarea);
+      this.timeout = setTimeout(dispatchEventWithTimeout, this.time);
     };
 
-    if (!shiftKey && controls.callBeforeContextMenu)
-      controls.callBeforeContextMenu();
+    document.ontouchend = this.onTouchEnd.bind(this);
+    document.ontouchcancel = this.onTouchEnd.bind(this);
 
-    switch (action) {
-      case 'left':
-        this.dispatchKey(37, shiftKey, $textarea);
-        break;
-
-      case 'right':
-        this.dispatchKey(39, shiftKey, $textarea);
-        break;
-
-      case 'up':
-        this.dispatchKey(38, shiftKey, $textarea);
-        break;
-
-      case 'down':
-        this.dispatchKey(40, shiftKey, $textarea);
-        break;
-    }
-
+    dispatchEventWithTimeout();
     e.preventDefault();
+    e.stopImmediatePropagation();
   },
-  onTouchEnd: function () {
-    if (this.interval) clearInterval(this.interval);
+  onTouchEnd() {
+    this.time = 300;
+    clearTimeout(this.timeout);
+    document.ontouchend = null;
+    document.ontouchcancel = null;
+    document.ontouchstart = null;
   },
-  dispatchKey: function (key, shiftKey, $textarea) {
-    dispatchEvent();
-    this.interval = setInterval(dispatchEvent, 100);
+  dispatchKey({ which }, shiftKey, $textarea) {
+    const keyevent = window.createKeyboardEvent('keydown', {
+      key: keyMapping[which],
+      keyCode: which,
+      shiftKey,
+    });
 
-    function dispatchEvent() {
-      const keyevent = window.createKeyboardEvent('keydown', {
-        key: keyMapping[key],
-        keyCode: key,
-        shiftKey,
-      });
-
-      $textarea.dispatchEvent(keyevent);
-    }
+    $textarea.dispatchEvent(keyevent);
   },
 };

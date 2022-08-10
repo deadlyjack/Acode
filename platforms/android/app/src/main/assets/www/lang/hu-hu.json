@@ -6,7 +6,6 @@
   "app theme": "Alkalmazástéma",
   "autocorrect": "Bekapcsolja az automatikus javítást?",
   "autosave": "automatikus mentés",
-  "beautify on save": "Szépítés mentéskor",
   "cancel": "mégse",
   "change language": "Nyelv váltása",
   "choose color": "Válassz színt",
@@ -29,7 +28,6 @@
   "empty folder message": "Üres mappa",
   "enter line number": "Írja be a sorszámot",
   "error": "hiba",
-  "except": "except",
   "failed": "nem sikerült",
   "file already exists": "A fájl már létezik",
   "file already exists force": "A fájl már létezik. Felülírja?",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

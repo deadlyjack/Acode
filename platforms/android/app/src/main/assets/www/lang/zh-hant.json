@@ -6,7 +6,6 @@
   "app theme": "應用程式主題",
   "autocorrect": "自動校正",
   "autosave": "自動儲存",
-  "beautify on save": "美化儲存",
   "cancel": "取消",
   "change language": "選擇語言",
   "choose color": "選擇顏色",
@@ -29,7 +28,6 @@
   "empty folder message": "空資料夾",
   "enter line number": "輸入行號",
   "error": "錯誤",
-  "except": "除外",
   "failed": "無效",
   "file already exists": "檔案已存在",
   "file already exists force": "檔案已存在，確認覆蓋檔案？",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

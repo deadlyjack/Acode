@@ -6,7 +6,6 @@
   "app theme": "Tema aplikasi",
   "autocorrect": "Aktifkan koreksi otomatis?",
   "autosave": "Penyimpanan otomatis",
-  "beautify on save": "Mempercantik saat menyimpan",
   "cancel": "batal",
   "change language": "Ganti bahasa",
   "choose color": "Pilih warna",
@@ -29,7 +28,6 @@
   "empty folder message": "Folder kosong",
   "enter line number": "Masukkan nomor baris",
   "error": "kesalahan",
-  "except": "kecuali",
   "failed": "gagal",
   "file already exists": "Berkas sudah ada",
   "file already exists force": "Berkas sudah ada. Timpa?",
@@ -240,5 +238,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

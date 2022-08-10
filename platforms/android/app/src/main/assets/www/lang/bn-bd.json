@@ -6,7 +6,6 @@
   "app theme": "অ্যাপ থীম",
   "autocorrect": " অটো কারেক্ট সক্রীয় করুন?",
   "autosave": "অটো সংরক্ষণ",
-  "beautify on save": "সংরক্ষণে সৌন্দর্য্যবৃদ্ধী",
   "cancel": "বাতিল করুন",
   "change language": "ভাষা বদলান",
   "choose color": "কালার পছন্দ করুন",
@@ -29,7 +28,6 @@
   "empty folder message": "ফাঁকা ফোল্ডার এর বার্তা",
   "enter line number": "লাইন নম্বর লিখুন",
   "error": "ত্রুটি",
-  "except": "ব্যতীত",
   "failed": "ব্যার্থ",
   "file already exists": "ফাইলটি বিদ্যমান",
   "file already exists force": "ফাইলটি বিদ্যমান. ওভার রাইট?",
@@ -238,5 +236,11 @@
   "update": "আপডেট করুন",
   "uninstall": "আনইনস্টল করুন",
   "download acode pro": "Acode pro ডাউনলোড করুন",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

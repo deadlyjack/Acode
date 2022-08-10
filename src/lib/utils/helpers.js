@@ -770,5 +770,25 @@ export default {
     if (dir.length) {
       await this.createFileRecursive(newParent, dir);
     }
+  },
+  /**
+   * 
+   * @param {AceAjax.Editor} editor 
+   * @returns 
+   */
+  getEditorHeight(editor) {
+    const renderer = editor.renderer;
+    const session = editor.getSession();
+    const offset = (renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5;
+    const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
+    return editorHeight;
+  },
+
+  getEditorWidth(editor) {
+    const renderer = editor.renderer;
+    const session = editor.getSession();
+    const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
+    const editorWidth = session.getScreenWidth() * renderer.characterWidth - offset;
+    return editorWidth + appSettings.value.leftMargin;
   }
 };

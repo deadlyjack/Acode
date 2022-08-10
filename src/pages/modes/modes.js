@@ -1,4 +1,3 @@
-//#region Imports
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
@@ -7,13 +6,11 @@ import _template from './modes.hbs';
 import _list from './list.hbs';
 import './modes.scss';
 import searchBar from '../../components/searchbar';
-//#endregion
 
 function Modes() {
-  const modelist = ace.require('ace/ext/modelist');
-  const actionStack = window.actionStack;
   return new Promise((resolve, reject) => {
     //#region Declaration
+    const { modes } = ace.require('ace/ext/modelist');
     const $search = tag('i', {
       className: 'icon search',
       attr: {
@@ -22,7 +19,6 @@ function Modes() {
     });
     const $page = Page(strings['syntax highlighting']);
     const $content = tag.parse(_template);
-    const modes = modelist.modes;
     const $list = tag.parse(
       mustache.render(_list, {
         modes,

@@ -4,6 +4,7 @@ import dialogs from '../../components/dialogs';
 import constants from '../../lib/constants';
 import tag from 'html-tag-js';
 import helpers from '../../lib/utils/helpers';
+import scrollSettings from './scrolling';
 
 export default function editorSettings() {
   const $page = Page(strings['editor settings'].capitalize());
@@ -63,9 +64,9 @@ export default function editorSettings() {
       subText: values.lineHeight,
     },
     {
-      key: 'beautify',
-      text: strings['beautify on save'],
-      subText: strings.except + ': ' + values.beautify.join(','),
+      key: 'formatOnSave',
+      text: strings['format on save'],
+      subText: values.formatOnSave ? strings.yes : strings.no,
     },
     {
       key: 'linting',
@@ -88,11 +89,6 @@ export default function editorSettings() {
       subText: values.editorFont,
     },
     {
-      key: 'floatingButton',
-      text: strings['floating button'],
-      checkbox: values.floatingButton,
-    },
-    {
       key: 'quickTools',
       text: strings['quick tools'],
       checkbox: values.quickTools,
@@ -113,15 +109,14 @@ export default function editorSettings() {
       checkbox: values.showPrintMargin,
     },
     {
-      key: 'cursorControllerSize',
+      key: 'teardropSize',
       text: strings['cursor controller size'],
-      subText: values.cursorControllerSize,
+      subText: values.teardropSize,
     },
     {
-      key: 'scrollbarSize',
-      text: strings['scrollbar size'],
-      subText: values.scrollbarSize,
-    },
+      key: 'scrolling',
+      text: strings['scrolling'],
+    }
   ];
 
   gen.listItems($settingsList, settingsOptions, changeSetting);
@@ -201,16 +196,20 @@ export default function editorSettings() {
           });
         break;
 
-      case 'beautify':
+      case 'formatOnSave':
         dialogs
-          .prompt(strings.except + ' (eg. php,py)', values.beautify.join(','))
+          .select(this.text, [
+            [true, strings.yes],
+            [false, strings.no],
+          ], {
+            default: values.formatOnSave,
+          })
           .then((res) => {
-            const files = res.split(',');
-            files.map((file, i) => (files[i] = file.trim().toLowerCase()));
+            this.value = res;
             appSettings.update({
-              beautify: files,
+              formatOnSave: res,
             });
-            this.changeSubText(strings.except + ': ' + res);
+            this.changeSubText(res ? strings.yes : strings.no);
           });
         break;
 
@@ -258,46 +257,29 @@ export default function editorSettings() {
         this.value = values.fullscreen;
         break;
 
-      case 'floatingButton':
-        appSettings.update({
-          floatingButton: !values.floatingButton,
-        });
-        root.classList.toggle('hide-floating-button');
-        this.value = values.floatingButton;
-        break;
-
-      case 'cursorControllerSize':
+      case 'teardropSize':
         dialogs
           .select(
             strings['cursor controller size'],
             [
-              ['none', strings.none],
-              ['small', strings.small],
-              ['large', strings.large],
+              [0, strings.none],
+              [30, strings.small],
+              [60, strings.large],
             ],
             {
-              default: values.cursorControllerSize,
+              default: values.teardropSize,
             },
           )
           .then((res) => {
             appSettings.update({
-              cursorControllerSize: res,
+              teardropSize: res,
             });
             this.value = res;
           });
         break;
 
-      case 'scrollbarSize':
-        dialogs
-          .select(strings['scrollbar size'], [5, 10, 15, 20], {
-            default: values.scrollbarSize,
-          })
-          .then((res) => {
-            appSettings.update({
-              scrollbarSize: res,
-            });
-            this.value = res;
-          });
+      case 'scrolling':
+        scrollSettings();
         break;
 
       default:

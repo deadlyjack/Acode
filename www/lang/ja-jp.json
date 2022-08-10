@@ -6,7 +6,6 @@
   "app theme": "アプリテーマ",
   "autocorrect": "オートコレクトを有効にする",
   "autosave": "オートセーブ",
-  "beautify on save": "保存時に整形",
   "cancel": "キャンセル",
   "change language": "言語変更",
   "choose color": "カラー選択",
@@ -29,7 +28,6 @@
   "empty folder message": "フォルダ名が空です",
   "enter line number": "行数の入力",
   "error": "エラー",
-  "except": "除外",
   "failed": "失敗",
   "file already exists": "ファイルは既に存在します。",
   "file already exists force": "ファイルは既に存在します。上書きしますか？",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

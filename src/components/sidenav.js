@@ -80,7 +80,6 @@ function sidenav($activator, toggler) {
       $el.classList.remove(mode);
       mode = innerWidth > 750 ? 'tab' : 'phone';
       $el.classList.add(mode);
-      editorManager.controls.update();
     }, 300);
   }
 
@@ -161,7 +160,6 @@ function sidenav($activator, toggler) {
       $resizeBar.remove();
       $el.remove();
       editorManager.editor.resize(true);
-      editorManager.controls.update();
     }
   }
 
@@ -383,7 +381,6 @@ function sidenav($activator, toggler) {
     clearTimeout(setWidthTimeout);
     setWidthTimeout = setTimeout(() => {
       editorManager?.editor?.resize(true);
-      editorManager?.controls?.update();
       $resizeBar.style.left = width + 'px';
     }, 300);
   }

@@ -6,7 +6,6 @@
   "app theme": "ਐਪ ਥੀਮ",
   "autocorrect": "ਕੀ ਸਵੈ-ਸੁਧਾਰ ਚਾਲੂ ਕਰਨਾ ਹੈ?",
   "autosave": "ਆਟੋ ਸੇਵ",
-  "beautify on save": "ਸੇਵ 'ਤੇ ਸੁੰਦਰ ਬਣਾਓ",
   "cancel": "ਰੱਦ",
   "change language": "ਭਾਸ਼ਾ ਬਦਲੋ",
   "choose color": "ਰੰਗ ਚੁਣੋ",
@@ -29,7 +28,6 @@
   "empty folder message": "ਖਾਲੀ ਫੋਲਡਰ",
   "enter line number": "ਲਾਈਨ ਨੰਬਰ ਦਰਜ ਕਰੋ",
   "error": "ਗਲਤੀ",
-  "except": "ਨੂੰ ਛੱਡ ਕੇ",
   "failed": "ਅਸਫਲ",
   "file already exists": "ਫ਼ਾਈਲ ਪਹਿਲਾਂ ਹੀ ਮੌਜੂਦ ਹੈ",
   "file already exists force": "ਫ਼ਾਈਲ ਪਹਿਲਾਂ ਹੀ ਮੌਜੂਦ ਹੈ। ਓਵਰਰਾਈਟ ਕਰਨਾ ਹੈ?",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

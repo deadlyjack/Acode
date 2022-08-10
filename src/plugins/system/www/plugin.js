@@ -1,4 +1,7 @@
 module.exports = {
+  clearCache: function (success, fail) {
+    return cordova.exec(success, fail, "System", "clearCache", []);
+  },
   getWebviewInfo: function (onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'get-webkit-info', []);
   },
@@ -90,5 +93,8 @@ module.exports = {
   },
   setInputType: function (type, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'set-input-type', [type]);
+  },
+  getGlobalSetting: function (key, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'System', 'get-global-setting', [key]);
   }
 };

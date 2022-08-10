@@ -16,25 +16,32 @@
 
     <script>
       window._regeneratorRuntime = null;
-      if (!String.prototype.startsWith) {
-        String.prototype.startsWith = function (needle) {
-          return this.indexOf(needle) === 0;
-        };
+      function startsWith(string, needle) {
+        return string.indexOf(needle) === 0;
       }
 
+      // save all touch events added by ace editor so it can be use in src/ade/touchHandler.js
       var __oldAddEventListener = HTMLElement.prototype.addEventListener;
-      HTMLElement.prototype.addEventListener = function(type, listener, useCapture){
-        if(!this.touchListeners){
-          this.touchListeners = {};
-        }
-        if(this.classList.contains('editor-container') && type.startsWith('touch')){
-          if(!this.touchListeners[type]){
-            this.touchListeners[type] = [];
+      HTMLElement.prototype.addEventListener =
+        //
+        function (type, listener, useCapture) {
+          if (!this.touchListeners) {
+            this.touchListeners = {};
           }
-          this.touchListeners[type].push({listener:listener, useCapture:useCapture});
-        }
-        __oldAddEventListener.call(this,type,listener,useCapture);
-      }
+          if (
+            this.classList.contains('editor-container') &&
+            startsWith(type, 'touch')
+          ) {
+            if (!this.touchListeners[type]) {
+              this.touchListeners[type] = [];
+            }
+            this.touchListeners[type].push({
+              listener: listener,
+              useCapture: useCapture,
+            });
+          }
+          __oldAddEventListener.call(this, type, listener, useCapture);
+        };
     </script>
 
     <script src="./js/emmet-core.js"></script>

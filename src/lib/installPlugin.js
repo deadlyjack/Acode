@@ -38,30 +38,24 @@ export default async function installPlugin(plugin, host) {
         url: mainJs,
         method: 'GET',
         responseType: 'arraybuffer',
-        xhr(xhr) {
-          xhr.onprogress = (e) => {
-            progress(plugin.name, e.loaded / e.total);
-          }
+        onprogress(loaded, total) {
+          progress(plugin.name, loaded / total);
         }
       }),
       ajax({
         url: Url.join(host, plugin.icon),
         method: 'GET',
         responseType: 'arraybuffer',
-        xhr(xhr) {
-          xhr.onprogress = (e) => {
-            progress('icon', e.loaded / e.total);
-          }
+        onprogress(loaded, total) {
+          progress('icon', loaded / total);
         }
       }),
       ajax({
         url: Url.join(host, plugin.readme),
         method: 'GET',
         responseType: 'arraybuffer',
-        xhr(xhr) {
-          xhr.onprogress = (e) => {
-            progress('readme', e.loaded / e.total);
-          }
+        onprogress(loaded, total) {
+          progress('readme', loaded / total);
         }
       }),
     );
@@ -108,10 +102,8 @@ export default async function installPlugin(plugin, host) {
                   url: Url.join(rootDir, file),
                   method: 'GET',
                   responseType: 'arraybuffer',
-                  xhr(xhr) {
-                    xhr.onprogress = (e) => {
-                      progress(file, e.loaded / e.total);
-                    }
+                  onprogress(loaded, total) {
+                    progress(file, loaded / total);
                   }
                 }),
               );

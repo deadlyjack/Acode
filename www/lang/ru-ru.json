@@ -6,7 +6,6 @@
   "app theme": "Тема приложения",
   "autocorrect": "Автозамена",
   "autosave": "Автосохранение",
-  "beautify on save": "Использовать Beautify при сохранении",
   "cancel": "Отмена",
   "change language": "Изменить язык",
   "choose color": "Выберите цвет",
@@ -29,7 +28,6 @@
   "empty folder message": "Пустая папка",
   "enter line number": "Введите номер строки",
   "error": "Ошибка",
-  "except": "Кроме",
   "failed": "Неудача",
   "file already exists": "Файл уже существует",
   "file already exists force": "Файл уже существует. Перезаписать?",
@@ -239,5 +237,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

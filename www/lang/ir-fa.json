@@ -6,7 +6,6 @@
   "app theme": "تم برنامه",
   "autocorrect": "فعالسازی اصلاح خودکار؟",
   "autosave": "ذخیره خودکار",
-  "beautify on save": "کد هنگام ذخیره مرتب سازی (زیباسازی)",
   "cancel": "انصراف",
   "change language": "انتخاب زبان",
   "choose color": "انتخاب رنگ",
@@ -29,7 +28,6 @@
   "empty folder message": "پوشه خالی",
   "enter line number": "شماره خط را وارد کنید",
   "error": "خطا",
-  "except": "استثنا",
   "failed": "ناموفق",
   "file already exists": "فایل در حال حاضر موجود میباشد",
   "file already exists force": "فایل در حال حاضر موجود میباشد ، رونویسی کنم؟",
@@ -239,5 +237,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

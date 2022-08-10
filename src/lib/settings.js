@@ -1,3 +1,4 @@
+import constants from './constants';
 import fsOperation from './fileSystem/fsOperation';
 import helpers from './utils/helpers';
 import Url from './utils/Url';
@@ -39,14 +40,16 @@ class Settings {
     };
 
     this.#defaultSettings = {
-      animation: true,
+      animation: 'system',
       appTheme: /free/.test(BuildInfo.packageName) ? 'dark' : 'ocean',
       autosave: 0,
       fileBrowser: {
         showHiddenFiles: false,
         sortByName: true,
       },
+      formatter: {},
       maxFileSize: 12,
+      previewPort: constants.PORT,
       filesNotAllowed: [
         'zip',
         'apk',
@@ -70,14 +73,14 @@ class Settings {
       },
       lang: 'en-us',
       fontSize: '12px',
-      editorTheme: /free/.test(BuildInfo.packageName)
+      editorTheme: IS_FREE_VERSION
         ? 'ace/theme/nord_dark'
         : 'ace/theme/dracula',
       textWrap: true,
       softTab: true,
       tabSize: 2,
       linenumbers: true,
-      beautify: ['*'],
+      formatOnSave: false,
       linting: false,
       autoCorrect: true,
       previewMode: 'inapp',
@@ -92,7 +95,6 @@ class Settings {
       showPrintMargin: false,
       scrollbarSize: 20,
       showSpaces: false,
-      // showAd: true,
       cursorControllerSize: 'small',
       confirmOnExit: true,
       customThemeMode: 'dark',
@@ -102,10 +104,13 @@ class Settings {
       desktopMode: false,
       console: 'legacy',
       keyboardMode: 'NO_SUGGESTIONS',
-      hideTearDropTimeOut: 3000,
       disableCache: false,
       rememberFiles: true,
       rememberFolders: true,
+      diagonalScrolling: false,
+      reverseScrolling: false,
+      teardropTimeout: 3000,
+      teardropSize: 30,
       customTheme: {
         '--primary-color': 'rgb(153,153,255)',
         '--secondary-color': 'rgb(255,255,255)',
@@ -153,9 +158,10 @@ class Settings {
 
     const settings = helpers.parseJSON(await fs.readFile('utf-8'));
     if (settings) {
-      if (!Array.isArray(settings.beautify)) savedSettings.beautify = ['*'];
+      // make sure that all the settings are present
       for (let setting in this.#defaultSettings) {
-        if (!(setting in settings)) {
+        const value = settings[setting];
+        if (value === undefined) {
           settings[setting] = this.#defaultSettings[setting];
         }
 
@@ -202,6 +208,9 @@ class Settings {
 
     for (let key in settings) {
       if (key in this.value) this.value[key] = settings[key];
+      if (key === 'animation') {
+        this.applyAnimationSetting();
+      }
     }
 
     const changedSettings = this.#getChangedKeys();
@@ -288,6 +297,21 @@ class Settings {
       if (value !== this.value[key]) keys.push(key);
     }
     return keys;
+  }
+
+  async applyAnimationSetting() {
+    let value = this.value.animation;
+    if (value === 'system') {
+      value = await new Promise((resolve, reject) => {
+        system.getGlobalSetting("animator_duration_scale", resolve, reject);
+      });
+    }
+
+    if (value) {
+      app.classList.remove('no-animation');
+    } else {
+      app.classList.add('no-animation');
+    }
   }
 }
 

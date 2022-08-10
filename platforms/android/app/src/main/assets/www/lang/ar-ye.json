@@ -7,7 +7,6 @@
   "app theme": "لون التطبيق",
   "autocorrect": "تفعيل التصحيح التلقائي؟",
   "autosave": "حفظ تلقائي",
-  "beautify on save": "تجميل الكود عند الحفظ",
   "cancel": "إلغاء",
   "change language": "تغيير اللغة",
   "choose color": "إختر لون",
@@ -30,7 +29,6 @@
   "empty folder message": "مجلد فارغ",
   "enter line number": "أدخل رقم السطر",
   "error": "خطأ",
-  "except": "تجاوز",
   "failed": "فشل",
   "file already exists": "الملف موجود مسبقاً",
   "file already exists force": "الملف موجود مسبقاً ، إستبدال؟",
@@ -238,5 +236,11 @@
   "update": "Update",
   "uninstall": "Uninstall",
   "download acode pro": "Download Acode pro",
-  "loading plugins": "Loading plugins"
+  "loading plugins": "Loading plugins",
+  "scrolling": "Scrolling",
+  "diagonal scrolling": "Diagonal scrolling",
+  "reverse scrolling": "Reverse Scrolling",
+  "formatter": "Formatter",
+  "format on save": "Format on save",
+  "remove ads": "Remove ads"
 }

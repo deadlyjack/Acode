@@ -3,8 +3,6 @@ import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
 import _template from './about.hbs';
-import rateBox from '../../components/dialogboxes/rateBox';
-import constants from '../../lib/constants';
 import helpers from '../../lib/utils/helpers';
 
 export default function AboutInclude() {
@@ -33,26 +31,8 @@ export default function AboutInclude() {
       mustache.render(_template, {
         ...BuildInfo,
         webview,
-        PERSONAL_EMAIL: constants.PERSONAL_EMAIL,
       }),
     );
-
-    $content.onclick = (e) => {
-      const $el = e.target;
-      if (!($el instanceof HTMLElement)) return;
-      const action = $el.getAttribute('action');
-      if (!action) return;
-
-      e.preventDefault();
-      switch (action) {
-        case 'rate-box':
-          rateBox();
-          break;
-
-        default:
-          break;
-      }
-    };
 
     $page.classList.add('about-us');
     $page.body = $content;

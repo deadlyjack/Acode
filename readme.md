@@ -41,16 +41,7 @@ Run `npm install` to install all dependencies before building the APK.
 ## Develop plugin for Acode
 
 Please see this [repository](https://github.com/deadlyjack/acode-plugin) for documentation.
-## Special thanks to
+
+## Ace editor
 
 - [Ace editor](https://ace.c9.io/)
-- [Autosize](http://www.jacklmoore.com/autosize/)
-- [Apache cordova](https://cordova.apache.org/)
-- [babeljs.io](https://babeljs.io/)
-- [Cordova plugin intent](https://github.com/napolitano/cordova-plugin-intent)
-- [Esprima](https://esprima.org/)
-- [Mustache](https://github.com/janl/mustache.js)
-- [Marked](https://marked.js.org/)
-- [Mime types](https://www.npmjs.com/package/mime-types)
-- [Webpack](https://webpack.js.org/)
-- [Vanilla picker](https://vanilla-picker.js.org/)
