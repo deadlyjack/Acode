@@ -243,10 +243,11 @@
   "formatter": "Formatter",
   "format on save": "Format on save",
   "remove ads": "Remove ads",
-  "scrolling": "Scrolling",
-  "diagonal scrolling": "Diagonal scrolling",
-  "reverse scrolling": "Reverse Scrolling",
-  "formatter": "Formatter",
-  "format on save": "Format on save",
-  "remove ads": "Remove ads"
+  "faqs": "FAQs",
+  "feedback": "Feedback",
+  "header": "Header",
+  "sidebar": "Sidebar",
+  "inapp": "Inapp",
+  "browser": "Browser",
+  "default font": "Default"
 }
