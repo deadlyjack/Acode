@@ -789,6 +789,10 @@ export default {
     const session = editor.getSession();
     const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
     const editorWidth = session.getScreenWidth() * renderer.characterWidth - offset;
-    return editorWidth + appSettings.value.leftMargin;
+    if (appSettings.value.textWrap) {
+      return editorWidth;
+    } else {
+      return editorWidth + appSettings.value.leftMargin;
+    }
   }
 };

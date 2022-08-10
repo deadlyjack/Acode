@@ -66,7 +66,7 @@ async function EditorManager($sidebar, $header, $body) {
     onscroll: onscrollH,
     onscrollend: onscrollHend,
     parent: $body,
-    direction: 'bottom',
+    placement: 'bottom',
   });
   /**@type {Manager}*/
   const manager = {
@@ -242,6 +242,7 @@ async function EditorManager($sidebar, $header, $body) {
     const scroll = editorHeight * value;
 
     session.setScrollTop(scroll);
+    editor._emit('scroll', editor);
   }
 
   function onscrollVend() {
@@ -259,6 +260,7 @@ async function EditorManager($sidebar, $header, $body) {
     const scroll = editorWidth * value;
 
     session.setScrollLeft(scroll);
+    editor._emit('scroll', editor);
   }
 
   function onscrollHend() {

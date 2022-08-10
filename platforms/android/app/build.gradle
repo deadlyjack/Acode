@@ -142,7 +142,7 @@ ext {
 }
 
 // PLUGIN GRADLE EXTENSIONS START
-apply from: "../cordova-plugin-buildinfo/acodefree-BuildInfo.gradle"
+apply from: "../cordova-plugin-buildinfo/acode-BuildInfo.gradle"
 // PLUGIN GRADLE EXTENSIONS END
 
 def hasBuildExtras1 = file('build-extras.gradle').exists()
@@ -347,7 +347,6 @@ dependencies {
 
     // SUB-PROJECT DEPENDENCIES START
     implementation(project(path: ":CordovaLib"))
-    implementation "com.google.android.gms:play-services-ads:20.4.0"
     implementation "commons-net:commons-net:3.8.0"
     implementation "com.android.billingclient:billing:4.0.0"
     implementation "commons-io:commons-io:2.11.0"

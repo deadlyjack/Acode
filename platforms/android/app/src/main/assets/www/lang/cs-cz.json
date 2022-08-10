@@ -242,5 +242,12 @@
   "reverse scrolling": "Reverse Scrolling",
   "formatter": "Formatter",
   "format on save": "Format on save",
-  "remove ads": "Remove ads"
+  "remove ads": "Remove ads",
+  "faqs": "FAQs",
+  "feedback": "Feedback",
+  "header": "Header",
+  "sidebar": "Sidebar",
+  "inapp": "Inapp",
+  "browser": "Browser",
+  "default font": "Default"
 }

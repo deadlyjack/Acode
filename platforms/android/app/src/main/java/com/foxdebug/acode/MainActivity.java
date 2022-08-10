@@ -17,7 +17,7 @@
        under the License.
  */
 
-package com.foxdebug.acodefree;
+package com.foxdebug.acode;
 
 import android.os.Bundle;
 import org.apache.cordova.*;

@@ -126,6 +126,7 @@ export default function addTouchListeners(editor) {
   editor.on('change', onupdate);
   editor.on('fold', onfold);
   editor.on('scroll', onscroll);
+  editor.on('changeSession', onchangesession);
   appSettings.on('update:diagonalScrolling', (value) => {
     diagonalScrolling = value;
   });
@@ -138,6 +139,7 @@ export default function addTouchListeners(editor) {
     $end.dataset.size = value;
     $cursor.dataset.size = value;
   });
+  appSettings.on('update:textWrap', onupdate);
 
   /**
    * Editor container on touch start
@@ -205,8 +207,8 @@ export default function addTouchListeners(editor) {
     lastX = clientX;
     lastY = clientY;
     mode = 'scroll';
-    const [canScrollX, canScrollY] = testScroll(moveX, moveY);
-    if (canScrollX || canScrollY) scroll(moveX, moveY);
+    [moveX, moveY] = testScroll(moveX, moveY);
+    scroll(moveX, moveY);
     clearTimeout(selectionTimeout);
   }
 
@@ -290,6 +292,13 @@ export default function addTouchListeners(editor) {
     );
   }
 
+  /**
+   * BUG: not reliable
+   * Test if scrolling is possible
+   * @param {number} moveX 
+   * @param {number} moveY 
+   * @returns 
+   */
   function testScroll(moveX, moveY) {
     const vDirection = moveY > 0 ? 'down' : 'up';
     const hDirection = moveX > 0 ? 'right' : 'left';
@@ -297,17 +306,18 @@ export default function addTouchListeners(editor) {
     const { getEditorHeight, getEditorWidth } = helpers;
     const { scrollLeft } = editor.renderer.scrollBarH;
     const { scrollTop } = editor.renderer.scrollBarV;
+    const [editorWidth, editorHeight] = [getEditorWidth(editor), getEditorHeight(editor)];
 
     if (
       (vDirection === 'down' && scrollTop <= 0)
-      || (vDirection === 'up' && scrollTop >= getEditorHeight(editor))
+      || (vDirection === 'up' && scrollTop >= editorHeight)
     ) {
       moveY = 0;
     }
 
     if (
       (hDirection === 'right' && scrollLeft <= 0)
-      || (hDirection === 'left' && scrollLeft <= getEditorWidth(editor))
+      || (hDirection === 'left' && scrollLeft >= editorWidth)
     ) {
       moveX = 0;
     }
@@ -363,8 +373,12 @@ export default function addTouchListeners(editor) {
     editor.selection.on('changeCursor', clearCursorMode);
   }
 
+  /**
+   * Remove cursor mode
+   * @returns 
+   */
   function clearCursorMode() {
-    if (!$cursor.isConnected) return;
+    if (!$el.contains($cursor)) return;
     if ($cursor.dataset.immortal === 'true') return;
     $cursor.remove();
     clearTimeout($cursor.dataset.timeout);
@@ -409,11 +423,17 @@ export default function addTouchListeners(editor) {
     if (!$end.isConnected) $el.append($end);
   }
 
+  /**
+   * Remove selection mode
+   * @param {Event} e 
+   * @param {boolean} clearActive 
+   * @returns 
+   */
   function clearSelectionMode(e, clearActive = true) {
     const $els = [$start.dataset.immortal, $end.dataset.immortal];
     if ($els.includes('true')) return;
-    if ($start.isConnected) $start.remove();
-    if ($end.isConnected) $end.remove();
+    if ($el.contains($start)) $start.remove();
+    if ($el.contains($end)) $end.remove();
     if (clearActive) {
       selectionActive = false;
     }
@@ -489,7 +509,7 @@ export default function addTouchListeners(editor) {
   }
 
   function hideMenu(e, clearActive = true) {
-    if (!$menu.isConnected) return;
+    if (!$el.contains($menu)) return;
     $menu.remove();
     editor.selection.off('changeCursor', hideMenu);
     editor.selection.off('changeSelection', hideMenu);
@@ -648,6 +668,18 @@ export default function addTouchListeners(editor) {
   function onupdate() {
     clearCursorMode();
     clearSelectionMode();
+    hideMenu();
+  }
+
+  function onchangesession() {
+    const copyText = editor.session.getTextRange(editor.getSelectionRange());
+    if (!copyText) {
+      menuActive = false;
+      selectionActive = false;
+    } else {
+      selectionActive = true;
+      menuActive = true;
+    }
   }
 
   function onfold() {

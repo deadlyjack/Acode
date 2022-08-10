@@ -91,6 +91,7 @@ async function ondeviceready() {
   let lang = 'en-us';
 
   iap.startConnection();
+  window.root = tag.get('#root');
   window.app = document.body;
   window.addedFolder = [];
   window.fileClipBoard = null;

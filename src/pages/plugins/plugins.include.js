@@ -130,14 +130,14 @@ export default function PluginsInclude(updates) {
     plugins.all = helpers.parseJSON(file) || [];
 
     // To test and develop plugin, update host in file: '/res/network_security_config.xml:11:43'
-    // plugins.all.push({
-    //   name: 'Python local',
-    //   plugin: 'http://192.168.1.33:5500/plugin.json',
-    //   icon: 'http://192.168.1.33:5500/icon.png',
-    //   author: {
-    //     name: 'DeadlyJack',
-    //   }
-    // })
+    plugins.all.push({
+      name: 'Plugin test',
+      plugin: 'http://192.168.0.103:5500/plugin.json',
+      icon: 'http://192.168.0.103:5500/icon.png',
+      author: {
+        name: 'DeadlyJack',
+      }
+    })
 
     if (plugins.installed.length) {
       plugins.installed.forEach((localPlugin) => {

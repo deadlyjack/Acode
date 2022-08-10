@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<manifest android:hardwareAccelerated="true" android:versionCode="197" android:versionName="1.6.0" package="com.foxdebug.acodefree" xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest android:hardwareAccelerated="true" android:versionCode="198" android:versionName="1.6.0" package="com.foxdebug.acode" xmlns:android="http://schemas.android.com/apk/res/android">
     <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:resizeable="true" android:smallScreens="true" android:xlargeScreens="true" />
     <uses-permission android:name="android.permission.INTERNET" />
     <application android:hardwareAccelerated="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:networkSecurityConfig="@xml/network_security_config" android:requestLegacyExternalStorage="true" android:supportsRtl="true">
@@ -20,10 +20,7 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" android:excludeFromRecents="true" android:name="com.google.android.gms.ads.AdActivity" android:noHistory="true" />
-        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-5911839694379275~4255791238" />
-        <meta-data android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT" android:value="true" />
-        <provider android:authorities="com.foxdebug.acodefree.provider" android:exported="false" android:grantUriPermissions="true" android:name="androidx.core.content.FileProvider">
+        <provider android:authorities="com.foxdebug.acode.provider" android:exported="false" android:grantUriPermissions="true" android:name="androidx.core.content.FileProvider">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_provider" />
         </provider>
     </application>

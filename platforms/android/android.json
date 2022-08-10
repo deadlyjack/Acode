@@ -9,7 +9,7 @@
         "parents": {
           "/manifest/application": [
             {
-              "xml": "<application android:networkSecurityConfig=\"@xml/network_security_config\" />",
+              "xml": "<application android:hardwareAccelerated=\"true\" />",
               "count": 3,
               "mode": "merge",
               "id": "config.xml",
@@ -18,12 +18,12 @@
                 "android:icon": "@mipmap/ic_launcher",
                 "android:label": "@string/app_name",
                 "android:networkSecurityConfig": "@xml/network_security_config",
-                "android:supportsRtl": "true",
-                "android:requestLegacyExternalStorage": "true"
+                "android:requestLegacyExternalStorage": "true",
+                "android:supportsRtl": "true"
               }
             },
             {
-              "xml": "<application android:hardwareAccelerated=\"true\" />",
+              "xml": "<application android:requestLegacyExternalStorage=\"true\" />",
               "count": 2,
               "mode": "merge",
               "id": "config.xml",
@@ -32,12 +32,12 @@
                 "android:icon": "@mipmap/ic_launcher",
                 "android:label": "@string/app_name",
                 "android:networkSecurityConfig": "@xml/network_security_config",
-                "android:supportsRtl": "true",
-                "android:requestLegacyExternalStorage": "true"
+                "android:requestLegacyExternalStorage": "true",
+                "android:supportsRtl": "true"
               }
             },
             {
-              "xml": "<application android:requestLegacyExternalStorage=\"true\" />",
+              "xml": "<application android:networkSecurityConfig=\"@xml/network_security_config\" />",
               "count": 1,
               "mode": "merge",
               "id": "config.xml",
@@ -46,6 +46,7 @@
                 "android:icon": "@mipmap/ic_launcher",
                 "android:label": "@string/app_name",
                 "android:networkSecurityConfig": "@xml/network_security_config",
+                "android:requestLegacyExternalStorage": "true",
                 "android:supportsRtl": "true"
               }
             }
@@ -57,7 +58,7 @@
           "./application/activity": [
             {
               "xml": "<intent-filter><action android:name=\"android.intent.action.VIEW\" /><action android:name=\"android.intent.action.EDIT\" /><category android:name=\"android.intent.category.DEFAULT\" /><category android:name=\"android.intent.category.LAUNCHER\" /><data android:mimeType=\"text/*\" /><data android:mimeType=\"xml/*\" /></intent-filter>",
-              "count": 4
+              "count": 23
             },
             {
               "xml": "<intent-filter><action android:name=\"android.intent.action.MAIN\" /></intent-filter>",
@@ -67,28 +68,14 @@
           "/manifest": [
             {
               "xml": "<uses-permission android:name=\"android.permission.WRITE_MEDIA_STORAGE\" />",
-              "count": 4
+              "count": 23
             },
             {
               "xml": "<uses-permission android:name=\"android.permission.VIBRATE\" />",
-              "count": 5
+              "count": 24
             },
             {
               "xml": "<uses-permission android:name=\"com.android.vending.BILLING\" />",
-              "count": 1
-            }
-          ],
-          "/manifest/application": [
-            {
-              "xml": "<activity android:configChanges=\"keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize\" android:excludeFromRecents=\"true\" android:name=\"com.google.android.gms.ads.AdActivity\" android:noHistory=\"true\" />",
-              "count": 1
-            },
-            {
-              "xml": "<meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"ca-app-pub-5911839694379275~4255791238\" />",
-              "count": 1
-            },
-            {
-              "xml": "<meta-data android:name=\"com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT\" android:value=\"true\" />",
               "count": 1
             }
           ],
@@ -109,10 +96,6 @@
       "res/xml/config.xml": {
         "parents": {
           "/*": [
-            {
-              "xml": "<feature name=\"AdMob\"><param name=\"android-package\" value=\"admob.plus.cordova.AdMob\" /></feature>",
-              "count": 1
-            },
             {
               "xml": "<feature name=\"Clipboard\"><param name=\"android-package\" value=\"com.verso.cordova.clipboard.Clipboard\" /></feature>",
               "count": 1
@@ -173,58 +156,45 @@
     }
   },
   "installed_plugins": {
-    "admob-plus-cordova": {
-      "APP_ID_ANDROID": "ca-app-pub-5911839694379275~4255791238",
-      "PLAY_SERVICES_VERSION": "20.4.0",
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
-    },
     "cordova-clipboard": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-buildinfo": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-device": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-file": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-ftp": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-iap": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-sdcard": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-server": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-sftp": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-system": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-vibration": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     },
     "cordova-plugin-whitelist": {
-      "PACKAGE_NAME": "com.foxdebug.acodefree"
+      "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },
   "dependent_plugins": {},
   "modules": [
-    {
-      "id": "admob-plus-cordova.AdMob",
-      "file": "plugins/admob-plus-cordova/www/admob.js",
-      "pluginId": "admob-plus-cordova",
-      "clobbers": [
-        "admob"
-      ]
-    },
     {
       "id": "cordova-clipboard.Clipboard",
       "file": "plugins/cordova-clipboard/www/clipboard.js",
@@ -472,7 +442,6 @@
     }
   ],
   "plugin_metadata": {
-    "admob-plus-cordova": "1.27.0",
     "cordova-clipboard": "1.3.0",
     "cordova-plugin-buildinfo": "4.0.0",
     "cordova-plugin-device": "2.0.3",
