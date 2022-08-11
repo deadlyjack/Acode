@@ -4,3 +4,5 @@ www/js/build
 www/css/build
 package-lock.json
 keystore.jks
+platforms/android/debug-signing.properties
+platforms/android/release-signing.properties

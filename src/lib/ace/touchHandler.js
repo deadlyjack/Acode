@@ -80,6 +80,7 @@ export default function addTouchListeners(editor) {
   const $menu = tag('menu', {
     className: 'cursor-menu',
     onclick(e) {
+      editor.focus();
       const { action } = e.target.dataset;
       if (!action) return;
 
