@@ -474,14 +474,12 @@ export default function addTouchListeners(editor) {
     if ((right + margin) > rectContainer.right) {
       const [x] = relativePosition(left - (right - rectContainer.right) - margin);
       $menu.style.left = `${x}px`;
-      positionMenu($trigger);
     }
 
     // if menu is positioned off screen horizonatally from the left
     if ((left - margin) < rectContainer.left) {
       const [x] = relativePosition(left + (rectContainer.left - left) + margin);
       $menu.style.left = `${x}px`;
-      positionMenu($trigger);
     }
 
     // if menu is positioned off screen vertically from the bottom
@@ -498,7 +496,6 @@ export default function addTouchListeners(editor) {
       const { pageY } = renderer.textToScreenCoordinates(pos);
       const [, y] = relativePosition(null, pageY - lineHeight * 1.8);
       $menu.style.top = `${y}px`;
-      positionMenu($trigger);
     }
   }
 
