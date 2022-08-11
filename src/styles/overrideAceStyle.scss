@@ -16,6 +16,14 @@
   font-family: 'Fira Code' !important;
 }
 
+main .ace_editor {
+  textarea {
+    user-select: none !important;
+    pointer-events: none !important;
+    transform: translate(-100000px, -10000px) !important;
+  }
+}
+
 .ace-container {
   height: 100%;
 }

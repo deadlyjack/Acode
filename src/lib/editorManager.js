@@ -117,10 +117,6 @@ async function EditorManager($sidebar, $header, $body) {
   $hScrollbar.onshow = $vScrollbar.onshow = updateFloatingButton.bind({}, false);
   $hScrollbar.onhide = $vScrollbar.onhide = updateFloatingButton.bind({}, true);
 
-  $body.addEventListener('touchstart', () => {
-    editor.renderer.textarea.value = '';
-  });
-
   window.addEventListener('resize', () => {
     if (innerHeight > lastHeight) {
       editor.blur();
@@ -841,13 +837,11 @@ async function EditorManager($sidebar, $header, $body) {
       if (mode === 'ace/mode/text') {
         editor.setOptions({
           enableBasicAutocompletion: false,
-          enableSnippets: false,
           enableLiveAutocompletion: false,
         });
       } else {
         editor.setOptions({
           enableBasicAutocompletion: true,
-          enableSnippets: true,
           enableLiveAutocompletion: settings.liveAutoCompletion,
         });
       }

@@ -50,9 +50,9 @@
     "> 0.25%, not dead"
   ],
   "devDependencies": {
-    "@babel/cli": "^7.18.9",
-    "@babel/plugin-transform-runtime": "^7.18.9",
-    "@babel/preset-env": "^7.18.9",
+    "@babel/cli": "^7.18.10",
+    "@babel/plugin-transform-runtime": "^7.18.10",
+    "@babel/preset-env": "^7.18.10",
     "@babel/runtime": "^7.18.9",
     "@types/ace": "0.0.48",
     "@types/url-parse": "^1.4.8",
@@ -85,7 +85,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "@babel/core": "^7.18.9",
+    "@babel/core": "^7.18.10",
     "@babel/runtime-corejs3": "^7.18.9",
     "@deadlyjack/ajax": "^1.2.3",
     "@ungap/custom-elements": "^1.1.0",
@@ -100,7 +100,7 @@
     "marked": "^4.0.17",
     "mime-types": "^2.1.35",
     "mustache": "^4.2.0",
-    "sass": "^1.54.0",
+    "sass": "^1.54.4",
     "url-parse": "^1.5.10",
     "utf8": "^3.0.0",
     "vanilla-picker": "^2.11.2",

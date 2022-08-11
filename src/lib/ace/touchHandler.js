@@ -8,6 +8,7 @@ import helpers from "../utils/helpers";
  */
 export default function addTouchListeners(editor) {
   const { renderer, container: $el } = editor;
+  const { scroller } = renderer;
 
   if ($el.touchListeners) {
     Object.keys($el.touchListeners).forEach((key) => {
@@ -78,18 +79,7 @@ export default function addTouchListeners(editor) {
    */
   const $menu = tag('menu', {
     className: 'cursor-menu',
-    ontouchstart(e) {
-      this.moved = false;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    },
-    ontouchmove(e) {
-      this.moved = true;
-    },
-    ontouchend(e) {
-      if (this.moved) return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
+    onclick(e) {
       const { action } = e.target.dataset;
       if (!action) return;
 
@@ -103,7 +93,6 @@ export default function addTouchListeners(editor) {
   });
 
   let scrollTimeout; // timeout to check if scrolling is finished
-  let clickTimeout; // timeout to count as a click
   let selectionTimeout; // timeout for context menu
   let menuActive; // true if menu is active
   let selectionActive; // true if selection is active
@@ -122,11 +111,12 @@ export default function addTouchListeners(editor) {
     passive: false, // allow preventDefault
   };
 
-  renderer.scroller.addEventListener('touchstart', touchStart, config);
+  scroller.addEventListener('touchstart', touchStart, config);
   editor.on('change', onupdate);
   editor.on('fold', onfold);
   editor.on('scroll', onscroll);
   editor.on('changeSession', onchangesession);
+
   appSettings.on('update:diagonalScrolling', (value) => {
     diagonalScrolling = value;
   });
@@ -157,20 +147,17 @@ export default function addTouchListeners(editor) {
     moveX = 0;
     lockX = false;
     lockY = false;
-    mode = 'cursor';
-    ++clickCount;
-
-    clearTimeout(clickTimeout);
+    mode = 'wait';
 
     selectionTimeout = setTimeout(() => {
-      mode = 'selection';
       moveCursorTo(clientX, clientY);
-      selection();
+      select();
+      removeListeners();
     }, timeToSelectText);
 
-    clickTimeout = setTimeout(() => {
+    setTimeout(() => {
       clickCount = 0;
-    }, 300);
+    }, timeToSelectText);
 
     document.addEventListener('touchmove', touchMove, config);
     document.addEventListener('touchend', touchEnd, config);
@@ -219,12 +206,17 @@ export default function addTouchListeners(editor) {
   function touchEnd(e) {
     e.preventDefault();
     removeListeners();
-    clearTimeout(selectionTimeout);
 
     const { clientX, clientY } = e.changedTouches[0];
 
-    if (clickCount === 2) {
-      mode = 'selection';
+    clearTimeout(selectionTimeout);
+
+    if (mode === 'wait') {
+      if (++clickCount >= 2) {
+        mode = 'selection';
+      } else {
+        mode = 'cursor';
+      }
     }
 
     if (mode === 'cursor') {
@@ -240,18 +232,18 @@ export default function addTouchListeners(editor) {
 
     if (mode === 'selection') {
       moveCursorTo(clientX, clientY);
-      selection();
-      clickCount = 0;
+      select();
+      return;
     }
   };
 
-  function selection() {
+  function select() {
     removeListeners();
-    editor.selection.selectWord();
-
-    const copyText = editor.session.getTextRange(editor.getSelectionRange());
-    if (!copyText) return;
-
+    const range = editor.selection.getWordRange();
+    if (!range || range?.isEmpty()) return;
+    editor.blur();
+    editor.selection.setSelectionRange(range);
+    editor.focus();
     selectionMode($end);
 
     if (appSettings.value.vibrateOnTap) {
@@ -349,7 +341,8 @@ export default function addTouchListeners(editor) {
 
   function moveCursorTo(x, y) {
     const pos = renderer.screenToTextCoordinates(x, y);
-    editor.gotoLine(pos.row + 1, pos.column);
+    editor.blur();
+    editor.selection.moveToPosition(pos);
     editor.focus();
   }
 
@@ -395,8 +388,10 @@ export default function addTouchListeners(editor) {
     positionStart();
     if ($trigger) showMenu($trigger);
 
-    editor.selection.on('changeSelection', clearSelectionMode);
-    editor.selection.on('changeCursor', clearSelectionMode);
+    setTimeout(() => {
+      editor.selection.on('changeSelection', clearSelectionMode);
+      editor.selection.on('changeCursor', clearSelectionMode);
+    }, 0);
   }
 
   function positionStart() {
@@ -453,9 +448,9 @@ export default function addTouchListeners(editor) {
     const readOnly = editor.getReadOnly();
     const [x, y] = relativePosition(left, bottom);
     if (readOnly) {
-      menu('read-only');
+      populateMenuItems('read-only');
     } else {
-      menu();
+      populateMenuItems();
     }
 
     $menu.style.left = `${x}px`;
@@ -472,11 +467,8 @@ export default function addTouchListeners(editor) {
     const rectMenu = $menu.getBoundingClientRect();
     const rectContainer = $el.getBoundingClientRect();
     const { left, right, top, bottom, height } = rectMenu;
-    const { size } = $trigger;
     const { lineHeight } = editor.renderer;
     const margin = 10;
-
-    if (!size) return;
 
     // if menu is positioned off screen horizonatally from the right
     if ((right + margin) > rectContainer.right) {
@@ -494,18 +486,20 @@ export default function addTouchListeners(editor) {
 
     // if menu is positioned off screen vertically from the bottom
     if (bottom > rectContainer.bottom) {
-      const [, y] = relativePosition(null, top - (bottom - rectContainer.bottom) - size - lineHeight - height);
+      const range = editor.getSelectionRange();
+      let pos;
+
+      if ($trigger === $start) {
+        pos = range.start;
+      } else {
+        pos = range.end;
+      }
+
+      const { pageY } = renderer.textToScreenCoordinates(pos);
+      const [, y] = relativePosition(null, pageY - lineHeight * 1.8);
       $menu.style.top = `${y}px`;
       positionMenu($trigger);
     }
-
-    // if menu is positioned off screen vertically from the top
-    if (top < rectContainer.top) {
-      const [, y] = relativePosition(null, top + (rectContainer.top - top));
-      $menu.style.top = `${y}px`;
-      positionMenu($trigger);
-    }
-
   }
 
   function hideMenu(e, clearActive = true) {
@@ -693,7 +687,7 @@ export default function addTouchListeners(editor) {
     }
   }
 
-  function menu(mode = 'regular') {
+  function populateMenuItems(mode = 'regular') {
     $menu.innerHTML = '';
 
     const menuItem = (text, action) => tag('span', {

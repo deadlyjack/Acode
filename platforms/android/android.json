@@ -9,7 +9,7 @@
         "parents": {
           "/manifest/application": [
             {
-              "xml": "<application android:hardwareAccelerated=\"true\" />",
+              "xml": "<application android:requestLegacyExternalStorage=\"true\" />",
               "count": 3,
               "mode": "merge",
               "id": "config.xml",
@@ -23,7 +23,7 @@
               }
             },
             {
-              "xml": "<application android:requestLegacyExternalStorage=\"true\" />",
+              "xml": "<application android:networkSecurityConfig=\"@xml/network_security_config\" />",
               "count": 2,
               "mode": "merge",
               "id": "config.xml",
@@ -37,7 +37,7 @@
               }
             },
             {
-              "xml": "<application android:networkSecurityConfig=\"@xml/network_security_config\" />",
+              "xml": "<application android:hardwareAccelerated=\"true\" />",
               "count": 1,
               "mode": "merge",
               "id": "config.xml",
@@ -58,7 +58,7 @@
           "./application/activity": [
             {
               "xml": "<intent-filter><action android:name=\"android.intent.action.VIEW\" /><action android:name=\"android.intent.action.EDIT\" /><category android:name=\"android.intent.category.DEFAULT\" /><category android:name=\"android.intent.category.LAUNCHER\" /><data android:mimeType=\"text/*\" /><data android:mimeType=\"xml/*\" /></intent-filter>",
-              "count": 23
+              "count": 93
             },
             {
               "xml": "<intent-filter><action android:name=\"android.intent.action.MAIN\" /></intent-filter>",
@@ -68,11 +68,11 @@
           "/manifest": [
             {
               "xml": "<uses-permission android:name=\"android.permission.WRITE_MEDIA_STORAGE\" />",
-              "count": 23
+              "count": 93
             },
             {
               "xml": "<uses-permission android:name=\"android.permission.VIBRATE\" />",
-              "count": 24
+              "count": 94
             },
             {
               "xml": "<uses-permission android:name=\"com.android.vending.BILLING\" />",
