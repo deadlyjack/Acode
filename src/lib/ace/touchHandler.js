@@ -169,7 +169,6 @@ export default function addTouchListeners(editor) {
    * @param {TouchEvent} e 
    */
   function touchMove(e) {
-    e.preventDefault();
     if (mode === 'selection') {
       removeListeners();
       return;
@@ -205,7 +204,6 @@ export default function addTouchListeners(editor) {
    * @param {TouchEvent} e 
    */
   function touchEnd(e) {
-    e.preventDefault();
     removeListeners();
 
     const { clientX, clientY } = e.changedTouches[0];
@@ -227,11 +225,13 @@ export default function addTouchListeners(editor) {
     }
 
     if (mode === 'scroll') {
+      e.preventDefault();
       scrollAnimation(moveX, moveY);
       return;
     }
 
     if (mode === 'selection') {
+      e.preventDefault();
       moveCursorTo(clientX, clientY);
       select();
       return;
@@ -253,8 +253,8 @@ export default function addTouchListeners(editor) {
   }
 
   function scrollAnimation(moveX, moveY) {
-    const nextX = moveX * 0.05;
-    const nextY = moveY * 0.05;
+    const nextX = moveX * 0.04;
+    const nextY = moveY * 0.04;
 
     let scrollX = parseInt(nextX * 100) / 100;
     let scrollY = parseInt(nextY * 100) / 100;
@@ -320,6 +320,7 @@ export default function addTouchListeners(editor) {
   }
 
   function scroll(x, y) {
+    const threshold = 0.5;
     let direction = reverseScrolling ? 1 : -1;
     let scrollX = direction * x;
     let scrollY = direction * y;
@@ -332,6 +333,15 @@ export default function addTouchListeners(editor) {
       }
     }
 
+    if (Math.abs(scrollX) < threshold) {
+      scrollX = 0;
+    }
+
+    if (Math.abs(scrollY) < threshold) {
+      scrollY = 0;
+    }
+
+    if (!scrollX && !scrollY) return;
     renderer.scrollBy(scrollX, scrollY);
   }
 
