@@ -48,13 +48,11 @@ export default function settingsMain() {
 
   const settingsOptions = [
     {
-      index: 0,
       key: 'about',
       text: strings.about,
       icon: 'acode',
     },
     {
-      index: 1,
       key: 'donate',
       text: strings.support,
       icon: 'favorite',
@@ -62,43 +60,36 @@ export default function settingsMain() {
       sake: true
     },
     {
-      index: 2,
       key: 'editor-settings',
       text: strings['editor settings'],
       icon: 'text_format',
     },
     {
-      index: 3,
       key: 'app-settings',
       text: strings['app settings'],
       icon: 'tune',
     },
     {
-      index: 4,
       key: 'formatter',
       text: strings.formatter,
       icon: 'stars',
     },
     {
-      index: 5,
       key: 'theme',
       text: strings.theme,
       icon: 'color_lenspalette',
     },
     {
-      index: 6,
       key: 'backup-restore',
       text: strings.backup.capitalize() + '/' + strings.restore.capitalize(),
       icon: 'cached',
     },
     {
-      index: 7,
       key: 'rateapp',
       text: strings['rate acode'],
       icon: 'googleplay'
     },
     {
-      index: 8,
       key: 'plugins',
       text: strings['plugins'],
       icon: 'extension',

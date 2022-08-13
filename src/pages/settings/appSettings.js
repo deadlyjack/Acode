@@ -11,6 +11,7 @@ import ajax from '@deadlyjack/ajax';
 import Url from '../../lib/utils/Url';
 import Box from '../../components/dialogboxes/box';
 import Donate from '../donate/donate';
+import searchBar from '../../components/searchbar';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -18,6 +19,17 @@ export default function otherSettings() {
   const $settingsList = tag('div', {
     className: 'main list',
   });
+  const $search = tag('i', {
+    className: 'icon search',
+    attr: {
+      action: 'search',
+    },
+    onclick() {
+      searchBar($settingsList);
+    }
+  });
+
+  $page.header.append($search);
 
   actionStack.push({
     id: 'other-settings',
@@ -93,6 +105,16 @@ export default function otherSettings() {
       text: strings['floating button'],
       checkbox: values.floatingButton,
     },
+    {
+      key: 'openFileListPos',
+      text: strings['active files'],
+      subText: values.openFileListPos,
+    },
+    {
+      key: 'quickTools',
+      text: strings['quick tools'],
+      checkbox: values.quickTools,
+    },
   ];
 
   gen.listItems($settingsList, settingsOptions, changeSetting);
@@ -117,7 +139,7 @@ export default function otherSettings() {
             appSettings.update({
               animation: value,
             });
-            this.changeSubText(values.animation);
+            this.value = value;
           })
         break;
 
@@ -172,7 +194,7 @@ export default function otherSettings() {
             if (res === values.previewMode) return;
             appSettings.value.previewMode = res;
             appSettings.update();
-            this.changeSubText(res);
+            this.value = res;
           });
         break;
 
@@ -207,7 +229,7 @@ export default function otherSettings() {
               }
               appSettings.value.console = res;
               appSettings.update();
-              this.changeSubText(res);
+              this.value = res;
             })();
           });
         break;
@@ -225,7 +247,7 @@ export default function otherSettings() {
             system.setInputType(res);
             appSettings.value.keyboardMode = res;
             appSettings.update();
-            this.changeSubText(getModeString(res));
+            this.value = getModeString(res);
           });
         break;
 
@@ -297,6 +319,27 @@ export default function otherSettings() {
         });
         root.classList.toggle('hide-floating-button');
         this.value = values.floatingButton;
+        break;
+
+      case 'openFileListPos':
+        dialogs
+          .select(this.text, [
+            ['sidebar', strings.sidebar],
+            ['header', strings.header],
+          ], {
+            default: values.openFileListPos,
+          })
+          .then((res) => {
+            appSettings.update({
+              openFileListPos: res,
+            });
+            this.value = res;
+          });
+        break;
+
+      case 'quickTools':
+        acode.exec('toggle-quick-tools');
+        this.value = values.quickTools;
         break;
 
       default:

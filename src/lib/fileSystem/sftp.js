@@ -335,6 +335,7 @@ class SFTP {
             }
           }
 
+          newname = move ? newname : Path.join(Path.dirname(src), newname);
           const cmd = `mv "${this.#safeName(src)}" "${this.#safeName(newname)}"`;
           sftp.exec(
             cmd,
@@ -377,7 +378,7 @@ class SFTP {
             }
           }
           await this.#setStat();
-          const cmd = `rm ${this.#stat.isDirectory ? '-rf' : ''} "${this.#safeName(filename)}"`;
+          const cmd = `rm ${this.#stat.isDirectory ? '-r' : ''} "${this.#safeName(filename)}"`;
           sftp.exec(
             cmd,
             (res) => {

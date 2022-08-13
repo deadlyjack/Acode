@@ -53,14 +53,7 @@ export default async function openFile(file, data = {}) {
 
     // Else open a new file
     // Checks for valid file
-    const ext = helpers.extname(name);
-    if (appSettings.isFileAllowed(ext)) {
-      helpers.removeTitleLoader();
-      return alert(
-        strings.notice.toUpperCase(),
-        `'${ext}' ${strings['file is not supported']}`,
-      );
-    } else if (fileInfo.length * 0.000001 > settings.maxFileSize) {
+    if (fileInfo.length * 0.000001 > settings.maxFileSize) {
       helpers.removeTitleLoader();
       return alert(
         strings.error.toUpperCase(),

@@ -268,8 +268,8 @@ export default function RepoInclude(owner, repoName) {
     });
 
     return helpers.sortDir(list, {
-      showHiddenFiles: 'on',
-      sortByName: 'on',
+      showHiddenFiles: true,
+      sortByName: true,
     });
   }
 

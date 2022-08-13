@@ -237,7 +237,6 @@
   "uninstall": "Désinstaller",
   "download acode pro": "Télécharger Acode pro",
   "loading plugins": "Charger les plugins",
-  "scrolling": "Scrolling",
   "diagonal scrolling": "Diagonal scrolling",
   "reverse scrolling": "Reverse Scrolling",
   "formatter": "Formatter",
@@ -250,10 +249,8 @@
   "inapp": "Inapp",
   "browser": "Browser",
   "default font": "Default",
-  "scrolling": "Scrolling",
-  "diagonal scrolling": "Diagonal scrolling",
-  "reverse scrolling": "Reverse Scrolling",
-  "formatter": "Formatter",
-  "format on save": "Format on save",
-  "remove ads": "Remove ads"
+  "fast": "Fast",
+  "slow": "Slow",
+  "scroll settings": "Scroll settings",
+  "scroll speed": "Scroll speed"
 }

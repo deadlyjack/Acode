@@ -67,7 +67,7 @@ export default function defaultFormatter() {
       values.formatter[key] = res;
       appSettings.update();
       const subtext = formatters.find(({ id }) => id === res)?.name || strings.none;
-      this.changeSubText(subtext);
+      this.value = subtext;
     });
   }
 

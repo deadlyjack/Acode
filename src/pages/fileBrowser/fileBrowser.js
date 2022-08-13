@@ -31,15 +31,6 @@ function FileBrowser(mode, info, buttonText, doesOpenLast, ...args) {
   });
 }
 
-FileBrowser.checkForValidFile = (uri) => {
-  const ext = helpers.extname(uri);
-
-  if (appSettings.value.filesNotAllowed.includes((ext || '').toLowerCase())) {
-    return false;
-  }
-  return true;
-};
-
 FileBrowser.openFile = (res) => {
   const { url, name, mode } = res;
 
@@ -73,7 +64,7 @@ FileBrowser.openFolder = (res) => {
   const url = res.url;
   const protocol = Url.getProtocol(url);
 
-  async () => {};
+  async () => { };
 
   if (protocol === 'ftp:') {
     openFolder(res.url, {

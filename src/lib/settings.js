@@ -19,12 +19,11 @@ import Url from './utils/Url';
  * @typedef {object} settingsValue
  * @property {fileBrowserSettings} fileBrowser
  * @property {number} maxFileSize
- * @property {string[]} filesNotAllowed
  * @property {searchAndFindSettings} search
  * @property {string} lang
  */
 
-class Settings {
+export default class Settings {
   /**
    * @type {settingsValue}
    */
@@ -32,50 +31,34 @@ class Settings {
   #initialized = false;
   #oldSettings;
   #keyboardModes = ['NO_SUGGESTIONS', 'NO_SUGGESTIONS_AGGRESSIVE', 'NORMAL'];
+  #on = {
+    update: [],
+    reset: [],
+  };
+  #searchSettings = {
+    caseSensitive: false,
+    regExp: false,
+    wholeWord: false,
+    backwards: true,
+  };
+  #fileBrowserSettings = {
+    showHiddenFiles: false,
+    sortByName: true,
+  };
 
   constructor() {
-    this.methods = {
-      update: [],
-      reset: [],
-    };
-
     this.#defaultSettings = {
       animation: 'system',
-      appTheme: /free/.test(BuildInfo.packageName) ? 'dark' : 'ocean',
+      appTheme: IS_FREE_VERSION ? 'dark' : 'ocean',
       autosave: 0,
-      fileBrowser: {
-        showHiddenFiles: false,
-        sortByName: true,
-      },
+      fileBrowser: this.#fileBrowserSettings,
       formatter: {},
       maxFileSize: 12,
       previewPort: constants.PORT,
-      filesNotAllowed: [
-        'zip',
-        'apk',
-        'doc',
-        'docx',
-        'mp3',
-        'mp4',
-        'avi',
-        'flac',
-        'mov',
-        'rar',
-        'pdf',
-        'gif',
-        'flv',
-      ],
-      search: {
-        caseSensitive: false,
-        regExp: false,
-        wholeWord: false,
-        backwards: true,
-      },
+      search: this.#searchSettings,
       lang: 'en-us',
       fontSize: '12px',
-      editorTheme: IS_FREE_VERSION
-        ? 'ace/theme/nord_dark'
-        : 'ace/theme/dracula',
+      editorTheme: IS_FREE_VERSION ? 'ace/theme/nord_dark' : 'ace/theme/dracula',
       textWrap: true,
       softTab: true,
       tabSize: 2,
@@ -111,6 +94,7 @@ class Settings {
       reverseScrolling: false,
       teardropTimeout: 3000,
       teardropSize: 30,
+      scrollSpeed: constants.SCROLL_SPEED_NORMAL,
       customTheme: {
         '--primary-color': 'rgb(153,153,255)',
         '--secondary-color': 'rgb(255,255,255)',
@@ -204,27 +188,26 @@ class Settings {
       settings = null;
     }
 
-    const onupdate = [...this.methods.update];
+    const onupdate = [...this.#on.update];
 
-    for (let key in settings) {
+    Object.keys(settings).forEach((key) => {
       if (key in this.value) this.value[key] = settings[key];
       if (key === 'animation') {
         this.applyAnimationSetting();
       }
-    }
+    });
 
     const changedSettings = this.#getChangedKeys();
-    for (let key of changedSettings) {
-      if (Array.isArray(this.methods[`update:${key}`])) {
-        for (let cb of this.methods[`update:${key}`]) {
-          onupdate.push(cb.bind(this.value, this.value[key]));
-        }
+    changedSettings.forEach((setting) => {
+      const listeners = this.#on[`update:${setting}`];
+      if (Array.isArray(listeners)) {
+        onupdate.push(...listeners);
       }
-    }
+      onupdate.forEach((listener) => listener(this.value[setting]));
+    });
 
     if (saveFile) await this.#save();
     if (showToast) toast(strings['settings saved']);
-    for (let callback of onupdate) callback(this.value);
   }
 
   async reset(setting) {
@@ -240,7 +223,7 @@ class Settings {
       await this.update(false);
     }
 
-    for (let onreset of this.methods.reset) onreset(this.value);
+    for (let onreset of this.#on.reset) onreset(this.value);
   }
 
   /**
@@ -249,8 +232,8 @@ class Settings {
    * @param {function():void} callback
    */
   on(event, callback) {
-    if (!this.methods[event]) this.methods[event] = [];
-    this.methods[event].push(callback);
+    if (!this.#on[event]) this.#on[event] = [];
+    this.#on[event].push(callback);
   }
 
   /**
@@ -259,8 +242,8 @@ class Settings {
    * @param {function():void} callback
    */
   off(event, callback) {
-    if (!this.methods[event]) this.methods[event] = [];
-    this.methods[event].splice(this.methods[event].indexOf(callback), 1);
+    if (!this.#on[event]) this.#on[event] = [];
+    this.#on[event].splice(this.#on[event].indexOf(callback), 1);
   }
 
   /**
@@ -270,15 +253,6 @@ class Settings {
    */
   get(key) {
     return this.value[key];
-  }
-
-  /**
-   *
-   * @param {String} ext
-   * @returns
-   */
-  isFileAllowed(ext = '') {
-    return this.value.filesNotAllowed.includes(ext.toLowerCase());
   }
 
   /**
@@ -314,5 +288,3 @@ class Settings {
     }
   }
 }
-
-export default Settings;

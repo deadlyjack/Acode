@@ -65,27 +65,31 @@ function iconButton(options) {
   return opts;
 }
 
-function listItems(settingsList, settingsOptions, changeSetting) {
-  settingsList.textContent = '';
-  const settings = {};
-
-  settingsOptions.sort((a, b) => {
+/**
+ * 
+ * @param {HTMLUListElement} $list 
+ * @param {Array<Object>} settings 
+ * @param {()=>void} callback 
+ */
+function listItems($list, settings, callback, sort = true) {
+  settings.sort((a, b) => {
     if (a.index && b.index) {
       return a.index - b.index;
     }
     return a.key < b.key ? -1 : 1;
   });
+  const $items = [];
 
-  for (let setting of settingsOptions) {
-    const $text = tag('span', {
-      className: 'text',
-      textContent: `${setting.text}`.capitalize(0),
-    });
-    const $container = tag('div', {
+  if (sort) settings = settings.sort((a, b) => a.text < b.text ? -1 : 1);
+  settings.forEach((setting) => {
+    const $setting = tag('div', {
       className: 'container',
-      child: $text,
+      child: tag('span', {
+        className: 'text',
+        textContent: `${setting.text}`.capitalize(0),
+      }),
     });
-    const $tmp = tag(setting.type || 'div', {
+    const $item = tag(setting.type || 'div', {
       className: 'list-item' + (setting.sake ? ' sake' : ''),
       children: [
         tag('i', {
@@ -94,7 +98,7 @@ function listItems(settingsList, settingsOptions, changeSetting) {
             color: setting.color || '',
           }
         }),
-        $container,
+        $setting,
       ],
       href: setting.href || undefined,
     });
@@ -106,44 +110,41 @@ function listItems(settingsList, settingsOptions, changeSetting) {
         className: 'value',
         textContent: `${setting.subText || ''}`.capitalize(0),
       });
-      $container.appendChild($subText);
+      $setting.appendChild($subText);
     } else if (setting.checkbox !== undefined) {
       $checkbox = Checkbox('', setting.checkbox);
-      $tmp.appendChild($checkbox);
-      $tmp.style.paddingRight = '10px';
+      $item.appendChild($checkbox);
+      $item.style.paddingRight = '10px';
     }
 
-    if (setting.type !== 'a')
-      addListerner($tmp, $checkbox, $text, $subText, setting);
+    if (setting.type !== 'a') {
+      $item.onclick = callback.bind({
+        key: setting.key,
+        text: setting.text,
+        set value(value) {
+          if ($subText) $subText.textContent = value;
+          else if ($checkbox) $checkbox.checked = value;
+        },
+        get value() {
+          if ($subText) return $subText.textContent;
+          else if ($checkbox) return $checkbox.checked;
+        },
+      });
+    }
 
-    settings[setting.key] = $tmp;
-    settingsList.appendChild($tmp);
-  }
+    if (Number.isInteger(setting.index)) {
+      $items.splice(setting.index, 0, $item);
+    } else {
+      $items.push($item);
+    }
+  });
 
-  function addListerner($tmp, $checkbox, $text, $subText, setting) {
-    $tmp.onclick = changeSetting.bind({
-      key: setting.key,
-      text: setting.text,
-      changeSubText: function (str) {
-        $subText.textContent = str;
-      },
-      changeText: function (str) {
-        $text.textContent = str;
-      },
-      set value(value) {
-        if ($subText) $subText.textContent = value;
-        else if ($checkbox) $checkbox.checked = value;
-      },
-      get value() {
-        if ($subText) return $subText.textContent;
-        else if ($checkbox) return $checkbox.checked;
-      },
-    });
-  }
+  $list.innerHTML = '';
+  $list.append(...$items);
 }
 
 export default {
   listTileGen,
   iconButton,
-  listItems: listItems,
+  listItems,
 };

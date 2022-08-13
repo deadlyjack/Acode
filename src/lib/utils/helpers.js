@@ -262,20 +262,13 @@ export default {
    *
    * @param {FileEntry[]} list
    * @param {object} fileBrowser settings
-   * @param {boolean | function(string):boolean} [readOnly]
    * @param {'both'|'file'|'folder'}
    */
-  sortDir(list, fileBrowser, readOnly = false, mode = 'both') {
+  sortDir(list, fileBrowser, mode = 'both') {
     const dir = [];
     const file = [];
     const sortByName = fileBrowser.sortByName;
     const showHiddenFile = fileBrowser.showHiddenFiles;
-    let getEnabled = () => true;
-
-    if (typeof readOnly === 'function') {
-      getEnabled = readOnly;
-      readOnly = false;
-    }
 
     for (let item of list) {
       let hidden;
@@ -283,14 +276,11 @@ export default {
       item.name = decodeURL(item.name || path.basename(item.url || ''));
       hidden = item.name[0] === '.';
 
-      if (typeof item.readOnly !== 'boolean') item.readOnly = readOnly;
-      if (typeof item.canWrite !== 'boolean') item.canWrite = !readOnly;
       if (typeof item.isDirectory !== 'boolean') {
         if (this.isDir(item.type)) item.isDirectory = true;
       }
       if (!item.type) item.type = item.isDirectory ? 'dir' : 'file';
       if (!item.url) item.url = item.url || item.uri;
-      if (item.isFile) item.disabled = !getEnabled(item.name);
       if ((hidden && showHiddenFile) || !hidden) {
         if (item.isDirectory) {
           dir.push(item);

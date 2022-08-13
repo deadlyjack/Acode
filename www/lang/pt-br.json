@@ -245,10 +245,13 @@
   "inapp": "No app",
   "browser": "Navegador",
   "default font": "Padrão",
-  "scrolling": "Rolagem",
   "diagonal scrolling": "Rolagem diagonal",
   "reverse scrolling": "Rolagem reversa",
   "formatter": "Formatador",
   "format on save": "Formatar ao salvar",
-  "remove ads": "Remover propagandas"
+  "remove ads": "Remover propagandas",
+  "fast": "Fast",
+  "slow": "Slow",
+  "scroll settings": "Scroll settings",
+  "scroll speed": "Scroll speed"
 }

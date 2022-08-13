@@ -23,6 +23,7 @@ export default function addTouchListeners(editor) {
     reverseScrolling,
     teardropSize,
     teardropTimeout,
+    scrollSpeed,
   } = appSettings.value;
 
   /**
@@ -131,15 +132,15 @@ export default function addTouchListeners(editor) {
     $cursor.dataset.size = value;
   });
   appSettings.on('update:textWrap', onupdate);
+  appSettings.on('update:scrollSpeed', (value) => {
+    scrollSpeed = value;
+  });
 
   /**
    * Editor container on touch start
    * @param {TouchEvent} e 
    */
   function touchStart(e) {
-    if ([$cursor, $start, $end, $menu].includes(e.target)) return;
-    if ($menu.contains(e.target)) return;
-    e.preventDefault();
     cancelAnimationFrame(animation);
     const { clientX, clientY } = e.touches[0];
     lastX = clientX;
@@ -193,10 +194,23 @@ export default function addTouchListeners(editor) {
 
     lastX = clientX;
     lastY = clientY;
-    mode = 'scroll';
-    [moveX, moveY] = testScroll(moveX, moveY);
-    scroll(moveX, moveY);
-    clearTimeout(selectionTimeout);
+
+    const threshold = 0.5;
+    if (Math.abs(moveX) < threshold) {
+      moveX = 0;
+    }
+
+    if (Math.abs(moveY) < threshold) {
+      moveY = 0;
+    }
+
+    if (moveX || moveY) {
+      e.preventDefault();
+      [moveX, moveY] = testScroll(moveX, moveY);
+      mode = 'scroll';
+      scroll(moveX, moveY);
+      clearTimeout(selectionTimeout);
+    }
   }
 
   /**
@@ -253,8 +267,8 @@ export default function addTouchListeners(editor) {
   }
 
   function scrollAnimation(moveX, moveY) {
-    const nextX = moveX * 0.04;
-    const nextY = moveY * 0.04;
+    const nextX = moveX * scrollSpeed;
+    const nextY = moveY * scrollSpeed;
 
     let scrollX = parseInt(nextX * 100) / 100;
     let scrollY = parseInt(nextY * 100) / 100;
@@ -293,8 +307,13 @@ export default function addTouchListeners(editor) {
    * @returns 
    */
   function testScroll(moveX, moveY) {
-    const vDirection = moveY > 0 ? 'down' : 'up';
-    const hDirection = moveX > 0 ? 'right' : 'left';
+    const UP = reverseScrolling ? 'down' : 'up';
+    const DOWN = reverseScrolling ? 'up' : 'down';
+    const LEFT = reverseScrolling ? 'right' : 'left';
+    const RIGHT = reverseScrolling ? 'left' : 'right';
+
+    const vDirection = moveY > 0 ? DOWN : UP;
+    const hDirection = moveX > 0 ? RIGHT : LEFT;
 
     const { getEditorHeight, getEditorWidth } = helpers;
     const { scrollLeft } = editor.renderer.scrollBarH;
@@ -320,7 +339,6 @@ export default function addTouchListeners(editor) {
   }
 
   function scroll(x, y) {
-    const threshold = 0.5;
     let direction = reverseScrolling ? 1 : -1;
     let scrollX = direction * x;
     let scrollY = direction * y;
@@ -333,15 +351,6 @@ export default function addTouchListeners(editor) {
       }
     }
 
-    if (Math.abs(scrollX) < threshold) {
-      scrollX = 0;
-    }
-
-    if (Math.abs(scrollY) < threshold) {
-      scrollY = 0;
-    }
-
-    if (!scrollX && !scrollY) return;
     renderer.scrollBy(scrollX, scrollY);
   }
 

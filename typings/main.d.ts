@@ -25,7 +25,7 @@ interface searchSettings {
 }
 
 interface Settings {
-  animation: boolean;
+  animation: 'system' | boolean;
   autosave: number;
   fileBrowser: fileBrowserSettings;
   maxFileSize: number;
@@ -71,6 +71,7 @@ interface Settings {
   reverseScrolling: boolean;
   teardropTimeout: number;
   teardropSize: 20 | 40 | 60;
+  scrollSpeed: number;
 }
 
 interface AppSettings {

@@ -4,13 +4,25 @@ import dialogs from '../../components/dialogs';
 import constants from '../../lib/constants';
 import tag from 'html-tag-js';
 import helpers from '../../lib/utils/helpers';
-import scrollSettings from './scrolling';
+import scrollSettings from './scrollSettings';
+import searchBar from '../../components/searchbar';
 
 export default function editorSettings() {
   const $page = Page(strings['editor settings'].capitalize());
   const $settingsList = tag('div', {
     className: 'main list',
   });
+  const $search = tag('i', {
+    className: 'icon search',
+    attr: {
+      action: 'search',
+    },
+    onclick() {
+      searchBar($settingsList);
+    }
+  });
+
+  $page.header.append($search);
 
   actionStack.push({
     id: 'settings-editor',
@@ -21,11 +33,7 @@ export default function editorSettings() {
     actionStack.remove('settings-editor');
   };
 
-  let values = appSettings.value;
-
-  appSettings.on('update', function (newValues) {
-    values = newValues;
-  });
+  const values = appSettings.value;
 
   const settingsOptions = [
     {
@@ -37,11 +45,6 @@ export default function editorSettings() {
       key: 'fontSize',
       text: strings['font size'],
       subText: values.fontSize,
-    },
-    {
-      key: 'textWrap',
-      text: strings['text wrap'],
-      checkbox: values.textWrap,
     },
     {
       key: 'softTab',
@@ -79,19 +82,9 @@ export default function editorSettings() {
       checkbox: values.showSpaces,
     },
     {
-      key: 'openFileListPos',
-      text: strings['active files'],
-      subText: values.openFileListPos,
-    },
-    {
       key: 'editorFont',
       text: strings['editor font'],
       subText: values.editorFont,
-    },
-    {
-      key: 'quickTools',
-      text: strings['quick tools'],
-      checkbox: values.quickTools,
     },
     {
       key: 'fullscreen',
@@ -114,8 +107,9 @@ export default function editorSettings() {
       subText: values.teardropSize,
     },
     {
-      key: 'scrolling',
-      text: strings['scrolling'],
+      index: 0,
+      key: 'scroll-settings',
+      text: strings['scroll settings'],
     }
   ];
 
@@ -134,7 +128,7 @@ export default function editorSettings() {
             appSettings.update({
               autosave: res,
             });
-            this.changeSubText(res ? res + '' : strings.no);
+            this.value = res ? res + '' : strings.no;
 
             if (res) {
               if (saveInterval) clearInterval(saveInterval);
@@ -157,12 +151,10 @@ export default function editorSettings() {
             match: constants.FONT_SIZE,
           })
           .then((res) => {
-            if (res === values.fontSize) return;
-
             appSettings.update({
               fontSize: res,
             });
-            this.changeSubText(res);
+            this.value = res;
           });
         break;
 
@@ -173,12 +165,12 @@ export default function editorSettings() {
           })
           .then((res) => {
             res = parseFloat(res);
-            if (res < 1 || res === values.lineHeight) return;
+            if (res < 1) return;
 
             appSettings.update({
               lineHeight: res,
             });
-            this.changeSubText(res);
+            this.value = res;
           });
         break;
 
@@ -192,7 +184,7 @@ export default function editorSettings() {
             appSettings.update({
               tabSize: res,
             });
-            this.changeSubText(res);
+            this.value = res;
           });
         break;
 
@@ -209,24 +201,7 @@ export default function editorSettings() {
             appSettings.update({
               formatOnSave: res,
             });
-            this.changeSubText(res ? strings.yes : strings.no);
-          });
-        break;
-
-      case 'openFileListPos':
-        dialogs
-          .select(this.text, [
-            ['sidebar', strings.sidebar],
-            ['header', strings.header],
-          ], {
-            default: values.openFileListPos,
-          })
-          .then((res) => {
-            if (res === values.openFileListPos) return;
-            appSettings.update({
-              openFileListPos: res,
-            });
-            this.changeSubText(res);
+            this.value = res ? strings.yes : strings.no;
           });
         break;
 
@@ -243,13 +218,8 @@ export default function editorSettings() {
             appSettings.update({
               editorFont: res,
             });
-            this.changeSubText(res);
+            this.value = res;
           });
-        break;
-
-      case 'quickTools':
-        acode.exec('toggle-quick-tools');
-        this.value = values.quickTools;
         break;
 
       case 'fullscreen':
@@ -284,7 +254,7 @@ export default function editorSettings() {
           });
         break;
 
-      case 'scrolling':
+      case 'scroll-settings':
         scrollSettings();
         break;
 
