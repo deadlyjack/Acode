@@ -691,7 +691,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
           url,
           name,
           scroll: 0,
-          list: helpers.sortDir(list, fileBrowser, testFileType, mode),
+          list: helpers.sortDir(list, fileBrowser, mode),
         };
       }
     }
@@ -962,23 +962,6 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
           folder.reload();
         }
       }
-    }
-
-    /**
-     * Check if file is allowed or not and returns `true` if allowed
-     * else returns `false`.
-     * @param {String} uri
-     * @returns
-     */
-    function testFileType(uri) {
-      const ext = helpers.extname(uri);
-
-      if (
-        appSettings.value.filesNotAllowed.includes((ext || '').toLowerCase())
-      ) {
-        return false;
-      }
-      return true;
     }
 
     /**
