@@ -1,6 +1,6 @@
 import tag from 'html-tag-js';
-import Commands from '../lib/ace/commands';
-import helpers from '../lib/utils/helpers';
+import Commands from '../ace/commands';
+import helpers from '../utils/helpers';
 import inputhints from './inputhints';
 
 export default async function commandPallete() {

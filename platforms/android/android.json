@@ -58,7 +58,7 @@
           "./application/activity": [
             {
               "xml": "<intent-filter><action android:name=\"android.intent.action.VIEW\" /><action android:name=\"android.intent.action.EDIT\" /><category android:name=\"android.intent.category.DEFAULT\" /><category android:name=\"android.intent.category.LAUNCHER\" /><data android:mimeType=\"text/*\" /><data android:mimeType=\"xml/*\" /></intent-filter>",
-              "count": 25
+              "count": 22
             },
             {
               "xml": "<intent-filter><action android:name=\"android.intent.action.MAIN\" /></intent-filter>",
@@ -68,11 +68,11 @@
           "/manifest": [
             {
               "xml": "<uses-permission android:name=\"android.permission.WRITE_MEDIA_STORAGE\" />",
-              "count": 25
+              "count": 22
             },
             {
               "xml": "<uses-permission android:name=\"android.permission.VIBRATE\" />",
-              "count": 26
+              "count": 23
             },
             {
               "xml": "<uses-permission android:name=\"com.android.vending.BILLING\" />",

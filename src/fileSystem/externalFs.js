@@ -1,4 +1,4 @@
-import dialogs from '../../components/dialogs';
+import dialogs from '../components/dialogs';
 import internalFs from './internalFs';
 
 export default {

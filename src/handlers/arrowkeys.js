@@ -18,11 +18,7 @@ export default {
      * @type {HTMLElement}
      */
     const el = e.target;
-    const action = el.getAttribute('action');
     const { which } = el.dataset;
-
-    if (!['left', 'right', 'up', 'down'].includes(action)) return;
-
     const { editor } = editorManager;
     const $textarea = editor.textInput.getElement();
     const shiftKey = footer.get('#shift-key').dataset.state === 'on';
@@ -39,8 +35,6 @@ export default {
     document.ontouchcancel = this.onTouchEnd.bind(this);
 
     dispatchEventWithTimeout();
-    e.preventDefault();
-    e.stopImmediatePropagation();
   },
   onTouchEnd() {
     this.time = 300;

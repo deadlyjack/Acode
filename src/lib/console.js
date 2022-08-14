@@ -2,7 +2,7 @@ import 'core-js/stable';
 import 'html-tag-js/dist/polyfill';
 import tag from 'html-tag-js';
 import * as esprima from 'esprima';
-import loadPolyFill from './utils/polyfill';
+import loadPolyFill from '../utils/polyfill';
 
 (function () {
   loadPolyFill.apply(window);

@@ -1,6 +1,6 @@
 import tag from 'html-tag-js';
 import dialogs from '../../components/dialogs';
-import helpers from '../../lib/utils/helpers';
+import helpers from '../../utils/helpers';
 
 export default {
   /**
@@ -35,7 +35,7 @@ export default {
             type: 'text',
             required: true,
             readOnly: true,
-            onclick: function () {
+            onclick() {
               sdcard.getStorageAccessPermission(
                 uuid,
                 (res) => {

@@ -1,0 +1,36 @@
+import helpers from '../utils/helpers';
+import constants from '../lib/constants';
+import settingsPage from '../components/settingPage';
+
+export default function help() {
+  const title = strings.help.capitalize();
+  const items = [
+    {
+      key: 'feedback',
+      text: strings.feedback,
+    },
+    {
+      key: 'help',
+      text: strings.help,
+      link: 'https://acode.foxdebug.com/faqs',
+    },
+    {
+      key: 'faqs',
+      text: strings.faqs,
+      link: 'https://t.me/foxdebug_acode',
+    },
+  ];
+
+  function callback(key) {
+    if (key === 'feedback') {
+      const subject = 'feedback - Acode editor';
+      const textBody = helpers.getFeedbackBody('<br/>%0A');
+      const email = constants.FEEDBACK_EMAIL;
+      system.openInBrowser(
+        `mailto:${email}?subject=${subject}&body=${textBody}`,
+      );
+    }
+  }
+
+  settingsPage(title, items, callback);
+}

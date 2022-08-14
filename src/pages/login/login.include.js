@@ -3,11 +3,11 @@ import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
 import _template from './login.hbs';
-import helpers from '../../lib/utils/helpers';
+import helpers from '../../utils/helpers';
 import gitHub from '../github/gitHub';
 import constants from '../../lib/constants';
-import Url from '../../lib/utils/Url';
-import fsOperation from '../../lib/fileSystem/fsOperation';
+import Url from '../../utils/Url';
+import fsOperation from '../../fileSystem/fsOperation';
 
 export default async function GithubLoginInclude() {
   const $page = Page(strings['github login']);

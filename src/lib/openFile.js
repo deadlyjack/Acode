@@ -1,7 +1,7 @@
-import helpers from './utils/helpers';
+import helpers from '../utils/helpers';
 import dialogs from '../components/dialogs';
 import recents from './recents';
-import fsOperation from './fileSystem/fsOperation';
+import fsOperation from '../fileSystem/fsOperation';
 
 /**
  *

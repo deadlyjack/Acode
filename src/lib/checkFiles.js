@@ -1,5 +1,5 @@
 import dialogs from '../components/dialogs';
-import fsOperation from './fileSystem/fsOperation';
+import fsOperation from '../fileSystem/fsOperation';
 
 export default async () => {
   const files = editorManager.files;

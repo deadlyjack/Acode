@@ -1,7 +1,7 @@
 import dialogs from '../dialogs';
 import template from '../../views/rating.hbs';
 import constants from '../../lib/constants';
-import helpers from '../../lib/utils/helpers';
+import helpers from '../../utils/helpers';
 
 function rateBox() {
   const box = dialogs

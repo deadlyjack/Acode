@@ -4,10 +4,10 @@ import tag from "html-tag-js";
 import template from './plugins.hbs';
 import list from './list.hbs';
 import Page from "../../components/page";
-import helpers from "../../lib/utils/helpers";
+import helpers from "../../utils/helpers";
 import searchBar from "../../components/searchbar";
-import fsOperation from "../../lib/fileSystem/fsOperation";
-import Url from "../../lib/utils/Url";
+import fsOperation from "../../fileSystem/fsOperation";
+import Url from "../../utils/Url";
 import plugin from "../plugin/plugin";
 
 /**

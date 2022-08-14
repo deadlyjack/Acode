@@ -2,15 +2,15 @@ import list from '../components/collapsableList';
 import tag from 'html-tag-js';
 import tile from '../components/tile';
 import dialogs from '../components/dialogs';
-import helpers from './utils/helpers';
+import helpers from '../utils/helpers';
 import constants from './constants';
 import openFolder from './openFolder';
-import Url from './utils/Url';
-import path from './utils/Path';
+import Url from '../utils/Url';
+import path from '../utils/Path';
 import ScrollBar from '../components/scrollbar/scrollbar';
-import fsOperation from './fileSystem/fsOperation';
-import Commands from './ace/commands';
-import addTouchListeners from './ace/touchHandler';
+import fsOperation from '../fileSystem/fsOperation';
+import Commands from '../ace/commands';
+import touchListeners from '../ace/touchHandler';
 
 //TODO: Add option to work multiple files at same time in large display.
 
@@ -777,7 +777,7 @@ async function EditorManager($sidebar, $header, $body) {
     const settings = appSettings.value;
     const commands = await Commands();
 
-    addTouchListeners(editor);
+    touchListeners(editor);
     Emmet.setCore(window.emmet);
     commands.forEach((command) => {
       editor.commands.addCommand(command);

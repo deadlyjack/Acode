@@ -5,7 +5,7 @@ import tag from 'html-tag-js';
 import mustache from 'mustache';
 import mimeType from 'mime-types';
 import Page from '../../components/page';
-import helpers from '../../lib/utils/helpers';
+import helpers from '../../utils/helpers';
 import dialogs from '../../components/dialogs';
 import git from '../../lib/git';
 import searchBar from '../../components/searchbar';

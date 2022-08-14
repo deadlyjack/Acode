@@ -1,4 +1,4 @@
-import path from "../src/lib/utils/Path";
+import path from "../src/utils/Path";
 
 test("path -> dirname", () => {
   const dirname = path.dirname("/dir/dir2/dir3/demo.txt");

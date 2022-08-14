@@ -1,5 +1,5 @@
-import fsOperation from "./fileSystem/fsOperation";
-import Url from "./utils/Url";
+import fsOperation from "../fileSystem/fsOperation";
+import Url from "../utils/Url";
 
 /**
  * 

@@ -3,12 +3,12 @@ import { marked } from 'marked';
 import mustache from 'mustache';
 import $_console from '../views/console.hbs';
 import $_markdown from '../views/markdown.hbs';
-import helpers from './utils/helpers';
+import helpers from '../utils/helpers';
 import dialogs from '../components/dialogs';
 import git from './git';
 import constants from './constants';
-import fsOperation from './fileSystem/fsOperation';
-import Url from './utils/Url';
+import fsOperation from '../fileSystem/fsOperation';
+import Url from '../utils/Url';
 import openFolder from './openFolder';
 
 /**

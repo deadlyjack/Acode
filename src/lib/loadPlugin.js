@@ -1,7 +1,7 @@
 import tag from "html-tag-js";
 import Page from "../components/page";
-import fsOperation from "./fileSystem/fsOperation";
-import Url from "./utils/Url";
+import fsOperation from "../fileSystem/fsOperation";
+import Url from "../utils/Url";
 
 export default async function loadPlugin(pluginId) {
   const baseUrl = Url.join(`http://localhost:${acode.pluginServer.port}`, pluginId);

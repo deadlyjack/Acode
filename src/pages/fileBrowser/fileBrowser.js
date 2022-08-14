@@ -1,8 +1,8 @@
 import dialogs from '../../components/dialogs';
 import openFile from '../../lib/openFile';
 import openFolder from '../../lib/openFolder';
-import helpers from '../../lib/utils/helpers';
-import Url from '../../lib/utils/Url';
+import helpers from '../../utils/helpers';
+import Url from '../../utils/Url';
 
 /**
  * @typedef {"file"|"folder"|"both"} BrowseMode

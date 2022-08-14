@@ -1,5 +1,5 @@
-import openFile from '../openFile';
-import dialogs from '../../components/dialogs';
+import openFile from '../lib/openFile';
+import dialogs from '../components/dialogs';
 import helpers from '../utils/helpers';
 
 export default HandleIntent;

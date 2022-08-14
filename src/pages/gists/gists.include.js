@@ -1,14 +1,15 @@
+import './gists.scss';
+
 import tag from 'html-tag-js';
 import mustache from 'mustache';
-import helpers from '../../lib/utils/helpers';
+import helpers from '../../utils/helpers';
 import GithubLogin from '../login/login';
 import Page from '../../components/page';
 
 import _template from './gists.hbs';
 import _menu from './menu.hbs';
-import './gists.scss';
 import contextMenu from '../../components/contextMenu';
-import fs from '../../lib/fileSystem/internalFs';
+import fs from '../../fileSystem/internalFs';
 import dialogs from '../../components/dialogs';
 import git from '../../lib/git';
 import GistFiles from '../gistFiles/gistFiles';

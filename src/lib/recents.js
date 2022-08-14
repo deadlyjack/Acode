@@ -1,6 +1,6 @@
-import Url from './utils/Url';
+import Url from '../utils/Url';
 import dialogs from '../components/dialogs';
-import helpers from './utils/helpers';
+import helpers from '../utils/helpers';
 
 const recents = {
   /**

@@ -1,7 +1,7 @@
 import ajax from "@deadlyjack/ajax";
-import fsOperation from "./fileSystem/fsOperation";
-import helpers from "./utils/helpers";
-import Url from "./utils/Url";
+import fsOperation from "../fileSystem/fsOperation";
+import helpers from "../utils/helpers";
+import Url from "../utils/Url";
 
 export default async function checkPluginsUpdate() {
   const plugins = await fsOperation(PLUGIN_DIR).lsDir();

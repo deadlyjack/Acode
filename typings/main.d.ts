@@ -92,6 +92,9 @@ interface AppSettings {
     eventName: 'reset' | 'update',
     callback: (this: Settings, settings: Settings | string) => void,
   ): void;
+  applyAutoSaveSetting(): void;
+  applyAnimationSetting(): void;
+  applyLangSetting(): void;
 }
 
 interface ActionStackOptions {

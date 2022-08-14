@@ -1,7 +1,7 @@
 import Irid from 'irid';
 import constants from './constants';
-import fsOperation from './fileSystem/fsOperation';
-import Url from './utils/Url';
+import fsOperation from '../fileSystem/fsOperation';
+import Url from '../utils/Url';
 
 export default async function restoreTheme(darken) {
   if (darken && document.body.classList.contains('loading')) return;

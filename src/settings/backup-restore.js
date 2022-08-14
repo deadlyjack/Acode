@@ -1,32 +1,16 @@
-import Page from '../../components/page';
-import tag from 'html-tag-js';
-import gen from '../../components/gen';
-import helpers from '../../lib/utils/helpers';
-import dialogs from '../../components/dialogs';
-import fsOperation from '../../lib/fileSystem/fsOperation';
+import helpers from '../utils/helpers';
+import dialogs from '../components/dialogs';
+import fsOperation from '../fileSystem/fsOperation';
 import URLParse from 'url-parse';
-import Url from '../../lib/utils/Url';
-import FileBrowser from '../fileBrowser/fileBrowser';
-import Uri from '../../lib/utils/Uri';
+import Url from '../utils/Url';
+import FileBrowser from '../pages/fileBrowser/fileBrowser';
+import Uri from '../utils/Uri';
+import settingsPage from '../components/settingPage';
 
 function backupRestore() {
-  const $page = Page(
-    strings.backup.capitalize() + '/' + strings.restore.capitalize(),
-  );
-  const $settingsList = tag('div', {
-    className: 'main list',
-  });
+  const title = strings.backup.capitalize() + '/' + strings.restore.capitalize();
 
-  actionStack.push({
-    id: 'backup-restore',
-    action: $page.hide,
-  });
-  $page.onhide = function () {
-    helpers.hideAd();
-    actionStack.remove('backup-restore');
-  };
-
-  const settingsOptions = [
+  const items = [
     {
       key: 'backup',
       text: strings.backup.capitalize(),
@@ -39,26 +23,22 @@ function backupRestore() {
     },
   ];
 
-  gen.listItems($settingsList, settingsOptions, changeSetting);
-
-  $page.body = $settingsList;
-  app.append($page);
-  helpers.showAd();
-
-  function changeSetting() {
-    switch (this.key) {
+  function callback(key) {
+    switch (key) {
       case 'backup':
         backup();
-        break;
+        return;
 
       case 'restore':
         restore();
-        break;
+        return;
 
       default:
         break;
     }
   }
+
+  settingsPage(title, items, callback);
 
   async function backup() {
     try {

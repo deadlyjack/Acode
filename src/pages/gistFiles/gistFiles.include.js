@@ -1,10 +1,10 @@
+import './gistFiles.scss';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import _template from './gistFiles.hbs';
 import _menu from './menu.hbs';
-import './gistFiles.scss';
 import Page from '../../components/page';
-import helpers from '../../lib/utils/helpers';
+import helpers from '../../utils/helpers';
 import contextMenu from '../../components/contextMenu';
 import dialogs from '../../components/dialogs';
 import Gists from '../gists/gists';

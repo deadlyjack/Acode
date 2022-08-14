@@ -4,7 +4,7 @@ import Mustache from 'mustache';
 import template from './customTheme.hbs';
 import Page from '../../components/page';
 import color from '../../components/dialogboxes/color';
-import helpers from '../../lib/utils/helpers';
+import helpers from '../../utils/helpers';
 import constants from '../../lib/constants';
 import confirm from '../../components/dialogboxes/confirm';
 import select from '../../components/dialogboxes/select';

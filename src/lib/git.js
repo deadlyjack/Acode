@@ -1,10 +1,10 @@
-import fs from './fileSystem/internalFs';
+import fs from '../fileSystem/internalFs';
 import dialogs from '../components/dialogs';
-import helpers from './utils/helpers';
-import GitHub from './GitHubAPI/GitHub';
-import path from './utils/Path';
-import Url from './utils/Url';
-import fsOperation from './fileSystem/fsOperation';
+import helpers from '../utils/helpers';
+import GitHub from '../GitHubAPI/GitHub';
+import path from '../utils/Path';
+import Url from '../utils/Url';
+import fsOperation from '../fileSystem/fsOperation';
 
 //Creates new github object
 function gitHub() {

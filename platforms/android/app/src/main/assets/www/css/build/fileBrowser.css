@@ -1,1 +1,71 @@
-#file-browser data-url{display:none}#file-browser .tile[storageType=notification]{background-color:#99f;background-color:var(--primary-color);color:#fff;color:var(--text-main-color);height:40px;text-align:center}#file-browser .tile[storageType=notification] .icon{display:none;content:""}#file-browser .tile .icon{position:relative;color:#415585}#file-browser .tile .icon[storageType]::after{position:absolute;top:50%;left:50%;content:attr(storageType);-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%);color:#fff;font-size:.6rem;font-weight:600;text-transform:uppercase}#file-browser .tile .icon.clearclose{color:currentColor;font-size:1.2rem}#file-browser .tile .icon.folder{color:#cece35}#file-browser .tile .icon.folder.user-added-storage{color:#3565ce}#file-browser .tile .icon.code{color:#4f9b4f}#file-browser .info{height:30px;display:flex;align-items:center;justify-content:center;font-size:.9rem;background-color:rgba(0,0,0,.1)}#file-browser #list{height:calc(100% - 60px);overflow-y:auto}#file-browser #list .tile[disabled] .text{opacity:.5}#file-browser #list .tile[read-only] .text::after{content:"Read only";font-size:.6em;color:#fff;background-color:#3e648a;border-radius:4px;padding:5px;margin:auto 15px}
+/*!*******************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/pages/fileBrowser/fileBrowser.scss ***!
+  \*******************************************************************************************************************************************************************************************************/
+#file-browser data-url {
+  display: none;
+}
+#file-browser .tile[storageType=notification] {
+  background-color: rgb(153, 153, 255);
+  background-color: var(--primary-color);
+  color: rgb(255, 255, 255);
+  color: var(--text-main-color);
+  height: 40px;
+  text-align: center;
+}
+#file-browser .tile[storageType=notification] .icon {
+  display: none;
+  content: "";
+}
+#file-browser .tile .icon {
+  position: relative;
+  color: rgb(65, 85, 133);
+}
+#file-browser .tile .icon[storageType]::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  content: attr(storageType);
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  color: rgb(255, 255, 255);
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+#file-browser .tile .icon.clearclose {
+  color: currentColor;
+  font-size: 1.2rem;
+}
+#file-browser .tile .icon.folder {
+  color: rgb(206, 206, 53);
+}
+#file-browser .tile .icon.folder.user-added-storage {
+  color: rgb(53, 101, 206);
+}
+#file-browser .tile .icon.code {
+  color: rgb(79, 155, 79);
+}
+#file-browser .info {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+#file-browser #list {
+  height: calc(100% - 60px);
+  overflow-y: auto;
+}
+#file-browser #list .tile[disabled] .text {
+  opacity: 0.5;
+}
+#file-browser #list .tile[read-only] .text::after {
+  content: "Read only";
+  font-size: 0.6em;
+  color: rgb(255, 255, 255);
+  background-color: rgb(62, 100, 138);
+  border-radius: 4px;
+  padding: 5px;
+  margin: auto 15px;
+}

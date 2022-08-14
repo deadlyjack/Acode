@@ -1,9 +1,9 @@
 import tag from 'html-tag-js';
 import mustache from 'mustache';
-import $_search from '../../views/footer/search.hbs';
-import $_row1 from '../../views/footer/row1.hbs';
-import $_row2 from '../../views/footer/row2.hbs';
-import searchSettings from '../../pages/settings/searchSettings';
+import $_search from '../views/footer/search.hbs';
+import $_row1 from '../views/footer/row1.hbs';
+import $_row2 from '../views/footer/row2.hbs';
+import searchSettings from '../settings/searchSettings';
 
 /**
  * Performs quick actions

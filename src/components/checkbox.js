@@ -38,7 +38,7 @@ function Checkbox(text, checked, name, id, type) {
         return $input.onclick;
       },
       set(onclick) {
-        $input.onclick = onchange;
+        $input.onclick = onclick;
       },
     },
     onchange: {
@@ -57,6 +57,11 @@ function Checkbox(text, checked, name, id, type) {
         this.checked = value;
       },
     },
+    toggle: {
+      value() {
+        this.checked = !this.checked;
+      }
+    }
   });
 
   return $checkbox;

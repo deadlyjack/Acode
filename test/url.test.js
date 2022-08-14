@@ -1,4 +1,4 @@
-import Url from '../src/lib/utils/Url';
+import Url from '../src/utils/Url';
 
 test("Url -> basename", () => {
   let basename, url;

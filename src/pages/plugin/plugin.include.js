@@ -3,11 +3,11 @@ import mustache from 'mustache';
 import template from './plugin.hbs';
 import Page from "../../components/page";
 import ajax from '@deadlyjack/ajax';
-import helpers from '../../lib/utils/helpers';
+import helpers from '../../utils/helpers';
 import { marked } from 'marked';
-import Url from '../../lib/utils/Url';
+import Url from '../../utils/Url';
 import installPlugin from '../../lib/installPlugin';
-import fsOperation from '../../lib/fileSystem/fsOperation';
+import fsOperation from '../../fileSystem/fsOperation';
 import tag from 'html-tag-js';
 import constants from '../../lib/constants';
 

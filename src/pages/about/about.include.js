@@ -3,7 +3,7 @@ import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
 import _template from './about.hbs';
-import helpers from '../../lib/utils/helpers';
+import helpers from '../../utils/helpers';
 
 export default function AboutInclude() {
   const $page = Page(strings.about.capitalize());

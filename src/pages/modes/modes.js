@@ -1,10 +1,11 @@
+import './modes.scss';
+
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
 
 import _template from './modes.hbs';
 import _list from './list.hbs';
-import './modes.scss';
 import searchBar from '../../components/searchbar';
 
 function Modes() {

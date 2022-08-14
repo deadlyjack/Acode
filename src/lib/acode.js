@@ -1,7 +1,7 @@
 import commands from "./commands";
-import fsOperation from "./fileSystem/fsOperation";
-import helpers from "./utils/helpers";
-import Url from "./utils/Url";
+import fsOperation from "../fileSystem/fsOperation";
+import Url from "../utils/Url";
+import settingsPage from "../components/settingPage";
 
 export default class Acode {
   #pluginsInit = {};
@@ -25,19 +25,22 @@ export default class Acode {
       return false;
     }
   }
+
   get exitAppMessage() {
     const numFiles = editorManager.hasUnsavedFiles();
     if (numFiles) {
       return strings['unsaved files close app'];
     }
   }
+
   setLoadingMessage(message) {
     document.body.setAttribute('data-small-msg', message);
   }
+
   setPluginInit(id, initFunction) {
-    console.log('initPlugin', id);
     this.#pluginsInit[id] = initFunction;
   }
+
   setPluginUnmount(id, unmountFunction) {
     console.log('unmountPlugin', id);
     this.#pluginUnmount[id] = unmountFunction;
@@ -53,12 +56,14 @@ export default class Acode {
       this.#pluginsInit[id](baseUrl, $page, options);
     }
   }
+
   unmountPlugin(id) {
     if (id in this.#pluginUnmount) {
       this.#pluginUnmount[id]();
       fsOperation(Url.join(CACHE_STORAGE, id)).delete();
     }
   }
+
   registerFormatter(id, extensions, format) {
     this.#formatter.unshift({
       id,
@@ -66,6 +71,7 @@ export default class Acode {
       format,
     });
   }
+
   async format() {
     const file = editorManager.activeFile;
     const { getModeForPath } = ace.require('ace/ext/modelist');
@@ -77,6 +83,7 @@ export default class Acode {
       await formatter.format();
     }
   }
+
   fsOperation(file) {
     return fsOperation(file);
   }

@@ -1,5 +1,5 @@
 import fsOperation from "../fileSystem/fsOperation";
-import keyBindings from "../keyBindings";
+import keyBindings from "../lib/keyBindings";
 import helpers from "../utils/helpers";
 
 export default async function Commands() {

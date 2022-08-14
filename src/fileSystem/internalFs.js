@@ -1,5 +1,6 @@
 import ajax from '@deadlyjack/ajax';
 import Url from '../utils/Url';
+
 export default {
   /**
    *

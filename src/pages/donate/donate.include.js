@@ -5,7 +5,7 @@ import mustache from "mustache";
 import Page from "../../components/page";
 import constants from "../../lib/constants";
 import ajax from '@deadlyjack/ajax';
-import helpers from '../../lib/utils/helpers';
+import helpers from '../../utils/helpers';
 import dialogs from '../../components/dialogs';
 import tag from 'html-tag-js';
 
