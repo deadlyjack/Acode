@@ -57,6 +57,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
         ajax({
           url: json,
           responseType: 'text',
+          contentType: 'application/x-www-form-urlencoded',
         }),
       );
     }
@@ -76,6 +77,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       ajax({
         url: Url.join(host, plugin.readme),
         responseType: 'text',
+        contentType: 'application/x-www-form-urlencoded',
       })
         .then((text) => {
           readme = text;
@@ -87,6 +89,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       ajax({
         url: Url.join(plugin.host, 'plugin.json'),
         responseType: 'text',
+        contentType: 'application/x-www-form-urlencoded',
       }).then((json) => {
         remotePlugin = helpers.parseJSON(json);
         remoteHost = plugin.host;

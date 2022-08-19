@@ -75,7 +75,7 @@ body {
       top: 6px;
       left: 50%;
       transform: translateX(-50%);
-      background-image: url(file:///android_asset/www/res/tail-spin.svg);
+      background-image: url(https://localhost/__cdvfile_assets__/www/res/tail-spin.svg);
       background-image: var(--tail-spin);
       background-repeat: no-repeat;
       background-position: center;
@@ -129,12 +129,11 @@ a {
   z-index: 5;
 
   li.tile {
-    height: calc(100% - 1px);
+    height: 100%;
     overflow: hidden;
     font-size: 0.8em;
     align-items: center;
     margin: 0;
-    margin-top: auto;
     padding: 0;
     color: inherit;
     min-width: 110px;
@@ -312,7 +311,7 @@ a.icon {
   }
 
   &.foxdebug {
-    background-image: url(file:///android_asset/www/res/logo/favicon.ico);
+    background-image: url(https://localhost/__cdvfile_assets__/www/res/logo/favicon.ico);
   }
 
   &.no-icon {

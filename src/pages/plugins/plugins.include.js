@@ -126,6 +126,7 @@ export default function PluginsInclude(updates) {
       url: listJson,
       method: 'GET',
       responseType: 'text',
+      contentType: 'application/x-www-form-urlencoded',
     });
     plugins.all = helpers.parseJSON(file) || [];
 

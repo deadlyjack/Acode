@@ -20,6 +20,38 @@
 -->
 # Release Notes
 
+### 7.0.0 (Apr 08, 2022)
+
+* [GH-520](https://github.com/apache/cordova-plugin-file/pull/520) test(android): disable `content` scheme tests
+* [GH-519](https://github.com/apache/cordova-plugin-file/pull/519) chore!: removed old platform code & lint cleanup
+* [GH-518](https://github.com/apache/cordova-plugin-file/pull/518) test(android): fix tests to use `cordova-android` 10.x default https scheme
+* [GH-517](https://github.com/apache/cordova-plugin-file/pull/517) fix(android): support cdvfile assets for custom scheme
+* [GH-516](https://github.com/apache/cordova-plugin-file/pull/516) fix(android): create `toURL` override to preserve other platforms
+* [GH-515](https://github.com/apache/cordova-plugin-file/pull/515) chore(npm): bump `package-lock.json` to v2
+* [GH-487](https://github.com/apache/cordova-plugin-file/pull/487) fix(android): Request external read permission when listing external directories
+* [GH-513](https://github.com/apache/cordova-plugin-file/pull/513) feat(android): add `WebViewAssetLoader` proxy handler for cdvfile
+* [GH-501](https://github.com/apache/cordova-plugin-file/pull/501) ci(ios): update workflow w/ **iOS** 15
+* [GH-498](https://github.com/apache/cordova-plugin-file/pull/498) ci: add action-badge
+* [GH-497](https://github.com/apache/cordova-plugin-file/pull/497) ci: remove `travis` & `appveyor`
+* [GH-490](https://github.com/apache/cordova-plugin-file/pull/490) chore: `npmrc`
+* [GH-493](https://github.com/apache/cordova-plugin-file/pull/493) test: remove deprecated `cordova-plugin-contact` tests
+* [GH-492](https://github.com/apache/cordova-plugin-file/pull/492) ci: remove `ci.yml` infavor of `lint.yml`
+* [GH-491](https://github.com/apache/cordova-plugin-file/pull/491) ci: add gh-actions workflows
+* [GH-441](https://github.com/apache/cordova-plugin-file/pull/441) ci: add node-14.x to workflow
+* [GH-489](https://github.com/apache/cordova-plugin-file/pull/489) fix: Brought back the return statement
+* [GH-470](https://github.com/apache/cordova-plugin-file/pull/470) fix: Remove test log
+* [GH-467](https://github.com/apache/cordova-plugin-file/pull/467) docs: adds missing words to the file object section in the `README`
+* [GH-458](https://github.com/apache/cordova-plugin-file/pull/458) refactor: shared `eslint` config
+* [GH-447](https://github.com/apache/cordova-plugin-file/pull/447) fix(browser): typo in `preparing.js`
+* [GH-439](https://github.com/apache/cordova-plugin-file/pull/439) chore: Require **Android** 9
+* [GH-433](https://github.com/apache/cordova-plugin-file/pull/433) refactor(android): Removed obsolete copyResource function
+* [GH-411](https://github.com/apache/cordova-plugin-file/pull/411) test: (android) use API 29
+* [GH-417](https://github.com/apache/cordova-plugin-file/pull/417) fix(android): Use legacy storage
+* [GH-404](https://github.com/apache/cordova-plugin-file/pull/404) chore(npm): use short notation in `package.json`
+* chore(asf): update git notification settings
+* Update CONTRIBUTING.md
+* [GH-383](https://github.com/apache/cordova-plugin-file/pull/383) chore(npm): improve ignore list
+
 ### 6.0.2 (Jun 27, 2019)
 
 -   fix: manually fix line endings of some files that were using CRLF ([`e8e06c3`](https://github.com/apache/cordova-plugin-file/commit/e8e06c3))
@@ -30,15 +62,15 @@
 -   ci(travis): Update Travis CI configuration for new paramedic ([#314](https://github.com/apache/cordova-plugin-file/issues/314)) ([`2b93a67`](https://github.com/apache/cordova-plugin-file/commit/2b93a67))
 -   fix(browser): support safari private browsing mode by using base64 text instead of blob ([#301](https://github.com/apache/cordova-plugin-file/issues/301)) ([`c609ff6`](https://github.com/apache/cordova-plugin-file/commit/c609ff6))
 -   chore(github): Add or update GitHub pull request and issue template ([`b762743`](https://github.com/apache/cordova-plugin-file/commit/b762743))
--   fix(types): CB-13569: fix inverted LocalFileSystem enum ([#274](https://github.com/apache/cordova-plugin-file/issues/274)) ([`d135cd0`](https://github.com/apache/cordova-plugin-file/commit/d135cd0))
+-   fix(types): [CB-13569](https://issues.apache.org/jira/browse/CB-13569) fix inverted LocalFileSystem enum ([#274](https://github.com/apache/cordova-plugin-file/issues/274)) ([`d135cd0`](https://github.com/apache/cordova-plugin-file/commit/d135cd0))
 -   docs: remove JIRA link ([`341fa9c`](https://github.com/apache/cordova-plugin-file/commit/341fa9c))
--   fix(types): CB-13850: Fix spelling in typed-file: property name filesystem (wrong… ([#229](https://github.com/apache/cordova-plugin-file/issues/229)) ([`4642fde`](https://github.com/apache/cordova-plugin-file/commit/4642fde))
--   fix(types): CB-13960: fix FileWriter.write argument type definition for typescript ([#231](https://github.com/apache/cordova-plugin-file/issues/231)) ([`5353b84`](https://github.com/apache/cordova-plugin-file/commit/5353b84))
+-   fix(types): [CB-13850](https://issues.apache.org/jira/browse/CB-13850) Fix spelling in typed-file: property name filesystem (wrong… ([#229](https://github.com/apache/cordova-plugin-file/issues/229)) ([`4642fde`](https://github.com/apache/cordova-plugin-file/commit/4642fde))
+-   fix(types): [CB-13960](https://issues.apache.org/jira/browse/CB-13960) fix FileWriter.write argument type definition for typescript ([#231](https://github.com/apache/cordova-plugin-file/issues/231)) ([`5353b84`](https://github.com/apache/cordova-plugin-file/commit/5353b84))
 -   ci(travis): also accept terms for android sdk `android-27` ([`6e7871b`](https://github.com/apache/cordova-plugin-file/commit/6e7871b))
 -   docs: add details for `applicationDirectory` on android ([#234](https://github.com/apache/cordova-plugin-file/issues/234)) ([`c2f5216`](https://github.com/apache/cordova-plugin-file/commit/c2f5216))
 -   fix: require FileReader in FileWriter to fix 'write' exec not being called ([#237](https://github.com/apache/cordova-plugin-file/issues/237)) ([`4a92bbb`](https://github.com/apache/cordova-plugin-file/commit/4a92bbb))
--   fix(android): CB-14181: (android) Fix bug - Cannot read property 'filesystemName' of null ([#235](https://github.com/apache/cordova-plugin-file/issues/235)) ([`cc3aedb`](https://github.com/apache/cordova-plugin-file/commit/cc3aedb))
--   ci(travis): CB-13753: Add build-tools-26.0.2 to travis ([#228](https://github.com/apache/cordova-plugin-file/issues/228)) ([`d8cc0fd`](https://github.com/apache/cordova-plugin-file/commit/d8cc0fd), [`5e12b5e`](https://github.com/apache/cordova-plugin-file/commit/5e12b5e))
+-   fix(android): [CB-14181](https://issues.apache.org/jira/browse/CB-14181) (android) Fix bug - Cannot read property 'filesystemName' of null ([#235](https://github.com/apache/cordova-plugin-file/issues/235)) ([`cc3aedb`](https://github.com/apache/cordova-plugin-file/commit/cc3aedb))
+-   ci(travis): [CB-13753](https://issues.apache.org/jira/browse/CB-13753) Add build-tools-26.0.2 to travis ([#228](https://github.com/apache/cordova-plugin-file/issues/228)) ([`d8cc0fd`](https://github.com/apache/cordova-plugin-file/commit/d8cc0fd), [`5e12b5e`](https://github.com/apache/cordova-plugin-file/commit/5e12b5e))
 -   chore: Fix release notes ([#227](https://github.com/apache/cordova-plugin-file/issues/227)) ([`c248827`](https://github.com/apache/cordova-plugin-file/commit/c248827))
 
 

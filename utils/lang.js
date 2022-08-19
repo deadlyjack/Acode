@@ -4,7 +4,7 @@ const yargs = require('yargs');
 const readline = require('readline');
 const args = yargs.alias('a', 'all').argv;
 
-const dir = path.resolve(__dirname, '../www/lang');
+const dir = path.resolve(__dirname, '../src/lang');
 const read = readline.createInterface({
   input: process.stdin,
   output: process.stdout

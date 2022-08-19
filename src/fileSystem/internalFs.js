@@ -31,48 +31,31 @@ export default {
    * @returns {Promise}
    */
   writeFile(filename, data, create = false, exclusive = true) {
+    exclusive = create ? exclusive : false;
     const name = filename.split('/').pop();
-    const _path = Url.dirname(filename);
+    const dirname = Url.dirname(filename);
 
     if (data instanceof ArrayBuffer) data = new Blob([data]);
 
     return new Promise((resolve, reject) => {
-      if (!create) {
-        window.resolveLocalFileSystemURL(
-          filename,
-          (fileEntry) => {
-            if (!fileEntry.isFile) reject('Expected file but got directory.');
-            fileEntry.createWriter((file) => {
-              file.onwriteend = () => resolve(filename);
-              file.onerror = (err) => reject(err.target.error);
-              file.write(data);
-            });
-          },
-          reject,
-        );
-      } else {
-        window.resolveLocalFileSystemURL(
-          _path,
-          (fs) => {
-            fs.getFile(
-              name,
-              {
-                create,
-                exclusive: create ? exclusive : false,
-              },
-              (fileEntry) => {
-                fileEntry.createWriter((file) => {
-                  file.onwriteend = () => resolve(filename);
-                  file.onerror = (err) => reject(err.target.error);
-                  file.write(data);
-                });
-              },
-              reject,
-            );
-          },
-          reject,
-        );
-      }
+      window.resolveLocalFileSystemURL(
+        dirname,
+        (entry) => {
+          entry.getFile(
+            name,
+            { create, exclusive },
+            (fileEntry) => {
+              fileEntry.createWriter((file) => {
+                file.onwriteend = (res) => resolve(filename);
+                file.onerror = (err) => reject(err.target.error);
+                file.write(data);
+              });
+            },
+            reject,
+          );
+        },
+        reject,
+      );
     });
   },
 
@@ -105,39 +88,31 @@ export default {
   readFile(filename) {
     return new Promise((resolve, reject) => {
       if (!filename) return reject('Invalid valud of fileURL: ' + filename);
-
-      ajax({
-        url: filename,
-        responseType: 'arraybuffer',
-      })
-        .then((res) => {
-          if (res)
-            resolve({
-              data: res,
+      window.resolveLocalFileSystemURL(
+        filename,
+        async (fileEntry) => {
+          const url = fileEntry.toInternalURL();
+          try {
+            const data = await ajax({
+              url: url,
+              responseType: 'arraybuffer',
             });
-          else return Promise.reject();
-        })
-        .catch(() => {
-          window.resolveLocalFileSystemURL(
-            filename,
-            (fileEntry) => {
-              fileEntry.file((file) => {
-                const fileReader = new FileReader();
-                fileReader.onloadend = function () {
-                  resolve({
-                    file,
-                    data: this.result,
-                  });
-                };
+            resolve({ data });
+          } catch (error) {
+            fileEntry.file((file) => {
+              const fileReader = new FileReader();
+              fileReader.onloadend = function () {
+                resolve({
+                  data: this.result,
+                });
+              };
 
-                fileReader.onerror = reject;
+              fileReader.onerror = reject;
 
-                fileReader.readAsArrayBuffer(file);
-              }, reject);
-            },
-            reject,
-          );
-        });
+              fileReader.readAsArrayBuffer(file);
+            }, reject);
+          }
+        }, reject);
     });
   },
 

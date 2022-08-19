@@ -1,12 +1,12 @@
 # Acode editor (Code editor for android)
 
-![logo](./res/icon/android/ic_launcher-web.png)
+![logo](./res/logo.png)
 
-Acode is a hybrid app using Apache Cordova. This app is available on the play store. Check it out from [here](https://acode.foxdebug.com).
+Acode is a lightweight code editor for Android phones. You can use this editor for editing HTML, JavaScript, text.
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/com.foxdebug.acode/)
+You can create a website, run the website in the browser and see errors or logs in the console.
+Also edit any kind of source file like python, CSS, HTML, Java, JavaScript, Dart, etc.
+
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
      alt="Get it on Google Play"
      height="80">](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree)
@@ -19,7 +19,7 @@ Acode is a hybrid app using Apache Cordova. This app is available on the play st
 
 ## Multi-language support
 
-To add new language, create a new file with language code for android (eg. en-us for english) in [`www/lang/`](https://github.com/deadlyjack/Acode/tree/main/www/lang) directory. After adding new laguage also add it to [`src/constants.js -> langList`](https://github.com/deadlyjack/Acode/blob/main/src/lib/constants.js#L89).
+To add new language, create a new file with language code for android (eg. en-us for english) in [`src/lang/`](https://github.com/deadlyjack/Acode/tree/main/src/lang) directory. After adding new laguage also add it to [`src/lib/lang.js`](https://github.com/deadlyjack/Acode/blob/main/src/lib/lang.js#L89).
 
 Here are few utility tools to add, remove or search a string in all added languages.
 
@@ -41,7 +41,3 @@ Run `npm install` to install all dependencies before building the APK.
 ## Develop plugin for Acode
 
 Please see this [repository](https://github.com/deadlyjack/acode-plugin) for documentation.
-
-## Ace editor
-
-- [Ace editor](https://ace.c9.io/)

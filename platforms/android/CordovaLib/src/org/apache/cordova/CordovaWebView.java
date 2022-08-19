@@ -10,7 +10,7 @@ import java.util.Map;
 public interface CordovaWebView {
   public void setInputType(int type);
 
-  public static final String CORDOVA_VERSION = "9.1.0";
+  public static final String CORDOVA_VERSION = "10.1.2";
 
   void init(CordovaInterface cordova, List<PluginEntry> pluginEntries, CordovaPreferences preferences);
 

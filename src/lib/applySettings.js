@@ -11,11 +11,6 @@ export default {
       acode.exec('enable-fullscreen');
     }
 
-    //disable-floating-button
-    if (appSettings.value.disableFloatingButton) {
-      root.classList.add('disable-floating-button');
-    }
-
     //setup vibration
     app.addEventListener('click', function (e) {
       const $target = e.target;
@@ -25,8 +20,13 @@ export default {
     });
 
     system.setInputType(appSettings.value.keyboardMode);
+    window.restoreTheme();
   },
   afterRender() {
+    if (!appSettings.value.floatingButton) {
+      root.classList.add('hide-floating-button');
+    }
+
     appSettings.applyAutoSaveSetting();
     //quick-tools
     if (appSettings.value.quickTools) {

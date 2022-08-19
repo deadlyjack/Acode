@@ -37,6 +37,7 @@ export default async function installPlugin(plugin, host) {
       ajax({
         url: mainJs,
         method: 'GET',
+        contentType: 'application/x-www-form-urlencoded',
         responseType: 'arraybuffer',
         onprogress(loaded, total) {
           progress(plugin.name, loaded / total);
@@ -45,6 +46,7 @@ export default async function installPlugin(plugin, host) {
       ajax({
         url: Url.join(host, plugin.icon),
         method: 'GET',
+        contentType: 'application/x-www-form-urlencoded',
         responseType: 'arraybuffer',
         onprogress(loaded, total) {
           progress('icon', loaded / total);
@@ -53,6 +55,7 @@ export default async function installPlugin(plugin, host) {
       ajax({
         url: Url.join(host, plugin.readme),
         method: 'GET',
+        contentType: 'application/x-www-form-urlencoded',
         responseType: 'arraybuffer',
         onprogress(loaded, total) {
           progress('readme', loaded / total);
@@ -101,6 +104,7 @@ export default async function installPlugin(plugin, host) {
                 await ajax({
                   url: Url.join(rootDir, file),
                   method: 'GET',
+                  contentType: 'application/x-www-form-urlencoded',
                   responseType: 'arraybuffer',
                   onprogress(loaded, total) {
                     progress(file, loaded / total);

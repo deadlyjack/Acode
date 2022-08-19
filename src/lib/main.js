@@ -46,6 +46,7 @@ import plugins from '../pages/plugins/plugins';
 import Acode from './acode';
 import createPluginServer from './createPluginServer';
 import ajax from '@deadlyjack/ajax';
+import lang from './lang';
 
 window.onload = Main;
 
@@ -79,7 +80,6 @@ async function Main() {
 }
 
 async function ondeviceready() {
-  const language = navigator.language.toLowerCase();
   const oldRURL = window.resolveLocalFileSystemURL;
   const {
     externalCacheDirectory, //
@@ -87,7 +87,6 @@ async function ondeviceready() {
     cacheDirectory,
     dataDirectory,
   } = cordova.file;
-  let lang = 'en-us';
 
   iap.startConnection();
   window.root = tag.get('#root');
@@ -166,11 +165,8 @@ async function ondeviceready() {
       );
   }, 1000 * 10);
 
-  if (language in constants.langList) {
-    lang = language;
-  }
   acode.setLoadingMessage('Loading settings...');
-  await appSettings.init(lang);
+  await appSettings.init();
 
   if (localStorage.versionCode < 150) {
     localStorage.clear();
@@ -215,14 +211,7 @@ async function ondeviceready() {
   );
 
   acode.setLoadingMessage('Loading language...');
-  try {
-    const languageFile = `${ASSETS_DIRECTORY}/lang/${appSettings.value.lang}.json`;
-    const fs = fsOperation(languageFile);
-    const text = await fs.readFile('utf-8');
-    window.strings = helpers.parseJSON(text);
-  } catch (error) {
-    alert('Unable to load language file.');
-  }
+  await lang.set(appSettings.value.language);
 
   acode.setLoadingMessage('Initializing GitHub...');
   await git.init();
@@ -334,26 +323,24 @@ async function loadApp() {
 
   actionStack.onCloseApp = () => acode.exec('save-state');
   $sidebar.setAttribute('empty-msg', strings['open folder']);
-  window.editorManager = await EditorManager($sidebar, $header, $main);
+  window.editorManager = await EditorManager($sidebar, $header, $main)
+    .catch((error) => {
+      console.error(error);
+      toast('Editor initialization failed!');
+    });
 
-  const fmode = appSettings.value.floatingButtonActivation;
-  const activationMode = fmode === 'long tap' ? 'oncontextmenu' : 'onclick';
-  $headerToggler[activationMode] = function () {
+  $headerToggler.onclick = function () {
     root.classList.toggle('show-header');
     this.classList.toggle('keyboard_arrow_left');
     this.classList.toggle('keyboard_arrow_right');
   };
-  $quickToolToggler[activationMode] = function () {
+  $quickToolToggler.onclick = function () {
     acode.exec('toggle-quick-tools');
   };
 
   //#region rendering
   applySettings.beforeRender();
-  window.restoreTheme();
   root.appendOuter($header, $main, $footer, $floatingNavToggler, $headerToggler, $quickToolToggler);
-  if (!appSettings.value.floatingButton) {
-    root.classList.add('hide-floating-button');
-  }
   applySettings.afterRender();
   //#endregion
 
@@ -364,14 +351,14 @@ async function loadApp() {
   }
 
   if (Array.isArray(files) && files.length) {
-    acode.setLoadingMessage(`Loading files (0/${files.length})`);
-    const res = await openFiles(files, (count) => {
-      acode.setLoadingMessage(`Loading files (${count}/${files.length})`);
-    });
-    if (res.success === 0) {
-      editorManager.addNewFile();
-    }
-    onEditorUpdate(false);
+    openFiles(files)
+      .then(() => {
+        onEditorUpdate(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast('File loading failed!');
+      });
   } else {
     editorManager.addNewFile();
   }
@@ -380,7 +367,7 @@ async function loadApp() {
   setTimeout(() => {
     document.body.removeAttribute('data-small-msg');
     app.classList.remove('loading', 'splash');
-  }, 1000);
+  }, 500);
 
   //#region Add event listeners
   root.on('show', mainPageOnShow);

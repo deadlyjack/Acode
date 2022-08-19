@@ -728,7 +728,11 @@ public class System extends CordovaPlugin {
   }
 
   private void getGlobalSetting(String setting, CallbackContext callback) {
-    int value = (int) Global.getFloat(context.getContentResolver(), setting, 0);
+    int value = (int) Global.getFloat(
+      context.getContentResolver(),
+      setting,
+      -1
+    );
     callback.success(value);
   }
 

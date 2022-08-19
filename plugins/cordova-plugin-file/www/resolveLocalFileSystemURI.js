@@ -21,7 +21,7 @@
 (function () {
     // For browser platform: not all browsers use overrided `resolveLocalFileSystemURL`.
     function checkBrowser () {
-        if (cordova.platformId === 'browser' && require('./isChrome')()) { // eslint-disable-line no-undef
+        if (cordova.platformId === 'browser' && require('./isChrome')()) {
             module.exports.resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
             return true;
         }
@@ -65,11 +65,11 @@
             if (entry) {
                 if (successCallback) {
                     // create appropriate Entry object
-                    var fsName = entry.filesystemName || (entry.filesystem && entry.filesystem.name) || (entry.filesystem === window.PERSISTENT ? 'persistent' : 'temporary'); // eslint-disable-line no-undef
+                    var fsName = entry.filesystemName || (entry.filesystem && entry.filesystem.name) || (entry.filesystem === window.PERSISTENT ? 'persistent' : 'temporary');
                     fileSystems.getFs(fsName, function (fs) {
                         // This should happen only on platforms that haven't implemented requestAllFileSystems (windows)
                         if (!fs) {
-                            fs = new FileSystem(fsName, {name: '', fullPath: '/'}); // eslint-disable-line no-undef
+                            fs = new FileSystem(fsName, { name: '', fullPath: '/' });
                         }
                         var result = (entry.isDirectory) ? new DirectoryEntry(entry.name, entry.fullPath, fs, entry.nativeURL) : new FileEntry(entry.name, entry.fullPath, fs, entry.nativeURL);
                         successCallback(result);

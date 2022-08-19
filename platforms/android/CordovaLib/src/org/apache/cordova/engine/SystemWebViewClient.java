@@ -18,17 +18,18 @@
 */
 package org.apache.cordova.engine;
 
-import android.annotation.TargetApi;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
-import android.os.Build;
 import android.webkit.ClientCertRequest;
 import android.webkit.HttpAuthHandler;
+import android.webkit.MimeTypeMap;
 import android.webkit.SslErrorHandler;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -36,14 +37,17 @@ import android.webkit.WebViewClient;
 import org.apache.cordova.AuthenticationToken;
 import org.apache.cordova.CordovaClientCertRequest;
 import org.apache.cordova.CordovaHttpAuthHandler;
+import org.apache.cordova.CordovaPluginPathHandler;
 import org.apache.cordova.CordovaResourceApi;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
 
+import androidx.webkit.WebViewAssetLoader;
 
 /**
  * This class is the WebViewClient that implements callbacks for our web view.
@@ -56,6 +60,7 @@ public class SystemWebViewClient extends WebViewClient {
 
     private static final String TAG = "SystemWebViewClient";
     protected final SystemWebViewEngine parentEngine;
+    private final WebViewAssetLoader assetLoader;
     private boolean doClearHistory = false;
     boolean isCurrentlyLoading;
 
@@ -64,6 +69,52 @@ public class SystemWebViewClient extends WebViewClient {
 
     public SystemWebViewClient(SystemWebViewEngine parentEngine) {
         this.parentEngine = parentEngine;
+
+        WebViewAssetLoader.Builder assetLoaderBuilder = new WebViewAssetLoader.Builder()
+                .setDomain(parentEngine.preferences.getString("hostname", "localhost"))
+                .setHttpAllowed(true);
+
+        assetLoaderBuilder.addPathHandler("/", path -> {
+            try {
+                // Check if there a plugins with pathHandlers
+                PluginManager pluginManager = this.parentEngine.pluginManager;
+                if (pluginManager != null) {
+                    for (CordovaPluginPathHandler handler : pluginManager.getPluginPathHandlers()) {
+                        if (handler.getPathHandler() != null) {
+                            WebResourceResponse response = handler.getPathHandler().handle(path);
+                            if (response != null) {
+                                return response;
+                            }
+                        };
+                    }
+                }
+
+                if (path.isEmpty()) {
+                    path = "index.html";
+                }
+                InputStream is = parentEngine.webView.getContext().getAssets().open("www/" + path, AssetManager.ACCESS_STREAMING);
+                String mimeType = "text/html";
+                String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+                if (extension != null) {
+                    if (path.endsWith(".js") || path.endsWith(".mjs")) {
+                        // Make sure JS files get the proper mimetype to support ES modules
+                        mimeType = "application/javascript";
+                    } else if (path.endsWith(".wasm")) {
+                        mimeType = "application/wasm";
+                    } else {
+                        mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                    }
+                }
+
+                return new WebResourceResponse(mimeType, null, is);
+            } catch (Exception e) {
+                e.printStackTrace();
+                LOG.e(TAG, e.getMessage());
+            }
+            return null;
+        });
+
+        this.assetLoader = assetLoaderBuilder.build();
     }
 
     /**
@@ -320,10 +371,10 @@ public class SystemWebViewClient extends WebViewClient {
     @SuppressWarnings("deprecation")
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
         try {
-            // Check the against the whitelist and lock out access to the WebView directory
+            // Check the against the allow list and lock out access to the WebView directory
             // Changing this will cause problems for your application
             if (!parentEngine.pluginManager.shouldAllowRequest(url)) {
-                LOG.w(TAG, "URL blocked by whitelist: " + url);
+                LOG.w(TAG, "URL blocked by allow list: " + url);
                 // Results in a 404.
                 return new WebResourceResponse("text/plain", "UTF-8", null);
             }
@@ -365,5 +416,10 @@ public class SystemWebViewClient extends WebViewClient {
         }
 
         return false;
+    }
+
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+        return this.assetLoader.shouldInterceptRequest(request.getUrl());
     }
 }

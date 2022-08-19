@@ -127,20 +127,21 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     settings.setJavaScriptCanOpenWindowsAutomatically(true);
     settings.setLayoutAlgorithm(LayoutAlgorithm.NORMAL);
 
-    settings.setAllowFileAccess(true);
-
     String manufacturer = android.os.Build.MANUFACTURER;
     LOG.d(TAG, "CordovaWebView is running on device made by: " + manufacturer);
 
     settings.setSaveFormData(false);
-    settings.setSavePassword(false);
 
-    settings.setAllowUniversalAccessFromFileURLs(true);
+    if (preferences.getBoolean("AndroidInsecureFileModeEnabled", false)) {
+      LOG.d(TAG, "Enabled insecure file access");
+      settings.setAllowFileAccess(true);
+      settings.setAllowUniversalAccessFromFileURLs(true);
+    }
+
     settings.setMediaPlaybackRequiresUserGesture(false);
 
     String databasePath = webView.getContext().getApplicationContext().getDir("database", Context.MODE_PRIVATE).getPath();
     settings.setDatabaseEnabled(true);
-    settings.setDatabasePath(databasePath);
 
     ApplicationInfo appInfo = webView.getContext().getApplicationContext().getApplicationInfo();
     if ((appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
@@ -152,10 +153,6 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     settings.setDomStorageEnabled(true);
 
     settings.setGeolocationEnabled(true);
-
-    settings.setAppCacheMaxSize(5 * 1048576);
-    settings.setAppCachePath(databasePath);
-    settings.setAppCacheEnabled(true);
 
     String defaultUserAgent = settings.getUserAgentString();
 

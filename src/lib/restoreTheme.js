@@ -51,7 +51,6 @@ export default async function restoreTheme(darken) {
       }
       const text = svg.replace(/#fff/g, textColor);
       await fs.writeFile(text);
-      app.style.cssText = `--tail-spin: url(${img})`;
     } catch (error) {
       console.error(error);
     }

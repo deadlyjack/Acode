@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<widget id="com.foxdebug.acode" android-versionCode="203" version="1.6.0"
+<widget id="com.foxdebug.acode" android-versionCode="205" version="1.6.0"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -22,9 +22,6 @@
     <allow-intent href="geo:*" />
 
     <platform name="android">
-        <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/colors.xml" />
-        <resource-file src="res/network_security_config.xml" target="/app/src/main/res/xml/network_security_config.xml" />
-
         <allow-intent href="market:*" />
         <preference name="fullscreen" value="false"/>
         <preference name="SplashScreen" value="none"/>
@@ -33,7 +30,7 @@
         <preference name="BackgroundColor" value="0xFF313131" />
         <preference name="AndroidPersistentFileLocation" value="Compatibility" />
         <preference name="android-minSdkVersion" value="22" />
-        <preference name="android-targetSdkVersion" value="30" />
+        <preference name="android-targetSdkVersion" value="31" />
         <preference name="AndroidLaunchMode" value="singleTask" />
         <preference name="prerendered-icon" value="false" />
         <preference name="androidxEnabled" value="true" />
@@ -42,6 +39,7 @@
             <application android:networkSecurityConfig="@xml/network_security_config" />
             <application android:hardwareAccelerated="true" />
             <application android:requestLegacyExternalStorage="true" />
+            <application android:largeHeap="true" />
         </edit-config>
 
         <config-file parent="./application/activity" target="AndroidManifest.xml">
@@ -60,14 +58,9 @@
             <uses-permission android:name="android.permission.VIBRATE" />
         </config-file>
 
-        <icon background="@color/ic_launcher_background" density="mdpi" foreground="res/icon/android/mipmap-mdpi/ic_launcher_foreground.png" />
-        <icon background="@color/ic_launcher_background" density="hdpi" foreground="res/icon/android/mipmap-hdpi/ic_launcher_foreground.png" />
-        <icon background="@color/ic_launcher_background" density="xhdpi" foreground="res/icon/android/mipmap-xhdpi/ic_launcher_foreground.png" />
-        <icon background="@color/ic_launcher_background" density="xxhdpi" foreground="res/icon/android/mipmap-xxhdpi/ic_launcher_foreground.png" />
-        <icon background="@color/ic_launcher_background" density="xxxhdpi" foreground="res/icon/android/mipmap-xxxhdpi/ic_launcher_foreground.png" />
-
         <hook type="before_prepare" src="hooks/add-input-type.js" />
         <hook type="before_prepare" src="hooks/post-process.js" />
+        <hook type="before_prepare" src="hooks/copy-resources.js" />
         <hook type="before_prepare" src="hooks/move-files.js" />
     </platform>
 </widget>

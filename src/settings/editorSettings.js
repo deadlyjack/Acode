@@ -72,11 +72,6 @@ export default function editorSettings() {
       checkbox: values.formatOnSave,
     },
     {
-      key: 'linting',
-      text: strings.linting,
-      checkbox: values.linting,
-    },
-    {
       key: 'showSpaces',
       text: strings['show spaces'],
       checkbox: values.showSpaces,

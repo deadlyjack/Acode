@@ -24,9 +24,7 @@ export default async function openFile(file, data = {}) {
 
     helpers.showTitleLoader();
     const fs = fsOperation(uri);
-    const fileInfo = await fs.stat().catch((err) => {
-      console.error("Error while getting file info", err);
-    });
+    const fileInfo = await fs.stat();
     const name = fileInfo.name || file.name || uri;
     const settings = appSettings.value;
     const readOnly = fileInfo.canWrite ? false : true;
@@ -46,7 +44,6 @@ export default async function openFile(file, data = {}) {
 
     if (text) {
       // If file is not opened and has unsaved text
-      helpers.removeTitleLoader();
       createEditor(true, text);
       return;
     }
@@ -54,7 +51,6 @@ export default async function openFile(file, data = {}) {
     // Else open a new file
     // Checks for valid file
     if (fileInfo.length * 0.000001 > settings.maxFileSize) {
-      helpers.removeTitleLoader();
       return alert(
         strings.error.toUpperCase(),
         strings['file too large'].replace(
@@ -64,15 +60,17 @@ export default async function openFile(file, data = {}) {
       );
     }
 
-    const binData = await fs.readFile().catch((err) => {
-      console.error("Error while reading file", err);
-    });
+    const binData = await fs.readFile();
     const fileContent = helpers.decodeText(binData);
 
-    helpers.removeTitleLoader();
-    if (helpers.isBinary(fileContent) && /image/i.test(fileInfo.type)) {
+    if (helpers.isBinary(fileContent)) {
       const blob = new Blob([binData]);
-      dialogs.box(name, `<img src='${URL.createObjectURL(blob)}'>`);
+      if (/image/i.test(fileInfo.type)) {
+        dialogs.box(name, `<img src='${URL.createObjectURL(blob)}'>`);
+        return;
+      }
+
+      dialogs.alert(strings.info.toUpperCase(), 'Cannot open binary file');
       return;
     }
 
@@ -80,7 +78,8 @@ export default async function openFile(file, data = {}) {
     if (mode !== 'single') recents.addFile(uri);
     return;
   } catch (error) {
-    helpers.removeTitleLoader();
     console.error(error);
+  } finally {
+    helpers.removeTitleLoader();
   }
 }

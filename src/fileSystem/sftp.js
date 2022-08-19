@@ -1,3 +1,4 @@
+import ajax from '@deadlyjack/ajax';
 import mimeType from 'mime-types';
 import Path from '../utils/Path';
 import Url from '../utils/Url';
@@ -262,7 +263,8 @@ class SFTP {
             localFilename,
             async () => {
               try {
-                resolve(await internalFs.readFile(localFilename));
+                const data = await internalFs.readFile(localFilename);
+                resolve(data);
               } catch (error) {
                 reject(error);
               }
@@ -450,6 +452,10 @@ class SFTP {
       type: mimeType.lookup(filename),
       uri: file.url,
     };
+  }
+
+  async exists() {
+    return (await this.stat()).exists;
   }
 
   /**

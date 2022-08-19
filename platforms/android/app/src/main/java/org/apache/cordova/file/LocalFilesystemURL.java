@@ -23,6 +23,7 @@ import android.net.Uri;
 public class LocalFilesystemURL {
 	
 	public static final String FILESYSTEM_PROTOCOL = "cdvfile";
+    public static final String CDVFILE_KEYWORD = "__cdvfile_";
 
     public final Uri uri;
     public final String fsName;
@@ -37,19 +38,26 @@ public class LocalFilesystemURL {
 	}
 
     public static LocalFilesystemURL parse(Uri uri) {
-        if (!FILESYSTEM_PROTOCOL.equals(uri.getScheme())) {
+        if(!uri.toString().contains(CDVFILE_KEYWORD)) {
             return null;
         }
+
         String path = uri.getPath();
         if (path.length() < 1) {
             return null;
         }
+
         int firstSlashIdx = path.indexOf('/', 1);
         if (firstSlashIdx < 0) {
             return null;
         }
+
         String fsName = path.substring(1, firstSlashIdx);
+        fsName = fsName.substring(CDVFILE_KEYWORD.length());
+        fsName = fsName.substring(0, fsName.length() - 2);
+
         path = path.substring(firstSlashIdx);
+
         boolean isDirectory = path.charAt(path.length() - 1) == '/';
         return new LocalFilesystemURL(uri, fsName, path, isDirectory);
     }
@@ -57,6 +65,8 @@ public class LocalFilesystemURL {
     public static LocalFilesystemURL parse(String uri) {
         return parse(Uri.parse(uri));
     }
+
+    public static String fsNameToCdvKeyword(String fsName) { return CDVFILE_KEYWORD + fsName + "__"; }
 
     public String toString() {
         return uri.toString();

@@ -21,7 +21,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android"
            id="cordova-plugin-file"
-      version="6.0.2">
+      version="7.0.0">
     <name>File</name>
     <description>Cordova File Plugin</description>
     <license>Apache 2.0</license>
@@ -30,7 +30,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     <issue>https://github.com/apache/cordova-plugin-file/issues</issue>
 
     <engines>
-        <engine name="cordova-android" version=">=6.3.0" />
+        <engine name="cordova-android" version=">=10.0.0" />
     </engines>
 
     <js-module src="www/DirectoryEntry.js" name="DirectoryEntry">
@@ -132,7 +132,6 @@ to config.xml in order for the application to find previously stored files.
             </feature>
             <allow-navigation href="cdvfile:*" />
         </config-file>
-
         <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         </config-file>
@@ -151,7 +150,13 @@ to config.xml in order for the application to find previously stored files.
         <source-file src="src/android/AssetFilesystem.java" target-dir="src/org/apache/cordova/file" />
         <source-file src="src/android/PendingRequests.java" target-dir="src/org/apache/cordova/file" />
 
+        <preference name="ANDROIDX_WEBKIT_VERSION" default="1.4.0"/>
+        <framework src="androidx.webkit:webkit:$ANDROIDX_WEBKIT_VERSION" />
+
         <!-- android specific file apis -->
+        <js-module src="www/android/Entry.js" name="androidEntry">
+            <merges target="Entry" />
+        </js-module>
         <js-module src="www/android/FileSystem.js" name="androidFileSystem">
             <merges target="FileSystem" />
         </js-module>

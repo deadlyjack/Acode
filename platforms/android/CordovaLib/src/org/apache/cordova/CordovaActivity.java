@@ -24,7 +24,6 @@ import java.util.Locale;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -32,7 +31,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +40,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * This class is the main Android activity that represents the Cordova
@@ -74,7 +74,7 @@ import android.widget.FrameLayout;
  * deprecated in favor of the config.xml file.
  *
  */
-public class CordovaActivity extends Activity {
+public class CordovaActivity extends AppCompatActivity {
     public static String TAG = "CordovaActivity";
 
     // The webview for our app
@@ -513,6 +513,8 @@ public class CordovaActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[],
                                            int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         try
         {
             cordovaInterface.onRequestPermissionResult(requestCode, permissions, grantResults);

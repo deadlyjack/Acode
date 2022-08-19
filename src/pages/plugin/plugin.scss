@@ -1,15 +1,16 @@
-#plugin{
+#plugin {
   display: flex;
   flex-direction: column;
-  
-  .header{
+
+  .header {
     display: flex;
     flex-direction: column;
 
-    .tag{
+    .tag {
       display: flex;
       align-items: center;
       justify-content: center;
+      min-height: 20px;
       height: 20px;
       width: fit-content;
       padding: 0 10px;
@@ -20,16 +21,16 @@
       color: var(--button-text-color);
       margin: 10px 10px 10px 0;
 
-      &:last-child{
+      &:last-child {
         margin-right: 0;
       }
     }
 
-    .info{
+    .info {
       display: flex;
-      padding:20px;
-      
-      .logo{
+      padding: 20px;
+
+      .logo {
         height: 100px;
         width: 100px;
         background-position: center;
@@ -37,21 +38,21 @@
         background-size: 80px;
       }
 
-      .desc{
+      .desc {
         flex: 1;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        
-        :not(.name){
+
+        :not(.name) {
           font-size: 0.8rem;
         }
 
-        .name{
+        .name {
           margin-bottom: 10px;
         }
 
-        .version::before{
+        .version::before {
           content: 'v';
         }
       }
@@ -59,25 +60,30 @@
     }
   }
 
-  .button-container{
+  .button-container {
     padding: 0 10px;
     margin: 10px 0;
     box-sizing: border-box;
 
-    button{
+    button {
       margin: 0 10px;
       border-radius: 4px;
     }
   }
 
-  .body{
+  .body {
     flex: 1;
     text-align: justify;
     padding: 10px;
     box-sizing: border-box;
   }
 
-  h1,h2,h3,h4,h5,h6{
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     margin: 10px 0;
   }
 }

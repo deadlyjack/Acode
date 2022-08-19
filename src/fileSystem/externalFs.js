@@ -1,11 +1,11 @@
+import ajax from '@deadlyjack/ajax';
 import dialogs from '../components/dialogs';
-import internalFs from './internalFs';
 
 export default {
-  async readFile(uri) {
-    uri = await this.formatUri(uri);
+  async readFile(url) {
+    url = await this.formatUri(url);
     return new Promise((resolve, reject) => {
-      internalFs.readFile(uri).then(resolve).catch(reject)
+      sdcard.read(url, (data) => resolve({ data }), reject);
     });
   },
 

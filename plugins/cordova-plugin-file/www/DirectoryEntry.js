@@ -36,7 +36,6 @@ var DirectoryReader = require('./DirectoryReader');
  * {FileSystem} filesystem on which the directory resides (readonly)
  */
 var DirectoryEntry = function (name, fullPath, fileSystem, nativeURL) {
-
     // add trailing slash if it is missing
     if ((fullPath) && !/\/$/.test(fullPath)) {
         fullPath += '/';

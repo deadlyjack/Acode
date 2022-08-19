@@ -1,17 +1,17 @@
 import settingsPage from '../components/settingPage';
 
-export default function filesSettings(callback) {
+export default function filesSettings(onSaveSettings) {
   const title = strings.settings.capitalize();
   const values = appSettings.value.fileBrowser;
 
   const items = [
     {
-      key: 'sort',
+      key: 'sortByName',
       text: strings['sort by name'],
       checkbox: values.sortByName,
     },
     {
-      key: 'show',
+      key: 'showHiddenFiles',
       text: strings['show hidden files'],
       checkbox: values.showHiddenFiles,
     },
@@ -19,10 +19,9 @@ export default function filesSettings(callback) {
 
 
   function callback(key, value) {
-    appSettings.update({
-      [key]: value,
-    });
-    if (callback) callback();
+    appSettings.value.fileBrowser[key] = value;
+    appSettings.update();
+    if (onSaveSettings) onSaveSettings();
   }
 
   settingsPage(title, items, callback);

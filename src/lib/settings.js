@@ -65,7 +65,6 @@ export default class Settings {
       tabSize: 2,
       linenumbers: true,
       formatOnSave: false,
-      linting: false,
       autoCorrect: true,
       previewMode: 'inapp',
       openFileListPos: 'header',
@@ -73,7 +72,6 @@ export default class Settings {
       editorFont: 'default',
       vibrateOnTap: true,
       fullscreen: false,
-      floatingButtonActivation: 'click',
       floatingButton: true,
       liveAutoCompletion: true,
       showPrintMargin: false,
@@ -127,7 +125,7 @@ export default class Settings {
     this.settingsFile = Url.join(DATA_STORAGE, 'settings.json');
   }
 
-  async init(lang) {
+  async init() {
     if (this.#initialized) return;
     this.#initialized = true;
 
@@ -137,7 +135,7 @@ export default class Settings {
       await this.#save();
       this.value = { ...this.#defaultSettings };
       this.#oldSettings = { ...this.#defaultSettings };
-      this.value.lang = lang;
+      this.value.lang = navigator.language || 'en-us';
       return;
     }
 
@@ -191,15 +189,17 @@ export default class Settings {
 
     const onupdate = [...this.#on.update];
 
-    Object.keys(settings).forEach((key) => {
-      if (key in this.value) this.value[key] = settings[key];
-      if (key === 'animation') {
-        this.applyAnimationSetting();
-      }
-      if (key === 'autosave') {
-        this.applyAutoSaveSetting();
-      }
-    });
+    if (settings) {
+      Object.keys(settings).forEach((key) => {
+        if (key in this.value) this.value[key] = settings[key];
+        if (key === 'animation') {
+          this.applyAnimationSetting();
+        }
+        if (key === 'autosave') {
+          this.applyAutoSaveSetting();
+        }
+      });
+    }
 
     const changedSettings = this.#getChangedKeys();
     changedSettings.forEach((setting) => {

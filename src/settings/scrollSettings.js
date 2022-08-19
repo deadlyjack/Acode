@@ -7,7 +7,7 @@ export default function scrollSettings() {
 
   const items = [
     {
-      key: 'scroll-speed',
+      key: 'scrollSpeed',
       text: strings['scroll speed'],
       value: values.scrollSpeed,
       valueText: getScrollSpeedString,
@@ -18,12 +18,12 @@ export default function scrollSettings() {
       ],
     },
     {
-      key: 'reverse-scrolling',
+      key: 'reverseScrolling',
       text: strings['reverse scrolling'],
       checkbox: values.reverseScrolling,
     },
     {
-      key: 'diagonal-scrolling',
+      key: 'diagonalScrolling',
       text: strings['diagonal scrolling'],
       checkbox: values.diagonalScrolling,
     },

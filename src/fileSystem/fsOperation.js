@@ -164,7 +164,7 @@ function fsOperation(uri) {
       renameTo(newname) {
         return fs.rename(newname);
       },
-      async exists() {
+      exists() {
         return fs.exists();
       },
       stat() {

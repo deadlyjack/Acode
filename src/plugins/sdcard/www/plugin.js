@@ -41,6 +41,9 @@ module.exports = {
   rename: function (pathname, newFilename, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'SDcard', 'rename', [pathname, newFilename]);
   },
+  read: function (filename, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'SDcard', 'read', [filename]);
+  },
   write: function (filename, content, isBinary, onSuccess, onFail) {
     if (typeof isBinary === 'function') {
       onSuccess = isBinary;

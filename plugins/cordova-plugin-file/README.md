@@ -21,11 +21,9 @@ description: Read/write files on the device.
 #         under the License.
 -->
 
-|AppVeyor|Travis CI|
-|:-:|:-:|
-|[![Build status](https://ci.appveyor.com/api/projects/status/github/apache/cordova-plugin-file?branch=master)](https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-plugin-file)|[![Build Status](https://travis-ci.org/apache/cordova-plugin-file.svg?branch=master)](https://travis-ci.org/apache/cordova-plugin-file)|
-
 # cordova-plugin-file
+
+[![Android Testsuite](https://github.com/apache/cordova-plugin-file/actions/workflows/android.yml/badge.svg)](https://github.com/apache/cordova-plugin-file/actions/workflows/android.yml) [![Chrome Testsuite](https://github.com/apache/cordova-plugin-file/actions/workflows/chrome.yml/badge.svg)](https://github.com/apache/cordova-plugin-file/actions/workflows/chrome.yml) [![iOS Testsuite](https://github.com/apache/cordova-plugin-file/actions/workflows/ios.yml/badge.svg)](https://github.com/apache/cordova-plugin-file/actions/workflows/ios.yml) [![Lint Test](https://github.com/apache/cordova-plugin-file/actions/workflows/lint.yml/badge.svg)](https://github.com/apache/cordova-plugin-file/actions/workflows/lint.yml)
 
 This plugin implements a File API allowing read/write access to files residing on the device.
 
@@ -49,9 +47,9 @@ To get a few ideas how to use the plugin, check out the [sample](#sample) at the
 For an overview of other storage options, refer to Cordova's
 [storage guide](http://cordova.apache.org/docs/en/latest/cordova/storage/storage.html).
 
-This plugin defines global `cordova.file` object.
+This plugin defines a global `cordova.file` object.
 
-Although in the global scope, it is not available until after the `deviceready` event.
+Although the object is in the global scope, it is not available to applications until after the `deviceready` event fires.
 
     document.addEventListener("deviceready", onDeviceReady, false);
     function onDeviceReady() {
@@ -162,7 +160,7 @@ the `cordova.file.*` properties map to physical paths on a real device.
 | &nbsp;&nbsp;&nbsp;`cache`                       | cacheDirectory              | cache                     | r/w  |     Yes     |     Yes\* |   Yes   |
 | &nbsp;&nbsp;&nbsp;`files`                       | dataDirectory               | files                     | r/w  |     Yes     |     No    |   Yes   |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Documents` |                             | documents                 | r/w  |     Yes     |     No    |   Yes   |
-| `<sdcard>/`                                     | externalRootDirectory       | sdcard                    | r/w  |     Yes     |     No    |   No    |
+| `<sdcard>/`                                     | externalRootDirectory       | sdcard                    | r/w\*\*\*  |     Yes     |     No    |   No    |
 | &nbsp;&nbsp;&nbsp;`Android/data/<app-id>/`      | externalApplicationStorageDirectory | -                 | r/w  |     Yes     |     No    |   No    |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cache`     | externalCacheDirectory       | cache-external            | r/w  |     Yes     |     No\*\*|   No    |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`files`     | externalDataDirectory       | files-external            | r/w  |     Yes     |     No    |   No    |
@@ -174,6 +172,8 @@ the `cordova.file.*` properties map to physical paths on a real device.
 \*\* The OS does not clear this directory automatically; you are responsible for managing
      the contents yourself. Should the user purge the cache manually, the contents of the
      directory are removed.
+
+\*\*\* As of API 30, these directories are no longer writable.
 
 **Note**: If external storage can't be mounted, the `cordova.file.external*`
 properties are `null`.
@@ -422,7 +422,22 @@ This method will now return filesystem URLs of the form
 
 which can be used to identify the file uniquely.
 
+In v7.0.0 the return value of `toURL()` for Android was updated to return the absolute `file://` URL when app content is served from the `file://` scheme.
+
+If app content is served from the `http(s)://` scheme, a `cdvfile` formatted URL will be returned instead. The `cdvfile` formatted URL is created from the internal method `toInternalURL()`.
+
+An example `toInternalURL()` return filesystem URL:
+
+    https://localhost/persistent/path/to/file
+
+[![toURL flow](https://sketchviz.com/@erisu/7b05499842275be93a0581e8e3576798/6dc71d8302cafd05b443d874a592d10fa415b8e3.sketchy.png)](//sketchviz.com/@erisu/7b05499842275be93a0581e8e3576798)
+
+It is recommended to always use the `toURL()` to ensure that the correct URL is returned.
+
 ## cdvfile protocol
+
+- Not Supported on Android
+
 **Purpose**
 
 `cdvfile://localhost/persistent|temporary|another-fs-root*/path/to/file` can be used for platform-independent file paths.

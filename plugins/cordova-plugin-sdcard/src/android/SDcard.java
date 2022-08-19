@@ -8,15 +8,19 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.provider.DocumentsContract;
 import android.provider.DocumentsContract.Document;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import androidx.documentfile.provider.DocumentFile;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +30,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.cordova.CallbackContext;
@@ -96,6 +99,9 @@ public class SDcard extends CordovaPlugin {
         break;
       case "storage permission":
         getStorageAccess(arg1, callbackContext);
+        break;
+      case "read":
+        readFile(arg1, callbackContext);
         break;
       case "write":
         writeFile(formatUri(arg1), arg2, args.getBoolean(2), callbackContext);
@@ -276,7 +282,7 @@ public class SDcard extends CordovaPlugin {
           res.put("length", file.length());
           res.put("type", file.getType());
           res.put("filename", file.getName());
-          res.put("canWrite", file.canWrite());
+          res.put("canWrite", canWrite(file.getUri()));
           res.put("uri", uri.toString());
           activityResultCallback.success(res);
         } catch (JSONException e) {
@@ -318,6 +324,39 @@ public class SDcard extends CordovaPlugin {
     }
   }
 
+  private void readFile(String filename, CallbackContext callback) {
+    cordova
+      .getThreadPool()
+      .execute(
+        new Runnable() {
+          public void run() {
+            try {
+              Uri uri = Uri.parse(filename);
+              InputStream is = context
+                .getContentResolver()
+                .openInputStream(uri);
+
+              if (is == null) {
+                callback.error("File not found");
+                return;
+              }
+              ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+              final int bufferSize = 1024;
+              byte[] buffer = new byte[bufferSize];
+              int bytesRead = 0;
+              while ((bytesRead = is.read(buffer, 0, bufferSize)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+              }
+              is.close();
+              callback.success(outputStream.toByteArray());
+            } catch (Exception e) {
+              callback.error(e.toString());
+            }
+          }
+        }
+      );
+  }
+
   private void writeFile(
     final String filename,
     final String content,
@@ -333,8 +372,7 @@ public class SDcard extends CordovaPlugin {
           public void run() {
             try {
               DocumentFile file = getFile(filename);
-
-              if (file.canWrite()) {
+              if (canWrite(file.getUri())) {
                 OutputStream op = context
                   .getContentResolver()
                   .openOutputStream(file.getUri(), "rwt");
@@ -342,19 +380,10 @@ public class SDcard extends CordovaPlugin {
                 byte[] contentAsBytes = content.getBytes();
 
                 if (isBinary) {
-                  byte[] decodedContentAsBytes;
-
-                  try {
-                    decodedContentAsBytes = Base64.decodeBase64(content);
-                  } catch (NoSuchMethodError e4) {
-                    try {
-                      decodedContentAsBytes =
-                        Base64.decodeBase64(contentAsBytes);
-                    } catch (NoSuchMethodError e5) {
-                      callback.error(e5.toString());
-                      return;
-                    }
-                  }
+                  byte[] decodedContentAsBytes = Base64.decode(
+                    content,
+                    Base64.DEFAULT
+                  );
 
                   Log.d("writeFile", "Content is base64");
                   op.write(decodedContentAsBytes);
@@ -712,7 +741,7 @@ public class SDcard extends CordovaPlugin {
       JSONObject result = new JSONObject();
       result.put("exists", file.exists());
       result.put("canRead", file.canRead());
-      result.put("canWrite", file.canWrite());
+      result.put("canWrite", canWrite(file.getUri()));
       result.put("name", file.getName());
       result.put("length", file.length());
       result.put("type", file.getType());
@@ -778,7 +807,7 @@ public class SDcard extends CordovaPlugin {
     DocumentFile file = null;
 
     file = DocumentFile.fromTreeUri(context, Uri.parse(uri));
-    if (!file.canWrite()) {
+    if (!canWrite(file.getUri())) {
       throw new RuntimeException("Cnnot write file");
     }
 
@@ -823,5 +852,20 @@ public class SDcard extends CordovaPlugin {
       Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
       Intent.FLAG_GRANT_READ_URI_PERMISSION
     );
+  }
+
+  public boolean canWrite(Uri uri) {
+    boolean canWrite = false;
+    try {
+      // if the file is not writable this throws a SecurityException
+      OutputStream os = context
+        .getContentResolver()
+        .openOutputStream(uri, "wa");
+      os.close(); // we don't actually want to write anything, so we close immediately
+      canWrite = true;
+    } catch (SecurityException | IOException ignored) {
+      // if we don't have write-permission or the file doesn't exist, canWrite can stay on false
+    }
+    return canWrite;
   }
 }

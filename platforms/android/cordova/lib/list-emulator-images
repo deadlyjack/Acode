@@ -19,10 +19,10 @@
        under the License.
 */
 
-var emulators = require('./emulator');
+var emulators = require('cordova-android/lib/emulator');
 
 // Usage support for when args are given
-require('./check_reqs').check_android().then(function () {
+require('cordova-android/lib/check_reqs').check_android().then(function () {
     emulators.list_images().then(function (emulator_list) {
         emulator_list && emulator_list.forEach(function (emu) {
             console.log(emu.name);

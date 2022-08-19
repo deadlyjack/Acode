@@ -19,10 +19,10 @@
        under the License.
 */
 
-const { list } = require('./target');
+const { list } = require('cordova-android/lib/target');
 
 // Usage support for when args are given
-require('./check_reqs').check_android().then(function () {
+require('cordova-android/lib/check_reqs').check_android().then(function () {
     list().then(targets => {
         const deviceIds = targets
             .filter(({ type }) => type === 'device')

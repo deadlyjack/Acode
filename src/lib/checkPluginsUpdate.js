@@ -20,6 +20,7 @@ export default async function checkPluginsUpdate() {
             url: Url.join(plugin.host, 'plugin.json'),
             method: 'GET',
             responseType: 'text',
+            contentType: 'application/x-www-form-urlencoded',
           }),
         );
 

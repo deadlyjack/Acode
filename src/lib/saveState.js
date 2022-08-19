@@ -21,6 +21,8 @@ export default () => {
       mode: file.mode,
       deltedFile: file.deltedFile,
       cursorPos: editor.getCursorPosition(),
+      scrollTop: editor.session.getScrollTop(),
+      scrollLeft: editor.session.getScrollLeft(),
       recordid: null,
       isNew: null,
       sha: null,

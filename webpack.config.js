@@ -78,8 +78,8 @@ function clearOutputDir() {
   const css = path.join(WWW, 'css/build');
   const js = path.join(WWW, 'js/build');
 
-  fs.rmdirSync(css, { recursive: true });
-  fs.rmdirSync(js, { recursive: true });
+  fs.rmSync(css, { recursive: true });
+  fs.rmSync(js, { recursive: true });
 
   fs.mkdir(css, (err) => {
     if (err) console.log(err);

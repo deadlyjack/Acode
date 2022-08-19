@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.cordova.CordovaPreferences;
 import org.apache.cordova.CordovaResourceApi;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,13 +39,18 @@ public abstract class Filesystem {
 
     protected final Uri rootUri;
     protected final CordovaResourceApi resourceApi;
+    protected final CordovaPreferences preferences;
     public final String name;
     private JSONObject rootEntry;
 
-    public Filesystem(Uri rootUri, String name, CordovaResourceApi resourceApi) {
+    static String SCHEME_HTTPS = "https";
+    static String DEFAULT_HOSTNAME = "localhost";
+
+    public Filesystem(Uri rootUri, String name, CordovaResourceApi resourceApi, CordovaPreferences preferences) {
         this.rootUri = rootUri;
         this.name = name;
         this.resourceApi = resourceApi;
+        this.preferences = preferences;
     }
 
     public interface ReadFileCallback {
@@ -327,5 +333,16 @@ public abstract class Filesystem {
             numBytesToRead -= numBytesRead;
             return numBytesRead;
         }
+    }
+
+    protected Uri.Builder createLocalUriBuilder() {
+        String scheme = preferences.getString("scheme", SCHEME_HTTPS).toLowerCase();
+        String hostname = preferences.getString("hostname", DEFAULT_HOSTNAME).toLowerCase();
+        String path = LocalFilesystemURL.fsNameToCdvKeyword(name);
+
+        return new Uri.Builder()
+            .scheme(scheme)
+            .authority(hostname)
+            .path(path);
     }
 }

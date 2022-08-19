@@ -7,6 +7,14 @@ const resPath = path.resolve(
 );
 
 const splashScreens = [
+  'drawable',
+  'mipmap-ldpi',
+  'mipmap-hdpi-v26',
+  'mipmap-ldpi-v26',
+  'mipmap-mdpi-v26',
+  'mipmap-xhdpi-v26',
+  'mipmap-xxhdpi-v26',
+  'mipmap-xxxhdpi-v26',
   'drawable-land-hdpi',
   'drawable-land-ldpi',
   'drawable-land-mdpi',
@@ -24,7 +32,7 @@ const splashScreens = [
 for (let splashScreen of splashScreens) {
   const file = path.join(resPath, splashScreen);
   if (fs.existsSync(file)) {
-    fs.rmdirSync(file, {
+    fs.rmSync(file, {
       recursive: true,
     });
     console.log('Removed: ', splashScreen);

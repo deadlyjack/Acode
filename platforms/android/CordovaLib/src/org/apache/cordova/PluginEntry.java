@@ -47,9 +47,21 @@ public final class PluginEntry {
 
     /**
      * Constructs with a CordovaPlugin already instantiated.
+     *
+     * @param service               The name of the service
+     * @param pluginClass           The plugin class name
      */
     public PluginEntry(String service, CordovaPlugin plugin) {
         this(service, plugin.getClass().getName(), true, plugin);
+    }
+
+    /**
+     * @param service               The name of the service
+     * @param plugin                The CordovaPlugin already instantiated
+     * @param onload                Create plugin object when HTML page is loaded
+     */
+    public PluginEntry(String service, CordovaPlugin plugin, boolean onload) {
+        this(service, plugin.getClass().getName(), onload, plugin);
     }
 
     /**
@@ -61,6 +73,12 @@ public final class PluginEntry {
         this(service, pluginClass, onload, null);
     }
 
+    /**
+     * @param service               The name of the service
+     * @param pluginClass           The plugin class name
+     * @param onload                Create plugin object when HTML page is loaded
+     * @param plugin                The CordovaPlugin already instantiated
+     */
     private PluginEntry(String service, String pluginClass, boolean onload, CordovaPlugin plugin) {
         this.service = service;
         this.pluginClass = pluginClass;

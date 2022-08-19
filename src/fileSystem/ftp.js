@@ -1,3 +1,4 @@
+import ajax from "@deadlyjack/ajax";
 import Path from "../utils/Path";
 import Url from "../utils/Url";
 import internalFs from "./internalFs";
@@ -74,8 +75,8 @@ class FtpClient {
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
       ftp.downloadFile(this.#conId, this.#path, this.#cacheFile, async () => {
-        const content = await internalFs.readFile(this.#cacheFile);
-        resolve(content);
+        const data = await internalFs.readFile(this.#cacheFile);
+        resolve(data);
       }, reject);
     });
   }

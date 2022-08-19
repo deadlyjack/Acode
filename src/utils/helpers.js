@@ -21,15 +21,26 @@ const credentials = {
   },
 };
 
+let loaderIsImmortal = false;
+
 export default {
   credentials,
-  showTitleLoader() {
+  showTitleLoader(immortal = false) {
+    if (typeof immortal === 'boolean') {
+      loaderIsImmortal = immortal;
+    }
+
     setTimeout(() => {
       app.classList.remove('title-loading-hide');
       app.classList.add('title-loading');
     }, 0);
   },
-  removeTitleLoader() {
+  removeTitleLoader(immortal = undefined) {
+    if (typeof immortal === 'boolean') {
+      loaderIsImmortal = immortal;
+    }
+
+    if (loaderIsImmortal) return;
     setTimeout(() => {
       app.classList.add('title-loading-hide');
     }, 0);

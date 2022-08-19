@@ -16,46 +16,34 @@
    under the License.
 */
 
-ext {
-    apply from: 'cordova.gradle'
-    cdvCompileSdkVersion = privateHelpers.getProjectTarget()
-    cdvBuildToolsVersion = privateHelpers.findLatestInstalledBuildTools()
-    if (project.hasProperty('cdvMinSdkVersion') && cdvMinSdkVersion.isInteger()) {
-        cdvMinSdkVersion = cdvMinSdkVersion as int
-        println '[Cordova] cdvMinSdkVersion is overridden, try it at your own risk.'
-    } else {
-        cdvMinSdkVersion = 22; // current Cordova's default
-    }
-}
-
 buildscript {
+    apply from: 'cordova.gradle'
     apply from: 'repositories.gradle'
+
     repositories repos
 
     dependencies {
-        // The gradle plugin and the maven plugin have to be updated after each version of Android
-        // studio comes out
-        classpath 'com.android.tools.build:gradle:4.0.0'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        // Android Gradle Plugin (AGP) Build Tools
+        classpath "com.android.tools.build:gradle:${cordovaConfig.AGP_VERSION}"
     }
 }
 
 allprojects {
-    apply from: 'repositories.gradle'
+    def hasRepositoriesGradle = file('repositories.gradle').exists()
+    if (hasRepositoriesGradle) {
+        apply from: 'repositories.gradle'
+    } else {
+        apply from: "${project.rootDir}/repositories.gradle"
+    }
+
     repositories repos
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
-
-group = 'org.apache.cordova'
-version = '9.1.0'
 
 android {
-    compileSdkVersion cdvCompileSdkVersion
-    buildToolsVersion cdvBuildToolsVersion
+    compileSdkVersion cordovaConfig.SDK_VERSION
+    buildToolsVersion cordovaConfig.BUILD_TOOLS_VERSION
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -64,7 +52,7 @@ android {
 
     // For the Android Cordova Lib, we allow changing the minSdkVersion, but it is at the users own risk
     defaultConfig {
-        minSdkVersion cdvMinSdkVersion
+        minSdkVersion cordovaConfig.MIN_SDK_VERSION
     }
 
     sourceSets {
@@ -87,64 +75,17 @@ android {
     }
 }
 
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                name 'Cordova'
-                url 'https://cordova.apache.org'
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'stevengill'
-                        name 'Steve Gill'
-                    }
-                }
-                scm {
-                    connection 'scm:git:https://github.com/apache/cordova-android.git'
-                    developerConnection 'scm:git:git@github.com:apache/cordova-android.git'
-                    url 'https://github.com/apache/cordova-android'
-
-                }
-            }
-        }
-    }
+dependencies {
+    implementation "androidx.appcompat:appcompat:${cordovaConfig.ANDROIDX_APP_COMPAT_VERSION}"
+    implementation "androidx.webkit:webkit:${cordovaConfig.ANDROIDX_WEBKIT_VERSION}"
 }
 
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-artifacts {
-    archives sourcesJar
-}
-
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
-    configurations = ['archives']
-    pkg {
-        repo = 'maven'
-        name = 'cordova-android'
-        userOrg = 'cordova'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/apache/cordova-android'
-        websiteUrl = 'https://cordova.apache.org'
-        issueTrackerUrl = 'https://github.com/apache/cordova-android/issues'
-        publicDownloadNumbers = true
-        licenses = ['Apache-2.0']
-        labels = ['android', 'cordova', 'phonegap']
-        version {
-            name = '9.1.0'
-            released = new Date()
-            vcsTag = '9.1.0'
-        }
-    }
+/**
+ * In a project created though CLI, the `cordova-publish.gradle` file is not copied to the `framework` dir.
+ * App development (CLI) projects can not and should not publish our framework.
+ * In this case, there is no need for the gradle build process to know about the publish process.
+ */
+def cordovaPublishGradle = './cordova-publish.gradle'
+if(file(cordovaPublishGradle).exists()) {
+    apply from: cordovaPublishGradle
 }

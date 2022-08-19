@@ -6,13 +6,11 @@ import fsOperation from '../fileSystem/fsOperation';
 import ajax from '@deadlyjack/ajax';
 import Url from '../utils/Url';
 import settingsPage from '../components/settingPage';
+import lang from '../lib/lang';
 
 export default function otherSettings() {
   const values = appSettings.value;
   const title = strings['app settings'].capitalize();
-  const langList = Object.keys(constants.langList).map(
-    (lang) => [lang, constants.langList[lang]]
-  );
 
   const items = [
     {
@@ -29,7 +27,7 @@ export default function otherSettings() {
       key: 'language',
       text: strings['change language'],
       value: strings.lang,
-      select: langList,
+      select: lang.list,
     },
     {
       key: 'previewMode',
@@ -54,7 +52,7 @@ export default function otherSettings() {
       checkbox: values.confirmOnExit,
     },
     {
-      key: 'check-files',
+      key: 'checkFiles',
       text: strings['check file changes'],
       checkbox: values.checkFiles,
     },

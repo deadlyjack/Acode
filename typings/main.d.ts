@@ -50,7 +50,6 @@ interface Settings {
   vibrateOnTap: boolean;
   fullscreen: boolean;
   smartCompletion: boolean;
-  floatingButtonActivation: 'click' | 'long tap';
   floatingButton: boolean;
   liveAutoCompletion: boolean;
   showPrintMargin: boolean;
@@ -219,7 +218,6 @@ interface File {
    */
   type: 'regular' | 'git' | 'gist';
   record: Repo & Gist;
-  updateControls(): void;
   session: AceAjax.IEditSession;
   editable: boolean;
   canWrite: boolean;
@@ -238,6 +236,7 @@ interface File {
    * gets and sets new line mode of deocument
    */
   eol: 'unix' | 'windows' | 'auto';
+  destroy(): void;
 }
 
 interface FileStatus {
@@ -605,10 +604,6 @@ declare function decodeURL(url: string): string;
  * App settings
  */
 declare var appSettings: AppSettings;
-/**
- * language of the app
- */
-declare var lang: string;
 /**
  * Predefined strings for language support
  */

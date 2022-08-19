@@ -23,7 +23,7 @@ import java.util.List;
 
 import android.app.Activity;
 
-@Deprecated // Use Whitelist, CordovaPrefences, etc. directly.
+@Deprecated // Use AllowList, CordovaPrefences, etc. directly.
 public class Config {
     private static final String TAG = "Config";
 

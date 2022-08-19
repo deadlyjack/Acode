@@ -20,8 +20,6 @@ cordova.define("cordova-plugin-file.androidFileSystem", function(require, export
  *
 */
 
-FILESYSTEM_PROTOCOL = 'cdvfile'; // eslint-disable-line no-undef
-
 module.exports = {
     __format__: function (fullPath, nativeUrl) {
         var path;
@@ -33,7 +31,7 @@ module.exports = {
             // doesn't match the string for which permission was originally granted.
             path = nativeUrl.substring(contentUrlMatch[0].length - 1);
         } else {
-            path = FileSystem.encodeURIPath(fullPath); // eslint-disable-line no-undef
+            path = FileSystem.encodeURIPath(fullPath);
             if (!/^\//.test(path)) {
                 path = '/' + path;
             }
@@ -44,7 +42,7 @@ module.exports = {
             }
         }
 
-        return FILESYSTEM_PROTOCOL + '://localhost/' + this.name + path; // eslint-disable-line no-undef
+        return window.location.origin + '/__cdvfile_' + this.name + '__' + path;
     }
 };
 

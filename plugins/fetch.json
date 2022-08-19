@@ -31,14 +31,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-whitelist": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-whitelist@1.3.5"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-iap": {
     "source": {
       "type": "local",
@@ -51,14 +43,6 @@
     "source": {
       "type": "local",
       "path": "D:\\Github\\deadlyjack\\Acode\\node_modules\\cordova-plugin-sftp"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
-  "cordova-plugin-file": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-file@^6.0.2"
     },
     "is_top_level": true,
     "variables": {}
@@ -79,18 +63,26 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-sdcard": {
-    "source": {
-      "type": "local",
-      "path": "D:\\Github\\deadlyjack\\acode\\node_modules\\cordova-plugin-sdcard"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-system": {
     "source": {
       "type": "local",
       "path": "D:\\Github\\deadlyjack\\acode\\node_modules\\cordova-plugin-system"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-file": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-file@latest"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-sdcard": {
+    "source": {
+      "type": "local",
+      "path": "D:\\Github\\deadlyjack\\acode\\node_modules\\cordova-plugin-sdcard"
     },
     "is_top_level": true,
     "variables": {}

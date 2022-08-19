@@ -79,7 +79,9 @@ public class PermissionHelper {
         Arrays.fill(requestResults, PackageManager.PERMISSION_GRANTED);
 
         try {
+            // This one is deprecated - see https://github.com/apache/cordova-android/issues/592
             plugin.onRequestPermissionResult(requestCode, permissions, requestResults);
+            plugin.onRequestPermissionsResult(requestCode, permissions, requestResults);
         } catch (JSONException e) {
             LOG.e(LOG_TAG, "JSONException when delivering permissions results", e);
         }

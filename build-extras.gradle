@@ -1,4 +1,4 @@
-  ext.cdvCompileSdkVersion = 30
+  ext.cdvCompileSdkVersion = 31
 
   configurations {
     all {

@@ -17,7 +17,7 @@ const exec = promisify(require('child_process').exec);
   const htmlpath = path.resolve(__dirname, '../www/index.html');
   const logopath = path.resolve(
     __dirname,
-    '../res/icon/android/values/ic_launcher_background.xml',
+    '../res/android/values/ic_launcher_background.xml',
   );
 
   const logoTextPaid = `<?xml version="1.0" encoding="utf-8"?>
