@@ -119,7 +119,7 @@
   "select": "選択",
   "editor font": "フォント",
   "new project": "新規プロジェクト",
-  "format": "フォーマット",
+  "format": "整形",
   "project name": "プロジェクト名",
   "unsupported device": "お使いのデバイスはテーマをサポートしていません。",
   "vibrate on tap": "タップ時に振動させる",
@@ -222,7 +222,7 @@
   "normal": "通常",
   "app settings": "アプリ設定",
   "show ads": "広告を表示",
-  "disable in-app-browser caching": "アプリ内ブラウザキャッシュを無効",
+  "disable in-app-browser caching": "アプリ内ブラウザキャッシュ無効",
   "disable ad message": "広告を無効にしたい場合は、寄付をご検討ください。",
   "copied to clipboard": "クリップボードにコピーしました",
   "remember opened files": "開いたファイルを記憶する",
@@ -236,7 +236,7 @@
   "update": "更新",
   "uninstall": "アンインストール",
   "download acode pro": "Acode Proをダウンロード",
-  "loading plugins": "プラグインを読込中",
+  "loading plugins": "プラグインを読み込み中",
   "faqs": "よくある質問",
   "feedback": "フィードバック",
   "header": "ヘッダー",
@@ -253,6 +253,6 @@
   "slow": "低速",
   "scroll settings": "スクロール設定",
   "scroll speed": "スクロール速度",
-  "loading...": "Loading...",
-  "no plugins found": "No plugins found"
+  "loading...": "読み込み中...",
+  "no plugins found": "プラグインが見つかりません"
 }
