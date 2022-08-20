@@ -255,5 +255,6 @@
   "slow": "Slow",
   "scroll settings": "Scroll settings",
   "scroll speed": "Scroll speed",
-  "loading...": "Loading..."
+  "loading...": "Loading...",
+  "no plugins found": "No plugins found"
 }

@@ -165,11 +165,11 @@ async function EditorManager($sidebar, $header, $body) {
   });
 
   appSettings.on('update:tabSize', function (value) {
-    for (let file of manager.files) file.session.setTabSize(value);
+    manager.files.forEach((file) => file.session.setTabSize(value));
   });
 
   appSettings.on('update:softTab', function (value) {
-    for (let file of manager.files) file.session.setUseSoftTabs(value);
+    manager.files.forEach((file) => file.session.setUseSoftTabs(value));
   });
 
   appSettings.on('update:showSpaces', function (value) {
@@ -177,7 +177,7 @@ async function EditorManager($sidebar, $header, $body) {
   });
 
   appSettings.on('update:editorFont', function (value) {
-    $container.classList.remove(this.editorFont);
+    $container.classList.remove(appSettings.value.editorFont);
     $container.classList.add(value);
   });
 

@@ -795,5 +795,13 @@ export default {
     } else {
       return editorWidth + appSettings.value.leftMargin;
     }
+  },
+
+  async toInternalUri(uri) {
+    return new Promise((resolve, reject) => {
+      window.resolveLocalFileSystemURL(uri, (entry) => {
+        resolve(entry.toInternalURL());
+      }, reject);
+    });
   }
 };

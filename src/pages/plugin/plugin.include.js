@@ -152,8 +152,11 @@ export default async function PluginInclude(json, installed = false, onInstall, 
     }
   }
 
-  function render() {
+  async function render() {
     const isPaid = ['paid', 'premium', 'pro'].includes(plugin.type) && IS_FREE_VERSION;
+    if (Url.getProtocol(icon) === 'file:') {
+      icon = await helpers.toInternalUri(icon);
+    }
     $page.body = tag.parse(mustache.render(template, {
       ...plugin,
       readme,

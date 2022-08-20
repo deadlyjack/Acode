@@ -15,6 +15,8 @@ import plugin from "../plugin/plugin";
  * @param {Array<PluginJson>} updates 
  */
 export default function PluginsInclude(updates) {
+  const LOADING = 0;
+  const LOADED = 1;
   const listJson = 'https://raw.githubusercontent.com/deadlyjack/acode-plugins/main/list.json';
   const $page = Page(strings['plugins']);
   const $search = tag('span', {
@@ -28,9 +30,12 @@ export default function PluginsInclude(updates) {
     installed: [],
   };
   let section = 'installed';
-  $page.body = tag.parse(
-    mustache.render(template, { msg: `${strings.loading}...` }),
-  );
+  let allState = LOADING;
+  let installedState = LOADING;
+
+  $page.body.innerHTML = mustache.render(template, {
+    msg: strings['loading...'],
+  });
   $page.header.append($search);
 
   actionStack.push({
@@ -57,24 +62,11 @@ export default function PluginsInclude(updates) {
     return;
   }
 
+  getAllPlugins();
   getInstalledPlugins()
     .then(() => {
       render();
     });
-
-  (async function () {
-    helpers.showTitleLoader();
-    try {
-      try {
-        await getAllPlugins();
-      } catch (error) { }
-    } catch (error) {
-      helpers.error(error);
-    } finally {
-      $page.get('#plugin-list')?.setAttribute('empty-msg', 'No plugins found');
-      helpers.removeTitleLoader();
-    }
-  })();
 
   function renderAll() {
     $page.get('[action="select"].active')?.classList.remove('active');
@@ -110,66 +102,74 @@ export default function PluginsInclude(updates) {
   }
 
   function render() {
+    const $list = $page.get('#plugin-list');
+    let emptyMsg = strings['no plugins found'];
     if (section === 'all') {
+      if (allState === LOADING) {
+        emptyMsg = string['loading...'];
+      }
       renderAll();
-      return;
     }
 
     if (section === 'installed') {
+      if (installedState === LOADING) {
+        emptyMsg = string['loading...'];
+      }
       renderInstalled();
-      return;
     }
+
+    $list.setAttribute('empty-msg', emptyMsg);
   }
 
   async function getAllPlugins() {
-    const file = await ajax({
-      url: listJson,
-      method: 'GET',
-      responseType: 'text',
-      contentType: 'application/x-www-form-urlencoded',
-    });
-    plugins.all = helpers.parseJSON(file) || [];
+    try {
+      const installed = await fsOperation(PLUGIN_DIR).lsDir();
+      const file = await ajax({
+        url: listJson,
+        method: 'GET',
+        responseType: 'text',
+        contentType: 'application/x-www-form-urlencoded',
+      });
+      plugins.all = helpers.parseJSON(file) || [];
 
-    // To test and develop plugin, update host in file: '/res/network_security_config.xml:11:43'
-    // plugins.all.push({
-    //   name: 'Plugin test',
-    //   plugin: 'http://192.168.0.103:5500/plugin.json',
-    //   icon: 'http://192.168.0.103:5500/icon.png',
-    //   author: {
-    //     name: 'DeadlyJack',
-    //   }
-    // });
+      // To test and develop plugin, update host in file: '/res/network_security_config.xml:11:43'
+      // plugins.all.push({
+      //   name: 'Plugin test',
+      //   plugin: 'http://192.168.0.103:5500/plugin.json',
+      //   icon: 'http://192.168.0.103:5500/icon.png',
+      //   author: {
+      //     name: 'DeadlyJack',
+      //   }
+      // });
 
-    if (plugins.installed.length) {
-      plugins.installed.forEach((localPlugin) => {
-        const plugin = plugins.all.find((plugin) => plugin.name === localPlugin.name);
+      installed.forEach(({ url }) => {
+        const plugin = plugins.all.find(({ id }) => id === Url.basename(url));
         if (plugin) {
           plugin.installed = true;
-          plugin.plugin = localPlugin.plugin;
+          plugin.plugin = getLocalRes(plugin.id, 'plugin.json');
         }
       });
+      allState = LOADED;
+    } catch (error) {
+      helpers.error(error);
     }
   }
 
   async function getInstalledPlugins(updates) {
     const installed = await fsOperation(PLUGIN_DIR).lsDir();
-    const promises = [];
-    installed.forEach((item) => {
+    await Promise.all(installed.map(async (item) => {
       const id = Url.basename(item.url);
       if ((updates && updates.includes(id)) || !updates) {
-        promises.push(
-          fsOperation(
-            Url.join(item.url, 'plugin.json'),
-          ).readFile('json'),
-        );
+        const url = Url.join(item.url, 'plugin.json');
+        const plugin = await fsOperation(url).readFile('json');
+        const { id } = plugin;
+        const iconUrl = getLocalRes(id, 'icon.png');
+        plugin.icon = await helpers.toInternalUri(iconUrl);
+        plugin.plugin = getLocalRes(id, 'plugin.json');
+        plugins.installed.push(plugin);
       }
-    });
-
-    plugins.installed = await Promise.all(promises);
-    plugins.installed.forEach((localPlugin) => {
-      localPlugin.icon = getLocalRes(localPlugin.id, 'icon.png');
-      localPlugin.plugin = getLocalRes(localPlugin.id, 'plugin.json');
-    });
+    }));
+    installedState = LOADED;
   }
 
   function onIninstall(pluginId) {

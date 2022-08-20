@@ -253,5 +253,6 @@
   "slow": "低速",
   "scroll settings": "スクロール設定",
   "scroll speed": "スクロール速度",
-  "loading...": "Loading..."
+  "loading...": "Loading...",
+  "no plugins found": "No plugins found"
 }

@@ -254,5 +254,6 @@
   "slow": "Медленно",
   "scroll settings": "Настройки прокрутки",
   "scroll speed": "Скорость прокрутки",
-  "loading...": "Loading..."
+  "loading...": "Loading...",
+  "no plugins found": "No plugins found"
 }

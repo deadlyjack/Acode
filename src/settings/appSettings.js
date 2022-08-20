@@ -138,9 +138,17 @@ export default function otherSettings() {
                 strings['downloading file'].replace('{file}', 'eruda.js'),
                 strings['downloading...']
               );
-              const erudaScript = await ajax({ url: constants.ERUDA_CDN, responseType: 'text' });
-              await fsOperation(DATA_STORAGE).createFile('eruda.js', erudaScript);
-              dialogs.loader.destroy();
+              try {
+                const erudaScript = await ajax({
+                  url: constants.ERUDA_CDN,
+                  responseType: 'text',
+                  contentType: 'application/x-www-form-urlencoded',
+                });
+                await fsOperation(DATA_STORAGE).createFile('eruda.js', erudaScript);
+                dialogs.loader.destroy();
+              } catch (error) {
+                helpers.error(error);
+              }
             }
           }
         })();
