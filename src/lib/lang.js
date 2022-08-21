@@ -176,6 +176,8 @@ export default {
     const strings = await lang.strings();
     window.strings = strings;
   },
-  list: Object.keys(langMap)
-    .map((code) => [code, langMap[code].name]),
+  list: Object.keys(langMap).map((code) => [code, langMap[code].name]),
+  getName(code) {
+    return langMap[code.toLowerCase()].name;
+  },
 }

@@ -40,10 +40,6 @@ export default () => {
     if (settings.rememberFiles || edit.isUnsaved) filesToSave.push(edit);
   }
 
-  if (settings.rememberFiles && activeFile) {
-    localStorage.setItem('lastfile', activeFile.id);
-  }
-
   if (settings.rememberFolders) {
     addedFolder.forEach((folder) => {
       const { url, reloadOnResume, saveState, title } = folder;

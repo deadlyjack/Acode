@@ -3,9 +3,10 @@ import helpers from '../utils/helpers';
 
 /**
  *
- * @param {HTMLUListElement|HTMLOListElement} list
+ * @param {HTMLUListElement|HTMLOListElement} $list
+ * @param {(hide:()=>)=>void} setHide
  */
-function searchBar(list) {
+function searchBar($list, setHide) {
   const $searchInput = tag('input', {
     type: 'search',
     placeholder: strings.search,
@@ -18,21 +19,22 @@ function searchBar(list) {
         className: 'icon clearclose',
         onclick: (e) => {
           e.preventDefault();
-          e.stopImmediatePropagation();
           e.stopPropagation();
+          e.stopImmediatePropagation();
           hide();
         },
       }),
     ],
   });
-  const children = [...list.children];
+  const children = [...$list.children];
 
+  if (typeof setHide === 'function') setHide(() => {
+    $container.remove();
+    actionStack.remove('searchbar');
+  });
   app.appendChild($container);
   $searchInput.oninput = search;
   $searchInput.focus();
-  $searchInput.onblur = () => {
-    hide(false);
-  };
 
   actionStack.push({
     id: 'searchbar',
@@ -64,13 +66,13 @@ function searchBar(list) {
       if (text.match(val, 'i')) result.push(child);
     });
 
-    list.textContent = '';
-    list.append(...result);
+    $list.textContent = '';
+    $list.append(...result);
   }
 
   function onhide() {
-    list.textContent = '';
-    list.append(...children);
+    $list.textContent = '';
+    $list.append(...children);
   }
 }
 

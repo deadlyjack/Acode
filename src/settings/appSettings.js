@@ -24,10 +24,11 @@ export default function otherSettings() {
       ],
     },
     {
-      key: 'language',
+      key: 'lang',
       text: strings['change language'],
-      value: strings.lang,
+      value: values.lang,
       select: lang.list,
+      valueText: (value) => lang.getName(value),
     },
     {
       key: 'previewMode',
@@ -177,10 +178,6 @@ export default function otherSettings() {
 
       case 'keyboardMode':
         system.setInputType(value);
-        break;
-
-      case 'language':
-        appSettings.applyLangSetting();
         break;
 
       default:

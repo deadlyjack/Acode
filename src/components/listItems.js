@@ -46,7 +46,7 @@ export default function listItems($list, items, callback, sort = true) {
 
     let $checkbox, $valueText;
 
-    if (setting.value) {
+    if (setting.value !== undefined) {
       $valueText = tag('small', {
         className: 'value',
       });

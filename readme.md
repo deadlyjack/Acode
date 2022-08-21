@@ -1,6 +1,8 @@
 # Acode editor (Code editor for android)
 
-![logo](./res/logo.png)
+<p style='text-align:center;'>
+     <img src='res/logo_1.png' width='250'>
+</p>
 
 Acode is a lightweight code editor for Android phones. You can use this editor for editing HTML, JavaScript, text.
 

@@ -11,7 +11,7 @@ header {
     color: rgb(255, 255, 255);
     color: var(--text-main-color);
 
-    > .text {
+    >.text {
       pointer-events: unset !important;
       margin: auto;
       font-weight: bold;
@@ -41,15 +41,20 @@ header {
     pointer-events: none;
   }
 
-  *:not([action]) {
+  * {
     pointer-events: none;
+  }
+
+  [data-action],
+  [action] {
+    pointer-events: unset;
   }
 
   &.cut {
     opacity: 0.6;
   }
 
-  > .text {
+  >.text {
     flex: 1;
     white-space: nowrap;
     overflow: hidden;

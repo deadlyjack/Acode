@@ -62,6 +62,7 @@ export default function editorFile(filename = 'untitled.txt', options) {
 
   let editable = options.editable ?? true;
   const file = {
+    loading: false,
     deletedFile: options.deletedFile,
     mode: options.mode,
     markChanged: true,
@@ -274,8 +275,11 @@ export default function editorFile(filename = 'untitled.txt', options) {
     async removeCacheFile() {
       try {
         const fs = fsOperation(Url.join(CACHE_STORAGE, this.id));
-        fs.delete();
-      } catch (error) { }
+        if (!(await fs.exists())) return;
+        await fs.delete();
+      } catch (error) {
+        console.error(error);
+      }
     },
     async updateChangeFile(cacheNewName) {
       try {
@@ -410,8 +414,9 @@ function parseFolds(folds) {
 async function loadText(file, cursorPos, scrollLeft, scrollTop, folds) {
   let value = null;
 
-  file.markChanged = false;
   editorManager.editor.setReadOnly(true);
+  file.loading = true;
+  file.markChanged = false;
   file.session.setValue(strings['loading...']);
   file.session.on('change', onTextSet);
 
@@ -435,16 +440,17 @@ async function loadText(file, cursorPos, scrollLeft, scrollTop, folds) {
     }
 
     file.markChanged = false;
-    if (value) {
-      file.session.setValue(value);
-    } else {
-      file.session.setValue('');
+    file.session.setValue(value || '');
+    file.loading = false;
+    const { activeFile, editor } = editorManager;
+    if (activeFile.id === file.id) {
+      editor.setReadOnly(file.readOnly);
     }
-    editorManager.editor.setReadOnly(false);
   } catch (error) {
-    file.session.off('change', onTextSet);
-    file.session.setValue(`${strings['error']}: ${error.message}`);
-    console.log(error);
+    file.session?.off('change', onTextSet);
+    editorManager.removeFile(file.id, true);
+    toast(`${strings['error']}: Unable to load file '${file.name}'`);
+    console.error(error);
   }
 
   function onTextSet() {
@@ -465,8 +471,6 @@ async function loadText(file, cursorPos, scrollLeft, scrollTop, folds) {
     }
   }
 }
-
-
 
 function setupSession(file) {
   const { editor } = editorManager;
@@ -499,6 +503,7 @@ function setupSession(file) {
 
     session.setTabSize(settings.tabSize);
     session.setUseSoftTabs(settings.softTab);
+    session.setUseWorker(false);
     file.setMode(mode);
   }
   file.session.setUseWrapMode(settings.textWrap);

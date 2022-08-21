@@ -20,6 +20,7 @@ import checkFiles from './checkFiles';
 import saveState from './saveState';
 import commandPallete from '../components/commandPallete';
 import tag from 'html-tag-js';
+import TextEncodings from '../pages/textEncodings/textEncodings';
 
 export default {
   'close-all-tabs'() {
@@ -49,22 +50,17 @@ export default {
     this['resize-editor']();
     editorManager.scroll.$vScrollbar.resize();
   },
-  'encoding'() {
-    dialogs
-      .select(strings.encoding, constants.encodings, {
-        default: editorManager.activeFile.encoding,
-      })
-      .then((encoding) => {
-        const file = editorManager.activeFile;
-        file.encoding = encoding;
-        const text = file.session.getValue();
-        const decodedText = new TextEncoder().encode(text);
-        const newText = new TextDecoder(encoding).decode(decodedText);
-        file.session.setValue(newText);
-        file.isUnsaved = false;
-        editorManager.onupdate('encoding');
-        editorManager.emit('update', 'encoding');
-      });
+  async 'encoding'() {
+    const encoding = await TextEncodings();
+    const file = editorManager.activeFile;
+    file.encoding = encoding;
+    const text = file.session.getValue();
+    const decodedText = new TextEncoder().encode(text);
+    const newText = new TextDecoder(encoding).decode(decodedText);
+    file.session.setValue(newText);
+    file.isUnsaved = false;
+    editorManager.onupdate('encoding');
+    editorManager.emit('update', 'encoding');
   },
   'exit'() {
     navigator.app.exitApp();
@@ -202,24 +198,22 @@ export default {
   'save-as'(toast) {
     saveFile(editorManager.activeFile, true, toast);
   },
-  'syntax'() {
+  async 'syntax'() {
     editorManager.editor.blur();
-    Modes().then((mode) => {
-      const activefile = editorManager.activeFile;
-      const ext = path.extname(activefile.filename);
+    const mode = await Modes();
+    const activefile = editorManager.activeFile;
 
-      let modeAssociated;
-      try {
-        modeAssociated = JSON.parse(localStorage.modeassoc || '{}');
-      } catch (error) {
-        modeAssociated = {};
-      }
+    let modeAssociated;
+    try {
+      modeAssociated = JSON.parse(localStorage.modeassoc || '{}');
+    } catch (error) {
+      modeAssociated = {};
+    }
 
-      modeAssociated[ext] = mode;
-      localStorage.modeassoc = JSON.stringify(modeAssociated);
+    modeAssociated[path.extname(activefile.filename)] = mode;
+    localStorage.modeassoc = JSON.stringify(modeAssociated);
 
-      activefile.setMode(mode);
-    });
+    activefile.setMode(mode);
   },
   'toggle-quick-tools'() {
     quickTools.actions('toggle-quick-tools');

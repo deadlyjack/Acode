@@ -106,14 +106,14 @@ export default function PluginsInclude(updates) {
     let emptyMsg = strings['no plugins found'];
     if (section === 'all') {
       if (allState === LOADING) {
-        emptyMsg = string['loading...'];
+        emptyMsg = strings['loading...'];
       }
       renderAll();
     }
 
     if (section === 'installed') {
       if (installedState === LOADING) {
-        emptyMsg = string['loading...'];
+        emptyMsg = strings['loading...'];
       }
       renderInstalled();
     }
@@ -135,8 +135,8 @@ export default function PluginsInclude(updates) {
       // To test and develop plugin, update host in file: '/res/network_security_config.xml:11:43'
       // plugins.all.push({
       //   name: 'Plugin test',
-      //   plugin: 'http://192.168.0.103:5500/plugin.json',
-      //   icon: 'http://192.168.0.103:5500/icon.png',
+      //   plugin: 'https://192.168.1.104:5500/plugin.json',
+      //   icon: 'https://192.168.1.104:5500/icon.png',
       //   author: {
       //     name: 'DeadlyJack',
       //   }

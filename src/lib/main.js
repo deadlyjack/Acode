@@ -211,7 +211,7 @@ async function ondeviceready() {
   );
 
   acode.setLoadingMessage('Loading language...');
-  await lang.set(appSettings.value.language);
+  await lang.set(appSettings.value.lang);
 
   acode.setLoadingMessage('Initializing GitHub...');
   await git.init();
@@ -353,7 +353,7 @@ async function loadApp() {
   if (Array.isArray(files) && files.length) {
     openFiles(files)
       .then(() => {
-        onEditorUpdate(false);
+        onEditorUpdate(undefined, false);
       })
       .catch((error) => {
         console.error(error);
@@ -361,6 +361,7 @@ async function loadApp() {
       });
   } else {
     editorManager.addNewFile();
+    onEditorUpdate(undefined, false);
   }
 
   //#endregion
@@ -466,8 +467,8 @@ async function loadApp() {
     editorManager.editor.focus();
   }
 
-  function onEditorUpdate(saveState = true) {
-    const activeFile = editorManager.activeFile;
+  function onEditorUpdate(mode, saveState = true) {
+    const { activeFile } = editorManager;
     const $save = $footer.querySelector('[action=save]');
 
     if (!$editMenuToggler.isConnected) {
@@ -482,6 +483,13 @@ async function loadApp() {
         activeFile.assocTile.classList.remove('notice');
         if ($save) $save.classList.remove('notice');
       }
+    }
+
+    if (mode === 'switch-file') {
+      if (appSettings.value.rememberFiles && activeFile) {
+        localStorage.setItem('lastfile', activeFile.id);
+      }
+      return;
     }
 
     if (saveState) acode.exec('save-state');

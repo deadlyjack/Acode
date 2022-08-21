@@ -32,6 +32,7 @@ async function EditorManager($sidebar, $header, $body) {
   let scrollBarVisiblityCount = 0;
   let timeoutQuicktoolToggler;
   let timeoutHeaderToggler;
+  let autosaveTimeout;
   const { scrollbarSize, editorFont } = appSettings.value;
   const events = {
     'switch-file': [],
@@ -129,21 +130,24 @@ async function EditorManager($sidebar, $header, $body) {
 
   editor.on('change', function (e) {
     if (checkTimeout) clearTimeout(checkTimeout);
-    checkTimeout = setTimeout(() => {
+    checkTimeout = setTimeout(async () => {
       const { activeFile } = manager;
-      (async () => {
+      if (activeFile.markChanged) {
         const changed = await activeFile.isChanged();
         activeFile.isUnsaved = changed;
+        activeFile.writeToCache();
+        events.emit('file-content-changed', activeFile);
+        manager.onupdate('file-changed');
+        manager.emit('update', 'file-changed');
 
-        if (activeFile.markChanged) {
-          activeFile.writeToCache();
-          events.emit('file-content-changed', activeFile);
-          manager.onupdate('file-changed');
-          manager.emit('update', 'file-changed');
+        if (changed) {
+          if (autosaveTimeout) clearTimeout(autosaveTimeout);
+          autosaveTimeout = setTimeout(() => {
+            acode.exec('save', false);
+          }, appSettings.value.autosave);
         }
-
-        activeFile.markChanged = true;
-      })();
+      }
+      activeFile.markChanged = true;
     }, TIMEOUT_VALUE);
   });
 
@@ -366,7 +370,7 @@ async function EditorManager($sidebar, $header, $body) {
         $vScrollbar.remove();
         onscrolltop(false);
         if (!appSettings.value.textWrap) onscrollleft(false);
-        editor.setReadOnly(!file.editable);
+        editor.setReadOnly(!file.editable || !!file.loading);
 
         manager.onupdate('switch-file');
         events.emit('switch-file', file);

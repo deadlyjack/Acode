@@ -11,18 +11,18 @@
         display: none;
       }
 
-      > .tile {
-        > .folder::before {
+      >.tile {
+        >.folder::before {
           content: '\e92c' !important;
         }
 
-        > .indicator::before {
+        >.indicator::before {
           content: '\e9bd' !important;
         }
       }
     }
 
-    > .tile {
+    >.tile {
       position: relative;
       height: 30px;
       font-size: 1em;
@@ -60,11 +60,11 @@
         }
       }
 
-      > .folder::before {
+      >.folder::before {
         content: '\e92d';
       }
 
-      > .indicator::before {
+      >.indicator::before {
         content: '\e9a6';
       }
 
@@ -80,7 +80,7 @@
       padding-left: 10px;
       box-sizing: border-box;
 
-      > .tile {
+      >.tile {
         height: 30px;
 
         .octicon,
@@ -92,7 +92,7 @@
       }
 
       .collaspable {
-        > .tile {
+        >.tile {
           background-color: transparent;
         }
       }
@@ -109,7 +109,7 @@
     }
   }
 
-  > .list-item {
+  >.list-item {
     display: flex;
     min-height: 60px;
     text-decoration: none;
@@ -150,7 +150,7 @@
         display: flex;
         align-items: center;
 
-        button{
+        button {
           background-color: rgb(51, 153, 255);
           background-color: var(--button-background-color);
           color: rgb(255, 255, 255);
@@ -197,6 +197,7 @@
       font-size: 1.4em;
     }
 
+    *:not([data-action]),
     *:not([action]) {
       pointer-events: none;
     }
@@ -236,9 +237,15 @@ ul {
         }
       }
 
-      *:not([action]) {
+      * {
         pointer-events: none;
         overflow: hidden;
+      }
+
+      [data-action],
+      [action] {
+        pointer-events: unset;
+        overflow: unset;
       }
 
       &.tile:active {
@@ -259,6 +266,7 @@ ul {
 }
 
 .list {
+
   &:empty,
   &.empty {
     display: flex;

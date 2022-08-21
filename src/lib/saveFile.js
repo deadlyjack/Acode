@@ -13,6 +13,7 @@ import openFolder from './openFolder';
  * @param {boolean} [isSaveAs]
  */
 async function saveFile(file, isSaveAs = false) {
+  if (file.loading) return;
   let fs;
   let url;
   let filename;

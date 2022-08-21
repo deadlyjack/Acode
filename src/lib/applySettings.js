@@ -27,7 +27,6 @@ export default {
       root.classList.add('hide-floating-button');
     }
 
-    appSettings.applyAutoSaveSetting();
     //quick-tools
     if (appSettings.value.quickTools) {
       quickTools.actions('enable-quick-tools');

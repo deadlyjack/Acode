@@ -2,6 +2,7 @@ import constants from './constants';
 import fsOperation from '../fileSystem/fsOperation';
 import helpers from '../utils/helpers';
 import Url from '../utils/Url';
+import lang from './lang';
 /**
  * @typedef {object} fileBrowserSettings
  * @property {string} showHiddenFiles
@@ -29,7 +30,6 @@ export default class Settings {
    */
   #defaultSettings;
   #oldSettings;
-  #autoSaveInterval;
   #initialized = false;
   #keyboardModes = ['NO_SUGGESTIONS', 'NO_SUGGESTIONS_AGGRESSIVE', 'NORMAL'];
   #on = {
@@ -192,11 +192,17 @@ export default class Settings {
     if (settings) {
       Object.keys(settings).forEach((key) => {
         if (key in this.value) this.value[key] = settings[key];
-        if (key === 'animation') {
-          this.applyAnimationSetting();
-        }
-        if (key === 'autosave') {
-          this.applyAutoSaveSetting();
+        switch (key) {
+          case 'animation':
+            this.applyAnimationSetting();
+            break;
+
+          case 'lang':
+            this.applyLangSetting();
+            break;
+
+          default:
+            break;
         }
       });
     }
@@ -292,24 +298,8 @@ export default class Settings {
     }
   }
 
-  async applyAutoSaveSetting() {
-    const value = this.value.autoSave;
-    clearInterval(this.#autoSaveInterval);
-
-    if (value) {
-      this.#autoSaveInterval = setInterval(() => {
-        editorManager.files.map((file) => {
-          if (file.isUnsaved && file.location)
-            acode.exec('save', false);
-        });
-      }, value);
-    }
-  }
-
   async applyLangSetting() {
     const value = this.value.lang;
-    const json = await fsOperation(`${ASSETS_DIRECTORY}/lang/${value}.json`)
-      .readFile('utf-8');
-    window.strings = JSON.parse(json);
+    lang.set(value);
   }
 }

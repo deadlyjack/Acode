@@ -29,7 +29,7 @@ body.no-animation {
   border: solid 1px transparent;
   border: solid 1px var(--popup-border-color);
 
-  & + .mask {
+  &+.mask {
     z-index: 110;
   }
 
@@ -58,8 +58,13 @@ body.no-animation {
       background-color: rgba($color: #000000, $alpha: 0.1);
     }
 
-    :not([action]) {
+    * {
       pointer-events: none;
+    }
+
+    [data-action],
+    [action] {
+      pointer-events: unset;
     }
 
     .text {

@@ -23,10 +23,11 @@
     border-radius: 4px 4px 0 0;
   }
 
-  &.all{
+  &.all {
     border-radius: 4px;
   }
 
+  [data-action='hint'],
   [action='hint'] {
     font-size: 0.9rem;
     min-height: 30px;
@@ -38,14 +39,14 @@
     overflow-x: hidden;
     text-overflow: ellipsis;
 
-    span[data-str]::after{
+    span[data-str]::after {
       content: attr(data-str);
       font-size: 0.6rem;
       opacity: 0.5;
       margin-left: 10px;
     }
 
-    small:not(:empty){
+    small:not(:empty) {
       margin-left: auto;
       background-color: rgb(255, 255, 255);
       background-color: var(--text-main-color);
@@ -63,8 +64,8 @@
       color: var(--text-main-color);
     }
 
-    &:hover{
-      background-color: rgb(107, 168, 229); 
+    &:hover {
+      background-color: rgb(107, 168, 229);
       background-color: var(--primary-color);
       color: rgb(27, 26, 26);
       color: var(--text-color);
