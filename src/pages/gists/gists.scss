@@ -27,7 +27,7 @@
     }
 
     .value {
-      text-transform: unset;
+      text-transform: unset; // TODO: replace with none, because 'unset' is not supported in older browsers
       display: flex;
 
       .group {
@@ -45,7 +45,7 @@
     }
 
     .private {
-      > .text::after {
+      >.text::after {
         content: 'private';
         font-size: 0.6em;
         border-radius: 4px;

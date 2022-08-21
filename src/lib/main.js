@@ -150,7 +150,7 @@ async function ondeviceready() {
   }
 
   localStorage.versionCode = versionCode;
-  document.body.setAttribute('data-version', 'v' + BuildInfo.version);
+  document.body.setAttribute('data-version', `v${BuildInfo.version} (${versionCode})`);
   acode.setLoadingMessage('Loading settings...');
 
   window.resolveLocalFileSystemURL = function (url, ...args) {
@@ -193,10 +193,6 @@ async function ondeviceready() {
         });
         window.ad = ad;
       });
-
-    document.addEventListener('admob.banner.size', (event) => {
-      console.log(event);
-    });
   }
 
   acode.setLoadingMessage('Loading custom theme...');

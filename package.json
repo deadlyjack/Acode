@@ -35,7 +35,9 @@
       },
       "cordova-plugin-sdcard": {}
     },
-    "platforms": []
+    "platforms": [
+      "android"
+    ]
   },
   "repository": {
     "type": "git",

@@ -197,9 +197,13 @@
       font-size: 1.4em;
     }
 
-    *:not([data-action]),
-    *:not([action]) {
+    * {
       pointer-events: none;
+    }
+
+    [data-action],
+    [action] {
+      pointer-events: all !important;
     }
   }
 }
@@ -244,8 +248,8 @@ ul {
 
       [data-action],
       [action] {
-        pointer-events: unset;
-        overflow: unset;
+        pointer-events: all !important;
+        overflow: auto !important;
       }
 
       &.tile:active {

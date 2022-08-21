@@ -12,7 +12,6 @@ import constants from '../../lib/constants';
 function TextEncodings() {
   return new Promise((resolve) => {
     //#region Declaration
-    let hideSearchbar = () => { };
     const { encodings } = constants;
     const $search = tag('i', {
       className: 'icon search',
@@ -48,7 +47,6 @@ function TextEncodings() {
     $page.onhide = function () {
       actionStack.remove('encodings');
       $content.removeEventListener('click', handleClick);
-      hideSearchbar();
     };
 
     /**
@@ -64,9 +62,7 @@ function TextEncodings() {
       if (!action) return;
 
       if (action === 'search') {
-        searchBar($list, (hide) => {
-          hideSearchbar = hide;
-        });
+        searchBar($list);
       } else if (action === 'select') {
         resolve(encoding);
         $page.hide();

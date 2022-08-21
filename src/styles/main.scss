@@ -420,7 +420,7 @@ footer {
   textarea,
   input {
     flex: 2;
-    height: unset;
+    height: unset; // TODO: replace with none
     color: inherit;
     border-bottom: 1px solid currentColor;
     margin: 5px;

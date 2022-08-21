@@ -7,6 +7,7 @@ import helpers from '../utils/helpers';
  * @param {(hide:()=>)=>void} setHide
  */
 function searchBar($list, setHide) {
+  let hideOnBlur = true;
   const $searchInput = tag('input', {
     type: 'search',
     placeholder: strings.search,
@@ -28,26 +29,37 @@ function searchBar($list, setHide) {
   });
   const children = [...$list.children];
 
-  if (typeof setHide === 'function') setHide(() => {
-    $container.remove();
-    actionStack.remove('searchbar');
-  });
+  if (typeof setHide === 'function') {
+    hideOnBlur = false;
+    setHide(() => {
+      $container.remove();
+      actionStack.remove('searchbar');
+      restoreList(); // resotre list items when searchbar is hidden
+    });
+  }
   app.appendChild($container);
   $searchInput.oninput = search;
   $searchInput.focus();
+  $searchInput.onblur = () => {
+    if (hideOnBlur) {
+      setTimeout(() => {
+        hide();
+      }, 0);
+    }
+  };
 
   actionStack.push({
     id: 'searchbar',
     action: hideSearchBar,
   });
 
-  function hide(resetList) {
+  function hide() {
     actionStack.remove('searchbar');
-    hideSearchBar(resetList);
+    hideSearchBar();
   }
 
-  function hideSearchBar(resetList = true) {
-    if (resetList) onhide();
+  function hideSearchBar() {
+    onhide();
     $container.classList.add('hide');
     setTimeout(() => {
       $container.remove();
@@ -71,6 +83,11 @@ function searchBar($list, setHide) {
   }
 
   function onhide() {
+    if (!$list.parentElement) return;
+    restoreList();
+  }
+
+  function restoreList() {
     $list.textContent = '';
     $list.append(...children);
   }

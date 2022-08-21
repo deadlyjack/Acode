@@ -12,7 +12,7 @@ header {
     color: var(--text-main-color);
 
     >.text {
-      pointer-events: unset !important;
+      pointer-events: all !important;
       margin: auto;
       font-weight: bold;
       font-size: 1.2em;
@@ -47,7 +47,7 @@ header {
 
   [data-action],
   [action] {
-    pointer-events: unset;
+    pointer-events: all !important;
   }
 
   &.cut {

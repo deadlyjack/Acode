@@ -64,7 +64,7 @@ body.no-animation {
 
     [data-action],
     [action] {
-      pointer-events: unset;
+      pointer-events: all !important;
     }
 
     .text {

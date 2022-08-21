@@ -11,7 +11,6 @@ import searchBar from '../../components/searchbar';
 function Modes() {
   return new Promise((resolve, reject) => {
     //#region Declaration
-    let hideSearchbar = () => { };
     const { modes } = ace.require('ace/ext/modelist');
     const $search = tag('i', {
       className: 'icon search',
@@ -47,7 +46,6 @@ function Modes() {
     $page.onhide = function () {
       actionStack.remove('modes');
       $content.removeEventListener('click', handleClick);
-      hideSearchbar();
     };
 
     /**
@@ -63,9 +61,7 @@ function Modes() {
       if (!action) return;
 
       if (action === 'search') {
-        searchBar($list, (hide) => {
-          hideSearchbar = hide;
-        });
+        searchBar($list);
       } else if (action === 'select') {
         const mode = $el.getAttribute('mode');
         resolve(mode);
