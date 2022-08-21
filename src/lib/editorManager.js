@@ -130,6 +130,8 @@ async function EditorManager($sidebar, $header, $body) {
 
   editor.on('change', function (e) {
     if (checkTimeout) clearTimeout(checkTimeout);
+    if (autosaveTimeout) clearTimeout(autosaveTimeout);
+
     checkTimeout = setTimeout(async () => {
       const { activeFile } = manager;
       if (activeFile.markChanged) {
@@ -140,11 +142,11 @@ async function EditorManager($sidebar, $header, $body) {
         manager.onupdate('file-changed');
         manager.emit('update', 'file-changed');
 
-        if (changed) {
-          if (autosaveTimeout) clearTimeout(autosaveTimeout);
+        const { autosave } = appSettings.value;
+        if (activeFile.uri && changed && autosave) {
           autosaveTimeout = setTimeout(() => {
             acode.exec('save', false);
-          }, appSettings.value.autosave);
+          }, autosave);
         }
       }
       activeFile.markChanged = true;
