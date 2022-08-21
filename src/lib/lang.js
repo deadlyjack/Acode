@@ -178,6 +178,8 @@ export default {
   },
   list: Object.keys(langMap).map((code) => [code, langMap[code].name]),
   getName(code) {
-    return langMap[code.toLowerCase()].name;
+    code = code?.toLowerCase();
+    code = code in langMap ? code : 'en-us';
+    return langMap[code].name;
   },
 }

@@ -26,7 +26,7 @@ export default {
     const mode = active ? 'active' : 'passive';
     const ftp = Ftp(hostname, username, password, port, security, mode);
     try {
-      dialogs.loader.create(strings['add ftp'], strings.connecting + '...', {
+      dialogs.loader.create(strings['add ftp'], strings['connecting...'], {
         timeout: 10000,
         callback() {
           stopConnection = true;
@@ -91,32 +91,32 @@ export default {
       return dialogs.multiPrompt(strings['add ftp'], [
         {
           id: 'alias',
-          placeholder: 'Name',
+          placeholder: strings.name,
           type: 'text',
           value: alias ? alias : '',
           required: true,
         },
         {
           id: 'username',
-          placeholder: 'Username (optional)',
+          placeholder: `${strings.username} (${strings.optional})`,
           type: 'text',
           value: username,
         },
         {
           id: 'hostname',
-          placeholder: 'Hostname',
+          placeholder: strings.hostname,
           type: 'text',
           required: true,
           value: hostname,
         },
         {
           id: 'password',
-          placeholder: 'Password (optional)',
+          placeholder: `${strings.password} (${strings.optional})`,
           type: 'password',
           value: password,
         },
         [
-          'Security type: ',
+          `${strings['security type']}: `,
           {
             id: 'ftp',
             placeholder: 'FTP',
@@ -133,7 +133,7 @@ export default {
           },
         ],
         [
-          'Connection mode: ',
+          `${strings['connection mode']}: `,
           {
             id: 'active',
             placeholder: 'Active',
@@ -151,7 +151,7 @@ export default {
         ],
         {
           id: 'port',
-          placeholder: 'Port (optional)',
+          placeholder: `${strings.port} (${strings.optional})`,
           type: 'number',
           value: port,
         },
@@ -176,7 +176,7 @@ export default {
     } = await prompt(...args);
     const authType = usePassword ? 'password' : 'keyFile';
 
-    dialogs.loader.create(strings['add sftp'], strings.connecting + '...', {
+    dialogs.loader.create(strings['add sftp'], strings['connecting...'], {
       timeout: 10000,
       callback() {
         stopConnection = true;
@@ -272,20 +272,20 @@ export default {
       const inputs = [
         {
           id: 'alias',
-          placeholder: 'Name',
+          placeholder: strings.name,
           type: 'text',
           value: alias ? alias : '',
           required: true,
         },
         {
           id: 'username',
-          placeholder: 'Username (optional)',
+          placeholder: `${strings.username} (${strings.optional})`,
           type: 'text',
           value: username,
         },
         {
           id: 'hostname',
-          placeholder: 'Hostname',
+          placeholder: strings.hostname,
           type: 'text',
           required: true,
           value: hostname,
@@ -294,7 +294,7 @@ export default {
           'Authentication type: ',
           {
             id: 'usePassword',
-            placeholder: 'Password',
+            placeholder: strings.password,
             name: 'authType',
             type: 'radio',
             value: MODE_PASS,
@@ -308,7 +308,7 @@ export default {
           },
           {
             id: 'useKeyFile',
-            placeholder: 'Key file',
+            placeholder: strings['key file'],
             name: 'authType',
             type: 'radio',
             value: !MODE_PASS,
@@ -325,7 +325,7 @@ export default {
         ],
         {
           id: 'password',
-          placeholder: 'Password',
+          placeholder: strings.password,
           name: 'password',
           type: 'password',
           value: password,
@@ -333,7 +333,7 @@ export default {
         },
         {
           id: 'keyFile',
-          placeholder: 'Select key file',
+          placeholder: strings['select key file'],
           name: 'keyFile',
           hidden: MODE_PASS,
           value: keyFile,
@@ -346,7 +346,7 @@ export default {
         },
         {
           id: 'passPhrase',
-          placeholder: 'Passphrase (optional)',
+          placeholder: `${strings.passphrase} (${strings.optional})`,
           name: 'passPhrase',
           type: 'password',
           hidden: MODE_PASS,
@@ -354,7 +354,7 @@ export default {
         },
         {
           id: 'port',
-          placeholder: 'Port (optional)',
+          placeholder: `${strings.port} (${strings.optional})`,
           type: 'number',
           value: port,
         },
