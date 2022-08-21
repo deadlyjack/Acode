@@ -21,7 +21,7 @@ Also edit any kind of source file like python, CSS, HTML, Java, JavaScript, Dart
 
 ## Multi-language support
 
-To add new language, create a new file with language code for android (eg. en-us for english) in [`src/lang/`](https://github.com/deadlyjack/Acode/tree/main/src/lang) directory. After adding new laguage also add it to [`src/lib/lang.js`](https://github.com/deadlyjack/Acode/blob/main/src/lib/lang.js#L89).
+To add new language, create a new file with language code for android (eg. en-us for english) in [`src/lang/`](https://github.com/deadlyjack/Acode/tree/main/src/lang) directory. After adding new laguage also add it to [`src/lib/lang.js`](https://github.com/deadlyjack/Acode/blob/main/src/lib/lang.js).
 
 Here are few utility tools to add, remove or search a string in all added languages.
 
