@@ -4,7 +4,7 @@
      <img src='res/logo_1.png' width='250'>
 </p>
 
-Acode is a lightweight code editor for Android phones. You can use this editor for editing HTML, JavaScript, text.
+Acode is a lightweight but powerful code editor for Android phones. You can use this editor for editing HTML, CSS, JavaScript, text files etc.
 
 You can create a website, run the website in the browser and see errors or logs in the console.
 Also edit any kind of source file like python, CSS, HTML, Java, JavaScript, Dart, etc.
@@ -15,9 +15,15 @@ Also edit any kind of source file like python, CSS, HTML, Java, JavaScript, Dart
 
 ## Project structure
 
-- `src` (directory) contains all raw codes
-- `www` (directory) contains public documents, built javascript and CSS files, language files, and HTML files
-- `utils` (directory) contains the CLI tool to manipulate or add strings to all languages easily
+<pre>
+Acode/
+|
+|- src/   - contains all the raw code
+|
+|- www/   - contains public documents, built JavaScript and CSS files, language files, and HTML files
+|
+|- utils/ - contains the CLI tools for building the package, manipulating/adding strings to all languages etc.
+</pre>
 
 ## Multi-language support
 
@@ -36,7 +42,7 @@ yarn lang update
 
 To build the APK you need Nodejs, NPM, and Apache Cordova installed on your device. Use Cordova CLI to build the application.
 
-Run `npm install` to install all dependencies before building the APK.
+Run `yarn install` to setup the project before building the APK.
 
 `yarn build <platform (android)> <free|paid> <p|prod|d|dev>`
 
