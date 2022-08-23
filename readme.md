@@ -42,9 +42,17 @@ yarn lang update
 
 To build the APK you need Nodejs, NPM, and Apache Cordova installed on your device. Use Cordova CLI to build the application.
 
-Run `yarn install` to setup the project before building the APK.
+Run this command to do the initial setup of the project. It's required just once.
 
-`yarn build <platform (android)> <free|paid> <p|prod|d|dev>`
+```
+yarn setup
+```
+
+Build the project
+
+```
+yarn build <platform (android)> <free|paid> <p|prod|d|dev>
+```
 
 ## Develop plugin for Acode
 
