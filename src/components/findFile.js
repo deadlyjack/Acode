@@ -9,7 +9,7 @@ import inputhints from './inputhints';
 export default async function findFile() {
   const $input = tag('input', {
     type: 'search',
-    placeholder: 'Type filename',
+    placeholder: strings['type filename'],
     onfocusout: remove,
   });
   const $mask = tag('span', {
@@ -55,7 +55,7 @@ export default async function findFile() {
       await listDir(files, dirs);
       setHints(files);
     } catch (error) {
-      toast('Unable to load all files.');
+      toast(strings['unable to load files']);
       remove();
     }
   }

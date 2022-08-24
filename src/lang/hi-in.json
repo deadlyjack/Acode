@@ -257,5 +257,7 @@
   "key file": "की फाइल",
   "select key file": "की फ़ाइल का चयन करें",
   "passphrase": "पसस्फरसे",
-  "connecting...": "कनेक्टिंग..."
+  "connecting...": "कनेक्टिंग...",
+  "type filename": "Type filename",
+  "unable to load files": "Unable to load files"
 }

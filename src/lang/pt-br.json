@@ -257,5 +257,7 @@
   "key file": "Arquivo de chave",
   "select key file": "Selecione o arquivo de chave",
   "passphrase": "Palavra chave",
-  "connecting...": "Conectando..."
+  "connecting...": "Conectando...",
+  "type filename": "Type filename",
+  "unable to load files": "Unable to load files"
 }

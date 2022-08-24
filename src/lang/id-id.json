@@ -258,5 +258,7 @@
   "key file": "Key file",
   "select key file": "Select key file",
   "passphrase": "Passphrase",
-  "connecting...": "Connecting..."
+  "connecting...": "Connecting...",
+  "type filename": "Type filename",
+  "unable to load files": "Unable to load files"
 }
