@@ -11,12 +11,12 @@ export default function editorSettings() {
       text: strings.autosave.capitalize(),
       value: values.autosave,
       valueText: (value) => value ? value : strings.no,
-      prompt: strings.delay + ' (>1000)',
+      prompt: strings.delay + ' (>=1000 || 0)',
       promptType: 'number',
       promptOptions: {
         test(value) {
           value = parseInt(value);
-          return value >= 1000;
+          return value >= 1000 || value == 0;
         }
       },
     },
