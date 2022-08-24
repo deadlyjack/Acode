@@ -16,6 +16,7 @@ import GistFiles from '../gistFiles/gistFiles';
 import constants from '../../lib/constants';
 import searchBar from '../../components/searchbar';
 import Icon from '../../components/icon';
+import EditorFile from '../../lib/editorFile';
 
 function GistsInclude(callbackGists) {
   const $search = tag('span', {
@@ -164,7 +165,7 @@ function GistsInclude(callbackGists) {
 
           const gist = gistRecord.add(newGist, true);
 
-          editorManager.addNewFile(filename, {
+          new EditorFile(filename, {
             type: 'gist',
             text: file.content,
             isUnsaved: false,

@@ -245,6 +245,7 @@ public class System extends CordovaPlugin {
       }
 
       callback.success(1);
+      return;
     }
 
     callback.error("No permission passed to request.");
@@ -552,6 +553,7 @@ public class System extends CordovaPlugin {
       );
 
       callback.success();
+      return;
     }
 
     callback.error("Not suppported");

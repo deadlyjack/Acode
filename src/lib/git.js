@@ -51,10 +51,6 @@ async function init() {
   window.gistRecord = GistRecord(gistRecord);
 }
 
-function fileError(code) {
-  dialogs.alert(strings.error, helpers.getErrorMessage(code));
-}
-
 function error(err) {
   if (err.response && err.response.status === 409)
     dialogs.alert(strings.error, strings['conflict error']);
@@ -224,7 +220,7 @@ function GitRecord(obj) {
           resolve(record);
         })
         .catch((err) => {
-          if (err.code) fileError(err.code);
+          helpers.error(err);
           reject(err);
         });
     });
@@ -284,10 +280,7 @@ function GitRecord(obj) {
         if (echo) toast(echo);
       })
       .catch((err) => {
-        if (err.code) {
-          fileError(err.code);
-        }
-        console.error(err);
+        helpers.error(err);
       });
   }
 
@@ -366,7 +359,7 @@ function Gist(id, files, isNew, _public) {
           if (res.status === 200) {
             if (isDelete) {
               delete _this.files[name];
-              editorManager.removeFile(getFile(name), true);
+              getFile(name)?.remove(true);
             }
 
             gistRecord.update(_this);
@@ -527,8 +520,7 @@ function GistRecord(obj) {
         if (echo) toast(echo);
       })
       .catch((err) => {
-        console.error(err);
-        if (err.code) fileError(err.code);
+        helpers.error(err);
       });
   }
 

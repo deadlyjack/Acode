@@ -1,13 +1,11 @@
 import list from '../components/collapsableList';
 import tag from 'html-tag-js';
-import dialogs from '../components/dialogs';
 import helpers from '../utils/helpers';
 import constants from './constants';
 import openFolder from './openFolder';
 import ScrollBar from '../components/scrollbar/scrollbar';
 import Commands from '../ace/commands';
 import touchListeners from '../ace/touchHandler';
-import editorFile from './editorFile';
 
 //TODO: Add option to work multiple files at same time in large display.
 
@@ -16,7 +14,6 @@ import editorFile from './editorFile';
  * @param {HTMLElement} $sidebar
  * @param {HTMLElement} $header
  * @param {HTMLElement} $body
- * @returns {Promise<Manager>}
  */
 async function EditorManager($sidebar, $header, $body) {
   /**
@@ -25,8 +22,7 @@ async function EditorManager($sidebar, $header, $body) {
   let $openFileList;
   let checkTimeout = null;
   let TIMEOUT_VALUE = 500;
-  let lastHeight = innerHeight;
-  let editorState = 'blur';
+  let heightOffset = Math.round(screen.height - innerHeight);
   let preventScrollbarV = false;
   let preventScrollbarH = false;
   let scrollBarVisiblityCount = 0;
@@ -38,6 +34,7 @@ async function EditorManager($sidebar, $header, $body) {
     'switch-file': [],
     'rename-file': [],
     'save-file': [],
+    'file-loaded': [],
     'file-content-changed': [],
     'update': [],
     emit(event, ...args) {
@@ -48,9 +45,6 @@ async function EditorManager($sidebar, $header, $body) {
   const $container = tag('div', {
     className: `editor-container ${editorFont}`,
   });
-  /**
-   * @type {AceAjax.Editor}
-   */
   const editor = ace.edit($container);
   const $vScrollbar = ScrollBar({
     width: scrollbarSize,
@@ -65,27 +59,22 @@ async function EditorManager($sidebar, $header, $body) {
     parent: $body,
     placement: 'bottom',
   });
-  /**@type {Manager}*/
   const manager = {
     editor,
-    addNewFile: editorFile,
     getFile,
     switchFile,
     activeFile: null,
     onupdate: () => { },
     hasUnsavedFiles,
     files: [],
-    removeFile,
     setSubText,
     moveOpenFileList,
+    header: $header,
     sidebar: $sidebar,
     container: $container,
     scroll: {
       $vScrollbar,
       $hScrollbar,
-    },
-    get state() {
-      return editorState;
     },
     get TIMEOUT_VALUE() {
       return TIMEOUT_VALUE;
@@ -114,16 +103,17 @@ async function EditorManager($sidebar, $header, $body) {
   $hScrollbar.onhide = $vScrollbar.onhide = updateFloatingButton.bind({}, true);
 
   window.addEventListener('resize', () => {
-    if (innerHeight > lastHeight) {
+    const screenHeight = screen.height - heightOffset;
+    const ratio = Math.round((screenHeight / innerHeight) * 10) / 10;
+    if (ratio === 1) {
       editor.blur();
-      editorState = 'blur';
+      manager.activeFile.focused = false;
     }
-    lastHeight = innerHeight;
     editor.renderer.scrollCursorIntoView();
   });
 
   editor.on('focus', () => {
-    editorState = 'focus';
+    manager.activeFile.focused = true;
     $hScrollbar.hide();
     $vScrollbar.hide();
   });
@@ -222,6 +212,48 @@ async function EditorManager($sidebar, $header, $body) {
   appSettings.on('update:lineHeight', function (value) {
     editor.container.style.lineHeight = value;
   });
+
+  return manager;
+
+  async function setupEditor() {
+    const Emmet = ace.require('ace/ext/emmet');
+    const settings = appSettings.value;
+    const commands = await Commands();
+
+    touchListeners(editor);
+    Emmet.setCore(window.emmet);
+    commands.forEach((command) => {
+      editor.commands.addCommand(command);
+    });
+    editor.setFontSize(settings.fontSize);
+    editor.setHighlightSelectedWord(true);
+    editor.container.style.lineHeight = settings.lineHeight;
+    editor.textInput.onContextMenu = (e) => {
+      e.preventDefault();
+    };
+
+    editor.setOptions({
+      animatedScroll: false,
+      tooltipFollowsMouse: false,
+      theme: settings.editorTheme,
+      showGutter: settings.linenumbers,
+      showLineNumbers: settings.linenumbers,
+      enableEmmet: true,
+      showInvisibles: settings.showSpaces,
+      indentedSoftWrap: false,
+      scrollPastEnd: 0.5,
+      showPrintMargin: settings.showPrintMargin,
+      enableLiveAutocompletion: settings.liveAutoCompletion,
+    });
+
+    if (!appSettings.value.textWrap) {
+      editor.renderer.setScrollMargin(0, 0, 0, settings.leftMargin);
+    }
+
+    if (appSettings.value.linenumbers) {
+      editor.renderer.setMargin(0, 0, -16, 0);
+    }
+  }
 
   /**
    * Callback function
@@ -353,73 +385,24 @@ async function EditorManager($sidebar, $header, $body) {
   }
 
   function switchFile(id) {
-    for (let file of manager.files) {
-      if (id === file.id) {
-        if (manager.activeFile) {
-          manager.activeFile.assocTile.classList.remove('active');
-        }
+    const file = editorManager.getFile(id);
 
-        manager.activeFile = file;
-        editor.setSession(file.session);
+    manager.activeFile?.tab.classList.remove('active');
+    manager.activeFile = file;
+    editor.setSession(file.session);
 
-        if (manager.state === 'focus') editor.focus();
-        $header.text = file.filename;
-        setSubText(file);
-        file.assocTile.classList.add('active');
-        file.assocTile.scrollIntoView();
+    if (manager.state === 'focus') editor.focus();
+    $header.text = file.filename;
+    setSubText(file);
 
-        $hScrollbar.remove();
-        $vScrollbar.remove();
-        onscrolltop(false);
-        if (!appSettings.value.textWrap) onscrollleft(false);
-        editor.setReadOnly(!file.editable || !!file.loading);
-
-        manager.onupdate('switch-file');
-        events.emit('switch-file', file);
-        return;
-      }
-    }
+    $hScrollbar.remove();
+    $vScrollbar.remove();
+    onscrolltop(false);
+    if (!appSettings.value.textWrap) onscrollleft(false);
+    editor.setReadOnly(!file.editable || !!file.loading);
 
     manager.onupdate('switch-file');
-  }
-
-  async function setupEditor() {
-    const Emmet = ace.require('ace/ext/emmet');
-    const settings = appSettings.value;
-    const commands = await Commands();
-
-    touchListeners(editor);
-    Emmet.setCore(window.emmet);
-    commands.forEach((command) => {
-      editor.commands.addCommand(command);
-    });
-    editor.setFontSize(settings.fontSize);
-    editor.setHighlightSelectedWord(true);
-    editor.container.style.lineHeight = settings.lineHeight;
-    editor.textInput.onContextMenu = (e) => {
-      e.preventDefault();
-    };
-
-    editor.setOptions({
-      animatedScroll: false,
-      tooltipFollowsMouse: false,
-      theme: settings.editorTheme,
-      showGutter: settings.linenumbers,
-      showLineNumbers: settings.linenumbers,
-      enableEmmet: true,
-      showInvisibles: settings.showSpaces,
-      indentedSoftWrap: false,
-      scrollPastEnd: 0.5,
-      showPrintMargin: settings.showPrintMargin,
-    });
-
-    if (!appSettings.value.textWrap) {
-      editor.renderer.setScrollMargin(0, 0, 0, settings.leftMargin);
-    }
-
-    if (appSettings.value.linenumbers) {
-      editor.renderer.setMargin(0, 0, -16, 0);
-    }
+    events.emit('switch-file', file);
   }
 
   function moveOpenFileList() {
@@ -568,7 +551,7 @@ async function EditorManager($sidebar, $header, $body) {
       const newFileList = [];
       for (let el of children) {
         for (let file of manager.files) {
-          if (file.assocTile === el) {
+          if (file.tab === el) {
             newFileList.push(file);
             break;
           }
@@ -580,49 +563,8 @@ async function EditorManager($sidebar, $header, $body) {
   }
 
   function hasUnsavedFiles() {
-    let count = 0;
-    for (let editor of manager.files) {
-      if (editor.isUnsaved) ++count;
-    }
-
-    return count;
-  }
-
-  function removeFile(id, force) {
-    /**
-     * @type {File}
-     */
-    const file = typeof id === 'string' ? getFile(id, 'id') : id;
-
-    if (!file) return;
-
-    if (file.isUnsaved && !force) {
-      dialogs
-        .confirm(strings.warning.toUpperCase(), strings['unsaved file'])
-        .then(closeFile);
-    } else {
-      closeFile();
-
-      if (file.type === 'git') gitRecord.remove(file.record.sha);
-      else if (file.type === 'gist') gistRecord.remove(file.record);
-    }
-
-    function closeFile() {
-      manager.files = manager.files.filter((editor) => editor.id !== file.id);
-
-      if (!manager.files.length) {
-        editor.setSession(new ace.EditSession(''));
-        $sidebar.hide();
-        manager.addNewFile();
-      } else {
-        if (file.id === manager.activeFile.id) {
-          switchFile(manager.files[manager.files.length - 1].id);
-        }
-      }
-
-      file.destroy();
-      manager.onupdate('remove-file');
-    }
+    const unsavedFiles = manager.files.filter((file) => file.isUnsaved);
+    return unsavedFiles.length;
   }
 
   /**
@@ -632,34 +574,28 @@ async function EditorManager($sidebar, $header, $body) {
    * @returns {File}
    */
   function getFile(checkFor, type = 'id') {
-    if (typeof type !== 'string') return null;
-
-    let result = null;
-    for (let file of manager.files) {
-      if (typeof type === 'string') {
-        if (type === 'id' && file.id === checkFor) result = file;
-        else if (type === 'name' && file.name === checkFor) result = file;
-        else if (type === 'uri' && file.uri === checkFor) result = file;
-        else if (
-          type === 'gist' &&
-          file.record &&
-          file.record.id === checkFor.id
-        )
-          result = file;
-        else if (
-          type === 'git' &&
-          file.record &&
-          file.record.sha === checkFor.sha
-        )
-          result = file;
+    return manager.files.find((file) => {
+      switch (type) {
+        case 'id':
+          if (file.id === checkFor) return true;
+          return false;
+        case 'name':
+          if (file.filename === checkFor) return true;
+          return false;
+        case 'uri':
+          if (file.uri === checkFor) return true;
+          return false;
+        case 'git':
+          if (file.record?.sha === checkFor.sha) return true;
+          return false;
+        case 'gist':
+          if (file.record?.id === checkFor.id) return true;
+          return false;
+        default:
+          return false;
       }
-      if (result) break;
-    }
-
-    return result;
+    });
   }
-
-  return manager;
 }
 
 export default EditorManager;

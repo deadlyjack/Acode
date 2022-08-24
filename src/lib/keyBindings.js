@@ -1,4 +1,9 @@
 export default {
+  findFile: {
+    description: 'Find a file',
+    key: 'Ctrl-P',
+    action: 'find-file',
+  },
   closeCurrentTab: {
     description: 'Close current tab.',
     key: 'Ctrl-Q',
@@ -353,7 +358,7 @@ export default {
   },
   jumptomatching: {
     description: 'Jump to matching',
-    key: 'Ctrl-\\|Ctrl-P',
+    key: 'Ctrl-\\',
     readOnly: true,
   },
   selecttomatching: {

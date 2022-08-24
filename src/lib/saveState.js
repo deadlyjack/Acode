@@ -3,42 +3,38 @@ import constants from './constants';
 export default () => {
   const filesToSave = [];
   const folders = [];
-  const { activeFile, editor, files } = editorManager;
+  const { editor, files, activeFile } = editorManager;
   const { value: settings } = appSettings;
 
-  for (let file of files) {
-    if (file.id === constants.DEFAULT_FILE_SESSION) {
-      continue;
-    }
+  files.forEach((file) => {
+    if (file.id === constants.DEFAULT_FILE_SESSION) return;
 
-    const edit = {
+    const fileJson = {
       id: file.id,
-      filename: file.name,
+      filename: file.filename,
       type: file.type,
       uri: file.uri,
       isUnsaved: file.isUnsaved,
       readOnly: file.readOnly,
-      mode: file.mode,
+      SAFMode: file.SAFMode,
       deltedFile: file.deltedFile,
       cursorPos: editor.getCursorPosition(),
       scrollTop: editor.session.getScrollTop(),
       scrollLeft: editor.session.getScrollLeft(),
-      recordid: null,
-      isNew: null,
-      sha: null,
       editable: file.editable,
       encoding: file.encoding,
+      render: activeFile.id === file.id,
       folds: parseFolds(file.session.getAllFolds()),
     };
 
-    if (edit.type === 'git') edit.sha = file.record.sha;
-    else if (edit.type === 'gist') {
-      edit.recordid = file.record.id;
-      edit.isNew = file.record.isNew;
+    if (fileJson.type === 'git') fileJson.sha = file.record.sha;
+    else if (fileJson.type === 'gist') {
+      fileJson.recordid = file.record.id;
+      fileJson.isNew = file.record.isNew;
     }
 
-    if (settings.rememberFiles || edit.isUnsaved) filesToSave.push(edit);
-  }
+    if (settings.rememberFiles || fileJson.isUnsaved) filesToSave.push(fileJson);
+  });
 
   if (settings.rememberFolders) {
     addedFolder.forEach((folder) => {
@@ -59,16 +55,12 @@ export default () => {
 };
 
 function parseFolds(folds) {
-  const foldsToSave = [];
-
-  for (let fold of folds) {
+  return folds.map((fold) => {
     const { range, ranges, placeholder } = fold;
-    foldsToSave.push({
+    return {
       range,
       ranges: parseFolds(ranges),
       placeholder,
-    });
-  }
-
-  return foldsToSave;
+    };
+  });
 }

@@ -31,14 +31,18 @@ function ActionStack() {
         if (closeMessage) {
           dialogs
             .confirm(strings.warning.toUpperCase(), closeMessage)
-            .then(closeApp);
+            .then((confirmation) => {
+              if (confirmation) closeApp();
+            });
         } else {
           dialogs
             .confirm(
               strings.alert.toUpperCase(),
               strings['close app'].capitalize(0),
             )
-            .then(closeApp);
+            .then((confirmation) => {
+              if (confirmation) closeApp();
+            });
         }
       } else {
         closeApp();

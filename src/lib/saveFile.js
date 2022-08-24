@@ -20,7 +20,7 @@ async function saveFile(file, isSaveAs = false) {
   let isNewFile = false;
   let createFile = false;
   const data = file.session.getValue();
-  const $text = file.assocTile.querySelector('span.text');
+  const $text = file.tab.querySelector('span.text');
   if (file.type === 'regular' && !file.uri) {
     isNewFile = true;
   } else if (file.uri) {
@@ -67,7 +67,7 @@ async function saveFile(file, isSaveAs = false) {
       return;
     }
     if (file.type === 'gist') {
-      await file.record.setData(file.name, data);
+      await file.record.setData(file.filename, data);
       file.isUnsaved = false;
       editorManager.onupdate('save-file');
       editorManager.emit('save-file', file);
@@ -137,11 +137,13 @@ async function saveFile(file, isSaveAs = false) {
       recents.addFolder(file.location);
     }
 
-    if (window.saveTimeout) clearTimeout(window.saveTimeout);
+    if (window.saveTimeout) {
+      clearTimeout(window.saveTimeout);
+    }
     window.saveTimeout = setTimeout(() => {
       file.isSaving = false;
       file.isUnsaved = false;
-      file.onsave();
+      // file.onsave();
       if (url) recents.addFile(file.uri);
       editorManager.onupdate('save-file');
       editorManager.emit('update', 'save-file');

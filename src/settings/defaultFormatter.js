@@ -1,6 +1,6 @@
 import settingsPage from '../components/settingPage';
 
-export default function defaultFormatter() {
+export default function defaultFormatter(languageName) {
   const title = strings.formatter;
   const values = appSettings.value;
   const { formatters } = acode;
@@ -11,13 +11,7 @@ export default function defaultFormatter() {
     const formatter = values.formatter[name];
     const value = formatters.find((f) => f.id === formatter)?.name || strings.none;
     const extensions = mode.extensions.split('|');
-    const options = [[null, strings.none]];
-    formatters.forEach(({ id, name, exts }) => {
-      const supports = exts.some((ext) => extensions.includes(ext));
-      if (supports || exts.includes('*')) {
-        options.push([id, name]);
-      }
-    });
+    const options = acode.getFormatterFor(extensions);
 
     return {
       key: name,
@@ -33,5 +27,12 @@ export default function defaultFormatter() {
     appSettings.update();
   }
 
-  settingsPage(title, items, callback);
+  const { $list } = settingsPage(title, items, callback);
+  if (!languageName) return;
+
+  const $item = $list.get(`[data-key="${languageName}"]`);
+  if (!$item) return;
+
+  $item.scrollIntoView();
+  $item.click();
 }

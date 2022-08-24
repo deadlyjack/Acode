@@ -21,6 +21,7 @@ import openFolder from '../../lib/openFolder';
 import recents from '../../lib/recents';
 import remoteStorage from '../../lib/remoteStorage';
 import URLParse from 'url-parse';
+import checkFiles from '../../lib/checkFiles';
 
 /**
  * @typedef {{url: String, name: String}} Location
@@ -118,11 +119,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
     const $addMenu = contextMenu({
       innerHTML: () => {
         if (currentDir.url === '/') {
-          const addSftpNotice = !localStorage.__fbAddSftp;
-          const addPathNotice = !localStorage.__fbAddPath;
           return mustache.render(_addMenuHome, {
-            addPathNotice,
-            addSftpNotice,
             ...strings,
           });
         } else {
@@ -192,7 +189,12 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       $fbMenu.hide();
       const action = e.target.getAttribute('action');
       if (action === 'settings') {
-        filesSettings(reload);
+        filesSettings();
+        const onshow = () => {
+          $page.off('show', onshow);
+          reload();
+        }
+        $page.on('show', onshow);
         return;
       }
 
@@ -215,8 +217,6 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
         toast(strings.success);
         return;
       }
-
-      checkAndSetNotification();
     };
 
     $addMenu.onclick = function (e) {
@@ -232,16 +232,11 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
           break;
 
         case 'add-path':
-          localStorage.__fbAddPath = true;
           addStorage();
           break;
 
         case 'addFtp':
         case 'addSftp':
-          if (action === 'addSftp') {
-            localStorage.__fbAddSftp = true;
-          }
-
           remoteStorage[action]()
             .then((storage) => {
               updateStorage(storage);
@@ -254,8 +249,6 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
         default:
           break;
       }
-
-      checkAndSetNotification();
     };
 
     $search.onclick = function () {
@@ -408,21 +401,20 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
         dialogs.select('', options).then((res) => {
           switch (res) {
             case 'delete':
-              dialogs
-                .confirm(
-                  strings.warning.toUpperCase(),
-                  strings['delete {name}'].replace('{name}', name),
-                )
-                .then(remove);
+              dialogs.confirm(
+                strings.warning.toUpperCase(),
+                strings['delete {name}'].replace('{name}', name),
+              ).then((confirmation) => {
+                if (!confirmation) return;
+                remove();
+              });
               break;
             case 'rename':
-              dialogs
-                .prompt(strings.rename, name, 'text', {
-                  match: constants.FILE_NAME_REGEX,
-                })
-                .then((newname) => {
-                  rename(newname);
-                });
+              dialogs.prompt(strings.rename, name, 'text', {
+                match: constants.FILE_NAME_REGEX,
+              }).then((newname) => {
+                rename(newname);
+              });
               break;
 
             case 'edit':
@@ -531,6 +523,7 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       }
 
       function openDoc() {
+        checkFiles.check = false;
         sdcard.openDocumentFile(
           (res) => {
             res.url = res.uri;
@@ -551,16 +544,6 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
 
     function handleContextMenu(e) {
       handleClick(e, true);
-    }
-
-    function checkAndSetNotification() {
-      const addButtonNotice = !localStorage.__fbAddPath || !localStorage.__fbAddSftp;
-
-      if (addButtonNotice) {
-        $addMenuToggler.classList.add('notice');
-      } else {
-        $addMenuToggler.classList.remove('notice');
-      }
     }
 
     async function listAllStorages() {
@@ -1009,14 +992,6 @@ function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
       $content.append($list);
       $list.scrollTop = scroll;
       $list.focus();
-
-      //Adding notification to icon to let user know about new feature
-      if (dir.url === '/') {
-        checkAndSetNotification();
-      } else {
-        $menuToggler.classList.remove('notice');
-        $addMenuToggler.classList.remove('notice');
-      }
 
       currentDir = dir;
       cachedDir[dir.url] = dir;

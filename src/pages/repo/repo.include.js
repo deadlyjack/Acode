@@ -9,6 +9,7 @@ import helpers from '../../utils/helpers';
 import dialogs from '../../components/dialogs';
 import git from '../../lib/git';
 import searchBar from '../../components/searchbar';
+import EditorFile from '../../lib/editorFile';
 
 export default function RepoInclude(owner, repoName) {
   let $page;
@@ -333,7 +334,7 @@ export default function RepoInclude(owner, repoName) {
         });
 
         hideAd = true;
-        editorManager.addNewFile(name, {
+        new EditorFile(name, {
           type: 'git',
           record,
           text: data,

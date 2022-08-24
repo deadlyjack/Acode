@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="211" id="com.foxdebug.acode" version="1.6.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget android-versionCode="212" id="com.foxdebug.acode" version="1.6.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <feature name="Clipboard">
         <param name="android-package" value="com.verso.cordova.clipboard.Clipboard" />
     </feature>
@@ -14,20 +14,20 @@
         <param name="onload" value="true" />
     </feature>
     <allow-navigation href="cdvfile:*" />
-    <feature name="Ftp">
-        <param name="android-package" value="com.foxdebug.ftp.Ftp" />
-    </feature>
     <feature name="Iap">
         <param name="android-package" value="com.foxdebug.iap.Iap" />
-    </feature>
-    <feature name="SDcard">
-        <param name="android-package" value="com.foxdebug.sdcard.SDcard" />
     </feature>
     <feature name="Sftp">
         <param name="android-package" value="com.foxdebug.sftp.Sftp" />
     </feature>
+    <feature name="Ftp">
+        <param name="android-package" value="com.foxdebug.ftp.Ftp" />
+    </feature>
     <feature name="System">
         <param name="android-package" value="com.foxdebug.system.System" />
+    </feature>
+    <feature name="SDcard">
+        <param name="android-package" value="com.foxdebug.sdcard.SDcard" />
     </feature>
     <feature name="Server">
         <param name="android-package" value="com.foxdebug.server.Server" />

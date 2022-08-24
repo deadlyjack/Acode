@@ -1,4 +1,4 @@
-import ajax from "@deadlyjack/ajax";
+import mimeType from 'mime-types';
 import Path from "../utils/Path";
 import Url from "../utils/Url";
 import internalFs from "./internalFs";
@@ -42,8 +42,9 @@ class FtpClient {
     })
   }
 
-  async connect() {
-    await new Promise((resolve, reject) => {
+  connect() {
+    console.log('FTP Connect: ', this.#path);
+    return new Promise((resolve, reject) => {
       ftp.connect(this.#host, +this.#port, this.#username, this.#password, {
         securityType: this.#security,
         connectionMode: this.#mode,
@@ -65,6 +66,9 @@ class FtpClient {
       ftp.listDirectory(this.#conId, this.#path, (list) => {
         resolve(list.map((i) => {
           i.url = Url.join(this.#origin, i.url);
+          if (i.isFile) {
+            i.type = mimeType.lookup(i.name);
+          }
           return i;
         }));
       }, reject);
@@ -77,7 +81,10 @@ class FtpClient {
       ftp.downloadFile(this.#conId, this.#path, this.#cacheFile, async () => {
         const data = await internalFs.readFile(this.#cacheFile);
         resolve(data);
-      }, reject);
+      }, (error) => {
+        reject(error);
+        console.error('FTP readFile: ', error);
+      });
     });
   }
 
@@ -163,7 +170,10 @@ class FtpClient {
   async exists() {
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
-      ftp.exists(this.#conId, this.#path, resolve, reject);
+      ftp.exists(this.#conId, this.#path, resolve, (error) => {
+        reject(error);
+        console.error('FTP exists: ', error);
+      });
     });
   }
 
@@ -174,7 +184,7 @@ class FtpClient {
     return this.#stat;
   }
 
-  async copyTo(newPath) {
+  async copyTo() {
     throw new Error('Not supported by FTP.');
   }
 
@@ -189,6 +199,9 @@ class FtpClient {
     return new Promise((resolve, reject) => {
       ftp.getStat(this.#conId, this.#path, (stat) => {
         this.#stat = stat;
+        if (this.#stat.isFile) {
+          this.#stat.type = mimeType.lookup(this.#stat.name);
+        }
         resolve(stat);
       }, (err) => {
         console.error('Error while getting stat', err);
@@ -206,7 +219,10 @@ class FtpClient {
     return new Promise((resolve, reject) => {
       ftp.isConnected(this.#conId, (isConnected) => {
         resolve(isConnected);
-      }, reject);
+      }, (error) => {
+        reject(error);
+        console.error('FTP isConnected: ', error);
+      });
     });
   }
 

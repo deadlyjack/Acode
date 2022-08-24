@@ -40,13 +40,12 @@ import Icon from '../components/icon';
 import restoreTheme from './restoreTheme';
 import openFiles from './openFiles';
 import loadPlugins from './loadPlugins';
-import pluginServer from '../handlers/pluginServer';
 import checkPluginsUpdate from './checkPluginsUpdate';
 import plugins from '../pages/plugins/plugins';
 import Acode from './acode';
-import createPluginServer from './createPluginServer';
 import ajax from '@deadlyjack/ajax';
 import lang from './lang';
+import EditorFile from './editorFile';
 
 window.onload = Main;
 
@@ -92,9 +91,7 @@ async function ondeviceready() {
   window.root = tag.get('#root');
   window.app = document.body;
   window.addedFolder = [];
-  window.fileClipBoard = null;
   window.restoreTheme = restoreTheme;
-  window.saveInterval = null;
   window.editorManager = null;
   window.toastQueue = [];
   window.toast = toast;
@@ -172,14 +169,6 @@ async function ondeviceready() {
     localStorage.clear();
     appSettings.reset();
     window.location.reload();
-  }
-
-  try {
-    acode.pluginServer = await createPluginServer();
-    acode.pluginServer.setOnRequestHandler(pluginServer);
-  } catch (error) {
-    console.error(error);
-    toast('Plugins loading failed!');
   }
 
   if (IS_FREE_VERSION && admob) {
@@ -312,18 +301,15 @@ async function loadApp() {
   });
   const folders = helpers.parseJSON(localStorage.folders);
   const files = helpers.parseJSON(localStorage.files) || [];
+  const editorManager = await EditorManager($sidebar, $header, $main);
   //#endregion
 
+  window.editorManager = editorManager;
   acode.$quickToolToggler = $quickToolToggler;
   acode.$headerToggler = $headerToggler;
 
   actionStack.onCloseApp = () => acode.exec('save-state');
   $sidebar.setAttribute('empty-msg', strings['open folder']);
-  window.editorManager = await EditorManager($sidebar, $header, $main)
-    .catch((error) => {
-      console.error(error);
-      toast('Editor initialization failed!');
-    });
 
   $headerToggler.onclick = function () {
     root.classList.toggle('show-header');
@@ -340,26 +326,6 @@ async function loadApp() {
   applySettings.afterRender();
   //#endregion
 
-  //#region loading-files
-  acode.setLoadingMessage('Loading folders...');
-  if (Array.isArray(folders)) {
-    folders.forEach((folder) => openFolder(folder.url, folder.opts));
-  }
-
-  if (Array.isArray(files) && files.length) {
-    openFiles(files)
-      .then(() => {
-        onEditorUpdate(undefined, false);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast('File loading failed!');
-      });
-  } else {
-    editorManager.addNewFile();
-    onEditorUpdate(undefined, false);
-  }
-
   //#endregion
   setTimeout(() => {
     document.body.removeAttribute('data-small-msg');
@@ -367,11 +333,12 @@ async function loadApp() {
   }, 500);
 
   //#region Add event listeners
-  root.on('show', mainPageOnShow);
   editorManager.onupdate = onEditorUpdate;
-  editorManager.on('rename-file', onRenameOrSwitchFile);
-  editorManager.on('switch-file', onRenameOrSwitchFile);
+  root.on('show', mainPageOnShow);
   app.addEventListener('click', onClickApp);
+  editorManager.on('rename-file', onFileUpdate);
+  editorManager.on('switch-file', onFileUpdate);
+  editorManager.on('file-loaded', onFileUpdate);
   $fileMenu.addEventListener('click', handleMenu);
   $mainMenu.addEventListener('click', handleMenu);
   $footer.addEventListener('touchstart', footerTouchStart);
@@ -392,6 +359,25 @@ async function loadApp() {
     acode.exec('check-files');
   });
   //#endregion
+
+  acode.setLoadingMessage('Loading folders...');
+  if (Array.isArray(folders)) {
+    folders.forEach((folder) => openFolder(folder.url, folder.opts));
+  }
+
+  if (Array.isArray(files) && files.length) {
+    openFiles(files)
+      .then(() => {
+        onEditorUpdate(undefined, false);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast('File loading failed!');
+      });
+  } else {
+    new EditorFile();
+    onEditorUpdate(undefined, false);
+  }
 
   checkPluginsUpdate()
     .then((updates) => {
@@ -419,8 +405,6 @@ async function loadApp() {
       }
     })
     .catch(console.error);
-
-  onRenameOrSwitchFile();
 
   //load plugins
   loadPlugins()
@@ -465,20 +449,9 @@ async function loadApp() {
 
   function onEditorUpdate(mode, saveState = true) {
     const { activeFile } = editorManager;
-    const $save = $footer.querySelector('[action=save]');
 
     if (!$editMenuToggler.isConnected) {
       $header.insertBefore($editMenuToggler, $header.lastChild);
-    }
-
-    if (activeFile) {
-      if (activeFile.isUnsaved) {
-        activeFile.assocTile.classList.add('notice');
-        if ($save) $save.classList.add('notice');
-      } else {
-        activeFile.assocTile.classList.remove('notice');
-        if ($save) $save.classList.remove('notice');
-      }
     }
 
     if (mode === 'switch-file') {
@@ -491,24 +464,19 @@ async function loadApp() {
     if (saveState) acode.exec('save-state');
   }
 
-  function onRenameOrSwitchFile() {
-    run
-      .checkRunnable()
-      .then((res) => {
-        if (res) {
-          editorManager.activeFile.canRun = true;
-          $runBtn.setAttribute('run-file', res);
-          $header.insertBefore($runBtn, $header.lastChild);
-        } else {
-          editorManager.activeFile.canRun = false;
-          $runBtn.removeAttribute('run-file');
-          $runBtn.remove();
-        }
-      })
-      .catch((err) => {
-        $runBtn.removeAttribute('run-file');
+  async function onFileUpdate() {
+    try {
+      const { activeFile } = editorManager;
+      const canRun = await activeFile?.canRun();
+      if (canRun) {
+        $header.insertBefore($runBtn, $header.lastChild);
+      } else {
         $runBtn.remove();
-      });
+      }
+    } catch (error) {
+      $runBtn.removeAttribute('run-file');
+      $runBtn.remove();
+    }
   }
 }
 

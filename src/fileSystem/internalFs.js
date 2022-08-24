@@ -90,28 +90,30 @@ export default {
       if (!filename) return reject('Invalid valud of fileURL: ' + filename);
       window.resolveLocalFileSystemURL(
         filename,
-        async (fileEntry) => {
-          const url = fileEntry.toInternalURL();
-          try {
-            const data = await ajax({
-              url: url,
-              responseType: 'arraybuffer',
-            });
-            resolve({ data });
-          } catch (error) {
-            fileEntry.file((file) => {
-              const fileReader = new FileReader();
-              fileReader.onloadend = function () {
-                resolve({
-                  data: this.result,
-                });
-              };
+        (fileEntry) => {
+          (async () => {
+            const url = fileEntry.toInternalURL();
+            try {
+              const data = await ajax({
+                url: url,
+                responseType: 'arraybuffer',
+              });
+              resolve({ data });
+            } catch (error) {
+              fileEntry.file((file) => {
+                const fileReader = new FileReader();
+                fileReader.onloadend = function () {
+                  resolve({
+                    data: this.result,
+                  });
+                };
 
-              fileReader.onerror = reject;
+                fileReader.onerror = reject;
 
-              fileReader.readAsArrayBuffer(file);
-            }, reject);
-          }
+                fileReader.readAsArrayBuffer(file);
+              }, reject);
+            }
+          })();
         }, reject);
     });
   },

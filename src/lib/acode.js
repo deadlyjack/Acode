@@ -1,7 +1,8 @@
 import commands from "./commands";
 import fsOperation from "../fileSystem/fsOperation";
 import Url from "../utils/Url";
-import settingsPage from "../components/settingPage";
+import EditorFile from "./editorFile";
+import defaultFormatter from "../settings/defaultFormatter";
 
 export default class Acode {
   #pluginsInit = {};
@@ -75,17 +76,23 @@ export default class Acode {
   async format() {
     const file = editorManager.activeFile;
     const { getModeForPath } = ace.require('ace/ext/modelist');
-    const { name } = getModeForPath(file.name);
+    const { name } = getModeForPath(file.filename);
     const formatterId = appSettings.value.formatter[name];
-    const formatter = this.#formatter.find(({ id }) => id === formatterId);
+    let formatter = this.#formatter.find(({ id }) => id === formatterId);
 
-    if (formatter) {
-      await formatter.format();
+    if (!formatter) {
+      defaultFormatter(name);
     }
+
+    if (formatter) await formatter.format();
   }
 
   fsOperation(file) {
     return fsOperation(file);
+  }
+
+  newEditorFile(filename, options) {
+    new EditorFile(filename, options);
   }
 
   get formatters() {
@@ -94,5 +101,19 @@ export default class Acode {
       name: name || id,
       exts,
     }));
+  }
+
+  /**
+   * 
+   * @param {string[]} extensions 
+   */
+  getFormatterFor(extensions) {
+    const options = [[null, strings.none]];
+    this.formatters.forEach(({ id, name, exts }) => {
+      const supports = exts.some((ext) => extensions.includes(ext));
+      if (supports || exts.includes('*')) {
+        options.push([id, name]);
+      }
+    });
   }
 }

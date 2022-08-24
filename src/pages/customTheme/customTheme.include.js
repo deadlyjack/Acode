@@ -6,8 +6,8 @@ import Page from '../../components/page';
 import color from '../../components/dialogboxes/color';
 import helpers from '../../utils/helpers';
 import constants from '../../lib/constants';
-import confirm from '../../components/dialogboxes/confirm';
 import select from '../../components/dialogboxes/select';
+import dialogs from '../../components/dialogs';
 
 export default function CustomThemeInclude() {
   const $page = Page(`${strings['custom']} ${strings['theme']}`.capitalize());
@@ -77,26 +77,27 @@ export default function CustomThemeInclude() {
       if (action === 'set-color') {
         const name = $target.getAttribute('name');
         const defaultValue = $target.getAttribute('value');
-        color(defaultValue).then((color) => {
-          appSettings.value.customTheme[name] = color;
-          appSettings.update();
-          const scrolltop = $page.get('#custom-theme').scrollTop;
-          render();
-          $page.get('#custom-theme').scrollTop = scrolltop;
-          if ($page.header.text.slice(-1) !== '*') $page.header.text += ' *';
-        });
+        color(defaultValue)
+          .then((color) => {
+            appSettings.value.customTheme[name] = color;
+            appSettings.update();
+            const scrolltop = $page.get('#custom-theme').scrollTop;
+            render();
+            $page.get('#custom-theme').scrollTop = scrolltop;
+            if ($page.header.text.slice(-1) !== '*') $page.header.text += ' *';
+          });
 
         return;
       }
 
       if (action === 'reset-theme') {
-        confirm(strings['info'].toUpperCase(), strings['reset warning']).then(
-          () => {
+        dialogs.confirm(strings['info'].toUpperCase(), strings['reset warning'])
+          .then((confirmation) => {
+            if (!confirmation) return;
             appSettings.reset('customTheme');
             render();
             updateTheme();
-          },
-        );
+          });
       }
     }
   }

@@ -21,15 +21,17 @@ import saveState from './saveState';
 import commandPallete from '../components/commandPallete';
 import tag from 'html-tag-js';
 import TextEncodings from '../pages/textEncodings/textEncodings';
+import EditorFile from './editorFile';
+import findFile from '../components/findFile';
 
 export default {
   'close-all-tabs'() {
-    for (let file of editorManager.files) {
-      editorManager.removeFile(file);
-    }
+    editorManager.files.forEach((file) => {
+      file.remove();
+    });
   },
   'close-current-tab'() {
-    editorManager.removeFile(editorManager.activeFile);
+    editorManager.activeFile.remove();
   },
   'console'() {
     run(true, 'in app');
@@ -64,6 +66,9 @@ export default {
   },
   'exit'() {
     navigator.app.exitApp();
+  },
+  'find-file'() {
+    findFile();
   },
   'files'() {
     FileBrowser('both', strings['file browser'])
@@ -113,9 +118,9 @@ export default {
       .then((filename) => {
         if (filename) {
           filename = helpers.removeLineBreaks(filename);
-          editorManager.addNewFile(filename, {
+          new EditorFile(filename, {
             isUnsaved: false,
-          });
+          })
         }
       })
       .catch((err) => {
@@ -129,7 +134,7 @@ export default {
     if (fileIndex === len - 1) fileIndex = 0;
     else ++fileIndex;
 
-    editorManager.switchFile(editorManager.files[fileIndex].id);
+    editorManager.files[fileIndex].makeActive();
   },
   'open'(page) {
     if (page === 'settings') settingsMain();
@@ -155,7 +160,7 @@ export default {
     if (fileIndex === 0) fileIndex = len - 1;
     else --fileIndex;
 
-    editorManager.switchFile(editorManager.files[fileIndex].id);
+    editorManager.files[fileIndex].makeActive();
   },
   'read-only'() {
     const file = editorManager.activeFile;

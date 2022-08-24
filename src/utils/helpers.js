@@ -91,46 +91,11 @@ export default {
     }
   },
   /**
-   * Get programming language name for extension name
-   * @param {String} ext
-   * @returns
-   */
-  getLangNameFromExt(ext) {
-    if (ext === 'mdb') return 'access';
-    if (ext === 'any') return 'anyscript';
-    if (
-      [
-        'xl',
-        'xls',
-        'xlr',
-        'xlsx',
-        'xltx',
-        'xlthtml',
-        'sdc',
-        'ods',
-        'dex',
-        'cell',
-        'def',
-        'ods',
-        'ots',
-        'uos',
-      ].includes(ext)
-    )
-      return 'excel';
-    if (ext === 'pde') return 'processinglang';
-    if (['py', 'pyc', 'pyd', 'pyo', 'pyw', 'pyz', 'gyp'].includes(ext))
-      return 'python';
-    if (ext === 'src') return 'source';
-    if (['doc', 'docx', 'odt', 'rtf', 'wpd'].includes(ext)) return 'word';
-    if (['txt', 'csv'].includes(ext)) return 'text';
-    return ext;
-  },
-  /**
    * Gets programming language name according to filename
    * @param {String} filename
    * @returns
    */
-  getLangNameFromFileName(filename) {
+  getFileType(filename) {
     const regex = {
       postcssconfig: /^postcss\.config\.js$/i,
       typescriptdef: /\.d\.ts$/i,
@@ -243,31 +208,45 @@ export default {
       xquery: /\.xq$/i,
       yaml: /\.(yaml|yml)$/i,
     };
-    for (let type in regex) {
-      if (regex[type].test(filename)) return type;
-    }
 
+    const fileType = Object.keys(regex).find((type) => regex[type].test(filename));
+    if (fileType) return fileType;
+
+    const EXCEL = ['xl', 'xls', 'xlr', 'xlsx', 'xltx', 'sdc', 'ods', 'dex', 'cell', 'def', 'ods', 'ots', 'uos'];
+    const PYTHON = ['py', 'pyc', 'pyd', 'pyo', 'pyw', 'pyz', 'gyp'];
+    const WORD = ['doc', 'docx', 'odt', 'rtf', 'wpd'];
+    const TEXT = ['txt', 'csv'];
     const ext = this.extname(filename);
-    return this.getLangNameFromExt(ext);
+
+    if (ext === 'mdb') return 'access';
+    if (ext === 'any') return 'anyscript';
+    if (ext === 'pde') return 'processinglang';
+    if (ext === 'src') return 'source';
+    if (TEXT.includes(ext)) return 'text';
+    if (WORD.includes(ext)) return 'word';
+    if (PYTHON.includes(ext)) return 'python';
+    if (EXCEL.includes(ext)) return 'excel';
+    return ext;
   },
   /**
    * Gets icon according to filename
    * @param {string} filename
    */
   getIconForFile(filename) {
-    let file;
     let ext = this.extname(filename);
 
-    if (['mp4', 'm4a', 'mov', '3gp', 'wmv', 'flv', 'avi'].includes(ext))
-      file = 'movie';
-    if (['png', 'jpeg', 'jpg', 'gif', 'ico', 'webp'].includes(ext))
-      file = 'image';
-    if (['wav', 'mp3', 'flac'].includes(ext)) file = 'audiotrack';
-    if (['zip', 'rar', 'tar', 'deb'].includes(ext)) file = 'zip';
-    if (ext === 'apk') file = 'android';
+    const MOVIE = ['mp4', 'm4a', 'mov', '3gp', 'wmv', 'flv', 'avi'];
+    const IMAGE = ['png', 'jpeg', 'jpg', 'gif', 'ico', 'webp'];
+    const SONG = ['wav', 'mp3', 'flac'];
+    const ZIP = ['zip', 'rar', 'tar', 'deb'];
 
-    if (file) return 'icon ' + file;
-    return `file file_type_${this.getLangNameFromFileName(filename)}`;
+    if (ext === 'apk') return 'icon android';
+    if (SONG.includes(ext)) return 'icon audiotrack';
+    if (ZIP.includes(ext)) return 'icon zip';
+    if (IMAGE.includes(ext)) return 'icon image';
+    if (MOVIE.includes(ext)) return 'icon movie';
+
+    return `file file_type_${this.getFileType(filename)}`;
   },
   /**
    *

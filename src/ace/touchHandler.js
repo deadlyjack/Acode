@@ -150,8 +150,15 @@ export default function addTouchListeners(editor) {
     lockX = false;
     lockY = false;
     mode = 'wait';
+    const preventDefault = (e) => {
+      e.preventDefault();
+    }
+
+    e.target.ontouchstart = preventDefault;
+    e.target.oncontextmenu = preventDefault;
 
     selectionTimeout = setTimeout(() => {
+      e.preventDefault();
       moveCursorTo(clientX, clientY);
       select();
       removeListeners();
@@ -221,7 +228,6 @@ export default function addTouchListeners(editor) {
     removeListeners();
 
     const { clientX, clientY } = e.changedTouches[0];
-
     clearTimeout(selectionTimeout);
 
     if (mode === 'wait') {
@@ -562,6 +568,8 @@ export default function addTouchListeners(editor) {
     editor.focus();
     this.dataset.immortal = true;
     let doesShowMenu = true;
+    let touchEnded = false;
+    let moveTimeout;
 
     if (mode === 'cursor') {
       clearTimeout($cursor.dataset.timeout);
@@ -628,7 +636,12 @@ export default function addTouchListeners(editor) {
       }
 
       if (!editor.isRowFullyVisible(line)) {
-        editor.scrollToLine(line, true, false);
+        clearTimeout(moveTimeout);
+        moveTimeout = setTimeout(() => {
+          editor.scrollToLine(line, true, false);
+          if (touchEnded) return;
+          touchMove(e);
+        }, 100);
       }
 
       const [left, top] = relativePosition(clientX, clientY - lineHeight);
@@ -638,6 +651,7 @@ export default function addTouchListeners(editor) {
     };
 
     const touchEnd = (e) => {
+      touchEnded = true;
       e.preventDefault();
       if (mode === 'cursor') {
         cursorMode();

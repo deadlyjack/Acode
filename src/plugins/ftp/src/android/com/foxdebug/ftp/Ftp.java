@@ -73,21 +73,20 @@ public class Ftp extends CordovaPlugin {
       .execute(
         new Runnable() {
           public void run() {
+            int reply;
+            int port = args.optInt(1);
+            String host = args.optString(0);
+            String username = args.optString(2);
+            String password = args.optString(3);
+            String defaultPath = args.optString(4);
+            String sequirtyType = args.optString(5);
+            String connectionMode = args.optString(6);
+            String encryption = args.optString(7);
+            String encoding = args.optString(8);
+            String ftpId = getFtpId(host, port, username);
+            FTPClient ftp;
+
             try {
-              String host = getJSONValueString(args, 0);
-              int port = getJSONValueInt(args, 1);
-              String username = getJSONValueString(args, 2);
-              String password = getJSONValueString(args, 3);
-              String defaultPath = getJSONValueString(args, 4);
-              String sequirtyType = getJSONValueString(args, 5);
-              String connectionMode = getJSONValueString(args, 6);
-              String encryption = getJSONValueString(args, 7);
-              String encoding = getJSONValueString(args, 8);
-              String ftpId = getFtpId(host, port, username);
-              int reply;
-
-              FTPClient ftp;
-
               if (ftpProfiles.containsKey(ftpId)) {
                 ftp = ftpProfiles.get(ftpId);
                 reply = ftp.getReplyCode();
@@ -98,12 +97,14 @@ public class Ftp extends CordovaPlugin {
                 }
                 Log.d("FTP", "FTPClient (" + ftpId + ") is not connected");
                 ftp.disconnect();
+                Log.d("FTP", "FTPClient (" + ftpId + ") disconnecting...");
               } else {
                 Log.d("FTP", "Creating new FTPClient (" + ftpId + ")");
                 ftp = new FTPClient();
                 ftpProfiles.put(ftpId, ftp);
               }
 
+              Log.d("FTP", "FTPClient (" + ftpId + ") connecting...");
               ftp.connect(host, port);
               ftp.setControlKeepAliveTimeout(300);
               if (connectionMode.equals("active")) {
@@ -114,22 +115,29 @@ public class Ftp extends CordovaPlugin {
                 ftp.enterLocalPassiveMode();
               }
 
+              Log.d("FTP", "FTPClient (" + ftpId + ") logging in...");
               ftp.login(username, password);
 
               reply = ftp.getReplyCode();
               if (!FTPReply.isPositiveCompletion(reply)) {
                 ftp.disconnect();
+                Log.d(
+                  "FTP",
+                  "FTPClient (" + ftpId + ") server refused connection."
+                );
                 callback.error("FTP server refused connection.");
                 return;
               }
 
               ftp.setListHiddenFiles(true);
-
               ftpProfiles.put(ftpId, ftp);
+              Log.d("FTP", "FTPClient (" + ftpId + ") connected");
               callback.success(ftpId);
             } catch (IOException e) {
+              Log.e("FTP", "FTPClient (" + ftpId + ")", e);
               callback.error(e.getMessage());
             } catch (Exception e) {
+              Log.e("FTP", "FTPClient (" + ftpId + ")", e);
               callback.error(e.getMessage());
             }
           }
@@ -144,8 +152,8 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String path = getJSONValueString(args, 1);
+              String ftpId = args.optString(0);
+              String path = args.optString(1);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -163,8 +171,14 @@ public class Ftp extends CordovaPlugin {
               }
 
               FTPFile[] files = ftp.listFiles(path);
-              Log.d("FTP", "Listing files in " + path);
-              Log.d("FTP", "Found " + files.length + " files.");
+              Log.d(
+                "FTP",
+                "FTPClient (" + ftpId + ") Listing files in " + path
+              );
+              Log.d(
+                "FTP",
+                "FTPClient (" + ftpId + ") Found " + files.length + " files."
+              );
               JSONArray jsonFiles = new JSONArray();
               for (FTPFile file : files) {
                 JSONObject jsonFile = new JSONObject();
@@ -222,10 +236,9 @@ public class Ftp extends CordovaPlugin {
       .execute(
         new Runnable() {
           public void run() {
+            String ftpId = args.optString(0);
+            String path = args.optString(1);
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String path = getJSONValueString(args, 1);
-
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
                 return;
@@ -249,12 +262,17 @@ public class Ftp extends CordovaPlugin {
                 callback.success(0);
               }
             } catch (ParserInitializationException e) {
+              Log.e("FTP", "FTPClient (" + ftpId + ") path: " + path, e);
               callback.error(e.getMessage());
+              Log.e("FTP", "FTPClient (" + ftpId + ") path: " + path, e);
             } catch (FTPConnectionClosedException e) {
+              Log.e("FTP", "FTPClient (" + ftpId + ") path: " + path, e);
               callback.error(e.getMessage());
             } catch (IOException e) {
+              Log.e("FTP", "FTPClient (" + ftpId + ") path: " + path, e);
               callback.error(e.getMessage());
             } catch (Exception e) {
+              Log.e("FTP", "FTPClient (" + ftpId + ") path: " + path, e);
               callback.error(e.getMessage());
             }
           }
@@ -269,7 +287,7 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
+              String ftpId = args.optString(0);
               FTPClient ftp = ftpProfiles.get(ftpId);
               if (ftp == null) {
                 callback.error("FTP client not found.");
@@ -292,8 +310,8 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String path = getJSONValueString(args, 1);
+              String ftpId = args.optString(0);
+              String path = args.optString(1);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -332,8 +350,8 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String path = getJSONValueString(args, 1);
+              String ftpId = args.optString(0);
+              String path = args.optString(1);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -375,9 +393,9 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String oldPath = getJSONValueString(args, 1);
-              String newPath = getJSONValueString(args, 2);
+              String ftpId = args.optString(0);
+              String oldPath = args.optString(1);
+              String newPath = args.optString(2);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -421,9 +439,9 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String path = getJSONValueString(args, 1);
-              String localFilePath = getJSONValueString(args, 2);
+              String ftpId = args.optString(0);
+              String path = args.optString(1);
+              String localFilePath = args.optString(2);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -451,6 +469,10 @@ public class Ftp extends CordovaPlugin {
 
               InputStream inputStream = ftp.retrieveFileStream(path);
               if (inputStream == null) {
+                Log.d(
+                  "FTP",
+                  "FTPClient (" + ftpId + ") path: " + path + " - not found"
+                );
                 callback.error("File not found.");
                 return;
               }
@@ -493,9 +515,9 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String localFilePath = getJSONValueString(args, 1);
-              String remoteFilePath = getJSONValueString(args, 2);
+              String ftpId = args.optString(0);
+              String localFilePath = args.optString(1);
+              String remoteFilePath = args.optString(2);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -567,7 +589,7 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
+              String ftpId = args.optString(0);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -596,8 +618,8 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String command = getJSONValueString(args, 1);
+              String ftpId = args.optString(0);
+              String command = args.optString(1);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -635,7 +657,7 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
+              String ftpId = args.optString(0);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -651,6 +673,7 @@ public class Ftp extends CordovaPlugin {
               boolean connected = ftp.isConnected();
               callback.success(connected ? 1 : 0);
             } catch (Exception e) {
+              Log.e("FTP", "FTPClient", e);
               callback.error(e.getMessage());
             }
           }
@@ -665,7 +688,7 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
+              String ftpId = args.optString(0);
               FTPClient ftp = ftpProfiles.get(ftpId);
               if (ftp != null) {
                 ftp.disconnect();
@@ -689,8 +712,8 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String path = getJSONValueString(args, 1);
+              String ftpId = args.optString(0);
+              String path = args.optString(1);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -727,8 +750,8 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String path = getJSONValueString(args, 1);
+              String ftpId = args.optString(0);
+              String path = args.optString(1);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -768,7 +791,7 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
+              String ftpId = args.optString(0);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -800,7 +823,7 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
+              String ftpId = args.optString(0);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -832,8 +855,8 @@ public class Ftp extends CordovaPlugin {
         new Runnable() {
           public void run() {
             try {
-              String ftpId = getJSONValueString(args, 0);
-              String path = getJSONValueString(args, 1);
+              String ftpId = args.optString(0);
+              String path = args.optString(1);
 
               if (ftpId == null || ftpId.isEmpty()) {
                 callback.error("FTP ID is required.");
@@ -860,9 +883,11 @@ public class Ftp extends CordovaPlugin {
               FTPFile file = files[0];
               JSONObject stat = new JSONObject();
               stat.put("isFile", file.isFile());
+              stat.put("isValid", file.isValid());
+              stat.put("isUnknown", file.isUnknown());
               stat.put("isDirectory", file.isDirectory());
               stat.put("isSymbolicLink", file.isSymbolicLink());
-              stat.put("type", file.getType());
+              stat.put("linkCount", file.getHardLinkCount());
               stat.put("size", file.getSize());
               stat.put("name", file.getName());
               stat.put("lastModified", file.getTimestamp().getTimeInMillis());
@@ -898,22 +923,6 @@ public class Ftp extends CordovaPlugin {
 
   private String getFtpId(String host, int port, String username) {
     return username + "@" + host + ":" + port;
-  }
-
-  private String getJSONValueString(JSONArray ar, int index) {
-    try {
-      return ar.getString(index);
-    } catch (JSONException e) {
-      return null;
-    }
-  }
-
-  private int getJSONValueInt(JSONArray ar, int index) {
-    try {
-      return ar.getInt(index);
-    } catch (JSONException e) {
-      return 0;
-    }
   }
 
   private String errMessage(Exception e) {

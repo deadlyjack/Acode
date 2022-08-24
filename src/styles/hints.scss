@@ -39,7 +39,11 @@
     overflow-x: hidden;
     text-overflow: ellipsis;
 
-    span[data-str]::after {
+    * {
+      pointer-events: none;
+    }
+
+    [data-str]::after {
       content: attr(data-str);
       font-size: 0.6rem;
       opacity: 0.5;

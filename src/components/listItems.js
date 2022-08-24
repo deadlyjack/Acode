@@ -69,6 +69,11 @@ export default function listItems($list, items, callback, sort = true) {
   $list.append(...$items);
   $list.addEventListener('click', onclick);
 
+  /**
+   * Click handler for $list
+   * @this {HTMLElement}
+   * @param {MouseEvent} e 
+   */
   async function onclick(e) {
     const $target = e.target;
     const { action, key } = e.target.dataset;
@@ -81,84 +86,36 @@ export default function listItems($list, items, callback, sort = true) {
     const { text, value, valueText } = item;
     const { promptType, promptOptions } = item;
 
-    if (select) {
-      try {
-        const res = await dialogs.select(text, select, {
+    const $valueText = $target.get('.value');
+    const $checkbox = $target.get('.input-checkbox');
+    let res;
+
+    try {
+      if (select) {
+        res = await dialogs.select(text, select, {
           default: value,
         });
-        const $valueText = $target.get('.value');
-        setValueText($valueText, res, valueText);
-        callback(key, res);
-      } catch (error) {
-        // ignore
+      } else if (checkbox !== undefined) {
+        $checkbox.toggle();
+        res = $checkbox.checked;
+      } else if (prompt) {
+        res = await dialogs.prompt(prompt, value, promptType, promptOptions);
+      } else if (file || folder) {
+        const { url } = await FileBrowser(mode);
+        res = url;
+      } else if (color) {
+        res = await dialogs.color(value);
+      } else if (link) {
+        system.openInBrowser(link);
+        return;
       }
-
-      return;
+    } catch (error) {
+      console.log(error);
     }
 
-    if (checkbox !== undefined) {
-      const $checkbox = $target.get('.input-checkbox');
-      $checkbox.toggle();
-      callback(key, $checkbox.checked);
-      return;
-    }
-
-    if (prompt) {
-      try {
-        const res = await dialogs.prompt(prompt, value, promptType, promptOptions);
-        const $valueText = this.get('.value');
-        setValueText($valueText, res, valueText);
-        callback(key, res);
-      } catch (error) {
-        // ignore
-      }
-
-      return;
-    }
-
-    if (file || folder) {
-      try {
-        const res = await dialogs.multiPrompt(text, {
-          placeholder: strings['select file'],
-          value,
-          type: 'text',
-          required: true,
-          readOnly: true,
-          onclick() {
-            const mode = file ? 'file' : 'folder';
-            FileBrowser(mode, ({ uri }) => {
-              this.value = uri;
-            });
-          }
-        });
-        const $valueText = this.get('.value');
-        setValueText($valueText, res, valueText);
-        callback(key, res);
-      } catch (error) {
-        // ignore
-      }
-
-      return;
-    }
-
-    if (color) {
-      try {
-        const res = await dialogs.color(value);
-        const $valueText = this.get('.value');
-        setValueText($valueText, res, valueText);
-        callback(key, res);
-      } catch (error) {
-        // ignore
-      }
-
-      return;
-    }
-
-    if (link) {
-      system.openInBrowser(link);
-    }
-
-    callback(key, value);
+    item.value = res ?? value;
+    setValueText($valueText, res, valueText);
+    callback(key, item.value);
   }
 
   function setValueText($valueText, value, valueText) {

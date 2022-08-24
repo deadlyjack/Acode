@@ -60,8 +60,8 @@ body {
           height: 30px !important;
           width: 40px !important;
           opacity: 1;
-          border-radius: unset; // TODO: replace with none
-          border: unset; // TODO: replace with none
+          border-radius: 0;
+          border: none;
           box-shadow: none !important;
         }
 
@@ -397,7 +397,7 @@ wc-page {
   }
 
   &.primary {
-    z-index: unset; // TODO: replace with none
+    z-index: auto;
   }
 
   &:not(.primary):not(.no-transition) {

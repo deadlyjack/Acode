@@ -708,7 +708,8 @@ public class SDcard extends CordovaPlugin {
         fileData.put("mime", mime);
         fileData.put("isDirectory", isDirectory);
         fileData.put("isFile", !isDirectory);
-        fileData.put("uri", src + SAPERATOR + docId);
+        fileData.put("uri", src + SAPERATOR + docId); // TODO: Deprecate in future
+        fileData.put("url", src + SAPERATOR + docId);
         result.put(fileData);
       }
 

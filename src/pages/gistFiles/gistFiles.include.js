@@ -12,6 +12,7 @@ import git from '../../lib/git';
 import constants from '../../lib/constants';
 import searchBar from '../../components/searchbar';
 import Icon from '../../components/icon';
+import EditorFile from '../../lib/editorFile';
 
 /**
  *
@@ -105,7 +106,7 @@ function GistFilesInclude(gist) {
         })
         .then((name) => {
           gist.addFile(name);
-          editorManager.addNewFile(name, {
+          new EditorFile(name, {
             type: 'gist',
             filename: name,
             isUnsaved: false,
@@ -121,84 +122,82 @@ function GistFilesInclude(gist) {
 
     function deleteFile() {
       const filename = $el.parentElement.getAttribute('filename');
-      dialogs
-        .confirm(
-          strings.warning,
-          strings['delete {name}'].replace('{name}', filename),
-        )
-        .then(() => {
-          if (filename) {
-            dialogs.loader.create(filename, strings.loading + '...');
-            gist
-              .removeFile(filename)
-              .then(() => {
-                $el.parentElement.remove();
-                toast(strings.success);
-              })
-              .catch((err) => {
-                if (err) dialogs.alert(strings.error, err.toString());
-              })
-              .finally(() => {
-                dialogs.loader.destroy();
-              });
-          }
-        });
+      dialogs.confirm(
+        strings.warning,
+        strings['delete {name}'].replace('{name}', filename),
+      ).then((confirmation) => {
+        if (!confirmation) return;
+        if (!filename) return;
+        dialogs.loader.create(filename, strings.loading + '...');
+        gist.removeFile(filename)
+          .then(() => {
+            $el.parentElement.remove();
+            toast(strings.success);
+          })
+          .catch((err) => {
+            if (err) dialogs.alert(strings.error, err.toString());
+          })
+          .finally(() => {
+            dialogs.loader.destroy();
+          });
+      });
     }
 
     function deleteGist() {
-      dialogs
-        .confirm(
-          strings.warning,
-          strings['delete {name}'].replace('{name}', 'Gist: ' + gist.id),
-        )
-        .then(() => {
-          const Gist = git.GitHub().getGist(gist.id);
-          dialogs.loader.create('', strings.loading + '...');
-          Gist.delete()
-            .then((res) => {
-              if (res.status === 204) {
-                for (let file of editorManager.files) {
-                  if (file.type === 'gist' && file.record.id === gist.id)
-                    editorManager.removeFile(file, true);
+      dialogs.confirm(
+        strings.warning,
+        strings['delete {name}'].replace('{name}', 'Gist: ' + gist.id),
+      ).then((confirmation) => {
+        if (!confirmation) return;
+        const Gist = git.GitHub().getGist(gist.id);
+        dialogs.loader.create('', strings.loading + '...');
+        Gist.delete()
+          .then((res) => {
+            if (res.status === 204) {
+              for (let file of editorManager.files) {
+                if (file.type === 'gist' && file.record.id === gist.id) {
+                  file.remove(true);
                 }
-                toast(strings.success);
-                actionStack.pop();
-                actionStack.pop();
-                Gists((gists) => {
-                  let index;
-                  for (let [i, g] of gists.entries()) {
-                    if (g.id === gist.id) {
-                      index = i;
-                      break;
-                    }
+              }
+              toast(strings.success);
+              actionStack.pop();
+              actionStack.pop();
+              Gists((gists) => {
+                let index;
+                for (let [i, g] of gists.entries()) {
+                  if (g.id === gist.id) {
+                    index = i;
+                    break;
                   }
+                }
 
-                  if (index !== undefined) {
-                    gists.splice(index, 1);
-                  }
-                  return gists;
-                });
-              }
-            })
-            .catch((err) => {
-              if (err) {
-                console.error(err);
-                dialogs.alert(strings.error, err.toString());
-              }
-            })
-            .finally(() => {
-              dialogs.loader.destroy();
-            });
-        });
+                if (index !== undefined) {
+                  gists.splice(index, 1);
+                }
+                return gists;
+              });
+            }
+          })
+          .catch((err) => {
+            if (err) {
+              console.error(err);
+              dialogs.alert(strings.error, err.toString());
+            }
+          })
+          .finally(() => {
+            dialogs.loader.destroy();
+          });
+      });
     }
 
     function share() {
-      const filename = $el.parentElement.getAttribute('filename');
+      // const filename = $el.parentElement.getAttribute('filename');
+      // TODO: implement share
     }
 
     function file() {
       const filename = $el.getAttribute('filename');
-      editorManager.addNewFile(filename, {
+      new EditorFile(filename, {
         type: 'gist',
         text: gist.files[filename].content,
         isUnsaved: false,

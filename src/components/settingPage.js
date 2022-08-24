@@ -14,7 +14,7 @@ import helpers from "../utils/helpers";
 export default function settingsPage(title, settings, callback) {
   let hideSearchBar = () => { };
   const $page = Page(title);
-  const $settingsList = tag('div', { className: 'main list' });
+  const $list = tag('div', { className: 'main list' });
 
   if (settings.length > 5) {
     const $search = tag('span', {
@@ -23,7 +23,7 @@ export default function settingsPage(title, settings, callback) {
         action: 'search',
       },
       onclick() {
-        searchBar($settingsList, (hide) => {
+        searchBar($list, (hide) => {
           hideSearchBar = hide;
         });
       }
@@ -43,9 +43,11 @@ export default function settingsPage(title, settings, callback) {
     actionStack.remove(title);
   };
 
-  listItems($settingsList, settings, callback);
+  listItems($list, settings, callback);
 
-  $page.body = $settingsList;
+  $page.body = $list;
   app.append($page);
   helpers.showAd();
+
+  return { $page, $list };
 }

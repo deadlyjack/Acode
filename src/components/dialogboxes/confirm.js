@@ -3,10 +3,10 @@ import tag from 'html-tag-js';
  *
  * @param {string} titleText
  * @param {string} message
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>}
  */
 function confirm(titleText, message) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (!message && titleText) {
       message = titleText;
       titleText = '';
@@ -24,14 +24,14 @@ function confirm(titleText, message) {
       textContent: strings.ok,
       onclick: function () {
         hide();
-        resolve();
+        resolve(true);
       },
     });
     const cancelBtn = tag('button', {
       textContent: strings.cancel,
       onclick: function () {
         hide();
-        reject(false);
+        resolve(false);
       },
     });
     const confirmDiv = tag('div', {

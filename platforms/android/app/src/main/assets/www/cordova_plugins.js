@@ -206,27 +206,11 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "runs": true
     },
     {
-      "id": "cordova-plugin-ftp.ftp",
-      "file": "plugins/cordova-plugin-ftp/www/ftp.js",
-      "pluginId": "cordova-plugin-ftp",
-      "clobbers": [
-        "window.ftp"
-      ]
-    },
-    {
       "id": "cordova-plugin-iap.iap",
       "file": "plugins/cordova-plugin-iap/www/plugin.js",
       "pluginId": "cordova-plugin-iap",
       "clobbers": [
         "window.iap"
-      ]
-    },
-    {
-      "id": "cordova-plugin-sdcard.sdcard",
-      "file": "plugins/cordova-plugin-sdcard/www/plugin.js",
-      "pluginId": "cordova-plugin-sdcard",
-      "clobbers": [
-        "window.sdcard"
       ]
     },
     {
@@ -246,11 +230,27 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       ]
     },
     {
+      "id": "cordova-plugin-ftp.ftp",
+      "file": "plugins/cordova-plugin-ftp/www/ftp.js",
+      "pluginId": "cordova-plugin-ftp",
+      "clobbers": [
+        "window.ftp"
+      ]
+    },
+    {
       "id": "cordova-plugin-system.system",
       "file": "plugins/cordova-plugin-system/www/plugin.js",
       "pluginId": "cordova-plugin-system",
       "clobbers": [
         "window.system"
+      ]
+    },
+    {
+      "id": "cordova-plugin-sdcard.sdcard",
+      "file": "plugins/cordova-plugin-sdcard/www/plugin.js",
+      "pluginId": "cordova-plugin-sdcard",
+      "clobbers": [
+        "window.sdcard"
       ]
     }
   ];
@@ -259,12 +259,12 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
     "cordova-plugin-buildinfo": "4.0.0",
     "cordova-plugin-device": "2.0.3",
     "cordova-plugin-file": "7.0.0",
-    "cordova-plugin-ftp": "1.1.1",
     "cordova-plugin-iap": "0.0.1",
-    "cordova-plugin-sdcard": "0.0.1",
     "cordova-plugin-server": "1.1.0",
     "cordova-plugin-sftp": "1.1.1",
+    "cordova-plugin-vibration": "3.1.1",
+    "cordova-plugin-ftp": "1.1.1",
     "cordova-plugin-system": "0.0.1",
-    "cordova-plugin-vibration": "3.1.1"
+    "cordova-plugin-sdcard": "0.0.1"
   };
 });

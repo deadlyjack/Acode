@@ -1,6 +1,6 @@
 import settingsPage from '../components/settingPage';
 
-export default function filesSettings(onSaveSettings) {
+export default function filesSettings() {
   const title = strings.settings.capitalize();
   const values = appSettings.value.fileBrowser;
 
@@ -21,7 +21,6 @@ export default function filesSettings(onSaveSettings) {
   function callback(key, value) {
     appSettings.value.fileBrowser[key] = value;
     appSettings.update();
-    if (onSaveSettings) onSaveSettings();
   }
 
   settingsPage(title, items, callback);

@@ -28,11 +28,11 @@
       "cordova-plugin-iap": {},
       "cordova-plugin-sftp": {},
       "cordova-plugin-server": {},
-      "cordova-plugin-ftp": {},
-      "cordova-plugin-system": {},
       "cordova-plugin-file": {
         "ANDROIDX_WEBKIT_VERSION": "1.4.0"
       },
+      "cordova-plugin-ftp": {},
+      "cordova-plugin-system": {},
       "cordova-plugin-sdcard": {}
     },
     "platforms": [
@@ -73,9 +73,8 @@
     "cordova-plugin-webserver": "file:src/plugins/server",
     "css-loader": "^6.7.1",
     "mini-css-extract-plugin": "^2.6.1",
-    "node-sass": "^7.0.1",
     "path-browserify": "^1.0.1",
-    "postcss-loader": "^7.0.0",
+    "postcss-loader": "^7.0.1",
     "prettier": "2.7.1",
     "prettier-plugin-java": "^1.6.2",
     "raw-loader": "^4.0.2",
@@ -85,7 +84,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "@babel/core": "^7.18.10",
+    "@babel/core": "^7.18.13",
     "@babel/runtime-corejs3": "^7.18.9",
     "@deadlyjack/ajax": "^1.2.3",
     "@ungap/custom-elements": "^1.1.0",
@@ -96,11 +95,10 @@
     "esprima": "^4.0.1",
     "filesize": "^9.0.9",
     "html-tag-js": "^1.1.6",
-    "irid": "^2.0.2",
-    "marked": "^4.0.17",
+    "irid": "^3.0.0",
+    "marked": "^4.0.19",
     "mime-types": "^2.1.35",
     "mustache": "^4.2.0",
-    "sass": "^1.54.5",
     "url-parse": "^1.5.10",
     "utf8": "^3.0.0",
     "vanilla-picker": "^2.11.2",

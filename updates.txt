@@ -1,3 +1,13 @@
+version 1.6.0 beta
+☞ New option find file
+☞ Stability improvement
+☞ UI improvement
+☞ Fixed keyboard issues
+☞ Fixed tap hold to select text
+☞ Fixed loading files using FTP/SFTP
+☞ Fixed File checking
+☞ Fixed settings
+
 version 1.6.0
 ☞ Supports plugin
 ☞ The console can log HTML code

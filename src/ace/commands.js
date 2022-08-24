@@ -8,9 +8,12 @@ export default async function Commands() {
   let keyboardShortcuts = keyBindings;
 
   try {
-    const bindings = await fsOperation(KEYBINDING_FILE).readFile('json');
-    if (bindings) {
+    const bindingsFile = fsOperation(KEYBINDING_FILE);
+    if (await bindingsFile.exists()) {
+      const bindings = await bindingsFile.readFile('json');
       keyboardShortcuts = bindings;
+    } else {
+      helpers.resetKeyBindings();
     }
   } catch (error) {
     console.error(error);
@@ -18,6 +21,15 @@ export default async function Commands() {
   }
 
   let commands = [
+    {
+      name: 'findFile',
+      description: 'Find file in workspace',
+      exec() {
+        setTimeout(() => {
+          acode.exec('find-file');
+        }, 0);
+      },
+    },
     {
       name: 'closeCurrentTab',
       description: 'Close current tab',
@@ -98,7 +110,9 @@ export default async function Commands() {
       name: 'renameFile',
       description: 'Rename active file',
       exec() {
-        acode.exec('rename');
+        setTimeout(() => {
+          acode.exec('rename');
+        }, 0);
       },
       readOnly: true,
     },
@@ -107,14 +121,6 @@ export default async function Commands() {
       description: 'Preview HTML and MarkDown',
       exec() {
         acode.exec('run');
-      },
-      readOnly: true,
-    },
-    {
-      name: 'selectWord',
-      description: 'Select word',
-      exec() {
-        acode.exec('select-word');
       },
       readOnly: true,
     },
@@ -158,7 +164,9 @@ export default async function Commands() {
       name: 'gotoline',
       description: 'Go to line...',
       exec() {
-        acode.exec('goto');
+        setTimeout(() => {
+          acode.exec('goto');
+        }, 0);
       },
       readOnly: true,
     },
@@ -233,29 +241,6 @@ export default async function Commands() {
         acode.exec('syntax');
       },
       readOnly: true,
-    },
-    {
-      name: 'increaseFontSize',
-      description: 'Increase font size',
-      exec: function (editor) {
-        var size = parseInt(editor.getFontSize(), 10) || 12;
-        editor.setFontSize(size + 1);
-      },
-    },
-    {
-      name: 'decreaseFontSize',
-      description: 'Decrease font size',
-      exec: function (editor) {
-        var size = parseInt(editor.getFontSize(), 10) || 12;
-        editor.setFontSize(Math.max(size - 1 || 1));
-      },
-    },
-    {
-      name: 'resetFontSize',
-      description: 'Reset font size',
-      exec: function (editor) {
-        editor.setFontSize(12);
-      },
     },
   ];
 

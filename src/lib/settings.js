@@ -55,7 +55,7 @@ export default class Settings {
       fileBrowser: this.#fileBrowserSettings,
       formatter: {},
       maxFileSize: 12,
-      previewPort: constants.PORT,
+      previewPort: constants.PREVIEW_PORT,
       search: this.#searchSettings,
       lang: 'en-us',
       fontSize: '12px',

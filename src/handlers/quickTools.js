@@ -11,9 +11,9 @@ import searchSettings from '../settings/searchSettings';
  * @param {string} value 
  */
 function actions(action, value) {
+  const { editor, activeFile } = editorManager;
   const search = mustache.render($_search, strings);
   const $footer = root.get('#quick-tools');
-  const editor = editorManager.editor;
   const $row2 = $footer.querySelector('#row2');
   const $searchRow1 = $footer.querySelector('#search_row1');
   const $searchRow2 = $footer.querySelector('#search_row2');
@@ -25,11 +25,10 @@ function actions(action, value) {
 
   if (selectedText.length > 50) selectedText = '';
 
-  if (
-    !['pallete', 'search', 'search-settings'].includes(action) &&
-    editorManager.state === 'focus'
-  )
+  const ignore = !['pallete', 'search', 'search-settings'].includes(action);
+  if (ignore && activeFile?.focused) {
     editor.focus();
+  }
 
   switch (action) {
     case 'key':

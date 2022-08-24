@@ -245,6 +245,7 @@ public class System extends CordovaPlugin {
       }
 
       callback.success(1);
+      return;
     }
 
     callback.error("No permission passed to request.");
@@ -552,6 +553,7 @@ public class System extends CordovaPlugin {
       );
 
       callback.success();
+      return;
     }
 
     callback.error("Not suppported");
@@ -728,7 +730,11 @@ public class System extends CordovaPlugin {
   }
 
   private void getGlobalSetting(String setting, CallbackContext callback) {
-    int value = (int) Global.getFloat(context.getContentResolver(), setting, 0);
+    int value = (int) Global.getFloat(
+      context.getContentResolver(),
+      setting,
+      -1
+    );
     callback.success(value);
   }
 

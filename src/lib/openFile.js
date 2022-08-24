@@ -2,6 +2,7 @@ import helpers from '../utils/helpers';
 import dialogs from '../components/dialogs';
 import recents from './recents';
 import fsOperation from '../fileSystem/fsOperation';
+import EditorFile from './editorFile';
 
 /**
  *
@@ -18,19 +19,19 @@ export default async function openFile(file, data = {}) {
 
     if (existingFile) {
       // If file is already opened
-      editorManager.switchFile(existingFile.id);
+      existingFile.makeActive();
       return;
     }
 
     helpers.showTitleLoader();
     const fs = fsOperation(uri);
     const fileInfo = await fs.stat();
-    const name = fileInfo.name || file.name || uri;
+    const name = fileInfo.name || file.filename || uri;
     const settings = appSettings.value;
     const readOnly = fileInfo.canWrite ? false : true;
     const { cursorPos, render, onsave, text, mode } = data;
     const createEditor = (isUnsaved, text) => {
-      editorManager.addNewFile(name, {
+      new EditorFile(name, {
         uri,
         text,
         cursorPos,

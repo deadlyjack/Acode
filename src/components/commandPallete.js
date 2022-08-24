@@ -22,27 +22,7 @@ export default async function commandPallete() {
     children: [$input],
   });
 
-  inputhints($input, ((setHints) => {
-    recentlyUsedCommands.commands.forEach((name) => {
-      const command = Object.assign({}, commands.find(command => command.name === name));
-      if (command) {
-        command.recentlyUsed = true;
-        commands.unshift(command);
-      }
-    });
-    setHints(
-      commands.map(({ name, description, bindKey, recentlyUsed }) => ({
-        value: name,
-        text: `<span ${recentlyUsed ? `data-str='${strings['recently used']}'` : ''}>${description ?? name}</span><small>${bindKey?.win ?? ''}</small>`,
-      })),
-    );
-  }), (value) => {
-    const command = commands.find(({ name }) => name === value);
-    if (!command) return;
-    recentlyUsedCommands.push(value);
-    command.exec(editorManager.editor);
-    remove();
-  });
+  inputhints($input, generateHints, onselect);
 
   actionStack.push({
     id: 'command-pallete',
@@ -57,6 +37,30 @@ export default async function commandPallete() {
     window.restoreTheme();
     $mask.remove();
     $pallete.remove();
+  }
+
+  function generateHints(setHints) {
+    recentlyUsedCommands.commands.forEach((name) => {
+      const command = Object.assign({}, commands.find(command => command.name === name));
+      if (command) {
+        command.recentlyUsed = true;
+        commands.unshift(command);
+      }
+    });
+    const hints = commands.map(({ name, description, bindKey, recentlyUsed }) => ({
+      value: name,
+      text: `<span ${recentlyUsed ? `data-str='${strings['recently used']}'` : ''}>${description ?? name}</span><small>${bindKey?.win ?? ''}</small>`,
+    }));
+
+    setHints(hints);
+  }
+
+  function onselect(value) {
+    const command = commands.find(({ name }) => name === value);
+    if (!command) return;
+    recentlyUsedCommands.push(value);
+    command.exec(editorManager.editor);
+    remove();
   }
 }
 

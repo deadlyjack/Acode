@@ -27,7 +27,7 @@
     }
 
     .value {
-      text-transform: unset; // TODO: replace with none
+      text-transform: none;
       display: flex;
 
       .group {
