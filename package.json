@@ -12,7 +12,8 @@
     "clean": "sh utils/scripts/clean.sh",
     "plugin": "sh utils/scripts/plugin.sh",
     "test": "jest",
-    "build-ace": "node ./utils/build-ace.js"
+    "build-ace": "node ./utils/build-ace.js",
+    "setup": "sh utils/scripts/setup.sh"
   },
   "keywords": [
     "ecosystem:cordova"
