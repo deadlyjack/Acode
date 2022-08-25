@@ -257,6 +257,6 @@
   "select key file": "Schlüsseldatei wählen",
   "passphrase": "Passphrase",
   "connecting...": "verbinden...",
-  "type filename": "Type filename",
-  "unable to load files": "Unable to load files"
+  "type filename": "Dateinamen angeben",
+  "unable to load files": "Dateien können nicht geladen werden"
 }
