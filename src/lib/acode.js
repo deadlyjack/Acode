@@ -106,6 +106,7 @@ export default class Acode {
   /**
    * 
    * @param {string[]} extensions 
+   * @returns {Array<[id: String, name: String]>} options
    */
   getFormatterFor(extensions) {
     const options = [[null, strings.none]];
@@ -115,5 +116,6 @@ export default class Acode {
         options.push([id, name]);
       }
     });
+    return options;
   }
 }
