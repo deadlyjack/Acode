@@ -115,5 +115,6 @@ export default class Acode {
         options.push([id, name]);
       }
     });
+    return options;
   }
 }

@@ -47,6 +47,7 @@ export default function () {
     }),
   );
   $themePreview.classList.add(appSettings.value.editorFont);
+  editor.resize(true);
 
   actionStack.push({
     id: 'appTheme',

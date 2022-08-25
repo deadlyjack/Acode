@@ -22,8 +22,9 @@ export default async function commandPallete() {
     children: [$input],
   });
 
-  inputhints($input, generateHints, onselect);
+  const { container } = inputhints($input, generateHints, onselect);
 
+  // container.id = 'command-pallete-hint-box';
   actionStack.push({
     id: 'command-pallete',
     action: remove,

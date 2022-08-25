@@ -302,9 +302,9 @@ dependencies {
     implementation "com.sshtools:maverick-synergy-client:3.0.6"
     implementation "commons-net:commons-net:3.8.0"
     implementation "commons-io:commons-io:2.11.0"
+    implementation "commons-codec:commons-codec:1.10"
     implementation "androidx.core:core:1.6.0"
     implementation "androidx.core:core-google-shortcuts:1.0.0"
-    implementation "commons-codec:commons-codec:1.10"
     // SUB-PROJECT DEPENDENCIES END
 }
 

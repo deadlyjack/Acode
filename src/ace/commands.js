@@ -25,9 +25,7 @@ export default async function Commands() {
       name: 'findFile',
       description: 'Find file in workspace',
       exec() {
-        setTimeout(() => {
-          acode.exec('find-file');
-        }, 0);
+        acode.exec('find-file');
       },
     },
     {
@@ -110,9 +108,7 @@ export default async function Commands() {
       name: 'renameFile',
       description: 'Rename active file',
       exec() {
-        setTimeout(() => {
-          acode.exec('rename');
-        }, 0);
+        acode.exec('rename');
       },
       readOnly: true,
     },
@@ -164,9 +160,7 @@ export default async function Commands() {
       name: 'gotoline',
       description: 'Go to line...',
       exec() {
-        setTimeout(() => {
-          acode.exec('goto');
-        }, 0);
+        acode.exec('goto');
       },
       readOnly: true,
     },

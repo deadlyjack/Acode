@@ -9,7 +9,7 @@
         "parents": {
           "/manifest/application": [
             {
-              "xml": "<application android:hardwareAccelerated=\"true\" />",
+              "xml": "<application android:requestLegacyExternalStorage=\"true\" />",
               "count": 4,
               "mode": "merge",
               "id": "config.xml",
@@ -24,7 +24,7 @@
               }
             },
             {
-              "xml": "<application android:requestLegacyExternalStorage=\"true\" />",
+              "xml": "<application android:largeHeap=\"true\" />",
               "count": 3,
               "mode": "merge",
               "id": "config.xml",
@@ -39,7 +39,7 @@
               }
             },
             {
-              "xml": "<application android:largeHeap=\"true\" />",
+              "xml": "<application android:networkSecurityConfig=\"@xml/network_security_config\" />",
               "count": 2,
               "mode": "merge",
               "id": "config.xml",
@@ -54,7 +54,7 @@
               }
             },
             {
-              "xml": "<application android:networkSecurityConfig=\"@xml/network_security_config\" />",
+              "xml": "<application android:hardwareAccelerated=\"true\" />",
               "count": 1,
               "mode": "merge",
               "id": "config.xml",
@@ -76,7 +76,7 @@
           "./application/activity": [
             {
               "xml": "<intent-filter><action android:name=\"android.intent.action.VIEW\" /><action android:name=\"android.intent.action.EDIT\" /><category android:name=\"android.intent.category.DEFAULT\" /><category android:name=\"android.intent.category.LAUNCHER\" /><data android:mimeType=\"text/*\" /><data android:mimeType=\"xml/*\" /></intent-filter>",
-              "count": 178
+              "count": 211
             },
             {
               "xml": "<intent-filter><action android:name=\"android.intent.action.MAIN\" /></intent-filter>",
@@ -86,11 +86,11 @@
           "/manifest": [
             {
               "xml": "<uses-permission android:name=\"android.permission.WRITE_MEDIA_STORAGE\" />",
-              "count": 178
+              "count": 211
             },
             {
               "xml": "<uses-permission android:name=\"android.permission.VIBRATE\" />",
-              "count": 179
+              "count": 212
             },
             {
               "xml": "<uses-permission android:name=\"com.android.vending.BILLING\" />",
@@ -147,11 +147,11 @@
               "count": 1
             },
             {
-              "xml": "<feature name=\"System\"><param name=\"android-package\" value=\"com.foxdebug.system.System\" /></feature>",
+              "xml": "<feature name=\"SDcard\"><param name=\"android-package\" value=\"com.foxdebug.sdcard.SDcard\" /></feature>",
               "count": 1
             },
             {
-              "xml": "<feature name=\"SDcard\"><param name=\"android-package\" value=\"com.foxdebug.sdcard.SDcard\" /></feature>",
+              "xml": "<feature name=\"System\"><param name=\"android-package\" value=\"com.foxdebug.system.System\" /></feature>",
               "count": 1
             }
           ]
@@ -198,10 +198,10 @@
     "cordova-plugin-ftp": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-system": {
+    "cordova-plugin-sdcard": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     },
-    "cordova-plugin-sdcard": {
+    "cordova-plugin-system": {
       "PACKAGE_NAME": "com.foxdebug.acode"
     }
   },
@@ -445,19 +445,19 @@
       ]
     },
     {
-      "id": "cordova-plugin-system.system",
-      "file": "plugins/cordova-plugin-system/www/plugin.js",
-      "pluginId": "cordova-plugin-system",
-      "clobbers": [
-        "window.system"
-      ]
-    },
-    {
       "id": "cordova-plugin-sdcard.sdcard",
       "file": "plugins/cordova-plugin-sdcard/www/plugin.js",
       "pluginId": "cordova-plugin-sdcard",
       "clobbers": [
         "window.sdcard"
+      ]
+    },
+    {
+      "id": "cordova-plugin-system.system",
+      "file": "plugins/cordova-plugin-system/www/plugin.js",
+      "pluginId": "cordova-plugin-system",
+      "clobbers": [
+        "window.system"
       ]
     }
   ],
@@ -471,7 +471,7 @@
     "cordova-plugin-sftp": "1.1.1",
     "cordova-plugin-vibration": "3.1.1",
     "cordova-plugin-ftp": "1.1.1",
-    "cordova-plugin-system": "0.0.1",
-    "cordova-plugin-sdcard": "0.0.1"
+    "cordova-plugin-sdcard": "0.0.1",
+    "cordova-plugin-system": "0.0.1"
   }
 }

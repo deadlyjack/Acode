@@ -3,7 +3,14 @@ import constants from './constants';
 import fsOperation from '../fileSystem/fsOperation';
 import Url from '../utils/Url';
 
+let busy = false;
+let lastCall;
+
 export default async function restoreTheme(darken) {
+  if (busy) {
+    lastCall = darken;
+    return;
+  }
   if (darken && document.body.classList.contains('loading')) return;
 
   let theme = DOES_SUPPORT_THEME ? appSettings.value.appTheme : 'default';
@@ -29,7 +36,16 @@ export default async function restoreTheme(darken) {
   let hexColor = darken ? themeData.darken : themeData.primary;
 
   app.setAttribute('theme', theme);
-  system.setUiTheme(hexColor, type);
+  busy = true;
+  system.setUiTheme(hexColor, type, () => {
+    busy = false;
+    if (lastCall !== undefined) {
+      restoreTheme(lastCall);
+      lastCall = undefined;
+    }
+  }, (error) => {
+    console.error(error);
+  });
 
   if (DOES_SUPPORT_THEME) {
     document.body.setAttribute('theme-type', type);

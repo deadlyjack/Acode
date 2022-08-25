@@ -184,6 +184,7 @@ function inputhints($input, hints, onSelect) {
 
   return {
     getSelected: () => $hintingContainer.get('.active'),
+    container: $hintingContainer,
   }
 }
 

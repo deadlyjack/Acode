@@ -33,8 +33,8 @@
         "ANDROIDX_WEBKIT_VERSION": "1.4.0"
       },
       "cordova-plugin-ftp": {},
-      "cordova-plugin-system": {},
-      "cordova-plugin-sdcard": {}
+      "cordova-plugin-sdcard": {},
+      "cordova-plugin-system": {}
     },
     "platforms": [
       "android"

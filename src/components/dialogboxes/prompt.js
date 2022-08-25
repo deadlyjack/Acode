@@ -5,7 +5,7 @@ import autosize from 'autosize';
  *
  * @param {string} message
  * @param {string} defaultValue
- * @param {"textarea"|"text"|"numberic"|"tel"|"search"|"email"|"url"} type
+ * @param {"textarea"|"text"|"number"|"tel"|"search"|"email"|"url"} type
  * @param {object} options
  * @param {RegExp} options.match
  * @param {boolean} options.required
@@ -36,7 +36,9 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
           return;
         }
         hide();
-        resolve(input.value);
+        let value;
+        if (type === 'number') value = +input.value;
+        resolve(value);
       },
     });
     const cancelBtn = tag('button', {

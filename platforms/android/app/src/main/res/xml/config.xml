@@ -23,11 +23,11 @@
     <feature name="Ftp">
         <param name="android-package" value="com.foxdebug.ftp.Ftp" />
     </feature>
-    <feature name="System">
-        <param name="android-package" value="com.foxdebug.system.System" />
-    </feature>
     <feature name="SDcard">
         <param name="android-package" value="com.foxdebug.sdcard.SDcard" />
+    </feature>
+    <feature name="System">
+        <param name="android-package" value="com.foxdebug.system.System" />
     </feature>
     <feature name="Server">
         <param name="android-package" value="com.foxdebug.server.Server" />

@@ -238,19 +238,19 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       ]
     },
     {
-      "id": "cordova-plugin-system.system",
-      "file": "plugins/cordova-plugin-system/www/plugin.js",
-      "pluginId": "cordova-plugin-system",
-      "clobbers": [
-        "window.system"
-      ]
-    },
-    {
       "id": "cordova-plugin-sdcard.sdcard",
       "file": "plugins/cordova-plugin-sdcard/www/plugin.js",
       "pluginId": "cordova-plugin-sdcard",
       "clobbers": [
         "window.sdcard"
+      ]
+    },
+    {
+      "id": "cordova-plugin-system.system",
+      "file": "plugins/cordova-plugin-system/www/plugin.js",
+      "pluginId": "cordova-plugin-system",
+      "clobbers": [
+        "window.system"
       ]
     }
   ];
@@ -264,7 +264,7 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
     "cordova-plugin-sftp": "1.1.1",
     "cordova-plugin-vibration": "3.1.1",
     "cordova-plugin-ftp": "1.1.1",
-    "cordova-plugin-system": "0.0.1",
-    "cordova-plugin-sdcard": "0.0.1"
+    "cordova-plugin-sdcard": "0.0.1",
+    "cordova-plugin-system": "0.0.1"
   };
 });

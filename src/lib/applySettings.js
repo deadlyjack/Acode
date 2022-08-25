@@ -23,12 +23,13 @@ export default {
     window.restoreTheme();
   },
   afterRender() {
-    if (!appSettings.value.floatingButton) {
+    const { value: settings } = appSettings;
+    if (!settings.floatingButton) {
       root.classList.add('hide-floating-button');
     }
 
     //quick-tools
-    if (appSettings.value.quickTools) {
+    if (settings.quickTools) {
       quickTools.actions('enable-quick-tools');
     }
   },

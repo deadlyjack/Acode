@@ -1,4 +1,4 @@
-#command-pallete{
+#command-pallete {
   position: fixed;
   top: 0;
   left: 0;
@@ -13,12 +13,17 @@
   background-color: inherit;
   box-shadow: 0 0 4px black;
 
-  &~.mask{
+  &~.mask {
     opacity: 0.4;
   }
 
-  input{
+  input {
     width: 100%;
     border: none;
   }
 }
+
+// #command-pallete-hint-box {
+//   width: 90vw;
+//   max-width: 600px;
+// }

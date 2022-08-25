@@ -2,6 +2,7 @@ node_modules
 build.json
 www/js/build
 www/css/build
+plugins
 package-lock.json
 keystore.jks
 platforms/android/debug-signing.properties

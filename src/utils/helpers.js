@@ -757,16 +757,14 @@ export default {
    * @returns 
    */
   getEditorHeight(editor) {
-    const renderer = editor.renderer;
-    const session = editor.getSession();
+    const { renderer, session } = editor;
     const offset = (renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5;
     const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
     return editorHeight;
   },
 
   getEditorWidth(editor) {
-    const renderer = editor.renderer;
-    const session = editor.getSession();
+    const { renderer, session } = editor;
     const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
     const editorWidth = session.getScreenWidth() * renderer.characterWidth - offset;
     if (appSettings.value.textWrap) {

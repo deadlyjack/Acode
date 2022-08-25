@@ -202,8 +202,8 @@ export default function addTouchListeners(editor) {
     lastX = clientX;
     lastY = clientY;
 
-    const threshold = 0.5;
-    if (Math.abs(moveX) < threshold) {
+    const threshold = Math.round((1 / devicePixelRatio) * 10) / 10;
+    if (appSettings.value.textWrap || Math.abs(moveX) < threshold) {
       moveX = 0;
     }
 
@@ -446,11 +446,11 @@ export default function addTouchListeners(editor) {
 
   /**
    * Remove selection mode
-   * @param {Event} e 
+   * @param {Event} ignore 
    * @param {boolean} clearActive 
    * @returns 
    */
-  function clearSelectionMode(e, clearActive = true) {
+  function clearSelectionMode(ignore, clearActive = true) {
     const $els = [$start.dataset.immortal, $end.dataset.immortal];
     if ($els.includes('true')) return;
     if ($el.contains($start)) $start.remove();
@@ -525,7 +525,7 @@ export default function addTouchListeners(editor) {
     }
   }
 
-  function hideMenu(e, clearActive = true) {
+  function hideMenu(ignore, clearActive = true) {
     if (!$el.contains($menu)) return;
     $menu.remove();
     editor.selection.off('changeCursor', hideMenu);
@@ -635,10 +635,10 @@ export default function addTouchListeners(editor) {
         $el = $end;
       }
 
+      clearTimeout(moveTimeout);
       if (!editor.isRowFullyVisible(line)) {
-        clearTimeout(moveTimeout);
         moveTimeout = setTimeout(() => {
-          editor.scrollToLine(line, true, false);
+          renderer.scrollToLine(line);
           if (touchEnded) return;
           touchMove(e);
         }, 100);

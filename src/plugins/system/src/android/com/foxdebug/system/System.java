@@ -598,7 +598,12 @@ public class System extends CordovaPlugin {
 
         setStatusBarStyle(window);
         setNavigationBarStyle(window);
-      } catch (IllegalArgumentException ignore) {} catch (Exception ignore) {}
+        callback.success("OK");
+      } catch (IllegalArgumentException error) {
+        callback.error(error.toString());
+      } catch (Exception error) {
+        callback.error(error.toString());
+      }
     }
   }
 
