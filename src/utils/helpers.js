@@ -150,7 +150,7 @@ export default {
       html: /\.(html|htm|xhtml|we|wpy)$/i,
       ini: /\.(ini|conf|cfg|prefs)$/i,
       io: /\.io$/i,
-      javascript: /\.(js|jsm|jsx)$/i,
+      javascript: /\.(js|jsm|jsx|mjs)$/i,
       jsp: /\.jsp$/i,
       julia: /\.jl$/i,
       kotlin: /\.(kt|kts)$/i,
@@ -632,7 +632,7 @@ export default {
     url = Url.parse(url).url;
 
     if (/^content:/.test(url)) {
-      return Uri.getVirtualAddress(url);
+      return Uri.getPrimaryAddress(url);
     }
 
     const storageList = JSON.parse(localStorage.storageList || '[]');

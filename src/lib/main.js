@@ -270,7 +270,7 @@ async function loadApp() {
       run();
     },
     oncontextmenu() {
-      run.runFile();
+      run(false, "inapp", true);
     },
     style: {
       fontSize: '1.2em',

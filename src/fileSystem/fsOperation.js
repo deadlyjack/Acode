@@ -258,7 +258,6 @@ function fsOperation(uri) {
           const stats = await fs.stats(url);
           return stats.exists;
         } catch (error) {
-          console.error('ExternalFs Stats Error', error);
           return false;
         }
       },

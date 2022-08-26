@@ -7,6 +7,8 @@ import fsOperation from '../fileSystem/fsOperation';
 import Url from '../utils/Url';
 import openFolder from './openFolder';
 
+let saveTimeout;
+
 /**
  *
  * @param {File} file
@@ -113,11 +115,9 @@ async function saveFile(file, isSaveAs = false) {
       const fileUri = Url.join(url, file.filename);
       fs = fsOperation(fileUri);
 
-      if (!(await fs.exists())) {
+      if (!await fs.exists()) {
         const fileDir = fsOperation(url);
-        await fileDir.createFile(file.filename).catch((err) => {
-          helpers.error("Error creating file", err);
-        });
+        await fileDir.createFile(file.filename);
       }
 
       const openedFile = editorManager.getFile(fileUri, 'uri');
@@ -130,17 +130,13 @@ async function saveFile(file, isSaveAs = false) {
     }
 
     if (!fs) fs = fsOperation(file.uri);
-    await fs.writeFile(data).catch((err) => {
-      helpers.error("Error writing file", err);
-    });
+    await fs.writeFile(data);
     if (file.location) {
       recents.addFolder(file.location);
     }
 
-    if (window.saveTimeout) {
-      clearTimeout(window.saveTimeout);
-    }
-    window.saveTimeout = setTimeout(() => {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
       file.isSaving = false;
       file.isUnsaved = false;
       // file.onsave();

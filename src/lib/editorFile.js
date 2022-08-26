@@ -136,7 +136,6 @@ export default class EditorFile {
       files,
       getFile,
       header,
-      setSubText,
     } = editorManager;
     let doesExists = null;
 
@@ -215,7 +214,6 @@ export default class EditorFile {
 
     files.push(this);
     header.text = this.#name;
-    setSubText(this);
     this.session = ace.createEditSession(options?.text || '');
     this.setMode();
     this.#setupSession();
@@ -280,16 +278,17 @@ export default class EditorFile {
         editorManager.header.text = value;
       }
 
-      const oldExt = helpers.extname(this.#name);
-      const newExt = helpers.extname(value);
-
-      if (oldExt !== newExt) this.setMode();
 
       editorManager.onupdate('rename-file');
       editorManager.emit('rename-file', this);
 
+      const oldExt = helpers.extname(this.#name);
+      const newExt = helpers.extname(value);
+
       this.#tab.text = value;
       this.#name = value;
+
+      if (oldExt !== newExt) this.setMode();
     })();
   }
 
@@ -337,18 +336,23 @@ export default class EditorFile {
     if (!value) {
       this.deletedFile = true;
       this.isUnsaved = true;
+      this.#uri = null;
       this.id = helpers.uuid();
-      return;
+    } else {
+      this.#uri = value;
+      this.deletedFile = false;
+      this.readOnly = false;
+      this.type = 'regular';
+      this.id = value.hashCode();
     }
 
-    this.#uri = value;
-    this.deletedFile = false;
-    this.readOnly = false;
-    this.type = 'regular';
-    this.id = value.hashCode();
-    editorManager.setSubText(this);
     editorManager.onupdate('rename-file');
     editorManager.emit('rename-file', this);
+
+    // if this file is active set sub text of header
+    if (editorManager.activeFile.id === this.id) {
+      editorManager.setSubText(this);
+    }
   }
 
   /**
@@ -725,7 +729,7 @@ export default class EditorFile {
   }
 
   #upadteSaveIcon() {
-    const $save = tag.get('#quick-tools [action=save]');
+    const $save = root.get('#quick-tools [action=save]');
     if (this.#isUnsaved) {
       $save?.classList.add('notice');
     } else {

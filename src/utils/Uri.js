@@ -109,4 +109,13 @@ export default {
       return url;
     }
   },
+  /**
+   * Gets primary address of a content url.
+   * @param {string} url 
+   * @returns {string}
+   */
+  getPrimaryAddress(url) {
+    const [, primary] = url.split('::primary:');
+    return primary || url;
+  },
 };

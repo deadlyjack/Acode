@@ -36,8 +36,8 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
           return;
         }
         hide();
-        let value;
-        if (type === 'number') value = +input.value;
+        let { value } = input;
+        if (type === 'number') value = +value;
         resolve(value);
       },
     });

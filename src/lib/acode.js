@@ -43,7 +43,6 @@ export default class Acode {
   }
 
   setPluginUnmount(id, unmountFunction) {
-    console.log('unmountPlugin', id);
     this.#pluginUnmount[id] = unmountFunction;
   }
   /**
