@@ -1,7 +1,7 @@
 import settingsPage from '../components/settingPage';
 
 export default function searchSettings() {
-  const title = strings.search.capitalize();
+  const title = strings.search;
   const values = appSettings.value.search;
   const items = [
     {

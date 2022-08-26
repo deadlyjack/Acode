@@ -1,7 +1,0 @@
-  ext.cdvCompileSdkVersion = 31
-
-  configurations {
-    all {
-        exclude module: 'commons-logging'
-    }
-  }

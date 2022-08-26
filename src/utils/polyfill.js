@@ -81,17 +81,18 @@ export default function loadPolyFill() {
     },
   });
 
+  // No idea why it was used.
   /**
    * Decode any url recursively until its fully decoded
-   * @param {string} url URL string
-   * @returns {string}
+  //  * @param {string} url URL string
+  //  * @returns {string}
    */
-  window.decodeURL = (url) => {
-    if (/%[0-9a-f]{2}/i.test(url)) {
-      const newurl = decodeURIComponent(url);
-      if (url === newurl) return url;
-      return decodeURL(newurl);
-    }
-    return url;
-  };
+  // window.decodeURL = (url) => {
+  //   if (/%[0-9a-f]{2}/i.test(url)) {
+  //     const newurl = decodeURIComponent(url);
+  //     if (url === newurl) return url;
+  //     return decodeURL(newurl);
+  //   }
+  //   return url;
+  // };
 }

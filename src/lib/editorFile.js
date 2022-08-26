@@ -655,6 +655,13 @@ export default class EditorFile {
         } else if (value === undefined) {
           value = await file.readFile('utf-8');
         }
+      } else if (!value) {
+        if (this.type === 'gist') {
+          const gistFile = this.record.files[this.filename];
+          value = gistFile.content;
+        } else if (this.type === 'git') {
+          value = this.record.data;
+        }
       }
 
       this.markChanged = false;

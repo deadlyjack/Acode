@@ -42,14 +42,11 @@ export default async function openFiles(files) {
     if (type === 'git') {
       const record = await gitRecord.get(file.sha);
       if (record) {
-        if (!options.text) options.text = record.data;
         options.record = record;
       }
     } else if (type === 'gist') {
       const gist = gistRecord.get(file.recordid, file.isNew);
       if (gist) {
-        const gistFile = gist.files[filename];
-        if (!options.text) options.text = gistFile.content;
         options.record = gist;
       }
     }

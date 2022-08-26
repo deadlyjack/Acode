@@ -150,7 +150,7 @@ export default {
       html: /\.(html|htm|xhtml|we|wpy)$/i,
       ini: /\.(ini|conf|cfg|prefs)$/i,
       io: /\.io$/i,
-      javascript: /\.(js|jsm|jsx|mjs)$/i,
+      javascript: /\.(js|jsm|jsx|mjs|cjs)$/i,
       jsp: /\.jsp$/i,
       julia: /\.jl$/i,
       kotlin: /\.(kt|kts)$/i,
@@ -260,10 +260,10 @@ export default {
     const sortByName = fileBrowser.sortByName;
     const showHiddenFile = fileBrowser.showHiddenFiles;
 
-    for (let item of list) {
+    list.forEach((item) => {
       let hidden;
 
-      item.name = decodeURL(item.name || path.basename(item.url || ''));
+      item.name = item.name || path.basename(item.url || '');
       hidden = item.name[0] === '.';
 
       if (typeof item.isDirectory !== 'boolean') {
@@ -286,7 +286,7 @@ export default {
         }
         item.icon = this.getIconForFile(item.name);
       }
-    }
+    });
 
     if (sortByName) {
       dir.sort(compare);

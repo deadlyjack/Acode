@@ -68,7 +68,6 @@ function ReposInclude() {
 
     repos.map((repo) => {
       const { language, size, updated_at } = repo;
-
       repo.size = (size / 1024).toFixed(2) + 'KB';
       repo.updated_at = new Date(updated_at).toLocaleDateString();
       repo.language = `file_type_${(language || 'text').toLowerCase()}`;
@@ -76,9 +75,7 @@ function ReposInclude() {
     const $content = tag.parse(mustache.render(_template, repos));
 
     $content.addEventListener('click', handleClick);
-
     $page.body = $content;
-
     app.append($page);
     helpers.showAd();
 
@@ -86,9 +83,8 @@ function ReposInclude() {
       id: 'repos',
       action: $page.hide,
     });
-    $page.onhide = function () {
+    $page.onhide = () => {
       helpers.hideAd();
-      actionStack.pop();
       actionStack.remove('repos');
     };
 

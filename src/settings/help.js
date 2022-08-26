@@ -3,7 +3,7 @@ import constants from '../lib/constants';
 import settingsPage from '../components/settingPage';
 
 export default function help() {
-  const title = strings.help.capitalize();
+  const title = strings.help;
   const items = [
     {
       key: 'feedback',

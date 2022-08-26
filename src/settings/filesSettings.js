@@ -1,7 +1,7 @@
 import settingsPage from '../components/settingPage';
 
 export default function filesSettings() {
-  const title = strings.settings.capitalize();
+  const title = strings.settings;
   const values = appSettings.value.fileBrowser;
 
   const items = [

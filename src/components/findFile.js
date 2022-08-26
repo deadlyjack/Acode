@@ -23,9 +23,8 @@ export default async function findFile() {
     children: [$input],
   });
 
-  const { container } = inputhints($input, generateHints, onselect);
+  inputhints($input, generateHints, onselect);
 
-  container.id = 'command-pallete-hint-box';
   actionStack.push({
     id: 'command-pallete',
     action: remove,

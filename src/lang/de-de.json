@@ -258,5 +258,6 @@
   "passphrase": "Passphrase",
   "connecting...": "verbinden...",
   "type filename": "Dateinamen angeben",
-  "unable to load files": "Dateien können nicht geladen werden"
+  "unable to load files": "Dateien können nicht geladen werden",
+  "preview port": "Preview port"
 }

@@ -11,15 +11,15 @@ module.exports = (env, options) => {
       test: /\.hbs$/,
       use: ['raw-loader'],
     },
-    // {
-    //   test: /\.m?js$/,
-    //   use: {
-    //     loader: 'babel-loader',
-    //     options: {
-    //       presets: ['@babel/preset-env'],
-    //     },
-    //   },
-    // },
+    {
+      test: /\.m?js$/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+        },
+      },
+    },
     {
       test: /\.(sa|sc|c)ss$/,
       use: [

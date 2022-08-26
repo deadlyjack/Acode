@@ -1,4 +1,5 @@
 version 1.6.0 beta
+☞ Set custom port for preview in app settings
 ☞ New option find file
 ☞ Stability improvement
 ☞ UI improvement

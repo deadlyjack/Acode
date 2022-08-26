@@ -259,5 +259,6 @@
   "passphrase": "Palavra chave",
   "connecting...": "Conectando...",
   "type filename": "Type filename",
-  "unable to load files": "Unable to load files"
+  "unable to load files": "Unable to load files",
+  "preview port": "Preview port"
 }

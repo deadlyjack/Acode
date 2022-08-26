@@ -130,7 +130,7 @@ export default {
         url,
         (fs) => {
           fs.getParent((parent) => {
-            const parentUrl = decodeURL(parent.nativeURL);
+            const parentUrl = parent.nativeURL;
             const newUrl = Url.join(parentUrl, newname);
             fs.moveTo(parent, newname, () => resolve(newUrl), reject);
           }, reject);
@@ -188,7 +188,7 @@ export default {
           src[action](
             dest,
             undefined,
-            (entry) => resolve(decodeURL(entry.nativeURL)),
+            (entry) => resolve(entry.nativeURL),
             reject,
           );
         })
@@ -224,7 +224,7 @@ export default {
             dest,
             (destEntry) => {
               window.resolveLocalFileSystemURL(
-                decodeURL(destEntry.nativeURL) + srcEntry.name,
+                Url.join(destEntry.nativeURL, srcEntry.name),
                 (res) => {
                   reject({
                     code: 12,

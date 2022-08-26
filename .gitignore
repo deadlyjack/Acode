@@ -3,6 +3,7 @@ build.json
 www/js/build
 www/css/build
 plugins
+platforms
 package-lock.json
 keystore.jks
 platforms/android/debug-signing.properties

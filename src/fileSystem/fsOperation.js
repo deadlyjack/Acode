@@ -289,7 +289,7 @@ function fsOperation(uri) {
         .then((entries) => {
           entries.map((entry) => {
             files.push({
-              url: decodeURL(entry.nativeURL),
+              url: entry.nativeURL,
               isDirectory: entry.isDirectory,
               isFile: entry.isFile,
             });

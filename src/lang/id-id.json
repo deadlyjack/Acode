@@ -260,5 +260,6 @@
   "passphrase": "Passphrase",
   "connecting...": "Connecting...",
   "type filename": "Type filename",
-  "unable to load files": "Unable to load files"
+  "unable to load files": "Unable to load files",
+  "preview port": "Preview port"
 }

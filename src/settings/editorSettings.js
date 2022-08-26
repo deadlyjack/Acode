@@ -3,7 +3,7 @@ import scrollSettings from './scrollSettings';
 import settingsPage from '../components/settingPage';
 
 export default function editorSettings() {
-  const title = strings['editor settings'].capitalize();
+  const title = strings['editor settings'];
   const values = appSettings.value;
   const items = [
     {
