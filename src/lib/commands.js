@@ -97,7 +97,7 @@ export default {
       .then((lineNumber) => {
         const editor = editorManager.editor;
         editor.focus();
-        const [line, col] = lineNumber.split('.');
+        const [line, col] = `${lineNumber}`.split('.');
         editor.gotoLine(line, col, true);
       })
       .catch((err) => {

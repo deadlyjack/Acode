@@ -79,6 +79,9 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
       input.inputMode = type;
     } else {
       input.type = type;
+      if (type === 'number') {
+        input.step = 'any';
+      }
     }
 
     input.oninput = function () {
