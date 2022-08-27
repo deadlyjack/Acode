@@ -113,7 +113,7 @@ export default function listItems($list, items, callback, sort = true) {
       console.log(error);
     }
 
-    item.value = res ?? value;
+    item.value = res;
     setValueText($valueText, res, valueText);
     callback(key, item.value);
   }
