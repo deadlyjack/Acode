@@ -9,6 +9,8 @@ import searchBar from "../../components/searchbar";
 import fsOperation from "../../fileSystem/fsOperation";
 import Url from "../../utils/Url";
 import plugin from "../plugin/plugin";
+import dialogs from "../../components/dialogs";
+import constants from "../../lib/constants";
 
 /**
  * 
@@ -17,7 +19,6 @@ import plugin from "../plugin/plugin";
 export default function PluginsInclude(updates) {
   const LOADING = 0;
   const LOADED = 1;
-  const listJson = 'https://raw.githubusercontent.com/deadlyjack/acode-plugins/main/list.json';
   const $page = Page(strings['plugins']);
   const $search = tag('span', {
     className: 'icon search',
@@ -25,6 +26,13 @@ export default function PluginsInclude(updates) {
       action: 'search',
     },
   });
+  const $add = tag('span', {
+    className: 'icon add',
+    dataset: {
+      action: 'add-source'
+    },
+    onclick: addSource,
+  })
   const plugins = {
     all: [],
     installed: [],
@@ -36,7 +44,7 @@ export default function PluginsInclude(updates) {
   $page.body.innerHTML = mustache.render(template, {
     msg: strings['loading...'],
   });
-  $page.header.append($search);
+  $page.header.append($search, $add);
 
   actionStack.push({
     id: 'plugins',
@@ -125,22 +133,12 @@ export default function PluginsInclude(updates) {
     try {
       const installed = await fsOperation(PLUGIN_DIR).lsDir();
       const file = await ajax({
-        url: listJson,
+        url: constants.PLUGIN_LIST,
         method: 'GET',
         responseType: 'text',
         contentType: 'application/x-www-form-urlencoded',
       });
       plugins.all = helpers.parseJSON(file) || [];
-
-      // To test and develop plugin, update host in file: '/res/network_security_config.xml:11:43'
-      // plugins.all.push({
-      //   name: 'Plugin test',
-      //   plugin: 'https://192.168.1.104:5500/plugin.json',
-      //   icon: 'https://192.168.1.104:5500/icon.png',
-      //   author: {
-      //     name: 'DeadlyJack',
-      //   }
-      // });
 
       installed.forEach(({ url }) => {
         const plugin = plugins.all.find(({ id }) => id === Url.basename(url));
@@ -192,5 +190,28 @@ export default function PluginsInclude(updates) {
 
   function getLocalRes(id, name) {
     return Url.join(PLUGIN_DIR, id, name);
+  }
+
+  async function addSource() {
+    const source = await dialogs.prompt('Enter plugin source', 'https://', 'url');
+    const json = Url.join(source, 'plugin.json');
+    try {
+      helpers.showTitleLoader();
+      const data = await ajax.get(json, {
+        responseType: 'json'
+      });
+
+      if (data) {
+        const { id } = data;
+        plugin({
+          installed: plugins.installed.includes(id),
+          plugin: json,
+        }, onIninstall, onUninstall);
+      }
+    } catch (error) {
+      helpers.error(error);
+    } finally {
+      helpers.removeTitleLoader();
+    }
   }
 }

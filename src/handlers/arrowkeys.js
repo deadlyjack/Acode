@@ -19,6 +19,12 @@ export default {
      */
     const el = e.target;
     const { which } = el.dataset;
+
+    if (which === undefined) {
+      return;
+    }
+
+    e.preventDefault();
     const { editor } = editorManager;
     const $textarea = editor.textInput.getElement();
     const shiftKey = footer.get('#shift-key').dataset.state === 'on';

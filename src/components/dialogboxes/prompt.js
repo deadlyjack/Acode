@@ -118,6 +118,14 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
     window.restoreTheme(true);
     app.append(promptDiv, mask);
     input.focus();
+    if (input.value) {
+      try {
+        const col = input.value.length;
+        input.setSelectionRange(col, col);
+      } catch (error) {
+        // ignore
+      }
+    }
     if (inputType === 'textarea') autosize(input);
 
     function hidePrompt() {

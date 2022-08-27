@@ -17,11 +17,12 @@ function actions(action, value) {
   const $row2 = $footer.querySelector('#row2');
   const $searchRow1 = $footer.querySelector('#search_row1');
   const $searchRow2 = $footer.querySelector('#search_row2');
+  const $shiftKey = $footer.querySelector('#shift-key');
   const $textarea = editor.textInput.getElement();
-  let $searchInput = $footer.querySelector('#searchInput'),
-    $replaceInput = $footer.querySelector('#replaceInput'),
-    state,
-    selectedText = editor.getCopyText();
+  let $searchInput = $footer.querySelector('#searchInput');
+  let $replaceInput = $footer.querySelector('#replaceInput');
+  let selectedText = editor.getCopyText();
+  let state;
 
   if (selectedText.length > 50) selectedText = '';
 
@@ -39,15 +40,11 @@ function actions(action, value) {
       break;
 
     case 'tab':
-      const shiftKey =
-        $footer.querySelector('#shift-key').getAttribute('data-state') === 'on'
-          ? true
-          : false;
       $textarea.dispatchEvent(
         window.createKeyboardEvent('keydown', {
           key: 9,
           keyCode: 9,
-          shiftKey,
+          shiftKey: $shiftKey.dataset.state === 'on',
         }),
       );
       break;

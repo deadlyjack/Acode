@@ -122,7 +122,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       installPlugin(remotePlugin, remoteHost)
         .then(() => {
           acode.unmountPlugin(plugin.id);
-          onInstall(plugin.id);
+          if (onInstall) onInstall(plugin.id);
           installed = true;
           update = false;
           render();
@@ -138,7 +138,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
         .delete()
         .then(() => {
           acode.unmountPlugin(plugin.id);
-          onUninstall(plugin.id);
+          if (onUninstall) onUninstall(plugin.id);
           installed = false;
           update = false;
           render();

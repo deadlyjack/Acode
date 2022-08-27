@@ -29,7 +29,7 @@ async function saveFile(file, isSaveAs = false) {
     isSaveAs = isSaveAs ?? file.readOnly;
   }
 
-  beautifyFile();
+  formatFile();
 
   if (!isSaveAs && !isNewFile) {
     if (file.type === 'git') {
@@ -104,7 +104,7 @@ async function saveFile(file, isSaveAs = false) {
 
   if (filename !== file.filename) {
     file.filename = filename;
-    beautifyFile();
+    formatFile();
   }
 
   $text.textContent = strings.saving + '...';
@@ -198,7 +198,7 @@ async function saveFile(file, isSaveAs = false) {
     return filename;
   }
 
-  function beautifyFile() {
+  function formatFile() {
     const { formatOnSave } = appSettings.value;
     if (formatOnSave) {
       editorManager.activeFile.markChanged = false;

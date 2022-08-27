@@ -13,9 +13,10 @@ export default {
   SCROLL_SPEED_NORMAL: 0.04,
   SCROLL_SPEED_SLOW: 0.08,
   CUSTOM_THEME: 'body[theme="custom"]',
+  FEEDBACK_EMAIL: 'acode@foxdebug.com',
   ERUDA_CDN: 'https://cdn.jsdelivr.net/npm/eruda',
   PAID_VERSION: 'https://play.google.com/store/apps/details?id=com.foxdebug.acode',
-  FEEDBACK_EMAIL: 'acode@foxdebug.com',
+  PLUGIN_LIST: 'https://raw.githubusercontent.com/deadlyjack/acode-plugins/main/list.json',
   GITHUB_TOKEN: 'https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token',
   SKULIST: ["basic", "bronze", "silver", "gold", "platinum"],
   encodings: [

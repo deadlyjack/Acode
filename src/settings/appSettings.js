@@ -116,6 +116,7 @@ export default function otherSettings() {
       key: 'openFileListPos',
       text: strings['active files'],
       value: values.openFileListPos,
+      valueText: (value) => strings[value],
       select: [
         ['sidebar', strings.sidebar],
         ['header', strings.header],
