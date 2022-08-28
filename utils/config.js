@@ -70,11 +70,6 @@ const exec = promisify(require('child_process').exec);
       for (let platform of platforms) {
         if (!platform) continue;
 
-        let version;
-        if (platform === 'android') {
-          version = '@9';
-        }
-
         promises.push(
           (async () => {
             console.log(
@@ -91,7 +86,7 @@ const exec = promisify(require('child_process').exec);
               else console.log('DONE! Removing admob-plus-cordova');
             }
 
-            const { stderr } = await exec(`yarn clean ${platform} ${platform + version}`);
+            const { stderr } = await exec(`yarn clean ${platform} ${platform}`);
             if (stderr) console.error(stderr);
             else console.log('DONE! Cleaning and reinstalling platform');
 
