@@ -145,6 +145,24 @@ public class Ftp extends CordovaPlugin {
       );
   }
 
+  private static String getBaseName(String path) {
+    int lastSepIndex = path.lastIndexOf('/');
+    if (lastSepIndex == path.length() - 1) {
+      return getBaseName(path.substring(0, lastSepIndex));
+    }
+
+    return path.substring(lastSepIndex + 1);
+  }
+
+  private static String getParentPath(String path) {
+    int lastSepIndex = path.lastIndexOf('/');
+    if (lastSepIndex == path.length() - 1) {
+      lastSepIndex = path.substring(0, lastSepIndex).lastIndexOf('/');
+    }
+
+    return path.substring(0, lastSepIndex);
+  }
+
   public void listDirectory(JSONArray args, CallbackContext callback) {
     cordova
       .getThreadPool()
@@ -179,15 +197,20 @@ public class Ftp extends CordovaPlugin {
                 "FTP",
                 "FTPClient (" + ftpId + ") Found " + files.length + " files."
               );
+  
               JSONArray jsonFiles = new JSONArray();
-              for (FTPFile file : files) {
-                JSONObject jsonFile = new JSONObject();
-                String filename = file.getName();
+              if (files.length < 2) {
+                callback.error("Cannot read this directory!");
+                return;
+              }
 
+              for (FTPFile file : files) {
+                String filename = file.getName();
                 if (filename.equals(".") || filename.equals("..")) {
                   continue;
                 }
 
+                JSONObject jsonFile = new JSONObject();
                 jsonFile.put("name", filename);
                 jsonFile.put("size", file.getSize());
                 jsonFile.put("isDirectory", file.isDirectory());

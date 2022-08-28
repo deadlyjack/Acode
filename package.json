@@ -32,9 +32,9 @@
       "cordova-plugin-file": {
         "ANDROIDX_WEBKIT_VERSION": "1.4.0"
       },
-      "cordova-plugin-ftp": {},
       "cordova-plugin-sdcard": {},
-      "cordova-plugin-system": {}
+      "cordova-plugin-system": {},
+      "cordova-plugin-ftp": {}
     },
     "platforms": [
       "android"
@@ -98,6 +98,7 @@
     "filesize": "^9.0.9",
     "html-tag-js": "^1.1.6",
     "irid": "^3.0.0",
+    "js-base64": "^3.7.2",
     "marked": "^4.0.19",
     "mime-types": "^2.1.35",
     "mustache": "^4.2.0",
