@@ -1,0 +1,23 @@
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../res/fonts/FiraCode.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../res/fonts/RobotoMono.ttf') format('truetype');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F,
+    U+FE2E-FE2F;
+}
+
+@font-face {
+  font-family: 'Source Code';
+  src: url('../res/fonts/SourceCodePro.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+}

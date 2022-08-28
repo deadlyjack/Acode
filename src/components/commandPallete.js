@@ -1,11 +1,10 @@
 import tag from 'html-tag-js';
-import Commands from '../ace/commands';
 import helpers from '../utils/helpers';
 import inputhints from './inputhints';
 
 export default async function commandPallete() {
   const recentlyUsedCommands = RecentlyUsedCommands();
-  const commands = await Commands();
+  const commands = Object.values(editorManager.editor.commands.commands);
   const $input = tag('input', {
     type: 'search',
     placeholder: 'Type command',

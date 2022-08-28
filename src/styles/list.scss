@@ -202,7 +202,8 @@
     }
 
     [data-action],
-    [action] {
+    [action],
+    a {
       pointer-events: all !important;
     }
   }
@@ -247,7 +248,8 @@ ul {
       }
 
       [data-action],
-      [action] {
+      [action],
+      a {
         pointer-events: all !important;
         overflow: auto !important;
       }

@@ -98,6 +98,9 @@ const loader = {
       setMessage(message) {
         $messageSpan.get('.message').innerHTML = message;
       },
+      hide: this.hide.bind(this),
+      destroy: this.destroy.bind(this),
+      show: this.show.bind(this),
     }
   },
   /**

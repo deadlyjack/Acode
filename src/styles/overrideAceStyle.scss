@@ -3,17 +3,13 @@
   display: none !important;
 }
 
-.ace_editor,
-.ace_editor * {
-  font-family: 'Roboto Mono', monospace !important;
-}
-
-.ace_editor.fira-code,
-.ace_editor.fira-code * {
-  -webkit-font-feature-settings: 'liga' on, 'calt' on;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  font-family: 'Fira Code' !important;
+.ace_editor {
+  &[data-font="Fira Code"] {
+    font-feature-settings: 'liga' on, 'calt' on;
+    -webkit-font-feature-settings: 'liga' on, 'calt' on;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
 }
 
 main .ace_editor {

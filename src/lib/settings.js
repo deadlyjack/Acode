@@ -69,7 +69,7 @@ export default class Settings {
       previewMode: 'inapp',
       openFileListPos: 'header',
       quickTools: true,
-      editorFont: 'default',
+      editorFont: 'Roboto Mono',
       vibrateOnTap: true,
       fullscreen: false,
       floatingButton: true,

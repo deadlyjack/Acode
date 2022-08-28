@@ -39,12 +39,11 @@ import checkFiles from '../../lib/checkFiles';
 /**
  *
  * @param {import('./fileBrowser').BrowseMode} [mode='file']
- * @param {function(string):boolean} [buttonText] button text or function to check extension
  * @param {string} [info]
  * @param {boolean} [doesOpenLast]
  * @returns {Promise<import('./fileBrowser').SelectedFile>}
  */
-function FileBrowserInclude(mode, info, buttonText, doesOpenLast = true) {
+function FileBrowserInclude(mode, info, doesOpenLast = true) {
   mode = mode || 'file';
 
   const IS_FOLDER_MODE = ['folder', 'both'].includes(mode);

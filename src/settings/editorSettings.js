@@ -81,8 +81,9 @@ export default function editorSettings() {
       text: strings['editor font'],
       value: values.editorFont,
       select: [
-        'fira-code',
-        ['default', strings['default font']],
+        'Fira Code',
+        'Roboto Mono',
+        'Source Code'
       ],
     },
     {

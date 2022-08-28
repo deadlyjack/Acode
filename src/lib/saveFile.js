@@ -161,7 +161,6 @@ async function saveFile(file, isSaveAs = false) {
     const dir = await FileBrowser(
       'folder',
       strings[`save file${isSaveAs ? ' as' : ''}`],
-      strings['save here'],
     );
     return dir.url;
   }

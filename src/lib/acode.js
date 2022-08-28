@@ -3,6 +3,9 @@ import fsOperation from "../fileSystem/fsOperation";
 import Url from "../utils/Url";
 import EditorFile from "./editorFile";
 import defaultFormatter from "../settings/defaultFormatter";
+import dialogs from "../components/dialogs";
+import FileBrowser from "../pages/fileBrowser/fileBrowser";
+import helpers from "../utils/helpers";
 
 export default class Acode {
   #pluginsInit = {};
@@ -116,5 +119,47 @@ export default class Acode {
       }
     });
     return options;
+  }
+
+  alert(title, message, onhide) {
+    dialogs.alert(title, message, onhide);
+  }
+
+  loader(title, message, cancel) {
+    return dialogs.loader.create(title, message, cancel);
+  }
+
+  joinUrl(...args) {
+    return Url.join(...args);
+  }
+
+  async prompt(message, defaultValue, type, options) {
+    const response = await dialogs.prompt(message, defaultValue, type, options);
+    return response;
+  }
+
+  async confirm(title, message) {
+    const confirmation = await dialogs.confirm(title, message);
+    return confirmation;
+  }
+
+  async select(title, options, config) {
+    const response = await dialogs.select(title, options, config);
+    return response;
+  }
+
+  async multiPrompt(title, inputs, help) {
+    const values = await dialogs.multiPrompt(title, inputs, help);
+    return values;
+  }
+
+  async fileBrowser(mode, info, openLast) {
+    const res = await FileBrowser(mode, info, openLast)
+    return res;
+  }
+
+  async toIneternalUrl(url) {
+    url = await helpers.toInternalUri(url);
+    return url;
   }
 }

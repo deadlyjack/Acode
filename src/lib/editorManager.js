@@ -42,9 +42,7 @@ async function EditorManager($sidebar, $header, $body) {
       events[event].forEach((fn) => fn(...args));
     }
   };
-  const $container = tag('div', {
-    className: `editor-container ${editorFont}`,
-  });
+  const $container = tag('div', { className: 'editor-container' });
   const editor = ace.edit($container);
   const $vScrollbar = ScrollBar({
     width: scrollbarSize,
@@ -95,6 +93,7 @@ async function EditorManager($sidebar, $header, $body) {
     }
   };
 
+  setFont(editorFont);
   moveOpenFileList();
   $body.appendChild($container);
   await setupEditor();
@@ -173,8 +172,7 @@ async function EditorManager($sidebar, $header, $body) {
   });
 
   appSettings.on('update:editorFont', function (value) {
-    $container.classList.remove(appSettings.value.editorFont);
-    $container.classList.add(value);
+    setFont(value);
   });
 
   appSettings.on('update:fontSize', function (value) {
@@ -467,9 +465,13 @@ async function EditorManager($sidebar, $header, $body) {
       let prevEnd = startX;
       let position;
       let left = $el.offsetLeft;
-      let $placeholder = $el.cloneNode(true);
+      let $placeholder = tag('div');
 
-      $placeholder.style.opacity = '0';
+      const rect = $el.getBoundingClientRect();
+      $el.style.zIndex = 999;
+      $placeholder.style.height = `${rect.height}px`;
+      $placeholder.style.width = `${rect.width}px`;
+
       if (appSettings.value.vibrateOnTap) {
         navigator.vibrate(constants.VIBRATION_TIME);
         $el.classList.add('select');
@@ -486,7 +488,8 @@ async function EditorManager($sidebar, $header, $body) {
 
       function cancelDrag() {
         $el.classList.remove('select');
-        $el.style.removeProperty('transform');
+        $el.style.zIndex = 0;
+        $el.style.transform = `translate3d(0, 0, 0)`;
         document.removeEventListener(type, drag, opts);
         document.ontouchend = document.onmouseup = null;
         if ($placeholder.isConnected) {
@@ -595,6 +598,22 @@ async function EditorManager($sidebar, $header, $body) {
           return false;
       }
     });
+  }
+
+  function setFont(font) {
+    let $style = tag.get("#font-style");
+    if (!$style) {
+      $style = tag('style', { id: "font-style" });
+    }
+
+    $style.textContent = `.editor-container,.editor-container *{
+  font-family: "${font}", MONOSPACE !important;
+}`;
+    $container.dataset.font = font;
+
+    if (!$style.isConnected) {
+      document.head.append($style);
+    }
   }
 }
 

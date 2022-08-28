@@ -46,7 +46,7 @@ interface Settings {
   showSpaces: boolean;
   openFileListPos: 'sidebar' | 'header';
   quickTools: boolean;
-  editorFont: 'fira code' | 'default';
+  editorFont: string;
   vibrateOnTap: boolean;
   fullscreen: boolean;
   smartCompletion: boolean;
