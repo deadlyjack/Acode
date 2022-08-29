@@ -31,9 +31,9 @@ export default function otherSettings() {
       text: strings.animation,
       value: values.animation,
       select: [
-        [true, 'True'],
-        [false, 'False'],
-        ['system', 'System'],
+        [true, strings['animation true']],
+        [false, strings['animation false']],
+        ['system', strings['animation system']],
       ],
     },
     {
