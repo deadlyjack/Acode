@@ -75,6 +75,17 @@ export default class Acode {
     });
   }
 
+  unregisterFormatter(id) {
+    this.#formatter = this.#formatter.filter((formatter) => formatter.id !== id);
+    const { formatter } = appSettings.value;
+    Object.keys(formatter).forEach((mode) => {
+      if (formatter[mode] === id) {
+        delete formatter[mode];
+      }
+    });
+    appSettings.update(false);
+  }
+
   async format() {
     const file = editorManager.activeFile;
     const { getModeForPath } = ace.require('ace/ext/modelist');
