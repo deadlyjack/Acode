@@ -637,18 +637,19 @@ export default {
 
     const storageList = JSON.parse(localStorage.storageList || '[]');
 
-    for (let uuid of storageList) {
+    url = storageList.find((uuid) => {
       const storageUrl = Url.parse(uuid.uri || '').url;
-      if (!storageUrl) continue;
+      if (!storageUrl) return false;
       const regex = new RegExp('^' + storageUrl);
       if (regex.test(url)) {
         url = url.replace(
           regex,
           `${uuid.name}${url.startsWith('/') ? '' : '/'}`,
         );
-        break;
+        return true;
       }
-    }
+      return false;
+    });
     return url;
   },
   /**

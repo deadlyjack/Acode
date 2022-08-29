@@ -44,8 +44,10 @@ export default {
    */
   extname(path) {
     const filename = path.split('/').slice(-1)[0];
-    if (/.+\..*$/.test(filename))
+    if (/.+\..*$/.test(filename)) {
       return /(?:\.([^.]*))?$/.exec(filename)[0] || '';
+    }
+
     return '';
   },
 
@@ -96,12 +98,15 @@ export default {
     const resolved = [];
     const pathAr = path.split('/');
 
-    for (let dir of pathAr) {
+    pathAr.forEach((dir) => {
       if (dir === '..') {
         if (resolved.length) resolved.pop();
-      } else if (dir === '.') continue;
-      else resolved.push(dir);
-    }
+      } else if (dir === '.') {
+        return;
+      } else {
+        resolved.push(dir);
+      }
+    });
 
     return resolved.join('/');
   },
@@ -139,14 +144,14 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
 
     let result = '';
 
-    for (let path of paths) {
+    paths.forEach((path) => {
       if (path.startsWith('/')) {
         result = path;
-        continue;
+        return;
       }
 
       result = this.normalize(this.join(result, path));
-    }
+    });
 
     if (result.startsWith('/')) return result;
     else return '/' + result;
@@ -164,9 +169,10 @@ resolvePath('path/to/some/dir/', '../../dir') //returns 'path/to/dir'
     const p1len = path1.length;
     const p2len = path2.length;
 
-    let flag = false,
-      path = [];
-    path1.map((dir, i) => {
+    let flag = false;
+    let path = [];
+
+    path1.forEach((dir, i) => {
       if (dir === path2[i] && !flag) return;
 
       path.push(path2[i]);

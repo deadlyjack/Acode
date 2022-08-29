@@ -24,6 +24,7 @@ export default function () {
   });
   let editor = ace.edit($themePreview);
 
+  editor.setOption('useWorker', false);
   editor.setTheme(appSettings.value.editorTheme);
   editor.setFontSize(appSettings.value.fontSize);
   editor.session.setOptions({
@@ -46,7 +47,6 @@ export default function () {
       id: 'theme-preview-header',
     }),
   );
-  $themePreview.classList.add(appSettings.value.editorFont);
   editor.resize(true);
 
   actionStack.push({
@@ -76,9 +76,11 @@ export default function () {
       html = '',
       defaultValue = () => false;
 
-    if (mode === 'editor' && innerHeight * 0.3 >= 120)
+    if (mode === 'editor' && innerHeight * 0.3 >= 120) {
       $container.append($themePreview);
-    else $themePreview.remove();
+    } else {
+      $themePreview.remove();
+    }
 
     if (mode === 'app') {
       if (!DOES_SUPPORT_THEME)

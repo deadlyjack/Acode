@@ -51,7 +51,7 @@ export default async function restoreTheme(darken) {
     document.body.setAttribute('theme-type', type);
     const style = getComputedStyle(app);
     const loaderFile = Url.join(ASSETS_DIRECTORY, 'res/tail-spin.svg');
-    const textColor = style.getPropertyValue('--text-main-color').trim();
+    const textColor = style.getPropertyValue('--primary-text-color').trim();
     const svgName = '__tail-spin__.svg';
     const img = Url.join(DATA_STORAGE, svgName);
 

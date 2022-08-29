@@ -666,67 +666,77 @@ public class SDcard extends CordovaPlugin {
     }
   }
 
-  private void listDir(
-    String src,
-    String parentDocId,
-    CallbackContext callback
-  ) {
-    Uri srcUri = Uri.parse(src);
-    ContentResolver contentResolver = context.getContentResolver();
+  private void listDir(String src, String parentId, CallbackContext callback) {
+    cordova
+      .getThreadPool()
+      .execute(
+        new Runnable() {
+          public void run() {
+            Uri srcUri = Uri.parse(src);
+            ContentResolver contentResolver = context.getContentResolver();
+            String parentDocId = parentId;
 
-    if (parentDocId == null) {
-      parentDocId = DocumentsContract.getTreeDocumentId(srcUri);
-    }
+            if (parentDocId == null) {
+              parentDocId = DocumentsContract.getTreeDocumentId(srcUri);
+            }
 
-    Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
-      srcUri,
-      parentDocId
-    );
+            Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+              srcUri,
+              parentDocId
+            );
 
-    JSONArray result = new JSONArray();
-    Cursor c = contentResolver.query(
-      childrenUri,
-      new String[] {
-        Document.COLUMN_DOCUMENT_ID,
-        Document.COLUMN_DISPLAY_NAME,
-        Document.COLUMN_MIME_TYPE,
-      },
-      null,
-      null,
-      null
-    );
+            JSONArray result = new JSONArray();
+            Cursor cursor = contentResolver.query(
+              childrenUri,
+              new String[] {
+                Document.COLUMN_DOCUMENT_ID,
+                Document.COLUMN_DISPLAY_NAME,
+                Document.COLUMN_MIME_TYPE,
+              },
+              null,
+              null,
+              null
+            );
 
-    try {
-      while (c.moveToNext()) {
-        JSONObject fileData = new JSONObject();
-        String docId = c.getString(0);
-        String name = c.getString(1);
-        String mime = c.getString(2);
-        boolean isDirectory = isDirectory(mime);
+            if (cursor == null) {
+              callback.error("Cannot read directory.");
+              return;
+            }
 
-        fileData.put("name", name);
-        fileData.put("mime", mime);
-        fileData.put("isDirectory", isDirectory);
-        fileData.put("isFile", !isDirectory);
-        fileData.put("uri", src + SAPERATOR + docId); // TODO: Deprecate in future
-        fileData.put("url", src + SAPERATOR + docId);
-        result.put(fileData);
-      }
+            try {
+              while (cursor.moveToNext()) {
+                JSONObject fileData = new JSONObject();
+                String docId = cursor.getString(0);
+                String name = cursor.getString(1);
+                String mime = cursor.getString(2);
+                boolean isDirectory = isDirectory(mime);
 
-      callback.success(result);
-    } catch (JSONException e) {
-      callback.error(e.toString());
-    } finally {
-      if (c != null) {
-        try {
-          c.close();
-        } catch (RuntimeException re) {
-          throw re;
-        } catch (Exception ignore) {
-          // ignore exception
+                fileData.put("name", name);
+                fileData.put("mime", mime);
+                fileData.put("isDirectory", isDirectory);
+                fileData.put("isFile", !isDirectory);
+                fileData.put("uri", src + SAPERATOR + docId); // TODO: Deprecate in future
+                fileData.put("url", src + SAPERATOR + docId);
+                result.put(fileData);
+              }
+
+              callback.success(result);
+            } catch (JSONException e) {
+              callback.error(e.toString());
+            } finally {
+              if (cursor != null) {
+                try {
+                  cursor.close();
+                } catch (RuntimeException re) {
+                  throw re;
+                } catch (Exception ignore) {
+                  // ignore exception
+                }
+              }
+            }
+          }
         }
-      }
-    }
+      );
   }
 
   private boolean isDirectory(String mimeType) {

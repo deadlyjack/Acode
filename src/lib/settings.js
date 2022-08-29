@@ -47,6 +47,28 @@ export default class Settings {
     sortByName: true,
   };
 
+  customTheme = {
+    '--accent-color': 'rgb(51,153,255)',
+    '--active-icon-color': 'rgba(0, 0, 0, 0.2)',
+    '--border-color': 'rgba(122, 122, 122, 0.227)',
+    '--box-shadow-color': 'rgba(0, 0, 0, 0.2)',
+    '--button-active-color': 'rgb(44,142,240)',
+    '--button-background-color': 'rgb(51,153,255)',
+    '--button-text-color': 'rgb(255,255,255)',
+    '--error-text-color': 'rgb(255,185,92)',
+    '--link-text-color': 'rgb(97,94,253)',
+    '--popup-active-color': 'rgb(169,0,0)',
+    '--popup-background-color': 'rgb(255,255,255)',
+    '--popup-border-color': 'rgba(0, 0, 0, 0)',
+    '--popup-icon-color': 'rgb(153,153,255)',
+    '--popup-text-color': 'rgb(37,37,37)',
+    '--primary-color': 'rgb(153,153,255)',
+    '--primary-text-color': 'rgb(255,255,255)',
+    '--scrollbar-color': 'rgba(0, 0, 0, 0.33)',
+    '--secondary-color': 'rgb(255,255,255)',
+    '--secondary-text-color': 'rgb(37,37,37)',
+  };
+
   constructor() {
     this.#defaultSettings = {
       animation: 'system',
@@ -94,32 +116,7 @@ export default class Settings {
       teardropTimeout: 3000,
       teardropSize: 30,
       scrollSpeed: constants.SCROLL_SPEED_NORMAL,
-      customTheme: {
-        '--primary-color': 'rgb(153,153,255)',
-        '--secondary-color': 'rgb(255,255,255)',
-        '--accent-color': 'rgb(51,153,255)',
-        '--text-color': 'rgb(37,37,37)',
-        '--text-main-color': 'rgb(255,255,255)',
-        '--a-color': 'rgb(97,94,253)',
-        '--border-color': 'rgba(122, 122, 122, 0.227)',
-        '--error-text-color': 'rgb(255,185,92)',
-        '--active-icon-color': 'rgba(0, 0, 0, 0.2)',
-        '--popup-border-color': 'rgba(0, 0, 0, 0)',
-        '--box-shadow-color': 'rgba(0, 0, 0, 0.2)',
-        '--button-background-color': 'rgb(51,153,255)',
-        '--button-active-color': 'rgb(44,142,240)',
-        '--button-text-color': 'rgb(255,255,255)',
-        '--scrollbar-color': 'rgba(0, 0, 0, 0.33)',
-        '--menu-background-color': 'rgb(255,255,255)',
-        '--menu-text-color': 'rgb(37,37,37)',
-        '--menu-icon-color': 'rgb(153,153,255)',
-        '--dialogbox-background-color': 'rgb(255,255,255)',
-        '--dialogbox-text-color': 'rgb(37,37,37)',
-        '--dialogbox-selected-option-color': 'rgb(169,0,0)',
-        '--command-palette-background-color': 'rgb(153,153,255)',
-        '--command-palette-text-color': 'rgb(255,255,255)',
-        '--command-palette-border': 'none',
-      },
+      customTheme: this.customTheme,
     };
 
     this.settingsFile = Url.join(DATA_STORAGE, 'settings.json');

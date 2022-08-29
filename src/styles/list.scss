@@ -103,7 +103,7 @@
       font-family: 'Roboto', sans-serif;
       font-weight: bolder;
       color: rgb(37, 37, 37);
-      color: var(--text-color);
+      color: var(--secondary-text-color);
       font-weight: 900;
       text-transform: uppercase;
     }
@@ -283,7 +283,7 @@ ul {
     &::after {
       content: attr(empty-msg);
       color: rgb(37, 37, 37);
-      color: var(--text-color);
+      color: var(--secondary-text-color);
       text-align: center;
       font-weight: 900;
       background: transparent;

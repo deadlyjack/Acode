@@ -8,7 +8,7 @@
   background-color: rgb(255, 255, 255);
   background-color: var(--secondary-color);
   color: rgb(37, 37, 37);
-  color: var(--text-color);
+  color: var(--secondary-text-color);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 4px var(--box-shadow-color);
   border: solid 1px transparent;
@@ -53,7 +53,7 @@
     small:not(:empty) {
       margin-left: auto;
       background-color: rgb(255, 255, 255);
-      background-color: var(--text-main-color);
+      background-color: var(--primary-text-color);
       color: rgb(51, 153, 255);
       color: var(--accent-color);
       padding: 2px;
@@ -65,14 +65,14 @@
       background-color: rgb(51, 153, 255);
       background-color: var(--accent-color);
       color: rgb(27, 26, 26);
-      color: var(--text-main-color);
+      color: var(--primary-text-color);
     }
 
     &:hover {
       background-color: rgb(107, 168, 229);
       background-color: var(--primary-color);
       color: rgb(27, 26, 26);
-      color: var(--text-color);
+      color: var(--secondary-text-color);
     }
 
     // &:not(:last-child) {
@@ -97,7 +97,7 @@
       width: 18px;
       border-radius: 50%;
       border: solid 4px rgb(37, 37, 37);
-      border: solid 4px var(--text-color);
+      border: solid 4px var(--secondary-text-color);
       border-bottom: solid 4px rgba($color: #000000, $alpha: 0) !important;
       margin: auto;
       animation: rotate 1s linear infinite !important;

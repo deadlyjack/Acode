@@ -366,7 +366,7 @@ async function EditorManager($sidebar, $header, $body) {
     if (file.type === 'git') {
       text = 'git • ' + file.record.repo + '/' + file.record.path;
     } else if (file.type === 'gist') {
-      const id = file.record.id;
+      const { id } = file.record;
       text = `gist • ${id.length > 10 ? '...' + id.substring(id.length - 7) : id
         }`;
     } else if (text && !file.readOnly) {

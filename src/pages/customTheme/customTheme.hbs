@@ -8,10 +8,7 @@
         value='{{value}}'
         name='{{color}}'
       >
-        <style>
-          .{{color}}::before{ background-color:{{value}}!important; }
-        </style>
-        <span class='icon color {{color}}'></span>
+        <span style='color: {{value}};' class='icon color {{color}}'></span>
         <div class='container'>
           <span class='text'>{{text}}</span>
         </div>

@@ -72,17 +72,19 @@ export default {
       try {
         if (pathnames[1].startsWith('/')) pathnames[1] = pathnames[1].slice(1);
         const contentUri = Uri.parse(url);
-        const protocol = this.getProtocol(contentUri.rootUri);
-        if (protocol === 'content:') {
-          let [root, pathname] = contentUri.docId.split(':');
-          const newDocId = path.join(pathname, ...pathnames.slice(1));
-          if (/^content:\/\/com.termux/.test(url)) {
-            return `${contentUri.rootUri}::${root}${newDocId}${query}`;
+        let [root, pathname] = contentUri.docId.split(':');
+        const newDocId = path.join(pathname, ...pathnames.slice(1));
+        if (/^content:\/\/com.termux/.test(url)) {
+          const rootCondition = root.endsWith('/');
+          const newDocIdCondition = newDocId.startsWith('/');
+          if (rootCondition === newDocIdCondition) {
+            root = root.slice(0, -1);
+          } else if (!rootCondition === !newDocIdCondition) {
+            root += '/';
           }
-          return `${contentUri.rootUri}::${root}:${newDocId}${query}`;
-        } else {
-          return this.join(contentUri.rootUri, ...pathnames.slice(1));
+          return `${contentUri.rootUri}::${root}${newDocId}${query}`;
         }
+        return `${contentUri.rootUri}::${root}:${newDocId}${query}`;
       } catch (error) {
         return null;
       }

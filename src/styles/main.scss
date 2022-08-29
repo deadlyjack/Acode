@@ -34,7 +34,7 @@ body {
   background-color: #9999ff;
   background-color: var(--primary-color);
   color: #252525;
-  color: var(--text-color);
+  color: var(--secondary-text-color);
 
   &.no-animation * {
     animation: none !important;
@@ -109,7 +109,7 @@ body {
 
 a {
   color: #615efd;
-  color: var(--a-color);
+  color: var(--link-text-color);
 }
 
 .open-file-list {
@@ -125,7 +125,7 @@ a {
   display: flex;
   flex-direction: row !important;
   color: white;
-  color: var(--text-main-color);
+  color: var(--primary-text-color);
   z-index: 5;
 
   li.tile {
@@ -344,7 +344,7 @@ footer {
     background-color: #9999ff;
     background-color: var(--primary-color);
     color: white;
-    color: var(--text-main-color);
+    color: var(--primary-text-color);
   }
 }
 
@@ -448,16 +448,16 @@ input {
   border: none;
   background-color: inherit;
   border-bottom: solid 1px #252525;
-  border-bottom: solid 1px var(--text-color);
+  border-bottom: solid 1px var(--secondary-text-color);
   padding: 0;
   box-sizing: border-box;
   color: #252525;
-  color: var(--text-color);
+  color: var(--secondary-text-color);
   text-indent: 10px;
 
   ::placeholder {
     color: #252525;
-    color: var(--text-color);
+    color: var(--secondary-text-color);
     opacity: 0.5;
   }
 
@@ -471,7 +471,7 @@ input,
 textarea {
   &::placeholder {
     color: #252525;
-    color: var(--text-color);
+    color: var(--secondary-text-color);
     opacity: 0.8;
     text-transform: lowercase;
   }
@@ -481,14 +481,14 @@ textarea {
   flex: 1;
   display: flex;
   color: white;
-  color: var(--text-main-color);
+  color: var(--primary-text-color);
   align-items: center;
   justify-content: center;
 
   span:not(:nth-child(2)) {
     margin: 0 5px;
     color: white;
-    color: var(--text-main-color);
+    color: var(--primary-text-color);
   }
 }
 
@@ -499,7 +499,7 @@ textarea {
   display: block;
   border-radius: 50%;
   background-color: white;
-  background-color: var(--text-main-color);
+  background-color: var(--primary-text-color);
   border: solid 1px #666;
   box-sizing: border-box;
   transform-origin: left top;
@@ -543,7 +543,7 @@ textarea {
   border: none;
   border: var(--clipboard-menu-border);
   color: #252525;
-  color: var(--text-color);
+  color: var(--secondary-text-color);
   z-index: 4;
 
   >span {
@@ -591,7 +591,7 @@ textarea {
     height: 1px;
     width: 60px;
     background-color: #252525;
-    background-color: var(--text-color);
+    background-color: var(--secondary-text-color);
     margin: auto 15px;
     opacity: 0.5;
   }
@@ -615,7 +615,7 @@ textarea {
     width: 1.2rem;
     border-radius: 4px;
     border: solid 1px #252525;
-    border: solid 1px var(--text-color);
+    border: solid 1px var(--secondary-text-color);
     margin: 0 5px;
 
     &::after {
@@ -656,7 +656,7 @@ textarea {
   opacity: 0.2;
   box-sizing: border-box;
   color: white;
-  color: var(--text-main-color);
+  color: var(--primary-text-color);
   transition: all 300ms ease;
   box-shadow: -5px 5px 20px 0px rgba(0, 0, 0, 0.5);
 

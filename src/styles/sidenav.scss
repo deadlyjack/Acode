@@ -15,7 +15,7 @@ body.no-animation {
   background-color: rgb(153, 153, 255);
   background-color: var(--primary-color);
   color: rgb(255, 255, 255);
-  color: var(--text-main-color);
+  color: var(--primary-text-color);
   overflow: hidden;
   box-sizing: border-box;
 
@@ -37,7 +37,7 @@ body.no-animation {
     &::after {
       content: attr(empty-msg);
       color: rgb(255, 255, 255);
-      color: var(--text-main-color);
+      color: var(--primary-text-color);
       font-weight: 900;
       opacity: 0.5;
     }
@@ -46,11 +46,11 @@ body.no-animation {
   display: flex;
   flex-direction: column;
 
-  & + .mask {
+  &+.mask {
     z-index: 108;
   }
 
-  > .list {
+  >.list {
     max-width: 100%;
     max-height: 100%;
 
@@ -82,25 +82,25 @@ body.no-animation {
       font-size: 1em;
     }
 
-    > ul {
+    >ul {
       overflow: auto;
       max-width: 100%;
       max-height: calc(100% - 30px);
       height: calc(100% - 30px);
 
       .tile:active {
-        > *:nth-child(2) {
+        >*:nth-child(2) {
           color: rgb(255, 215, 0);
         }
       }
 
       li {
-        > *:nth-child(2) {
+        >*:nth-child(2) {
           color: currentColor;
         }
 
         &.active {
-          > *:nth-child(2) {
+          >*:nth-child(2) {
             color: rgb(255, 215, 0);
           }
         }

@@ -9,7 +9,7 @@ header {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     box-shadow: 0 2px 4px var(--box-shadow-color);
     color: rgb(255, 255, 255);
-    color: var(--text-main-color);
+    color: var(--primary-text-color);
 
     >.text {
       pointer-events: all !important;

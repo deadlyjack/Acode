@@ -16,7 +16,7 @@ body.no-animation {
   overflow-y: auto;
   user-select: none;
   background-color: rgb(255, 255, 255);
-  background-color: var(--menu-background-color);
+  background-color: var(--popup-background-color);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 4px var(--box-shadow-color);
   border-radius: 4px;
@@ -71,7 +71,7 @@ body.no-animation {
       flex: 1;
       text-transform: capitalize;
       color: rgb(37, 37, 37);
-      color: var(--menu-text-color);
+      color: var(--popup-text-color);
 
       .value {
         display: block;
@@ -82,7 +82,7 @@ body.no-animation {
 
     .icon {
       color: rgb(153, 153, 255);
-      color: var(--menu-icon-color);
+      color: var(--popup-icon-color);
     }
 
     &.disabled {

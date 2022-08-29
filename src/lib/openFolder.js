@@ -219,7 +219,6 @@ function openFolder(_path, opts = {}) {
       ];
     } else if (type === 'root') {
       options = [
-        RENAME,
         PASTE,
         NEW_FILE,
         NEW_FOLDER,

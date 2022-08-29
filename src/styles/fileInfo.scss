@@ -18,7 +18,7 @@
     background-color: rgb(51, 153, 255);
     background-color: var(--button-background-color);
     color: rgb(255, 255, 255);
-    color: var(--text-main-color);
+    color: var(--primary-text-color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,6 +27,7 @@
     margin: 5px auto;
     padding: 0 10px;
     border-radius: 20px;
+
     * {
       pointer-events: none;
     }
@@ -43,18 +44,18 @@
     }
   }
 
-  > div {
+  >div {
     display: flex;
     flex-direction: column;
     margin-bottom: 10px;
 
-    > span:first-child {
+    >span:first-child {
       font-size: 0.95rem;
       opacity: 0.5;
       margin-right: 10px;
     }
 
-    > span:last-child {
+    >span:last-child {
       max-width: 100%;
       overflow: auto;
     }

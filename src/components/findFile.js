@@ -53,11 +53,28 @@ export default async function findFile() {
     const dirs = addedFolder.map(({ url }) => url);
     try {
       await listDir(files, dirs);
-      setHints(files);
     } catch (error) {
-      toast(strings['unable to load files']);
-      remove();
+      // ignore
     }
+
+    editorManager.files.forEach((file) => {
+      const { uri, name, type } = file;
+      let { location = '' } = file;
+
+      if (type === 'git') {
+        location = 'git • ' + file.record.repo + '/' + file.record.path;
+      } else if (type === 'gist') {
+        const { id } = file.record;
+        const path = id.length > 10 ? '...' + id.substring(id.length - 7) : id;
+        location = `gist • ${path}`;
+      } else if (location) {
+        location = helpers.getVirtualPath(location);
+      }
+
+      files.push(hintItem(name, location, uri));
+    });
+
+    setHints(files);
   }
 
   /**
@@ -80,14 +97,7 @@ export default async function findFile() {
       const vRootDir = Url.dirname(vRoot);
       const vUrl = helpers.getVirtualPath(url);
       const path = Url.dirname(vUrl.subtract(vRootDir)).replace(/\/$/, '');
-      const recent = recents.files.find((file) => file === url);
-      list.push({
-        text: `<div style="display: flex; flex-direction: column;">
-          <strong ${recent ? `data-str='${strings['recently used']}'` : ''} style="font-size: 1rem;">${name}</strong>
-          <span style="font-size: 0.8rem; opacity: 0.8;">${path}</span>
-        <div>`,
-        value: url,
-      });
+      list.push(hintItem(name, path, url));
     });
 
     await listDir(list, dirs, root);
@@ -109,5 +119,16 @@ export default async function findFile() {
     if (!value) return;
     openFile(value);
     remove();
+  }
+
+  function hintItem(name, path, url) {
+    const recent = recents.files.find((file) => file === url);
+    return {
+      text: `<div style="display: flex; flex-direction: column;">
+        <strong ${recent ? `data-str='${strings['recently used']}'` : ''} style="font-size: 1rem;">${name}</strong>
+        <span style="font-size: 0.8rem; opacity: 0.8;">${path}</span>
+      <div>`,
+      value: url,
+    };
   }
 }

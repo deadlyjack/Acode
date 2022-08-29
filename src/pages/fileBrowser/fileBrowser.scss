@@ -8,9 +8,10 @@
       background-color: rgb(153, 153, 255);
       background-color: var(--primary-color);
       color: rgb(255, 255, 255);
-      color: var(--text-main-color);
+      color: var(--primary-text-color);
       height: 40px;
       text-align: center;
+
       .icon {
         display: none;
         content: '';

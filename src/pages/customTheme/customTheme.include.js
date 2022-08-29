@@ -11,7 +11,6 @@ import dialogs from '../../components/dialogs';
 
 export default function CustomThemeInclude() {
   const $page = Page(`${strings['custom']} ${strings['theme']}`.capitalize());
-  let unsaved = false;
 
   $page.header.append(
     tag('span', {
@@ -84,6 +83,10 @@ export default function CustomThemeInclude() {
             const scrolltop = $page.get('#custom-theme').scrollTop;
             render();
             $page.get('#custom-theme').scrollTop = scrolltop;
+            const $color = $target.get('.icon.color');
+            if ($color) {
+              $color.style.color = color;
+            }
             if ($page.header.text.slice(-1) !== '*') $page.header.text += ' *';
           });
 
@@ -103,12 +106,13 @@ export default function CustomThemeInclude() {
   }
 
   function render() {
-    const customThemeColor = appSettings.value.customTheme;
-    const colors = Object.keys(customThemeColor).map((color) => {
+    const { customTheme } = appSettings;
+    const { customTheme: userSaved } = appSettings.value;
+    const colors = Object.keys(customTheme).map((color) => {
       return {
         color,
-        value: customThemeColor[color],
-        text: color.replace(/-/g, ' ').trim(),
+        value: userSaved[color] || customTheme[color],
+        text: color.replace(/-/g, ' ').trim().capitalize(0),
       };
     });
     const html = Mustache.render(template, { colors });
@@ -123,6 +127,8 @@ export default function CustomThemeInclude() {
       appSettings.value.customTheme,
     );
 
-    window.restoreTheme();
+    setTimeout(() => {
+      restoreTheme();
+    }, 0);
   }
 }
