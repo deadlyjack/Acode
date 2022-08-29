@@ -257,5 +257,9 @@
   "connecting...": "verbinden...",
   "type filename": "Dateinamen angeben",
   "unable to load files": "Dateien können nicht geladen werden",
-  "preview port": "Preview port"
+  "preview port": "Preview port",
+  "find file": "Find file",
+  "animation true": "Yes",
+  "animation false": "No",
+  "animation system": "System"
 }
