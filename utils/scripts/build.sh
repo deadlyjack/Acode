@@ -23,7 +23,7 @@ fi
 
 if [ "$mode" = "p" ] || [ "$mode" = "prod" ]
 then
-mode = "p"
+mode="p"
 webpackmode="production"
 cordovamode="--release"
 fi
