@@ -86,9 +86,9 @@ const exec = promisify(require('child_process').exec);
               else console.log('DONE! Removing admob-plus-cordova');
             }
 
-            const { stderr } = await exec(`yarn clean ${platform} ${platform}`);
+            const { stderr } = await exec(`yarn clean`);
             if (stderr) console.error(stderr);
-            else console.log('DONE! Cleaning and reinstalling platform');
+            else console.log('DONE! Reinstalling platform');
 
           })(),
         );

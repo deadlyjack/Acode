@@ -4,7 +4,10 @@ import helpers from "../utils/helpers";
 
 export default async function Commands() {
   const { clipboard } = cordova.plugins;
-  const { commands: defaultCommands } = ace.require("ace/commands/default_commands");
+  const {
+    commandKeyBinding,
+    commands: defaultCommands,
+  } = ace.require("ace/commands/default_commands");
   let keyboardShortcuts = keyBindings;
 
   try {
@@ -224,7 +227,7 @@ export default async function Commands() {
       name: 'openCommandPallete',
       description: 'Open command pallete',
       exec() {
-        acode.exec('open-command');
+        acode.exec('command-pallete');
       },
       readOnly: true,
     },
@@ -243,6 +246,9 @@ export default async function Commands() {
   });
 
   defaultCommands.forEach((command) => {
+    if ('bindKey' in command) {
+      delete command.bindKey;
+    }
     defineKeyBinding(command);
     const exists = commands.find((c) => c.name === command.name);
     if (exists) return;
@@ -255,8 +261,17 @@ export default async function Commands() {
     Object.defineProperty(command, 'bindKey', {
       configurable: true,
       get() {
+        const key = keyboardShortcuts[this.name]?.key;
+        if (key && commandKeyBinding) {
+          const keys = key.split('|');
+          keys.forEach((k) => {
+            if (k in commandKeyBinding) {
+              delete commandKeyBinding[k];
+            }
+          });
+        }
         return {
-          win: keyboardShortcuts[this.name]?.key,
+          win: key,
         }
       },
     });
