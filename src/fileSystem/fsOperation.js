@@ -288,8 +288,11 @@ function fsOperation(uri) {
         .listDir(url)
         .then((entries) => {
           entries.map((entry) => {
+            const url = decodeURI(entry.nativeURL);
+            const name = Url.basename(url);
             files.push({
-              url: entry.nativeURL,
+              name,
+              url,
               isDirectory: entry.isDirectory,
               isFile: entry.isFile,
             });

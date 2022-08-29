@@ -635,21 +635,20 @@ export default {
       return Uri.getPrimaryAddress(url);
     }
 
+    /**@type {string[]} */
     const storageList = JSON.parse(localStorage.storageList || '[]');
+    const storageListLen = storageList.length;
 
-    url = storageList.find((uuid) => {
-      const storageUrl = Url.parse(uuid.uri || '').url;
-      if (!storageUrl) return false;
+    for (let i = 0; i < storageListLen; ++i) {
+      const uuid = storageList[i];
+      if (!storageUrl) continue;
       const regex = new RegExp('^' + storageUrl);
       if (regex.test(url)) {
-        url = url.replace(
-          regex,
-          `${uuid.name}${url.startsWith('/') ? '' : '/'}`,
-        );
-        return true;
+        url = url.replace(regex, uuid.name);
+        break;
       }
-      return false;
-    });
+    }
+
     return url;
   },
   /**
