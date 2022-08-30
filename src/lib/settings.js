@@ -268,6 +268,7 @@ export default class Settings {
    * @returns {Array<String>}
    */
   #getChangedKeys() {
+    if (!this.#oldSettings) return [];
     const keys = [];
     Object.keys(this.#oldSettings).forEach((key) => {
       const value = this.#oldSettings[key];

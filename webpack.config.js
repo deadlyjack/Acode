@@ -12,15 +12,6 @@ module.exports = (env, options) => {
       use: ['raw-loader'],
     },
     {
-      test: /\.m?js$/,
-      use: {
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-        },
-      },
-    },
-    {
       test: /\.(sa|sc|c)ss$/,
       use: [
         {
@@ -40,6 +31,18 @@ module.exports = (env, options) => {
       ],
     }
   ];
+
+  if (mode === 'production') {
+    rules.push({
+      test: /\.m?js$/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+        },
+      },
+    });
+  }
 
   clearOutputDir();
 
