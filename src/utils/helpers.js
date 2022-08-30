@@ -305,11 +305,9 @@ export default {
    * @param  {...string} args
    */
   errorMessage(err, ...args) {
-    args.map((arg) => {
-      try {
-        return Url.pathname(arg);
-      } catch (error) {
-        return arg;
+    args.forEach((arg, i) => {
+      if (/^(content|file|ftp|sftp|https?):/.test(arg)) {
+        args[i] = this.getVirtualPath(arg);
       }
     });
 
@@ -632,7 +630,10 @@ export default {
     url = Url.parse(url).url;
 
     if (/^content:/.test(url)) {
-      return Uri.getPrimaryAddress(url);
+      const primary = Uri.getPrimaryAddress(url);
+      if (primary) {
+        return primary;
+      }
     }
 
     /**@type {string[]} */
@@ -641,6 +642,7 @@ export default {
 
     for (let i = 0; i < storageListLen; ++i) {
       const uuid = storageList[i];
+      const storageUrl = Url.parse(uuid.uri || uuid.url || '').url;
       if (!storageUrl) continue;
       const regex = new RegExp('^' + storageUrl);
       if (regex.test(url)) {

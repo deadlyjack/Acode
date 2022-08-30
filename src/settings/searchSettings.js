@@ -22,9 +22,8 @@ export default function searchSettings() {
   ];
 
   function callback(key, value) {
-    appSettings.update({
-      [key]: value,
-    });
+    values[key] = value;
+    appSettings.update();
   }
 
   settingsPage(title, items, callback);

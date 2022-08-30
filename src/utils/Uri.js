@@ -116,6 +116,6 @@ export default {
    */
   getPrimaryAddress(url) {
     const [, primary] = url.split('::primary:');
-    return primary || url;
+    return primary;
   },
 };

@@ -686,17 +686,25 @@ public class SDcard extends CordovaPlugin {
             );
 
             JSONArray result = new JSONArray();
-            Cursor cursor = contentResolver.query(
-              childrenUri,
-              new String[] {
-                Document.COLUMN_DOCUMENT_ID,
-                Document.COLUMN_DISPLAY_NAME,
-                Document.COLUMN_MIME_TYPE,
-              },
-              null,
-              null,
-              null
-            );
+            Cursor cursor = null;
+
+            try {
+              cursor =
+                contentResolver.query(
+                  childrenUri,
+                  new String[] {
+                    Document.COLUMN_DOCUMENT_ID,
+                    Document.COLUMN_DISPLAY_NAME,
+                    Document.COLUMN_MIME_TYPE,
+                  },
+                  null,
+                  null,
+                  null
+                );
+            } catch (Error e) {
+              callback.error("Cannot read directory.");
+              return;
+            }
 
             if (cursor == null) {
               callback.error("Cannot read directory.");
