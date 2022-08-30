@@ -298,11 +298,11 @@ export default {
       file.filename = newname;
     }
   },
-  async 'format'() {
+  async 'format'(selectIfNull) {
     const { editor } = editorManager;
     const pos = editor.getCursorPosition();
 
-    await acode.format();
+    await acode.format(selectIfNull);
     editor.selection.moveCursorToPosition(pos);
   },
   async 'eol'() {

@@ -18,7 +18,7 @@ async function saveFile(file, isSaveAs = false) {
   if (file.loading) return;
   let fs;
   let url;
-  let filename;
+  let { filename } = file;
   let isNewFile = false;
   let createFile = false;
   const data = file.session.getValue();
@@ -84,8 +84,6 @@ async function saveFile(file, isSaveAs = false) {
       'dir',
       strings['select folder'],
     );
-
-    filename = file.filename;
 
     if (option === 'select-folder') {
       url = await selectFolder();
@@ -201,7 +199,7 @@ async function saveFile(file, isSaveAs = false) {
     const { formatOnSave } = appSettings.value;
     if (formatOnSave) {
       editorManager.activeFile.markChanged = false;
-      acode.exec('format');
+      acode.exec('format', false);
     }
   }
 }

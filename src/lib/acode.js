@@ -86,15 +86,17 @@ export default class Acode {
     appSettings.update(false);
   }
 
-  async format() {
+  async format(selectIfNull = true) {
     const file = editorManager.activeFile;
     const { getModeForPath } = ace.require('ace/ext/modelist');
     const { name } = getModeForPath(file.filename);
     const formatterId = appSettings.value.formatter[name];
     let formatter = this.#formatter.find(({ id }) => id === formatterId);
 
-    if (!formatter) {
+    if (!formatter && selectIfNull) {
       defaultFormatter(name);
+    } else if (!formatter && !selectIfNull) {
+      toast(strings['please select a formatter']);
     }
 
     if (formatter) await formatter.format();

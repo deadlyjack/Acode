@@ -139,7 +139,7 @@ export default class Settings {
     const settings = helpers.parseJSON(await fs.readFile('utf-8'));
     if (settings) {
       // make sure that all the settings are present
-      for (let setting in this.#defaultSettings) {
+      Object.keys(this.#defaultSettings).forEach((setting) => {
         const value = settings[setting];
         if (value === undefined) {
           settings[setting] = this.#defaultSettings[setting];
@@ -150,7 +150,8 @@ export default class Settings {
             settings[setting] = this.#defaultSettings[setting];
           }
         }
-      }
+      });
+
       this.value = { ...settings };
       this.#oldSettings = { ...settings };
       return;
@@ -230,7 +231,7 @@ export default class Settings {
       await this.update(false);
     }
 
-    for (let onreset of this.#on.reset) onreset(this.value);
+    this.#on.reset.forEach((onreset) => onreset(this.value))
   }
 
   /**
@@ -268,29 +269,31 @@ export default class Settings {
    */
   #getChangedKeys() {
     const keys = [];
-    for (let key in this.#oldSettings) {
+    Object.keys(this.#oldSettings).forEach((key) => {
       const value = this.#oldSettings[key];
       if (typeof value === 'object') {
         if (!helpers.areEqual(value, this.value[key])) keys.push(key);
-        continue;
+        return;
       }
 
       if (value !== this.value[key]) keys.push(key);
-    }
+    });
     return keys;
   }
 
   async applyAnimationSetting() {
     let value = this.value.animation;
     if (value === 'system') {
-      value = await new Promise((resolve, reject) => {
+      const res = await new Promise((resolve, reject) => {
         system.getGlobalSetting("animator_duration_scale", resolve, reject);
       });
+      if (res) value = 'yes';
+      else value = 'no';
     }
 
-    if (value) {
+    if (value === 'yes') {
       app.classList.remove('no-animation');
-    } else {
+    } else if (value === 'no') {
       app.classList.add('no-animation');
     }
   }

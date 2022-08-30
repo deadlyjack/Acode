@@ -421,7 +421,7 @@ async function loadApp() {
   function handleMenu(e) {
     const $target = e.target;
     const action = $target.getAttribute('action');
-    const value = $target.getAttribute('value');
+    const value = $target.getAttribute('value') || undefined;
     if (!action) return;
 
     if ($mainMenu.contains($target)) $mainMenu.hide();

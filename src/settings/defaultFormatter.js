@@ -8,16 +8,22 @@ export default function defaultFormatter(languageName) {
 
   const items = modes.map((mode) => {
     const { name, caption } = mode;
-    const formatter = values.formatter[name];
-    const value = formatters.find((f) => f.id === formatter)?.name || strings.none;
+    const formatterID = values.formatter[name] || null;
     const extensions = mode.extensions.split('|');
     const options = acode.getFormatterFor(extensions);
+
 
     return {
       key: name,
       text: caption,
-      value,
-      valueText: (value) => formatters.find(({ id }) => id === value)?.name || strings.none,
+      value: formatterID,
+      valueText: (value) => {
+        const formatter = formatters.find(({ id }) => id === value);
+        if (formatter) {
+          return formatter.name;
+        }
+        return strings.none
+      },
       select: options
     };
   });

@@ -30,10 +30,11 @@ export default function otherSettings() {
       key: 'animation',
       text: strings.animation,
       value: values.animation,
+      valueText: (value) => strings[value],
       select: [
-        [true, strings['animation true']],
-        [false, strings['animation false']],
-        ['system', strings['animation system']],
+        ['no', strings.no],
+        ['yes', strings.yes],
+        ['system', strings.system],
       ],
     },
     {

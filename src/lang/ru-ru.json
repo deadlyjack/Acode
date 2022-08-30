@@ -260,7 +260,6 @@
   "unable to load files": "Не удалось загрузить файлы",
   "preview port": "Порт сервера для предпросмотра",
   "find file": "Поиск",
-  "animation true": "Да",
-  "animation false": "Нет",
-  "animation system": "Как в системе"
+  "system": "Как в системе",
+  "please select a formatter": "Please select a formatter"
 }
