@@ -188,6 +188,7 @@ export default function ScrollBar(options) {
   }
 
   function show() {
+    $scrollbar.dataset.state = false;
     clearTimeout(scrollbarTimeoutHide);
     clearTimeout(scrollbarTimeoutRemove);
     $scrollbar.classList.remove('hide');
@@ -198,6 +199,7 @@ export default function ScrollBar(options) {
   }
 
   function hide() {
+    $scrollbar.dataset.hidden = true;
     $scrollbar.classList.add('hide');
     scrollbarTimeoutRemove = setTimeout(() => $scrollbar.remove(), 300);
     if (typeof onhide === 'function') onhide();
@@ -231,6 +233,12 @@ export default function ScrollBar(options) {
 
   Object.defineProperty($scrollbar, 'hide', {
     value: hide,
+  });
+
+  Object.defineProperty($scrollbar, 'visible', {
+    get() {
+      return this.dataset.hidden !== 'true';
+    }
   });
 
   Object.defineProperty($scrollbar, 'onshow', {

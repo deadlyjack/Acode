@@ -1,9 +1,15 @@
 import tag from 'html-tag-js';
 import mustache from 'mustache';
-import $_search from '../views/footer/search.hbs';
+import $_searchRow1 from '../views/footer/searchRow1.hbs';
+import $_searchRow2 from '../views/footer/searchRow2.hbs';
 import $_row1 from '../views/footer/row1.hbs';
 import $_row2 from '../views/footer/row2.hbs';
 import searchSettings from '../settings/searchSettings';
+
+const $row1 = tag.parse($_row1);
+const $row2 = tag.parse($_row2);
+let $searchRow1;
+let $searchRow2;
 
 /**
  * Performs quick actions
@@ -12,17 +18,23 @@ import searchSettings from '../settings/searchSettings';
  */
 function actions(action, value) {
   const { editor, activeFile } = editorManager;
-  const search = mustache.render($_search, strings);
   const $footer = root.get('#quick-tools');
-  const $row2 = $footer.querySelector('#row2');
-  const $searchRow1 = $footer.querySelector('#search_row1');
-  const $searchRow2 = $footer.querySelector('#search_row2');
-  const $shiftKey = $footer.querySelector('#shift-key');
+  const $shiftKey = $footer.get('#shift-key');
   const $textarea = editor.textInput.getElement();
-  let $searchInput = $footer.querySelector('#searchInput');
-  let $replaceInput = $footer.querySelector('#replaceInput');
+  let $searchInput = $footer.get('#searchInput');
+  let $replaceInput = $footer.get('#replaceInput');
   let selectedText = editor.getCopyText();
   let state;
+
+  if (!$searchRow1) {
+    $searchRow1 = tag.parse(
+      mustache.render($_searchRow1, strings),
+    );
+
+    $searchRow2 = tag.parse(
+      mustache.render($_searchRow2, strings),
+    );
+  }
 
   if (selectedText.length > 50) selectedText = '';
 
@@ -72,7 +84,7 @@ function actions(action, value) {
       break;
 
     case 'search':
-      initSearch();
+      toggleSearch();
       break;
 
     case 'save':
@@ -80,17 +92,17 @@ function actions(action, value) {
       break;
 
     case 'more':
-      if (!$row2) {
-        if ($searchRow1) {
-          removeSearchRow2();
+      if (!$row2.isConnected) {
+        if ($searchRow1.isConnected) {
+          removeSearch();
         }
         moreIconDown();
-        $footer.appendChild(tag.parse($_row2));
+        $footer.appendChild($row2);
         incFooterHeightBy(1);
       } else {
         removeRow2();
       }
-      resizeEditor();
+      editor.resize(true);
       break;
 
     case 'moveline-up':
@@ -143,12 +155,12 @@ function actions(action, value) {
       break;
   }
 
-  function initSearch() {
-    if (!$searchRow1) {
-      if ($row2) {
+  function toggleSearch() {
+    if (!$searchRow1.isConnected) {
+      if ($row2.isConnected) {
         removeRow2();
       }
-      $footer.append(...tag.parse(search));
+      $footer.append($searchRow1, $searchRow2);
       if (!$searchInput) $searchInput = $footer.querySelector('#searchInput');
       $searchInput.value = selectedText || '';
       if (!selectedText) $searchInput.focus();
@@ -165,9 +177,9 @@ function actions(action, value) {
         },
       });
     } else {
-      removeSearchRow2();
+      removeSearch();
     }
-    resizeEditor();
+    editor.resize(true);
   }
 
   function toggleQuickTools() {
@@ -183,18 +195,13 @@ function actions(action, value) {
 
   function enableQuickTools() {
     if (root.hasAttribute('quicktools')) return; //Quicktools is already enabled
-
     let quickToolsState = parseInt(localStorage.quickToolsState) || 1;
-    const $row1 = tag.parse($_row1);
-    const $row2 = tag.parse($_row2);
-
-    if (quickToolsState > 2) quickToolsState = 1;
-
-    if (quickToolsState == 2) {
+    if (quickToolsState === 1) {
+      $footer.append($row1);
+    } else {
+      quickToolsState = 2;
       $footer.append($row1, $row2);
       moreIconDown();
-    } else {
-      $footer.append($row1);
     }
 
     if (localStorage.quickToolRow1ScrollLeft) {
@@ -210,27 +217,28 @@ function actions(action, value) {
     if (editorManager.activeFile && editorManager.activeFile.isUnsaved) {
       $row1.querySelector("[action='save']").classList.add('notice');
     }
-    resizeEditor();
+    editor.resize(true);
   }
 
   function disableQuickTools() {
     const height = root.getAttribute('footer-height');
-    let $row1 = $footer.querySelector('#row1');
-    let $row2 = $footer.querySelector('#row2');
     localStorage.quickToolsState = height;
-    if ($row1) {
+    if ($row1.isConnected) {
       localStorage.quickToolRow1ScrollLeft = $row1.scrollLeft;
       $row1.remove();
       incFooterHeightBy(-1);
     }
-    if ($row2) {
+    if ($row2.isConnected) {
       localStorage.quickToolRow2ScrollLeft = $row2.scrollLeft;
       $row2.remove();
       incFooterHeightBy(-1);
     }
+    if ($searchRow1.isConnected) {
+      removeSearch();
+    }
 
     root.removeAttribute('quicktools');
-    resizeEditor();
+    editor.resize(true);
   }
 
   function removeRow2() {
@@ -250,17 +258,16 @@ function actions(action, value) {
       .classList.replace('arrow_drop_up', 'arrow_drop_down');
   }
 
-  function resizeEditor() {
-    editor.resize(true);
-    editorManager.scroll.$vScrollbar.resize(false);
-  }
-
-  function removeSearchRow2() {
+  function removeSearch() {
     actionStack.remove('search-bar');
     $footer.removeAttribute('data-searching');
     $footer.removeChild($searchRow1);
     $footer.removeChild($searchRow2);
     incFooterHeightBy(-2);
+    const { editor, activeFile } = editorManager;
+    if (activeFile.focused) {
+      editor.focus();
+    }
   }
 
   function find(skip, backward) {

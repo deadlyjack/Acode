@@ -239,7 +239,13 @@ export default function addTouchListeners(editor) {
     }
 
     if (mode === 'cursor') {
-      moveCursorTo(clientX, clientY);
+      const $footer = root.get('#quick-tools');
+      const $shiftKey = $footer.get('#shift-key');
+      const shiftKey = $shiftKey?.dataset.state === 'on';
+      moveCursorTo(clientX, clientY, shiftKey);
+      if (shiftKey) {
+        selectionMode($end);
+      }
       cursorMode();
       return;
     }
@@ -365,10 +371,21 @@ export default function addTouchListeners(editor) {
     document.removeEventListener('touchend', touchEnd, config);
   }
 
-  function moveCursorTo(x, y) {
+  function moveCursorTo(x, y, shiftKey = false) {
     const pos = renderer.screenToTextCoordinates(x, y);
     editor.blur();
-    editor.selection.moveToPosition(pos);
+    if (shiftKey) {
+      let anchor = editor.selection.getSelectionAnchor();
+      if (!anchor) {
+        anchor = editor.getCursorPosition();
+      }
+      editor.selection.setRange({
+        start: anchor,
+        end: pos,
+      });
+    } else {
+      editor.selection.moveToPosition(pos);
+    }
     editor.focus();
   }
 

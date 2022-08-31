@@ -642,8 +642,11 @@ export default {
 
     for (let i = 0; i < storageListLen; ++i) {
       const uuid = storageList[i];
-      const storageUrl = Url.parse(uuid.uri || uuid.url || '').url;
+      let storageUrl = Url.parse(uuid.uri || uuid.url || '').url;
       if (!storageUrl) continue;
+      if (storageUrl.endsWith('/')) {
+        storageUrl = storageUrl.slice(0, -1);
+      }
       const regex = new RegExp('^' + storageUrl);
       if (regex.test(url)) {
         url = url.replace(regex, uuid.name);

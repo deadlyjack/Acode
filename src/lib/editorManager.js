@@ -70,10 +70,6 @@ async function EditorManager($sidebar, $header, $body) {
     header: $header,
     sidebar: $sidebar,
     container: $container,
-    scroll: {
-      $vScrollbar,
-      $hScrollbar,
-    },
     get TIMEOUT_VALUE() {
       return TIMEOUT_VALUE;
     },
@@ -100,16 +96,6 @@ async function EditorManager($sidebar, $header, $body) {
 
   $hScrollbar.onshow = $vScrollbar.onshow = updateFloatingButton.bind({}, false);
   $hScrollbar.onhide = $vScrollbar.onhide = updateFloatingButton.bind({}, true);
-
-  window.addEventListener('resize', () => {
-    const screenHeight = screen.height - heightOffset;
-    const ratio = Math.round((screenHeight / innerHeight) * 10) / 10;
-    if (ratio === 1) {
-      editor.blur();
-      manager.activeFile.focused = false;
-    }
-    editor.renderer.scrollCursorIntoView();
-  });
 
   editor.on('focus', () => {
     manager.activeFile.focused = true;
@@ -144,6 +130,21 @@ async function EditorManager($sidebar, $header, $body) {
 
   editor.on('scrolltop', onscrolltop);
   editor.on('scrollleft', onscrollleft);
+
+  editor.renderer.on('resize', () => {
+    $vScrollbar.resize($vScrollbar.visible);
+    $hScrollbar.resize($hScrollbar.visible);
+  });
+
+  window.addEventListener('resize', () => {
+    const screenHeight = screen.height - heightOffset;
+    const ratio = Math.round((screenHeight / innerHeight) * 10) / 10;
+    if (ratio === 1) {
+      editor.blur();
+      manager.activeFile.focused = false;
+    }
+    editor.renderer.scrollCursorIntoView();
+  });
 
   appSettings.on('update:textWrap', function (value) {
     if (!value) {
@@ -383,7 +384,7 @@ async function EditorManager($sidebar, $header, $body) {
   }
 
   function switchFile(id) {
-    const file = editorManager.getFile(id);
+    const file = manager.getFile(id);
 
     manager.activeFile?.tab.classList.remove('active');
     manager.activeFile = file;

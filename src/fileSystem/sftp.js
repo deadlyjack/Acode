@@ -79,9 +79,9 @@ class SFTP {
 
   /**
    * List directory or get file info
-   * @param {boolean} isFile
+   * @param {boolean} stat
    */
-  lsDir(isFile) {
+  lsDir(stat) {
     if (!this.#path) {
       throw new Error('Path is not set');
     }
@@ -97,13 +97,15 @@ class SFTP {
             }
           }
 
+          const path = this.#safeName(this.#path);
+          let options = '-gaAG';
+          if (stat) options += 'd';
+
           sftp.exec(
-            `ls -gaAG --full-time "${this.#safeName(
-              this.#path,
-            )}" | awk '{$2=\"\"; print $0}'`,
+            `ls ${options} --full-time "${path}" | awk '{$2=\"\"; print $0}'`,
             (res) => {
               if (res.code <= 0) {
-                if (isFile) {
+                if (stat) {
                   resolve(this.#parseFile(res.result, Url.dirname(this.#path)));
                   return;
                 }
@@ -140,15 +142,15 @@ class SFTP {
               return;
             }
           }
-          const cmd = `[[ -f "${this.#safeName(
-            filename,
-          )}" ]] && echo "Already exists" || touch "${filename}"`;
+
+          const file = this.#safeName(filename);
+          const cmd = `[[ -f "${file}" ]] && echo "Already exists" || touch "${filename}"`;
           sftp.exec(
             cmd,
             (res) => {
               if (res.code <= 0) {
                 if (content) {
-                  this.writeFile(filename, content)
+                  this.writeFile(content, filename)
                     .then(() => resolve(fullFilename))
                     .catch(reject);
                   return;
@@ -210,8 +212,8 @@ class SFTP {
    * Write to a file on server
    * @param {String} content
    */
-  writeFile(content) {
-    const filename = this.#path;
+  writeFile(content, remotefile) {
+    const filename = remotefile || this.#path;
     const localFilename = this.#getLocalname(filename);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
@@ -222,16 +224,8 @@ class SFTP {
             }
 
             await internalFs.writeFile(localFilename, content, true, false);
-            sftp.putFile(
-              this.#safeName(filename),
-              localFilename,
-              (res) => {
-                resolve(res);
-              },
-              (err) => {
-                reject(err);
-              },
-            );
+            const remoteFile = this.#safeName(filename);
+            sftp.putFile(remoteFile, localFilename, resolve, reject);
           } catch (err) {
             reject(err);
           }

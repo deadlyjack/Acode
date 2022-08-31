@@ -50,7 +50,6 @@ export default {
   'enable-fullscreen'() {
     app.classList.add('fullscreen-mode');
     this['resize-editor']();
-    editorManager.scroll.$vScrollbar.resize();
   },
   async 'encoding'() {
     const encoding = await TextEncodings();
@@ -222,7 +221,6 @@ export default {
   },
   'toggle-quick-tools'() {
     quickTools.actions('toggle-quick-tools');
-    editorManager.scroll.$vScrollbar.resize();
   },
   'toggle-fullscreen'() {
     app.classList.toggle('fullscreen-mode');

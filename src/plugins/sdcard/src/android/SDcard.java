@@ -701,7 +701,7 @@ public class SDcard extends CordovaPlugin {
                   null,
                   null
                 );
-            } catch (Error e) {
+            } catch (SecurityException | Error e) {
               callback.error("Cannot read directory.");
               return;
             }

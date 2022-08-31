@@ -341,7 +341,7 @@ async function loadApp() {
   editorManager.on('file-loaded', onFileUpdate);
   $fileMenu.addEventListener('click', handleMenu);
   $mainMenu.addEventListener('click', handleMenu);
-  $footer.addEventListener('touchstart', footerTouchStart);
+  $footer.addEventListener('click', footerOnClick);
   $footer.addEventListener('contextmenu', footerOnContextMenu);
   document.addEventListener('backbutton', actionStack.pop);
   document.addEventListener('menubutton', $sidebar.toggle);
@@ -429,8 +429,8 @@ async function loadApp() {
     acode.exec(action, value);
   }
 
-  function footerTouchStart(e) {
-    arrowkeys.onTouchStart(e, $footer);
+  function footerOnClick(e) {
+    arrowkeys.onClick(e, $footer);
   }
 
   /**
@@ -438,13 +438,15 @@ async function loadApp() {
    * @param {MouseEvent} e
    */
   function footerOnContextMenu(e) {
-    if (
-      e.target instanceof HTMLInputElement ||
-      e.target instanceof HTMLTextAreaElement
-    )
-      return;
-    e.preventDefault();
-    editorManager.editor.focus();
+    arrowkeys.oncontextmenu(e, $footer);
+    // if (
+    //   e.target instanceof HTMLInputElement ||
+    //   e.target instanceof HTMLTextAreaElement
+    // ) {
+    //   return;
+    // }
+    // e.preventDefault();
+    // editorManager.editor.focus();
   }
 
   function onEditorUpdate(mode, saveState = true) {

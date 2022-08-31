@@ -287,10 +287,6 @@ a.icon {
     color: #e34f26;
   }
 
-  &:focus {
-    border: rgba(0, 0, 0, 0.1);
-  }
-
   &.disabled {
     opacity: 0.6;
     pointer-events: none;
@@ -300,9 +296,14 @@ a.icon {
     opacity: 0.6;
   }
 
+  &:focus {
+    border: rgba(0, 0, 0, 0.1);
+  }
+
   &:not(.floating):active {
     transition: all 100ms ease;
     background-color: rgba(0, 0, 0, 0.2) !important;
+    background-color: var(--active-icon-color) !important;
   }
 
   &.active {

@@ -1,4 +1,3 @@
-import ajax from '@deadlyjack/ajax';
 import dialogs from '../components/dialogs';
 
 export default {

@@ -129,6 +129,6 @@ export default function CustomThemeInclude() {
 
     setTimeout(() => {
       restoreTheme();
-    }, 0);
+    }, 1000);
   }
 }
