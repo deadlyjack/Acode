@@ -246,6 +246,13 @@ async function loadApp() {
     transformOrigin: 'top right',
     innerHTML: () => {
       const file = editorManager.activeFile;
+
+      if (file.loading) {
+        $fileMenu.classList.add('disabled');
+      } else {
+        $fileMenu.classList.remove('disabled');
+      }
+
       return mustache.render(
         $_fileMenu,
         Object.assign(strings, {

@@ -172,14 +172,15 @@ export default class EditorFile {
         className: 'icon cancel',
         dataset: {
           action: 'close-file'
-        }
-      })
+        },
+      }),
     });
+
+    const editable = options?.editable ?? true;
 
     this.#SAFMode = options?.SAFMode;
     this.isUnsaved = options?.isUnsaved ?? false;
     this.encoding = options?.encoding ?? 'utf-8';
-    this.editable = options?.editable ?? true;
     // if options contains text property then there is no need to load
     // set loaded true i.e. text is no undefi
 
@@ -194,7 +195,10 @@ export default class EditorFile {
         scrollLeft: options?.scrollLeft,
         scrollTop: options?.scrollTop,
         folds: options?.folds,
-      }
+        editable,
+      };
+    } else {
+      this.editable = editable;
     }
 
     this.#tab.onclick = (e) => {
@@ -630,7 +634,13 @@ export default class EditorFile {
   }
 
   async #loadText() {
-    const { cursorPos, scrollLeft, scrollTop, folds } = this.#loadOptions;
+    const {
+      cursorPos,
+      scrollLeft,
+      scrollTop,
+      folds,
+      editable,
+    } = this.#loadOptions;
     const { editor } = editorManager;
     let value;
 
@@ -679,6 +689,7 @@ export default class EditorFile {
         if (cursorPos) this.session.selection.moveCursorTo(cursorPos.row, cursorPos.column);
         if (scrollTop) this.session.setScrollTop(scrollTop);
         if (scrollLeft) this.session.setScrollLeft(scrollLeft);
+        if (editable !== undefined) this.editable = editable;
 
         if (Array.isArray(folds)) {
           const parsedFolds = EditorFile.#parseFolds(folds);
