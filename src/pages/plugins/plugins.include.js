@@ -96,7 +96,7 @@ export default function PluginsInclude(updates) {
     const $target = event.target;
     const action = $target.getAttribute('action');
     if (action === 'search') {
-      searchBar($page.get('#plugins'));
+      searchBar($page.get('#plugin-list'));
       return;
     }
     if (action === 'open') {
