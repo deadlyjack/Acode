@@ -107,6 +107,7 @@ export default function addTouchListeners(editor) {
   let lockY; // lock y for prevent scrolling in vertical direction
   let mode; // cursor, selection or scroll
   let clickCount = 0; // number of clicks
+  let lastClickPos = null;
 
   const timeToSelectText = 500; // ms
   const config = {
@@ -154,7 +155,9 @@ export default function addTouchListeners(editor) {
       e.preventDefault();
     }
 
-    e.target.ontouchstart = preventDefault;
+    if (clickCount) {
+      e.target.ontouchstart = preventDefault;
+    }
     e.target.oncontextmenu = preventDefault;
 
     selectionTimeout = setTimeout(() => {
@@ -166,6 +169,7 @@ export default function addTouchListeners(editor) {
 
     setTimeout(() => {
       clickCount = 0;
+      lastClickPos = null;
     }, timeToSelectText);
 
     document.addEventListener('touchmove', touchMove, config);
@@ -231,8 +235,37 @@ export default function addTouchListeners(editor) {
     clearTimeout(selectionTimeout);
 
     if (mode === 'wait') {
-      if (++clickCount >= 2) {
+      if (lastClickPos) {
+        const {
+          clientX: clickXThen,
+          clientY: clickYThen,
+        } = lastClickPos;
+        const {
+          row: rowNow,
+          column: columnNow,
+        } = renderer.screenToTextCoordinates(clientX, clientY);
+        const {
+          row: rowThen,
+          column: columnThen,
+        } = renderer.screenToTextCoordinates(clickXThen, clickYThen);
+
+        const rowDiff = Math.abs(rowNow - rowThen);
+        const columnDiff = Math.abs(columnNow - columnThen);
+
+        console.log({ rowDiff, columnDiff });
+        if (!rowDiff && columnDiff <= 2) {
+          clickCount += 1;
+        }
+      } else {
+        clickCount = 1;
+      }
+
+      lastClickPos = { clientX, clientY };
+
+      if (clickCount === 2) {
         mode = 'selection';
+      } else if (clickCount >= 3) {
+        mode = 'select-line';
       } else {
         mode = 'cursor';
       }
@@ -261,6 +294,13 @@ export default function addTouchListeners(editor) {
       moveCursorTo(clientX, clientY);
       select();
       return;
+    }
+
+    if (mode === 'select-line') {
+      e.preventDefault();
+      moveCursorTo(clientX, clientY);
+      editor.selection.selectLine();
+      selectionMode($end);
     }
   };
 

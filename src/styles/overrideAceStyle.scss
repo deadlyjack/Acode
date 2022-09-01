@@ -12,6 +12,15 @@
   }
 }
 
+.ace_tooltip {
+  background-color: rgb(255, 255, 255);
+  background-color: var(--secondary-color);
+  color: rgb(37, 37, 37);
+  color: var(--secondary-text-color);
+  max-width: 68%;
+  white-space: pre-wrap;
+}
+
 main .ace_editor {
   textarea {
     user-select: none !important;
