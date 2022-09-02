@@ -261,5 +261,8 @@
   "preview port": "Порт сервера для предпросмотра",
   "find file": "Поиск",
   "system": "Как в системе",
-  "please select a formatter": "Please select a formatter"
+  "please select a formatter": "Please select a formatter",
+  "case sensitive": "Case sensitive",
+  "regular expression": "Regular expression",
+  "whole word": "Whole word"
 }

@@ -95,7 +95,6 @@ export default function addTouchListeners(editor) {
   });
 
   let scrollTimeout; // timeout to check if scrolling is finished
-  let selectionTimeout; // timeout for context menu
   let menuActive; // true if menu is active
   let selectionActive; // true if selection is active
   let animation; // animation frame id
@@ -115,6 +114,7 @@ export default function addTouchListeners(editor) {
   };
 
   scroller.addEventListener('touchstart', touchStart, config);
+  scroller.addEventListener('contextmenu', contextmenu, config);
   editor.on('change', onupdate);
   editor.on('fold', onfold);
   editor.on('scroll', onscroll);
@@ -151,21 +151,6 @@ export default function addTouchListeners(editor) {
     lockX = false;
     lockY = false;
     mode = 'wait';
-    const preventDefault = (e) => {
-      e.preventDefault();
-    }
-
-    if (clickCount) {
-      e.target.ontouchstart = preventDefault;
-    }
-    e.target.oncontextmenu = preventDefault;
-
-    selectionTimeout = setTimeout(() => {
-      e.preventDefault();
-      moveCursorTo(clientX, clientY);
-      select();
-      removeListeners();
-    }, timeToSelectText);
 
     setTimeout(() => {
       clickCount = 0;
@@ -220,7 +205,6 @@ export default function addTouchListeners(editor) {
       [moveX, moveY] = testScroll(moveX, moveY);
       mode = 'scroll';
       scroll(moveX, moveY);
-      clearTimeout(selectionTimeout);
     }
   }
 
@@ -232,7 +216,6 @@ export default function addTouchListeners(editor) {
     removeListeners();
 
     const { clientX, clientY } = e.changedTouches[0];
-    clearTimeout(selectionTimeout);
 
     if (mode === 'wait') {
       if (lastClickPos) {
@@ -293,6 +276,7 @@ export default function addTouchListeners(editor) {
       e.preventDefault();
       moveCursorTo(clientX, clientY);
       select();
+      vibrate();
       return;
     }
 
@@ -301,8 +285,27 @@ export default function addTouchListeners(editor) {
       moveCursorTo(clientX, clientY);
       editor.selection.selectLine();
       selectionMode($end);
+      vibrate();
     }
   };
+
+  function vibrate() {
+    if (appSettings.value.vibrateOnTap) {
+      navigator.vibrate(constants.VIBRATION_TIME);
+    }
+  }
+
+  /**
+   * 
+   * @param {MouseEvent} e 
+   */
+  function contextmenu(e) {
+    e.preventDefault();
+    const { clientX, clientY } = e;
+    moveCursorTo(clientX, clientY);
+    select();
+    selectionMode($end);
+  }
 
   function select() {
     removeListeners();
@@ -312,10 +315,6 @@ export default function addTouchListeners(editor) {
     editor.selection.setSelectionRange(range);
     editor.focus();
     selectionMode($end);
-
-    if (appSettings.value.vibrateOnTap) {
-      navigator.vibrate(constants.VIBRATION_TIME);
-    }
   }
 
   function scrollAnimation(moveX, moveY) {

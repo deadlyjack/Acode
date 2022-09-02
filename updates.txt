@@ -1,4 +1,4 @@
-version 1.6.0 beta
+version 1.6.0 226
 ☞ Updated custom theme settings
 ☞ Option to add plugin source
 ☞ Set custom port for preview in app settings

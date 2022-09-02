@@ -262,5 +262,8 @@
   "preview port": "Preview port",
   "find file": "Find file",
   "system": "System",
-  "please select a formatter": "Please select a formatter"
+  "please select a formatter": "Please select a formatter",
+  "case sensitive": "Case sensitive",
+  "regular expression": "Regular expression",
+  "whole word": "Whole word"
 }

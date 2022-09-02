@@ -5,18 +5,18 @@ export default function searchSettings() {
   const values = appSettings.value.search;
   const items = [
     {
-      key: 'case sensitive',
-      text: 'Case sensitive',
+      key: 'caseSensitive',
+      text: strings['case sensitive'],
       checkbox: values.caseSensitive,
     },
     {
-      key: 'regexp',
-      text: 'RegExp',
+      key: 'regExp',
+      text: strings['regular expression'],
       checkbox: values.regExp,
     },
     {
       key: 'wholeWord',
-      text: 'Whole word',
+      text: strings['whole word'],
       checkbox: values.wholeWord,
     },
   ];
