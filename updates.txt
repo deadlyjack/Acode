@@ -1,6 +1,6 @@
-version 1.6.0 226
+version 1.6.0
+☞ Supports plugin
 ☞ Updated custom theme settings
-☞ Option to add plugin source
 ☞ Set custom port for preview in app settings
 ☞ New option find file
 ☞ Stability improvement
@@ -10,18 +10,6 @@ version 1.6.0 226
 ☞ Fixed loading files using FTP/SFTP
 ☞ Fixed File checking
 ☞ Fixed settings
-
-version 1.6.0
-☞ Supports plugin
-☞ The console can log HTML code
-☞ Updated FTP library.
-☞ Updated SFTP functionality.
-☞ Separated all hardcoded modifications in the ace editor.
-☞ Improved clipboard actions.
-☞ Updated Ace editor.
-☞ Added horizontal padding.
-☞ Changed syntax highlighting is saved.
-☞ Fixed many keyboard bugs.
 ☞ Various fixes.
 
 version 1.5.5

@@ -68,8 +68,8 @@ public class SDcard extends CordovaPlugin {
 
   public boolean execute(
     String action,
-    final JSONArray args,
-    final CallbackContext callbackContext
+    JSONArray args,
+    CallbackContext callback
   )
     throws JSONException {
     String arg1 = null, arg2 = null, arg3 = null, arg4 = null;
@@ -83,49 +83,49 @@ public class SDcard extends CordovaPlugin {
 
     switch (action) {
       case "create directory":
-        createDir(arg1, arg2, callbackContext);
+        createDir(arg1, arg2, callback);
         break;
       case "create file":
-        createFile(arg1, arg2, callbackContext);
+        createFile(arg1, arg2, callback);
         break;
       case "open document file":
-        openDocumentFile(arg1, callbackContext);
+        openDocumentFile(arg1, callback);
         break;
       case "get image":
-        getImage(arg1, callbackContext);
+        getImage(arg1, callback);
         break;
       case "list volumes":
-        getStorageVolumes(callbackContext);
+        getStorageVolumes(callback);
         break;
       case "storage permission":
-        getStorageAccess(arg1, callbackContext);
+        getStorageAccess(arg1, callback);
         break;
       case "read":
-        readFile(arg1, callbackContext);
+        readFile(arg1, callback);
         break;
       case "write":
-        writeFile(formatUri(arg1), arg2, args.getBoolean(2), callbackContext);
+        writeFile(formatUri(arg1), arg2, args.getBoolean(2), callback);
         break;
       case "rename":
-        rename(arg1, arg2, callbackContext);
+        rename(arg1, arg2, callback);
         break;
       case "delete":
-        delete(formatUri(arg1), callbackContext);
+        delete(formatUri(arg1), callback);
         break;
       case "copy":
-        copy(arg1, arg2, callbackContext);
+        copy(arg1, arg2, callback);
         break;
       case "move":
-        move(arg1, arg2, callbackContext);
+        move(arg1, arg2, callback);
         break;
       case "getpath":
-        getPath(formatUri(arg1), arg2, callbackContext);
+        getPath(formatUri(arg1), arg2, callback);
         break;
       case "exists":
-        exists(formatUri(arg1), callbackContext);
+        exists(formatUri(arg1), callback);
         break;
       case "format uri":
-        callbackContext.success(formatUri(arg1));
+        callback.success(formatUri(arg1));
         break;
       case "list directory":
         if (arg1.contains(SAPERATOR)) {
@@ -134,11 +134,11 @@ public class SDcard extends CordovaPlugin {
           arg2 = splittedStr[1];
         }
 
-        listDir(arg1, arg2, callbackContext);
+        listDir(arg1, arg2, callback);
 
         break;
       case "stats":
-        getStats(arg1, callbackContext);
+        getStats(arg1, callback);
         break;
       default:
         return false;
@@ -161,16 +161,13 @@ public class SDcard extends CordovaPlugin {
     }
   }
 
-  public void openDocumentFile(
-    String mimeType,
-    CallbackContext callbackContext
-  ) {
+  public void openDocumentFile(String mimeType, CallbackContext callback) {
     Intent intent = new Intent();
     if (mimeType == null) mimeType = "*/*";
     intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
     intent.addCategory(Intent.CATEGORY_OPENABLE);
     intent.setType(mimeType);
-    activityResultCallback = callbackContext;
+    activityResultCallback = callback;
     cordova.startActivityForResult(this, intent, this.OPEN_DOCUMENT);
   }
 
@@ -229,7 +226,6 @@ public class SDcard extends CordovaPlugin {
 
   public void getStorageAccess(String SDCardUUID, CallbackContext callback) {
     Intent intent = null;
-    activityResultCallback = callback;
 
     if (SDK_INT >= 24) {
       StorageVolume sdCard = null;
@@ -255,6 +251,7 @@ public class SDcard extends CordovaPlugin {
       intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
     }
 
+    activityResultCallback = callback;
     cordova.startActivityForResult(this, intent, REQUEST_CODE);
   }
 
@@ -316,8 +313,8 @@ public class SDcard extends CordovaPlugin {
             );
           }
         }
-      } catch (Exception e) {
-        activityResultCallback.error(e.toString());
+      } catch (Exception error) {
+        activityResultCallback.error(error.toString());
       }
 
       return;
@@ -372,6 +369,10 @@ public class SDcard extends CordovaPlugin {
           public void run() {
             try {
               DocumentFile file = getFile(filename);
+              if (file == null) {
+                callback.error("File not fount.");
+                return;
+              }
               if (canWrite(file.getUri())) {
                 OutputStream op = context
                   .getContentResolver()

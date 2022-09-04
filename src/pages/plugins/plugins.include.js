@@ -11,6 +11,7 @@ import Url from "../../utils/Url";
 import plugin from "../plugin/plugin";
 import dialogs from "../../components/dialogs";
 import constants from "../../lib/constants";
+import alert from "../../components/dialogboxes/alert";
 
 /**
  * 
@@ -31,7 +32,7 @@ export default function PluginsInclude(updates) {
     dataset: {
       action: 'add-source'
     },
-    onclick: addSource,
+    onclick: () => addSource(),
   })
   const plugins = {
     all: [],
@@ -192,13 +193,14 @@ export default function PluginsInclude(updates) {
     return Url.join(PLUGIN_DIR, id, name);
   }
 
-  async function addSource() {
-    const source = await dialogs.prompt('Enter plugin source', 'https://', 'url');
+  async function addSource(value = 'https://') {
+    const source = await dialogs.prompt('Enter plugin source', value, 'url');
     const json = Url.join(source, 'plugin.json');
     try {
       helpers.showTitleLoader();
       const data = await ajax.get(json, {
-        responseType: 'json'
+        responseType: 'json',
+        contentType: 'application/x-www-form-urlencoded',
       });
 
       if (data) {
@@ -209,7 +211,8 @@ export default function PluginsInclude(updates) {
         }, onIninstall, onUninstall);
       }
     } catch (error) {
-      helpers.error(error);
+      const message = helpers.errorMessage(error);
+      alert(strings.error, message || 'Unable to add source.', () => addSource(source));
     } finally {
       helpers.removeTitleLoader();
     }
