@@ -21,7 +21,6 @@ import android.os.PowerManager;
 import android.provider.Settings.Global;
 import android.view.View;
 import android.view.Window;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import androidx.core.content.FileProvider;
 import androidx.core.content.pm.ShortcutInfoCompat;
@@ -61,14 +60,6 @@ public class System extends CordovaPlugin {
     this.context = cordova.getContext();
     this.activity = cordova.getActivity();
     this.webView = webView;
-
-    if (Build.VERSION.SDK_INT < 18) {
-      //speed webview
-      webView
-        .getView()
-        .getSettings()
-        .setRenderPriority(WebSettings.RenderPriority.HIGH);
-    }
   }
 
   public boolean execute(

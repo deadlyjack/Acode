@@ -198,14 +198,17 @@ export default {
 
   stats(filename) {
     return new Promise((resolve, reject) => {
-      sdcard.stats(
-        filename,
-        (stats) => {
-          stats.uri = filename;
-          resolve(stats);
-        },
-        reject,
-      );
+      window.resolveLocalFileSystemURL(filename, (entry) => {
+        filename = entry.nativeURL;
+        sdcard.stats(
+          filename,
+          (stats) => {
+            stats.uri = filename;
+            resolve(stats);
+          },
+          reject,
+        );
+      }, reject);
     });
   },
 
