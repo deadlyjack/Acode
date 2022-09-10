@@ -1,1 +1,1 @@
-{"plugins":["cordova-clipboard","cordova-plugin-vibration","cordova-plugin-buildinfo","cordova-plugin-device","cordova-plugin-iap","cordova-plugin-sftp","cordova-plugin-server","cordova-plugin-file","cordova-plugin-ftp","cordova-plugin-system","cordova-plugin-sdcard","admob-plus-cordova"]}
+{"plugins":["cordova-clipboard","cordova-plugin-vibration","cordova-plugin-buildinfo","cordova-plugin-device","cordova-plugin-iap","cordova-plugin-sftp","cordova-plugin-server","cordova-plugin-file","cordova-plugin-ftp","cordova-plugin-sdcard","cordova-plugin-system"]}

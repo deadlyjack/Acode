@@ -1,4 +1,5 @@
 import tag from "html-tag-js";
+import mimeTypes from 'mime-types';
 import dialogs from "../components/dialogs";
 import tile from "../components/tile";
 import fsOperation from "../fileSystem/fsOperation";
@@ -606,6 +607,50 @@ export default class EditorFile {
     }
   }
 
+  openWith() {
+    this.#fileAction('VIEW');
+  }
+
+  editWith() {
+    this.#fileAction('EDIT', 'text/plain');
+  }
+
+  share() {
+    this.#fileAction('SEND');
+  }
+
+  run() {
+    this.#fileAction('RUN');
+  }
+
+  /**
+   * 
+   * @param {FileAction} action 
+   */
+  async #fileAction(action, mimeType) {
+    try {
+      const uri = await this.#getShareableUri();
+      if (!mimeType) mimeType = mimeTypes.lookup(this.name);
+      system.fileAction(uri, this.filename, action, mimeType, this.#showNoAppError);
+    } catch (error) {
+      toast(strings.error);
+    }
+  }
+
+  async #getShareableUri() {
+    if (this.type !== 'regular') {
+      return this.cahceFile;
+    }
+    if (!this.uri) return;
+
+    const fs = fsOperation(this.uri);
+
+    if (/^s?ftp:/.test(this.uri)) return fs.localName;
+
+    const { uri } = await fs.stat();
+    return uri;
+  }
+
   /**
    * Rename cache file.
    * @param {String} newId
@@ -788,5 +833,9 @@ export default class EditorFile {
     this.#tab.remove();
     delete this.session;
     this.#tab = null;
+  }
+
+  #showNoAppError() {
+    toast(strings['no app found to handle this file']);
   }
 }

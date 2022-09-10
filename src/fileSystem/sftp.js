@@ -1,4 +1,3 @@
-import ajax from '@deadlyjack/ajax';
 import mimeType from 'mime-types';
 import Path from '../utils/Path';
 import Url from '../utils/Url';
@@ -45,32 +44,6 @@ class SFTP {
     });
 
     this.#connectionID = `${this.#username}@${this.#hostname}`;
-  }
-
-  async connect() {
-    await new Promise((resolve, reject) => {
-      if (this.#authenticationType === 'key') {
-        sftp.connectUsingKeyFile(
-          this.#hostname,
-          this.#port,
-          this.#username,
-          this.#keyFile,
-          this.#passPhrase,
-          resolve,
-          reject,
-        );
-        return;
-      }
-
-      sftp.connectUsingPassword(
-        this.#hostname,
-        this.#port,
-        this.#username,
-        this.#password,
-        resolve,
-        reject,
-      );
-    });
   }
 
   setPath(path) {
@@ -426,6 +399,36 @@ class SFTP {
     });
   }
 
+  async connect() {
+    await new Promise((resolve, reject) => {
+      if (this.#authenticationType === 'key') {
+        sftp.connectUsingKeyFile(
+          this.#hostname,
+          this.#port,
+          this.#username,
+          this.#keyFile,
+          this.#passPhrase,
+          resolve,
+          reject,
+        );
+        return;
+      }
+
+      sftp.connectUsingPassword(
+        this.#hostname,
+        this.#port,
+        this.#username,
+        this.#password,
+        resolve,
+        reject,
+      );
+    });
+  }
+
+  async exists() {
+    return (await this.stat()).exists;
+  }
+
   async stat() {
     if (this.#stat) return this.#stat;
 
@@ -448,8 +451,8 @@ class SFTP {
     };
   }
 
-  async exists() {
-    return (await this.stat()).exists;
+  get localName() {
+    return this.#getLocalname(this.#path);
   }
 
   /**

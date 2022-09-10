@@ -1,5 +1,10 @@
 {{#.}}
-<div class="list-item" action="open" {{#installed}}data-installed="true"{{/installed}} data-plugin="{{plugin}}">
+<div 
+  class="list-item"
+  action="open"
+  {{#installed}}data-installed="true"{{/installed}}
+  data-plugin="{{#localPlugin}}{{.}}{{/localPlugin}}{{^localPlugin}}{{plugin}}{{/localPlugin}}"
+>
   <span 
     class="icon" 
     style="background-image: url({{#icon}}{{icon}}{{/icon}}{{^icon}}./res/puzzle.png{{/icon}});"

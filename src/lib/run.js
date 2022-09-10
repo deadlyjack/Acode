@@ -40,7 +40,7 @@ async function run(
 
   let isLoading = false;
   let filename, pathName, extension;
-  let port = appSettings.value.previewPort;
+  let port = appSettings.value.serverPort;
   let EXECUTING_SCRIPT = uuid + '_script.js';
   const MIMETYPE_HTML = mimeType.lookup('html');
   const CONSOLE_SCRIPT = uuid + '_console.js';
@@ -125,9 +125,7 @@ async function run(
             dialogs.alert(strings.info, strings['powersave mode warning']);
           else startServer();
         },
-        () => {
-          startServer();
-        },
+        startServer,
       );
     } else startServer();
   }

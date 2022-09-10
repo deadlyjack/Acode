@@ -262,6 +262,7 @@ async function loadApp() {
           file_info: !!file.uri,
           file_eol: file.eol,
           copy_text: !!editorManager.editor.getCopyText(),
+          new_file: file.name === constants.DEFAULT_FILE_NAME && !file.session.getValue(),
         }),
       );
     },
@@ -274,7 +275,25 @@ async function loadApp() {
       action: 'run',
     },
     onclick() {
-      run();
+      const {
+        serverPort,
+        previewPort,
+        previewMode,
+        disableCache,
+        host,
+      } = appSettings.value;
+      if (serverPort === previewPort) {
+        run();
+        return;
+      }
+
+      const src = `http://${host}:${previewPort}`;
+      if (previewMode === 'browser') {
+        system.openInBrowser(src);
+        return;
+      }
+
+      system.inAppBrowser(src, '', false, disableCache);
     },
     oncontextmenu() {
       run(false, "inapp", true);
@@ -446,14 +465,6 @@ async function loadApp() {
    */
   function footerOnContextMenu(e) {
     arrowkeys.oncontextmenu(e, $footer);
-    // if (
-    //   e.target instanceof HTMLInputElement ||
-    //   e.target instanceof HTMLTextAreaElement
-    // ) {
-    //   return;
-    // }
-    // e.preventDefault();
-    // editorManager.editor.focus();
   }
 
   function onEditorUpdate(mode, saveState = true) {
@@ -475,8 +486,15 @@ async function loadApp() {
 
   async function onFileUpdate() {
     try {
-      const { activeFile } = editorManager;
-      const canRun = await activeFile?.canRun();
+      const { serverPort, previewPort } = appSettings.value;
+      let canRun = false;
+      if (serverPort !== previewPort) {
+        canRun = true;
+      } else {
+        const { activeFile } = editorManager;
+        canRun = await activeFile?.canRun();
+      }
+
       if (canRun) {
         $header.insertBefore($runBtn, $header.lastChild);
       } else {

@@ -4,25 +4,22 @@ interface Info {
   versionCode: number;
 }
 
-interface AppInfo {
-  label: String;
-  packageName: String;
-  versionCode: Number;
-  versionName: String;
-  firstInstallTime: Number;
-  lastUpdateTime: Number;
+interface AppInfo extends Info {
+  label: string;
+  firstInstallTime: number;
+  lastUpdateTime: number;
 }
 
 interface ShortCut {
-  id: String;
-  label: String;
-  description: String;
-  icon: String;
-  action: String;
-  data: String;
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+  action: string;
+  data: string;
 }
 
-interface Intent{
+interface Intent {
   action: string;
   data: string;
   type: string;
@@ -32,43 +29,83 @@ interface Intent{
   };
 }
 
+type FileAction = 'VIEW' | 'EDIT' | 'SEND' | 'RUN';
+type OnFail = (err: string) => void;
+type OnSuccessBool = (res: boolean) => void;
+
 interface System {
   /**
    * Get informartion about current webview
    */
-  getWebviewInfo(
-    onSuccess: (res: Info) => void,
-    onFail: (err: String) => void,
-  ): void;
+  getWebviewInfo(onSuccess: (res: Info) => void, onFail: OnFail): void;
   /**
    * Checks if power saving mode is on
    * @param onSuccess
    * @param onFail
    */
-  isPowerSaveMode(
-    onSuccess: (res: Boolean) => void,
-    onFail: (err: String) => void,
-  ): void;
+  isPowerSaveMode(onSuccess: OnSuccessBool, onFail: OnFail): void;
   /**
-   * Shares file using Apps content provider
-   * @param fileUri File to share
-   * @param onSuccess
+   * File action using Apps content provider
+   * @param fileUri File uri
+   * @param filename file name
+   * @param action file name
    * @param onFail
    */
-  shareFile(
-    fileUri: String,
-    onSuccess: () => void,
-    onFail: (err: String) => void,
+  fileAction(
+    fileUri: string,
+    filename: string,
+    action: FileAction,
+    mimeType: string,
+    onFail: OnFail,
   ): void;
+  /**
+   * File action using Apps content provider
+   * @param fileUri File uri
+   * @param filename file name
+   * @param action file name
+   */
+  fileAction(
+    fileUri: string,
+    filename: string,
+    action: FileAction,
+    mimeType: string,
+  ): void;
+  /**
+   * File action using Apps content provider
+   * @param fileUri File uri
+   * @param action file name
+   * @param onFail
+   */
+  fileAction(
+    fileUri: string,
+    action: FileAction,
+    mimeType: string,
+    onFail: OnFail,
+  ): void;
+  /**
+   * File action using Apps content provider
+   * @param fileUri File uri
+   * @param action file name
+   */
+  fileAction(fileUri: string, action: FileAction, mimeType: string): void;
+  /**
+   * File action using Apps content provider
+   * @param fileUri File uri
+   * @param action file name
+   */
+  fileAction(fileUri: string, action: FileAction, onFail: OnFail): void;
+  /**
+   * File action using Apps content provider
+   * @param fileUri File uri
+   * @param action file name
+   */
+  fileAction(fileUri: string, action: FileAction): void;
   /**
    * Gets app infomartion
    * @param onSuccess
    * @param onFail
    */
-  getAppInfo(
-    onSuccess: (info: AppInfo) => void,
-    onFail: (err: String) => void,
-  ): void;
+  getAppInfo(onSuccess: (info: AppInfo) => void, onFail: OnFail): void;
   /**
    * Add shortcut to app context menu
    * @param shortCut
@@ -77,8 +114,8 @@ interface System {
    */
   addShortcut(
     shortCut: ShortCut,
-    onSuccess: (res: Boolean) => void,
-    onFail: (err: String) => void,
+    onSuccess: OnSuccessBool,
+    onFail: OnFail,
   ): void;
   /**
    * Removes shortcut
@@ -86,46 +123,32 @@ interface System {
    * @param onSuccess
    * @param onFail
    */
-  removeShortcut(
-    id: String,
-    onSuccess: (res: Boolean) => void,
-    onFail: (err: String) => void,
-  ): void;
+  removeShortcut(id: string, onSuccess: OnSuccessBool, onFail: OnFail): void;
   /**
    * Pins a shortcut
    * @param id
    * @param onSuccess
    * @param onFail
    */
-  pinShortcut(
-    id: String,
-    onSuccess: (res: Boolean) => void,
-    onFail: (err: String) => void,
-  ): void;
+  pinShortcut(id: string, onSuccess: OnSuccessBool, onFail: OnFail): void;
   /**
    * Gets android version
    * @param onSuccess
    * @param onFail
    */
-  getAndroidVersion(
-    onSuccess: (res: Number) => void,
-    onFail: (err: String) => void,
-  ): void;
+  getAndroidVersion(onSuccess: (res: Number) => void, onFail: OnFail): void;
   /**
    * Open settings which lets user change app settings to manage all files
    * @param onSuccess
    * @param onFail
    */
-  manageAllFiles(onSuccess: () => void, onFail: (err: String) => void): void;
+  manageAllFiles(onSuccess: OnSuccessBool, onFail: OnFail): void;
   /**
    * Opens settings to allow to grant the app permission manage all files on device
    * @param onSuccess
    * @param onFail
    */
-  isExternalStorageManager(
-    onSuccess: (res: Boolean) => void,
-    onFail: (err: String) => void,
-  ): void;
+  isExternalStorageManager(onSuccess: OnSuccessBool, onFail: OnFail): void;
   /**
    * Requests user to grant the provided permissions
    * @param permissions constant value of the permision required @see https://developer.android.com/reference/android/Manifest.permission
@@ -133,9 +156,9 @@ interface System {
    * @param onFail
    */
   requestPermissions(
-    permissions: String[],
-    onSuccess: (res: Boolean) => void,
-    onFail: (err: String) => void,
+    permissions: string[],
+    onSuccess: OnSuccessBool,
+    onFail: OnFail,
   ): void;
   /**
    * Requests user to grant the provided permission
@@ -144,9 +167,9 @@ interface System {
    * @param onFail
    */
   requestPermission(
-    permission: String,
-    onSuccess: (res: Boolean) => void,
-    onFail: (err: String) => void,
+    permission: string,
+    onSuccess: OnSuccessBool,
+    onFail: OnFail,
   ): void;
   /**
    * Checks whether the app has provided permission
@@ -155,29 +178,29 @@ interface System {
    * @param onFail
    */
   hasPermission(
-    permission: String,
-    onSuccess: (res: Boolean) => void,
-    onFail: (err: String) => void,
+    permission: string,
+    onSuccess: OnSuccessBool,
+    onFail: OnFail,
   ): void;
   /**
    * Opens src in browser
    * @param src
    */
-  openInBrowser(src: String): void;
+  openInBrowser(src: string): void;
   /**
    * Launches and app
-   * @param app 
-   * @param action 
-   * @param value 
-   * @param onSuccess 
-   * @param onfail 
+   * @param app
+   * @param action
+   * @param value
+   * @param onSuccess
+   * @param onfail
    */
   launchApp(
-    app: String,
-    action: String,
-    value: String,
-    onSuccess: (arg: any) => void,
-    onfail: (arg: any) => void,
+    app: string,
+    action: string,
+    value: string,
+    onSuccess: OnSuccessBool,
+    onfail: OnFail,
   ): void;
 
   /**
@@ -194,19 +217,24 @@ interface System {
    * @param onSuccess Callback on success
    * @param onFail Callback on fail
    */
-  setUiTheme(theme: string, type: string, onSuccess:()=>void, onFail: (err: String)=>void): void;
+  setUiTheme(
+    theme: string,
+    type: string,
+    onSuccess: OnSuccessBool,
+    onFail: OnFail,
+  ): void;
   /**
    * Sets intent handler for the app
-   * @param onSuccess 
-   * @param onFail 
+   * @param onSuccess
+   * @param onFail
    */
-  setIntentHandler(onSuccess: (intent: Intent)=>void, onFail: (err: String)=>void): void;
+  setIntentHandler(onSuccess: (intent: Intent) => void, onFail: OnFail): void;
   /**
    * Gets the launch intent
-   * @param onSuccess 
-   * @param onFail 
+   * @param onSuccess
+   * @param onFail
    */
-  getCordovaIntent(onSuccess: (intent: Intent)=>void, onFail: (err: String)=>void): void;
+  getCordovaIntent(onSuccess: (intent: Intent) => void, onFail: OnFail): void;
 }
 
 declare var system: System;

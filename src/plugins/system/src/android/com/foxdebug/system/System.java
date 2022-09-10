@@ -68,16 +68,16 @@ public class System extends CordovaPlugin {
     final CallbackContext callbackContext
   )
     throws JSONException {
-    final String arg1 = getString(args, 0);
-    final String arg2 = getString(args, 1);
-    final String arg3 = getString(args, 2);
-    final String arg4 = getString(args, 3);
-    final String arg5 = getString(args, 4);
-    final String arg6 = getString(args, 5);
+    final String arg1 = args.optString(0);
+    final String arg2 = args.optString(1);
+    final String arg3 = args.optString(2);
+    final String arg4 = args.optString(3);
+    final String arg5 = args.optString(4);
+    final String arg6 = args.optString(5);
 
     switch (action) {
       case "get-webkit-info":
-      case "share-file":
+      case "file-action":
       case "is-powersave-mode":
       case "get-app-info":
       case "add-shortcut":
@@ -119,8 +119,8 @@ public class System extends CordovaPlugin {
                 inAppBrowser(
                   arg1,
                   arg2,
-                  getBoolean(args, 2),
-                  getBoolean(args, 3),
+                  args.optBoolean(2),
+                  args.optBoolean(3),
                   callbackContext
                 );
               }
@@ -150,8 +150,8 @@ public class System extends CordovaPlugin {
               case "get-webkit-info":
                 getWebkitInfo(callbackContext);
                 break;
-              case "share-file":
-                shareFile(arg1, arg2, callbackContext);
+              case "file-action":
+                filAction(arg1, arg2, arg3, arg4, callbackContext);
                 break;
               case "is-powersave-mode":
                 isPowerSaveMode(callbackContext);
@@ -180,7 +180,7 @@ public class System extends CordovaPlugin {
                 getAndroidVersion(callbackContext);
                 break;
               case "request-permissions":
-                requestPermissions(getJSONArray(args, 0), callbackContext);
+                requestPermissions(args.optJSONArray(0), callbackContext);
                 break;
               case "request-permission":
                 requestPermission(arg1, callbackContext);
@@ -371,19 +371,42 @@ public class System extends CordovaPlugin {
     callback.success(powerSaveMode ? 1 : 0);
   }
 
-  private void shareFile(
+  private void filAction(
     String fileURI,
     String filename,
+    String action,
+    String mimeType,
     CallbackContext callback
   ) {
     Activity activity = this.activity;
     Context context = this.context;
     Uri uri = this.getContentProviderUri(fileURI);
     try {
-      Intent intent = new Intent(Intent.ACTION_SEND);
-      intent.putExtra(Intent.EXTRA_STREAM, uri);
-      if (!filename.equals("")) intent.putExtra(Intent.EXTRA_TEXT, filename);
-      intent.setType("application/octet-stream");
+      Intent intent = new Intent(action);
+
+      if (mimeType.equals("")) {
+        mimeType = "text/plain";
+      }
+
+      if (action.equals(Intent.ACTION_SEND)) {
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        if (!filename.equals("")) {
+          intent.putExtra(Intent.EXTRA_TEXT, filename);
+        }
+        intent.setType(mimeType);
+      } else {
+        int flags =
+          Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION |
+          Intent.FLAG_GRANT_READ_URI_PERMISSION;
+
+        if (action.equals(Intent.ACTION_EDIT)) {
+          flags |= Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+        }
+
+        intent.setFlags(flags);
+        intent.setDataAndType(uri, mimeType);
+      }
+
       activity.startActivity(intent);
       callback.success(uri.toString());
     } catch (Exception e) {
@@ -712,11 +735,24 @@ public class System extends CordovaPlugin {
   }
 
   private Uri getContentProviderUri(String fileUri) {
+    return this.getContentProviderUri(fileUri, "");
+  }
+
+  private Uri getContentProviderUri(String fileUri, String filename) {
     Uri uri = Uri.parse(fileUri);
     String Id = context.getPackageName();
     if (fileUri.matches("file:///(.*)")) {
       File file = new File(uri.getPath());
-      uri = FileProvider.getUriForFile(context, Id + ".provider", file);
+      if (filename.equals("")) {
+        return FileProvider.getUriForFile(context, Id + ".provider", file);
+      }
+
+      return FileProvider.getUriForFile(
+        context,
+        Id + ".provider",
+        file,
+        filename
+      );
     }
     return uri;
   }
@@ -756,37 +792,5 @@ public class System extends CordovaPlugin {
       mode = 1;
     }
     webView.setInputType(mode);
-  }
-
-  private String getString(JSONArray ar, int index) {
-    try {
-      return ar.getString(index);
-    } catch (JSONException e) {
-      return null;
-    }
-  }
-
-  private boolean getBoolean(JSONArray ar, int index) {
-    try {
-      return ar.getBoolean(index);
-    } catch (JSONException e) {
-      return false;
-    }
-  }
-
-  private int getInt(JSONArray ar, int index) {
-    try {
-      return ar.getInt(index);
-    } catch (JSONException e) {
-      return 0;
-    }
-  }
-
-  private JSONArray getJSONArray(JSONArray ar, int index) {
-    try {
-      return ar.getJSONArray(index);
-    } catch (JSONException e) {
-      return null;
-    }
   }
 }

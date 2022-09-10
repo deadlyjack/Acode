@@ -8,15 +8,22 @@ module.exports = {
   isPowerSaveMode: function (onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'is-powersave-mode', []);
   },
-  shareFile: function (fileUri, filename, onSuccess, onFail) {
-    if (typeof filename === 'function') {
-      onSuccess = filename;
-      onFail = onSuccess;
+  fileAction: function (fileUri, filename, action, mimeType, onFail) {
+    if (typeof action !== 'string') {
+      onFail = action || function () { };
+      action = filename
       filename = '';
+    } else if (typeof mimeType !== 'string') {
+      onFail = mimeType || function () { };
+      mimeType = action;
+      action = filename;
+      filename = '';
+    } else if (typeof onFail !== 'function') {
+      onFail = function () { };
     }
 
-    if (!filename) filename = '';
-    cordova.exec(onSuccess, onFail, 'System', 'share-file', [fileUri, filename]);
+    action = "android.intent.action." + action;
+    cordova.exec(function () { }, onFail, 'System', 'file-action', [fileUri, filename, action, mimeType]);
   },
   getAppInfo: function (onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'get-app-info', []);

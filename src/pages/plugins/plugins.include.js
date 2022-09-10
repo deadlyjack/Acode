@@ -145,7 +145,7 @@ export default function PluginsInclude(updates) {
         const plugin = plugins.all.find(({ id }) => id === Url.basename(url));
         if (plugin) {
           plugin.installed = true;
-          plugin.plugin = getLocalRes(plugin.id, 'plugin.json');
+          plugin.localPlugin = getLocalRes(plugin.id, 'plugin.json');
         }
       });
       allState = LOADED;
@@ -181,10 +181,11 @@ export default function PluginsInclude(updates) {
   }
 
   function onUninstall(pluginId) {
-    const plugin = plugins.installed.find((plugin) => plugin.id === pluginId);
+    const plugin = plugins.all.find((plugin) => plugin.id === pluginId);
+    plugins.installed = plugins.installed.filter((plugin) => plugin.id !== pluginId);
     if (plugin) {
       plugin.installed = false;
-      plugins.installed = plugins.installed.filter((item) => item.id !== pluginId);
+      plugin.localPlugin = null;
     }
     render();
   }

@@ -7,6 +7,7 @@ export default {
   DEFAULT_FILE_SESSION: 'default-session',
   DEFAULT_FILE_NAME: 'untitled.txt',
   CONSOLE_PORT: 8159,
+  SERVER_PORT: 8158,
   PREVIEW_PORT: 8158,
   VIBRATION_TIME: 30,
   SCROLL_SPEED_FAST: 0.01,

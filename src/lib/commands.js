@@ -66,6 +66,9 @@ export default {
   'exit'() {
     navigator.app.exitApp();
   },
+  'edit-with'() {
+    editorManager.activeFile.editWith();
+  },
   'find-file'() {
     findFile();
   },
@@ -140,6 +143,9 @@ export default {
     if (page === 'help') help();
     editorManager.editor.blur();
   },
+  'open-with'() {
+    editorManager.activeFile.openWith();
+  },
   'open-file'() {
     editorManager.editor.blur();
     FileBrowser('file')
@@ -201,6 +207,9 @@ export default {
   },
   'save-as'(toast) {
     saveFile(editorManager.activeFile, true, toast);
+  },
+  'share'() {
+    editorManager.activeFile.share();
   },
   async 'syntax'() {
     editorManager.editor.blur();

@@ -11,6 +11,7 @@ function searchBar($list, setHide) {
   const $searchInput = tag('input', {
     type: 'search',
     placeholder: strings.search,
+    enterKeyHint: 'go',
   });
   const $container = tag('div', {
     id: 'search-bar',

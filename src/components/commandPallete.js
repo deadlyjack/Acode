@@ -9,6 +9,7 @@ export default async function commandPallete() {
     type: 'search',
     placeholder: 'Type command',
     onfocusout: remove,
+    enterKeyHint: 'go',
   });
   const $mask = tag('span', {
     className: 'mask',

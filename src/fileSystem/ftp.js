@@ -195,6 +195,10 @@ class FtpClient {
     });
   }
 
+  get localName() {
+    return this.#cacheFile;
+  }
+
   async #getStat() {
     return new Promise((resolve, reject) => {
       ftp.getStat(this.#conId, this.#path, (stat) => {

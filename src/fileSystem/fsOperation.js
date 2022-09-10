@@ -126,6 +126,9 @@ function fsOperation(uri) {
       stat() {
         return fs.stat();
       },
+      get localName() {
+        return fs.localName;
+      }
     };
   }
 
@@ -170,6 +173,9 @@ function fsOperation(uri) {
       stat() {
         return fs.stat();
       },
+      get localName() {
+        return fs.localName;
+      }
     };
   }
 

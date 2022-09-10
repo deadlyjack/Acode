@@ -151,8 +151,6 @@ export default function () {
         const type = $target.getAttribute('type');
         if (mode === 'app') onSelectAppTheme(theme, type);
         else if (mode === 'editor') onSelectEditorTheme(theme, type);
-        else if (mode === 'md') {
-        }
         break;
 
       case 'search':

@@ -769,6 +769,30 @@ button {
   cursor: w-resize;
 }
 
+.note {
+  margin: 20px 0;
+
+  .note-title {
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    text-transform: uppercase;
+
+    .icon {
+      margin: 0 10px;
+    }
+  }
+
+  p {
+    padding: 10px;
+    box-sizing: border-box;
+    opacity: 0.8;
+    font-size: 0.9rem;
+  }
+}
+
 input[type="search"]::-webkit-search-decoration,
 input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-results-button,

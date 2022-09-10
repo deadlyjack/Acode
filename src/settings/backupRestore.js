@@ -1,7 +1,6 @@
 import helpers from '../utils/helpers';
 import dialogs from '../components/dialogs';
 import fsOperation from '../fileSystem/fsOperation';
-import URLParse from 'url-parse';
 import Url from '../utils/Url';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import Uri from '../utils/Uri';
@@ -21,6 +20,9 @@ function backupRestore() {
       text: strings.restore.capitalize(),
       icon: 'historyrestore',
     },
+    {
+      note: strings['backup/restore note']
+    }
   ];
 
   function callback(key) {
@@ -44,22 +46,17 @@ function backupRestore() {
     try {
       const settings = appSettings.value;
       const keyBindings = await fsOperation(KEYBINDING_FILE).readFile('json');
-      const storageList = JSON.parse(localStorage.storageList || '[]').filter(
-        (s) => /s?ftp/.test(s.storageType),
-      );
 
-      const backupStorage = (
-        await FileBrowser(
-          'folder', //
-          strings['select folder'],
-        )
-      ).url;
+      const { url } = await FileBrowser(
+        'folder',
+        strings['select folder'],
+      );
 
       const backupFilename = 'Acode.backup';
       const backupDirname = 'Backup';
-      const backupDir = Url.join(backupStorage, backupDirname);
+      const backupDir = Url.join(url, backupDirname);
       const backupFile = Url.join(backupDir, backupFilename);
-      const backupStorageFS = fsOperation(backupStorage);
+      const backupStorageFS = fsOperation(url);
       const backupDirFS = fsOperation(backupDir);
       const backupFileFS = fsOperation(backupFile);
 
@@ -71,19 +68,9 @@ function backupRestore() {
         await backupDirFS.createFile(backupFilename);
       }
 
-      for (let storage of storageList) {
-        const url = URLParse(storage.uri, true);
-        const keyFile = decodeURIComponent(url.query['keyFile'] || '');
-        if (keyFile) {
-          const srcFs = fsOperation(keyFile);
-          storage.keyFileData = await srcFs.readFile('utf-8');
-        }
-      }
-
       const backupString = JSON.stringify({
         settings,
         keyBindings,
-        storageList,
       });
 
       await backupFileFS.writeFile(backupString);
@@ -126,52 +113,12 @@ backupRestore.restore = async function (url) {
     }
 
     try {
-      fs = fsOperation(window.KEYBINDING_FILE);
-      await fs.writeFile(JSON.stringify(backup.keyBindings, undefined, 2));
+      const text = JSON.stringify(backup.keyBindings, undefined, 2);
+      await fsOperation(window.KEYBINDING_FILE).writeFile(text);
     } catch (error) { }
 
-    const { settings, storageList } = backup;
-    const storedStorageList = JSON.parse(localStorage.storageList || '[]');
-    for (let storage of storageList) {
-      if (!storedStorageList.find((st) => st.uuid === storage.uuid)) {
-        if ('keyFileData' in storage) {
-          const keyFileData = storage.keyFileData;
-          delete storage.keyFileData;
-
-          const url = URLParse(storage.uri, true);
-          const { passPhrase, keyFile } = url.query;
-          const filename = Url.basename(decodeURIComponent(keyFile));
-          const newKeyFile = Url.join(DATA_STORAGE, filename);
-
-          const fs = fsOperation(newKeyFile);
-          if (!(await fs.exists())) {
-            const dirFs = fsOperation(DATA_STORAGE);
-            await dirFs.createFile(filename);
-          }
-          await fs.writeFile(keyFileData);
-
-          url.set('query', {
-            passPhrase,
-            keyFile: encodeURIComponent(newKeyFile),
-          });
-
-          storage.uri = url.toString(true);
-        }
-
-        storedStorageList.push(storage);
-      }
-    }
-    localStorage.storageList = JSON.stringify(storedStorageList);
-
-    const settingsDir = Url.dirname(appSettings.settingsFile);
-    const settingsFileFS = fsOperation(settingsDir);
-    fs = fsOperation(appSettings.settingsFile);
-
-    if (!(await fs.exists())) {
-      await settingsFileFS.createFile(Url.basename(appSettings.settingsFile));
-    }
-
-    await fs.writeFile(JSON.stringify(settings, undefined, 2));
+    const { settings } = backup;
+    await appSettings.update(settings);
     location.reload();
   } catch (err) {
     helpers.toast(err);

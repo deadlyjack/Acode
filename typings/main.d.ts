@@ -42,7 +42,7 @@ interface Settings {
   linenumbers: boolean;
   formatOnSave: boolean;
   linting: boolean;
-  previewMode: 'browser' | 'in app' | 'none';
+  previewMode: 'browser' | 'inapp';
   showSpaces: boolean;
   openFileListPos: 'sidebar' | 'header';
   quickTools: boolean;
@@ -78,7 +78,7 @@ interface AppSettings {
   update(settings?: Settings, showToast?: boolean): Promise<void>;
   update(showToast?: boolean): Promise<void>;
   defaultSettings: Settings;
-  reset(): void;
+  reset(): Promise<void>;
   onload: () => void;
   onsave: () => void;
   loaded: boolean;

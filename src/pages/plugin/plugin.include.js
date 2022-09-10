@@ -44,7 +44,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
   try {
     const promises = [];
     let pluginJson = '';
-    if (installed) {
+    if (installed && json.startsWith('file:')) {
       promises.push(
         fsOperation(json).readFile('utf8'),
         fsOperation(
@@ -85,7 +85,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
         });
     }
 
-    if (installed) {
+    if (installed && json.startsWith('file:')) {
       ajax({
         url: Url.join(plugin.host, 'plugin.json'),
         responseType: 'text',

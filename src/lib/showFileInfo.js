@@ -6,8 +6,6 @@ import Url from '../utils/Url';
 import dialogs from '../components/dialogs';
 import helpers from '../utils/helpers';
 
-//TODO: enable file sharing
-
 /**
  * Shows file info
  * @param {String} [url]
@@ -29,8 +27,6 @@ export default async function showFileInfo(url) {
       name,
       lastModified,
       length,
-      showUri: uri,
-      shareUri: uri,
       type,
       lineCount: value.split(/\n+/).length,
       wordCount: value.split(/\s+|\n+/).length,
@@ -51,12 +47,6 @@ export default async function showFileInfo(url) {
       const $target = e.target;
       if ($target instanceof HTMLElement) {
         const action = $target.getAttribute('action');
-        const value = $target.getAttribute('value');
-
-        if (action === 'share') {
-          system.shareFile(value, () => { }, console.error);
-          return;
-        }
 
         if (action === 'copy') {
           cordova.plugins.clipboard.copy($target.textContent);

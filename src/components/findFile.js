@@ -11,6 +11,7 @@ export default async function findFile() {
     type: 'search',
     placeholder: strings['type filename'],
     onfocusout: remove,
+    enterKeyHint: 'go',
   });
   const $mask = tag('span', {
     className: 'mask',
