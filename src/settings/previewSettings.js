@@ -56,7 +56,7 @@ export default function previewSettings() {
       }
     },
     {
-      key: 'disablecache',
+      key: 'disableCache',
       text: strings['disable in-app-browser caching'],
       checkbox: values.disableCache,
     },
