@@ -22,12 +22,13 @@ function tile(options = {}) {
   const $el = tag(options.type || 'li', {
     className: 'tile',
   });
+
   const $titleEl =
     typeof options.text === 'string'
       ? tag('span', {
-          textContent: options.text || '',
-          className: 'text',
-        })
+        textContent: options.text || '',
+        className: 'text',
+      })
       : options.text;
   const leadEl =
     options.lead ||

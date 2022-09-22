@@ -1,13 +1,80 @@
+type Formatter = {
+  id: string;
+  name: string;
+  exts: Array<string>;
+  format(): Promise<void>;
+};
+
+type CancelOption = {
+  timeout: number;
+  callback(): void;
+};
+
+type Loader = {
+  setTitle(title: string): void;
+  setMessage(message: string): void;
+  hide(): void;
+  show(): void;
+  destroy(): void;
+};
+
+type PromptOptions = {
+  match: RegExp;
+  required: boolean;
+  placeholder: string;
+  test(value: any): boolean;
+};
+
+type SelectOptions = {
+  onCancel(): void;
+  hideOnSelect: boolean;
+  textTransform: boolean;
+  default: any;
+};
 interface Acode {
-  exec(command: string, value?: any): boolean;
   readonly exitAppMessage: string;
-  $menuToggler: HTMLElement;
-  $editMenuToggler: HTMLElement;
+  readonly formatters: Array<Formatter>;
+  exec(command: string, value?: any): boolean;
   setLoadingMessage(message: string): void;
-  pluginServer: Server;
-  webServer: Server;
   initPlugin(pluginId: string, baseUrl: string, $page: HTMLElement): void;
   unmountPlugin(pluginId: string): void;
+  registerFormatter(
+    id: string,
+    extensions: Array<string>,
+    format: () => Promise<void>,
+  ): void;
+  unregisterFormatter(id: string): void;
+  fsOperation(file: string): FileSystem;
+  newEditorFile(filename: string, options: object): object;
+  alert(title: string, message: string, onhide: () => void): void;
+  loader(title: string, message: string, options: CancelOption): Loader;
+  prompt(
+    message: string,
+    defaultValue: string | number | boolean,
+    type: string,
+    options: PromptOptions,
+  ): Promise<string | number | boolean>;
+  confirm(title: string, message: string): Promise<boolean>;
+  select(
+    title: string,
+    options: Array<[value: string, text: string, icon: string] | string>,
+    config: SelectOptions,
+  ): Promise<string>;
+  multiPrompt(
+    title: string,
+    inputs: Array<Input>,
+    help: string,
+  ): Promise<Map<string, string | number>>;
+  fileBrowser(
+    mode: 'file' | 'folder',
+    info: string,
+    openLast: boolean,
+  ): Promise<FileBrowserResponse>;
+  toInternalUrl(url: string): Promise<string>;
+  $menuToggler: HTMLElement;
+  $editMenuToggler: HTMLElement;
+  pluginServer: Server;
+  webServer: Server;
   $quickToolToggler: HTMLElement;
   $headerToggler: HTMLElement;
 }
@@ -121,13 +188,6 @@ interface ActionStack {
   onCloseApp: () => void;
 }
 
-interface storedFiles {
-  name: string;
-  data?: string;
-  url?: string;
-  fileUri?: string;
-}
-
 interface fileOptions {
   name: string;
   uri: string;
@@ -137,18 +197,6 @@ interface Fold {
   range: AceAjax.Range;
   ranges: Array<Fold>;
   placeholder: string;
-}
-
-interface Controls {
-  start: HTMLSpanElement;
-  end: HTMLSpanElement;
-  menu: HTMLSpanElement;
-  fullContent: string;
-  update: () => void;
-  color: HTMLSpanElement;
-  checkForColor(): void;
-  hScrollbar: Scrollbar;
-  vScrollbar: Scrollbar;
 }
 
 interface Scrollbar extends HTMLElement {
@@ -275,16 +323,6 @@ interface FileSystem {
   stat(): Promise<FileStatus>;
 }
 
-interface externalStorageData {
-  path: string;
-  name: string;
-  origin: string;
-}
-
-interface elementContainer {
-  [key: string]: HTMLElement;
-}
-
 interface GistFile {
   filename: string;
   content: string;
@@ -334,11 +372,6 @@ interface GistRecord {
   reset(): void;
 }
 
-interface EditorScroll {
-  readonly $vScrollbar: Scrollbar;
-  readonly $hScrollbar: Scrollbar;
-}
-
 interface Strings {
   [key: string]: string;
 }
@@ -365,12 +398,6 @@ interface Folder {
 
 interface Window {
   restoreTheme(): void;
-}
-
-interface FileClipBoard {
-  method: 'copy' | 'cut';
-  type: 'file' | 'dir';
-  nodeId: string;
 }
 
 interface ThemeData {
@@ -537,4 +564,4 @@ declare var gistRecord: GistRecord;
 declare var gitRecordFile: string;
 declare var gistRecordFile: string;
 declare var toastQueue: Array<HTMLElement>;
-declare var toast: (string) => void;
+declare var toast: (message: string) => void;

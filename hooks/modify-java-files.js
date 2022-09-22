@@ -97,10 +97,11 @@ function main() {
             } else {
               outAttrs.inputType |= InputType.TYPE_NULL;
             }
+
             return ic;`,
           ],
           notation: '@Override',
-        }
+        },
       ]
     },
     'SystemWebViewEngine.java': {

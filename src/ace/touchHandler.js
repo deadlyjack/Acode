@@ -34,7 +34,6 @@ export default function addTouchListeners(editor) {
     dataset: {
       size: teardropSize,
     },
-    ontouchstart: ontouchstart$start,
     size: teardropSize,
   });
 
@@ -46,7 +45,6 @@ export default function addTouchListeners(editor) {
     dataset: {
       size: teardropSize,
     },
-    ontouchstart: ontouchstart$end,
     size: teardropSize,
   });
 
@@ -72,7 +70,6 @@ export default function addTouchListeners(editor) {
         hideMenu();
       }, teardropTimeout);
     },
-    ontouchstart: ontouchstart$curosr,
   });
 
   /**
@@ -107,13 +104,17 @@ export default function addTouchListeners(editor) {
   let mode; // cursor, selection or scroll
   let clickCount = 0; // number of clicks
   let lastClickPos = null;
+  let teardropDoesShowMenu = true; // teardrop handler
+  let teardropTouchEnded = false; // teardrop handler
+  let teardropMoveTimeout; // teardrop handler
+  let $activeTeardrop;
 
   const timeToSelectText = 500; // ms
   const config = {
     passive: false, // allow preventDefault
   };
 
-  scroller.addEventListener('touchstart', touchStart, config);
+  $el.addEventListener('touchstart', touchStart, config);
   scroller.addEventListener('contextmenu', contextmenu, config);
   editor.on('change', onupdate);
   editor.on('fold', onfold);
@@ -144,6 +145,25 @@ export default function addTouchListeners(editor) {
   function touchStart(e) {
     cancelAnimationFrame(animation);
     const { clientX, clientY } = e.touches[0];
+
+    if (isIn($start, clientX, clientY)) {
+      e.preventDefault();
+      teardropHandler($start);
+      return;
+    }
+
+    if (isIn($end, clientX, clientY)) {
+      e.preventDefault();
+      teardropHandler($end);
+      return;
+    }
+
+    if (isIn($cursor, clientX, clientY)) {
+      e.preventDefault();
+      teardropHandler($cursor);
+      return;
+    }
+
     lastX = clientX;
     lastY = clientY;
     moveY = 0;
@@ -213,6 +233,9 @@ export default function addTouchListeners(editor) {
    * @param {TouchEvent} e 
    */
   function touchEnd(e) {
+    // why I was using e.preventDefault() ? 🤔
+    // because select word and select line misbehave without
+    // preventDefault
     removeListeners();
 
     const { clientX, clientY } = e.changedTouches[0];
@@ -234,8 +257,6 @@ export default function addTouchListeners(editor) {
 
         const rowDiff = Math.abs(rowNow - rowThen);
         const columnDiff = Math.abs(columnNow - columnThen);
-
-        console.log({ rowDiff, columnDiff });
         if (!rowDiff && columnDiff <= 2) {
           clickCount += 1;
         }
@@ -267,7 +288,6 @@ export default function addTouchListeners(editor) {
     }
 
     if (mode === 'scroll') {
-      e.preventDefault();
       scrollAnimation(moveX, moveY);
       return;
     }
@@ -288,6 +308,18 @@ export default function addTouchListeners(editor) {
       vibrate();
     }
   };
+
+  function isIn($el, cX, cY) {
+    const {
+      x: sx,
+      y: sy,
+      width: sWidth,
+      height: sHeight,
+    } = $el.getBoundingClientRect();
+
+    return (cX > sx && cX < sx + sWidth
+      && cY > sy && cY < sy + sHeight)
+  }
 
   function vibrate() {
     if (appSettings.value.vibrateOnTap) {
@@ -538,34 +570,54 @@ export default function addTouchListeners(editor) {
     $menu.style.left = `${x}px`;
     $menu.style.top = `${y}px`;
 
-    if (!$menu.isConnected) $el.append($menu);
+    if (!$menu.isConnected) $el.parentElement.append($menu);
     if ($trigger) positionMenu($trigger);
 
     editor.selection.on('changeCursor', hideMenu);
     editor.selection.on('changeSelection', hideMenu);
   }
 
+  /**
+   * @param {boolean} clearActive 
+   * @returns 
+   */
+  function hideMenu(clearActive = true) {
+    if (!$el.parentElement.contains($menu)) return;
+    $menu.remove();
+    editor.selection.off('changeCursor', hideMenu);
+    editor.selection.off('changeSelection', hideMenu);
+    if (clearActive) menuActive = false;
+  }
+
   function positionMenu($trigger) {
-    const rectMenu = $menu.getBoundingClientRect();
-    const rectContainer = $el.getBoundingClientRect();
-    const { left, right, top, bottom, height } = rectMenu;
+    const getProp = ($el, prop) => $el.getBoundingClientRect()[prop];
+    const containerRight = getProp($el, 'right');
+    const containerLeft = getProp($el, 'left');
+    const containerBottom = getProp($el, 'bottom');
     const { lineHeight } = editor.renderer;
     const margin = 10;
 
+
     // if menu is positioned off screen horizonatally from the right
-    if ((right + margin) > rectContainer.right) {
-      const [x] = relativePosition(left - (right - rectContainer.right) - margin);
-      $menu.style.left = `${x}px`;
+    const menuRight = getProp($menu, 'right');
+    if (menuRight + margin > containerRight) {
+      const menuLeft = getProp($menu, 'left');
+      const [x] = relativePosition(menuLeft - Math.abs(menuRight - containerRight));
+      $menu.style.left = `${x - margin}px`;
     }
 
     // if menu is positioned off screen horizonatally from the left
-    if ((left - margin) < rectContainer.left) {
-      const [x] = relativePosition(left + (rectContainer.left - left) + margin);
-      $menu.style.left = `${x}px`;
+    const menuLeft = getProp($menu, 'left');
+    if (menuLeft - margin < containerLeft) {
+      const [x] = relativePosition(menuLeft + Math.abs(menuLeft - containerLeft));
+      $menu.style.left = `${x + margin}px`;
     }
 
+    if (shrink()) return;
+
     // if menu is positioned off screen vertically from the bottom
-    if (bottom > rectContainer.bottom) {
+    const menuBottom = getProp($menu, 'bottom');
+    if (menuBottom > containerBottom) {
       const range = editor.getSelectionRange();
       let pos;
 
@@ -579,159 +631,130 @@ export default function addTouchListeners(editor) {
       const [, y] = relativePosition(null, pageY - lineHeight * 1.8);
       $menu.style.top = `${y}px`;
     }
-  }
 
-  function hideMenu(ignore, clearActive = true) {
-    if (!$el.contains($menu)) return;
-    $menu.remove();
-    editor.selection.off('changeCursor', hideMenu);
-    editor.selection.off('changeSelection', hideMenu);
-    if (clearActive) menuActive = false;
-  }
-
-  /**
-   * Touch start on cursor
-   * @param {TouchEvent} e 
-   */
-  function ontouchstart$curosr(e) {
-    handleCursor.call(this, e, 'cursor');
-  }
-
-  /**
-   * Touch start on selection
-   * @param {TouchEvent} e 
-   */
-  function ontouchstart$start(e) {
-    handleCursor.call(this, e, 'start');
+    function shrink() {
+      const [left, right] = [getProp($menu, 'left'), getProp($menu, 'right')];
+      const tooLeft = left < containerLeft;
+      const tooRight = right > containerRight;
+      if (tooLeft || tooRight) {
+        const { scale = 1 } = $menu.dataset;
+        $menu.dataset.scale = parseFloat(scale - 0.1);
+        $menu.style.transform = `scale(${$menu.dataset.scale})`;
+        positionMenu($trigger);
+        return true;
+      }
+      return false;
+    }
   }
 
   /**
-   * Touch start on selection
-   * @param {TouchEvent} e 
+   * Handles teardrop
+   * @param {HTMLDivElement} $teardrop
    */
-  function ontouchstart$end(e) {
-    handleCursor.call(this, e, 'end');
-  }
-
-  /**
-   * 
-   * @param {TouchEvent} e 
-   * @param {'cursor'|'start'|'end'} mode 
-   */
-  function handleCursor(e, mode) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    editor.focus();
-    this.dataset.immortal = true;
-    let doesShowMenu = true;
-    let touchEnded = false;
-    let moveTimeout;
+  function teardropHandler($teardrop) {
+    $activeTeardrop = $teardrop;
+    $activeTeardrop.dataset.immortal = true;
+    teardropDoesShowMenu = true;
+    teardropTouchEnded = false;
 
     if (mode === 'cursor') {
       clearTimeout($cursor.dataset.timeout);
     }
 
+    document.addEventListener('touchmove', teardropTouchMoveHandler, config);
+    document.addEventListener('touchend', teardropTouchEndHandler, config);
+  }
 
-    const touchMove = (e) => {
-      e.preventDefault();
-      const { clientX, clientY } = e.touches[0];
-      const { lineHeight } = renderer;
-      const { start, end } = editor.selection.getRange();
-      let y = clientY - (lineHeight * 1.8);
-      let line;
-      let x = clientX;
-      let $el;
+  function teardropTouchMoveHandler(e) {
+    const { clientX, clientY } = e.touches[0];
+    const { lineHeight } = renderer;
+    const { start, end } = editor.selection.getRange();
+    let y = clientY - (lineHeight * 1.8);
+    let line;
+    let x = clientX;
 
-      if (mode === 'cursor') {
-        const { row, column } = renderer.screenToTextCoordinates(x, y);
-        editor.gotoLine(row + 1, column);
-        line = row;
-        $el = $cursor;
-      } else if (mode === 'start') {
-        x = clientX + teardropSize;
+    if ($activeTeardrop === $cursor) {
+      const { row, column } = renderer.screenToTextCoordinates(x, y);
+      editor.gotoLine(row + 1, column);
+      line = row;
+    } else if ($activeTeardrop === $start) {
+      x = clientX + teardropSize;
 
-        const { pageX, pageY } = renderer.textToScreenCoordinates(end);
-        if (pageY <= y) {
-          y = pageY;
-        }
-
-        if (pageY <= y && pageX < x) {
-          x = pageX;
-        }
-
-        let { row, column } = renderer.screenToTextCoordinates(x, y);
-
-        if (column === end.column) {
-          --column;
-        }
-
-        editor.selection.setSelectionAnchor(row, column);
-        positionEnd();
-        line = row;
-        $el = $start;
-      } else {
-        const { pageX, pageY } = renderer.textToScreenCoordinates(start);
-        if (pageY >= y) {
-          y = pageY;
-        }
-
-        if (pageY >= y && pageX > x) {
-          x = pageX;
-        }
-
-        let { row, column } = renderer.screenToTextCoordinates(x, y);
-
-        if (column === start.column) {
-          ++column;
-        }
-
-        editor.selection.moveCursorToPosition({ row, column });
-        positionStart();
-        line = row;
-        $el = $end;
+      const { pageX, pageY } = renderer.textToScreenCoordinates(end);
+      if (pageY <= y) {
+        y = pageY;
       }
 
-      clearTimeout(moveTimeout);
-      if (!editor.isRowFullyVisible(line)) {
-        moveTimeout = setTimeout(() => {
-          renderer.scrollToLine(line);
-          if (touchEnded) return;
-          touchMove(e);
-        }, 100);
+      if (pageY <= y && pageX < x) {
+        x = pageX;
       }
 
-      const [left, top] = relativePosition(clientX, clientY - lineHeight);
-      $el.style.left = `${left}px`;
-      $el.style.top = `${top}px`;
-      doesShowMenu = false;
-    };
+      let { row, column } = renderer.screenToTextCoordinates(x, y);
 
-    const touchEnd = (e) => {
-      touchEnded = true;
-      e.preventDefault();
-      if (mode === 'cursor') {
-        cursorMode();
-      } else {
-        selectionMode(this);
+      if (column === end.column) {
+        --column;
       }
 
-      this.dataset.immortal = false;
-      document.removeEventListener('touchmove', touchMove, config);
-      document.removeEventListener('touchend', touchEnd, config);
-      if (doesShowMenu) {
-        showMenu(this);
+      editor.selection.setSelectionAnchor(row, column);
+      positionEnd();
+      line = row;
+    } else {
+      const { pageX, pageY } = renderer.textToScreenCoordinates(start);
+      if (pageY >= y) {
+        y = pageY;
       }
-    };
 
-    document.addEventListener('touchmove', touchMove, config);
-    document.addEventListener('touchend', touchEnd, config);
+      if (pageY >= y && pageX > x) {
+        x = pageX;
+      }
+
+      let { row, column } = renderer.screenToTextCoordinates(x, y);
+
+      if (column === start.column) {
+        ++column;
+      }
+
+      editor.selection.moveCursorToPosition({ row, column });
+      positionStart();
+      line = row;
+    }
+
+    clearTimeout(teardropMoveTimeout);
+    if (!editor.isRowFullyVisible(line)) {
+      teardropMoveTimeout = setTimeout(() => {
+        renderer.scrollToLine(line);
+        if (teardropTouchEnded) return;
+        touchMove(e);
+      }, 100);
+    }
+
+    const [left, top] = relativePosition(clientX, clientY - lineHeight);
+    $activeTeardrop.style.left = `${left}px`;
+    $activeTeardrop.style.top = `${top}px`;
+    teardropDoesShowMenu = false;
+  };
+
+  function teardropTouchEndHandler() {
+    teardropTouchEnded = true;
+    if ($activeTeardrop === $cursor) {
+      cursorMode();
+    } else {
+      selectionMode($activeTeardrop);
+    }
+
+    $activeTeardrop.dataset.immortal = false;
+    document.removeEventListener('touchmove', teardropTouchMoveHandler, config);
+    document.removeEventListener('touchend', teardropTouchEndHandler, config);
+    if (teardropDoesShowMenu) {
+      showMenu($activeTeardrop);
+    }
   }
 
   function onscroll() {
     clearTimeout(scrollTimeout);
     clearCursorMode();
     clearSelectionMode(null, false);
-    hideMenu(null, false);
+    hideMenu(false);
 
     scrollTimeout = setTimeout(onscrollend, 100);
   }

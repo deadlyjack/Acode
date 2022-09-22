@@ -670,11 +670,11 @@ public class System extends CordovaPlugin {
     );
   }
 
-  private void setIntentHandler(CallbackContext callbackContext) {
-    intentHandler = callbackContext;
+  private void setIntentHandler(CallbackContext callback) {
+    intentHandler = callback;
     PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
     result.setKeepCallback(true);
-    callbackContext.sendPluginResult(result);
+    callback.sendPluginResult(result);
   }
 
   @Override

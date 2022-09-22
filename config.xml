@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<widget id="com.foxdebug.acode" android-versionCode="231" version="1.6.0"
+<widget id="com.foxdebug.acode" android-versionCode="232" version="1.6.0"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -58,7 +58,7 @@
             <uses-permission android:name="android.permission.VIBRATE" />
         </config-file>
 
-        <hook type="before_prepare" src="hooks/add-input-type.js" />
+        <hook type="before_prepare" src="hooks/modify-java-files.js" />
         <hook type="before_prepare" src="hooks/post-process.js" />
         <hook type="before_prepare" src="hooks/copy-resources.js" />
         <hook type="before_prepare" src="hooks/move-files.js" />

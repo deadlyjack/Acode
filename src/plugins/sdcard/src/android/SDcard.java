@@ -702,7 +702,7 @@ public class SDcard extends CordovaPlugin {
                   null,
                   null
                 );
-            } catch (SecurityException | Error e) {
+            } catch (SecurityException | IllegalArgumentException | Error e) {
               callback.error("Cannot read directory.");
               return;
             }
@@ -883,7 +883,9 @@ public class SDcard extends CordovaPlugin {
         .openOutputStream(uri, "wa");
       os.close(); // we don't actually want to write anything, so we close immediately
       canWrite = true;
-    } catch (SecurityException | IOException ignored) {
+    } catch (
+      SecurityException | IllegalArgumentException | IOException ignored
+    ) {
       // if we don't have write-permission or the file doesn't exist, canWrite can stay on false
     }
     return canWrite;

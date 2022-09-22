@@ -33,6 +33,10 @@ const { Range } = ace.require('ace/range');
 
 export default class EditorFile {
   /**
+   * If editor was focused before resize
+   */
+  focusedBefore = false;
+  /**
    * State of the editor for this file.
    */
   focused = false;
@@ -202,14 +206,8 @@ export default class EditorFile {
       this.editable = editable;
     }
 
-    this.#tab.onclick = (e) => {
-      const { action } = e.target.dataset;
-      if (action === 'close-file') {
-        this.remove();
-        return;
-      }
-      this.makeActive();
-    };
+    this.#tab.onclick = tabOnclick.bind(this);
+    this.#tab.oncontextmenu = startDrag;
 
     if (appSettings.value.openFileListPos === 'header') {
       openFileList.append(this.#tab);
@@ -256,6 +254,7 @@ export default class EditorFile {
     if (this.type === 'git') return this.record.name;
     return this.#name;
   }
+
   /**
    * File name
    * @param {string} value
@@ -414,6 +413,7 @@ export default class EditorFile {
     this.#upadteSaveIcon();
     this.#updateTab();
   }
+
   /**
    * DON'T remove, plugin need this property to get filename.
    */
@@ -838,4 +838,123 @@ export default class EditorFile {
   #showNoAppError() {
     toast(strings['no app found to handle this file']);
   }
+}
+
+/**
+ * 
+ * @param {MouseEvent} e 
+ * @returns 
+ */
+function tabOnclick(e) {
+  e.preventDefault();
+  const { action } = e.target.dataset;
+  if (action === 'close-file') {
+    this.remove();
+    return;
+  }
+  this.makeActive();
+}
+
+/**
+ * 
+ * @param {MouseEvent} e 
+ */
+function startDrag(e) {
+  const $el = e.target;
+  const $parent = $el.parentElement;
+  const event = (e) => (e.touches && e.touches[0]) || e;
+  const opts = {
+    passive: false,
+  };
+
+  let startX = event(e).clientX;
+  let startY = event(e).clientY;
+  let prevEnd = startX;
+  let position;
+  let left = $el.offsetLeft;
+  let $placeholder = tag('div');
+
+  const rect = $el.getBoundingClientRect();
+  $el.style.zIndex = 999;
+  $placeholder.style.height = `${rect.height}px`;
+  $placeholder.style.width = `${rect.width}px`;
+
+  if (appSettings.value.vibrateOnTap) {
+    navigator.vibrate(constants.VIBRATION_TIME);
+    $el.classList.add('select');
+    $el.style.transform = `translate3d(${left}px, 0, 0)`;
+    $parent.insertBefore($placeholder, $el);
+  }
+  document.addEventListener('mousemove', drag, opts);
+  document.addEventListener('touchmove', drag, opts);
+  document.ontouchmove = null;
+  document.onmousemove = null;
+  document.ontouchend = cancelDrag;
+  document.onmouseup = cancelDrag;
+  document.ontouchcancel = cancelDrag;
+  document.onmouseleave = cancelDrag;
+
+  function cancelDrag() {
+    $el.classList.remove('select');
+    $el.style.zIndex = 0;
+    $el.style.transform = `translate3d(0, 0, 0)`;
+    document.removeEventListener('mousemove', drag, opts);
+    document.removeEventListener('touchmove', drag, opts);
+    document.ontouchend = document.onmouseup = null;
+    if ($placeholder.isConnected) {
+      $parent.replaceChild($el, $placeholder);
+      updateFileList($parent);
+    }
+    $el.eventAdded = false;
+    document.ontouchend = null;
+    document.onmouseup = null;
+    document.ontouchcancel = null;
+    document.onmouseleave = null;
+  }
+
+  function drag(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    const end = event(e).clientX;
+
+    position = prevEnd - end > 0 ? 'l' : 'r';
+    prevEnd = end;
+    const move = end - startX;
+    const $newEl = document.elementFromPoint(end, startY);
+
+    $el.style.transform = `translate3d(${left + move}px, 0, 0)`;
+
+    if (
+      $newEl.classList.contains('tile') &&
+      $el !== $newEl &&
+      $parent.contains($newEl)
+    ) {
+      if (position === 'r') {
+        if ($newEl.nextElementSibling) {
+          $parent.insertBefore($placeholder, $newEl.nextElementSibling);
+        } else {
+          $parent.append($placeholder);
+        }
+      } else {
+        $parent.insertBefore($placeholder, $newEl);
+      }
+    }
+  }
+}
+
+function updateFileList($parent) {
+  const children = [...$parent.children];
+  const newFileList = [];
+  for (let el of children) {
+    for (let file of editorManager.files) {
+      if (file.tab === el) {
+        newFileList.push(file);
+        break;
+      }
+    }
+  }
+
+  editorManager.files = newFileList;
 }

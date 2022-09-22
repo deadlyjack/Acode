@@ -505,6 +505,7 @@ textarea {
   box-sizing: border-box;
   transform-origin: left top;
   z-index: 4;
+  pointer-events: none;
 
   &[data-size='60'] {
     width: 60px;
@@ -545,6 +546,7 @@ textarea {
   border: var(--clipboard-menu-border);
   color: #252525;
   color: var(--secondary-text-color);
+  transform-origin: left center;
   z-index: 4;
 
   >span {
