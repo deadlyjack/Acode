@@ -14,6 +14,11 @@ export default function otherSettings() {
 
   const items = [
     {
+      key: 'retryRemoteFsAfterFail',
+      text: strings['retry ftp/sftp when fail'],
+      checkbox: values.retryRemoteFsAfterFail,
+    },
+    {
       key: 'animation',
       text: strings.animation,
       value: values.animation,

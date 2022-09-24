@@ -4,6 +4,7 @@ import Url from '../utils/Url';
 import internalFs from './internalFs';
 
 class SFTP {
+  #MAX_TRY = 3;
   #hostname;
   #port;
   #username;
@@ -15,6 +16,7 @@ class SFTP {
   #connectionID;
   #path;
   #stat;
+  #retry = 0;
 
   /**
    *
@@ -401,6 +403,21 @@ class SFTP {
 
   async connect() {
     await new Promise((resolve, reject) => {
+      const retry = (err) => {
+        if (appSettings.value.retryRemoteFsAfterFail) {
+          if (++this.#retry > this.#MAX_TRY) {
+            this.#retry = 0;
+            reject(err);
+          } else {
+            this.connect()
+              .then(resolve)
+              .catch(reject);
+          }
+        } else {
+          reject(err);
+        }
+      };
+
       if (this.#authenticationType === 'key') {
         sftp.connectUsingKeyFile(
           this.#hostname,
@@ -409,7 +426,7 @@ class SFTP {
           this.#keyFile,
           this.#passPhrase,
           resolve,
-          reject,
+          retry,
         );
         return;
       }
@@ -420,7 +437,7 @@ class SFTP {
         this.#username,
         this.#password,
         resolve,
-        reject,
+        retry,
       );
     });
   }

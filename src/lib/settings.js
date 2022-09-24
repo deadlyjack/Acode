@@ -89,6 +89,7 @@ export default class Settings {
       textWrap: true,
       softTab: true,
       tabSize: 2,
+      retryRemoteFsAfterFail: true,
       linenumbers: true,
       formatOnSave: false,
       autoCorrect: true,

@@ -1,3 +1,5 @@
+import constants from "../lib/constants";
+
 const keyMapping = {
   37: 'ArrowLeft',
   38: 'ArrowUp',
@@ -31,6 +33,9 @@ export default {
     this.dispatchKey({ which }, shiftKey, $textarea);
   },
   oncontextmenu(e, footer) {
+    if (appSettings.value.vibrateOnTap) {
+      navigator.vibrate(constants.VIBRATION_TIME_LONG);
+    }
     const $el = e.target;
     const { which } = $el.dataset;
     const { editor, activeFile } = editorManager;

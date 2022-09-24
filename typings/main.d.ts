@@ -98,6 +98,7 @@ interface Settings {
   maxFileSize: number;
   filesNotAllowed: string[];
   formatter: Map<string, string>;
+  retryRemoteFsAfterFail: boolean;
   search: searchSettings;
   lang: string;
   fontSize: string;

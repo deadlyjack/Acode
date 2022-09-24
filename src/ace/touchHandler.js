@@ -276,9 +276,8 @@ export default function addTouchListeners(editor) {
     }
 
     if (mode === 'cursor') {
-      const $footer = root.get('#quick-tools');
-      const $shiftKey = $footer.get('#shift-key');
-      const shiftKey = $shiftKey?.dataset.state === 'on';
+      e.preventDefault();
+      const shiftKey = tag.get('#shift-key')?.dataset.state === 'on';
       moveCursorTo(clientX, clientY, shiftKey);
       if (shiftKey) {
         selectionMode($end);
@@ -534,11 +533,11 @@ export default function addTouchListeners(editor) {
 
   /**
    * Remove selection mode
-   * @param {Event} ignore 
+   * @param {Event} ev 
    * @param {boolean} clearActive 
    * @returns 
    */
-  function clearSelectionMode(ignore, clearActive = true) {
+  function clearSelectionMode(ev, clearActive = true) {
     const $els = [$start.dataset.immortal, $end.dataset.immortal];
     if ($els.includes('true')) return;
     if ($el.contains($start)) $start.remove();
@@ -676,7 +675,6 @@ export default function addTouchListeners(editor) {
     if ($activeTeardrop === $cursor) {
       const { row, column } = renderer.screenToTextCoordinates(x, y);
       editor.gotoLine(row + 1, column);
-      line = row;
     } else if ($activeTeardrop === $start) {
       x = clientX + teardropSize;
 
@@ -697,7 +695,6 @@ export default function addTouchListeners(editor) {
 
       editor.selection.setSelectionAnchor(row, column);
       positionEnd();
-      line = row;
     } else {
       const { pageX, pageY } = renderer.textToScreenCoordinates(start);
       if (pageY >= y) {
@@ -716,15 +713,20 @@ export default function addTouchListeners(editor) {
 
       editor.selection.moveCursorToPosition({ row, column });
       positionStart();
-      line = row;
     }
 
     clearTimeout(teardropMoveTimeout);
-    if (!editor.isRowFullyVisible(line)) {
+    const parent = $el.getBoundingClientRect();
+    let dx = 0;
+    if (clientY < parent.top) dx = -lineHeight;
+    if (clientY > parent.bottom) dx = lineHeight;
+    if (dx) {
+      console.log('dx', dx);
       teardropMoveTimeout = setTimeout(() => {
-        renderer.scrollToLine(line);
+        const top = editor.session.getScrollTop();
+        editor.session.setScrollTop(top + dx);
         if (teardropTouchEnded) return;
-        touchMove(e);
+        teardropTouchMoveHandler(e);
       }, 100);
     }
 

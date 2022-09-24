@@ -5,6 +5,7 @@ import $_searchRow2 from '../views/footer/searchRow2.hbs';
 import $_row1 from '../views/footer/row1.hbs';
 import $_row2 from '../views/footer/row2.hbs';
 import searchSettings from '../settings/searchSettings';
+import constants from '../lib/constants';
 
 const $row1 = tag.parse($_row1);
 const $row2 = tag.parse($_row2);
@@ -65,10 +66,16 @@ function actions(action, value) {
       const $el = $footer.querySelector('#shift-key');
       state = $el.getAttribute('data-state') || 'off';
       if (state === 'off') {
+        if (appSettings.value.vibrateOnTap) {
+          navigator.vibrate(constants.VIBRATION_TIME_LONG);
+        }
         $textarea.dispatchEvent(window.createKeyboardEvent('keydown', {}));
         $el.setAttribute('data-state', 'on');
         $el.classList.add('active');
       } else {
+        if (appSettings.value.vibrateOnTap) {
+          navigator.vibrate(constants.VIBRATION_TIME);
+        }
         $textarea.dispatchEvent(window.createKeyboardEvent('keyup', {}));
         $el.setAttribute('data-state', 'off');
         $el.classList.remove('active');

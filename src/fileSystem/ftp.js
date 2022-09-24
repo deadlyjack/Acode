@@ -6,6 +6,7 @@ import internalFs from "./internalFs";
 // set path not implemented
 
 class FtpClient {
+  #MAX_TRY = 3;
   #path = '/';
   #host;
   #username;
@@ -16,6 +17,7 @@ class FtpClient {
   #conId;
   #stat;
   #origin;
+  #try = 0;
 
   constructor(host, username = 'anonymous', password = '', port = 21, security = 'ftp', mode = 'passive', path = '/') {
     if (!host) {
@@ -52,7 +54,21 @@ class FtpClient {
       }, (conId) => {
         this.#conId = conId;
         resolve();
-      }, reject);
+      }, (err) => {
+        if (appSettings.value.retryRemoteFsAfterFail) {
+          console.log('Retrying connection....', this.#try);
+          if (++this.#try > this.#MAX_TRY) {
+            this.#try = 0;
+            reject(err);
+            return;
+          }
+          this.connect()
+            .then(resolve)
+            .catch(reject);
+        } else {
+          reject(err);
+        }
+      });
     });
   }
 
