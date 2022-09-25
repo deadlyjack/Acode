@@ -8,7 +8,7 @@ import helpers from "../utils/helpers";
  */
 export default function addTouchListeners(editor) {
   const { renderer, container: $el } = editor;
-  const { scroller } = renderer;
+  const { scroller, $gutter } = renderer;
 
   if ($el.touchListeners) {
     Object.keys($el.touchListeners).forEach((key) => {
@@ -143,6 +143,7 @@ export default function addTouchListeners(editor) {
    * @param {TouchEvent} e 
    */
   function touchStart(e) {
+    const $target = e.target;
     cancelAnimationFrame(animation);
     const { clientX, clientY } = e.touches[0];
 
@@ -161,6 +162,10 @@ export default function addTouchListeners(editor) {
     if (isIn($cursor, clientX, clientY)) {
       e.preventDefault();
       teardropHandler($cursor);
+      return;
+    }
+
+    if ($gutter.contains($target)) {
       return;
     }
 
@@ -457,6 +462,7 @@ export default function addTouchListeners(editor) {
       editor.selection.moveToPosition(pos);
     }
     editor.focus();
+    hideTooltip();
   }
 
   function cursorMode() {
@@ -758,7 +764,12 @@ export default function addTouchListeners(editor) {
     clearSelectionMode(null, false);
     hideMenu(false);
 
+    hideTooltip();
     scrollTimeout = setTimeout(onscrollend, 100);
+  }
+
+  function hideTooltip() {
+    $gutter.dispatchEvent(new MouseEvent('mouseout'));
   }
 
   function onscrollend() {

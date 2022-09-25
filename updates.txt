@@ -1,4 +1,4 @@
-version 1.6.0 234
+version 1.6.0 235
 ☞ Retry FTP/SFTP connection when fail
 ☞ Supports plugin
 ☞ Updated custom theme settings

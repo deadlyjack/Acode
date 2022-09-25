@@ -20,7 +20,6 @@ async function EditorManager($sidebar, $header, $body) {
    * @type {Collaspable & HTMLElement}
    */
   let $openFileList;
-  let checkTimeout = null;
   let TIMEOUT_VALUE = 500;
   let heightOffset = Math.round(screen.height - innerHeight);
   let preventScrollbarV = false;
@@ -28,7 +27,6 @@ async function EditorManager($sidebar, $header, $body) {
   let scrollBarVisiblityCount = 0;
   let timeoutQuicktoolToggler;
   let timeoutHeaderToggler;
-  let autosaveTimeout;
   const { scrollbarSize, editorFont } = appSettings.value;
   const events = {
     'switch-file': [],
@@ -96,46 +94,6 @@ async function EditorManager($sidebar, $header, $body) {
 
   $hScrollbar.onshow = $vScrollbar.onshow = updateFloatingButton.bind({}, false);
   $hScrollbar.onhide = $vScrollbar.onhide = updateFloatingButton.bind({}, true);
-
-  editor.on('focus', () => {
-    const { activeFile } = manager;
-    activeFile.focused = true;
-    $hScrollbar.hide();
-    $vScrollbar.hide();
-  });
-
-  editor.on('change', function (e) {
-    if (checkTimeout) clearTimeout(checkTimeout);
-    if (autosaveTimeout) clearTimeout(autosaveTimeout);
-
-    checkTimeout = setTimeout(async () => {
-      const { activeFile } = manager;
-      if (activeFile.markChanged) {
-        const changed = await activeFile.isChanged();
-        activeFile.isUnsaved = changed;
-        activeFile.writeToCache();
-        events.emit('file-content-changed', activeFile);
-        manager.onupdate('file-changed');
-        manager.emit('update', 'file-changed');
-
-        const { autosave } = appSettings.value;
-        if (activeFile.uri && changed && autosave) {
-          autosaveTimeout = setTimeout(() => {
-            acode.exec('save', false);
-          }, autosave);
-        }
-      }
-      activeFile.markChanged = true;
-    }, TIMEOUT_VALUE);
-  });
-
-  editor.on('scrolltop', onscrolltop);
-  editor.on('scrollleft', onscrollleft);
-
-  editor.renderer.on('resize', () => {
-    $vScrollbar.resize($vScrollbar.visible);
-    $hScrollbar.resize($hScrollbar.visible);
-  });
 
   window.addEventListener('resize', () => {
     const { activeFile } = manager;
@@ -220,9 +178,51 @@ async function EditorManager($sidebar, $header, $body) {
   return manager;
 
   async function setupEditor() {
+    let checkTimeout = null;
+    let autosaveTimeout;
     const Emmet = ace.require('ace/ext/emmet');
     const settings = appSettings.value;
     const commands = await Commands();
+
+    editor.on('focus', () => {
+      const { activeFile } = manager;
+      activeFile.focused = true;
+      $hScrollbar.hide();
+      $vScrollbar.hide();
+    });
+
+    editor.on('change', function (e) {
+      if (checkTimeout) clearTimeout(checkTimeout);
+      if (autosaveTimeout) clearTimeout(autosaveTimeout);
+
+      checkTimeout = setTimeout(async () => {
+        const { activeFile } = manager;
+        if (activeFile.markChanged) {
+          const changed = await activeFile.isChanged();
+          activeFile.isUnsaved = changed;
+          activeFile.writeToCache();
+          events.emit('file-content-changed', activeFile);
+          manager.onupdate('file-changed');
+          manager.emit('update', 'file-changed');
+
+          const { autosave } = appSettings.value;
+          if (activeFile.uri && changed && autosave) {
+            autosaveTimeout = setTimeout(() => {
+              acode.exec('save', false);
+            }, autosave);
+          }
+        }
+        activeFile.markChanged = true;
+      }, TIMEOUT_VALUE);
+    });
+
+    editor.on('scrolltop', onscrolltop);
+    editor.on('scrollleft', onscrollleft);
+
+    editor.renderer.on('resize', () => {
+      $vScrollbar.resize($vScrollbar.visible);
+      $hScrollbar.resize($hScrollbar.visible);
+    });
 
     touchListeners(editor);
     Emmet.setCore(window.emmet);
