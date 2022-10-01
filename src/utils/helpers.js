@@ -140,7 +140,7 @@ export default {
       gcode: /\.gcode$/i,
       glsl: /\.(glsl|frag|vert)$/i,
       graphql: /\.gql$/i,
-      groovy: /\.groovy$/i,
+      groovy: /\.(groovy|gradle)$/i,
       haml: /\.haml$/i,
       handlebars: /\.(hbs|handlebars|tpl|mustache)$/i,
       haskell: /\.hs$/i,
