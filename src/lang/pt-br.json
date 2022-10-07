@@ -66,7 +66,6 @@
   "paste": "Colar",
   "preview mode": "Modo de pré-visualização",
   "read only file": "Não é possível salvar arquivos abertos em modo somente-leitura. Tente salvar como",
-  "redo defination": "Refazer",
   "reload": "Recarregar",
   "rename": "Renomear",
   "replace": "Substituir",
@@ -258,11 +257,11 @@
   "connecting...": "Conectando...",
   "type filename": "Digite o nome do arquivo",
   "unable to load files": "Não foi possível carregar os arquivos",
-  "preview port": "Porta de pre-visualização",
+  "preview port": "Porta de pré-visualização",
   "find file": "Procurar arquivo",
   "system": "Sistema",
   "please select a formatter": "Selecione um formatador",
-  "case sensitive": "Diferencia maiúsculas e minúsculas",
+  "case sensitive": "Diferenciar maiúsculas de minúsculas",
   "regular expression": "Expressão regular",
   "whole word": "Palavra inteira",
   "edit with": "Editar com",
@@ -270,9 +269,9 @@
   "no app found to handle this file": "Nenhum aplicativo encontrado para lidar com este arquivo",
   "restore default settings": "Restaurar configurações iniciais",
   "server port": "Porta do servidor",
-  "preview settings": "Configurações de pre-visualização",
+  "preview settings": "Configurações de pré-visualização",
   "preview settings note": "Se a porta de visualização e a porta do servidor forem diferentes, o aplicativo não iniciará o servidor e, em vez disso, abrirá https://<host>:<porta de visualização> no navegador ou no navegador do aplicativo. Isso é útil quando você está executando um servidor em outro lugar.",
   "backup/restore note": "Isto faz apenas backup de suas configurações, tema personalizado e atalhos de teclado. Não faz backup de seus perfis FTP/SFTP e GitHub.",
   "host": "Host",
-  "retry ftp/sftp when fail": "Tente novamente quando ftp/sftp falhar"
+  "retry ftp/sftp when fail": "Tentar novamente quando ftp/sftp falhar"
 }
