@@ -86,7 +86,7 @@ ace.define("ace/ext/modelist", ["require", "exports", "module"], function (requi
     Gobstones: ["gbs"],
     golang: ["go"],
     GraphQLSchema: ["gql"],
-    Groovy: ["groovy"],
+    Groovy: ["groovy|gradle"],
     HAML: ["haml"],
     Handlebars: ["hbs|handlebars|tpl|mustache"],
     Haskell: ["hs"],
