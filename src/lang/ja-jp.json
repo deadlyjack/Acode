@@ -68,7 +68,7 @@
   "read only file": "読み取り専用ファイルは保存できません。名前を付けて保存してください",
   "reload": "再読み込み",
   "rename": "ファイル名変更",
-  "replace": "置き換え",
+  "replace": "置換",
   "required": "この項目は必須です",
   "run your web app": "ウェブアプリを実行",
   "save": "保存",
@@ -273,5 +273,5 @@
   "preview settings note": "プレビューポートとサーバーポートが異なる場合、アプリはサーバーを起動せず、代わりにブラウザやアプリ内ブラウザで https://<host>:<preview port> を開きます。これは別の場所でサーバーを動かしている場合に役立ちます。",
   "backup/restore note": "設定、カスタムテーマ、キーバインドのみバックアップされます。FTP/SFTPやGitHubプロファイルはバックアップされません。",
   "host": "ホスト",
-  "retry ftp/sftp when fail": "Retry ftp/sftp when fail"
+  "retry ftp/sftp when fail": "失敗時にFTP/SFTP接続を再試行"
 }
