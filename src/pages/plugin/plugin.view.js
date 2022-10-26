@@ -21,18 +21,18 @@ export default (props) => <div className="main" id="plugin">
 function Buttons({ props }) {
   if (props.installed && props.update) {
     return <>
-      <button onclick={props.uninstall}>{props.strings.uninstall}</button>
-      <button onclick={props.install}>{props.strings.update}</button>
+      <button onclick={props.uninstall}>{strings.uninstall}</button>
+      <button onclick={props.install}>{strings.update}</button>
     </>
   }
 
   if (props.installed) {
-    return <button onclick={props.uninstall}>{props.strings.uninstall}</button>
+    return <button onclick={props.uninstall}>{strings.uninstall}</button>
   }
 
   if (props.isPaid) {
-    return <button action="buy">{props.strings['download acode pro']}</button>
+    return <button action="buy">{strings['download acode pro']}</button>
   }
 
-  return <button onclick={props.install}>{props.strings.install}</button>
+  return <button onclick={props.install}>{strings.install}</button>
 }

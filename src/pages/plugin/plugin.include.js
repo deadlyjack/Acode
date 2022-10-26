@@ -125,7 +125,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
     }
 
     try {
-      let isAdLoaded = await window.iad.isLoaded();
+      let isAdLoaded = await window.iad?.isLoaded();
       if (IS_FREE_VERSION && !isAdLoaded) {
         const oldText = this.textContent;
         this.textContent = strings['loading...'];
@@ -149,7 +149,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
 
   async function uninstall() {
     try {
-      let isAdLoaded = await window.iad.isLoaded();
+      let isAdLoaded = await window.iad?.isLoaded();
       if (IS_FREE_VERSION && !isAdLoaded) {
         const oldText = this.textContent;
         this.textContent = strings['loading...'];
@@ -173,7 +173,6 @@ export default async function PluginInclude(json, installed = false, onInstall, 
 
   async function render() {
     const isPaid = ['paid', 'premium', 'pro'].includes(plugin.type) && IS_FREE_VERSION;
-    const isAdLoaded = await window.iad.isLoaded();
     if (Url.getProtocol(icon) === 'file:') {
       icon = await helpers.toInternalUri(icon);
     }
@@ -186,9 +185,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       body: readme ? marked(readme) : '',
       installed,
       update,
-      strings,
       isPaid,
-      isAdLoaded,
       install,
       uninstall,
     });
