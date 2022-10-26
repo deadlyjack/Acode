@@ -32,17 +32,15 @@ module.exports = (env, options) => {
     }
   ];
 
-  if (mode === 'production') {
-    rules.push({
-      test: /\.m?js$/,
-      use: {
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-        },
-      },
-    });
-  }
+  // if (mode === 'production') {
+  rules.push({
+    test: /\.m?js$/,
+    use: [
+      'html-tag-js/jsx/tag-loader.js',
+      'babel-loader',
+    ],
+  });
+  // }
 
   clearOutputDir();
 

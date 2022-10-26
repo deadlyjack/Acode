@@ -3,7 +3,8 @@
     [
       "@babel/preset-env",
       {
-        "useBuiltIns": "entry"
+        "useBuiltIns": "entry",
+        "corejs": "3.22"
       }
     ]
   ],
@@ -15,6 +16,8 @@
     }
   },
   "plugins": [
+    "html-tag-js/jsx/jsx-to-tag.js",
+    "html-tag-js/jsx/syntax-parser.js",
     [
       "@babel/plugin-transform-runtime"
     ]

@@ -149,6 +149,9 @@ export default function PluginsInclude(updates) {
         }
       });
       allState = LOADED;
+      if (section === 'all') {
+        render();
+      }
     } catch (error) {
       helpers.error(error);
     }
@@ -156,6 +159,10 @@ export default function PluginsInclude(updates) {
 
   async function getInstalledPlugins(updates) {
     const installed = await fsOperation(PLUGIN_DIR).lsDir();
+    if (!installed.length) {
+      section = 'all';
+      render();
+    }
     await Promise.all(installed.map(async (item) => {
       const id = Url.basename(item.url);
       if ((updates && updates.includes(id)) || !updates) {

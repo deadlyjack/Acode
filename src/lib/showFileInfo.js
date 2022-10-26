@@ -1,4 +1,4 @@
-import fileSize from 'filesize';
+import { filesize } from 'filesize';
 import mustache from 'mustache';
 import $_fileInfo from '../views/file-info.hbs';
 import fsOperation from '../fileSystem/fsOperation';
@@ -19,7 +19,7 @@ export default async function showFileInfo(url) {
     const value = await fs.readFile('utf-8');
 
     let { name, lastModified, length, uri, type } = stats;
-    length = fileSize(length);
+    length = filesize(length);
     lastModified = new Date(lastModified).toLocaleString();
 
     const protocol = Url.getProtocol(uri);

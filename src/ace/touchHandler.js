@@ -403,8 +403,11 @@ export default function addTouchListeners(editor) {
     const hDirection = moveX > 0 ? RIGHT : LEFT;
 
     const { getEditorHeight, getEditorWidth } = helpers;
-    const { scrollLeft } = editor.renderer.scrollBarH;
-    const { scrollTop } = editor.renderer.scrollBarV;
+    // Why I used it in first place?
+    // const { scrollLeft } = editor.renderer.scrollBarH;
+    const { scrollLeft } = editor.renderer.getScrollLeft();
+    // const { scrollTop } = editor.renderer.scrollBarV;
+    const { scrollTop } = editor.renderer.getScrollTop();
     const [editorWidth, editorHeight] = [getEditorWidth(editor), getEditorHeight(editor)];
 
     if (

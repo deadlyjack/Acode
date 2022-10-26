@@ -1,6 +1,5 @@
 import './plugin.scss';
-import mustache from 'mustache';
-import template from './plugin.hbs';
+import view from './plugin.view.js';
 import Page from "../../components/page";
 import ajax from '@deadlyjack/ajax';
 import helpers from '../../utils/helpers';
@@ -8,8 +7,8 @@ import { marked } from 'marked';
 import Url from '../../utils/Url';
 import installPlugin from '../../lib/installPlugin';
 import fsOperation from '../../fileSystem/fsOperation';
-import tag from 'html-tag-js';
 import constants from '../../lib/constants';
+import dialogs from '../../components/dialogs';
 
 export default async function PluginInclude(json, installed = false, onInstall, onUninstall) {
   const $page = Page('Plugin');
@@ -113,51 +112,73 @@ export default async function PluginInclude(json, installed = false, onInstall, 
   function handleClick(e) {
     const $target = e.target;
     const action = $target.getAttribute('action');
-    if (action === 'install') {
-      if (!remotePlugin) {
-        toast('Cannot install plugin');
-        return;
-      }
-
-      installPlugin(remotePlugin, remoteHost)
-        .then(() => {
-          acode.unmountPlugin(plugin.id);
-          if (onInstall) onInstall(plugin.id);
-          installed = true;
-          update = false;
-          render();
-        })
-        .catch((err) => {
-          helpers.error(err);
-        });
-    }
-    if (action === 'uninstall') {
-      fsOperation(
-        Url.join(PLUGIN_DIR, plugin.id)
-      )
-        .delete()
-        .then(() => {
-          acode.unmountPlugin(plugin.id);
-          if (onUninstall) onUninstall(plugin.id);
-          installed = false;
-          update = false;
-          render();
-        })
-        .catch((err) => {
-          helpers.error(err);
-        });
-    }
     if (action === 'buy') {
       system.openInBrowser(constants.PAID_VERSION)
+      return;
+    }
+  }
+
+  async function install() {
+    if (!remotePlugin) {
+      toast('Cannot install plugin');
+      return;
+    }
+
+    try {
+      let isAdLoaded = await window.iad.isLoaded();
+      if (IS_FREE_VERSION && !isAdLoaded) {
+        const oldText = this.textContent;
+        this.textContent = strings['loading...'];
+        await window.iad.load();
+        this.textContent = oldText;
+        isAdLoaded = true;
+      }
+      await installPlugin(remotePlugin, remoteHost)
+      acode.unmountPlugin(plugin.id);
+      if (onInstall) onInstall(plugin.id);
+      installed = true;
+      update = false;
+      if (IS_FREE_VERSION && isAdLoaded) {
+        window.iad.show();
+      }
+      render();
+    } catch (err) {
+      helpers.error(err);
+    }
+  }
+
+  async function uninstall() {
+    try {
+      let isAdLoaded = await window.iad.isLoaded();
+      if (IS_FREE_VERSION && !isAdLoaded) {
+        const oldText = this.textContent;
+        this.textContent = strings['loading...'];
+        await window.iad.load();
+        this.textContent = oldText;
+        isAdLoaded = true;
+      }
+      await fsOperation(Url.join(PLUGIN_DIR, plugin.id)).delete();
+      acode.unmountPlugin(plugin.id);
+      if (onUninstall) onUninstall(plugin.id);
+      installed = false;
+      update = false;
+      if (IS_FREE_VERSION && isAdLoaded) {
+        window.iad.show();
+      }
+      render();
+    } catch (err) {
+      helpers.error(err);
     }
   }
 
   async function render() {
     const isPaid = ['paid', 'premium', 'pro'].includes(plugin.type) && IS_FREE_VERSION;
+    const isAdLoaded = await window.iad.isLoaded();
     if (Url.getProtocol(icon) === 'file:') {
       icon = await helpers.toInternalUri(icon);
     }
-    $page.body = tag.parse(mustache.render(template, {
+
+    $page.content = view({
       ...plugin,
       readme,
       version,
@@ -167,11 +188,9 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       update,
       strings,
       isPaid,
-    }));
-
-    if (isPaid) {
-      const $installBtn = $page.get('[action="install"]');
-      if ($installBtn) $installBtn.style.display = 'none';
-    }
+      isAdLoaded,
+      install,
+      uninstall,
+    });
   }
 }

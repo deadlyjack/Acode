@@ -175,12 +175,31 @@ async function ondeviceready() {
     admob
       .start()
       .then(async () => {
-        const ad = new admob.BannerAd({
+        const banner = new admob.BannerAd({
           adUnitId: 'ca-app-pub-5911839694379275/9157899592', // Production
           // adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test
           position: 'bottom',
         });
-        window.ad = ad;
+
+        const interstitial = new admob.InterstitialAd({
+          adUnitId: 'ca-app-pub-5911839694379275/9570937608', // Production
+          // adUnitId: 'ca-app-pub-3940256099942544/5224354917', // Test
+        });
+
+        interstitial.load();
+
+        interstitial.on('load', () => {
+          if (typeof interstitial.onload === 'function') {
+            interstitial.onload();
+          }
+        });
+
+        interstitial.on('admob.ad.dismiss', () => {
+          interstitial.load();
+        });
+
+        window.ad = banner;
+        window.iad = interstitial;
       });
   }
 
