@@ -125,20 +125,15 @@ export default async function PluginInclude(json, installed = false, onInstall, 
     }
 
     try {
-      let isAdLoaded = await window.iad?.isLoaded();
-      if (IS_FREE_VERSION && !isAdLoaded) {
-        const oldText = this.textContent;
-        this.textContent = strings['loading...'];
-        await window.iad.load();
-        this.textContent = oldText;
-        isAdLoaded = true;
-      }
-      await installPlugin(remotePlugin, remoteHost)
+      await Promise.all([
+        loadAd(this),
+        installPlugin(remotePlugin, remoteHost),
+      ]);
       acode.unmountPlugin(plugin.id);
       if (onInstall) onInstall(plugin.id);
       installed = true;
       update = false;
-      if (IS_FREE_VERSION && isAdLoaded) {
+      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
         window.iad.show();
       }
       render();
@@ -149,20 +144,17 @@ export default async function PluginInclude(json, installed = false, onInstall, 
 
   async function uninstall() {
     try {
-      let isAdLoaded = await window.iad?.isLoaded();
-      if (IS_FREE_VERSION && !isAdLoaded) {
-        const oldText = this.textContent;
-        this.textContent = strings['loading...'];
-        await window.iad.load();
-        this.textContent = oldText;
-        isAdLoaded = true;
-      }
-      await fsOperation(Url.join(PLUGIN_DIR, plugin.id)).delete();
+      const pluginDir = Url.join(PLUGIN_DIR, plugin.id);
+      await Promise.all([
+        loadAd(this),
+        fsOperation(pluginDir)
+          .delete(),
+      ]);
       acode.unmountPlugin(plugin.id);
       if (onUninstall) onUninstall(plugin.id);
       installed = false;
       update = false;
-      if (IS_FREE_VERSION && isAdLoaded) {
+      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
         window.iad.show();
       }
       render();
@@ -189,5 +181,19 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       install,
       uninstall,
     });
+  }
+
+  async function loadAd(el) {
+    if (!IS_FREE_VERSION) return;
+    try {
+      let isAdLoaded = await window.iad?.isLoaded();
+      if (!isAdLoaded) {
+        const oldText = el.textContent;
+        el.textContent = strings['loading...'];
+        await window.iad.load();
+        el.textContent = oldText;
+        isAdLoaded = true;
+      }
+    } catch (error) { }
   }
 }

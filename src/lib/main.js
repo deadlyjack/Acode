@@ -188,13 +188,7 @@ async function ondeviceready() {
 
         interstitial.load();
 
-        interstitial.on('load', () => {
-          if (typeof interstitial.onload === 'function') {
-            interstitial.onload();
-          }
-        });
-
-        interstitial.on('admob.ad.dismiss', () => {
+        interstitial.on('dismiss', () => {
           interstitial.load();
         });
 
