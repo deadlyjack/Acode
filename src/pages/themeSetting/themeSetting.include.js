@@ -6,9 +6,9 @@ import constants from '../../lib/constants';
 import $_template from './themeSetting.hbs';
 import $_list_item from './list-item.hbs';
 import searchBar from '../../components/searchbar';
-import dialogs from '../../components/dialogs';
 import CustomTheme from '../customTheme/customTheme';
 import helpers from '../../utils/helpers';
+import removeAds from '../../lib/removeAds';
 
 export default function () {
   const $page = Page(strings.theme.capitalize());
@@ -173,20 +173,16 @@ export default function () {
    * @param {String} type
    * @returns
    */
-  function onSelectAppTheme(res, type) {
+  async function onSelectAppTheme(res, type) {
     const theme = constants.appThemeList[res];
     if (!theme) return;
     if (!theme.isFree && IS_FREE_VERSION) {
-      dialogs
-        .box(
-          strings.info.toUpperCase(),
-          'Hi dear user, dark modes are available in paid version of the app. ' +
-          'Please support this project by buying the paid version.',
-        )
-        .onhide(() => {
-          system.openInBrowser(constants.PAID_VERSION);
-        });
-      return;
+      try {
+        await removeAds();
+        render('app');
+      } catch (e) {
+        return;
+      }
     }
 
     if (theme.name === 'custom') {

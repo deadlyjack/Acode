@@ -1,3 +1,5 @@
+import removeAds from "../../lib/removeAds"
+
 export default (props) => <div className="main" id="plugin">
   <div className="header">
     <div className="info">
@@ -31,7 +33,7 @@ function Buttons({ props }) {
   }
 
   if (props.isPaid) {
-    return <button action="buy">{strings['download acode pro']}</button>
+    return <button onclick={removeAds}>{strings['download acode pro']}</button>
   }
 
   return <button onclick={props.install}>{strings.install}</button>

@@ -1,14 +1,12 @@
 import './plugin.scss';
 import view from './plugin.view.js';
 import Page from "../../components/page";
-import ajax from '@deadlyjack/ajax';
 import helpers from '../../utils/helpers';
 import { marked } from 'marked';
 import Url from '../../utils/Url';
 import installPlugin from '../../lib/installPlugin';
 import fsOperation from '../../fileSystem/fsOperation';
-import constants from '../../lib/constants';
-import dialogs from '../../components/dialogs';
+import settingsPage from '../../components/settingPage';
 
 export default async function PluginInclude(json, installed = false, onInstall, onUninstall) {
   const $page = Page('Plugin');
@@ -34,7 +32,6 @@ export default async function PluginInclude(json, installed = false, onInstall, 
     cancelled = true;
   };
 
-  $page.onclick = handleClick;
   app.append($page);
   helpers.showAd();
 
@@ -42,10 +39,9 @@ export default async function PluginInclude(json, installed = false, onInstall, 
 
   try {
     const promises = [];
-    let pluginJson = '';
     if (installed && json.startsWith('file:')) {
       promises.push(
-        fsOperation(json).readFile('utf8'),
+        fsOperation(json).readFile('json'),
         fsOperation(
           Url.join(host, 'readme.md'),
         ).readFile('utf8')
@@ -53,16 +49,20 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       icon = Url.join(host, 'icon.png');
     } else {
       promises.push(
-        ajax({
-          url: json,
-          responseType: 'text',
-          contentType: 'application/x-www-form-urlencoded',
-        }),
+        fsOperation(json).readFile('json'),
       );
     }
     if (cancelled) return;
-    [pluginJson, readme] = await Promise.all(promises);
-    plugin = helpers.parseJSON(pluginJson);
+    [plugin, readme] = await Promise.all(promises);
+
+    if (installed) {
+      const settings = acode.getPluginSettings(plugin.id);
+      if (settings) {
+        $page.header.append(
+          <span className="icon settings" onclick={() => settingsPage(plugin.name, settings)}></span>
+        );
+      }
+    }
 
     version = plugin.version;
     if (!icon && plugin.icon) {
@@ -73,11 +73,8 @@ export default async function PluginInclude(json, installed = false, onInstall, 
     render();
 
     if (!readme && plugin.readme) {
-      ajax({
-        url: Url.join(host, plugin.readme),
-        responseType: 'text',
-        contentType: 'application/x-www-form-urlencoded',
-      })
+      fsOperation(Url.join(host, plugin.readme))
+        .readFile('utf8')
         .then((text) => {
           readme = text;
           render();
@@ -85,18 +82,16 @@ export default async function PluginInclude(json, installed = false, onInstall, 
     }
 
     if (installed && json.startsWith('file:')) {
-      ajax({
-        url: Url.join(plugin.host, 'plugin.json'),
-        responseType: 'text',
-        contentType: 'application/x-www-form-urlencoded',
-      }).then((json) => {
-        remotePlugin = helpers.parseJSON(json);
-        remoteHost = plugin.host;
-        if (remotePlugin.version !== version) {
-          update = remotePlugin.version;
-          render();
-        }
-      });
+      fsOperation(Url.join(plugin.host, 'plugin.json'))
+        .readFile('json')
+        .then((json) => {
+          remotePlugin = json;
+          remoteHost = plugin.host;
+          if (remotePlugin.version !== version) {
+            update = remotePlugin.version;
+            render();
+          }
+        });
     } else {
       remotePlugin = plugin;
       remoteHost = host;
@@ -107,15 +102,6 @@ export default async function PluginInclude(json, installed = false, onInstall, 
   } finally {
     helpers.hideAd();
     helpers.removeTitleLoader();
-  }
-
-  function handleClick(e) {
-    const $target = e.target;
-    const action = $target.getAttribute('action');
-    if (action === 'buy') {
-      system.openInBrowser(constants.PAID_VERSION)
-      return;
-    }
   }
 
   async function install() {
@@ -165,8 +151,18 @@ export default async function PluginInclude(json, installed = false, onInstall, 
 
   async function render() {
     const isPaid = ['paid', 'premium', 'pro'].includes(plugin.type) && IS_FREE_VERSION;
-    if (Url.getProtocol(icon) === 'file:') {
+    const protocol = Url.getProtocol(icon);
+    if (protocol === 'file:') {
       icon = await helpers.toInternalUri(icon);
+    } else if (protocol === 'content:') {
+      const data = await fsOperation(icon).readFile();
+      icon = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function () {
+          resolve(reader.result);
+        };
+        reader.readAsDataURL(new Blob([data]));
+      });
     }
 
     $page.content = view({
@@ -186,13 +182,11 @@ export default async function PluginInclude(json, installed = false, onInstall, 
   async function loadAd(el) {
     if (!IS_FREE_VERSION) return;
     try {
-      let isAdLoaded = await window.iad?.isLoaded();
-      if (!isAdLoaded) {
+      if (!await window.iad?.isLoaded()) {
         const oldText = el.textContent;
         el.textContent = strings['loading...'];
         await window.iad.load();
         el.textContent = oldText;
-        isAdLoaded = true;
       }
     } catch (error) { }
   }

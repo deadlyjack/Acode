@@ -1,9 +1,10 @@
 import mimeType from 'mime-types';
+import helpers from '../utils/helpers';
 import Path from '../utils/Path';
 import Url from '../utils/Url';
 import internalFs from './internalFs';
 
-class SFTP {
+class SftpClient {
   #MAX_TRY = 3;
   #hostname;
   #port;
@@ -212,7 +213,7 @@ class SFTP {
   /**
    * Read the file from server
    */
-  readFile() {
+  readFile(encoding) {
     const filename = this.#path;
     const localFilename = this.#getLocalname(filename);
     return new Promise((resolve, reject) => {
@@ -232,7 +233,7 @@ class SFTP {
             localFilename,
             async () => {
               try {
-                const data = await internalFs.readFile(localFilename);
+                const data = await internalFs.readFile(localFilename, encoding);
                 resolve(data);
               } catch (error) {
                 reject(error);
@@ -638,7 +639,66 @@ class SFTP {
  * @param {{password?: String, passPhrase?: String, keyFile?: String}} authentication
  */
 function Sftp(host, port, username, authentication) {
-  return new SFTP(host, port, username, authentication);
+  return new SftpClient(host, port, username, authentication);
+}
+
+Sftp.fromUrl = (url) => {
+  const { username, password, hostname, pathname, port, query } = helpers.decodeUrl(url);
+  const { keyFile, passPhrase } = query;
+
+  const sftp = new SftpClient(hostname, port || 22, username, {
+    password,
+    keyFile,
+    passPhrase,
+  });
+
+  sftp.setPath(pathname);
+  return createFs(sftp);
+}
+
+Sftp.test = (url) => /^sftp:/.test(url);
+
+function createFs(sftp) {
+  return {
+    lsDir() {
+      return sftp.lsDir();
+    },
+    readFile(encoding) {
+      return sftp.readFile(encoding);
+    },
+    writeFile(content) {
+      return sftp.writeFile(content);
+    },
+    createFile(name, data) {
+      return sftp.createFile(name, data);
+    },
+    createDirectory(name) {
+      return sftp.createDir(name);
+    },
+    delete() {
+      return sftp.delete();
+    },
+    copyTo(dest) {
+      dest = Url.pathname(dest);
+      return sftp.copyTo(dest);
+    },
+    moveTo(dest) {
+      dest = Url.pathname(dest);
+      return sftp.moveTo(dest);
+    },
+    renameTo(newname) {
+      return sftp.rename(newname);
+    },
+    exists() {
+      return sftp.exists();
+    },
+    stat() {
+      return sftp.stat();
+    },
+    get localName() {
+      return sftp.localName;
+    }
+  };
 }
 
 export default Sftp;

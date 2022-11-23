@@ -1,313 +1,171 @@
-import UrlParse from 'url-parse';
-import helpers from '../utils/helpers';
 import internalFs from './internalFs';
 import externalFs from './externalFs';
-import Ftp from './ftp';
 import Url from '../utils/Url';
 import Sftp from './sftp';
+import Ftp from './ftp';
+import ajax from '@deadlyjack/ajax';
+import helpers from '../utils/helpers';
+
+const fsList = [];
+
+console.log('Called FsOpereation');
 
 /**
  *
- * @param {string} uri
+ * @param {string} url
  * @returns {FileSystem}
  */
-function fsOperation(uri) {
-  const protocol = Url.getProtocol(uri);
+function fsOperation(url) {
+  return fsList.find((fs) => fs.test(url))?.fs(url);
+}
 
-  if (protocol === 'file:') {
-    return internalOperation(internalFs, uri);
-  } else if (protocol === 'content:') {
-    return externalOperation(externalFs, uri);
-  } else {
-    const uuid = helpers.uuid();
+/**
+ *
+ * @param {InternalFs} internalFs
+ * @param {string} url
+ */
+function internalFsOperation(url) {
+  return {
+    lsDir() {
+      return listDir(url);
+    },
+    async readFile(encoding) {
+      const { data } = await internalFs.readFile(url, encoding);
+      return data;
+    },
+    writeFile(content) {
+      return internalFs.writeFile(url, content, false, false);
+    },
+    createFile(name, data) {
+      return internalFs.writeFile(Url.join(url, name), data || '', true, true);
+    },
+    createDirectory(name) {
+      return internalFs.createDir(url, name);
+    },
+    delete() {
+      return internalFs.delete(url);
+    },
+    copyTo(dest) {
+      return internalFs.moveOrCopy('copyTo', url, dest);
+    },
+    moveTo(dest) {
+      return internalFs.moveOrCopy('moveTo', url, dest);
+    },
+    renameTo(newname) {
+      return internalFs.renameFile(url, newname);
+    },
+    exists() {
+      return internalFs.exists(url);
+    },
+    stat() {
+      return internalFs.stats(url);
+    },
+  };
+}
 
-    if (/#/.test(uri)) {
-      uri = uri.replace(/#/g, uuid);
-    }
-
-    let { username, password, hostname, pathname, port, query } = UrlParse(
-      uri,
-      true,
-    );
-
-    if (pathname) {
-      pathname = decodeURIComponent(pathname);
-      pathname = pathname.replace(new RegExp(uuid, 'g'), '#');
-    }
-
-    if (username) {
-      username = decodeURIComponent(username);
-    }
-
-    if (password) {
-      password = decodeURIComponent(password);
-    }
-
-    if (port) {
-      port = parseInt(port);
-    }
-
-    if (protocol === 'ftp:') {
-
-      let { security, mode } = query;
-      const ftp = Ftp(hostname, username, password, port || 21, security, mode);
-
-      ftp.setPath(pathname);
-
-      return ftpOperation(ftp);
-
-    } else if (protocol === 'sftp:') {
-
-      let { keyFile, passPhrase } = query;
-
-      if (keyFile) {
-        keyFile = decodeURIComponent(keyFile);
+/**
+ *
+ * @param {ExternalFs} externalFs
+ * @param {string} url
+ */
+function externalFsOperation(url) {
+  return {
+    lsDir() {
+      return externalFs.listDir(url);
+    },
+    async readFile(encoding) {
+      const { data } = await externalFs.readFile(url, encoding);
+      return data;
+    },
+    writeFile(content) {
+      return externalFs.writeFile(url, content);
+    },
+    createFile(name, data) {
+      data = data || '';
+      return externalFs.createFile(url, name, data);
+    },
+    createDirectory(name) {
+      return externalFs.createDir(url, name);
+    },
+    delete() {
+      return externalFs.delete(url);
+    },
+    copyTo(dest) {
+      return externalFs.copy(url, dest);
+    },
+    moveTo(dest) {
+      const src = Url.dirname(url);
+      if (Url.areSame(src, dest)) return Promise.resolve(url);
+      return externalFs.move(url, dest);
+    },
+    renameTo(newname) {
+      return externalFs.renameFile(url, newname);
+    },
+    async exists() {
+      try {
+        const stats = await externalFs.stats(url);
+        return stats.exists;
+      } catch (error) {
+        return false;
       }
+    },
+    stat() {
+      return externalFs.stats(url);
+    },
+  };
+}
 
-      if (passPhrase) {
-        passPhrase = decodeURIComponent(passPhrase);
-      }
+function listDir(url) {
+  return new Promise((resolve, reject) => {
+    const files = [];
+    internalFs
+      .listDir(url)
+      .then((entries) => {
+        entries.map((entry) => {
+          const url = decodeURIComponent(entry.nativeURL);
+          const name = Url.basename(url);
+          files.push({
+            name,
+            url,
+            isDirectory: entry.isDirectory,
+            isFile: entry.isFile,
+          });
+        });
+        resolve(files);
+      })
+      .catch(reject);
+  });
+}
 
-      const sftp = Sftp(hostname, port || 22, username, {
-        password,
-        keyFile,
-        passPhrase,
+fsOperation.extend = (test, fs) => {
+  fsList.push({ test, fs });
+}
+
+fsOperation.extend(Sftp.test, Sftp.fromUrl);
+fsOperation.extend(Ftp.test, Ftp.fromUrl);
+fsOperation.extend((url) => /^file:/.test(url), (url) => internalFsOperation(url));
+fsOperation.extend((url) => /^content:/.test(url), (url) => externalFsOperation(url));
+fsOperation.extend((url) => /^https?:/.test(url), (url) => {
+  return {
+    async readFile(encoding, progress) {
+      const data = await ajax.get(url, {
+        responseType: 'arraybuffer',
+        contentType: 'application/x-www-form-urlencoded',
+        onprogress: progress,
       });
 
-      sftp.setPath(pathname);
-
-      return sftpOperation(sftp);
-
-    } else {
-
-      throw new Error('File system not supported yet.');
-
+      if (encoding) {
+        return helpers.decodeText(data, encoding);
+      }
+    },
+    async writeFile(content, progress) {
+      return ajax.post(url, {
+        data: content,
+        contentType: 'application/x-www-form-urlencoded',
+        onprogress: progress,
+      });
     }
   }
-  /**
-   *
-   * @param {RemoteFs} fs
-   * @param {string} url
-   */
-  function ftpOperation(fs) {
-    return {
-      lsDir() {
-        return fs.listDir();
-      },
-      readFile(encoding) {
-        return readFile(fs.readFile(), encoding);
-      },
-      writeFile(content) {
-        return fs.writeFile(content);
-      },
-      createFile(name, data = '') {
-        return fs.createFile(name, data);
-      },
-      createDirectory(name) {
-        return fs.createDir(name);
-      },
-      delete() {
-        return fs.delete();
-      },
-      copyTo(dest) {
-        dest = Url.pathname(dest);
-        return fs.copyTo(dest);
-      },
-      moveTo(dest) {
-        dest = Url.pathname(dest);
-        return fs.moveTo(dest);
-      },
-      renameTo(newname) {
-        return fs.rename(newname);
-      },
-      exists() {
-        return fs.exists();
-      },
-      stat() {
-        return fs.stat();
-      },
-      get localName() {
-        return fs.localName;
-      }
-    };
-  }
-
-  /**
-   *
-   * @param {RemoteFs} fs
-   */
-  function sftpOperation(fs) {
-    return {
-      lsDir() {
-        return fs.lsDir();
-      },
-      readFile(encoding) {
-        return readFile(fs.readFile(), encoding);
-      },
-      writeFile(content) {
-        return fs.writeFile(content);
-      },
-      createFile(name, data) {
-        return fs.createFile(name, data);
-      },
-      createDirectory(name) {
-        return fs.createDir(name);
-      },
-      delete() {
-        return fs.delete();
-      },
-      copyTo(dest) {
-        dest = Url.pathname(dest);
-        return fs.copyTo(dest);
-      },
-      moveTo(dest) {
-        dest = Url.pathname(dest);
-        return fs.moveTo(dest);
-      },
-      renameTo(newname) {
-        return fs.rename(newname);
-      },
-      exists() {
-        return fs.exists();
-      },
-      stat() {
-        return fs.stat();
-      },
-      get localName() {
-        return fs.localName;
-      }
-    };
-  }
-
-  /**
-   *
-   * @param {InternalFs} fs
-   * @param {string} url
-   */
-  function internalOperation(fs, url) {
-    return {
-      lsDir() {
-        return listDir(url);
-      },
-      readFile(encoding) {
-        return readFile(fs.readFile(url), encoding);
-      },
-      writeFile(content) {
-        return fs.writeFile(url, content, false, false);
-      },
-      createFile(name, data) {
-        return fs.writeFile(Url.join(url, name), data || '', true, true);
-      },
-      createDirectory(name) {
-        return fs.createDir(url, name);
-      },
-      delete() {
-        return fs.delete(url);
-      },
-      copyTo(dest) {
-        return fs.moveOrCopy('copyTo', url, dest);
-      },
-      moveTo(dest) {
-        return fs.moveOrCopy('moveTo', url, dest);
-      },
-      renameTo(newname) {
-        return fs.renameFile(url, newname);
-      },
-      exists() {
-        return fs.exists(url);
-      },
-      stat() {
-        return fs.stats(url);
-      },
-    };
-  }
-
-  /**
-   *
-   * @param {ExternalFs} fs
-   * @param {string} url
-   */
-  function externalOperation(fs, url) {
-    return {
-      lsDir() {
-        return fs.listDir(url);
-      },
-      readFile(encoding) {
-        return readFile(fs.readFile(url), encoding);
-      },
-      writeFile(content) {
-        return fs.writeFile(url, content);
-      },
-      createFile(name, data) {
-        data = data || '';
-        return fs.createFile(url, name, data);
-      },
-      createDirectory(name) {
-        return fs.createDir(url, name);
-      },
-      delete() {
-        return fs.delete(url);
-      },
-      copyTo(dest) {
-        return fs.copy(url, dest);
-      },
-      moveTo(dest) {
-        const src = Url.dirname(url);
-        if (Url.areSame(src, dest)) return Promise.resolve(url);
-        return fs.move(url, dest);
-      },
-      renameTo(newname) {
-        return fs.renameFile(url, newname);
-      },
-      async exists() {
-        try {
-          const stats = await fs.stats(url);
-          return stats.exists;
-        } catch (error) {
-          return false;
-        }
-      },
-      stat() {
-        return fs.stats(url);
-      },
-    };
-  }
-
-  function readFile(file, encoding) {
-    return new Promise((resolve, reject) => {
-      file
-        .then((res) => {
-          const data = res.data;
-          if (encoding) {
-            const text = helpers.decodeText(data, encoding);
-            resolve(text);
-          } else resolve(data);
-        })
-        .catch(reject);
-    });
-  }
-
-  function listDir(url) {
-    return new Promise((resolve, reject) => {
-      const files = [];
-      internalFs
-        .listDir(url)
-        .then((entries) => {
-          entries.map((entry) => {
-            const url = decodeURIComponent(entry.nativeURL);
-            const name = Url.basename(url);
-            files.push({
-              name,
-              url,
-              isDirectory: entry.isDirectory,
-              isFile: entry.isFile,
-            });
-          });
-          resolve(files);
-        })
-        .catch(reject);
-    });
-  }
-}
+});
 
 export default fsOperation;

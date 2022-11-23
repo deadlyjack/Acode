@@ -8,7 +8,7 @@ import helpers from "../utils/helpers";
  * 
  * @param {string} title 
  * @param {Array<object>} settings 
- * @param {(key, value) => void} callback 
+ * @param {(key, value) => void} callback  called when setting is changed
  */
 
 export default function settingsPage(title, settings, callback) {

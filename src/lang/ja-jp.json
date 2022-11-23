@@ -273,5 +273,11 @@
   "preview settings note": "プレビューポートとサーバーポートが異なる場合、アプリはサーバーを起動せず、代わりにブラウザやアプリ内ブラウザで https://<host>:<preview port> を開きます。これは別の場所でサーバーを動かしている場合に役立ちます。",
   "backup/restore note": "設定、カスタムテーマ、キーバインドのみバックアップされます。FTP/SFTPやGitHubプロファイルはバックアップされません。",
   "host": "ホスト",
-  "retry ftp/sftp when fail": "失敗時にFTP/SFTP接続を再試行"
+  "retry ftp/sftp when fail": "失敗時にFTP/SFTP接続を再試行",
+  "more": "More",
+  "thank you :)": "Thank you :)",
+  "purchase pending": "purchase pending",
+  "cancelled": "cancelled",
+  "local": "Local",
+  "remote": "Remote"
 }

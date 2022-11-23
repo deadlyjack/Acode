@@ -1,5 +1,7 @@
 import tag from "html-tag-js";
+import dialogs from "../components/dialogs";
 import constants from "../lib/constants";
+import selectionMenu from "../lib/selectionMenu";
 import helpers from "../utils/helpers";
 
 /**
@@ -77,18 +79,6 @@ export default function addTouchListeners(editor) {
    */
   const $menu = tag('menu', {
     className: 'cursor-menu',
-    onclick(e) {
-      editor.focus();
-      const { action } = e.target.dataset;
-      if (!action) return;
-
-      editor.execCommand(action);
-      if (action === 'selectall') {
-        editor.scrollToRow(Infinity);
-        selectionActive = true;
-        menuActive = true;
-      }
-    }
   });
 
   let scrollTimeout; // timeout to check if scrolling is finished
@@ -137,6 +127,14 @@ export default function addTouchListeners(editor) {
   appSettings.on('update:scrollSpeed', (value) => {
     scrollSpeed = value;
   });
+
+  editor.setSelection = (value) => {
+    selectionActive = value;
+  };
+
+  editor.setMenu = (value) => {
+    menuActive = value;
+  };
 
   /**
    * Editor container on touch start
@@ -815,34 +813,39 @@ export default function addTouchListeners(editor) {
 
   function populateMenuItems(mode = 'regular') {
     $menu.innerHTML = '';
+    const copyText = editor.getCopyText();
+    const items = [];
 
-    const menuItem = (text, action) => tag('span', {
-      textContent: text,
-      dataset: {
-        action: action || text,
-      },
+    selectionMenu().forEach((item) => {
+      if (mode === 'read-only' && !item.readOnly) return;
+      if (copyText && !['selected', 'all'].includes(item.mode)) return;
+
+      items.push(item);
     });
 
-    const $copy = menuItem(strings.copy, 'copy');
-    const $paste = menuItem(strings.paste, 'paste');
-    const $cut = menuItem(strings.cut, 'cut');
-    const $selectAll = menuItem(strings['select all'], 'selectall');
+    const firstFour = items.slice(0, 4);
+    const rest = items.slice(4);
 
-    const copyText = editor.getCopyText();
+    firstFour.forEach(({ onclick, text }) => {
+      $menu.append(
+        <div onclick={onclick}>{text}</div>
+      );
+    });
 
-    if (mode === 'read-only') {
-      if (copyText) {
-        $menu.append($copy, $selectAll);
-      } else {
-        $menu.append($selectAll);
-      }
-      return;
-    }
+    if (rest.length) {
+      const showMoreMenu = async () => {
+        try {
+          const res = await dialogs.select(strings.more, rest.map(({ text }, i) => ([i, text])));
+          rest[res].onclick();
+        } catch (error) {
 
-    if (copyText) {
-      $menu.append($copy, $cut, $paste, $selectAll);
-    } else {
-      $menu.append($paste, $selectAll);
+        }
+      };
+      $menu.append(
+        <div onclick={showMoreMenu}>
+          <span className="icon more_vert"></span>
+        </div>
+      );
     }
   }
 

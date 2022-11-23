@@ -1,7 +1,7 @@
 {{#.}}
 <div 
   class="list-item"
-  action="open"
+  data-action="open"
   {{#installed}}data-installed="true"{{/installed}}
   data-plugin="{{#localPlugin}}{{.}}{{/localPlugin}}{{^localPlugin}}{{plugin}}{{/localPlugin}}"
 >

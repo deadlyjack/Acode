@@ -79,6 +79,7 @@ async function Main() {
 }
 
 async function ondeviceready() {
+  const isFreePackage = /(free)$/.test(BuildInfo.packageName);
   const oldRURL = window.resolveLocalFileSystemURL;
   const {
     externalCacheDirectory, //
@@ -87,7 +88,6 @@ async function ondeviceready() {
     dataDirectory,
   } = cordova.file;
 
-  iap.startConnection();
   window.root = tag.get('#root');
   window.app = document.body;
   window.addedFolder = [];
@@ -96,7 +96,6 @@ async function ondeviceready() {
   window.toastQueue = [];
   window.toast = toast;
   window.ASSETS_DIRECTORY = Url.join(cordova.file.applicationDirectory, 'www');
-  window.IS_FREE_VERSION = /(free)$/.test(BuildInfo.packageName);
   window.DATA_STORAGE = externalDataDirectory || dataDirectory;
   window.CACHE_STORAGE = externalCacheDirectory || cacheDirectory;
   window.PLUGIN_DIR = Url.join(DATA_STORAGE, 'plugins');
@@ -104,6 +103,31 @@ async function ondeviceready() {
   window.gitRecordFile = Url.join(DATA_STORAGE, 'git/.gitfiles');
   window.gistRecordFile = Url.join(DATA_STORAGE, 'git/.gistfiles');
   window.actionStack = ActionStack();
+  window.IS_FREE_VERSION = isFreePackage;
+
+  try {
+    await helpers.promisify(iap.startConnection)
+      .catch((e) => {
+        console.log('connection error:', e);
+      });
+
+    if (localStorage.acode_pro === 'true') {
+      window.IS_FREE_VERSION = false;
+    }
+
+    if (navigator.onLine) {
+      const purchases = await helpers.promisify(iap.getPurchases);
+      const isPro = purchases.find((p) => JSON.parse(p.json).productId === 'acode_pro');
+      if (isPro) {
+        window.IS_FREE_VERSION = false;
+      } else {
+        window.IS_FREE_VERSION = isFreePackage;
+      }
+    }
+  } catch (error) {
+    console.log('error :>> ', error);
+  }
+
   window.appSettings = new Settings();
 
   try {

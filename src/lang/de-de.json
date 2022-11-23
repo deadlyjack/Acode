@@ -273,5 +273,11 @@
   "preview settings note": "Wenn sich Vorschau-Port und Server-Port unterscheiden startet die App keinen Server, sondern öffnet stattdessen https://<Host>:<Vorschau-Port> im Browser oder App-Browser. Dies ist nützlich, um einen Server an einem anderen Ort zu betreiben.",
   "backup/restore note": "Es werden nur ihre Einstellungen, ein individuelles Thema und ihre Tasten-Bindungen gesichert. FTP/SFTP, GitHub Profile werden nicht gesichert.",
   "host": "Host",
-  "retry ftp/sftp when fail": "FTP/SFTP bei Fehlversuch wiederholen"
+  "retry ftp/sftp when fail": "FTP/SFTP bei Fehlversuch wiederholen",
+  "more": "More",
+  "thank you :)": "Thank you :)",
+  "purchase pending": "purchase pending",
+  "cancelled": "cancelled",
+  "local": "Local",
+  "remote": "Remote"
 }

@@ -1,4 +1,3 @@
-import ajax from "@deadlyjack/ajax";
 import dialogs from "../components/dialogs";
 import fsOperation from "../fileSystem/fsOperation";
 import loadPlugin from "./loadPlugin";
@@ -34,33 +33,9 @@ export default async function installPlugin(plugin, host) {
     const readFiles = [];
 
     readFiles.push(
-      ajax({
-        url: mainJs,
-        method: 'GET',
-        contentType: 'application/x-www-form-urlencoded',
-        responseType: 'arraybuffer',
-        onprogress(loaded, total) {
-          progress(plugin.name, loaded / total);
-        }
-      }),
-      ajax({
-        url: Url.join(host, plugin.icon),
-        method: 'GET',
-        contentType: 'application/x-www-form-urlencoded',
-        responseType: 'arraybuffer',
-        onprogress(loaded, total) {
-          progress('icon', loaded / total);
-        }
-      }),
-      ajax({
-        url: Url.join(host, plugin.readme),
-        method: 'GET',
-        contentType: 'application/x-www-form-urlencoded',
-        responseType: 'arraybuffer',
-        onprogress(loaded, total) {
-          progress('readme', loaded / total);
-        }
-      }),
+      fsOperation(mainJs).readFile(),
+      fsOperation(Url.join(host, plugin.icon)).readFile(),
+      fsOperation(Url.join(host, plugin.readme)).readFile(),
     );
 
     const [main, icon, readme] = await Promise.all(readFiles);
@@ -97,20 +72,20 @@ export default async function installPlugin(plugin, host) {
       files.forEach((file) => {
         promises.push(
           (async () => {
-            await helpers
-              .createFileRecursive(pluginDir, file);
-            await fsOperation(Url.join(pluginDir, file))
-              .writeFile(
-                await ajax({
-                  url: Url.join(rootDir, file),
-                  method: 'GET',
-                  contentType: 'application/x-www-form-urlencoded',
-                  responseType: 'arraybuffer',
-                  onprogress(loaded, total) {
-                    progress(file, loaded / total);
-                  }
-                }),
-              );
+            try {
+              const fileContent = await fsOperation(Url.join(rootDir, file))
+                .readFile(undefined, (loaded, total) => {
+                  progress(file, loaded / total);
+                });
+
+              await helpers
+                .createFileRecursive(pluginDir, file);
+
+              await fsOperation(Url.join(pluginDir, file))
+                .writeFile(fileContent);
+            } catch (error) {
+              console.error(error);
+            }
           })(),
         );
       });

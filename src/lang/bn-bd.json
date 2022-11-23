@@ -273,5 +273,11 @@
   "preview settings note": "If preview port and server port are different, app will not start server and it will instead open https://<host>:<preview port> in browser or in-app browser. This is useful when you are running a server somewhere else.",
   "backup/restore note": "এটি শুধুমাত্র আপনার সেটিংস, কাস্টম থিম এবং কী বাইন্ডিং ব্যাকআপ করবে। এটি আপনার FPT/SFTP, GitHub প্রোফাইল ব্যাকআপ করবে না।",
   "host": "হোস্ট",
-  "retry ftp/sftp when fail": "Retry ftp/sftp when fail"
+  "retry ftp/sftp when fail": "Retry ftp/sftp when fail",
+  "more": "More",
+  "thank you :)": "Thank you :)",
+  "purchase pending": "purchase pending",
+  "cancelled": "cancelled",
+  "local": "Local",
+  "remote": "Remote"
 }

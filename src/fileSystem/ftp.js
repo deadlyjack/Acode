@@ -1,4 +1,5 @@
 import mimeType from 'mime-types';
+import helpers from '../utils/helpers';
 import Path from "../utils/Path";
 import Url from "../utils/Url";
 import internalFs from "./internalFs";
@@ -91,11 +92,11 @@ class FtpClient {
     });
   }
 
-  async readFile() {
+  async readFile(encoding) {
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
       ftp.downloadFile(this.#conId, this.#path, this.#cacheFile, async () => {
-        const data = await internalFs.readFile(this.#cacheFile);
+        const data = await internalFs.readFile(this.#cacheFile, encoding);
         resolve(data);
       }, (error) => {
         reject(error);
@@ -256,4 +257,58 @@ class FtpClient {
 
 export default function Ftp(path, host, port, username, password, security, mode) {
   return new FtpClient(path, host, port, username, password, security, mode);
+}
+
+Ftp.fromUrl = (url) => {
+  const { username, password, hostname, pathname, port, query } = helpers.decodeUrl(url);
+  const { security, mode } = query;
+  const ftp = new FtpClient(hostname, username, password, port || 21, security, mode);
+  ftp.setPath(pathname);
+
+  return createFs(ftp);
+}
+
+Ftp.test = (url) => /^ftp:/.test(url);
+
+function createFs(ftp) {
+  return {
+    lsDir() {
+      return ftp.listDir();
+    },
+    readFile(encoding) {
+      return ftp.readFile(encoding);
+    },
+    writeFile(content) {
+      return ftp.writeFile(content);
+    },
+    createFile(name, data = '') {
+      return ftp.createFile(name, data);
+    },
+    createDirectory(name) {
+      return ftp.createDir(name);
+    },
+    delete() {
+      return ftp.delete();
+    },
+    copyTo(dest) {
+      dest = Url.pathname(dest);
+      return ftp.copyTo(dest);
+    },
+    moveTo(dest) {
+      dest = Url.pathname(dest);
+      return ftp.moveTo(dest);
+    },
+    renameTo(newname) {
+      return ftp.rename(newname);
+    },
+    exists() {
+      return ftp.exists();
+    },
+    stat() {
+      return ftp.stat();
+    },
+    get localName() {
+      return ftp.localName;
+    }
+  }
 }

@@ -52,11 +52,6 @@ export default async function findFile() {
     }]);
     const files = [];
     const dirs = addedFolder.map(({ url }) => url);
-    try {
-      await listDir(files, dirs);
-    } catch (error) {
-      // ignore
-    }
 
     editorManager.files.forEach((file) => {
       const { uri, name, type } = file;
@@ -74,6 +69,12 @@ export default async function findFile() {
 
       files.push(hintItem(name, location, uri));
     });
+
+    try {
+      await listDir(files, dirs);
+    } catch (error) {
+      // ignore
+    }
 
     setHints(files);
   }
@@ -98,6 +99,11 @@ export default async function findFile() {
       const vRootDir = Url.dirname(vRoot);
       const vUrl = helpers.getVirtualPath(url);
       const path = Url.dirname(vUrl.subtract(vRootDir)).replace(/\/$/, '');
+      const exists = list.findIndex(({ value }) => value === url);
+      if (exists > -1) {
+        list[exists] = hintItem(name, path, url);
+        return;
+      }
       list.push(hintItem(name, path, url));
     });
 

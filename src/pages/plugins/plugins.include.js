@@ -1,6 +1,4 @@
-import ajax from "@deadlyjack/ajax";
 import mustache from 'mustache'
-import tag from "html-tag-js";
 import template from './plugins.hbs';
 import list from './list.hbs';
 import Page from "../../components/page";
@@ -12,6 +10,7 @@ import plugin from "../plugin/plugin";
 import dialogs from "../../components/dialogs";
 import constants from "../../lib/constants";
 import alert from "../../components/dialogboxes/alert";
+import FileBrowser from "../fileBrowser/fileBrowser";
 
 /**
  * 
@@ -21,19 +20,8 @@ export default function PluginsInclude(updates) {
   const LOADING = 0;
   const LOADED = 1;
   const $page = Page(strings['plugins']);
-  const $search = tag('span', {
-    className: 'icon search',
-    attr: {
-      action: 'search',
-    },
-  });
-  const $add = tag('span', {
-    className: 'icon add',
-    dataset: {
-      action: 'add-source'
-    },
-    onclick: () => addSource(),
-  })
+  const $search = <span className="icon search" data-action='search'></span>;
+  const $add = <span className="icon add" data-action='add-source' onclick={() => addSource()}></span>;
   const plugins = {
     all: [],
     installed: [],
@@ -78,16 +66,16 @@ export default function PluginsInclude(updates) {
     });
 
   function renderAll() {
-    $page.get('[action="select"].active')?.classList.remove('active');
-    $page.get('[action="select"][value="all"]')?.classList.add('active');
+    $page.get('[data-action="select"].active')?.classList.remove('active');
+    $page.get('[data-action="select"][value="all"]')?.classList.add('active');
     $page
       .get('#plugin-list')
       .innerHTML = mustache.render(list, plugins.all);
   }
 
   function renderInstalled() {
-    $page.get('[action="select"].active')?.classList.remove('active');
-    $page.get('[action="select"][value="installed"]')?.classList.add('active');
+    $page.get('[data-action="select"].active')?.classList.remove('active');
+    $page.get('[data-action="select"][value="installed"]')?.classList.add('active');
     $page
       .get('#plugin-list')
       .innerHTML = mustache.render(list, plugins.installed);
@@ -95,7 +83,7 @@ export default function PluginsInclude(updates) {
 
   function handleClick(event) {
     const $target = event.target;
-    const action = $target.getAttribute('action');
+    const { action } = $target.dataset;
     if (action === 'search') {
       searchBar($page.get('#plugin-list'));
       return;
@@ -133,13 +121,7 @@ export default function PluginsInclude(updates) {
   async function getAllPlugins() {
     try {
       const installed = await fsOperation(PLUGIN_DIR).lsDir();
-      const file = await ajax({
-        url: constants.PLUGIN_LIST,
-        method: 'GET',
-        responseType: 'text',
-        contentType: 'application/x-www-form-urlencoded',
-      });
-      plugins.all = helpers.parseJSON(file) || [];
+      plugins.all = await fsOperation(constants.PLUGIN_LIST).readFile('json');
 
       installed.forEach(({ url }) => {
         const plugin = plugins.all.find(({ id }) => id === Url.basename(url));
@@ -202,14 +184,24 @@ export default function PluginsInclude(updates) {
   }
 
   async function addSource(value = 'https://') {
-    const source = await dialogs.prompt('Enter plugin source', value, 'url');
+
+    const sourceType = await dialogs.select('', [
+      ['remote', strings.remote],
+      ['local', strings.local],
+    ], true);
+
+    let source;
+
+    if (sourceType === 'remote') {
+      source = await dialogs.prompt('Enter plugin source', value, 'url');
+    } else {
+      source = (await FileBrowser('folder', 'Select plugin source')).url;
+    }
+
     const json = Url.join(source, 'plugin.json');
     try {
       helpers.showTitleLoader();
-      const data = await ajax.get(json, {
-        responseType: 'json',
-        contentType: 'application/x-www-form-urlencoded',
-      });
+      const data = await fsOperation(json).readFile('json');
 
       if (data) {
         const { id } = data;

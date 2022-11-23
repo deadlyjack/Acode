@@ -26,7 +26,6 @@
       "cordova-plugin-vibration": {},
       "cordova-plugin-buildinfo": {},
       "cordova-plugin-device": {},
-      "cordova-plugin-iap": {},
       "cordova-plugin-sftp": {},
       "cordova-plugin-server": {},
       "cordova-plugin-file": {
@@ -34,7 +33,8 @@
       },
       "cordova-plugin-ftp": {},
       "cordova-plugin-sdcard": {},
-      "cordova-plugin-system": {}
+      "cordova-plugin-system": {},
+      "cordova-plugin-iap": {}
     },
     "platforms": [
       "android"

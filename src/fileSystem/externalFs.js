@@ -1,10 +1,16 @@
 import dialogs from '../components/dialogs';
+import helpers from '../utils/helpers';
 
 export default {
-  async readFile(url) {
+  async readFile(url, encoding) {
     url = await this.formatUri(url);
     return new Promise((resolve, reject) => {
-      sdcard.read(url, (data) => resolve({ data }), reject);
+      sdcard.read(url, (data) => {
+        if (encoding) {
+          data = helpers.decodeText(data, encoding);
+        }
+        resolve({ data });
+      }, reject);
     });
   },
 

@@ -7,7 +7,7 @@ import dialogs from './dialogs';
  * 
  * @param {HTMLUListElement} $list 
  * @param {Array<Object>} items 
- * @param {()=>void} callback 
+ * @param {()=>void} callback called when setting is changed
  */
 export default function listItems($list, items, callback, sort = true) {
   items.sort((a, b) => {
@@ -20,29 +20,14 @@ export default function listItems($list, items, callback, sort = true) {
 
   if (sort) items = items.sort((a, b) => a.text < b.text ? -1 : 1);
   items.forEach((setting) => {
-    const $setting = tag('div', {
-      className: 'container',
-      child: tag('span', {
-        className: 'text',
-        textContent: `${setting.text}`.capitalize(0),
-      }),
-    });
-    const $item = tag('div', {
-      className: 'list-item' + (setting.sake ? ' sake' : ''),
-      children: [
-        tag('i', {
-          className: `icon ${setting.icon || 'no-icon'}`,
-          style: {
-            color: setting.iconColor,
-          }
-        }),
-        $setting,
-      ],
-      dataset: {
-        key: setting.key,
-        action: 'list-item',
-      }
-    });
+    const $setting = <div className="container">
+      <span className="text">{setting.text.capitalize(0)}</span>
+    </div>;
+
+    const $item = <div className={`list-item ${setting.sake ? 'sake' : ''}`} data-key={setting.key} data-action='list-item'>
+      <span className={`icon ${setting.icon || 'no-icon'}`} style={{ color: setting.iconColor }}></span>
+      {$setting}
+    </div>;
 
     let $checkbox, $valueText;
 

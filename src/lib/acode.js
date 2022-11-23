@@ -6,10 +6,14 @@ import defaultFormatter from "../settings/defaultFormatter";
 import dialogs from "../components/dialogs";
 import FileBrowser from "../pages/fileBrowser/fileBrowser";
 import helpers from "../utils/helpers";
+import projects from "./projects";
+import selectionMenu from "./selectionMenu";
 
 export default class Acode {
+  #modules = {};
   #pluginsInit = {};
   #pluginUnmount = {};
+  #pluginSettings = {};
   #formatter = [{
     id: 'default',
     name: 'Default',
@@ -21,6 +25,29 @@ export default class Acode {
       editorManager.editor.gotoLine(cursorPos.row + 1, cursorPos.column);
     }
   }];
+
+  constructor() {
+    this.define('fs', fsOperation);
+    this.define('projects', projects);
+    this.define('selectionMenu', selectionMenu);
+    this.define('alert', dialogs.alert);
+    this.define('confirm', dialogs.confirm);
+    this.define('prompt', dialogs.prompt);
+    this.define('select', dialogs.select);
+    this.define('multiPrompt', dialogs.multiPrompt);
+    this.define('loader', dialogs.loader);
+    this.define('fileBrowser', FileBrowser);
+    this.define('toInternalUrl', helpers.toInternalUri);
+    this.define('Url', Url);
+  }
+
+  define(name, module) {
+    this.#modules[name] = module;
+  }
+
+  require(module) {
+    return this.#modules[module];
+  }
 
   exec(key, val) {
     if (key in commands) {
@@ -41,8 +68,13 @@ export default class Acode {
     document.body.setAttribute('data-small-msg', message);
   }
 
-  setPluginInit(id, initFunction) {
+  setPluginInit(id, initFunction, settings) {
     this.#pluginsInit[id] = initFunction;
+    this.#pluginSettings[id] = settings;
+  }
+
+  getPluginSettings(id) {
+    this.#pluginSettings[id];
   }
 
   setPluginUnmount(id, unmountFunction) {
@@ -144,6 +176,14 @@ export default class Acode {
 
   joinUrl(...args) {
     return Url.join(...args);
+  }
+
+  addIcon(className, src) {
+    let style = document.head.get(`style[icon="${className}"]`);
+    if (!style) {
+      style = <style icon={className}>{`.icon.${className}{background-image: url(${src})}`}</style>
+      document.head.appendChild(style);
+    }
   }
 
   async prompt(message, defaultValue, type, options) {

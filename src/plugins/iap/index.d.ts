@@ -1,9 +1,31 @@
-interface Iap{
-  getProducts(skuList: Array<string>, onSuccess: (skuList: Array<Object>)=>void, onError:(err: String)=>error): void;
-  setPurchaseUpdatedListener(onSuccess: (purchase: Object)=>void, onError:(err: string)=>void): void;
-  startConnection(onSuccess: (responseCode: number)=>void, onError: (err: string)=>void): void;
-  consume(purchaseToken: string, onSuccess: (responseCode: number)=>void, onError: (err: string)=>void): void;
-  purchase(skuId: string, onSuccess: (responseCode: number)=>void, onError: (err: string)=>void): void;
+interface Iap {
+  getProducts(
+    skuList: Array<string>,
+    onSuccess: (skuList: Array<Object>) => void,
+    onError: (err: String) => error,
+  ): void;
+  setPurchaseUpdatedListener(
+    onSuccess: (purchase: Object) => void,
+    onError: (err: string) => void,
+  ): void;
+  startConnection(
+    onSuccess: (responseCode: number) => void,
+    onError: (err: string) => void,
+  ): void;
+  consume(
+    purchaseToken: string,
+    onSuccess: (responseCode: number) => void,
+    onError: (err: string) => void,
+  ): void;
+  purchase(
+    skuId: string,
+    onSuccess: (responseCode: number) => void,
+    onError: (err: string) => void,
+  ): void;
+  getPurchases(
+    onSuccess: (purchaseList: Array<Object>) => void,
+    onError: (err: string) => void,
+  ): void;
   BILLING_UNAVAILABLE: 3;
   DEVELOPER_ERROR: 5;
   ERROR: 6;
@@ -16,6 +38,9 @@ interface Iap{
   SERVICE_TIMEOUT: -3;
   SERVICE_TIMEOUT: 2;
   USER_CANCELED: 1;
+  PURCAHSE_STATE_PURCHASED: 1;
+  PURCAHSE_STATE_PENDING: 2;
+  PURCAHSE_STATE_UNKNOW: 0;
 }
 
 declare var iap: Iap;

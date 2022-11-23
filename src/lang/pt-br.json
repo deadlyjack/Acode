@@ -273,5 +273,11 @@
   "preview settings note": "Se a porta de visualização e a porta do servidor forem diferentes, o aplicativo não iniciará o servidor e, em vez disso, abrirá https://<host>:<porta de visualização> no navegador ou no navegador do aplicativo. Isso é útil quando você está executando um servidor em outro lugar.",
   "backup/restore note": "Isto faz apenas backup de suas configurações, tema personalizado e atalhos de teclado. Não faz backup de seus perfis FTP/SFTP e GitHub.",
   "host": "Host",
-  "retry ftp/sftp when fail": "Tentar novamente quando ftp/sftp falhar"
+  "retry ftp/sftp when fail": "Tentar novamente quando ftp/sftp falhar",
+  "more": "More",
+  "thank you :)": "Thank you :)",
+  "purchase pending": "purchase pending",
+  "cancelled": "cancelled",
+  "local": "Local",
+  "remote": "Remote"
 }

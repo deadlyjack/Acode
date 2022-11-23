@@ -8,8 +8,8 @@ module.exports = {
   startConnection: function (onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'Iap', 'startConnection', []);
   },
-  consume: function (productId, onSuccess, onFail) {
-    cordova.exec(onSuccess, onFail, 'Iap', 'consume', [productId]);
+  consume: function (purchaseToken, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'Iap', 'consume', [purchaseToken]);
   },
   purchase: function (productId, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'Iap', 'purchase', [productId]);
@@ -28,5 +28,8 @@ module.exports = {
   SERVICE_DISCONNECTED: -1,
   SERVICE_TIMEOUT: -3,
   SERVICE_TIMEOUT: 2,
-  USER_CANCELED: 1
+  USER_CANCELED: 1,
+  PURCAHSE_STATE_PURCHASED: 1,
+  PURCAHSE_STATE_PENDING: 2,
+  PURCAHSE_STATE_UNKNOW: 0,
 };

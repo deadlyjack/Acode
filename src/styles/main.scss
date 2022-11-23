@@ -549,7 +549,8 @@ textarea {
   transform-origin: left center;
   z-index: 4;
 
-  >span {
+  >span,
+  >div {
     display: inline-flex;
     align-items: center;
     justify-content: center;

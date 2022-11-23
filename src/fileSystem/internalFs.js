@@ -1,7 +1,8 @@
 import ajax from '@deadlyjack/ajax';
+import helpers from '../utils/helpers';
 import Url from '../utils/Url';
 
-export default {
+const fs = {
   /**
    *
    * @param {string} url
@@ -83,9 +84,10 @@ export default {
   /**
    *
    * @param {string} filename
+   * @param {string} encoding
    * @returns {Promise}
    */
-  readFile(filename) {
+  readFile(filename, encoding) {
     return new Promise((resolve, reject) => {
       if (!filename) return reject('Invalid valud of fileURL: ' + filename);
       window.resolveLocalFileSystemURL(
@@ -94,10 +96,15 @@ export default {
           (async () => {
             const url = fileEntry.toInternalURL();
             try {
-              const data = await ajax({
+              let data = await ajax({
                 url: url,
                 responseType: 'arraybuffer',
               });
+
+              if (encoding) {
+                data = helpers.decodeText(data, encoding);
+              }
+
               resolve({ data });
             } catch (error) {
               fileEntry.file((file) => {
@@ -272,3 +279,5 @@ export default {
     });
   },
 };
+
+export default fs;

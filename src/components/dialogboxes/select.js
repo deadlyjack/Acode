@@ -9,14 +9,15 @@ import tile from '../tile';
  *            hideOnSelect: boolean,
  *            textTransform: boolean,
  *            default: String
- *        }} opts
- * @param {string} opts.default
- * @param {string} opts.onCancel
- * @param {boolean} opts.hideOnSelect
- * @param {boolean} opts.textTransform
+ *        } | boolean} opts
  */
 function select(title, options, opts = {}) {
-  return new Promise((resolve) => {
+  let rejectOnCancel = false;
+  if (typeof opts === 'boolean') {
+    rejectOnCancel = opts;
+    opts = {};
+  }
+  return new Promise((resolve, reject) => {
     const titleSpan =
       title &&
       tag('strong', {
@@ -33,10 +34,7 @@ function select(title, options, opts = {}) {
     });
     const mask = tag('span', {
       className: 'mask',
-      onclick: () => {
-        hide();
-        if (typeof opts.onCancel === 'function') opts.onCancel();
-      },
+      onclick: cancel,
     });
     let $defaultVal;
 
@@ -81,8 +79,8 @@ function select(title, options, opts = {}) {
 
       $item.onclick = function () {
         if (value !== undefined) {
-          resolve(value);
           if (opts.hideOnSelect) hide();
+          resolve(value);
         }
       };
 
@@ -93,7 +91,7 @@ function select(title, options, opts = {}) {
 
     actionStack.push({
       id: 'select',
-      action: hideSelect,
+      action: cancel,
     });
 
     document.body.append(selectDiv, mask);
@@ -103,6 +101,12 @@ function select(title, options, opts = {}) {
     if ($firstChild && $firstChild.focus) $firstChild.focus();
 
     window.restoreTheme(true);
+
+    function cancel() {
+      hide();
+      if (typeof opts.onCancel === 'function') opts.onCancel();
+      if (rejectOnCancel) reject();
+    }
 
     function hideSelect() {
       selectDiv.classList.add('hide');

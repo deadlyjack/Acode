@@ -1,6 +1,5 @@
 import About from '../pages/about/about';
 import editorSettings from './editorSettings';
-import constants from '../lib/constants';
 import backupRestore from './backupRestore';
 import themeSetting from '../pages/themeSetting/themeSetting';
 import otherSettings from './appSettings';
@@ -11,9 +10,11 @@ import plugins from '../pages/plugins/plugins';
 import settingsPage from '../components/settingPage';
 import dialogs from '../components/dialogs';
 import previewSettings from './previewSettings';
+import removeAds from '../lib/removeAds';
 
 export default function settingsMain() {
   const title = strings.settings.capitalize();
+  let $list;
 
   const items = [
     {
@@ -86,8 +87,11 @@ export default function settingsMain() {
       key: 'removeads',
       text: strings['remove ads'],
       icon: 'cancel',
-      link: constants.PAID_VERSION,
     });
+  }
+
+  removeAds.callback = () => {
+    $list.get('[data-key="removeads"]').remove();
   }
 
   async function callback(key) {
@@ -140,10 +144,14 @@ export default function settingsMain() {
         }
         break;
 
+      case 'removeads':
+        removeAds();
+        break;
+
       default:
         break;
     }
   }
 
-  settingsPage(title, items, callback);
+  ({ $list } = settingsPage(title, items, callback));
 }

@@ -14,7 +14,6 @@ import _addMenuHome from './add-menu-home.hbs';
 import externalFs from '../../fileSystem/externalFs';
 import fsOperation from '../../fileSystem/fsOperation';
 import searchBar from '../../components/searchbar';
-import projects from './projects';
 import Url from '../../utils/Url';
 import util from './util';
 import openFolder from '../../lib/openFolder';
@@ -22,6 +21,7 @@ import recents from '../../lib/recents';
 import remoteStorage from '../../lib/remoteStorage';
 import URLParse from 'url-parse';
 import checkFiles from '../../lib/checkFiles';
+import projects from '../../lib/projects';
 
 /**
  * @typedef {{url: String, name: String}} Location
@@ -65,30 +65,10 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
   return new Promise((resolve, reject) => {
     //#region Declaration
-    const $menuToggler = tag('i', {
-      className: 'icon more_vert',
-      attr: {
-        action: 'toggle-menu',
-      },
-    });
-    const $addMenuToggler = tag('i', {
-      className: 'icon add',
-      attr: {
-        action: 'toggle-add-menu',
-      },
-    });
-    const $search = tag('i', {
-      className: 'icon search',
-      attr: {
-        action: 'search',
-      },
-    });
-    const $lead = tag('span', {
-      className: 'icon clearclose',
-      attr: {
-        action: 'close',
-      },
-    });
+    const $menuToggler = <span className="icon more_vert" data-action='toggle-menu'></span>;
+    const $addMenuToggler = <span className="icon add" data-action='toggle-add-menu'></span>;
+    const $search = <span className="icon search" data-action='search'></span>;
+    const $lead = <span className="icon clearclose" data-action='close'></span>;
     const $page = Page(strings['file browser'].capitalize(), {
       lead: $lead,
     });
@@ -280,7 +260,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
        * @type {HTMLElement}
        */
       const $el = e.target;
-      let action = $el.getAttribute('action');
+      let action = $el.getAttribute('action') || $el.dataset.action;
       if (!action) return;
 
       let url = $el.data_url;
@@ -746,10 +726,10 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       const alreadyCreated = [];
       const options = [];
       let cturl = '';
-      let newUrl = null;
-      let project = '';
+      let projectLocation = null;
+      let projectFiles = '';
       let projectName = '';
-      let framework = '';
+      let project = '';
 
       if (arg === 'file' || arg === 'folder') {
         let title = strings['enter folder name'];
@@ -784,17 +764,18 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         /**
          * Initiating project options
          */
-        Object.keys(projects).map((projectname) => {
-          options.push([projectname, projectname, 'icon ' + projectname]);
+        projects.list().map((project) => {
+          const { name, icon } = project;
+          options.push([name, name, icon]);
         });
 
-        framework = await dialogs.select(strings['new project'], options);
-        dialogs.loader.create(framework, strings.loading + '...');
-        project = (await projects[framework]()).default;
+        project = await dialogs.select(strings['new project'], options);
+        dialogs.loader.create(project, strings.loading + '...');
+        projectFiles = await projects.get(project).files();
         dialogs.loader.destroy();
         projectName = await dialogs.prompt(
           strings['project name'],
-          framework,
+          project,
           'text',
           {
             required: true,
@@ -806,8 +787,8 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           const fs = fsOperation(url);
           dialogs.loader.create(projectName, strings.loading + '...');
           await fs.createDirectory(projectName);
-          newUrl = Url.join(url, projectName, '/');
-          const files = Object.keys(project); // All project files
+          projectLocation = Url.join(url, projectName, '/');
+          const files = Object.keys(projectFiles); // All project files
           await createProject(files); // Creating project
         } catch (err) {
           helpers.error(err);
@@ -832,11 +813,11 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       function createFile(fileurl) {
         const paths = fileurl.split('/');
         const filename = paths.pop();
-        return createDir(project, fileurl, filename, paths);
+        return createDir(projectFiles, fileurl, filename, paths);
       }
 
       async function createDir(project, fileurl, filename, paths) {
-        const lclUrl = Url.join(newUrl, cturl);
+        const lclUrl = Url.join(projectLocation, cturl);
         const fs = fsOperation(lclUrl);
 
         if (paths.length === 0) {

@@ -274,5 +274,11 @@
   "preview settings note": "Если порт предпросмотра и порт сервера отличаются, приложение не запустит встроенный сервер, а только откроет https://<хост>:<порт_предпросмотра> в браузере. Полезно при использовании сервера на другом устройстве.",
   "backup/restore note": "Будут сохранены только настройки, темы и сочетания клавиш. FTP/SFTP-сервера и профили GitHub не резервируются.",
   "host": "Хост",
-  "retry ftp/sftp when fail": "Повторять попытку подключения к FTP/SFTP при ошибке"
+  "retry ftp/sftp when fail": "Повторять попытку подключения к FTP/SFTP при ошибке",
+  "more": "More",
+  "thank you :)": "Thank you :)",
+  "purchase pending": "purchase pending",
+  "cancelled": "cancelled",
+  "local": "Local",
+  "remote": "Remote"
 }

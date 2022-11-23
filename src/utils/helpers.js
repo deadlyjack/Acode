@@ -1,3 +1,4 @@
+import URLParse from 'url-parse';
 import Cryptojs from 'crypto-js';
 import constants from '../lib/constants';
 import dialogs from '../components/dialogs';
@@ -785,5 +786,53 @@ export default {
         resolve(entry.toInternalURL());
       }, reject);
     });
-  }
+  },
+
+  decodeUrl(url) {
+    const uuid = this.uuid();
+
+    if (/#/.test(url)) {
+      url = url.replace(/#/g, uuid);
+    }
+
+    let { username, password, hostname, pathname, port, query } = URLParse(
+      url,
+      true,
+    );
+
+    if (pathname) {
+      pathname = decodeURIComponent(pathname);
+      pathname = pathname.replace(new RegExp(uuid, 'g'), '#');
+    }
+
+    if (username) {
+      username = decodeURIComponent(username);
+    }
+
+    if (password) {
+      password = decodeURIComponent(password);
+    }
+
+    if (port) {
+      port = parseInt(port);
+    }
+
+    let { keyFile, passPhrase } = query;
+
+    if (keyFile) {
+      query.keyFile = decodeURIComponent(keyFile);
+    }
+
+    if (passPhrase) {
+      query.passPhrase = decodeURIComponent(passPhrase);
+    }
+
+    return { username, password, hostname, pathname, port, query };
+  },
+
+  promisify(func, ...args) {
+    return new Promise((resolve, reject) => {
+      func(...args, resolve, reject);
+    });
+  },
 };

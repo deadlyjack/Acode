@@ -274,5 +274,11 @@
   "preview settings note": "如果预览端口和服务器端口不同，应用将不会启动服务器，而会在浏览器或应用内浏览器中打开 https://<host>:<preview port>。这在你运行着其他服务器时会有用。",
   "backup/restore note": "这将只会备份你的设置、个性化主题和快捷键，而不备份你的 FTP/SFTP 和 Github 信息。",
   "host": "主机",
-  "retry ftp/sftp when fail": "当连接失败时重试 ftp/sftp"
+  "retry ftp/sftp when fail": "当连接失败时重试 ftp/sftp",
+  "more": "More",
+  "thank you :)": "Thank you :)",
+  "purchase pending": "purchase pending",
+  "cancelled": "cancelled",
+  "local": "Local",
+  "remote": "Remote"
 }

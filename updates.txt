@@ -1,3 +1,9 @@
+version 1.6.0 240
+☞ Updated plugin APIs
+☞ Updated text menu
+☞ Install plugin form device
+☞ Updated ace editor
+
 version 1.6.0 239
 ☞ Fixed horizontal scroll bug
 ☞ Updated ace editor
