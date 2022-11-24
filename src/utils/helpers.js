@@ -1,5 +1,5 @@
 import URLParse from 'url-parse';
-import Cryptojs from 'crypto-js';
+import { AES, enc } from 'crypto-js';
 import constants from '../lib/constants';
 import dialogs from '../components/dialogs';
 import keyBindings from '../lib/keyBindings';
@@ -14,11 +14,11 @@ const credentials = {
   key: 'xkism2wq3)(I#$MNkds0)*(73am)(*73_L:w3k[*(#WOd983jkdssap sduy*&T#W3elkiu8983hKLUYs*(&y))',
 
   encrypt(str) {
-    return Cryptojs.AES.encrypt(str, this.key).toString();
+    return AES.encrypt(str, this.key).toString();
   },
 
   decrypt(str) {
-    return Cryptojs.AES.decrypt(str, this.key).toString(Cryptojs.enc.Utf8);
+    return AES.decrypt(str, this.key).toString(enc.Utf8);
   },
 };
 
@@ -391,7 +391,7 @@ export default {
    * @param {Number} sliceSize
    * @returns {Blob}
    */
-  b64toBlob(byteCharacters, contentType, sliceSize) {
+  base64toBlob(byteCharacters, contentType, sliceSize) {
     contentType = contentType || '';
     sliceSize = sliceSize || 512;
     const byteArrays = [];
@@ -413,6 +413,16 @@ export default {
       type: contentType,
     });
     return blob;
+  },
+  blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   },
   /**
    * Gets body for feedback email

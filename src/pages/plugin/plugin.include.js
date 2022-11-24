@@ -39,12 +39,11 @@ export default async function PluginInclude(json, installed = false, onInstall, 
 
   try {
     const promises = [];
+    const readmeDotMd = Url.join(host, 'readme.md');
     if (installed && json.startsWith('file:')) {
       promises.push(
         fsOperation(json).readFile('json'),
-        fsOperation(
-          Url.join(host, 'readme.md'),
-        ).readFile('utf8')
+        fsOperation(readmeDotMd).readFile('utf8')
       );
       icon = Url.join(host, 'icon.png');
     } else {
@@ -156,13 +155,7 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       icon = await helpers.toInternalUri(icon);
     } else if (protocol === 'content:') {
       const data = await fsOperation(icon).readFile();
-      icon = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = function () {
-          resolve(reader.result);
-        };
-        reader.readAsDataURL(new Blob([data]));
-      });
+      icon = await helpers.blobToBase64(new Blob([data]));
     }
 
     $page.content = view({

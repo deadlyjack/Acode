@@ -8,8 +8,6 @@ import helpers from '../utils/helpers';
 
 const fsList = [];
 
-console.log('Called FsOpereation');
-
 /**
  *
  * @param {string} url
@@ -157,6 +155,7 @@ fsOperation.extend((url) => /^https?:/.test(url), (url) => {
       if (encoding) {
         return helpers.decodeText(data, encoding);
       }
+      return data;
     },
     async writeFile(content, progress) {
       return ajax.post(url, {

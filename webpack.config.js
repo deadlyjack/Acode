@@ -37,7 +37,12 @@ module.exports = (env, options) => {
     test: /\.m?js$/,
     use: [
       'html-tag-js/jsx/tag-loader.js',
-      'babel-loader',
+      {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+        },
+      },
     ],
   });
   // }

@@ -263,7 +263,7 @@ async function run(
           if (file && file.type === 'git') {
             try {
               const gitFile = await git.getGitFile(file.record, reqPath);
-              const data = helpers.b64toBlob(
+              const data = helpers.base64toBlob(
                 gitFile,
                 mimeType.lookup(reqPath),
               );

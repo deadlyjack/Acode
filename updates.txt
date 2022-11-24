@@ -1,4 +1,4 @@
-version 1.6.0 240
+version 1.6.0 242
 ☞ Updated plugin APIs
 ☞ Updated text menu
 ☞ Install plugin form device
