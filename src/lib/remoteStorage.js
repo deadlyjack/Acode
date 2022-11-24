@@ -32,7 +32,10 @@ export default {
           stopConnection = true;
         },
       });
-      const home = await ftp.getWorkingDirectory();
+      const [home] = await Promise.all([
+        ftp.getWorkingDirectory(),
+        loadAd(),
+      ]);
 
       if (stopConnection) {
         stopConnection = false;
@@ -64,6 +67,9 @@ export default {
         res.home = home;
       }
       dialogs.loader.destroy();
+      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
+        window.iad.show();
+      }
       return res;
     } catch (err) {
       if (stopConnection) {
@@ -189,7 +195,10 @@ export default {
     });
 
     try {
-      const home = await connection.pwd();
+      const [home] = await Promise.all([
+        connection.pwd(),
+        loadAd(),
+      ]);
 
       if (stopConnection) {
         stopConnection = false;
@@ -229,6 +238,9 @@ export default {
         },
       });
       dialogs.loader.destroy();
+      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
+        window.iad.show();
+      }
       return {
         alias,
         name: alias,
@@ -420,3 +432,13 @@ export default {
     return null;
   },
 };
+
+async function loadAd() {
+  if (!IS_FREE_VERSION) return;
+  try {
+    if (!await window.iad?.isLoaded()) {
+      toast(strings.loading);
+      await window.iad.load();
+    }
+  } catch (error) { }
+}

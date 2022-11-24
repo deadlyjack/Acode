@@ -663,8 +663,9 @@ function createFs(sftp) {
     lsDir() {
       return sftp.lsDir();
     },
-    readFile(encoding) {
-      return sftp.readFile(encoding);
+    async readFile(encoding) {
+      const { data } = await sftp.readFile(encoding);
+      return data;
     },
     writeFile(content) {
       return sftp.writeFile(content);

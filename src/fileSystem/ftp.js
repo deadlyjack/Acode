@@ -275,8 +275,9 @@ function createFs(ftp) {
     lsDir() {
       return ftp.listDir();
     },
-    readFile(encoding) {
-      return ftp.readFile(encoding);
+    async readFile(encoding) {
+      const { data } = await ftp.readFile(encoding);
+      return data;
     },
     writeFile(content) {
       return ftp.writeFile(content);
