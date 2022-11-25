@@ -79,6 +79,7 @@ export default class Settings {
       maxFileSize: 12,
       serverPort: constants.SERVER_PORT,
       previewPort: constants.PREVIEW_PORT,
+      showConsoleToggler: true,
       previewMode: 'inapp',
       disableCache: false,
       host: 'localhost',

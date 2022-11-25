@@ -139,6 +139,11 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         disabled: true,
         onclick() {
           $page.hide();
+
+          if (IS_FREE_VERSION && window.iad?.isLoaded()) {
+            window.iad.show();
+          }
+
           resolve({
             type: 'folder',
             ...currentDir,

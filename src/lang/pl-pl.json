@@ -279,5 +279,6 @@
   "purchase pending": "purchase pending",
   "cancelled": "cancelled",
   "local": "Local",
-  "remote": "Remote"
+  "remote": "Remote",
+  "show console toggler": "Show console toggler"
 }

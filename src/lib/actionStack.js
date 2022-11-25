@@ -59,6 +59,9 @@ function ActionStack() {
           }
         }
 
+        if (IS_FREE_VERSION && window.iad?.isLoaded()) {
+          window.iad.show();
+        }
         exitApp();
       }
     },

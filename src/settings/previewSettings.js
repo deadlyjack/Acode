@@ -61,6 +61,11 @@ export default function previewSettings() {
       checkbox: values.disableCache,
     },
     {
+      key: 'showConsoleToggler',
+      text: strings['show console toggler'],
+      checkbox: values.showConsoleToggler,
+    },
+    {
       note: strings['preview settings note'],
     }
   ];

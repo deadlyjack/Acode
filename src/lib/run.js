@@ -346,7 +346,7 @@ async function run(
         document.addEventListener('showconsole', function () {eruda.show()});
         document.addEventListener('hideconsole', function () {eruda.hide()});
       }else if(document.querySelector('c-toggler')){
-        ${target === 'inapp'
+        ${target === 'inapp' || (target !== 'inapp' && !appSettings.value.showConsoleToggler)
         ? "document.querySelector('c-toggler').style.display = 'none';"
         : ""}
       }
