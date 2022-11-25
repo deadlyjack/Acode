@@ -274,10 +274,10 @@
   "backup/restore note": "Isto faz apenas backup de suas configurações, tema personalizado e atalhos de teclado. Não faz backup de seus perfis FTP/SFTP e GitHub.",
   "host": "Host",
   "retry ftp/sftp when fail": "Tentar novamente quando ftp/sftp falhar",
-  "more": "More",
-  "thank you :)": "Thank you :)",
-  "purchase pending": "purchase pending",
-  "cancelled": "cancelled",
+  "more": "Mais",
+  "thank you :)": "Obrigado :)",
+  "purchase pending": "compra pendente",
+  "cancelled": "cancelado",
   "local": "Local",
-  "remote": "Remote"
+  "remote": "Remoto"
 }
