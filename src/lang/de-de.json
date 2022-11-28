@@ -274,11 +274,11 @@
   "backup/restore note": "Es werden nur ihre Einstellungen, ein individuelles Thema und ihre Tasten-Bindungen gesichert. FTP/SFTP, GitHub Profile werden nicht gesichert.",
   "host": "Host",
   "retry ftp/sftp when fail": "FTP/SFTP bei Fehlversuch wiederholen",
-  "more": "More",
-  "thank you :)": "Thank you :)",
-  "purchase pending": "purchase pending",
-  "cancelled": "cancelled",
-  "local": "Local",
-  "remote": "Remote",
-  "show console toggler": "Show console toggler"
+  "more": "Mehr",
+  "thank you :)": "Danke schön :)",
+  "purchase pending": "Kauf ausstehend",
+  "cancelled": "abgebrochen",
+  "local": "Lokal",
+  "remote": "Entfernt",
+  "show console toggler": "Zeige Konsolen-Umschalter"
 }
