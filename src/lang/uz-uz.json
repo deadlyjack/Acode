@@ -280,5 +280,6 @@
   "cancelled": "cancelled",
   "local": "Local",
   "remote": "Remote",
-  "show console toggler": "Show console toggler"
+  "show console toggler": "Show console toggler",
+  "binary file": "This file contains binary data, do you want to open it?"
 }

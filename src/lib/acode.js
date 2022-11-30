@@ -10,6 +10,7 @@ import projects from "./projects";
 import selectionMenu from "./selectionMenu";
 
 export default class Acode {
+  #fileHandlers = [];
   #modules = {};
   #pluginsInit = {};
   #pluginUnmount = {};

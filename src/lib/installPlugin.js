@@ -3,6 +3,7 @@ import fsOperation from "../fileSystem/fsOperation";
 import loadPlugin from "./loadPlugin";
 import helpers from "../utils/helpers";
 import Url from "../utils/Url";
+import gh2cdn from "../utils/gh2cdn";
 
 /**
  * Installs a plugin.
@@ -15,7 +16,7 @@ export default async function installPlugin(plugin, host) {
     plugin.host = host;
     plugin.installed = true;
 
-    const mainJs = Url.join(host, plugin.main);
+    const mainJs = gh2cdn(Url.join(host, plugin.main));
     const rootDir = Url.dirname(mainJs);
     const { files } = plugin;
 
@@ -34,8 +35,12 @@ export default async function installPlugin(plugin, host) {
 
     readFiles.push(
       fsOperation(mainJs).readFile(),
-      fsOperation(Url.join(host, plugin.icon)).readFile(),
-      fsOperation(Url.join(host, plugin.readme)).readFile(),
+      fsOperation(
+        gh2cdn(Url.join(host, plugin.icon)),
+      ).readFile(),
+      fsOperation(
+        gh2cdn(Url.join(host, plugin.readme)),
+      ).readFile(),
     );
 
     const [main, icon, readme] = await Promise.all(readFiles);
@@ -73,7 +78,9 @@ export default async function installPlugin(plugin, host) {
         promises.push(
           (async () => {
             try {
-              const fileContent = await fsOperation(Url.join(rootDir, file))
+              const fileContent = await fsOperation(
+                gh2cdn(Url.join(rootDir, file)),
+              )
                 .readFile(undefined, (loaded, total) => {
                   progress(file, loaded / total);
                 });

@@ -280,5 +280,6 @@
   "cancelled": "abgebrochen",
   "local": "Lokal",
   "remote": "Entfernt",
-  "show console toggler": "Zeige Konsolen-Umschalter"
+  "show console toggler": "Zeige Konsolen-Umschalter",
+  "binary file": "This file contains binary data, do you want to open it?"
 }

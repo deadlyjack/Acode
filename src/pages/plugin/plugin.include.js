@@ -7,6 +7,7 @@ import Url from '../../utils/Url';
 import installPlugin from '../../lib/installPlugin';
 import fsOperation from '../../fileSystem/fsOperation';
 import settingsPage from '../../components/settingPage';
+import gh2cdn from '../../utils/gh2cdn';
 
 export default async function PluginInclude(json, installed = false, onInstall, onUninstall) {
   const $page = Page('Plugin');
@@ -48,7 +49,9 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       icon = Url.join(host, 'icon.png');
     } else {
       promises.push(
-        fsOperation(json).readFile('json'),
+        fsOperation(
+          gh2cdn(json),
+        ).readFile('json'),
       );
     }
     if (cancelled) return;
@@ -65,14 +68,16 @@ export default async function PluginInclude(json, installed = false, onInstall, 
 
     version = plugin.version;
     if (!icon && plugin.icon) {
-      icon = Url.join(host, plugin.icon);
+      icon = gh2cdn(Url.join(host, plugin.icon));
     }
 
     $page.settitle(plugin.name);
     render();
 
     if (!readme && plugin.readme) {
-      fsOperation(Url.join(host, plugin.readme))
+      fsOperation(
+        gh2cdn(Url.join(host, plugin.readme)),
+      )
         .readFile('utf8')
         .then((text) => {
           readme = text;
@@ -81,7 +86,9 @@ export default async function PluginInclude(json, installed = false, onInstall, 
     }
 
     if (installed && json.startsWith('file:')) {
-      fsOperation(Url.join(plugin.host, 'plugin.json'))
+      fsOperation(
+        gh2cdn(Url.join(plugin.host, 'plugin.json'))
+      )
         .readFile('json')
         .then((json) => {
           remotePlugin = json;

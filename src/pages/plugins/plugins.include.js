@@ -11,6 +11,7 @@ import dialogs from "../../components/dialogs";
 import constants from "../../lib/constants";
 import alert from "../../components/dialogboxes/alert";
 import FileBrowser from "../fileBrowser/fileBrowser";
+import gh2cdn from '../../utils/gh2cdn';
 
 /**
  * 
@@ -121,7 +122,14 @@ export default function PluginsInclude(updates) {
   async function getAllPlugins() {
     try {
       const installed = await fsOperation(PLUGIN_DIR).lsDir();
-      plugins.all = await fsOperation(constants.PLUGIN_LIST).readFile('json');
+      plugins.all = await fsOperation(
+        gh2cdn(constants.PLUGIN_LIST),
+      ).readFile('json');
+
+      plugins.all = plugins.all.map((plugin) => {
+        plugin.icon = gh2cdn(plugin.icon);
+        return plugin;
+      });
 
       installed.forEach(({ url }) => {
         const plugin = plugins.all.find(({ id }) => id === Url.basename(url));

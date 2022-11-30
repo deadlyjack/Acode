@@ -1,3 +1,6 @@
+version 1.6.1 245
+☞ Updated plugin CDN
+
 version 1.6.0 244
 ☞ Updated plugin APIs
 ☞ Updated text menu
