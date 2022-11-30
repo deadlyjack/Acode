@@ -71,8 +71,8 @@ export default async function openFile(file, data = {}) {
         return;
       }
 
-      dialogs.alert(strings.info.toUpperCase(), 'Cannot open binary file');
-      return;
+      const confirmation = await dialogs.confirm(strings.info, strings['binary file']);
+      if (!confirmation) return;
     }
 
     createEditor(false, fileContent);
