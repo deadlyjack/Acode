@@ -83,7 +83,11 @@ export default function editorSettings() {
       select: [
         'Fira Code',
         'Roboto Mono',
-        'Source Code'
+        'Source Code',
+        'Cascadia Code',
+        'Proggy Clean',
+        'JetBrains Mono Bold',
+        'JetBrains Mono Regular'
       ],
     },
     {
