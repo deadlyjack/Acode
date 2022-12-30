@@ -1,40 +1,47 @@
-import removeAds from "../../lib/removeAds"
-
 export default (props) => <div className="main" id="plugin">
   <div className="header">
     <div className="info">
       <span className="logo" style={{ backgroundImage: `url(${props.icon})` }}></span>
       <div className="desc">
         <span className="name">{props.name}</span>
-        <span className="version">{props.version} {props.update ? <span>&#8594; v{props.update}</span> : ''}</span>
-        <span className="author" action="open">{props.author.name}</span>
-        <div action="github" className="tag">
-          <span>{props.type ? props.type : 'free'}</span>
-        </div>
+        <DownloadCounter {...props} />
+        <a className="author" href={`https://github.com/${props.author_github}`}>{props.author}</a>
       </div>
     </div>
     <div className="button-container primary">
-      <Buttons props={props} />
+      <Buttons {...props} />
     </div>
   </div>
   <div className="body md" innerHTML={props.body}></div>
 </div>
 
-function Buttons({ props }) {
-  if (props.installed && props.update) {
+function Buttons({ installed, update, install, uninstall }) {
+  if (installed && update) {
     return <>
-      <button onclick={props.uninstall}>{strings.uninstall}</button>
-      <button onclick={props.install}>{strings.update}</button>
+      <button onclick={uninstall}>{strings.uninstall}</button>
+      <button onclick={install}>{strings.update}</button>
     </>
   }
 
-  if (props.installed) {
-    return <button onclick={props.uninstall}>{strings.uninstall}</button>
+  if (installed) {
+    return <button onclick={uninstall}>{strings.uninstall}</button>
   }
 
-  if (props.isPaid) {
-    return <button onclick={removeAds}>{strings['download acode pro']}</button>
+  return <button onclick={install}>{strings.install}</button>
+}
+
+function Version({ currentVersion, version }) {
+  if (!currentVersion) return <span>v{version}</span>
+  return <span>v{currentVersion}&nbsp;&#8594;&nbsp;v{version}</span>;
+}
+
+function DownloadCounter({ downloads, currentVersion, version }) {
+  const $el = <Version version={version} currentVersion={currentVersion} />;
+  if (downloads) {
+    return <div className="version">
+      {$el}&nbsp;•&nbsp;{downloads}<span className='icon file_downloadget_app'></span>
+    </div>;
   }
 
-  return <button onclick={props.install}>{strings.install}</button>
+  return <div className="version">{$el}</div>;
 }

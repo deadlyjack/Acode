@@ -100,7 +100,6 @@
   "use emmet": "使用 Emmet 工具",
   "use quick tools": "使用快捷工具",
   "yes": "是",
-  "github": "GitHub",
   "encoding": "文字编码转为",
   "syntax highlighting": "语法高亮语言",
   "read only": "只读",
@@ -203,7 +202,6 @@
   "new line mode": "转行模式",
   "add a storage": "添加存储位置",
   "rate acode": "评价 Acode",
-  "github login": "Github 登录",
   "support": "支持",
   "donate": "捐助 {amount}",
   "donation message": "因为觉得其他人亦如此所以一些人不选择捐助，同时又有一些人选择拿起火炬去传递它，感谢您选择成为后者，以及您友善而暖心的捐助。",
@@ -282,5 +280,15 @@
   "local": "Local",
   "remote": "Remote",
   "show console toggler": "Show console toggler",
-  "binary file": "This file contains binary data, do you want to open it?"
+  "binary file": "This file contains binary data, do you want to open it?",
+  "relative line numbers": "Relative line numbers",
+  "elastic tabstops": "Elastic tabstops",
+  "line based rtl switching": "Line based RTL switching",
+  "hard wrap": "Hard wrap",
+  "spellcheck": "Spellcheck",
+  "wrap method": "Wrap Method",
+  "use textarea for ime": "Use textarea for IME",
+  "invalid plugin": "Invalid Plugin",
+  "type command": "Type command",
+  "plugin": "Plugin"
 }

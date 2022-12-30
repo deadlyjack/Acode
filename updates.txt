@@ -1,3 +1,8 @@
+version 1.7.0 alpha 250
+☞ Updated plugin system
+☞ GitHub is removed from app but, you can still use it from plugin
+☞ Bugs fixes
+
 version 1.6.1 245
 ☞ Updated plugin CDN
 

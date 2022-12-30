@@ -1,4 +1,5 @@
 import constants from "../lib/constants";
+import appSettings from "../lib/settings";
 
 const keyMapping = {
   37: 'ArrowLeft',

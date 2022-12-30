@@ -3,6 +3,7 @@ import dialogs from "../components/dialogs";
 import constants from "../lib/constants";
 import selectionMenu from "../lib/selectionMenu";
 import helpers from "../utils/helpers";
+import appSettings from '../lib/settings';
 
 /**
  * Handler for touch events

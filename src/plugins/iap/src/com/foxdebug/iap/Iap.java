@@ -3,6 +3,8 @@ package com.foxdebug.iap;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import com.android.billingclient.api.AcknowledgePurchaseParams;
+import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClient.BillingResponseCode;
 import com.android.billingclient.api.BillingClient.SkuType;
@@ -12,10 +14,9 @@ import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchaseHistoryRecord;
-import com.android.billingclient.api.PurchaseHistoryResponseListener;
 import com.android.billingclient.api.PurchasesResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.QueryPurchasesParams;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.SkuDetailsResponseListener;
@@ -50,8 +51,7 @@ public class Iap extends CordovaPlugin {
     String action,
     JSONArray args,
     CallbackContext callbackContext
-  )
-    throws JSONException {
+  ) throws JSONException {
     String arg1 = getString(args, 0);
     switch (action) {
       case "startConnection":
@@ -60,6 +60,7 @@ public class Iap extends CordovaPlugin {
       case "purchase":
       case "consume":
       case "getPurchases":
+      case "acknowledgePurchase":
         break;
       default:
         return false;
@@ -89,6 +90,9 @@ public class Iap extends CordovaPlugin {
               case "getPurchases":
                 getPurchases(callbackContext);
                 break;
+              case "acknowledgePurchase":
+                aknowledgePurchase(arg1, callbackContext);
+                break;
             }
           }
         }
@@ -112,21 +116,7 @@ public class Iap extends CordovaPlugin {
               if (responseCode == BillingResponseCode.OK) {
                 JSONArray result = new JSONArray();
                 for (Purchase purchase : purchases) {
-                  JSONObject item = new JSONObject();
-                  List<String> skuList = purchase.getSkus();
-                  JSONArray skuArray = new JSONArray();
-                  for (String sku : skuList) {
-                    skuArray.put(sku);
-                  }
-                  item.put("productIds", skuArray);
-                  item.put("purchaseToken", purchase.getPurchaseToken());
-                  item.put("signature", purchase.getSignature());
-                  item.put("orderId", purchase.getOrderId());
-                  item.put("purchaseTime", purchase.getPurchaseTime());
-                  item.put("purchaseState", purchase.getPurchaseState());
-                  item.put("developerPayload", purchase.getDeveloperPayload());
-                  item.put("isAcknowledged", purchase.isAcknowledged());
-                  result.put(item);
+                  result.put(purchaseToJson(purchase));
                 }
                 sendPurchasePluginResult(
                   new PluginResult(PluginResult.Status.OK, result)
@@ -275,34 +265,25 @@ public class Iap extends CordovaPlugin {
       return;
     }
 
-    billingClient.queryPurchaseHistoryAsync(
-      SkuType.INAPP,
-      new PurchaseHistoryResponseListener() {
-        public void onPurchaseHistoryResponse(
+    QueryPurchasesParams params = QueryPurchasesParams
+      .newBuilder()
+      .setProductType(BillingClient.ProductType.INAPP)
+      .build();
+    billingClient.queryPurchasesAsync(
+      params,
+      new PurchasesResponseListener() {
+        public void onQueryPurchasesResponse(
           BillingResult billingResult,
-          List<PurchaseHistoryRecord> purchases
+          List<Purchase> purchasesList
         ) {
           try {
             int responseCode = billingResult.getResponseCode();
             if (responseCode == BillingResponseCode.OK) {
-              JSONArray result = new JSONArray();
-              for (PurchaseHistoryRecord purchase : purchases) {
-                JSONObject item = new JSONObject();
-                List<String> skuList = purchase.getSkus();
-                JSONArray skuArray = new JSONArray();
-                for (String sku : skuList) {
-                  skuArray.put(sku);
-                }
-                item.put("productIds", skuArray);
-                item.put("purchaseToken", purchase.getPurchaseToken());
-                item.put("purchaseTime", purchase.getPurchaseTime());
-                item.put("signature", purchase.getSignature());
-                item.put("developerPayload", purchase.getDeveloperPayload());
-                item.put("quantity", purchase.getQuantity());
-                item.put("json", purchase.getOriginalJson());
-                result.put(item);
+              JSONArray purchases = new JSONArray();
+              for (Purchase purchase : purchasesList) {
+                purchases.put(purchaseToJson(purchase));
               }
-              callbackContext.success(result);
+              callbackContext.success(purchases);
             } else {
               callbackContext.error(responseCode);
             }
@@ -312,6 +293,56 @@ public class Iap extends CordovaPlugin {
         }
       }
     );
+  }
+
+  private void aknowledgePurchase(
+    String purchaseToken,
+    CallbackContext callbackContext
+  ) {
+    if (billingClient == null) {
+      billingClient = getBillingClient();
+      callbackContext.error("Billing client is not connected");
+      return;
+    }
+
+    AcknowledgePurchaseParams params = AcknowledgePurchaseParams
+      .newBuilder()
+      .setPurchaseToken(purchaseToken)
+      .build();
+
+    billingClient.acknowledgePurchase(
+      params,
+      new AcknowledgePurchaseResponseListener() {
+        public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
+          int responseCode = billingResult.getResponseCode();
+          if (responseCode == BillingResponseCode.OK) {
+            callbackContext.success();
+          } else {
+            callbackContext.error(responseCode);
+          }
+        }
+      }
+    );
+  }
+
+  private JSONObject purchaseToJson(Purchase purchase) throws JSONException {
+    JSONObject item = new JSONObject();
+    List<String> skuList = purchase.getSkus();
+    JSONArray skuArray = new JSONArray();
+    for (String sku : skuList) {
+      skuArray.put(sku);
+    }
+    item.put("productIds", skuArray);
+    item.put("orderId", purchase.getOrderId());
+    item.put("sate", purchase.getPurchaseState());
+    item.put("signature", purchase.getSignature());
+    item.put("purchaseTime", purchase.getPurchaseTime());
+    item.put("isAcknowledged", purchase.isAcknowledged());
+    item.put("purchaseToken", purchase.getPurchaseToken());
+    item.put("purchaseState", purchase.getPurchaseState());
+    item.put("isAcknowledged", purchase.isAcknowledged());
+    item.put("developerPayload", purchase.getDeveloperPayload());
+    return item;
   }
 
   private void sendPurchasePluginResult(PluginResult result) {

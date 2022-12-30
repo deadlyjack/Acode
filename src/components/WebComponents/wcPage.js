@@ -20,7 +20,7 @@ export default class WCPage extends HTMLElement {
 
     this.handler = new PageHandler(this);
     this.#append = super.append.bind(this);
-    this.append = this.append.bind(this);
+    this.append = this.appendBody.bind(this);
     this.hide = this.hide.bind(this);
     this.settitle = this.settitle.bind(this);
     this.on = this.on.bind(this);
@@ -42,7 +42,7 @@ export default class WCPage extends HTMLElement {
     });
   }
 
-  append(...$els) {
+  appendBody(...$els) {
     let $main = this.body;
     if (!$main) return;
     for (const $el of $els) {

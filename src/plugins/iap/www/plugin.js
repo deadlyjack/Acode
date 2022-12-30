@@ -17,6 +17,9 @@ module.exports = {
   getPurchases: function (onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'Iap', 'getPurchases', []);
   },
+  acknowledgePurchase: function (purchaseToken, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'Iap', 'acknowledgePurchase', [purchaseToken]);
+  },
   BILLING_UNAVAILABLE: 3,
   DEVELOPER_ERROR: 5,
   ERROR: 6,

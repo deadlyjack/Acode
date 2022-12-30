@@ -1,11 +1,11 @@
 import list from '../components/collapsableList';
 import tag from 'html-tag-js';
 import helpers from '../utils/helpers';
-import constants from './constants';
 import openFolder from './openFolder';
 import ScrollBar from '../components/scrollbar/scrollbar';
 import Commands from '../ace/commands';
 import touchListeners from '../ace/touchHandler';
+import appSettings from './settings';
 
 //TODO: Add option to work multiple files at same time in large display.
 
@@ -63,7 +63,6 @@ async function EditorManager($sidebar, $header, $body) {
     onupdate: () => { },
     hasUnsavedFiles,
     files: [],
-    setSubText,
     moveOpenFileList,
     header: $header,
     sidebar: $sidebar,
@@ -175,6 +174,22 @@ async function EditorManager($sidebar, $header, $body) {
     editor.container.style.lineHeight = value;
   });
 
+  appSettings.on('update:relativeLineNumbers', function (value) {
+    editor.setOption('relativeLineNumbers', value);
+  });
+
+  appSettings.on('update:elasticTabstops', function (value) {
+    editor.setOption('useElasticTabstops', value);
+  });
+
+  appSettings.on('update:rtlText', function (value) {
+    editor.setOption('rtlText', value);
+  });
+
+  appSettings.on('update:hardWrap', function (value) {
+    editor.setOption('hardWrap', value);
+  });
+
   return manager;
 
   async function setupEditor() {
@@ -248,6 +263,11 @@ async function EditorManager($sidebar, $header, $body) {
       scrollPastEnd: 0.5,
       showPrintMargin: settings.showPrintMargin,
       enableLiveAutocompletion: settings.liveAutoCompletion,
+      relativeLineNumbers: settings.relativeLineNumbers,
+      useElasticTabstops: settings.elasticTabstops,
+      rtlText: settings.rtlText,
+      hardWrap: settings.hardWrap,
+      spellCheck: settings.spellCheck,
     });
 
     if (!appSettings.value.textWrap) {
@@ -362,40 +382,16 @@ async function EditorManager($sidebar, $header, $body) {
     }
   }
 
-  /**
-   *
-   * @param {File} file
-   */
-  function setSubText(file) {
-    let text = file.location || file.uri;
-
-    if (file.type === 'git') {
-      text = 'git • ' + file.record.repo + '/' + file.record.path;
-    } else if (file.type === 'gist') {
-      const { id } = file.record;
-      text = `gist • ${id.length > 10 ? '...' + id.substring(id.length - 7) : id
-        }`;
-    } else if (text && !file.readOnly) {
-      text = helpers.getVirtualPath(text);
-      if (text.length > 30) text = '...' + text.slice(text.length - 27);
-    } else if (file.readOnly) {
-      text = strings['read only'];
-    } else if (file.deletedFile) {
-      text = strings['deleted file'];
-    } else {
-      text = strings['new file'];
-    }
-    $header.subText = text;
-  }
-
   function switchFile(id) {
+    const { id: activeFileId } = manager.activeFile || {};
+    if (activeFileId === id) return;
+
     const file = manager.getFile(id);
 
     manager.activeFile?.tab.classList.remove('active');
     manager.activeFile = file;
     editor.setSession(file.session);
     $header.text = file.filename;
-    setSubText(file);
 
     $hScrollbar.remove();
     $vScrollbar.remove();
@@ -444,8 +440,8 @@ async function EditorManager($sidebar, $header, $body) {
 
   /**
    *
-   * @param {string|number|Repo|Gist} checkFor
-   * @param {"id"|"name"|"uri"|"git"|"gist"} [type]
+   * @param {string|number} checkFor
+   * @param {"id"|"name"|"uri"} [type]
    * @returns {File}
    */
   function getFile(checkFor, type = 'id') {
@@ -459,12 +455,6 @@ async function EditorManager($sidebar, $header, $body) {
           return false;
         case 'uri':
           if (file.uri === checkFor) return true;
-          return false;
-        case 'git':
-          if (file.record?.sha === checkFor.sha) return true;
-          return false;
-        case 'gist':
-          if (file.record?.id === checkFor.id) return true;
           return false;
         default:
           return false;

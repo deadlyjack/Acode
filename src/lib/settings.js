@@ -24,7 +24,7 @@ import lang from './lang';
  * @property {string} lang
  */
 
-export default class Settings {
+class Settings {
   /**
    * @type {settingsValue}
    */
@@ -70,9 +70,9 @@ export default class Settings {
   };
 
   constructor() {
-    this.#defaultSettings = {
+    this.#defaultSettings = this.value = {
       animation: 'system',
-      appTheme: IS_FREE_VERSION ? 'dark' : 'ocean',
+      appTheme: 'dark',
       autosave: 0,
       fileBrowser: this.#fileBrowserSettings,
       formatter: {},
@@ -86,7 +86,7 @@ export default class Settings {
       search: this.#searchSettings,
       lang: 'en-us',
       fontSize: '12px',
-      editorTheme: IS_FREE_VERSION ? 'ace/theme/nord_dark' : 'ace/theme/dracula',
+      editorTheme: 'ace/theme/nord_dark',
       textWrap: true,
       softTab: true,
       tabSize: 2,
@@ -121,13 +121,24 @@ export default class Settings {
       teardropSize: 30,
       scrollSpeed: constants.SCROLL_SPEED_NORMAL,
       customTheme: this.customTheme,
+      relativeLineNumbers: false,
+      elasticTabstops: false,
+      rtlText: false,
+      hardWrap: false,
+      useTextareaForIME: false,
     };
 
-    this.settingsFile = Url.join(DATA_STORAGE, 'settings.json');
   }
 
   async init() {
     if (this.#initialized) return;
+    this.settingsFile = Url.join(DATA_STORAGE, 'settings.json');
+
+    if (!IS_FREE_VERSION) {
+      this.#defaultSettings.appTheme = 'ocean';
+      this.#defaultSettings.editorTheme = 'ace/theme/dracula';
+    }
+
     this.#initialized = true;
 
     const fs = fsOperation(this.settingsFile);
@@ -308,3 +319,5 @@ export default class Settings {
     lang.set(value);
   }
 }
+
+export default new Settings();

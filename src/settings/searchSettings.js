@@ -1,4 +1,5 @@
 import settingsPage from '../components/settingPage';
+import appSettings from '../lib/settings';
 
 export default function searchSettings() {
   const title = strings.search;

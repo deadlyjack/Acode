@@ -6,6 +6,7 @@ import $_row1 from '../views/footer/row1.hbs';
 import $_row2 from '../views/footer/row2.hbs';
 import searchSettings from '../settings/searchSettings';
 import constants from '../lib/constants';
+import appSettings from '../lib/settings';
 
 const $row1 = tag.parse($_row1);
 const $row2 = tag.parse($_row2);
@@ -282,10 +283,7 @@ function actions(action, value) {
     editor.find($searchInput.value, {
       skipCurrent: skip,
       backwards: backward,
-      caseSensitive: searchSettings.caseSensitive,
-      wrap: searchSettings.wrap,
-      wholeWord: searchSettings.wholeWord,
-      regExp: searchSettings.regExp,
+      ...searchSettings,
     });
 
     updateStatus();

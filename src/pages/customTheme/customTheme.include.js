@@ -8,6 +8,7 @@ import helpers from '../../utils/helpers';
 import constants from '../../lib/constants';
 import select from '../../components/dialogboxes/select';
 import dialogs from '../../components/dialogs';
+import appSettings from '../../lib/settings';
 
 export default function CustomThemeInclude() {
   const $page = Page(`${strings['custom']} ${strings['theme']}`.capitalize());

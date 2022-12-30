@@ -11,6 +11,7 @@ import settingsPage from '../components/settingPage';
 import dialogs from '../components/dialogs';
 import previewSettings from './previewSettings';
 import removeAds from '../lib/removeAds';
+import appSettings from '../lib/settings';
 
 export default function settingsMain() {
   const title = strings.settings.capitalize();

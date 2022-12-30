@@ -6,6 +6,7 @@ import recents from '../lib/recents';
 import fsOperation from '../fileSystem/fsOperation';
 import Url from '../utils/Url';
 import openFolder from './openFolder';
+import appSettings from './settings';
 
 let saveTimeout;
 
@@ -23,60 +24,15 @@ async function saveFile(file, isSaveAs = false) {
   let createFile = false;
   const data = file.session.getValue();
   const $text = file.tab.querySelector('span.text');
-  if (file.type === 'regular' && !file.uri) {
+  if (!file.uri) {
     isNewFile = true;
-  } else if (file.uri) {
+  } else {
     isSaveAs = isSaveAs ?? file.readOnly;
   }
 
   formatFile();
 
-  if (!isSaveAs && !isNewFile) {
-    if (file.type === 'git') {
-      const values = await dialogs.multiPrompt('Commit', [
-        {
-          id: 'message',
-          placeholder: strings['commit message'],
-          value: file.record.commitMessage,
-          type: 'text',
-          required: true,
-        },
-        {
-          id: 'branch',
-          placeholder: strings.branch,
-          value: file.record.branch,
-          type: 'text',
-          required: true,
-          hints: (cb) => {
-            file.record.repository.listBranches().then((res) => {
-              const data = res.data;
-              const branches = [];
-              data.map((branch) => branches.push(branch.name));
-              cb(branches);
-            });
-          },
-        },
-      ]);
-
-      if (!values.branch || !values.message) return;
-      file.record.branch = values.branch;
-      file.record.commitMessage = values.message;
-      await file.record.setData(data);
-      file.isUnsaved = false;
-      editorManager.onupdate('save-file');
-      editorManager.emit('save-file', file);
-      editorManager.emit('update', 'save-file');
-      return;
-    }
-    if (file.type === 'gist') {
-      await file.record.setData(file.filename, data);
-      file.isUnsaved = false;
-      editorManager.onupdate('save-file');
-      editorManager.emit('save-file', file);
-      editorManager.emit('update', 'save-file');
-      return;
-    }
-  } else {
+  if (isSaveAs || isNewFile) {
     const option = await recents.select(
       [
         ['select-folder', strings['select folder'], 'folder']

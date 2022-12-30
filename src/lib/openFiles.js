@@ -39,18 +39,6 @@ export default async function openFiles(files) {
 
     if (!rendered) rendered = render;
 
-    if (type === 'git') {
-      const record = await gitRecord.get(file.sha);
-      if (record) {
-        options.record = record;
-      }
-    } else if (type === 'gist') {
-      const gist = gistRecord.get(file.recordid, file.isNew);
-      if (gist) {
-        options.record = gist;
-      }
-    }
-
     new EditorFile(filename, options);
   }
 

@@ -1,4 +1,3 @@
-import tag from "html-tag-js";
 import WCPage from "./WebComponents/wcPage";
 
 /**
@@ -10,7 +9,8 @@ import WCPage from "./WebComponents/wcPage";
  * @returns {WCPage}
  */
 function Page(title, options = {}) {
-  let page = tag('wc-page');
+  let page = <wc-page />;
+  page.append = page.appendBody;
   page.initializeIfNotAlreadyInitialized();
   page.settitle(title);
 

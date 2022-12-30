@@ -1,5 +1,6 @@
 import constants from '../lib/constants';
 import settingsPage from '../components/settingPage';
+import appSettings from '../lib/settings';
 
 export default function scrollSettings() {
   const values = appSettings.value;
