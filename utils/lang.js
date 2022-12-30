@@ -98,10 +98,15 @@ async function update() {
           for (let enKey in enLangData) {
 
             const key = Object.keys(langData).find((k) => {
-              if ((new RegExp(`^${k}$`, 'i')).test(enKey)) {
-                return true;
+              try {
+                if ((new RegExp(`^${escapeRegExp(k)}$`, 'i')).test(enKey)) {
+                  return true;
+                }
+                return false;
+              } catch (e) {
+                console.log({ e, k });
+                return false;
               }
-              return false;
             });
 
             if (!key) {
@@ -271,4 +276,8 @@ function getStr(str) {
       resolve(res);
     });
   });
+}
+
+function escapeRegExp(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }

@@ -100,7 +100,6 @@
   "use emmet": "Использовать Emmet",
   "use quick tools": "Использовать быстрые инструменты",
   "yes": "Да",
-  "github": "GitHub",
   "encoding": "Кодировка",
   "syntax highlighting": "Подсветка синтаксиса",
   "read only": "Только чтение",
@@ -203,7 +202,6 @@
   "new line mode": "Перенос строки",
   "add a storage": "Добавить хранилище",
   "rate acode": "Оценить Acode",
-  "github login": "Вход в GitHub",
   "support": "Поддержка",
   "donate": "Пожертвовать {amount}",
   "donation message": "Есть люди, которые не делают пожертвований, потому что предполагают, что это делают все остальные, а есть те, кто берет факел и бежит с ним. Спасибо вам за ваше доброе и трогательное пожертвование!",
@@ -282,5 +280,15 @@
   "local": "Local",
   "remote": "Remote",
   "show console toggler": "Show console toggler",
-  "binary file": "This file contains binary data, do you want to open it?"
+  "binary file": "This file contains binary data, do you want to open it?",
+  "relative line numbers": "Relative line numbers",
+  "elastic tabstops": "Elastic tabstops",
+  "line based rtl switching": "Line based RTL switching",
+  "hard wrap": "Hard wrap",
+  "spellcheck": "Spellcheck",
+  "wrap method": "Wrap Method",
+  "use textarea for ime": "Use textarea for IME",
+  "invalid plugin": "Invalid Plugin",
+  "type command": "Type command",
+  "plugin": "Plugin"
 }

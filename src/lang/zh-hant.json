@@ -100,7 +100,6 @@
   "use emmet": "使用 Emmet 語法",
   "use quick tools": "使用快捷工具",
   "yes": "是",
-  "github": "GitHub",
   "encoding": "文字編碼轉為",
   "syntax highlighting": "語法高亮語言",
   "read only": "只讀",
@@ -282,5 +281,15 @@
   "local": "本地",
   "remote": "遠程",
   "show console toggler": "顯示開/關控製臺按鈕",
-  "binary file": "此文件包含二進製數據, 要打開它嗎?"
+  "binary file": "此文件包含二進製數據, 要打開它嗎?",
+  "relative line numbers": "Relative line numbers",
+  "elastic tabstops": "Elastic tabstops",
+  "line based rtl switching": "Line based RTL switching",
+  "hard wrap": "Hard wrap",
+  "spellcheck": "Spellcheck",
+  "wrap method": "Wrap Method",
+  "use textarea for ime": "Use textarea for IME",
+  "invalid plugin": "Invalid Plugin",
+  "type command": "Type command",
+  "plugin": "Plugin"
 }

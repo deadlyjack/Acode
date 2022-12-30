@@ -1,5 +1,6 @@
 import quickTools from '../handlers/quickTools';
 import constants from './constants';
+import appSettings from '../lib/settings';
 
 export default {
   beforeRender() {

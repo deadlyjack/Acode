@@ -99,7 +99,6 @@
   "use emmet": "Usar emmet",
   "use quick tools": "Usar ferramentas rápidas",
   "yes": "Sim",
-  "github": "GitHub",
   "encoding": "Codificação de texto",
   "syntax highlighting": "Realce de sintaxe",
   "read only": "Somente leitura",
@@ -202,7 +201,6 @@
   "new line mode": "Novo modo de linha",
   "add a storage": "Adicionar um armazenamento",
   "rate acode": "Avaliar Acode",
-  "github login": "Login no Github",
   "support": "Suporte",
   "donate": "Doar {amount}",
   "donation message": "Há pessoas que não doam porque assumem que todo mundo doa, e há aqueles que pegam a tocha e correm com ela. Obrigado por ser o último, e por sua doação gentil e comovente.",
@@ -281,5 +279,15 @@
   "local": "Local",
   "remote": "Remoto",
   "show console toggler": "Mostrar alternador de console",
-  "binary file": "This file contains binary data, do you want to open it?"
+  "binary file": "This file contains binary data, do you want to open it?",
+  "relative line numbers": "Relative line numbers",
+  "elastic tabstops": "Elastic tabstops",
+  "line based rtl switching": "Line based RTL switching",
+  "hard wrap": "Hard wrap",
+  "spellcheck": "Spellcheck",
+  "wrap method": "Wrap Method",
+  "use textarea for ime": "Use textarea for IME",
+  "invalid plugin": "Invalid Plugin",
+  "type command": "Type command",
+  "plugin": "Plugin"
 }

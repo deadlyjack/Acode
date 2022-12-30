@@ -3,118 +3,93 @@ import fsOperation from "../fileSystem/fsOperation";
 import loadPlugin from "./loadPlugin";
 import helpers from "../utils/helpers";
 import Url from "../utils/Url";
-import gh2cdn from "../utils/gh2cdn";
+import JSZip from 'jszip';
 
 /**
  * Installs a plugin.
- * @param {PluginJson} plugin 
+ * @param {string} pluginId 
  */
-export default async function installPlugin(plugin, host) {
-  const loader = dialogs.loader.create(plugin.name, strings.installing);
+export default async function installPlugin(id, name) {
+  const title = name || 'Plugin';
+  const loader = dialogs.loader.create(title, strings.installing);
   let pluginDir;
+  let pluginUrl;
+
   try {
-    plugin.host = host;
-    plugin.installed = true;
-
-    const mainJs = gh2cdn(Url.join(host, plugin.main));
-    const rootDir = Url.dirname(mainJs);
-    const { files } = plugin;
-
-    pluginDir = Url.join(PLUGIN_DIR, plugin.id);
-
-    // create plugin directory
-    if (
-      await fsOperation(pluginDir)
-        .exists()
-    ) {
-      await fsOperation(pluginDir)
-        .delete();
+    if (!(await fsOperation(PLUGIN_DIR).exists())) {
+      await fsOperation(DATA_STORAGE).createDirectory('plugins');
     }
-
-    const readFiles = [];
-
-    readFiles.push(
-      fsOperation(mainJs).readFile(),
-      fsOperation(
-        gh2cdn(Url.join(host, plugin.icon)),
-      ).readFile(),
-      fsOperation(
-        gh2cdn(Url.join(host, plugin.readme)),
-      ).readFile(),
-    );
-
-    const [main, icon, readme] = await Promise.all(readFiles);
-    await fsOperation(PLUGIN_DIR)
-      .createDirectory(plugin.id);
-
-    const promises = [];
-
-    promises.push(
-      fsOperation(pluginDir)
-        .createFile(
-          'main.js',
-          main
-        ),
-      fsOperation(pluginDir)
-        .createFile(
-          'plugin.json',
-          JSON.stringify(plugin, null, 2)
-        ),
-      fsOperation(pluginDir)
-        .createFile(
-          'readme.md',
-          readme
-        ),
-      fsOperation(pluginDir)
-        .createFile(
-          'icon.png',
-          icon
-        ),
-    );
-
-    // copy files
-    if (Array.isArray(files)) {
-      files.forEach((file) => {
-        promises.push(
-          (async () => {
-            try {
-              const fileContent = await fsOperation(
-                gh2cdn(Url.join(rootDir, file)),
-              )
-                .readFile(undefined, (loaded, total) => {
-                  progress(file, loaded / total);
-                });
-
-              await helpers
-                .createFileRecursive(pluginDir, file);
-
-              await fsOperation(Url.join(pluginDir, file))
-                .writeFile(fileContent);
-            } catch (error) {
-              console.error(error);
-            }
-          })(),
-        );
-      });
-    }
-
-    await Promise.all(promises);
-    toast(strings.success);
-
-    loadPlugin(plugin.id);
-  } catch (err) {
-    if (pluginDir) {
-      await fsOperation(pluginDir).delete();
-    }
-    throw new Error('Cannot install plugin');
-  } finally {
-    dialogs.loader.destroy();
+  } catch (error) {
+    console.error(error);
   }
 
-  function progress(label, ratio) {
-    const percent = Math.round(ratio * 10000) / 100;
-    loader.setTitle(`${plugin.name}`);
-    loader.setMessage(`file: ${label}
-${strings.installing} ${Math.min(percent, 100)}%`);
+  if (!/^(https?|file|content):/.test(id)) {
+    pluginUrl = Url.join('https://acode.foxdebug.com/api/plugin/download/', `${id}?device=${device.uuid}`);
+    pluginDir = Url.join(PLUGIN_DIR, id);
+  } else {
+    pluginUrl = id;
+  }
+
+  try {
+    loader.show();
+
+    const plugin = await fsOperation(pluginUrl).readFile(undefined, (loaded, total) => {
+      loader.setMessage(`${strings.loading} ${(loaded / total * 100).toFixed(2)}%`);
+    });
+
+    if (plugin) {
+      const zip = new JSZip();
+      await zip.loadAsync(plugin);
+
+      if (!zip.files['plugin.json'] || !zip.files['main.js']) {
+        throw new Error(strings['invalid plugin']);
+      }
+
+      const pluginJson = JSON.parse(await zip.files['plugin.json'].async('text'));
+
+      if (!pluginDir) {
+        pluginJson.source = pluginUrl;
+        id = pluginJson.id;
+        pluginDir = Url.join(PLUGIN_DIR, id);
+      }
+
+      if (!await fsOperation(pluginDir).exists()) {
+        await fsOperation(PLUGIN_DIR).createDirectory(id);
+      }
+
+      const promises = Object.keys(zip.files).map(async (file) => {
+        let correctFile = file;
+        if (/\\/.test(correctFile)) {
+          correctFile = correctFile.replace(/\\/g, '/');
+        }
+
+        const fileUrl = Url.join(pluginDir, correctFile);
+        if (!await fsOperation(fileUrl).exists()) {
+          await helpers.createFileRecursive(pluginDir, correctFile);
+        }
+
+        if (correctFile.endsWith('/')) return;
+
+        let data = await zip.files[file].async('ArrayBuffer');
+
+        if (file === 'plugin.json') {
+          data = JSON.stringify(pluginJson);
+        }
+
+        await fsOperation(fileUrl).writeFile(data);
+      });
+
+      await Promise.all(promises);
+      await loadPlugin(id);
+    }
+  } catch (err) {
+    try {
+      await fsOperation(pluginDir).delete();
+    } catch (error) {
+      // ignore
+    }
+    throw err;
+  } finally {
+    loader.destroy();
   }
 }

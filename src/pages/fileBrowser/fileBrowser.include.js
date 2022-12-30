@@ -22,6 +22,7 @@ import remoteStorage from '../../lib/remoteStorage';
 import URLParse from 'url-parse';
 import checkFiles from '../../lib/checkFiles';
 import projects from '../../lib/projects';
+import appSettings from '../../lib/settings';
 
 /**
  * @typedef {{url: String, name: String}} Location

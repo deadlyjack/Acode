@@ -5,11 +5,11 @@ import $_console from '../views/console.hbs';
 import $_markdown from '../views/markdown.hbs';
 import helpers from '../utils/helpers';
 import dialogs from '../components/dialogs';
-import git from './git';
 import constants from './constants';
 import fsOperation from '../fileSystem/fsOperation';
 import Url from '../utils/Url';
 import openFolder from './openFolder';
+import appSettings from './settings';
 
 /**
  * Starts the server and run the active file in browser
@@ -22,6 +22,24 @@ async function run(
   target = appSettings.value.previewMode,
   runFile = false,
 ) {
+  if (!isConsole && !runFile) {
+    const {
+      serverPort,
+      previewPort,
+      previewMode,
+      disableCache,
+      host,
+    } = appSettings.value;
+    if (serverPort !== previewPort) {
+      const src = `http://${host}:${previewPort}`;
+      if (previewMode === 'browser') {
+        system.openInBrowser(src);
+        return;
+      }
+
+      system.inAppBrowser(src, '', false, disableCache);
+    }
+  }
 
   const activeFile = isConsole ? null : editorManager.activeFile;
   if (!isConsole && !await activeFile?.canRun()) return;
@@ -132,7 +150,6 @@ async function run(
 
   function startServer() {
     let serverHandler = (msg) => {
-      console.log(msg);
       openBrowser();
     }
     if (acode.webServer) {
@@ -260,52 +277,20 @@ async function run(
           break;
 
         default:
-          if (file && file.type === 'git') {
-            try {
-              const gitFile = await git.getGitFile(file.record, reqPath);
-              const data = helpers.base64toBlob(
-                gitFile,
-                mimeType.lookup(reqPath),
-              );
-
-              const id = file.record.sha + encodeURIComponent(reqPath);
-              const cacheFile = id.hashCode() + '.' + ext;
-              const uri = Url.join(CACHE_STORAGE, cacheFile);
-              const cacheDirFs = fsOperation(CACHE_STORAGE);
-              const cacheFileFs = fsOperation(uri);
-
-              if (await cacheFileFs.exists()) {
-                sendFile(uri, reqId);
-                break;
-              }
-
-              await cacheDirFs.createFile(cacheFile);
-              await cacheFileFs.writeFile(data);
-
-              sendFile(uri, reqId);
-            } catch (err) {
-              if (reqPath === 'favicon.ico') {
-                sendIco(ASSETS_DIRECTORY, reqId);
-              } else {
-                error(reqId);
-              }
+          if (file && file.isUnsaved) {
+            sendText(
+              file.session.getValue(),
+              reqId,
+              mimeType.lookup(file.filename),
+            );
+          } else if (url) {
+            if (reqPath === 'favicon.ico') {
+              sendIco(ASSETS_DIRECTORY, reqId);
+            } else {
+              sendFile(url, reqId);
             }
           } else {
-            if (file && file.isUnsaved) {
-              sendText(
-                file.session.getValue(),
-                reqId,
-                mimeType.lookup(file.filename),
-              );
-            } else if (url) {
-              if (reqPath === 'favicon.ico') {
-                sendIco(ASSETS_DIRECTORY, reqId);
-              } else {
-                sendFile(url, reqId);
-              }
-            } else {
-              error(reqId);
-            }
+            error(reqId);
           }
           break;
       }
@@ -374,6 +359,8 @@ async function run(
       });
       return;
     }
+
+    isLoading = true;
     const protocol = Url.getProtocol(path);
     const ext = Url.extname(path);
     const mimetype = mimeType.lookup(ext);
@@ -382,7 +369,6 @@ async function run(
         CACHE_STORAGE,
         protocol.slice(0, -1) + path.hashCode(),
       );
-      isLoading = true;
       const fs = fsOperation(path);
       try {
         await fs.readFile(); // Because reading the remote file will create cache file
@@ -390,33 +376,33 @@ async function run(
       } catch (err) {
         error(id);
       }
-
-      isLoading = false;
-      const action = queue.splice(-1, 1)[0];
-      if (typeof action === 'function') action();
     } else if (protocol === 'content:') {
-      sdcard.formatUri(
-        path,
-        (uri) => {
-          send(uri, mimetype);
-        },
-        () => {
-          error(id);
-        },
-      );
-    } else {
-      send(path, mimetype);
+      path = await new Promise((resolve, reject) => {
+        sdcard.formatUri(path, resolve, reject);
+      });
+    } else if (!/^file:/.test(protocol)) {
+      const fileContent = await fsOperation(path).readFile();
+      const tempFileName = path.hashCode();
+      const tempFile = Url.join(CACHE_STORAGE, tempFileName);
+      if (!await fsOperation(tempFile).exists()) {
+        await fsOperation(CACHE_STORAGE).createFile(tempFileName, fileContent);
+      } else {
+        await fsOperation(tempFile).writeFile(fileContent);
+      }
+      path = tempFile;
     }
 
-    function send(path, mimetype) {
-      acode.webServer?.send(id, {
-        status: 200,
-        path,
-        headers: {
-          'Content-Type': mimetype,
-        },
-      });
-    }
+    acode.webServer?.send(id, {
+      status: 200,
+      path,
+      headers: {
+        'Content-Type': mimetype,
+      },
+    });
+
+    isLoading = false;
+    const action = queue.splice(-1, 1)[0];
+    if (typeof action === 'function') action();
   }
 
   async function sendFileContent(url, id, mime, processText) {

@@ -1,6 +1,5 @@
-import mustache from 'mustache'
-import template from './plugins.hbs';
-import list from './list.hbs';
+import './plugins.scss';
+
 import Page from "../../components/page";
 import helpers from "../../utils/helpers";
 import searchBar from "../../components/searchbar";
@@ -9,9 +8,9 @@ import Url from "../../utils/Url";
 import plugin from "../plugin/plugin";
 import dialogs from "../../components/dialogs";
 import constants from "../../lib/constants";
-import alert from "../../components/dialogboxes/alert";
 import FileBrowser from "../fileBrowser/fileBrowser";
-import gh2cdn from '../../utils/gh2cdn';
+import PluginList from './pluginList';
+import installPlugin from '../../lib/installPlugin';
 
 /**
  * 
@@ -23,6 +22,7 @@ export default function PluginsInclude(updates) {
   const $page = Page(strings['plugins']);
   const $search = <span className="icon search" data-action='search'></span>;
   const $add = <span className="icon add" data-action='add-source' onclick={() => addSource()}></span>;
+  const $list = <div id='plugin-list' className='list scroll' empty-msg={strings['loading...']}></div>;
   const plugins = {
     all: [],
     installed: [],
@@ -31,9 +31,13 @@ export default function PluginsInclude(updates) {
   let allState = LOADING;
   let installedState = LOADING;
 
-  $page.body.innerHTML = mustache.render(template, {
-    msg: strings['loading...'],
-  });
+  $page.body = <div className='main' id='plugins'>
+    <div className='options'>
+      <span id='installed_plugins' onclick={renderInstalled} tabindex='0' className='active'>Installed</span>
+      <span id='all_plugins' onclick={renderAll} tabindex='0'>All</span>
+    </div>
+    {$list}
+  </div>;
   $page.header.append($search, $add);
 
   actionStack.push({
@@ -60,76 +64,54 @@ export default function PluginsInclude(updates) {
     return;
   }
 
-  getAllPlugins();
+  if (navigator.onLine) {
+    getAllPlugins();
+  }
   getInstalledPlugins()
     .then(() => {
       render();
     });
 
-  function renderAll() {
-    $page.get('[data-action="select"].active')?.classList.remove('active');
-    $page.get('[data-action="select"][value="all"]')?.classList.add('active');
-    $page
-      .get('#plugin-list')
-      .innerHTML = mustache.render(list, plugins.all);
-  }
-
-  function renderInstalled() {
-    $page.get('[data-action="select"].active')?.classList.remove('active');
-    $page.get('[data-action="select"][value="installed"]')?.classList.add('active');
-    $page
-      .get('#plugin-list')
-      .innerHTML = mustache.render(list, plugins.installed);
-  }
-
   function handleClick(event) {
     const $target = event.target;
     const { action } = $target.dataset;
     if (action === 'search') {
-      searchBar($page.get('#plugin-list'));
+      searchBar($list);
       return;
     }
     if (action === 'open') {
       plugin($target.dataset, onIninstall, onUninstall);
       return;
     }
-    if (action === 'select') {
-      section = $target.getAttribute('value');
-      render();
-    }
   }
 
-  function render() {
-    const $list = $page.get('#plugin-list');
+  function render(section = 'installed') {
     let emptyMsg = strings['no plugins found'];
-    if (section === 'all') {
-      if (allState === LOADING) {
-        emptyMsg = strings['loading...'];
-      }
-      renderAll();
+    if (
+      section === 'installed' && installedState === LOADING
+      || section === 'all' && allState === LOADING
+    ) {
+      emptyMsg = strings['loading...'];
     }
+    $page.get('.options>span.active')?.classList.remove('active');
+    $page.get(`#${section}_plugins`)?.classList.add('active');
+    $list.setAttribute('empty-msg', strings['no plugins found']);
+    $list.content = <PluginList plugins={plugins[section]} />;
+  }
 
-    if (section === 'installed') {
-      if (installedState === LOADING) {
-        emptyMsg = strings['loading...'];
-      }
-      renderInstalled();
-    }
+  function renderAll() {
+    render('all');
+  }
 
-    $list.setAttribute('empty-msg', emptyMsg);
+  function renderInstalled() {
+    render('installed');
   }
 
   async function getAllPlugins() {
+    plugins.all = [];
     try {
       const installed = await fsOperation(PLUGIN_DIR).lsDir();
-      plugins.all = await fsOperation(
-        gh2cdn(constants.PLUGIN_LIST),
-      ).readFile('json');
-
-      plugins.all = plugins.all.map((plugin) => {
-        plugin.icon = gh2cdn(plugin.icon);
-        return plugin;
-      });
+      plugins.all = await fsOperation(constants.PLUGIN_LIST).readFile('json');
 
       installed.forEach(({ url }) => {
         const plugin = plugins.all.find(({ id }) => id === Url.basename(url));
@@ -143,11 +125,12 @@ export default function PluginsInclude(updates) {
         render();
       }
     } catch (error) {
-      helpers.error(error);
+      console.error(error);
     }
   }
 
   async function getInstalledPlugins(updates) {
+    plugins.installed = [];
     const installed = await fsOperation(PLUGIN_DIR).lsDir();
     if (!installed.length) {
       section = 'all';
@@ -161,7 +144,7 @@ export default function PluginsInclude(updates) {
         const { id } = plugin;
         const iconUrl = getLocalRes(id, 'icon.png');
         plugin.icon = await helpers.toInternalUri(iconUrl);
-        plugin.plugin = getLocalRes(id, 'plugin.json');
+        plugin.installed = true;
         plugins.installed.push(plugin);
       }
     }));
@@ -203,26 +186,15 @@ export default function PluginsInclude(updates) {
     if (sourceType === 'remote') {
       source = await dialogs.prompt('Enter plugin source', value, 'url');
     } else {
-      source = (await FileBrowser('folder', 'Select plugin source')).url;
+      source = (await FileBrowser('file', 'Select plugin source')).url;
     }
 
-    const json = Url.join(source, 'plugin.json');
     try {
-      helpers.showTitleLoader();
-      const data = await fsOperation(json).readFile('json');
-
-      if (data) {
-        const { id } = data;
-        plugin({
-          installed: plugins.installed.includes(id),
-          plugin: json,
-        }, onIninstall, onUninstall);
-      }
+      await installPlugin(source);
+      await getInstalledPlugins();
+      render();
     } catch (error) {
-      const message = helpers.errorMessage(error);
-      alert(strings.error, message || 'Unable to add source.', () => addSource(source));
-    } finally {
-      helpers.removeTitleLoader();
+      helpers.error(error);
     }
   }
 }

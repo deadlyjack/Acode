@@ -1,8 +1,8 @@
-function plugin({ plugin, installed }, onInstall, onUninstall) {
+function plugin({ id, installed }, onInstall, onUninstall) {
   import(/* webpackChunkName: "plugins" */ './plugin.include').then(
     (res) => {
       const Plugin = res.default;
-      Plugin(plugin, installed, onInstall, onUninstall);
+      Plugin(id, installed, onInstall, onUninstall);
     },
   );
 }

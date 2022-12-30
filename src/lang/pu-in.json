@@ -99,7 +99,6 @@
   "use emmet": "Emmet ਦੀ ਵਰਤੋਂ ਕਰੋ",
   "use quick tools": "ਤੇਜ਼ ਸਾਧਨਾਂ ਦੀ ਵਰਤੋਂ ਕਰੋ",
   "yes": "ਹਾਂ",
-  "github": "GitHub",
   "encoding": "ਟੈਕਸਟ ਇੰਕੋਡਿੰਗ",
   "syntax highlighting": "ਸਿੰਟੈਕਸ ਹਾਈਲਾਈਟਿੰਗ",
   "read only": "ਸਿਰਫ ਪੜ੍ਹਨ ਲਈ",
@@ -202,7 +201,6 @@
   "new line mode": "ਨਵਾਂ ਲਾਈਨ ਮੋਡ",
   "add a storage": "ਸਟੋਰੇਜ ਸ਼ਾਮਲ ਕਰੋ",
   "rate acode": "Acode ਨੂੰ ਰੇਟ ਕਰੋ (NiceSapien ਦੁਆਰਾ ਪੰਜਾਬੀ ਅਨੁਵਾਦ)",
-  "github login": "Github ਲਾਗਇਨ",
   "support": "ਸਪੋਰਟ",
   "donate": "ਦਾਨ ਕਰੋ {amount}",
   "donation message": "ਅਜਿਹੇ ਲੋਕ ਹਨ ਜੋ ਦਾਨ ਨਹੀਂ ਕਰਦੇ ਕਿਉਂਕਿ ਉਹ ਮੰਨਦੇ ਹਨ ਕਿ ਹਰ ਕੋਈ ਹੈ, ਅਤੇ ਅਜਿਹੇ ਲੋਕ ਹਨ ਜੋ ਟਾਰਚ ਨੂੰ ਚੁੱਕਦੇ ਹਨ ਅਤੇ ਇਸ ਨਾਲ ਦੌੜਦੇ ਹਨ। ਤੁਹਾਡੇ ਦਿਆਲੂ ਅਤੇ ਦਿਲਕਸ਼ ਦਾਨ ਲਈ ਤੁਹਾਡਾ ਧੰਨਵਾਦ।",
@@ -281,5 +279,15 @@
   "local": "ਸਥਾਨਕ",
   "remote": "ਰਿਮੋਟ",
   "show console toggler": "ਕੰਸੋਲ ਟੌਗਲਰ ਦਿਖਾਓ",
-  "binary file": "ਇਸ ਫ਼ਾਈਲ ਵਿੱਚ ਬਾਈਨਰੀ ਡਾਟਾ ਹੈ, ਕੀ ਤੁਸੀਂ ਇਸਨੂੰ ਖੋਲ੍ਹਣਾ ਚਾਹੁੰਦੇ ਹੋ?"
+  "binary file": "ਇਸ ਫ਼ਾਈਲ ਵਿੱਚ ਬਾਈਨਰੀ ਡਾਟਾ ਹੈ, ਕੀ ਤੁਸੀਂ ਇਸਨੂੰ ਖੋਲ੍ਹਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
+  "relative line numbers": "Relative line numbers",
+  "elastic tabstops": "Elastic tabstops",
+  "line based rtl switching": "Line based RTL switching",
+  "hard wrap": "Hard wrap",
+  "spellcheck": "Spellcheck",
+  "wrap method": "Wrap Method",
+  "use textarea for ime": "Use textarea for IME",
+  "invalid plugin": "Invalid Plugin",
+  "type command": "Type command",
+  "plugin": "Plugin"
 }

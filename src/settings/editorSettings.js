@@ -1,6 +1,7 @@
 import constants from '../lib/constants';
 import scrollSettings from './scrollSettings';
 import settingsPage from '../components/settingPage';
+import appSettings from '../lib/settings';
 
 export default function editorSettings() {
   const title = strings['editor settings'];
@@ -91,11 +92,6 @@ export default function editorSettings() {
       ],
     },
     {
-      key: 'fullscreen',
-      text: strings.fullscreen.capitalize(),
-      checkbox: values.fullscreen,
-    },
-    {
       key: 'liveAutoCompletion',
       text: strings['live autocompletion'].capitalize(),
       checkbox: values.liveAutoCompletion,
@@ -131,6 +127,36 @@ export default function editorSettings() {
       ],
     },
     {
+      key: 'relativeLineNumbers',
+      text: strings['relative line numbers'],
+      checkbox: values.relativeLineNumbers,
+    },
+    {
+      key: 'elasticTabstops',
+      text: strings['elastic tabstops'],
+      checkbox: values.elasticTabstops,
+    },
+    {
+      key: 'rtlText',
+      text: strings['line based rtl switching'],
+      checkbox: values.rtlText,
+    },
+    {
+      key: 'spellcheck',
+      text: strings['spellcheck'],
+      checkbox: values.spellcheck,
+    },
+    {
+      key: 'hardWrap',
+      text: strings['hard wrap'],
+      checkbox: values.hardWrap,
+    },
+    {
+      key: 'useTextareaForIME',
+      text: strings['use textarea for ime'],
+      checkbox: values.useTextareaForIME,
+    },
+    {
       index: 0,
       key: 'scroll-settings',
       text: strings['scroll settings'],
@@ -142,10 +168,6 @@ export default function editorSettings() {
       case 'scroll-settings':
         scrollSettings();
         break;
-
-      case 'fullscreen':
-        if (value) acode.exec('enable-fullscreen');
-        else acode.exec('disable-fullscreen');
 
       default:
         appSettings.update({

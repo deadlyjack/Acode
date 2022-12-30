@@ -1,7 +1,8 @@
 import Irid from 'irid';
-import constants from './constants';
 import fsOperation from '../fileSystem/fsOperation';
 import Url from '../utils/Url';
+import themes from './themes';
+import appSettings from './settings';
 
 let busy = false;
 let lastCall;
@@ -14,13 +15,13 @@ export default async function restoreTheme(darken) {
   if (darken && document.body.classList.contains('loading')) return;
 
   let theme = DOES_SUPPORT_THEME ? appSettings.value.appTheme : 'default';
-  const themeList = constants.appThemeList;
-  let themeData = themeList[theme];
+  const { appThemes } = themes;
+  let themeData = appThemes[theme];
   let type = themeData.type;
 
   if (!themeData || (!themeData.isFree && IS_FREE_VERSION)) {
     theme = 'default';
-    themeData = themeList[theme];
+    themeData = appThemes[theme];
     appSettings.value.appTheme = theme;
     appSettings.update();
   }

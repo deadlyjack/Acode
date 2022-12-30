@@ -2,13 +2,14 @@ import './themeSetting.scss';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
-import constants from '../../lib/constants';
 import $_template from './themeSetting.hbs';
 import $_list_item from './list-item.hbs';
 import searchBar from '../../components/searchbar';
 import CustomTheme from '../customTheme/customTheme';
 import helpers from '../../utils/helpers';
 import removeAds from '../../lib/removeAds';
+import themes from '../../lib/themes';
+import appSettings from '../../lib/settings';
 
 export default function () {
   const $page = Page(strings.theme.capitalize());
@@ -94,17 +95,17 @@ export default function () {
           '</div>' +
           '</div>';
 
-      themeList = constants.appThemeList;
+      themeList = themes.appThemes;
       defaultValue = (theme) => appSettings.value.appTheme === theme;
     } else if (mode === 'editor') {
-      themeList = constants.editorThemeList;
+      themeList = themes.editorThemes;
       defaultValue = (theme) =>
         appSettings.value.editorTheme === `ace/theme/${theme}`;
     } else if (mode === 'md') { }
 
-    const themes = Object.keys(themeList).sort();
-    for (let i = 0; i < themes.length; ++i) {
-      const theme = themes[i];
+    const sortedThemes = Object.keys(themeList).sort();
+    for (let i = 0; i < sortedThemes.length; ++i) {
+      const theme = sortedThemes[i];
       let paid = false;
       let disable = false;
       const themeData = themeList[theme];
@@ -174,7 +175,7 @@ export default function () {
    * @returns
    */
   async function onSelectAppTheme(res, type) {
-    const theme = constants.appThemeList[res];
+    const theme = themes.appThemes[res];
     if (!theme) return;
     if (!theme.isFree && IS_FREE_VERSION) {
       try {

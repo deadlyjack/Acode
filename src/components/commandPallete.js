@@ -1,46 +1,13 @@
-import tag from 'html-tag-js';
 import helpers from '../utils/helpers';
-import inputhints from './inputhints';
+import pallete from './pallete';
 
 export default async function commandPallete() {
   const recentlyUsedCommands = RecentlyUsedCommands();
   const commands = Object.values(editorManager.editor.commands.commands);
-  const $input = tag('input', {
-    type: 'search',
-    placeholder: 'Type command',
-    onfocusout: remove,
-    enterKeyHint: 'go',
-  });
-  const $mask = tag('span', {
-    className: 'mask',
-    onclick() {
-      remove();
-    },
-  })
-  const $pallete = tag('div', {
-    id: 'command-pallete',
-    children: [$input],
-  });
 
-  const { container } = inputhints($input, generateHints, onselect);
+  pallete(generateHints, onselect, strings['type command']);
 
-  // container.id = 'command-pallete-hint-box';
-  actionStack.push({
-    id: 'command-pallete',
-    action: remove,
-  });
-
-  window.restoreTheme(true);
-  app.append($pallete, $mask);
-  $input.focus();
-
-  function remove() {
-    window.restoreTheme();
-    $mask.remove();
-    $pallete.remove();
-  }
-
-  function generateHints(setHints) {
+  function generateHints() {
     recentlyUsedCommands.commands.forEach((name) => {
       const command = Object.assign({}, commands.find(command => command.name === name));
       if (command) {
@@ -53,7 +20,7 @@ export default async function commandPallete() {
       text: `<span ${recentlyUsed ? `data-str='${strings['recently used']}'` : ''}>${description ?? name}</span><small>${bindKey?.win ?? ''}</small>`,
     }));
 
-    setHints(hints);
+    return hints;
   }
 
   function onselect(value) {
@@ -61,7 +28,6 @@ export default async function commandPallete() {
     if (!command) return;
     recentlyUsedCommands.push(value);
     command.exec(editorManager.editor);
-    remove();
   }
 }
 

@@ -1,3 +1,4 @@
+import appSettings from "./settings";
 import commands from "./commands";
 import fsOperation from "../fileSystem/fsOperation";
 import Url from "../utils/Url";
@@ -8,9 +9,12 @@ import FileBrowser from "../pages/fileBrowser/fileBrowser";
 import helpers from "../utils/helpers";
 import projects from "./projects";
 import selectionMenu from "./selectionMenu";
+import Page from '../components/page';
+import inputhints from '../components/inputhints';
+import pallete from '../components/pallete';
+import openFolder from './openFolder';
 
 export default class Acode {
-  #fileHandlers = [];
   #modules = {};
   #pluginsInit = {};
   #pluginUnmount = {};
@@ -28,26 +32,39 @@ export default class Acode {
   }];
 
   constructor() {
+    this.define('Url', Url);
     this.define('fs', fsOperation);
     this.define('projects', projects);
-    this.define('selectionMenu', selectionMenu);
     this.define('alert', dialogs.alert);
-    this.define('confirm', dialogs.confirm);
     this.define('prompt', dialogs.prompt);
     this.define('select', dialogs.select);
-    this.define('multiPrompt', dialogs.multiPrompt);
     this.define('loader', dialogs.loader);
     this.define('fileBrowser', FileBrowser);
+    this.define('confirm', dialogs.confirm);
+    this.define('selectionMenu', selectionMenu);
+    this.define('multiPrompt', dialogs.multiPrompt);
     this.define('toInternalUrl', helpers.toInternalUri);
-    this.define('Url', Url);
+    this.define('EditorFile', EditorFile);
+    this.define('page', Page);
+    this.define('settings', appSettings);
+    this.define('helpers', helpers);
+    this.define('inputhints', inputhints);
+    this.define('pallete', pallete);
+    this.define('fsOperation', fsOperation);
+    this.define('openfolder', openFolder);
   }
 
+  /**
+   * Define a module
+   * @param {string} name 
+   * @param {Object|function} module 
+   */
   define(name, module) {
-    this.#modules[name] = module;
+    this.#modules[name.toLowerCase()] = module;
   }
 
   require(module) {
-    return this.#modules[module];
+    return this.#modules[module.toLowerCase()];
   }
 
   exec(key, val) {
@@ -87,9 +104,9 @@ export default class Acode {
    * @param {string} baseUrl local plugin url
    * @param {HTMLElement} $page 
    */
-  initPlugin(id, baseUrl, $page, options) {
+  async initPlugin(id, baseUrl, $page, options) {
     if (id in this.#pluginsInit) {
-      this.#pluginsInit[id](baseUrl, $page, options);
+      await this.#pluginsInit[id](baseUrl, $page, options);
     }
   }
 

@@ -30,6 +30,10 @@
       display: flex;
       padding: 20px;
 
+      .icon {
+        display: inline-flex;
+      }
+
       .logo {
         height: 100px;
         width: 100px;
@@ -49,11 +53,7 @@
         }
 
         .name {
-          margin-bottom: 10px;
-        }
-
-        .version::before {
-          content: 'v';
+          margin-bottom: 5px;
         }
       }
 
@@ -77,6 +77,11 @@
     padding: 10px;
     box-sizing: border-box;
     overflow: auto;
+  }
+
+  .version {
+    display: flex;
+    align-items: center;
   }
 
   h1,

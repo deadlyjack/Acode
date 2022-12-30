@@ -9,6 +9,7 @@ import path from './Path';
 import Url from './Url';
 import Uri from './Uri';
 import fsOperation from '../fileSystem/fsOperation';
+import appSettings from '../lib/settings';
 
 const credentials = {
   key: 'xkism2wq3)(I#$MNkds0)*(73am)(*73_L:w3k[*(#WOd983jkdssap sduy*&T#W3elkiu8983hKLUYs*(&y))',
@@ -315,12 +316,14 @@ export default {
     const extra = args.join('<br>');
     let msg;
 
-    if (typeof err === 'string') {
+    if (typeof err === 'string' && err) {
       msg = err;
     } else if (err instanceof Error) {
       msg = err.message;
     } else if (err.code !== null) {
       msg = this.getErrorMessage(err.code);
+    } else {
+      msg = strings['an error occurred'];
     }
 
     return msg + (extra ? '<br>' + extra : '');
@@ -332,8 +335,6 @@ export default {
    * @returns {PromiseLike<void>}
    */
   error(err, ...args) {
-    console.error(err, ...args);
-
     if (err.code === 0) {
       this.toast(err);
       return;
@@ -750,14 +751,19 @@ export default {
   * @param {Array<string> | string} dir 
   */
   async createFileRecursive(parent, dir) {
+    let isDir = false;
     if (typeof dir === 'string') {
+      if (dir.endsWith('/')) {
+        isDir = true;
+        dir = dir.slice(0, -1);
+      }
       dir = dir.split('/');
     }
     dir = dir.filter(d => d);
     const cd = dir.shift();
     const newParent = Url.join(parent, cd);
     if (!(await fsOperation(newParent).exists())) {
-      if (dir.length) {
+      if (dir.length || isDir) {
         await fsOperation(parent).createDirectory(cd);
       } else {
         await fsOperation(parent).createFile(cd);

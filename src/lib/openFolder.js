@@ -11,6 +11,7 @@ import openFile from './openFile';
 import Url from '../utils/Url';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import URLParse from 'url-parse';
+import appSettings from './settings';
 
 /**
  *
@@ -156,9 +157,11 @@ function openFolder(_path, opts = {}) {
     const url = $target.data_url;
     const name = $target.data_name;
 
-    if (mode === 'click') handleClick(type, url, name, $target);
-    else if (mode === 'contextmenu')
+    if (mode === 'click') {
+      handleClick(type, url, name, $target);
+    } else if (mode === 'contextmenu') {
       handleContextmenu(type, url, name, $target);
+    }
   }
 
   /**
@@ -317,7 +320,7 @@ function openFolder(_path, opts = {}) {
       newName = Url.basename(newUrl);
       $target.querySelector(':scope>.text').textContent = newName;
       $target.data_url = newUrl;
-      $target.data_urlname = newName;
+      $target.data_name = newName;
       if (helpers.isFile(type)) {
         $target.querySelector(':scope>span').className =
           helpers.getIconForFile(newName);

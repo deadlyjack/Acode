@@ -4,5 +4,22 @@
   "java.configuration.updateBuildConfiguration": "disabled",
   "[scss]": {
     "editor.defaultFormatter": "vscode.css-language-features"
+  },
+  "propTypes.quote": "single",
+  "emmet.syntaxProfiles": {
+    "xml": {
+      "attr_quotes": "single"
+    },
+    "html": {
+      "attr_quotes": "single"
+    },
+    "javascript": {
+      "attr_quotes": "single",
+      "attr_quotes_style": "single",
+      "self_closing_tag": true
+    },
+    "jsx": {
+      "attr_quotes": "single"
+    }
   }
 }

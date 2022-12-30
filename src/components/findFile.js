@@ -1,55 +1,17 @@
-import tag from 'html-tag-js';
 import fsOperation from '../fileSystem/fsOperation';
 import openFile from '../lib/openFile';
 import recents from '../lib/recents';
 import helpers from '../utils/helpers';
 import Url from '../utils/Url';
-import inputhints from './inputhints';
+import pallete from './pallete';
 
 export default async function findFile() {
-  const $input = tag('input', {
-    type: 'search',
-    placeholder: strings['type filename'],
-    onfocusout: remove,
-    enterKeyHint: 'go',
-  });
-  const $mask = tag('span', {
-    className: 'mask',
-    onclick() {
-      remove();
-    },
-  })
-  const $pallete = tag('div', {
-    id: 'command-pallete',
-    children: [$input],
-  });
-
-  inputhints($input, generateHints, onselect);
-
-  actionStack.push({
-    id: 'command-pallete',
-    action: remove,
-  });
-
-  window.restoreTheme(true);
-  app.append($pallete, $mask);
-  $input.focus();
-
-  function remove() {
-    window.restoreTheme();
-    $mask.remove();
-    $pallete.remove();
-  }
+  pallete(generateHints, onselect, strings['type filename']);
 
   /**
    * Generates hint for inputhints
-   * @param {function({text: string, value: string}[]):void} setHints 
    */
-  async function generateHints(setHints) {
-    setHints([{
-      text: strings['loading...'],
-      value: '',
-    }]);
+  async function generateHints() {
     const files = [];
     const dirs = addedFolder.map(({ url }) => url);
 
@@ -76,7 +38,7 @@ export default async function findFile() {
       // ignore
     }
 
-    setHints(files);
+    return files;
   }
 
   /**
@@ -125,7 +87,6 @@ export default async function findFile() {
   function onselect(value) {
     if (!value) return;
     openFile(value);
-    remove();
   }
 
   function hintItem(name, path, url) {

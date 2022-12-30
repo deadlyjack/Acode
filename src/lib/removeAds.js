@@ -2,15 +2,24 @@ import helpers from "../utils/helpers";
 
 let callback;
 
-export default async function removeAds() {
+export default function removeAds() {
   return new Promise((resolve, reject) => {
-    iap.getProducts(['acode_pro'], (products) => {
+    iap.getProducts(['acode_pro_new'], (products) => {
       const [product] = products;
 
       iap.setPurchaseUpdatedListener((purchases) => {
         const [purchase] = purchases;
         if (purchase.purchaseState === iap.PURCAHSE_STATE_PURCHASED) {
           onpurchase();
+          if (!purchase.isAcknowledged) {
+            iap.acknowledgePurchase(purchase.purchaseToken, () => {
+              resolve();
+            }, (error) => {
+              helpers.error(error);
+              reject(error);
+            });
+            return;
+          }
           resolve();
           return;
         }

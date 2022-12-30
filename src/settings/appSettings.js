@@ -7,6 +7,7 @@ import ajax from '@deadlyjack/ajax';
 import Url from '../utils/Url';
 import settingsPage from '../components/settingPage';
 import lang from '../lib/lang';
+import appSettings from '../lib/settings';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -28,6 +29,11 @@ export default function otherSettings() {
         ['yes', strings.yes],
         ['system', strings.system],
       ],
+    },
+    {
+      key: 'fullscreen',
+      text: strings.fullscreen.capitalize(),
+      checkbox: values.fullscreen,
     },
     {
       key: 'lang',
@@ -173,10 +179,14 @@ export default function otherSettings() {
         system.setInputType(value);
         break;
 
+      case 'fullscreen':
+        if (value) acode.exec('enable-fullscreen');
+        else acode.exec('disable-fullscreen');
+        break;
+
       default:
         break;
     }
-
 
     appSettings.update({
       [key]: value,
