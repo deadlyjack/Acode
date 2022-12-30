@@ -265,6 +265,7 @@ async function EditorManager($sidebar, $header, $body) {
       enableLiveAutocompletion: settings.liveAutoCompletion,
       relativeLineNumbers: settings.relativeLineNumbers,
       useElasticTabstops: settings.elasticTabstops,
+      useTextareaForIME: settings.useTextareaForIME,
       rtlText: settings.rtlText,
       hardWrap: settings.hardWrap,
       spellCheck: settings.spellCheck,

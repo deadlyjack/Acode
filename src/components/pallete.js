@@ -30,6 +30,7 @@ export default function pallete(getList, onselect, placeholder) {
   }
 
   function remove() {
+    actionStack.remove('command-pallete');
     window.restoreTheme();
     $pallete.remove();
     $mask.remove();

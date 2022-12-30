@@ -1,4 +1,4 @@
-version 1.7.0 alpha 250
+version 1.7.0 beta 251
 ☞ Updated plugin system
 ☞ GitHub is removed from app but, you can still use it from plugin
 ☞ Bugs fixes

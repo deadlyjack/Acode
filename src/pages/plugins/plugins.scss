@@ -1,4 +1,7 @@
 #plugins {
+  display: flex;
+  flex-direction: column;
+
   .list:empty::after {
     content: 'No plugins found';
   }
