@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<widget id="com.foxdebug.acode" android-versionCode="250" version="1.7.0 alpha"
+<widget id="com.foxdebug.acode" android-versionCode="252" version="1.7.0"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -50,6 +50,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
                 <data android:mimeType="text/*"/>
                 <data android:mimeType="xml/*" />
+                <data android:mimeType="application/text" />
+                <data android:mimeType="application/xml" />
+                <data android:mimeType="application/json" />
+                <data android:mimeType="application/javascript" />
+                <data android:mimeType="application/x-sh" />
+                <data android:mimeType="application/octet-stream"/>
+                <data pathPattern=".*\.txt"/>
+                <data pathPattern=".*\.xml"/>
+                <data pathPattern=".*\.json"/>
             </intent-filter>
         </config-file>
 

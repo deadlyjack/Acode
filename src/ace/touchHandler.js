@@ -164,7 +164,7 @@ export default function addTouchListeners(editor) {
       return;
     }
 
-    if ($gutter.contains($target)) {
+    if ($gutter.contains($target) || $target.classList.contains('ace_fold')) {
       return;
     }
 
