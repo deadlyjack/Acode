@@ -19,6 +19,7 @@ export default {
   ERUDA_CDN: 'https://cdn.jsdelivr.net/npm/eruda',
   PAID_VERSION: 'https://play.google.com/store/apps/details?id=com.foxdebug.acode',
   PLUGIN_LIST: 'https://acode.foxdebug.com/api/plugins',
+  API_BASE: 'https://acode.foxdebug.com/api',
   GITHUB_TOKEN: 'https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token',
   SKULIST: ["basic", "bronze", "silver", "gold", "platinum"],
   encodings: [
