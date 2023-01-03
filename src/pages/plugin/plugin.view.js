@@ -9,11 +9,20 @@ export default (props) => {
     name,
     downloads,
     body,
+    icon,
+    author,
     votes_up: votesUp,
     votes_down: votesDown,
+    author_github: authorGithub,
+    comment_count: commentCount,
   } = props;
 
   let rating = 'unrated';
+  let moreInfoStyle = {};
+
+  if (votesUp === undefined) {
+    moreInfoStyle.display = 'none';
+  }
 
   if (votesUp || votesDown) {
     rating = `${Math.round(votesUp / (votesUp + votesDown) * 100)}%`;
@@ -22,22 +31,22 @@ export default (props) => {
   return <div className="main" id="plugin">
     <div className="header">
       <div className="info">
-        <span className="logo" style={{ backgroundImage: `url(${props.icon})` }}></span>
+        <span className="logo" style={{ backgroundImage: `url(${icon})` }}></span>
         <div className="desc">
           <span className="name">{name}</span>
           <div className='version'><Version {...props} /></div>
-          <a className="author" href={`https://github.com/${props.author_github}`}>{props.author}</a>
+          <a className="author" href={`https://github.com/${authorGithub}`}>{author}</a>
         </div>
       </div>
-      <div className='more-info'>
+      <div style={moreInfoStyle} className='more-info'>
         <div className='icon-info' data-label='downloads'>
           <div>{downloads} <span className='icon file_downloadget_app'></span></div>
         </div>
         <div className='icon-info' data-label='ratings'>
           <span style={{ margin: 'auto' }}>{rating}</span>
         </div>
-        <div onclick={showReviews.bind(null, id)} className='icon-info' data-label='reviews'>
-          <span className='icon chat_bubble'></span>
+        <div onclick={showReviews.bind(null, id, author)} className='icon-info' data-label='reviews'>
+          <div>{commentCount}&nbsp;<span className='icon chat_bubble'></span></div>
         </div>
       </div>
       <div className="button-container primary">
@@ -68,7 +77,7 @@ function Version({ currentVersion, version }) {
   return <span>v{currentVersion}&nbsp;&#8594;&nbsp;v{version}</span>;
 }
 
-async function showReviews(pluginId) {
+async function showReviews(pluginId, author) {
   const mask = new Ref();
   const body = new Ref();
   const container = new Ref();
@@ -87,7 +96,10 @@ async function showReviews(pluginId) {
           <span className='title'>Reviews</span>
         </div>
         <div>
-          <a className='icon edit' href={Url.join(constants.API_BASE, `../plugin/${pluginId}`)}></a>
+          <a style={{ textDecoration: 'none', display: 'flex' }} href={Url.join(constants.API_BASE, `../plugin/${pluginId}/comments`)}>
+            <span className='icon edit'></span>
+            <span className='title'>Review</span>
+          </a>
         </div>
       </div>
       <div ref={body} className='reviews-body'></div>
@@ -103,6 +115,8 @@ async function showReviews(pluginId) {
     }
 
     reviews.forEach(review => {
+      if (!review.comment) return;
+      review.author = author;
       body.append(<Review {...review} />);
     });
   } catch (error) {
@@ -120,9 +134,10 @@ async function showReviews(pluginId) {
   }
 }
 
-function Review({ name, github, vote, comment }) {
+function Review({ name, github, vote, comment, author, author_reply: authorReply }) {
   let dp = Url.join(constants.API_BASE, `../user.png`);
   let voteImage = new Ref();
+  let review = new Ref();
 
   if (github) {
     dp = `https://avatars.githubusercontent.com/${github}`;
@@ -134,7 +149,13 @@ function Review({ name, github, vote, comment }) {
     voteImage.style.backgroundImage = `url(${Url.join(constants.API_BASE, `../thumbs-down.gif`)})`;
   }
 
-  return <div className='review'>
+  if (authorReply) {
+    setTimeout(() => {
+      review.append(<p className='author-reply' data-author={author}>{authorReply}</p>);
+    }, 0);
+  }
+
+  return <div ref={review} className='review'>
     <div title={name} className='review-author'>
       <span style={{ backgroundImage: `url(${dp})` }} className='user-profile'></span>
       <span>{name}</span>

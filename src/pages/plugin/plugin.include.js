@@ -53,7 +53,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       };
       if (settings) {
         $page.header.append(
-          <span className="icon settings" onclick={() => settingsPage(plugin.name, settings)}></span>
+          <span className="icon settings" onclick={() => settingsPage(plugin.name, settings.list, settings.cb)}></span>
         );
       }
     }

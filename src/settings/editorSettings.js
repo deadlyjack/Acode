@@ -142,11 +142,6 @@ export default function editorSettings() {
       checkbox: values.rtlText,
     },
     {
-      key: 'spellcheck',
-      text: strings['spellcheck'],
-      checkbox: values.spellcheck,
-    },
-    {
       key: 'hardWrap',
       text: strings['hard wrap'],
       checkbox: values.hardWrap,

@@ -238,6 +238,18 @@
         align-items: center;
         font-weight: 300;
       }
+
+      .author-reply {
+        &::before {
+          display: block;
+          content: attr(data-author);
+          font-weight: 400;
+          margin-bottom: 10px;
+        }
+
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.1);
+      }
     }
   }
 }
