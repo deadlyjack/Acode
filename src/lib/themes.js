@@ -11,6 +11,7 @@ const editorThemes = {
   crimson_editor: scheme('crimson editor', 'light'),
   dawn: scheme('dawn', 'light'),
   dracula: scheme('dracula', 'dark'),
+  dracula_pro: scheme('dracula_pro','dark'),
   dreamweaver: scheme('dreamweaver', 'light'),
   eclipse: scheme('eclipse', 'light'),
   github: scheme('github', 'light'),
