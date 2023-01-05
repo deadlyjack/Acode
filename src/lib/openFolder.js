@@ -624,7 +624,8 @@ openFolder.updateHeight = function () {
   if (!addedFolder.length) return;
   let activeFileListHeight = 0;
 
-  if (appSettings.value.openFileListPos === 'sidebar') {
+  // show active files in sidebar
+  if (appSettings.value.openFileListPos === appSettings.OPEN_FILE_LIST_POS_SIDEBAR) {
     const client = editorManager.openFileList.getBoundingClientRect();
     activeFileListHeight = client.height;
   }

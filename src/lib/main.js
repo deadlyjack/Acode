@@ -24,7 +24,6 @@ import settings from './settings';
 import constants from './constants';
 import intentHandler from '../handlers/intent';
 import openFolder from './openFolder';
-import arrowkeys from '../handlers/arrowkeys';
 import quickTools from '../handlers/quickTools';
 import loadPolyFill from '../utils/polyfill';
 import Url from '../utils/Url';
@@ -242,7 +241,7 @@ async function loadApp() {
     lead: $navToggler,
     tail: $menuToggler,
   });
-  const $footer = <footer id='quick-tools' tabIndex={-1} onclick={quickTools.clickListener}></footer>;
+  const $footer = <footer id='quick-tools' tabIndex={-1}></footer>;
   const $mainMenu = contextMenu({
     top: '6px',
     right: '6px',
@@ -320,6 +319,7 @@ async function loadApp() {
 
   //#region Add event listeners
   editorManager.onupdate = onEditorUpdate;
+  quickTools($footer);
   root.on('show', mainPageOnShow);
   app.addEventListener('click', onClickApp);
   editorManager.on('rename-file', onFileUpdate);
@@ -327,8 +327,6 @@ async function loadApp() {
   editorManager.on('file-loaded', onFileUpdate);
   $fileMenu.addEventListener('click', handleMenu);
   $mainMenu.addEventListener('click', handleMenu);
-  $footer.addEventListener('click', footerOnClick);
-  $footer.addEventListener('contextmenu', footerOnContextMenu);
   document.addEventListener('backbutton', actionStack.pop);
   document.addEventListener('menubutton', $sidebar.toggle);
   navigator.app.overrideButton('menubutton', true);
@@ -406,18 +404,6 @@ async function loadApp() {
     if ($mainMenu.contains($target)) $mainMenu.hide();
     if ($fileMenu.contains($target)) $fileMenu.hide();
     acode.exec(action, value);
-  }
-
-  function footerOnClick(e) {
-    arrowkeys.onClick(e, $footer);
-  }
-
-  /**
-   *
-   * @param {MouseEvent} e
-   */
-  function footerOnContextMenu(e) {
-    arrowkeys.oncontextmenu(e, $footer);
   }
 
   function onEditorUpdate(mode, saveState = true) {

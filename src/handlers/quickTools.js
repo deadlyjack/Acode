@@ -1,349 +1,226 @@
 import tag from 'html-tag-js';
-import mustache from 'mustache';
-import $_searchRow1 from '../views/footer/searchRow1.hbs';
-import $_searchRow2 from '../views/footer/searchRow2.hbs';
-import $_row1 from '../views/footer/row1.hbs';
-import $_row2 from '../views/footer/row2.hbs';
-import searchSettings from '../settings/searchSettings';
-import constants from '../lib/constants';
-import appSettings from '../lib/settings';
+import constants from "../lib/constants";
+import appSettings from "../lib/settings";
+import quickToolsActions from './quickToolsActions';
 
-const $row1 = tag.parse($_row1);
-const $row2 = tag.parse($_row2);
-let $searchRow1;
-let $searchRow2;
+const keyMapping = {
+  37: 'ArrowLeft',
+  38: 'ArrowUp',
+  39: 'ArrowRight',
+  40: 'ArrowDown',
+};
+const CONTEXT_MENU_TIMEOUT = 1000;
+
+
+let movex;
+let time;
+let touchmoved;
+let isClickMode;
+let contextmenu;
+let contextmenuTimeout;
+
+let $row;
+let timeout;
+let $touchstart;
+let this$el;
+
+export default init;
+
+function reset() {
+  console.log('reset');
+  movex = 0;
+  time = 300;
+  $row = null;
+  $touchstart = null;
+  touchmoved = false;
+  contextmenu = false;
+  contextmenuTimeout = null;
+}
 
 /**
- * Performs quick actions
- * @param {string} action 
- * @param {string} value 
+ * 
+ * @param {HTMLElement} $el 
  */
-function actions(action, value) {
-  const { editor, activeFile } = editorManager;
-  const $footer = root.get('#quick-tools');
-  const $shiftKey = $footer.get('#shift-key');
-  const $textarea = editor.textInput.getElement();
-  let $searchInput = $footer.get('#searchInput');
-  let $replaceInput = $footer.get('#replaceInput');
-  let selectedText = editor.getCopyText();
-  let state;
-
-  if (!$searchRow1) {
-    $searchRow1 = tag.parse(
-      mustache.render($_searchRow1, strings),
-    );
-
-    $searchRow2 = tag.parse(
-      mustache.render($_searchRow2, strings),
-    );
+function init($el) {
+  this$el = $el;
+  if (appSettings.value.quickToolsTriggerMode === appSettings.QUICKTOOLS_TRIGGER_MODE_CLICK) {
+    isClickMode = true;
+    $el.addEventListener('click', onclick);
+    $el.addEventListener('contextmenu', oncontextmenu);
+  } else {
+    $el.addEventListener('touchstart', touchstart);
+    $el.addEventListener('keydown', touchstart);
   }
 
-  if (selectedText.length > 50) selectedText = '';
-
-  const ignore = !['pallete', 'search', 'search-settings'].includes(action);
-  if (ignore && activeFile?.focused) {
-    editor.focus();
-  }
-
-  switch (action) {
-    case 'key':
-      editor.insert(value);
-      break;
-    case 'pallete':
-      acode.exec('command-pallete');
-      break;
-
-    case 'tab':
-      $textarea.dispatchEvent(
-        window.createKeyboardEvent('keydown', {
-          key: 9,
-          keyCode: 9,
-          shiftKey: $shiftKey.dataset.state === 'on',
-        }),
-      );
-      break;
-
-    case 'shift':
-      const $el = $footer.querySelector('#shift-key');
-      state = $el.getAttribute('data-state') || 'off';
-      if (state === 'off') {
-        if (appSettings.value.vibrateOnTap) {
-          navigator.vibrate(constants.VIBRATION_TIME_LONG);
-        }
-        $textarea.dispatchEvent(window.createKeyboardEvent('keydown', {}));
-        $el.setAttribute('data-state', 'on');
-        $el.classList.add('active');
-      } else {
-        if (appSettings.value.vibrateOnTap) {
-          navigator.vibrate(constants.VIBRATION_TIME);
-        }
-        $textarea.dispatchEvent(window.createKeyboardEvent('keyup', {}));
-        $el.setAttribute('data-state', 'off');
-        $el.classList.remove('active');
-      }
-      break;
-
-    case 'undo':
-      editor.undo(true);
-      break;
-
-    case 'redo':
-      editor.redo(true);
-      break;
-
-    case 'search':
-      toggleSearch();
-      break;
-
-    case 'save':
-      acode.exec('save');
-      break;
-
-    case 'more':
-      if (!$row2.isConnected) {
-        if ($searchRow1.isConnected) {
-          removeSearch();
-        }
-        moreIconDown();
-        $footer.appendChild($row2);
-        incFooterHeightBy(1);
-      } else {
-        removeRow2();
-      }
-      editor.resize(true);
-      break;
-
-    case 'moveline-up':
-      editor.moveLinesUp();
-      break;
-
-    case 'moveline-down':
-      editor.moveLinesDown();
-      break;
-
-    case 'copyline-up':
-      editor.copyLinesUp();
-      break;
-
-    case 'copyline-down':
-      editor.copyLinesDown();
-      break;
-
-    case 'next':
-      find(true, false);
-      break;
-
-    case 'prev':
-      find(true, true);
-      break;
-
-    case 'replace':
-      editor.replace($replaceInput.value || '');
-      break;
-
-    case 'replace-all':
-      editor.replaceAll($replaceInput.value || '');
-      break;
-
-    case 'search-settings':
-      editor.blur();
-      searchSettings();
-      break;
-
-    case 'toggle-quick-tools':
-      toggleQuickTools();
-      break;
-
-    case 'enable-quick-tools':
-      enableQuickTools();
-      break;
-
-    case 'diable-quick-tools':
-      disableQuickTools();
-      break;
-  }
-
-  function toggleSearch() {
-    if (!$searchRow1.isConnected) {
-      if ($row2.isConnected) {
-        removeRow2();
-      }
-      $footer.append($searchRow1, $searchRow2);
-      if (!$searchInput) $searchInput = $footer.querySelector('#searchInput');
-      $searchInput.value = selectedText || '';
-      if (!selectedText) $searchInput.focus();
-      $searchInput.oninput = function () {
-        if (this.value) find(false, false);
-      };
-      incFooterHeightBy(2);
-      find(false, false);
-
-      actionStack.push({
-        id: 'search-bar',
-        action: () => {
-          actions('search');
-        },
-      });
+  appSettings.on('update:quickToolsTriggerMode', (value) => {
+    if (value === appSettings.QUICKTOOLS_TRIGGER_MODE_CLICK) {
+      this$el.removeEventListener('touchstart', touchstart);
+      this$el.removeEventListener('keydown', touchstart);
+      this$el.addEventListener('contextmenu', onclick);
+      this$el.addEventListener('click', onclick);
     } else {
-      removeSearch();
+      this$el.removeEventListener('contextmenu', onclick);
+      this$el.removeEventListener('click', onclick);
+      this$el.addEventListener('keydown', touchstart);
+      this$el.addEventListener('touchstart', touchstart);
     }
-    editor.resize(true);
+  });
+}
+
+function onclick(e) {
+  reset();
+
+  const $el = e.target;
+  const { which } = $el.dataset;
+
+  if (which === undefined) {
+    quickToolsActions(e);
+    return;
   }
 
-  function toggleQuickTools() {
-    appSettings.value.quickTools = !appSettings.value.quickTools;
-    appSettings.update(false);
+  e.preventDefault();
+  e.stopPropagation();
+  oncontextmenu(e);
+  clearTimeout(timeout);
+}
 
-    if (appSettings.value.quickTools) {
-      enableQuickTools();
-    } else {
-      disableQuickTools();
-    }
+function touchstart(e) {
+  reset();
+
+  const $el = e.target;
+
+  $touchstart = $el;
+
+  if (isClickMode && this$el?.classList?.contains('active')) {
+    this$el.classList.remove('active');
+    clearTimeout(timeout);
+    return;
   }
 
-  function enableQuickTools() {
-    if (root.hasAttribute('quicktools')) return; //Quicktools is already enabled
-    let quickToolsState = parseInt(localStorage.quickToolsState) || 1;
-    if (quickToolsState === 1) {
-      $footer.append($row1);
-    } else {
-      quickToolsState = 2;
-      $footer.append($row1, $row2);
-      moreIconDown();
-    }
+  e.preventDefault();
+  e.stopPropagation();
 
-    if (localStorage.quickToolRow1ScrollLeft) {
-      $row1.scrollLeft = parseInt(localStorage.quickToolRow1ScrollLeft);
-    }
+  if ($el.dataset.which) {
+    contextmenuTimeout = setTimeout(() => {
+      if (touchmoved) return;
 
-    if (localStorage.quickToolRow2ScrollLeft) {
-      $row2.scrollLeft = parseInt(localStorage.quickToolRow2ScrollLeft);
-    }
-
-    root.setAttribute('quicktools', 'enabled');
-    incFooterHeightBy(quickToolsState);
-    if (editorManager.activeFile && editorManager.activeFile.isUnsaved) {
-      $row1.querySelector("[action='save']").classList.add('notice');
-    }
-    editor.resize(true);
+      contextmenu = true;
+      oncontextmenu(e);
+    }, CONTEXT_MENU_TIMEOUT);
   }
 
-  function disableQuickTools() {
-    const height = root.getAttribute('footer-height');
-    localStorage.quickToolsState = height;
-    if ($row1.isConnected) {
-      localStorage.quickToolRow1ScrollLeft = $row1.scrollLeft;
-      $row1.remove();
-      incFooterHeightBy(-1);
-    }
-    if ($row2.isConnected) {
-      localStorage.quickToolRow2ScrollLeft = $row2.scrollLeft;
-      $row2.remove();
-      incFooterHeightBy(-1);
-    }
-    if ($searchRow1.isConnected) {
-      removeSearch();
-    }
+  document.addEventListener('touchmove', touchmove);
+  document.addEventListener('keyup', touchcancel);
+  document.addEventListener('touchend', touchend);
+  document.addEventListener('touchcancel', touchcancel);
+}
 
-    root.removeAttribute('quicktools');
-    editor.resize(true);
+/**
+ * 
+ * @param {TouchEvent} e 
+ */
+function touchend(e) {
+  const $el = e.target;
+
+  if ($touchstart !== $el || touchmoved || contextmenu) {
+    touchcancel(e);
+    return;
   }
 
-  function removeRow2() {
-    $footer.removeChild($row2);
-    incFooterHeightBy(-1);
-    moreIconUp();
+  const { which } = $el.dataset;
+
+  if (which === undefined) {
+    quickToolsActions(e);
+    return;
   }
 
-  function moreIconUp() {
-    $footer
-      .get('[action=more]')
-      .classList.replace('arrow_drop_down', 'arrow_drop_up');
-  }
-  function moreIconDown() {
-    $footer
-      .get('[action=more]')
-      .classList.replace('arrow_drop_up', 'arrow_drop_down');
-  }
-
-  function removeSearch() {
-    actionStack.remove('search-bar');
-    $footer.removeAttribute('data-searching');
-    $footer.removeChild($searchRow1);
-    $footer.removeChild($searchRow2);
-    incFooterHeightBy(-2);
-    const { editor, activeFile } = editorManager;
-    if (activeFile.focused) {
-      editor.focus();
-    }
-  }
-
-  function find(skip, backward) {
-    const searchSettings = appSettings.value.search;
-    editor.find($searchInput.value, {
-      skipCurrent: skip,
-      backwards: backward,
-      ...searchSettings,
-    });
-
-    updateStatus();
-  }
-
-  function updateStatus() {
-    let regex = editor.$search.$options.re;
-    let all = 0;
-    let before = 0;
-    const MAX_COUNT = 999;
-    if (regex) {
-      const value = editor.getValue();
-      const offset = editor.session.doc.positionToIndex(
-        editor.selection.anchor,
-      );
-      let last = (regex.lastIndex = 0);
-      let m;
-      while ((m = regex.exec(value))) {
-        all++;
-        last = m.index;
-        if (last <= offset) before++;
-        if (all > MAX_COUNT) break;
-        if (!m[0]) {
-          regex.lastIndex = last += 1;
-          if (last >= value.length) break;
-        }
-      }
-    }
-    $footer.querySelector('#total-result').textContent =
-      all > MAX_COUNT ? '999+' : all;
-    $footer.querySelector('#current-pos').textContent = before;
-  }
+  oncontextmenu(e);
+  touchcancel(e);
 }
 
 /**
  *
- * @param {TouchEvent | MouseEvent} e
+ * @param {TouchEvent} e 
  */
-function clickListener(e) {
-  if (!e.target) return;
+function touchmove(e) {
+  if (contextmenu) return;
 
-  const el = e.target;
-  const action = el.getAttribute('action');
-  const value = el.getAttribute('value');
+  const $el = e.target;
+  const { clientX } = e.touches[0];
 
-  if (!action) return;
+  if (movex === 0) {
+    movex = clientX;
+    return;
+  }
 
-  e.preventDefault();
-  actions(action, value);
+  const diff = movex - clientX;
+  if (diff > 10 || diff < -10) {
+    touchmoved = true;
+  }
+
+  if (!$row) {
+    const $row1 = tag.get('#row1');
+    const $row2 = tag.get('#row2');
+
+    if ($row1.contains($el)) {
+      $row = $row1;
+    } else if ($row2.contains($el)) {
+      $row = $row2;
+    } else {
+      throw new Error('Invalid element');
+    }
+  }
+
+  $row.scrollBy(diff, 0);
+
+  movex = clientX;
 }
 
-function incFooterHeightBy(factor) {
-  const footerHeight = parseInt(root.getAttribute('footer-height')) || 0;
-  const height = footerHeight + factor;
-  if (height) root.setAttribute('footer-height', height);
-  else root.removeAttribute('footer-height');
+/**
+ * 
+ * @param {TouchEvent} e 
+ */
+function touchcancel(e) {
+  document.removeEventListener('keyup', touchcancel);
+  document.removeEventListener('touchend', touchend);
+  document.removeEventListener('touchcancel', touchcancel);
+  document.removeEventListener('touchmove', touchmove);
+  clearTimeout(timeout);
+  clearTimeout(contextmenuTimeout);
 }
 
-export default {
-  actions,
-  clickListener,
-  incFooterHeightBy,
-};
+function oncontextmenu(e) {
+  if (isClickMode && appSettings.value.vibrateOnTap) {
+    navigator.vibrate(constants.VIBRATION_TIME_LONG);
+    this$el.classList.add('active');
+  }
+  const $el = e.target;
+  const { which } = $el.dataset;
+  const { editor, activeFile } = editorManager;
+  const $textarea = editor.textInput.getElement();
+  const shiftKey = tag.get('#shift-key').dataset.state === 'on';
+
+  const dispatchEventWithTimeout = () => {
+    if (time > 50) {
+      time -= 10;
+    }
+
+    dispatchKey({ which }, shiftKey, $textarea);
+    timeout = setTimeout(dispatchEventWithTimeout, time);
+  };
+
+  if (activeFile.focused) {
+    editor.focus();
+  }
+  dispatchEventWithTimeout();
+}
+
+function dispatchKey({ which }, shiftKey, $textarea) {
+  const keyevent = window.createKeyboardEvent('keydown', {
+    key: keyMapping[which],
+    keyCode: which,
+    shiftKey,
+  });
+
+  $textarea.dispatchEvent(keyevent);
+}

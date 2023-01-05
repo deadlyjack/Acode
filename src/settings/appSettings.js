@@ -64,7 +64,7 @@ export default function otherSettings() {
       key: 'console',
       text: strings.console,
       value: values.console,
-      select: ['legacy', 'eruda']
+      select: [appSettings.CONSOLE_LEGACY, appSettings.CONSOLE_ERUDA],
     },
     {
       key: 'keyboardMode',
@@ -72,9 +72,9 @@ export default function otherSettings() {
       value: values.keyboardMode,
       valueText: getModeString,
       select: [
-        ['NO_SUGGESTIONS', strings['no suggestions']],
-        ['NO_SUGGESTIONS_AGGRESSIVE', strings['no suggestions aggressive']],
-        ['NORMAL', strings.normal],
+        [appSettings.KEYBOARD_MODE_NORMAL, strings.normal],
+        [appSettings.KEYBOARD_MODE_NO_SUGGESTIONS, strings['no suggestions']],
+        [appSettings.KEYBOARD_MODE_NO_SUGGESTIONS_AGGRESSIVE, strings['no suggestions aggressive']],
       ],
     },
     {
@@ -103,8 +103,8 @@ export default function otherSettings() {
       value: values.openFileListPos,
       valueText: (value) => strings[value],
       select: [
-        ['sidebar', strings.sidebar],
-        ['header', strings.header],
+        [appSettings.OPEN_FILE_LIST_POS_SIDEBAR, strings.sidebar],
+        [appSettings.OPEN_FILE_LIST_POS_HEADER, strings.header],
       ],
     },
     {
@@ -112,6 +112,15 @@ export default function otherSettings() {
       text: strings['quick tools'],
       checkbox: values.quickTools,
     },
+    {
+      key: 'quickToolsTriggerMode',
+      text: strings['quicktools trigger mode'],
+      value: values.quickToolsTriggerMode,
+      select: [
+        [appSettings.QUICKTOOLS_TRIGGER_MODE_CLICK, 'click'],
+        [appSettings.QUICKTOOLS_TRIGGER_MODE_TOUCH, 'touch'],
+      ]
+    }
   ];
 
   function callback(key, value) {

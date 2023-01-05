@@ -126,8 +126,9 @@ export default class EditorFile {
    */
   #isUnsaved = false;
   /**
-   * 
+   * Whether to show run button or not
    */
+  #canRun = Promise.resolve(false);
   #events = {
     save: [],
     change: [],
@@ -141,7 +142,22 @@ export default class EditorFile {
     loadend: [],
     changemode: [],
     run: [],
+    canrun: [],
   };
+
+  onsave;
+  onchange;
+  onfocus;
+  onblur;
+  onclose;
+  onrename;
+  onload;
+  onloaderror;
+  onloadstart;
+  onloadend;
+  onchangeMode;
+  onrun;
+  oncanrun;
 
   /**
    * 
@@ -150,10 +166,8 @@ export default class EditorFile {
    */
   constructor(filename, options) {
     const {
-      openFileList,
-      files,
+      addFile,
       getFile,
-      header,
     } = editorManager;
     let doesExists = null;
 
@@ -219,14 +233,7 @@ export default class EditorFile {
     this.#tab.onclick = tabOnclick.bind(this);
     this.#tab.oncontextmenu = startDrag;
 
-    if (appSettings.value.openFileListPos === 'header') {
-      openFileList.append(this.#tab);
-    } else {
-      openFileList.$ul.append(this.#tab);
-    }
-
-    files.push(this);
-    header.text = this.#name;
+    addFile(this);
     this.session = ace.createEditSession(options?.text || '');
     this.setMode();
     this.#setupSession();
@@ -500,25 +507,52 @@ export default class EditorFile {
   }
 
   async canRun() {
+    if (!this.loaded || this.loading) return false;
+    this.readCanRun();
+    return this.#canRun;
+  }
+
+  async readCanRun() {
     try {
-      if (!this.loaded || this.loading) return false;
+      const event = createFileEvent(this);
+      this.#emit('canrun', event);
+      if (event.defaultPrevented) return false;
 
       const folder = openFolder.find(this.uri);
       if (folder) {
         const url = Url.join(folder.url, 'index.html');
         const fs = fsOperation(url);
         if (await fs.exists()) {
-          return url;
+          this.#canRun = Promise.resolve(true);
+          return;
         }
       }
 
       const runnableFile = /\.((html?)|(md)|(js)|(svg))$/;
-      if (runnableFile.test(this.filename)) return true;
-      return false;
-    } catch (err) {
-      if (err instanceof Error) throw error;
+      if (runnableFile.test(this.filename)) {
+        this.#canRun = Promise.resolve(true);
+        return;
+      }
+      this.#canRun = Promise.resolve(false);
+    } catch (error) {
+      if (err instanceof Error) throw err;
       else throw new Error(err);
     }
+  }
+
+  /**
+   * 
+   * @param {()=>(boolean|Promise<boolean>)} cb callback function that return true if file can run
+   */
+  async writeCanRun(cb) {
+    if (!cb || typeof cb !== 'function') return;
+    const res = cb();
+    if (res instanceof Promise) {
+      this.#canRun = res;
+      return;
+    }
+
+    this.#canRun = Promise.resolve(res);
   }
 
   /**
@@ -932,6 +966,8 @@ export default class EditorFile {
    * @param {FileEvent} event 
    */
   #emit(eventName, event) {
+    this[`on${eventName}`]?.(event);
+    if (!event.BUBBLING_PHASE) return;
     this.#events[eventName]?.some((fn) => {
       fn(event);
       return !event.BUBBLING_PHASE;

@@ -47,6 +47,18 @@ class Settings {
     sortByName: true,
   };
 
+  QUICKTOOLS_TRIGGER_MODE_TOUCH = 'touch';
+  QUICKTOOLS_TRIGGER_MODE_CLICK = 'click';
+  OPEN_FILE_LIST_POS_HEADER = 'header';
+  OPEN_FILE_LIST_POS_SIDEBAR = 'sidebar';
+  KEYBOARD_MODE_NO_SUGGESTIONS = 'NO_SUGGESTIONS';
+  KEYBOARD_MODE_NO_SUGGESTIONS_AGGRESSIVE = 'NO_SUGGESTIONS_AGGRESSIVE';
+  KEYBOARD_MODE_NORMAL = 'NORMAL';
+  CONSOLE_ERUDA = 'eruda';
+  CONSOLE_LEGACY = 'legacy';
+  PREVIEW_MODE_INAPP = 'inapp';
+  PREVIEW_MODE_BROWSER = 'browser';
+
   customTheme = {
     '--accent-color': 'rgb(51,153,255)',
     '--active-icon-color': 'rgba(0, 0, 0, 0.2)',
@@ -80,7 +92,7 @@ class Settings {
       serverPort: constants.SERVER_PORT,
       previewPort: constants.PREVIEW_PORT,
       showConsoleToggler: true,
-      previewMode: 'inapp',
+      previewMode: this.PREVIEW_MODE_INAPP,
       disableCache: false,
       host: 'localhost',
       search: this.#searchSettings,
@@ -94,8 +106,9 @@ class Settings {
       linenumbers: true,
       formatOnSave: false,
       autoCorrect: true,
-      openFileListPos: 'header',
+      openFileListPos: this.OPEN_FILE_LIST_POS_HEADER,
       quickTools: true,
+      quickToolsTriggerMode: this.QUICKTOOLS_TRIGGER_MODE_TOUCH,
       editorFont: 'Roboto Mono',
       vibrateOnTap: true,
       fullscreen: false,
@@ -104,15 +117,14 @@ class Settings {
       showPrintMargin: false,
       scrollbarSize: 20,
       showSpaces: false,
-      cursorControllerSize: 'small',
       confirmOnExit: true,
       customThemeMode: 'dark',
       lineHeight: 2,
       leftMargin: 50,
       checkFiles: true,
       desktopMode: false,
-      console: 'legacy',
-      keyboardMode: 'NO_SUGGESTIONS',
+      console: this.CONSOLE_LEGACY,
+      keyboardMode: this.KEYBOARD_MODE_NORMAL,
       rememberFiles: true,
       rememberFolders: true,
       diagonalScrolling: false,

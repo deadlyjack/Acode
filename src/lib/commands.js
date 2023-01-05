@@ -9,7 +9,7 @@ import help from '../settings/help';
 import recents from '../lib/recents';
 import fsOperation from '../fileSystem/fsOperation';
 import Modes from '../pages/modes/modes';
-import quickTools from '../handlers/quickTools';
+import { actions } from '../handlers/quickToolsActions';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import path from '../utils/Path';
 import showFileInfo from './showFileInfo';
@@ -76,7 +76,7 @@ export default {
       .catch(FileBrowser.openError);
   },
   'find'() {
-    quickTools.actions('search');
+    actions('search');
   },
   'file-info'(url) {
     showFileInfo(url);
@@ -233,7 +233,7 @@ export default {
     activefile.setMode(mode);
   },
   'toggle-quick-tools'() {
-    quickTools.actions('toggle-quick-tools');
+    actions('toggle-quick-tools');
   },
   'toggle-fullscreen'() {
     app.classList.toggle('fullscreen-mode');

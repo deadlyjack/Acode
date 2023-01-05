@@ -6,6 +6,7 @@ import ScrollBar from '../components/scrollbar/scrollbar';
 import Commands from '../ace/commands';
 import touchListeners from '../ace/touchHandler';
 import appSettings from './settings';
+import EditorFile from './editorFile';
 
 //TODO: Add option to work multiple files at same time in large display.
 
@@ -27,7 +28,7 @@ async function EditorManager($sidebar, $header, $body) {
   let scrollBarVisiblityCount = 0;
   let timeoutQuicktoolToggler;
   let timeoutHeaderToggler;
-  const { scrollbarSize, editorFont } = appSettings.value;
+  const { scrollbarSize, editorFont, openFileListPos } = appSettings.value;
   const events = {
     'switch-file': [],
     'rename-file': [],
@@ -56,22 +57,20 @@ async function EditorManager($sidebar, $header, $body) {
     placement: 'bottom',
   });
   const manager = {
+    files: [],
+    onupdate: () => { },
+    activeFile: null,
+    addFile,
     editor,
     getFile,
     switchFile,
-    activeFile: null,
-    onupdate: () => { },
     hasUnsavedFiles,
-    files: [],
     moveOpenFileList,
     header: $header,
     sidebar: $sidebar,
     container: $container,
     get TIMEOUT_VALUE() {
       return TIMEOUT_VALUE;
-    },
-    get openFileList() {
-      return $openFileList;
     },
     on(event, callback) {
       if (!events[event]) return;
@@ -191,6 +190,17 @@ async function EditorManager($sidebar, $header, $body) {
   });
 
   return manager;
+
+  /**
+   * 
+   * @param {EditorFile} file 
+   */
+  function addFile(file) {
+    if (manager.files.includes(file)) return;
+    manager.files.push(file);
+    $openFileList.append(file.tab);
+    $header.text = file.name;
+  }
 
   async function setupEditor() {
     let checkTimeout = null;
@@ -416,13 +426,17 @@ async function EditorManager($sidebar, $header, $body) {
       $openFileList.remove();
     }
 
-    if (appSettings.value.openFileListPos === 'header') {
-      $openFileList = tag('ul', {
-        className: 'open-file-list',
-      });
+    // show open file list in header
+    if (appSettings.value.openFileListPos === appSettings.OPEN_FILE_LIST_POS_HEADER) {
+      $openFileList = <ul className='open-file-list'></ul>;
       if ($list) $openFileList.append(...$list);
       root.appendOuter($openFileList);
       root.classList.add('top-bar');
+
+      const oldAppend = $openFileList.append;
+      $openFileList.append = (...args) => {
+        oldAppend.apply($openFileList, args);
+      }
     } else {
       $openFileList = list(strings['active files']);
       $openFileList.ontoggle = function () {
@@ -431,6 +445,12 @@ async function EditorManager($sidebar, $header, $body) {
       if ($list) $openFileList.$ul.append(...$list);
       $sidebar.insertBefore($openFileList, $sidebar.firstElementChild);
       root.classList.remove('top-bar');
+
+      const oldAppend = $openFileList.$ul.append;
+      $openFileList.append = (...args) => {
+        oldAppend.apply($openFileList.$ul, args);
+        $openFileList.updateHeight();
+      }
     }
   }
 

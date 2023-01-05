@@ -35,8 +35,8 @@ export default function previewSettings() {
       text: strings['preview mode'],
       value: values.previewMode,
       select: [
-        ['browser', strings.browser],
-        ['inapp', strings.inapp],
+        [appSettings.PREVIEW_MODE_BROWSER, strings.browser],
+        [appSettings.PREVIEW_MODE_INAPP, strings.inapp],
       ],
     },
     {

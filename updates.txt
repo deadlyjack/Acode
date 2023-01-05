@@ -1,4 +1,4 @@
-version 1.7.0 beta 254
+version 1.7.0 256
 ☞ Updated plugin system
 ☞ You can see plugin review and rating
 ☞ GitHub is removed from app but, you can still use it from plugin

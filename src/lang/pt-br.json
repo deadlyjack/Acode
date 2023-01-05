@@ -289,5 +289,6 @@
   "use textarea for ime": "Usar área de texto para IME",
   "invalid plugin": "Plugin Inválido",
   "type command": "Digitar comando",
-  "plugin": "Plugin"
+  "plugin": "Plugin",
+  "quicktools trigger mode": "Quicktools trigger mode"
 }

@@ -185,7 +185,7 @@ async function run(
 
     switch (reqPath) {
       case CONSOLE_SCRIPT:
-        if (isConsole || appSettings.value.console === 'legacy') {
+        if (isConsole || appSettings.value.console === appSettings.CONSOLE_LEGACY) {
           url = `${ASSETS_DIRECTORY}/js/build/console.build.js`;
         } else {
           url = `${DATA_STORAGE}/eruda.js`;

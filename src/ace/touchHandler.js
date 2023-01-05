@@ -820,6 +820,7 @@ export default function addTouchListeners(editor) {
     selectionMenu().forEach((item) => {
       if (mode === 'read-only' && !item.readOnly) return;
       if (copyText && !['selected', 'all'].includes(item.mode)) return;
+      if (!copyText && item.mode === 'selected') return;
 
       items.push(item);
     });
