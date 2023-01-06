@@ -10,6 +10,7 @@
     "start": "sh utils/scripts/start.sh",
     "start:debug": "sh utils/scripts/start.sh",
     "clean": "sh utils/scripts/clean.sh",
+    "deepclean": "git clean -Xfd",
     "plugin": "sh utils/scripts/plugin.sh",
     "test": "jest",
     "build-ace": "node ./utils/build-ace.js",
@@ -26,7 +27,7 @@
       "cordova-plugin-vibration": {},
       "cordova-plugin-buildinfo": {},
       "cordova-plugin-device": {},
-      "cordova-plugin-server": {},
+      "cordova-plugin-webserver": {},
       "cordova-plugin-file": {
         "ANDROIDX_WEBKIT_VERSION": "1.4.0"
       },
