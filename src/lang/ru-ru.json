@@ -291,5 +291,6 @@
   "invalid plugin": "Неверный формат плагина",
   "type command": "Введите команду",
   "plugin": "Плагин",
-  "quicktools trigger mode": "Quicktools trigger mode"
+  "quicktools trigger mode": "Quicktools trigger mode",
+  "print margin": "Print margin"
 }

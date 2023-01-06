@@ -102,6 +102,19 @@ export default function editorSettings() {
       checkbox: values.showPrintMargin,
     },
     {
+      key: 'printMargin',
+      text: strings['print margin'],
+      value: values.printMargin,
+      prompt: strings['print margin'],
+      promptType: 'number',
+      promptOptions: {
+        test(value) {
+          value = parseInt(value);
+          return value >= 10 && value <= 200;
+        }
+      },
+    },
+    {
       key: 'teardropSize',
       text: strings['cursor controller size'],
       value: values.teardropSize,

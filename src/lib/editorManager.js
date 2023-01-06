@@ -189,6 +189,10 @@ async function EditorManager($sidebar, $header, $body) {
     editor.setOption('hardWrap', value);
   });
 
+  appSettings.on('update:printMargin', function (value) {
+    editor.setOption('printMarginColumn', value);
+  });
+
   return manager;
 
   /**
@@ -279,6 +283,7 @@ async function EditorManager($sidebar, $header, $body) {
       rtlText: settings.rtlText,
       hardWrap: settings.hardWrap,
       spellCheck: settings.spellCheck,
+      printMarginColumn: settings.printMargin,
     });
 
     if (!appSettings.value.textWrap) {

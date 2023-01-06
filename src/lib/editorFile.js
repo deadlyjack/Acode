@@ -508,7 +508,7 @@ export default class EditorFile {
 
   async canRun() {
     if (!this.loaded || this.loading) return false;
-    this.readCanRun();
+    await this.readCanRun();
     return this.#canRun;
   }
 
@@ -516,7 +516,7 @@ export default class EditorFile {
     try {
       const event = createFileEvent(this);
       this.#emit('canrun', event);
-      if (event.defaultPrevented) return false;
+      if (event.defaultPrevented) return;
 
       const folder = openFolder.find(this.uri);
       if (folder) {

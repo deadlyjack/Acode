@@ -115,6 +115,7 @@ class Settings {
       floatingButton: true,
       liveAutoCompletion: true,
       showPrintMargin: false,
+      printMargin: 80,
       scrollbarSize: 20,
       showSpaces: false,
       confirmOnExit: true,

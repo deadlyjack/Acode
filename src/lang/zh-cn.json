@@ -291,5 +291,6 @@
   "invalid plugin": "Invalid Plugin",
   "type command": "Type command",
   "plugin": "Plugin",
-  "quicktools trigger mode": "Quicktools trigger mode"
+  "quicktools trigger mode": "Quicktools trigger mode",
+  "print margin": "Print margin"
 }

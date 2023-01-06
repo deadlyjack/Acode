@@ -290,5 +290,6 @@
   "invalid plugin": "Plugin Inválido",
   "type command": "Digitar comando",
   "plugin": "Plugin",
-  "quicktools trigger mode": "Quicktools trigger mode"
+  "quicktools trigger mode": "Quicktools trigger mode",
+  "print margin": "Print margin"
 }
