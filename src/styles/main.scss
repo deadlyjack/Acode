@@ -319,6 +319,13 @@ a.icon {
   &.no-icon {
     max-width: 10px;
   }
+
+  &.letters::before {
+    content: attr(data-letters);
+    text-transform: uppercase;
+    font-size: 0.38em;
+    font-weight: bolder;
+  }
 }
 
 .mask {

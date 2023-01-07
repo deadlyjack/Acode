@@ -52,6 +52,7 @@ function actions(action, value) {
     case 'key':
       editor.insert(value);
       break;
+
     case 'pallete':
       acode.exec('command-pallete');
       break;
@@ -187,10 +188,19 @@ function actions(action, value) {
       actionStack.push({
         id: 'search-bar',
         action: () => {
-          actions('search');
+          removeSearch();
         },
       });
     } else {
+      const inputValue = $searchInput?.value || '';
+      const copyValue = editor.getCopyText();
+      if (inputValue !== copyValue) {
+        $searchInput.value = copyValue;
+        $searchInput.focus();
+        find(false, false);
+        return;
+      }
+
       removeSearch();
     }
     editor.resize(true);
@@ -288,8 +298,8 @@ function actions(action, value) {
     const searchSettings = appSettings.value.search;
     editor.find($searchInput.value, {
       skipCurrent: skip,
-      backwards: backward,
       ...searchSettings,
+      backwards: backward,
     });
 
     updateStatus();

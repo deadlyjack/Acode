@@ -94,6 +94,7 @@
     "axios": "^0.27.2",
     "core-js": "^3.26.1",
     "crypto-js": "^4.1.1",
+    "escape-string-regexp": "^5.0.0",
     "esprima": "^4.0.1",
     "filesize": "^10.0.5",
     "html-tag-js": "^1.1.35",

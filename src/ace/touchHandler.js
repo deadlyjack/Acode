@@ -215,8 +215,10 @@ export default function addTouchListeners(editor) {
     lastX = clientX;
     lastY = clientY;
 
-    const threshold = Math.round((1 / devicePixelRatio) * 10) / 10;
-    if (appSettings.value.textWrap || Math.abs(moveX) < threshold) {
+    const threshold = appSettings.value.touchMoveThreshold;
+    const touchMoved = Math.abs(moveX) < threshold;
+
+    if (appSettings.value.textWrap || touchMoved) {
       moveX = 0;
     }
 
@@ -758,6 +760,7 @@ export default function addTouchListeners(editor) {
     if (teardropDoesShowMenu) {
       showMenu($activeTeardrop);
     }
+    editor.focus();
   }
 
   function onscroll() {

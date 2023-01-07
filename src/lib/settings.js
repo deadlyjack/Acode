@@ -40,7 +40,6 @@ class Settings {
     caseSensitive: false,
     regExp: false,
     wholeWord: false,
-    backwards: true,
   };
   #fileBrowserSettings = {
     showHiddenFiles: false,
@@ -139,7 +138,7 @@ class Settings {
       rtlText: false,
       hardWrap: false,
       useTextareaForIME: false,
-      touchMoveThreshold: 0.5,
+      touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 10,
     };
 
   }

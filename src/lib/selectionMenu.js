@@ -7,6 +7,7 @@ const exec = (command) => {
     editor.setSelection(true);
     editor.setMenu(true);
   }
+  editor.focus();
 };
 
 const items = [];

@@ -1,3 +1,4 @@
+import escapeStringRegexp from 'escape-string-regexp';
 import URLParse from 'url-parse';
 import { AES, enc } from 'crypto-js';
 import constants from '../lib/constants';
@@ -659,7 +660,7 @@ export default {
       if (storageUrl.endsWith('/')) {
         storageUrl = storageUrl.slice(0, -1);
       }
-      const regex = new RegExp('^' + storageUrl);
+      const regex = new RegExp('^' + escapeStringRegexp(storageUrl));
       if (regex.test(url)) {
         url = url.replace(regex, uuid.name);
         break;
@@ -681,7 +682,7 @@ export default {
     for (let file of files) {
       if (!file.uri) continue;
       const fileUrl = Url.parse(file.uri).url;
-      if (new RegExp('^' + url).test(fileUrl)) {
+      if (new RegExp('^' + escapeStringRegexp(url)).test(fileUrl)) {
         if (newUrl) {
           file.uri = Url.join(newUrl, file.filename);
         } else {

@@ -9,7 +9,7 @@ const keyMapping = {
   39: 'ArrowRight',
   40: 'ArrowDown',
 };
-const CONTEXT_MENU_TIMEOUT = 1000;
+const CONTEXT_MENU_TIMEOUT = 500;
 const MOVEX_THRESHOLD = 50;
 
 

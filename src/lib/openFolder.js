@@ -12,6 +12,7 @@ import Url from '../utils/Url';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import URLParse from 'url-parse';
 import appSettings from './settings';
+import escapeStringRegexp from 'escape-string-regexp';
 
 /**
  *
@@ -664,7 +665,7 @@ openFolder.removeItem = function (url) {
 
 openFolder.removeFolders = function (url) {
   ({ url } = Url.parse(url));
-  const regex = new RegExp('^' + url);
+  const regex = new RegExp('^' + escapeStringRegexp(url));
   addedFolder.forEach((folder) => {
     if (regex.test(folder.url)) {
       folder.remove();
@@ -680,7 +681,7 @@ openFolder.removeFolders = function (url) {
 openFolder.find = function (url) {
   return addedFolder.find((folder) => {
     const { url: furl } = Url.parse(folder.url);
-    const regex = new RegExp('^' + furl);
+    const regex = new RegExp('^' + escapeStringRegexp(furl));
     return regex.test(url);
   });
 };
