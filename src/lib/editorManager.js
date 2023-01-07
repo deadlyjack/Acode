@@ -265,26 +265,26 @@ async function EditorManager($sidebar, $header, $body) {
       e.preventDefault();
     };
 
-    editor.setOptions({
-      animatedScroll: false,
-      tooltipFollowsMouse: false,
-      theme: settings.editorTheme,
-      showGutter: settings.linenumbers,
-      showLineNumbers: settings.linenumbers,
-      enableEmmet: true,
-      showInvisibles: settings.showSpaces,
-      indentedSoftWrap: false,
-      scrollPastEnd: 0.5,
-      showPrintMargin: settings.showPrintMargin,
-      enableLiveAutocompletion: settings.liveAutoCompletion,
-      relativeLineNumbers: settings.relativeLineNumbers,
-      useElasticTabstops: settings.elasticTabstops,
-      useTextareaForIME: settings.useTextareaForIME,
-      rtlText: settings.rtlText,
-      hardWrap: settings.hardWrap,
-      spellCheck: settings.spellCheck,
-      printMarginColumn: settings.printMargin,
-    });
+    ace.require('ace/ext/language_tools');
+    editor.setOption('animatedScroll', false);
+    editor.setOption('tooltipFollowsMouse', false);
+    editor.setOption('theme', settings.editorTheme);
+    editor.setOption('showGutter', settings.linenumbers);
+    editor.setOption('showLineNumbers', settings.linenumbers);
+    editor.setOption('enableEmmet', true);
+    editor.setOption('showInvisibles', settings.showSpaces);
+    editor.setOption('indentedSoftWrap', false);
+    editor.setOption('scrollPastEnd', 0.5);
+    editor.setOption('showPrintMargin', settings.showPrintMargin);
+    editor.setOption('relativeLineNumbers', settings.relativeLineNumbers);
+    editor.setOption('useElasticTabstops', settings.elasticTabstops);
+    editor.setOption('useTextareaForIME', settings.useTextareaForIME);
+    editor.setOption('rtlText', settings.rtlText);
+    editor.setOption('hardWrap', settings.hardWrap);
+    editor.setOption('spellCheck', settings.spellCheck);
+    editor.setOption('printMarginColumn', settings.printMargin);
+    editor.setOption('enableBasicAutocompletion', true);
+    editor.setOption('enableLiveAutocompletion', settings.liveAutoCompletion);
 
     if (!appSettings.value.textWrap) {
       editor.renderer.setScrollMargin(0, 0, 0, settings.leftMargin);

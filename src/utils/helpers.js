@@ -435,7 +435,7 @@ export default {
     const device = window.device || {};
     return (
       'Version: ' +
-      buildInfo.version +
+      `${buildInfo.version} (${buildInfo.versionCode})` +
       eol +
       'Device: ' +
       (device.model || '') +
@@ -493,7 +493,7 @@ export default {
       }
       await fs.writeFile(content);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   },
   /**

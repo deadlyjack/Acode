@@ -1,4 +1,4 @@
-import tag from 'html-tag-js';
+import Ref from 'html-tag-js/ref';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import Checkbox from './checkbox';
 import dialogs from './dialogs';
@@ -19,32 +19,38 @@ export default function listItems($list, items, callback, sort = true) {
   const $items = [];
 
   if (sort) items = items.sort((a, b) => a.text < b.text ? -1 : 1);
-  items.forEach((setting) => {
-    const $setting = <div className="container">
-      <span className="text">{setting.text.capitalize(0)}</span>
-    </div>;
-
-    const $item = <div className={`list-item ${setting.sake ? 'sake' : ''}`} data-key={setting.key} data-action='list-item'>
-      <span className={`icon ${setting.icon || 'no-icon'}`} style={{ color: setting.iconColor }}></span>
-      {$setting}
+  items.forEach((item) => {
+    const $setting = new Ref();
+    const $settingName = new Ref();
+    const $item = <div className={`list-item ${item.sake ? 'sake' : ''}`} data-key={item.key} data-action='list-item'>
+      <span className={`icon ${item.icon || 'no-icon'}`} style={{ color: item.iconColor }}></span>
+      <div ref={$setting} className="container">
+        <div ref={$settingName} className="text">{item.text.capitalize(0)}</div>
+      </div>
     </div>;
 
     let $checkbox, $valueText;
 
-    if (setting.value !== undefined) {
-      $valueText = tag('small', {
-        className: 'value',
-      });
-      setValueText($valueText, setting.value, setting.valueText);
-      $setting.appendChild($valueText);
-    } else if (setting.checkbox !== undefined) {
-      $checkbox = Checkbox('', setting.checkbox);
+    if (item.info) {
+      $settingName.append(
+        <span className='icon info info-button' data-action='info' onclick={() => {
+          dialogs.alert(strings.info, item.info);
+        }}></span>
+      )
+    }
+
+    if (item.value !== undefined) {
+      $valueText = <small className='value'></small>;
+      setValueText($valueText, item.value, item.valueText);
+      $setting.append($valueText);
+    } else if (item.checkbox !== undefined) {
+      $checkbox = Checkbox('', item.checkbox);
       $item.appendChild($checkbox);
       $item.style.paddingRight = '10px';
     }
 
-    if (Number.isInteger(setting.index)) {
-      $items.splice(setting.index, 0, $item);
+    if (Number.isInteger(item.index)) {
+      $items.splice(item.index, 0, $item);
     } else {
       $items.push($item);
     }

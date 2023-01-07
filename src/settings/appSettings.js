@@ -111,6 +111,7 @@ export default function otherSettings() {
       key: 'quickTools',
       text: strings['quick tools'],
       checkbox: values.quickTools,
+      info: 'Show or hide quick tools.',
     },
     {
       key: 'quickToolsTriggerMode',
@@ -119,9 +120,29 @@ export default function otherSettings() {
       select: [
         [appSettings.QUICKTOOLS_TRIGGER_MODE_CLICK, 'click'],
         [appSettings.QUICKTOOLS_TRIGGER_MODE_TOUCH, 'touch'],
-      ]
-    }
+      ],
+    },
+    {
+      key: 'touchMoveThreshold',
+      text: strings['touch move threshold'],
+      value: values.touchMoveThreshold,
+      prompt: strings['touch move threshold'],
+      promptType: 'number',
+      promptOptions: {
+        test(value) {
+          return value >= 0;
+        }
+      },
+    },
   ];
+
+  items.forEach((item) => {
+    Object.defineProperty(item, 'info', {
+      get() {
+        return strings[`info-${this.key.toLocaleLowerCase()}`];
+      }
+    })
+  });
 
   function callback(key, value) {
     switch (key) {

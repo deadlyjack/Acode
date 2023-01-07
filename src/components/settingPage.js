@@ -14,7 +14,7 @@ import helpers from "../utils/helpers";
 export default function settingsPage(title, settings, callback) {
   let hideSearchBar = () => { };
   const $page = Page(title);
-  const $list = tag('div', { className: 'main list' });
+  const $list = <div className='main list'></div>;
   let note;
 
   settings = settings.filter((setting) => {
@@ -26,17 +26,12 @@ export default function settingsPage(title, settings, callback) {
   });
 
   if (settings.length > 5) {
-    const $search = tag('span', {
-      className: 'icon search',
-      attr: {
-        action: 'search',
-      },
-      onclick() {
-        searchBar($list, (hide) => {
-          hideSearchBar = hide;
-        });
-      }
-    });
+    const $search = <span className='icon search' attr-action='search'></span>;
+    $search.onclick = () => {
+      searchBar($list, (hide) => {
+        hideSearchBar = hide;
+      });
+    };
 
     $page.header.append($search);
   }
@@ -57,32 +52,18 @@ export default function settingsPage(title, settings, callback) {
   $page.body = $list;
 
   if (note) {
-    $page.append(tag('div', {
-      className: 'note',
-      children: [
-        tag('div', {
-          className: 'note-title',
-          children: [
-            tag('span', {
-              className: 'icon info'
-            }),
-            tag('span', {
-              textContent: strings.info,
-            }),
-          ]
-        }),
-        tag('p', {
-          textContent: note,
-        }),
-      ],
-    }));
+    $page.append(
+      <div className='note'>
+        <div className='note-title'>
+          <span className='icon info'></span>
+          <span>{strings.info}</span>
+        </div>
+        <p innerHTML={note}></p>
+      </div>
+    );
   }
 
-  $page.append(tag('div', {
-    style: {
-      height: '50vh',
-    },
-  }));
+  $page.append(<div style={{ height: '50vh' }}></div>);
 
   app.append($page);
   helpers.showAd();

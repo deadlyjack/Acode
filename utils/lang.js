@@ -272,6 +272,11 @@ async function update() {
 
 function getStr(str) {
   return new Promise((resolve, reject) => {
+    if (val) {
+      resolve(val);
+      return;
+    }
+
     read.question(str, res => {
       resolve(res);
     });

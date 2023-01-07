@@ -113,7 +113,6 @@
     display: flex;
     min-height: 60px;
     text-decoration: none;
-    // max-width: 600px;
     margin: auto;
     box-sizing: border-box;
 
@@ -149,6 +148,14 @@
         flex: 1.2;
         display: flex;
         align-items: center;
+
+        .info-button {
+          opacity: 0.5;
+          width: fit-content;
+          height: fit-content;
+          margin-left: 10px;
+          font-size: 0.8rem;
+        }
 
         button {
           background-color: rgb(51, 153, 255);

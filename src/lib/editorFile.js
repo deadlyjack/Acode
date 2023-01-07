@@ -622,12 +622,7 @@ export default class EditorFile {
 
     // sets file icon
     this.#tab.lead(
-      tag('span', {
-        className: this.icon,
-        style: {
-          paddingRight: '5px',
-        },
-      }),
+      <span className={this.icon} style={{ paddingRight: '5px' }}></span>
     );
   }
 

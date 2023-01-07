@@ -46,7 +46,7 @@ export default function removeAds() {
       });
 
       iap.purchase(product.json, (code) => {
-        console.log(code);
+        // ignore
       }, (err) => {
         alert(strings.error, err);
       });

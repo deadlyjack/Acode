@@ -47,7 +47,6 @@ class FtpClient {
   }
 
   connect() {
-    console.log('FTP Connect: ', this.#path);
     return new Promise((resolve, reject) => {
       ftp.connect(this.#host, +this.#port, this.#username, this.#password, {
         securityType: this.#security,
@@ -58,7 +57,6 @@ class FtpClient {
         resolve();
       }, (err) => {
         if (appSettings.value.retryRemoteFsAfterFail) {
-          console.log('Retrying connection....', this.#try);
           if (++this.#try > this.#MAX_TRY) {
             this.#try = 0;
             reject(err);

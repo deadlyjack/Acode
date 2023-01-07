@@ -78,10 +78,10 @@ export default function DonateInclude() {
     switch (action) {
       case 'donate':
         value = $target.getAttribute('value');
-        iap.purchase(value, purchase => {
-          console.log(purchase);
+        iap.purchase(value, () => {
+          // ignore
         }, err => {
-          if (err !== iap.USER_CANCELED) dialogs.alert(strings.error.toUpperCase(), err);
+          if (err !== iap.USER_CANCELED) dialogs.alert(strings.error, err);
         });
         break;
       default:

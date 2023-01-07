@@ -12,12 +12,12 @@ export default function help() {
     {
       key: 'help',
       text: strings.help,
-      link: 'https://acode.foxdebug.com/faqs',
+      link: 'https://telegram.me/foxdebug_acode',
     },
     {
       key: 'faqs',
       text: strings.faqs,
-      link: 'https://t.me/foxdebug_acode',
+      link: 'https://acode.foxdebug.com/faqs',
     },
   ];
 

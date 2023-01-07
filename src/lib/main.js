@@ -104,7 +104,7 @@ async function ondeviceready() {
   try {
     await helpers.promisify(iap.startConnection)
       .catch((e) => {
-        console.log('connection error:', e);
+        console.error('connection error:', e);
       });
 
     if (localStorage.acode_pro === 'true') {
@@ -121,7 +121,7 @@ async function ondeviceready() {
       }
     }
   } catch (error) {
-    console.log('Purchase error:', error);
+    console.error('Purchase error:', error);
   }
 
   try {

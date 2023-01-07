@@ -10,10 +10,12 @@ const keyMapping = {
   40: 'ArrowDown',
 };
 const CONTEXT_MENU_TIMEOUT = 1000;
+const MOVEX_THRESHOLD = 50;
 
 
-let movex;
 let time;
+let movex;
+let movedx; // total moved x
 let touchmoved;
 let isClickMode;
 let contextmenu;
@@ -27,13 +29,13 @@ let this$el;
 export default init;
 
 function reset() {
-  console.log('reset');
   movex = 0;
+  movedx = 0;
   time = 300;
   $row = null;
   $touchstart = null;
-  touchmoved = false;
   contextmenu = false;
+  touchmoved = undefined;
   contextmenuTimeout = null;
 }
 
@@ -109,6 +111,7 @@ function touchstart(e) {
     }, CONTEXT_MENU_TIMEOUT);
   }
 
+  $el.classList.add('active');
   document.addEventListener('touchmove', touchmove);
   document.addEventListener('keyup', touchcancel);
   document.addEventListener('touchend', touchend);
@@ -116,34 +119,11 @@ function touchstart(e) {
 }
 
 /**
- * 
- * @param {TouchEvent} e 
- */
-function touchend(e) {
-  const $el = e.target;
-
-  if ($touchstart !== $el || touchmoved || contextmenu) {
-    touchcancel(e);
-    return;
-  }
-
-  const { which } = $el.dataset;
-
-  if (which === undefined) {
-    quickToolsActions(e);
-    return;
-  }
-
-  oncontextmenu(e);
-  touchcancel(e);
-}
-
-/**
  *
  * @param {TouchEvent} e 
  */
 function touchmove(e) {
-  if (contextmenu) return;
+  if (contextmenu || touchmoved === false) return;
 
   const $el = e.target;
   const { clientX } = e.touches[0];
@@ -154,9 +134,20 @@ function touchmove(e) {
   }
 
   const diff = movex - clientX;
-  if (diff > 10 || diff < -10) {
-    touchmoved = true;
+  if (touchmoved === undefined) {
+    if (Math.abs(diff) > appSettings.value.touchMoveThreshold) {
+      touchmoved = true;
+    } else {
+      if ($row) {
+        const movedX = $row.scrollLeft % $row.clientWidth;
+        $row.scrollBy(-movedX, 0);
+      }
+      touchmoved = false;
+      return;
+    }
   }
+
+  movedx += diff;
 
   if (!$row) {
     const $row1 = tag.get('#row1');
@@ -171,9 +162,50 @@ function touchmove(e) {
     }
   }
 
+  $row.style.scrollBehavior = 'unset';
   $row.scrollBy(diff, 0);
-
+  $touchstart.classList.remove('active');
   movex = clientX;
+}
+
+/**
+ * 
+ * @param {TouchEvent} e 
+ */
+function touchend(e) {
+  const $el = e.target;
+
+  if (touchmoved) {
+    $row.style.scrollBehavior = 'smooth';
+    const slide = parseInt($row.scrollLeft / $row.clientWidth, 10);
+
+    if (movedx < 0 && movedx > -MOVEX_THRESHOLD) {
+      $row.scrollLeft = (slide - 1) * $row.clientWidth;
+    } else if (movedx > 0 && movedx > MOVEX_THRESHOLD) {
+      $row.scrollLeft = (slide + 1) * $row.clientWidth;
+    } else {
+      $row.scrollLeft = slide * $row.clientWidth;
+    }
+    touchcancel(e);
+    return;
+  }
+
+
+  if ($touchstart !== $el || contextmenu) {
+    touchcancel(e);
+    return;
+  }
+
+  const { which } = $el.dataset;
+
+  if (which === undefined) {
+    quickToolsActions(e);
+    touchcancel(e);
+    return;
+  }
+
+  oncontextmenu(e);
+  touchcancel(e);
 }
 
 /**
@@ -187,6 +219,7 @@ function touchcancel(e) {
   document.removeEventListener('touchmove', touchmove);
   clearTimeout(timeout);
   clearTimeout(contextmenuTimeout);
+  $touchstart.classList.remove('active');
 }
 
 function oncontextmenu(e) {

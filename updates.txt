@@ -1,4 +1,6 @@
-version 1.7.0 257
+version 1.7.0 258
+☞ Quick tools improvement
+☞ Settings will have info button, you can see more info about settings
 ☞ Updated plugin system
 ☞ You can see plugin review and rating
 ☞ GitHub is removed from app but, you can still use it from plugin

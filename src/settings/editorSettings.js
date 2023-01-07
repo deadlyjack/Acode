@@ -171,6 +171,14 @@ export default function editorSettings() {
     }
   ];
 
+  items.forEach((item) => {
+    Object.defineProperty(item, 'info', {
+      get() {
+        return strings[`info-${this.key.toLocaleLowerCase()}`];
+      }
+    })
+  });
+
   function callback(key, value) {
     switch (key) {
       case 'scroll-settings':
