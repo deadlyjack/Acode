@@ -1,4 +1,4 @@
-version 1.7.0 258
+version 1.7.0 259
 ☞ Quick tools improvement
 ☞ Settings will have info button, you can see more info about settings
 ☞ Updated plugin system

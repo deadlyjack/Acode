@@ -139,7 +139,7 @@ class Settings {
       rtlText: false,
       hardWrap: false,
       useTextareaForIME: false,
-      touchMoveThreshold: 0,
+      touchMoveThreshold: 0.5,
     };
 
   }

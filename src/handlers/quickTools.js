@@ -91,6 +91,10 @@ function touchstart(e) {
 
   const $el = e.target;
 
+  if ($el instanceof HTMLInputElement) {
+    return;
+  }
+
   $touchstart = $el;
 
   if (isClickMode && this$el?.classList?.contains('active')) {
@@ -153,17 +157,18 @@ function touchmove(e) {
     const $row1 = tag.get('#row1');
     const $row2 = tag.get('#row2');
 
-    if ($row1.contains($el)) {
+    if ($row1?.contains($el)) {
       $row = $row1;
-    } else if ($row2.contains($el)) {
+    } else if ($row2?.contains($el)) {
       $row = $row2;
-    } else {
-      throw new Error('Invalid element');
     }
   }
 
-  $row.style.scrollBehavior = 'unset';
-  $row.scrollBy(diff, 0);
+  if ($row) {
+    $row.style.scrollBehavior = 'unset';
+    $row.scrollBy(diff, 0);
+  }
+
   $touchstart.classList.remove('active');
   movex = clientX;
 }
@@ -175,7 +180,7 @@ function touchmove(e) {
 function touchend(e) {
   const $el = e.target;
 
-  if (touchmoved) {
+  if (touchmoved && $row) {
     $row.style.scrollBehavior = 'smooth';
     const slide = parseInt($row.scrollLeft / $row.clientWidth, 10);
 
@@ -198,14 +203,13 @@ function touchend(e) {
 
   const { which } = $el.dataset;
 
-  if (which === undefined) {
-    quickToolsActions(e);
+  if (which) {
+    oncontextmenu(e);
     touchcancel(e);
-    return;
+  } else {
+    touchcancel(e);
+    quickToolsActions(e);
   }
-
-  oncontextmenu(e);
-  touchcancel(e);
 }
 
 /**
