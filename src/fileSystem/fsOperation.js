@@ -139,6 +139,13 @@ fsOperation.extend = (test, fs) => {
   fsList.push({ test, fs });
 }
 
+fsOperation.remove = (test) => {
+  const index = fsList.findIndex((fs) => fs.test === test);
+  if (index !== -1) {
+    fsList.splice(index, 1);
+  }
+}
+
 fsOperation.extend(Sftp.test, Sftp.fromUrl);
 fsOperation.extend(Ftp.test, Ftp.fromUrl);
 fsOperation.extend((url) => /^file:/.test(url), (url) => internalFsOperation(url));

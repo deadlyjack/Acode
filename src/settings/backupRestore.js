@@ -5,6 +5,7 @@ import Url from '../utils/Url';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import Uri from '../utils/Uri';
 import settingsPage from '../components/settingPage';
+import appSettings from '../lib/settings';
 
 function backupRestore() {
   const title = strings.backup.capitalize() + '/' + strings.restore.capitalize();

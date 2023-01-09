@@ -7,6 +7,7 @@ import ajax from '@deadlyjack/ajax';
 import Url from '../utils/Url';
 import settingsPage from '../components/settingPage';
 import lang from '../lib/lang';
+import appSettings from '../lib/settings';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -28,6 +29,11 @@ export default function otherSettings() {
         ['yes', strings.yes],
         ['system', strings.system],
       ],
+    },
+    {
+      key: 'fullscreen',
+      text: strings.fullscreen.capitalize(),
+      checkbox: values.fullscreen,
     },
     {
       key: 'lang',
@@ -58,7 +64,7 @@ export default function otherSettings() {
       key: 'console',
       text: strings.console,
       value: values.console,
-      select: ['legacy', 'eruda']
+      select: [appSettings.CONSOLE_LEGACY, appSettings.CONSOLE_ERUDA],
     },
     {
       key: 'keyboardMode',
@@ -66,9 +72,9 @@ export default function otherSettings() {
       value: values.keyboardMode,
       valueText: getModeString,
       select: [
-        ['NO_SUGGESTIONS', strings['no suggestions']],
-        ['NO_SUGGESTIONS_AGGRESSIVE', strings['no suggestions aggressive']],
-        ['NORMAL', strings.normal],
+        [appSettings.KEYBOARD_MODE_NORMAL, strings.normal],
+        [appSettings.KEYBOARD_MODE_NO_SUGGESTIONS, strings['no suggestions']],
+        [appSettings.KEYBOARD_MODE_NO_SUGGESTIONS_AGGRESSIVE, strings['no suggestions aggressive']],
       ],
     },
     {
@@ -97,16 +103,46 @@ export default function otherSettings() {
       value: values.openFileListPos,
       valueText: (value) => strings[value],
       select: [
-        ['sidebar', strings.sidebar],
-        ['header', strings.header],
+        [appSettings.OPEN_FILE_LIST_POS_SIDEBAR, strings.sidebar],
+        [appSettings.OPEN_FILE_LIST_POS_HEADER, strings.header],
       ],
     },
     {
       key: 'quickTools',
       text: strings['quick tools'],
       checkbox: values.quickTools,
+      info: 'Show or hide quick tools.',
+    },
+    {
+      key: 'quickToolsTriggerMode',
+      text: strings['quicktools trigger mode'],
+      value: values.quickToolsTriggerMode,
+      select: [
+        [appSettings.QUICKTOOLS_TRIGGER_MODE_CLICK, 'click'],
+        [appSettings.QUICKTOOLS_TRIGGER_MODE_TOUCH, 'touch'],
+      ],
+    },
+    {
+      key: 'touchMoveThreshold',
+      text: strings['touch move threshold'],
+      value: values.touchMoveThreshold,
+      prompt: strings['touch move threshold'],
+      promptType: 'number',
+      promptOptions: {
+        test(value) {
+          return value >= 0;
+        }
+      },
     },
   ];
+
+  items.forEach((item) => {
+    Object.defineProperty(item, 'info', {
+      get() {
+        return strings[`info-${this.key.toLocaleLowerCase()}`];
+      }
+    })
+  });
 
   function callback(key, value) {
     switch (key) {
@@ -173,10 +209,14 @@ export default function otherSettings() {
         system.setInputType(value);
         break;
 
+      case 'fullscreen':
+        if (value) acode.exec('enable-fullscreen');
+        else acode.exec('disable-fullscreen');
+        break;
+
       default:
         break;
     }
-
 
     appSettings.update({
       [key]: value,

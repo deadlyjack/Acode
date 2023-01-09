@@ -1,9 +1,26 @@
 #plugins {
-  .icon {
-    height: 40px;
-  }
+  display: flex;
+  flex-direction: column;
 
   .list:empty::after {
     content: 'No plugins found';
+  }
+
+  .value {
+    text-transform: none;
+    display: flex;
+
+    .group {
+      display: flex;
+      align-items: center;
+      margin-right: 15px;
+
+      .octicon,
+      .icon {
+        height: 30px;
+        width: 30px;
+        font-size: 1em;
+      }
+    }
   }
 }

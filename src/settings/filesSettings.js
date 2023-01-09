@@ -1,4 +1,5 @@
 import settingsPage from '../components/settingPage';
+import appSettings from '../lib/settings';
 
 export default function filesSettings() {
   const title = strings.settings;
@@ -14,6 +15,7 @@ export default function filesSettings() {
       key: 'showHiddenFiles',
       text: strings['show hidden files'],
       checkbox: values.showHiddenFiles,
+      info: 'Show hidden files and folders. (Start with .)',
     },
   ];
 

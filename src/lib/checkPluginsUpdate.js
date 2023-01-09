@@ -1,6 +1,5 @@
 import ajax from "@deadlyjack/ajax";
 import fsOperation from "../fileSystem/fsOperation";
-import helpers from "../utils/helpers";
 import Url from "../utils/Url";
 
 export default async function checkPluginsUpdate() {
@@ -15,16 +14,11 @@ export default async function checkPluginsUpdate() {
           Url.join(pluginDir.url, 'plugin.json'),
         ).readFile('json');
 
-        const pluginRemote = helpers.parseJSON(
-          await ajax({
-            url: Url.join(plugin.host, 'plugin.json'),
-            method: 'GET',
-            responseType: 'text',
-            contentType: 'application/x-www-form-urlencoded',
-          }),
-        );
+        const res = await ajax({
+          url: `https://acode.foxdebug.com/api/plugin/check-update/${plugin.id}/${plugin.version}`,
+        });
 
-        if (plugin.version !== pluginRemote?.version) {
+        if (res.update) {
           updates.push(plugin.id);
         }
       })(),

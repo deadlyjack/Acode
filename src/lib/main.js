@@ -13,26 +13,22 @@ import '../styles/help.scss';
 import '../styles/overrideAceStyle.scss';
 import '../ace/modelist';
 import '../components/WebComponents/components';
-import tag from 'html-tag-js';
 import mustache from 'mustache';
-import git from './git';
 import tile from '../components/tile';
 import sidenav from '../components/sidenav';
 import contextMenu from '../components/contextMenu';
 import EditorManager from './editorManager';
 import ActionStack from './actionStack';
 import helpers from '../utils/helpers';
-import Settings from './settings';
+import settings from './settings';
 import constants from './constants';
 import intentHandler from '../handlers/intent';
 import openFolder from './openFolder';
-import arrowkeys from '../handlers/arrowkeys';
 import quickTools from '../handlers/quickTools';
 import loadPolyFill from '../utils/polyfill';
 import Url from '../utils/Url';
 import applySettings from './applySettings';
 import fsOperation from '../fileSystem/fsOperation';
-import run from './run';
 import toast from '../components/toast';
 import $_menu from '../views/menu.hbs';
 import $_fileMenu from '../views/file-menu.hbs';
@@ -88,7 +84,7 @@ async function ondeviceready() {
     dataDirectory,
   } = cordova.file;
 
-  window.root = tag.get('#root');
+  window.root = document.body.get('#root');
   window.app = document.body;
   window.addedFolder = [];
   window.restoreTheme = restoreTheme;
@@ -108,7 +104,7 @@ async function ondeviceready() {
   try {
     await helpers.promisify(iap.startConnection)
       .catch((e) => {
-        console.log('connection error:', e);
+        console.error('connection error:', e);
       });
 
     if (localStorage.acode_pro === 'true') {
@@ -117,7 +113,7 @@ async function ondeviceready() {
 
     if (navigator.onLine) {
       const purchases = await helpers.promisify(iap.getPurchases);
-      const isPro = purchases.find((p) => JSON.parse(p.json).productId === 'acode_pro');
+      const isPro = purchases.find((p) => p.productIds.includes('acode_pro_new'));
       if (isPro) {
         window.IS_FREE_VERSION = false;
       } else {
@@ -125,17 +121,7 @@ async function ondeviceready() {
       }
     }
   } catch (error) {
-    console.log('error :>> ', error);
-  }
-
-  window.appSettings = new Settings();
-
-  try {
-    if (!(await fsOperation(PLUGIN_DIR).exists())) {
-      await fsOperation(DATA_STORAGE).createDirectory('plugins');
-    }
-  } catch (error) {
-    console.error(error);
+    console.error('Purchase error:', error);
   }
 
   try {
@@ -146,12 +132,10 @@ async function ondeviceready() {
     window.ANDROID_SDK_INT = parseInt(device.version);
   }
   window.DOES_SUPPORT_THEME = (() => {
-    const $testEl = tag('div', {
-      style: {
-        height: `var(--test-height)`,
-        width: `var(--test-height)`,
-      },
-    });
+    const $testEl = <div style={{
+      height: `var(--test-height)`,
+      width: `var(--test-height)`,
+    }}></div>;
     document.body.append($testEl);
     const client = $testEl.getBoundingClientRect();
 
@@ -168,6 +152,17 @@ async function ondeviceready() {
 
   if (parseInt(localStorage.versionCode) !== versionCode) {
     system.clearCache();
+  }
+
+  // remove plugin dir if version code is lower than 246
+  if (parseInt(localStorage.versionCode) < 246) {
+    delete localStorage.files;
+    await fsOperation(PLUGIN_DIR).delete();
+    // create plugin dir
+  }
+
+  if (!await fsOperation(PLUGIN_DIR).exists()) {
+    await fsOperation(DATA_STORAGE).createDirectory('plugins');
   }
 
   localStorage.versionCode = versionCode;
@@ -187,11 +182,11 @@ async function ondeviceready() {
   }, 1000 * 10);
 
   acode.setLoadingMessage('Loading settings...');
-  await appSettings.init();
+  await settings.init();
 
   if (localStorage.versionCode < 150) {
     localStorage.clear();
-    appSettings.reset();
+    settings.reset();
     window.location.reload();
   }
 
@@ -223,39 +218,22 @@ async function ondeviceready() {
 
   acode.setLoadingMessage('Loading custom theme...');
   document.head.append(
-    tag('style', {
-      id: 'custom-theme',
-      textContent: helpers.jsonToCSS(
-        constants.CUSTOM_THEME,
-        appSettings.value.customTheme,
-      ),
-    }),
+    <style id='custom-theme'>{helpers.jsonToCSS(
+      constants.CUSTOM_THEME,
+      settings.value.customTheme,
+    )}</style>
   );
 
   acode.setLoadingMessage('Loading language...');
-  await lang.set(appSettings.value.lang);
-
-  acode.setLoadingMessage('Initializing GitHub...');
-  await git.init();
+  await lang.set(settings.value.lang);
 
   loadApp();
 }
 
 async function loadApp() {
   //#region declaration
-  const $editMenuToggler = tag('span', {
-    className: 'icon edit',
-    attr: {
-      style: 'font-size: 1.2em !important;',
-      action: 'toggle-edit-menu',
-    },
-  });
-  const $navToggler = tag('span', {
-    className: 'icon menu',
-    attr: {
-      action: 'toggle-sidebar',
-    },
-  });
+  const $editMenuToggler = <span className='icon edit' attr-action='toggle-edit-menu' style={{ fontSize: '1.2em' }} />;
+  const $navToggler = <span className='icon menu' attr-action='toggle-sidebar'></span>;
   const $menuToggler = Icon('more_vert', 'toggle-menu');
   const $header = tile({
     type: 'header',
@@ -263,11 +241,7 @@ async function loadApp() {
     lead: $navToggler,
     tail: $menuToggler,
   });
-  const $footer = tag('footer', {
-    id: 'quick-tools',
-    tabIndex: -1,
-    onclick: quickTools.clickListener,
-  });
+  const $footer = <footer id='quick-tools' tabIndex={-1}></footer>;
   const $mainMenu = contextMenu({
     top: '6px',
     right: '6px',
@@ -304,64 +278,12 @@ async function loadApp() {
       );
     },
   });
-  const $main = tag('main');
+  const $main = <main></main>;
   const $sidebar = sidenav($main, $navToggler);
-  const $runBtn = tag('span', {
-    className: 'icon play_arrow',
-    attr: {
-      action: 'run',
-    },
-    onclick() {
-      const {
-        serverPort,
-        previewPort,
-        previewMode,
-        disableCache,
-        host,
-      } = appSettings.value;
-      if (serverPort === previewPort) {
-        run();
-        return;
-      }
-
-      const src = `http://${host}:${previewPort}`;
-      if (previewMode === 'browser') {
-        system.openInBrowser(src);
-        return;
-      }
-
-      system.inAppBrowser(src, '', false, disableCache);
-    },
-    oncontextmenu() {
-      run(false, "inapp", true);
-    },
-    style: {
-      fontSize: '1.2em',
-    },
-  });
-  const $floatingNavToggler = tag('span', {
-    className: 'floating icon menu',
-    id: 'sidebar-toggler',
-    style: {
-      height: '40px',
-      width: '40px',
-    },
-    onclick() {
-      acode.exec('toggle-sidebar');
-    }
-  });
-  const $headerToggler = tag('span', {
-    className: 'floating icon keyboard_arrow_left',
-    id: 'header-toggler',
-    style: {
-      height: '40px',
-      width: '40px',
-    },
-  });
-  const $quickToolToggler = tag('span', {
-    className: 'floating icon keyboard_arrow_up',
-    id: 'quicktool-toggler',
-  });
+  const $runBtn = <span style={{ fontSize: '1.2em' }} className='icon play_arrow' attr-action='run' onclick={() => acode.exec('run')} oncontextmenu={() => acode.exec('run-file')}></span>;
+  const $floatingNavToggler = <span id='sidebar-toggler' className='floating icon menu' onclick={() => acode.exec('toggle-sidebar')}></span>;
+  const $headerToggler = <span className='floating icon keyboard_arrow_left' id='header-toggler'></span>;
+  const $quickToolToggler = <span className='floating icon keyboard_arrow_up' id='quicktool-toggler'></span>;
   const folders = helpers.parseJSON(localStorage.folders);
   const files = helpers.parseJSON(localStorage.files) || [];
   const editorManager = await EditorManager($sidebar, $header, $main);
@@ -397,6 +319,7 @@ async function loadApp() {
 
   //#region Add event listeners
   editorManager.onupdate = onEditorUpdate;
+  quickTools($footer);
   root.on('show', mainPageOnShow);
   app.addEventListener('click', onClickApp);
   editorManager.on('rename-file', onFileUpdate);
@@ -404,8 +327,6 @@ async function loadApp() {
   editorManager.on('file-loaded', onFileUpdate);
   $fileMenu.addEventListener('click', handleMenu);
   $mainMenu.addEventListener('click', handleMenu);
-  $footer.addEventListener('click', footerOnClick);
-  $footer.addEventListener('contextmenu', footerOnContextMenu);
   document.addEventListener('backbutton', actionStack.pop);
   document.addEventListener('menubutton', $sidebar.toggle);
   navigator.app.overrideButton('menubutton', true);
@@ -428,36 +349,17 @@ async function loadApp() {
     folders.forEach((folder) => openFolder(folder.url, folder.opts));
   }
 
-  if (Array.isArray(files) && files.length) {
-    openFiles(files)
-      .then(() => {
-        onEditorUpdate(undefined, false);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast('File loading failed!');
-      });
-  } else {
-    new EditorFile();
-    onEditorUpdate(undefined, false);
-  }
+  new EditorFile();
 
   checkPluginsUpdate()
     .then((updates) => {
       if (!updates.length) return;
-      const $icon = tag('span', {
-        className: 'octicon octicon-bell',
-        style: {
-          fontSize: '1.2rem',
-        },
-        attr: {
-          action: '',
-        },
-        onclick() {
+      const $icon = <span onclick={
+        () => {
           plugins(updates);
-          this.remove();
+          $icon.remove();
         }
-      });
+      } attr-action='' style={{ fontSize: '1.2rem' }} className='octicon octicon-bell'></span>
 
       if ($editMenuToggler.isConnected) {
         $header.insertBefore($icon, $editMenuToggler);
@@ -470,12 +372,24 @@ async function loadApp() {
     .catch(console.error);
 
   //load plugins
-  loadPlugins()
-    .then(() => { })
-    .catch((error) => {
-      console.error(error);
-      toast('Plugins loading failed!');
-    });
+  try {
+    await loadPlugins()
+  } catch (error) {
+    toast('Plugins loading failed!');
+  }
+
+  if (Array.isArray(files) && files.length) {
+    openFiles(files)
+      .then(() => {
+        onEditorUpdate(undefined, false);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast('File loading failed!');
+      });
+  } else {
+    onEditorUpdate(undefined, false);
+  }
 
   /**
    *
@@ -492,18 +406,6 @@ async function loadApp() {
     acode.exec(action, value);
   }
 
-  function footerOnClick(e) {
-    arrowkeys.onClick(e, $footer);
-  }
-
-  /**
-   *
-   * @param {MouseEvent} e
-   */
-  function footerOnContextMenu(e) {
-    arrowkeys.oncontextmenu(e, $footer);
-  }
-
   function onEditorUpdate(mode, saveState = true) {
     const { activeFile } = editorManager;
 
@@ -512,7 +414,7 @@ async function loadApp() {
     }
 
     if (mode === 'switch-file') {
-      if (appSettings.value.rememberFiles && activeFile) {
+      if (settings.value.rememberFiles && activeFile) {
         localStorage.setItem('lastfile', activeFile.id);
       }
       return;
@@ -523,7 +425,7 @@ async function loadApp() {
 
   async function onFileUpdate() {
     try {
-      const { serverPort, previewPort } = appSettings.value;
+      const { serverPort, previewPort } = settings.value;
       let canRun = false;
       if (serverPort !== previewPort) {
         canRun = true;
@@ -554,7 +456,7 @@ function onClickApp(e) {
   }
 
   function checkIfInsideAncher() {
-    const allAs = [...tag.getAll('a')];
+    const allAs = [...document.body.getAll('a')];
 
     for (let a of allAs) {
       if (a.contains(el)) {

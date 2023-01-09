@@ -4,15 +4,39 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="stylesheet" href="./css/fonts.css" />
     <link rel="stylesheet" href="./res/icons/style.css" />
     <link rel="stylesheet" href="./res/icon-file/style.css" />
     <link rel="stylesheet" href="./res/octicons/style.css" />
 
     <script>
+      (function () {
+        var __testEl = document.createElement('div');
+        var __testChildEl = document.createElement('div');
+        if (__testEl.append) {
+          __testEl.append(__testChildEl);
+          if (__testEl.children.length === 1) {
+            return;
+          }
+
+          HTMLElement.prototype.append = function () {
+            var argArr = Array.prototype.slice.call(arguments),
+              docFrag = document.createDocumentFragment();
+
+            argArr.forEach(function (argItem) {
+              var isNode = argItem instanceof Node;
+              argItem = isNode
+                ? argItem
+                : document.createTextNode(String(argItem));
+              docFrag.appendChild(argItem);
+            });
+
+            this.appendChild(docFrag);
+          };
+        }
+      })();
+
       window._regeneratorRuntime = null;
       function startsWith(string, needle) {
         return string.indexOf(needle) === 0;
@@ -49,6 +73,14 @@
     <script src="./js/ace/ext-emmet.js"></script>
     <script src="./js/ace/ext-language_tools.js"></script>
     <script src="./js/ace/ext-themelist.js"></script>
+    <script src="./js/ace/ext-elastic_tabstops_lite.js"></script>
+    <script src="./js/ace/ext-hardwrap.js"></script>
+    <script src="./js/ace/ext-linking.js"></script>
+    <script src="./js/ace/ext-rtl.js"></script>
+    <script src="./js/ace/ext-spellcheck.js"></script>
+    <script src="./js/ace/ext-error_marker.js"></script>
+    <script src="./js/ace/ext-whitespace.js"></script>
+    <script src="./js/ace/ext-static_highlight.js"></script>
     <script src="./js/createKeyboardEvent.js"></script>
     <script src="cordova.js"></script>
     <script defer src="./js/build/main.build.js"></script>
@@ -113,20 +145,14 @@
     </style>
 
       <!--styles-->
-<link rel="stylesheet" href="./css/build/600.css">
+<link rel="stylesheet" href="./css/build/235.css">
 <link rel="stylesheet" href="./css/build/627.css">
 <link rel="stylesheet" href="./css/build/about.css">
 <link rel="stylesheet" href="./css/build/customTheme.css">
 <link rel="stylesheet" href="./css/build/donate.css">
 <link rel="stylesheet" href="./css/build/fileBrowser.css">
-<link rel="stylesheet" href="./css/build/gistFiles.css">
-<link rel="stylesheet" href="./css/build/gists.css">
-<link rel="stylesheet" href="./css/build/gitHub.css">
-<link rel="stylesheet" href="./css/build/githublogin.css">
 <link rel="stylesheet" href="./css/build/main.css">
 <link rel="stylesheet" href="./css/build/plugins.css">
-<link rel="stylesheet" href="./css/build/repo.css">
-<link rel="stylesheet" href="./css/build/repos.css">
 <link rel="stylesheet" href="./css/build/themeSetting.css">
 <!--styles_end-->
 </head>

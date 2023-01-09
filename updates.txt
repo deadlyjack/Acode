@@ -1,3 +1,11 @@
+version 1.7.0 260
+☞ Quick tools improvement
+☞ Settings will have info button, you can see more info about settings
+☞ Updated plugin system
+☞ You can see plugin review and rating
+☞ GitHub is removed from app but, you can still use it from plugin
+☞ Bugs fixes
+
 version 1.6.1 245
 ☞ Updated plugin CDN
 
@@ -24,7 +32,7 @@ version 1.6.0 235
 ☞ Fixed loading files using FTP/SFTP
 ☞ Fixed File checking
 ☞ Fixed settings
-☞ Various fixes.
+☞ Various fixes
 
 version 1.5.5
 ☞ Remembers sidebar state in tablet devices.

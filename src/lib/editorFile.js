@@ -8,10 +8,17 @@ import Path from "../utils/Path";
 import Url from "../utils/Url";
 import constants from "./constants";
 import openFolder from "./openFolder";
+import run from './run';
+import saveFile from './saveFile';
+import appSettings from './settings';
 
 const modelist = ace.require('ace/ext/modelist');
 const { Fold } = ace.require('ace/edit_session/fold');
 const { Range } = ace.require('ace/range');
+
+/**
+ * @typedef {'run'|'save'|'change'|'focus'|'blur'|'close'|'rename'|'load'|'loadError'|'loadStart'|'loadEnd'|'changeMode'|'changeEncoding'|'changeReadOnly'} FileEvents
+ */
 
 /**
  * @typedef {object}  FileOptions new file options
@@ -19,7 +26,6 @@ const { Range } = ace.require('ace/range');
  * @property {render} [render] make file active
  * @property {string} [id] ID fo the file
  * @property {string} [uri] uri of the file
- * @property {GitRecord & GistRecord} [record] git/gist record
  * @property {string} [text] session text
  * @property {boolean} [editable] eable file to edit or not
  * @property {boolean} [deletedFile] file do not exists at source
@@ -60,16 +66,6 @@ export default class EditorFile {
    * @type {AceAjax.IEditSession}
    */
   session = null;
-  /**
-   * Type of file
-   * @type {'regular'| 'git' | 'gist'}
-   */
-  type = 'regular';
-  /**
-   * If file type is 'git' or 'gist' it will have this property to read/write/modify file
-   * @type {GitRecord & GistRecord}
-   */
-  record = null;
   /**
    * Encoding of the text e.e. 'utf-8'
    * @type {string}
@@ -129,6 +125,39 @@ export default class EditorFile {
    * @type {boolean}
    */
   #isUnsaved = false;
+  /**
+   * Whether to show run button or not
+   */
+  #canRun = Promise.resolve(false);
+  #events = {
+    save: [],
+    change: [],
+    focus: [],
+    blur: [],
+    close: [],
+    rename: [],
+    load: [],
+    loaderror: [],
+    loadstart: [],
+    loadend: [],
+    changemode: [],
+    run: [],
+    canrun: [],
+  };
+
+  onsave;
+  onchange;
+  onfocus;
+  onblur;
+  onclose;
+  onrename;
+  onload;
+  onloaderror;
+  onloadstart;
+  onloadend;
+  onchangeMode;
+  onrun;
+  oncanrun;
 
   /**
    * 
@@ -137,10 +166,8 @@ export default class EditorFile {
    */
   constructor(filename, options) {
     const {
-      openFileList,
-      files,
+      addFile,
       getFile,
-      header,
     } = editorManager;
     let doesExists = null;
 
@@ -157,12 +184,9 @@ export default class EditorFile {
     }
 
     this.#uri = options?.uri;
-    this.record = options?.record;
-    this.type = options?.type ?? 'regular';
 
     if (this.#id) doesExists = getFile(this.#id, 'id');
     else if (this.#uri) doesExists = getFile(this.#uri, 'uri');
-    else if (this.record) doesExists = getFile(this.record, this.type);
 
     if (doesExists) {
       doesExists.makeActive();
@@ -209,26 +233,12 @@ export default class EditorFile {
     this.#tab.onclick = tabOnclick.bind(this);
     this.#tab.oncontextmenu = startDrag;
 
-    if (appSettings.value.openFileListPos === 'header') {
-      openFileList.append(this.#tab);
-    } else {
-      openFileList.$ul.append(this.#tab);
-    }
-
-    files.push(this);
-    header.text = this.#name;
+    addFile(this);
     this.session = ace.createEditSession(options?.text || '');
     this.setMode();
     this.#setupSession();
 
-    if (options?.render ?? true) {
-      this.makeActive();
-
-      if (this.id !== constants.DEFAULT_FILE_SESSION) {
-        const defaultFile = editorManager.getFile(constants.DEFAULT_FILE_SESSION, 'id');
-        defaultFile?.remove();
-      }
-    }
+    if (options?.render ?? true) this.render();
   }
 
   /**
@@ -251,7 +261,6 @@ export default class EditorFile {
    * File name
    */
   get filename() {
-    if (this.type === 'git') return this.record.name;
     return this.#name;
   }
 
@@ -263,17 +272,12 @@ export default class EditorFile {
     if (!value || this.#SAFMode === 'single') return;
     if (this.#name === value) return;
 
-    (async () => {
-      try {
-        if (this.type === 'git') {
-          await this.record.setName(value);
-        } else if (this.type === 'gist') {
-          await this.record.setName(this.#name, value);
-        }
-      } catch (error) {
-        helpers.error(error);
-      }
+    const event = createFileEvent(this);
+    this.#emit('rename', event);
 
+    if (event.defaultPrevented) return;
+
+    (async () => {
       if (this.id === constants.DEFAULT_FILE_SESSION) {
         this.id = helpers.uuid();
       }
@@ -282,15 +286,14 @@ export default class EditorFile {
         editorManager.header.text = value;
       }
 
-
-      editorManager.onupdate('rename-file');
-      editorManager.emit('rename-file', this);
-
       const oldExt = helpers.extname(this.#name);
       const newExt = helpers.extname(value);
 
       this.#tab.text = value;
       this.#name = value;
+
+      editorManager.onupdate('rename-file');
+      editorManager.emit('rename-file', this);
 
       if (oldExt !== newExt) this.setMode();
     })();
@@ -320,6 +323,10 @@ export default class EditorFile {
     if (this.#SAFMode === 'single') return;
     if (this.location === value) return;
 
+    const event = createFileEvent(this);
+    this.#emit('rename', event);
+    if (event.defaultPrevented) return;
+
     this.uri = Url.join(value, this.filename);
     this.readOnly = false;
   }
@@ -346,7 +353,6 @@ export default class EditorFile {
       this.#uri = value;
       this.deletedFile = false;
       this.readOnly = false;
-      this.type = 'regular';
       this.id = value.hashCode();
     }
 
@@ -355,7 +361,7 @@ export default class EditorFile {
 
     // if this file is active set sub text of header
     if (editorManager.activeFile.id === this.id) {
-      editorManager.setSubText(this);
+      editorManager.header.subText = this.#getTitle();
     }
   }
 
@@ -501,26 +507,52 @@ export default class EditorFile {
   }
 
   async canRun() {
+    if (!this.loaded || this.loading) return false;
+    await this.readCanRun();
+    return this.#canRun;
+  }
+
+  async readCanRun() {
     try {
-      if (!this.loaded || this.loading) return false;
-      if (this.type === 'regular') {
-        const folder = openFolder.find(this.uri);
-        if (folder) {
-          const url = Url.join(folder.url, 'index.html');
-          const fs = fsOperation(url);
-          if (await fs.exists()) {
-            return url;
-          }
+      const event = createFileEvent(this);
+      this.#emit('canrun', event);
+      if (event.defaultPrevented) return;
+
+      const folder = openFolder.find(this.uri);
+      if (folder) {
+        const url = Url.join(folder.url, 'index.html');
+        const fs = fsOperation(url);
+        if (await fs.exists()) {
+          this.#canRun = Promise.resolve(true);
+          return;
         }
       }
 
       const runnableFile = /\.((html?)|(md)|(js)|(svg))$/;
-      if (runnableFile.test(this.filename)) return true;
-      return false;
-    } catch (err) {
-      if (err instanceof Error) throw error;
+      if (runnableFile.test(this.filename)) {
+        this.#canRun = Promise.resolve(true);
+        return;
+      }
+      this.#canRun = Promise.resolve(false);
+    } catch (error) {
+      if (err instanceof Error) throw err;
       else throw new Error(err);
     }
+  }
+
+  /**
+   * 
+   * @param {()=>(boolean|Promise<boolean>)} cb callback function that return true if file can run
+   */
+  async writeCanRun(cb) {
+    if (!cb || typeof cb !== 'function') return;
+    const res = cb();
+    if (res instanceof Promise) {
+      this.#canRun = res;
+      return;
+    }
+
+    this.#canRun = Promise.resolve(res);
   }
 
   /**
@@ -532,12 +564,6 @@ export default class EditorFile {
     if (!force && this.isUnsaved) {
       const confirmation = await dialogs.confirm(strings.warning.toUpperCase(), strings['unsaved file']);
       if (!confirmation) return;
-    }
-
-    if (this.type === 'git') {
-      gitRecord.remove(this.record.sha);
-    } else if (this.type === 'gist') {
-      gistRecord.remove(this.record);
     }
 
     this.#destroy();
@@ -559,10 +585,30 @@ export default class EditorFile {
   }
 
   /**
+   * Saves the file.
+   * @returns {Promise<boolean>} true if file is saved, false if not.
+   */
+  save() {
+    return this.#save(false);
+  }
+
+  /**
+   * Saves the file to a new location.
+   * @returns {Promise<boolean>} true if file is saved, false if not.
+   */
+  saveAs() {
+    return this.#save(true);
+  }
+
+  /**
    * Sets syntax highlighting of the file.
    * @param {string} [mode] 
    */
   setMode(mode) {
+    const event = createFileEvent(this);
+    this.#emit('changemode', event);
+    if (event.defaultPrevented) return;
+
     if (!mode) {
       const ext = Path.extname(this.filename);
       const modes = helpers.parseJSON(localStorage.modeassoc);
@@ -576,12 +622,7 @@ export default class EditorFile {
 
     // sets file icon
     this.#tab.lead(
-      tag('span', {
-        className: this.icon,
-        style: {
-          paddingRight: '5px',
-        },
-      }),
+      <span className={this.icon} style={{ paddingRight: '5px' }}></span>
     );
   }
 
@@ -591,6 +632,8 @@ export default class EditorFile {
   makeActive() {
     const { activeFile, editor, switchFile } = editorManager;
     if (activeFile?.id === this.id) return;
+
+    activeFile?.removeActive();
     switchFile(this.id);
 
     if (this.focused) {
@@ -605,6 +648,14 @@ export default class EditorFile {
     if (!this.loaded && !this.loading) {
       this.#loadText();
     }
+
+    editorManager.header.subText = this.#getTitle();
+
+    this.#emit('focus', createFileEvent(this));
+  }
+
+  removeActive() {
+    this.#emit('blur', createFileEvent(this));
   }
 
   openWith() {
@@ -619,8 +670,46 @@ export default class EditorFile {
     this.#fileAction('SEND');
   }
 
-  run() {
+  runAction() {
     this.#fileAction('RUN');
+  }
+
+  run() {
+    this.#run(false);
+  }
+
+  runFile() {
+    this.#run(true);
+  }
+
+  render() {
+    this.makeActive();
+
+    if (this.id !== constants.DEFAULT_FILE_SESSION) {
+      const defaultFile = editorManager.getFile(constants.DEFAULT_FILE_SESSION, 'id');
+      defaultFile?.remove();
+    }
+  }
+
+  /**
+   * Add event listener
+   * @param {string} event
+   * @param {(this:File, e:Event)=>void} callback
+   */
+  on(event, callback) {
+    this.#events[event.toLowerCase()]?.push(callback);
+  }
+
+  /**
+   * Remove event listener
+   * @param {string} event
+   * @param {(this:File, e:Event)=>void} callback
+   */
+  off(event, callback) {
+    const events = this.#events[event.toLowerCase()];
+    if (!events) return;
+    const index = events.indexOf(callback);
+    if (index > -1) events.splice(index, 1);
   }
 
   /**
@@ -638,10 +727,7 @@ export default class EditorFile {
   }
 
   async #getShareableUri() {
-    if (this.type !== 'regular') {
-      return this.cahceFile;
-    }
-    if (!this.uri) return;
+    if (!this.uri) return null;
 
     const fs = fsOperation(this.uri);
 
@@ -694,6 +780,7 @@ export default class EditorFile {
     editor.setReadOnly(true);
     this.loading = true;
     this.markChanged = false;
+    this.#emit('loadstart', createFileEvent(this));
     this.session.setValue(strings['loading...']);
 
     try {
@@ -710,13 +797,6 @@ export default class EditorFile {
         } else if (value === undefined) {
           value = await file.readFile('utf-8');
         }
-      } else if (!value) {
-        if (this.type === 'gist') {
-          const gistFile = this.record.files[this.filename];
-          value = gistFile.content;
-        } else if (this.type === 'git') {
-          value = this.record.data;
-        }
       }
 
       this.markChanged = false;
@@ -730,6 +810,7 @@ export default class EditorFile {
       }
 
       setTimeout(() => {
+        this.#emit('load', createFileEvent(this));
         emit('file-loaded', this);
         if (cursorPos) this.session.selection.moveCursorTo(cursorPos.row, cursorPos.column);
         if (scrollTop) this.session.setScrollTop(scrollTop);
@@ -742,9 +823,12 @@ export default class EditorFile {
         }
       }, 0);
     } catch (error) {
+      this.#emit('loaderror', createFileEvent(this));
       this.remove();
       toast(`Unable to load: ${this.filename}`);
       console.log(error);
+    } finally {
+      this.#emit('loadend', createFileEvent(this));
     }
   }
 
@@ -791,6 +875,21 @@ export default class EditorFile {
     return foldDataAr;
   }
 
+  #save(as) {
+    const event = createFileEvent(this);
+    this.#emit('save', event);
+
+    if (event.defaultPrevented) return Promise.resolve(false);
+    return saveFile(this, as);
+  }
+
+  #run(file) {
+    const event = createFileEvent(this);
+    this.#emit('run', event);
+    if (event.defaultPrevented) return;
+    run(false, file ? 'inapp' : appSettings.value.previewMode, file);
+  }
+
   #upadteSaveIcon() {
     const $save = root.get('#quick-tools [action=save]');
     if (this.#isUnsaved) {
@@ -825,6 +924,7 @@ export default class EditorFile {
   }
 
   #destroy() {
+    this.#emit('close', createFileEvent(this));
     this.session.off('changeScrollTop', EditorFile.#onscrolltop);
     this.session.off('changeScrollLeft', EditorFile.#onscrollleft);
     this.session.off('changeFold', EditorFile.#onfold);
@@ -837,6 +937,36 @@ export default class EditorFile {
 
   #showNoAppError() {
     toast(strings['no app found to handle this file']);
+  }
+
+  #getTitle() {
+    let text = this.location || this.uri;
+
+    if (text && !this.readOnly) {
+      text = helpers.getVirtualPath(text);
+      if (text.length > 30) text = '...' + text.slice(text.length - 27);
+    } else if (this.readOnly) {
+      text = strings['read only'];
+    } else if (this.deletedFile) {
+      text = strings['deleted file'];
+    } else {
+      text = strings['new file'];
+    }
+    return text;
+  }
+
+  /**
+   * Emits an event
+   * @param {FileEvents} eventName 
+   * @param {FileEvent} event 
+   */
+  #emit(eventName, event) {
+    this[`on${eventName}`]?.(event);
+    if (!event.BUBBLING_PHASE) return;
+    this.#events[eventName]?.some((fn) => {
+      fn(event);
+      return !event.BUBBLING_PHASE;
+    });
   }
 }
 
@@ -957,4 +1087,29 @@ function updateFileList($parent) {
   }
 
   editorManager.files = newFileList;
+}
+
+function createFileEvent(file) {
+  return new FileEvent(file);
+}
+
+class FileEvent {
+  #bubblingPhase = true;
+  #defaultPrevented = false;
+  target;
+  constructor(file) {
+    this.target = file;
+  }
+  stopPropagation() {
+    this.#bubblingPhase = false;
+  }
+  preventDefault() {
+    this.#defaultPrevented = true;
+  }
+  get BUBBLING_PHASE() {
+    return this.#bubblingPhase;
+  }
+  get defaultPrevented() {
+    return this.#defaultPrevented;
+  }
 }

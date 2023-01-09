@@ -1,3 +1,4 @@
+import escapeStringRegexp from 'escape-string-regexp';
 import path from './Path';
 
 export default {
@@ -84,7 +85,7 @@ export default {
 
       const matches = [];
       for (let storage of storageList) {
-        const regex = new RegExp('^' + (storage.uri ?? storage.url));
+        const regex = new RegExp('^' + escapeStringRegexp(storage.uri ?? storage.url));
         matches.push({
           regex,
           charMatched: url.length - url.replace(regex, '').length,

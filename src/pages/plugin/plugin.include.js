@@ -7,19 +7,14 @@ import Url from '../../utils/Url';
 import installPlugin from '../../lib/installPlugin';
 import fsOperation from '../../fileSystem/fsOperation';
 import settingsPage from '../../components/settingPage';
-import gh2cdn from '../../utils/gh2cdn';
 
-export default async function PluginInclude(json, installed = false, onInstall, onUninstall) {
-  const $page = Page('Plugin');
-  let host = Url.dirname(json);
-  let readme = '';
-  let icon = '';
-  let version = '';
+export default async function PluginInclude(id, installed, onInstall, onUninstall) {
+  installed = installed === 'true';
+  const $page = Page(strings['plugin']);
   let plugin = {};
   let cancelled = false;
   let update = false;
-  let remotePlugin;
-  let remoteHost;
+  let currentVersion = '';
 
   actionStack.push({
     id: 'plugin',
@@ -36,72 +31,54 @@ export default async function PluginInclude(json, installed = false, onInstall, 
   app.append($page);
   helpers.showAd();
 
-  helpers.showTitleLoader();
 
   try {
-    const promises = [];
-    const readmeDotMd = Url.join(host, 'readme.md');
-    if (installed && json.startsWith('file:')) {
-      promises.push(
-        fsOperation(json).readFile('json'),
-        fsOperation(readmeDotMd).readFile('utf8')
-      );
-      icon = Url.join(host, 'icon.png');
-    } else {
-      promises.push(
-        fsOperation(
-          gh2cdn(json),
-        ).readFile('json'),
-      );
-    }
-    if (cancelled) return;
-    [plugin, readme] = await Promise.all(promises);
-
     if (installed) {
-      const settings = acode.getPluginSettings(plugin.id);
+      const installedPlugin = await fsOperation(Url.join(PLUGIN_DIR, id, 'plugin.json')).readFile('json');
+      const settings = acode.getPluginSettings(id);
+      const { author } = installedPlugin;
+      const description = await fsOperation(Url.join(PLUGIN_DIR, id, 'readme.md')).readFile('utf-8');
+      const iconUrl = await helpers.toInternalUri(Url.join(PLUGIN_DIR, id, 'icon.png'));
+      const iconData = await fsOperation(iconUrl).readFile();
+      const icon = URL.createObjectURL(new Blob([iconData], { type: 'image/png' }));
+      plugin = {
+        id,
+        icon,
+        name: installedPlugin.name,
+        version: installedPlugin.version,
+        author: author.name,
+        author_github: author.github,
+        source: installedPlugin.source,
+        description,
+      };
       if (settings) {
         $page.header.append(
-          <span className="icon settings" onclick={() => settingsPage(plugin.name, settings)}></span>
+          <span className="icon settings" onclick={() => settingsPage(plugin.name, settings.list, settings.cb)}></span>
         );
       }
     }
 
-    version = plugin.version;
-    if (!icon && plugin.icon) {
-      icon = gh2cdn(Url.join(host, plugin.icon));
+    try {
+      if (navigator.onLine && (isValidSource(plugin.source) || !installed)) {
+        helpers.showTitleLoader();
+        const remotePlugin = await fsOperation(`https://acode.foxdebug.com/api/plugin/${id}`)
+          .readFile('json');
+        if (cancelled) return;
+
+        if (remotePlugin) {
+          if (installed && remotePlugin?.version !== plugin.version) {
+            currentVersion = plugin.version;
+            update = true;
+          }
+          plugin = Object.assign({}, remotePlugin);
+        }
+      }
+    } catch (error) {
+      console.error(error);
     }
 
     $page.settitle(plugin.name);
     render();
-
-    if (!readme && plugin.readme) {
-      fsOperation(
-        gh2cdn(Url.join(host, plugin.readme)),
-      )
-        .readFile('utf8')
-        .then((text) => {
-          readme = text;
-          render();
-        });
-    }
-
-    if (installed && json.startsWith('file:')) {
-      fsOperation(
-        gh2cdn(Url.join(plugin.host, 'plugin.json'))
-      )
-        .readFile('json')
-        .then((json) => {
-          remotePlugin = json;
-          remoteHost = plugin.host;
-          if (remotePlugin.version !== version) {
-            update = remotePlugin.version;
-            render();
-          }
-        });
-    } else {
-      remotePlugin = plugin;
-      remoteHost = host;
-    }
 
   } catch (err) {
     helpers.error(err);
@@ -111,17 +88,11 @@ export default async function PluginInclude(json, installed = false, onInstall, 
   }
 
   async function install() {
-    if (!remotePlugin) {
-      toast('Cannot install plugin');
-      return;
-    }
-
     try {
       await Promise.all([
         loadAd(this),
-        installPlugin(remotePlugin, remoteHost),
+        installPlugin(plugin.source || id, plugin.name),
       ]);
-      acode.unmountPlugin(plugin.id);
       if (onInstall) onInstall(plugin.id);
       installed = true;
       update = false;
@@ -156,24 +127,12 @@ export default async function PluginInclude(json, installed = false, onInstall, 
   }
 
   async function render() {
-    const isPaid = ['paid', 'premium', 'pro'].includes(plugin.type) && IS_FREE_VERSION;
-    const protocol = Url.getProtocol(icon);
-    if (protocol === 'file:') {
-      icon = await helpers.toInternalUri(icon);
-    } else if (protocol === 'content:') {
-      const data = await fsOperation(icon).readFile();
-      icon = await helpers.blobToBase64(new Blob([data]));
-    }
-
-    $page.content = view({
+    $page.body = view({
       ...plugin,
-      readme,
-      version,
-      icon,
-      body: readme ? marked(readme) : '',
+      body: marked(plugin.description),
       installed,
       update,
-      isPaid,
+      currentVersion,
       install,
       uninstall,
     });
@@ -190,4 +149,8 @@ export default async function PluginInclude(json, installed = false, onInstall, 
       }
     } catch (error) { }
   }
+}
+
+function isValidSource(source) {
+  return source ? source.startsWith('https://acode.foxdebug.com/api/plugin/') : true;
 }

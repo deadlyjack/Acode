@@ -31,7 +31,7 @@ To add new language, create a new file with language code for android (eg. en-us
 
 Here are few utility tools to add, remove or search a string in all added languages.
 
-```bash
+```shell
 yarn lang add
 yarn lang remove
 yarn lang search
@@ -44,13 +44,13 @@ To build the APK you need Nodejs, NPM, and Apache Cordova installed on your devi
 
 Run this command to do the initial setup of the project. It's required just once.
 
-```
+```shell
 yarn setup
 ```
 
 Build the project
 
-```
+```shell
 yarn build <platform (android)> <free|paid> <p|prod|d|dev>
 ```
 

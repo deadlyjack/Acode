@@ -36,7 +36,11 @@ interface Acode {
   readonly formatters: Array<Formatter>;
   exec(command: string, value?: any): boolean;
   setLoadingMessage(message: string): void;
-  initPlugin(pluginId: string, baseUrl: string, $page: HTMLElement): void;
+  initPlugin(
+    pluginId: string,
+    baseUrl: string,
+    $page: HTMLElement,
+  ): Promise<void>;
   unmountPlugin(pluginId: string): void;
   registerFormatter(
     id: string,
@@ -89,56 +93,6 @@ interface searchSettings {
   caseSensitive: boolean;
   regExp: boolean;
   wholeWord: boolean;
-}
-
-interface Settings {
-  animation: 'system' | boolean;
-  autosave: number;
-  fileBrowser: fileBrowserSettings;
-  maxFileSize: number;
-  filesNotAllowed: string[];
-  formatter: Map<string, string>;
-  retryRemoteFsAfterFail: boolean;
-  search: searchSettings;
-  lang: string;
-  fontSize: string;
-  editorTheme: string;
-  appTheme: string;
-  textWrap: boolean;
-  softTab: boolean;
-  tabSize: number;
-  linenumbers: boolean;
-  formatOnSave: boolean;
-  linting: boolean;
-  previewMode: 'browser' | 'inapp';
-  showSpaces: boolean;
-  openFileListPos: 'sidebar' | 'header';
-  quickTools: boolean;
-  editorFont: string;
-  vibrateOnTap: boolean;
-  fullscreen: boolean;
-  smartCompletion: boolean;
-  floatingButton: boolean;
-  liveAutoCompletion: boolean;
-  showPrintMargin: boolean;
-  scrollbarSize: number;
-  confirmOnExit: boolean;
-  customTheme: Map<string, string>;
-  customThemeMode: 'light' | 'dark';
-  lineHeight: number;
-  leftMargin: number;
-  checkFiles: boolean;
-  desktopMode: boolean;
-  console: 'legacy' | 'eruda';
-  keyboardMode: 'CODE' | 'NORMAL';
-  keyboardMode: 'NO_SUGGESTIONS' | 'NO_SUGGESTIONS_AGGRESSIVE' | 'NORMAL';
-  showAd: boolean;
-  disableCache: boolean;
-  diagonalScrolling: boolean;
-  reverseScrolling: boolean;
-  teardropTimeout: number;
-  teardropSize: 20 | 40 | 60;
-  scrollSpeed: number;
 }
 
 interface AppSettings {
@@ -313,6 +267,10 @@ interface FileSystem {
   lsDir(): Promise<Array<FsEntry>>;
   readFile(): Promise<ArrayBuffer>;
   readFile(encoding: string): Promise<string>;
+  readFile(
+    encoding: string,
+    progress: (e: ProgressEvent) => void,
+  ): Promise<string>;
   writeFile(content: string): Promise<void>;
   createFile(name: string, data: string): Promise<void>;
   createDirectory(name: string): Promise<void>;
@@ -323,56 +281,6 @@ interface FileSystem {
   exists(): Promise<boolean>;
   stat(): Promise<FileStatus>;
 }
-
-interface GistFile {
-  filename: string;
-  content: string;
-}
-
-interface GistFiles {
-  [filename: string]: GistFile;
-}
-
-interface Repository {}
-
-interface Repo {
-  readonly sha: string;
-  name: string;
-  data: string;
-  repo: string;
-  path: string;
-  branch: 'master' | 'main' | string;
-  commitMessage: string;
-  setName(name: string): Promise<void>;
-  setData(data: string): Promise<void>;
-  repository: Repository;
-}
-
-interface Gist {
-  readonly id: string;
-  readonly isNew: boolean;
-  files: GistFiles;
-  setName(name: string, newName: string): Promise<void>;
-  setData(name: string, text: string): Promise<void>;
-  addFile(name: string): void;
-  removeFile(name: string): Promise<void>;
-}
-
-interface GitRecord {
-  get(sha: string): Promise<Repo>;
-  add(gitFileRecord: Repo): void;
-  remove(sha: string): Repo;
-  update(sha: string, gitFileRecord: Repo): void;
-}
-
-interface GistRecord {
-  get(id: string): Gist;
-  add(gist: any, isNew?: boolean): void;
-  remove(gist: Gist): Gist;
-  update(gist: Gist): void;
-  reset(): void;
-}
-
 interface Strings {
   [key: string]: string;
 }
@@ -514,27 +422,12 @@ interface PluginAuthor {
   github: string;
 }
 
-interface PluginJson {
-  id: string;
-  name: string;
-  main: string;
-  version: string;
-  readme: string;
-  icon: string;
-  files: Array<string>;
-  authot: PluingAuthor;
-}
-
 /**
  * Returns fully decoded url
  * @param url
  */
 declare function decodeURL(url: string): string;
 
-/**
- * App settings
- */
-declare var appSettings: AppSettings;
 /**
  * Predefined strings for language support
  */
@@ -560,9 +453,6 @@ declare var freeze: boolean;
 declare var saveTimeout: number;
 declare var actionStack: ActionStack;
 declare var addedFolder: Array<Folder>;
-declare var gitRecord: GitRecord;
-declare var gistRecord: GistRecord;
-declare var gitRecordFile: string;
-declare var gistRecordFile: string;
 declare var toastQueue: Array<HTMLElement>;
 declare var toast: (message: string) => void;
+declare var editorManager: EditorManager;

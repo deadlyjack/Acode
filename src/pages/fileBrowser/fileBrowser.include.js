@@ -1,4 +1,6 @@
 import './fileBrowser.scss';
+
+import escapeStringRegexp from 'escape-string-regexp';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from '../../components/page';
@@ -22,6 +24,7 @@ import remoteStorage from '../../lib/remoteStorage';
 import URLParse from 'url-parse';
 import checkFiles from '../../lib/checkFiles';
 import projects from '../../lib/projects';
+import appSettings from '../../lib/settings';
 
 /**
  * @typedef {{url: String, name: String}} Location
@@ -921,7 +924,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       if (cachedDir[url]) delete cachedDir[url];
       if (cachedDir[currentDir.url]) delete cachedDir[currentDir.url];
 
-      const regex = new RegExp(Url.parse(url).url);
+      const regex = new RegExp(escapeStringRegexp(Url.parse(url).url));
 
       for (let folder of addedFolder) {
         if (folder.url === url) {

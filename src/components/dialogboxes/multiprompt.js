@@ -3,6 +3,7 @@ import autosize from 'autosize';
 import inputhints from '../inputhints';
 import Checkbox from '../checkbox';
 import alert from './alert';
+import appSettings from '../../lib/settings';
 
 /**
  *

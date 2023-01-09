@@ -74,7 +74,7 @@ export default async function checkFiles() {
           if (!confirmation) return;
 
           const cursorPos = editor.getCursorPosition();
-          editorManager.switchFile(file.id);
+          editorManager.getFile(file.id, 'id')?.makeActive();
 
           file.markChanged = false;
           file.session.setValue(text);

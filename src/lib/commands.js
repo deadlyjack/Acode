@@ -1,4 +1,3 @@
-import saveFile from './saveFile';
 import run from './run';
 import settingsMain from '../settings/mainSettings';
 import dialogs from '../components/dialogs';
@@ -6,13 +5,11 @@ import openFile from './openFile';
 import openFolder from './openFolder';
 import helpers from '../utils/helpers';
 import constants from './constants';
-import GithubLogin from '../pages/login/login';
-import gitHub from '../pages/github/gitHub';
 import help from '../settings/help';
 import recents from '../lib/recents';
 import fsOperation from '../fileSystem/fsOperation';
 import Modes from '../pages/modes/modes';
-import quickTools from '../handlers/quickTools';
+import { actions } from '../handlers/quickToolsActions';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import path from '../utils/Path';
 import showFileInfo from './showFileInfo';
@@ -23,6 +20,7 @@ import tag from 'html-tag-js';
 import TextEncodings from '../pages/textEncodings/textEncodings';
 import EditorFile from './editorFile';
 import findFile from '../components/findFile';
+import appSettings from './settings';
 
 export default {
   'close-all-tabs'() {
@@ -78,18 +76,10 @@ export default {
       .catch(FileBrowser.openError);
   },
   'find'() {
-    quickTools.actions('search');
+    actions('search');
   },
   'file-info'(url) {
     showFileInfo(url);
-  },
-  'github'() {
-    if (
-      (!localStorage.username || !localStorage.password) &&
-      !localStorage.token
-    )
-      return GithubLogin();
-    gitHub();
   },
   'goto'() {
     dialogs
@@ -194,19 +184,33 @@ export default {
     editorManager.editor.resize(true);
   },
   'run'() {
-    tag.get('[action=run]')?.click();
+    editorManager.activeFile.run();
   },
   'run-file'() {
-    tag.get('[action=run]')?.contextmenu();
+    editorManager.activeFile.runFile?.();
   },
-  'save'(toast) {
-    saveFile(editorManager.activeFile, false, toast);
+  async 'save'(showToast) {
+    try {
+      await editorManager.activeFile.save();
+      if (showToast) {
+        toast(strings['file saved']);
+      }
+    } catch (error) {
+      helpers.error(error);
+    }
+  },
+  async 'save-as'(showToast) {
+    try {
+      await editorManager.activeFile.saveAs();
+      if (showToast) {
+        toast(strings['file saved']);
+      }
+    } catch (error) {
+      helpers.error(error);
+    }
   },
   'save-state'() {
     saveState();
-  },
-  'save-as'(toast) {
-    saveFile(editorManager.activeFile, true, toast);
   },
   'share'() {
     editorManager.activeFile.share();
@@ -229,7 +233,7 @@ export default {
     activefile.setMode(mode);
   },
   'toggle-quick-tools'() {
-    quickTools.actions('toggle-quick-tools');
+    actions('toggle-quick-tools');
   },
   'toggle-fullscreen'() {
     app.classList.toggle('fullscreen-mode');

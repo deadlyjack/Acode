@@ -29,7 +29,7 @@ export default async function loadPlugin(pluginId) {
       if (!await fsOperation(cacheFile).exists()) {
         await fsOperation(CACHE_STORAGE).createFile(pluginId);
       }
-      acode.initPlugin(pluginId, baseUrl, $page, {
+      await acode.initPlugin(pluginId, baseUrl, $page, {
         cacheFileUrl: await helpers.toInternalUri(cacheFile),
         cacheFile: fsOperation(cacheFile)
       });

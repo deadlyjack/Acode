@@ -1,4 +1,5 @@
 import constants from './constants';
+import appSettings from './settings';
 
 export default () => {
   const filesToSave = [];

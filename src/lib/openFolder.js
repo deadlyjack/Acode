@@ -11,6 +11,8 @@ import openFile from './openFile';
 import Url from '../utils/Url';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import URLParse from 'url-parse';
+import appSettings from './settings';
+import escapeStringRegexp from 'escape-string-regexp';
 
 /**
  *
@@ -156,9 +158,11 @@ function openFolder(_path, opts = {}) {
     const url = $target.data_url;
     const name = $target.data_name;
 
-    if (mode === 'click') handleClick(type, url, name, $target);
-    else if (mode === 'contextmenu')
+    if (mode === 'click') {
+      handleClick(type, url, name, $target);
+    } else if (mode === 'contextmenu') {
       handleContextmenu(type, url, name, $target);
+    }
   }
 
   /**
@@ -317,7 +321,7 @@ function openFolder(_path, opts = {}) {
       newName = Url.basename(newUrl);
       $target.querySelector(':scope>.text').textContent = newName;
       $target.data_url = newUrl;
-      $target.data_urlname = newName;
+      $target.data_name = newName;
       if (helpers.isFile(type)) {
         $target.querySelector(':scope>span').className =
           helpers.getIconForFile(newName);
@@ -621,7 +625,8 @@ openFolder.updateHeight = function () {
   if (!addedFolder.length) return;
   let activeFileListHeight = 0;
 
-  if (appSettings.value.openFileListPos === 'sidebar') {
+  // show active files in sidebar
+  if (appSettings.value.openFileListPos === appSettings.OPEN_FILE_LIST_POS_SIDEBAR) {
     const client = editorManager.openFileList.getBoundingClientRect();
     activeFileListHeight = client.height;
   }
@@ -660,7 +665,7 @@ openFolder.removeItem = function (url) {
 
 openFolder.removeFolders = function (url) {
   ({ url } = Url.parse(url));
-  const regex = new RegExp('^' + url);
+  const regex = new RegExp('^' + escapeStringRegexp(url));
   addedFolder.forEach((folder) => {
     if (regex.test(folder.url)) {
       folder.remove();
@@ -676,7 +681,7 @@ openFolder.removeFolders = function (url) {
 openFolder.find = function (url) {
   return addedFolder.find((folder) => {
     const { url: furl } = Url.parse(folder.url);
-    const regex = new RegExp('^' + furl);
+    const regex = new RegExp('^' + escapeStringRegexp(furl));
     return regex.test(url);
   });
 };

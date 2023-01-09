@@ -21,3 +21,30 @@
   font-weight: 300 700;
   font-style: normal;
 }
+
+@font-face {
+  font-family: 'Cascadia Code';
+  src: url('../res/fonts/CascadiaCode.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Proggy Clean';
+  src: url('../res/fonts/ProggyClean.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Bold';
+  src: url('../res/fonts/JetBrainsMono-Bold.ttf') format('truetype');
+  font-weight: 300 700;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Regular';
+  src: url('../res/fonts/JetBrainsMono-Regular.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+}

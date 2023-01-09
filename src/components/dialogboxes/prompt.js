@@ -1,5 +1,6 @@
 import tag from 'html-tag-js';
 import autosize from 'autosize';
+import appSettings from '../../lib/settings';
 
 /**
  *

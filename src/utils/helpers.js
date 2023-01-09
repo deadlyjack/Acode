@@ -1,3 +1,4 @@
+import escapeStringRegexp from 'escape-string-regexp';
 import URLParse from 'url-parse';
 import { AES, enc } from 'crypto-js';
 import constants from '../lib/constants';
@@ -9,6 +10,7 @@ import path from './Path';
 import Url from './Url';
 import Uri from './Uri';
 import fsOperation from '../fileSystem/fsOperation';
+import appSettings from '../lib/settings';
 
 const credentials = {
   key: 'xkism2wq3)(I#$MNkds0)*(73am)(*73_L:w3k[*(#WOd983jkdssap sduy*&T#W3elkiu8983hKLUYs*(&y))',
@@ -315,12 +317,14 @@ export default {
     const extra = args.join('<br>');
     let msg;
 
-    if (typeof err === 'string') {
+    if (typeof err === 'string' && err) {
       msg = err;
     } else if (err instanceof Error) {
       msg = err.message;
     } else if (err.code !== null) {
       msg = this.getErrorMessage(err.code);
+    } else {
+      msg = strings['an error occurred'];
     }
 
     return msg + (extra ? '<br>' + extra : '');
@@ -332,8 +336,6 @@ export default {
    * @returns {PromiseLike<void>}
    */
   error(err, ...args) {
-    console.error(err, ...args);
-
     if (err.code === 0) {
       this.toast(err);
       return;
@@ -434,7 +436,7 @@ export default {
     const device = window.device || {};
     return (
       'Version: ' +
-      buildInfo.version +
+      `${buildInfo.version} (${buildInfo.versionCode})` +
       eol +
       'Device: ' +
       (device.model || '') +
@@ -492,7 +494,7 @@ export default {
       }
       await fs.writeFile(content);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   },
   /**
@@ -658,7 +660,7 @@ export default {
       if (storageUrl.endsWith('/')) {
         storageUrl = storageUrl.slice(0, -1);
       }
-      const regex = new RegExp('^' + storageUrl);
+      const regex = new RegExp('^' + escapeStringRegexp(storageUrl));
       if (regex.test(url)) {
         url = url.replace(regex, uuid.name);
         break;
@@ -680,7 +682,7 @@ export default {
     for (let file of files) {
       if (!file.uri) continue;
       const fileUrl = Url.parse(file.uri).url;
-      if (new RegExp('^' + url).test(fileUrl)) {
+      if (new RegExp('^' + escapeStringRegexp(url)).test(fileUrl)) {
         if (newUrl) {
           file.uri = Url.join(newUrl, file.filename);
         } else {
@@ -750,14 +752,19 @@ export default {
   * @param {Array<string> | string} dir 
   */
   async createFileRecursive(parent, dir) {
+    let isDir = false;
     if (typeof dir === 'string') {
+      if (dir.endsWith('/')) {
+        isDir = true;
+        dir = dir.slice(0, -1);
+      }
       dir = dir.split('/');
     }
     dir = dir.filter(d => d);
     const cd = dir.shift();
     const newParent = Url.join(parent, cd);
     if (!(await fsOperation(newParent).exists())) {
-      if (dir.length) {
+      if (dir.length || isDir) {
         await fsOperation(parent).createDirectory(cd);
       } else {
         await fsOperation(parent).createFile(cd);

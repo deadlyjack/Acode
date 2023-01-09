@@ -24,7 +24,7 @@ import lang from './lang';
  * @property {string} lang
  */
 
-export default class Settings {
+class Settings {
   /**
    * @type {settingsValue}
    */
@@ -40,12 +40,23 @@ export default class Settings {
     caseSensitive: false,
     regExp: false,
     wholeWord: false,
-    backwards: true,
   };
   #fileBrowserSettings = {
     showHiddenFiles: false,
     sortByName: true,
   };
+
+  QUICKTOOLS_TRIGGER_MODE_TOUCH = 'touch';
+  QUICKTOOLS_TRIGGER_MODE_CLICK = 'click';
+  OPEN_FILE_LIST_POS_HEADER = 'header';
+  OPEN_FILE_LIST_POS_SIDEBAR = 'sidebar';
+  KEYBOARD_MODE_NO_SUGGESTIONS = 'NO_SUGGESTIONS';
+  KEYBOARD_MODE_NO_SUGGESTIONS_AGGRESSIVE = 'NO_SUGGESTIONS_AGGRESSIVE';
+  KEYBOARD_MODE_NORMAL = 'NORMAL';
+  CONSOLE_ERUDA = 'eruda';
+  CONSOLE_LEGACY = 'legacy';
+  PREVIEW_MODE_INAPP = 'inapp';
+  PREVIEW_MODE_BROWSER = 'browser';
 
   customTheme = {
     '--accent-color': 'rgb(51,153,255)',
@@ -70,9 +81,9 @@ export default class Settings {
   };
 
   constructor() {
-    this.#defaultSettings = {
+    this.#defaultSettings = this.value = {
       animation: 'system',
-      appTheme: IS_FREE_VERSION ? 'dark' : 'ocean',
+      appTheme: 'dark',
       autosave: 0,
       fileBrowser: this.#fileBrowserSettings,
       formatter: {},
@@ -80,13 +91,13 @@ export default class Settings {
       serverPort: constants.SERVER_PORT,
       previewPort: constants.PREVIEW_PORT,
       showConsoleToggler: true,
-      previewMode: 'inapp',
+      previewMode: this.PREVIEW_MODE_INAPP,
       disableCache: false,
       host: 'localhost',
       search: this.#searchSettings,
       lang: 'en-us',
       fontSize: '12px',
-      editorTheme: IS_FREE_VERSION ? 'ace/theme/nord_dark' : 'ace/theme/dracula',
+      editorTheme: 'ace/theme/nord_dark',
       textWrap: true,
       softTab: true,
       tabSize: 2,
@@ -94,25 +105,26 @@ export default class Settings {
       linenumbers: true,
       formatOnSave: false,
       autoCorrect: true,
-      openFileListPos: 'header',
+      openFileListPos: this.OPEN_FILE_LIST_POS_HEADER,
       quickTools: true,
+      quickToolsTriggerMode: this.QUICKTOOLS_TRIGGER_MODE_TOUCH,
       editorFont: 'Roboto Mono',
       vibrateOnTap: true,
       fullscreen: false,
       floatingButton: true,
       liveAutoCompletion: true,
       showPrintMargin: false,
+      printMargin: 80,
       scrollbarSize: 20,
       showSpaces: false,
-      cursorControllerSize: 'small',
       confirmOnExit: true,
       customThemeMode: 'dark',
       lineHeight: 2,
       leftMargin: 50,
       checkFiles: true,
       desktopMode: false,
-      console: 'legacy',
-      keyboardMode: 'NO_SUGGESTIONS',
+      console: this.CONSOLE_LEGACY,
+      keyboardMode: this.KEYBOARD_MODE_NORMAL,
       rememberFiles: true,
       rememberFolders: true,
       diagonalScrolling: false,
@@ -121,13 +133,25 @@ export default class Settings {
       teardropSize: 30,
       scrollSpeed: constants.SCROLL_SPEED_NORMAL,
       customTheme: this.customTheme,
+      relativeLineNumbers: false,
+      elasticTabstops: false,
+      rtlText: false,
+      hardWrap: false,
+      useTextareaForIME: false,
+      touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 10,
     };
 
-    this.settingsFile = Url.join(DATA_STORAGE, 'settings.json');
   }
 
   async init() {
     if (this.#initialized) return;
+    this.settingsFile = Url.join(DATA_STORAGE, 'settings.json');
+
+    if (!IS_FREE_VERSION) {
+      this.#defaultSettings.appTheme = 'ocean';
+      this.#defaultSettings.editorTheme = 'ace/theme/dracula';
+    }
+
     this.#initialized = true;
 
     const fs = fsOperation(this.settingsFile);
@@ -308,3 +332,5 @@ export default class Settings {
     lang.set(value);
   }
 }
+
+export default new Settings();

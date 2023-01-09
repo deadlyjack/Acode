@@ -89,14 +89,10 @@ export default {
       sdcard.createFile(
         parent,
         filename,
-        (res) => {
-          if (data)
-            return sdcard.write(
-              res,
-              data,
-              () => resolve(res),
-              reject,
-            );
+        async (res) => {
+          if (data) {
+            await this.writeFile(res, data);
+          }
           resolve(res);
         },
         reject,

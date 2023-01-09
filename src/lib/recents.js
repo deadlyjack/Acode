@@ -1,3 +1,4 @@
+import escapeStringRegexp from 'escape-string-regexp';
 import Url from '../utils/Url';
 import dialogs from '../components/dialogs';
 import helpers from '../utils/helpers';
@@ -51,14 +52,14 @@ const recents = {
   removeFolder(url) {
     ({ url } = Url.parse(url));
     this.folders = this.folders.filter((folder) => {
-      return !new RegExp('^' + folder.url).test(url);
+      return !new RegExp('^' + escapeStringRegexp(folder.url)).test(url);
     });
   },
 
   removeFile(url) {
     ({ url } = Url.parse(url));
     this.files = this.files.filter((file) => {
-      return !new RegExp('^' + url).test(file);
+      return !new RegExp('^' + escapeStringRegexp(url)).test(file);
     });
   },
 
