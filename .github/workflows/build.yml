@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 14.x
+          node-version: 18.x
 
       - name: Install Cordova
         run: npm install -g cordova
@@ -28,6 +28,9 @@ jobs:
 
       - name: Install app dependencies
         run: yarn setup
+
+      - name: Configure the platform
+        run: yarn clean
 
       - name: Build Android prod aab
         run: yarn build android paid prod
