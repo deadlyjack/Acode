@@ -19,7 +19,11 @@ const exec = promisify(require('child_process').exec);
     let platforms = fs.readdirSync(platformsDir);
     let name, id, version, build, artifact, ext, target;
 
+    try{
     version = CONFIG_VERSION.exec(config)[1];
+    } catch (error) {
+      version = '0.0.0';
+    }
     
     if (arg[0] === 'd') {
       build = '_debug';
