@@ -305,5 +305,10 @@
   "info-touchmovethreshold": "デバイスのタッチ感度が高すぎる場合、この値を増やすと、意図しないタッチ移動を防ぐことができます。",
   "info-scroll-settings": "この設定では、テキストの折り返しを含むスクロールの設定ができます。",
   "info-animation": "アプリの動作が遅いと感じる場合、アニメーションを無効にしてください。",
-  "info-quicktoolstriggermode": "クイックツールのボタンが機能しない場合、この値を変更してみてください。"
+  "info-quicktoolstriggermode": "クイックツールのボタンが機能しない場合、この値を変更してみてください。",
+  "owned": "Owned",
+  "api_error": "API server down, please try after some time.",
+  "installed": "Installed",
+  "all": "All",
+  "medium": "Medium"
 }

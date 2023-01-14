@@ -3,6 +3,7 @@
 @import './fileInfo.scss';
 @import './commandPallete.scss';
 @import './markdown.scss';
+@import './fonts.scss';
 
 :root {
   --scrollbar-width: 4px;
@@ -523,6 +524,11 @@ textarea {
   &[data-size='30'] {
     width: 30px;
     height: 30px;
+  }
+
+  &[data-size='20'] {
+    width: 20px;
+    height: 20px;
   }
 
   &.end {

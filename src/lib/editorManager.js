@@ -1,5 +1,4 @@
 import list from '../components/collapsableList';
-import tag from 'html-tag-js';
 import helpers from '../utils/helpers';
 import openFolder from './openFolder';
 import ScrollBar from '../components/scrollbar/scrollbar';
@@ -41,7 +40,7 @@ async function EditorManager($sidebar, $header, $body) {
       events[event].forEach((fn) => fn(...args));
     }
   };
-  const $container = tag('div', { className: 'editor-container' });
+  const $container = <div className='editor-container'></div>;
   const editor = ace.edit($container);
   const $vScrollbar = ScrollBar({
     width: scrollbarSize,
@@ -69,6 +68,9 @@ async function EditorManager($sidebar, $header, $body) {
     header: $header,
     sidebar: $sidebar,
     container: $container,
+    get openFileList() {
+      return $openFileList;
+    },
     get TIMEOUT_VALUE() {
       return TIMEOUT_VALUE;
     },
@@ -218,6 +220,8 @@ async function EditorManager($sidebar, $header, $body) {
       activeFile.focused = true;
       $hScrollbar.hide();
       $vScrollbar.hide();
+      // scroll active line into middle of screen
+      editor.renderer.scrollCursorIntoView();
     });
 
     editor.on('change', function (e) {
@@ -432,7 +436,7 @@ async function EditorManager($sidebar, $header, $body) {
     }
 
     // show open file list in header
-    if (appSettings.value.openFileListPos === appSettings.OPEN_FILE_LIST_POS_HEADER) {
+    if (openFileListPos === appSettings.OPEN_FILE_LIST_POS_HEADER) {
       $openFileList = <ul className='open-file-list'></ul>;
       if ($list) $openFileList.append(...$list);
       root.appendOuter($openFileList);
@@ -454,7 +458,7 @@ async function EditorManager($sidebar, $header, $body) {
       const oldAppend = $openFileList.$ul.append;
       $openFileList.append = (...args) => {
         oldAppend.apply($openFileList.$ul, args);
-        $openFileList.updateHeight();
+        openFolder.updateHeight();
       }
     }
   }
@@ -491,11 +495,11 @@ async function EditorManager($sidebar, $header, $body) {
   function setFont(font) {
     let $style = tag.get("#font-style");
     if (!$style) {
-      $style = tag('style', { id: "font-style" });
+      $style = <style id="font-style"></style>;
     }
 
     $style.textContent = `.editor-container,.editor-container *{
-  font-family: "${font}", MONOSPACE !important;
+  font-family: "${font}", NotoMono, Monaco, MONOSPACE !important;
 }`;
     $container.dataset.font = font;
 

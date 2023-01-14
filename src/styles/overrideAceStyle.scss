@@ -9,6 +9,7 @@
     -webkit-font-feature-settings: 'liga' on, 'calt' on;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    unicode-bidi: isolate;
   }
 }
 

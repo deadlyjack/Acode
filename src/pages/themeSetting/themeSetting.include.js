@@ -179,7 +179,10 @@ export default function () {
     if (!theme) return;
     if (!theme.isFree && IS_FREE_VERSION) {
       try {
-        await removeAds();
+        await removeAds()
+          .catch((error) => {
+            helpers.error(error);
+          });
         render('app');
       } catch (e) {
         return;

@@ -11,6 +11,7 @@ import constants from "../../lib/constants";
 import FileBrowser from "../fileBrowser/fileBrowser";
 import PluginList from './pluginList';
 import installPlugin from '../../lib/installPlugin';
+import Ref from 'html-tag-js/ref';
 
 /**
  * 
@@ -22,10 +23,11 @@ export default function PluginsInclude(updates) {
   const $page = Page(strings['plugins']);
   const $search = <span className="icon search" data-action='search'></span>;
   const $add = <span className="icon add" data-action='add-source' onclick={() => addSource()}></span>;
-  const $list = <div id='plugin-list' className='list scroll' empty-msg={strings['loading...']}></div>;
+  const $list = new Ref();
   const plugins = {
     all: [],
     installed: [],
+    owned: [],
   };
   let section = 'installed';
   let allState = LOADING;
@@ -33,10 +35,11 @@ export default function PluginsInclude(updates) {
 
   $page.body = <div className='main' id='plugins'>
     <div className='options'>
-      <span id='installed_plugins' onclick={renderInstalled} tabindex='0' className='active'>Installed</span>
-      <span id='all_plugins' onclick={renderAll} tabindex='0'>All</span>
+      <span id='installed_plugins' onclick={renderInstalled} tabindex='0' className='active'>{strings.installed}</span>
+      <span id='all_plugins' onclick={renderAll} tabindex='0'>{strings.all}</span>
+      <span id='owned_plugins' onclick={renderOwned} tabindex='0'>{strings.owned}</span>
     </div>
-    {$list}
+    <div ref={$list} id='plugin-list' className='list scroll' empty-msg={strings['loading...']}></div>
   </div>;
   $page.header.append($search, $add);
 
@@ -66,6 +69,7 @@ export default function PluginsInclude(updates) {
 
   if (navigator.onLine) {
     getAllPlugins();
+    getOwned();
   }
   getInstalledPlugins()
     .then(() => {
@@ -76,7 +80,7 @@ export default function PluginsInclude(updates) {
     const $target = event.target;
     const { action } = $target.dataset;
     if (action === 'search') {
-      searchBar($list);
+      searchBar($list.el);
       return;
     }
     if (action === 'open') {
@@ -95,8 +99,8 @@ export default function PluginsInclude(updates) {
     }
     $page.get('.options>span.active')?.classList.remove('active');
     $page.get(`#${section}_plugins`)?.classList.add('active');
-    $list.setAttribute('empty-msg', strings['no plugins found']);
-    $list.content = <PluginList plugins={plugins[section]} />;
+    $list.attr('empty-msg', strings['no plugins found']);
+    $list.el.content = <PluginList plugins={plugins[section]} />;
   }
 
   function renderAll() {
@@ -107,11 +111,15 @@ export default function PluginsInclude(updates) {
     render('installed');
   }
 
+  function renderOwned() {
+    render('owned');
+  }
+
   async function getAllPlugins() {
     plugins.all = [];
     try {
       const installed = await fsOperation(PLUGIN_DIR).lsDir();
-      plugins.all = await fsOperation(constants.PLUGIN_LIST).readFile('json');
+      plugins.all = await fsOperation(constants.API_BASE, 'plugins').readFile('json');
 
       installed.forEach(({ url }) => {
         const plugin = plugins.all.find(({ id }) => id === Url.basename(url));
@@ -149,6 +157,16 @@ export default function PluginsInclude(updates) {
       }
     }));
     installedState = LOADED;
+  }
+
+  async function getOwned() {
+    const purchases = await helpers.promisify(iap.getPurchases);
+    purchases.forEach(async ({ productIds }) => {
+      const [sku] = productIds;
+      const url = Url.join(constants.API_BASE, 'plugin/owned', sku);
+      const plugin = await fsOperation(url).readFile('json');
+      plugins.owned.push(plugin);
+    });
   }
 
   function onIninstall(pluginId) {

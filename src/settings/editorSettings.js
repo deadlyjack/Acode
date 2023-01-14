@@ -118,24 +118,13 @@ export default function editorSettings() {
       key: 'teardropSize',
       text: strings['cursor controller size'],
       value: values.teardropSize,
-      valueText: (value) => {
-        switch (value) {
-          case 0:
-            return strings.none;
-
-          case 30:
-            return strings.small;
-
-          case 60:
-            return strings.large;
-
-          default:
-            break;
-        }
+      valueText(value) {
+        return this.select.find(([v]) => v == value)[1];
       },
       select: [
         [0, strings.none],
-        [30, strings.small],
+        [20, strings.small],
+        [30, strings.medium],
         [60, strings.large],
       ],
     },

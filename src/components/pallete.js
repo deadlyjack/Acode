@@ -1,6 +1,6 @@
 import inputhints from './inputhints';
 
-export default function pallete(getList, onselect, placeholder) {
+export default function pallete(getList, onselect, placeholder, onremove) {
   const $input = <input type='search' placeholder={placeholder} onfocusout={remove} enterKeyHint='go' />;
   const $mask = <div className='mask' onclick={remove} />;
   const $pallete = <div id="command-pallete">{$input}</div>;
@@ -34,5 +34,6 @@ export default function pallete(getList, onselect, placeholder) {
     window.restoreTheme();
     $pallete.remove();
     $mask.remove();
+    if (typeof onremove === 'function') onremove();
   }
 }

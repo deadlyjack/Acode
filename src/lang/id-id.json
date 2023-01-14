@@ -307,5 +307,10 @@
   "info-touchmovethreshold": "If your device touch sensitivity is too high, you can increase this value to prevent accidental touch move.",
   "info-scroll-settings": "This settings contain scroll settings including text wrap.",
   "info-animation": "If the app feels laggy, disable animation.",
-  "info-quicktoolstriggermode": "If button in quick tools is not working, try to change this value."
+  "info-quicktoolstriggermode": "If button in quick tools is not working, try to change this value.",
+  "owned": "Owned",
+  "api_error": "API server down, please try after some time.",
+  "installed": "Installed",
+  "all": "All",
+  "medium": "Medium"
 }

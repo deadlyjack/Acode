@@ -10,10 +10,15 @@ const fsList = [];
 
 /**
  *
- * @param {string} url
+ * @param {...string} url
  * @returns {FileSystem}
  */
-function fsOperation(url) {
+function fsOperation(...url) {
+  if (url.length > 1) {
+    url = Url.join(...url);
+  } else {
+    url = url[0];
+  }
   return fsList.find((fs) => fs.test(url))?.fs(url);
 }
 

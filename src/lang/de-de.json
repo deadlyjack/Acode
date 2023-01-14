@@ -305,5 +305,10 @@
   "info-touchmovethreshold": "Wenn die Berührungsempfindlichkeit des Gerätes zu hoch ist, können Sie diesen Wert erhöhen um versehentliche Berührungen zu verhindern.",
   "info-scroll-settings": "Diese Einstellungen enthalten Bildlaufeinstellungen einschließlich Textumbrüchen.",
   "info-animation": "Wenn die Anwendung träge reagiert, deaktivieren Sie die Animation.",
-  "info-quicktoolstriggermode": "Wenn die Schaltfläche in den Quick-Tools nicht funktioniert, versuchen Sie diesen Wert zu ändern."
+  "info-quicktoolstriggermode": "Wenn die Schaltfläche in den Quick-Tools nicht funktioniert, versuchen Sie diesen Wert zu ändern.",
+  "owned": "Owned",
+  "api_error": "API server down, please try after some time.",
+  "installed": "Installed",
+  "all": "All",
+  "medium": "Medium"
 }

@@ -852,4 +852,13 @@ export default {
       func(...args, resolve, reject);
     });
   },
+
+  async checkAPIStatus() {
+    try {
+      const { status } = await ajax.get(Url.join(constants.API_BASE, 'status'));
+      return status === 'ok';
+    } catch (error) {
+      return false;
+    }
+  }
 };

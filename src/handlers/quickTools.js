@@ -178,7 +178,8 @@ function touchmove(e) {
  * @param {TouchEvent} e 
  */
 function touchend(e) {
-  const $el = e.target;
+  // const $el = e.target; 
+  const $el = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
 
   if (touchmoved && $row) {
     $row.style.scrollBehavior = 'smooth';
