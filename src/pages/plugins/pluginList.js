@@ -24,7 +24,7 @@ function Plugin({ id, name, icon, version, downloads, installed }) {
         {
           downloads
             ? <div className='group'>
-              <div className='text'>{downloads}</div>
+              <div className='text'>{downloads.toLocaleString()}</div>
               <div style={{ width: 'fit-content' }} className='icon file_downloadget_app'></div>
             </div>
             : <></>

@@ -1,15 +1,18 @@
+import JSZip from 'jszip';
+import constants from './constants';
 import dialogs from "../components/dialogs";
 import fsOperation from "../fileSystem/fsOperation";
 import loadPlugin from "./loadPlugin";
 import helpers from "../utils/helpers";
 import Url from "../utils/Url";
-import JSZip from 'jszip';
 
 /**
  * Installs a plugin.
- * @param {string} pluginId 
+ * @param {string} id 
+ * @param {string} name 
+ * @param {string} purchaseToken
  */
-export default async function installPlugin(id, name) {
+export default async function installPlugin(id, name, purchaseToken) {
   const title = name || 'Plugin';
   const loader = dialogs.loader.create(title, strings.installing);
   let pluginDir;
@@ -24,7 +27,11 @@ export default async function installPlugin(id, name) {
   }
 
   if (!/^(https?|file|content):/.test(id)) {
-    pluginUrl = Url.join('https://acode.foxdebug.com/api/plugin/download/', `${id}?device=${device.uuid}`);
+    pluginUrl = Url.join(constants.API_BASE, 'plugin/download/', `${id}?device=${device.uuid}`);
+    if (purchaseToken) pluginUrl += `&token=${purchaseToken}`;
+    pluginUrl += `&package=${BuildInfo.packageName}`;
+    pluginUrl += `&version=${device.version}`;
+
     pluginDir = Url.join(PLUGIN_DIR, id);
   } else {
     pluginUrl = id;

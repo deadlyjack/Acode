@@ -41,7 +41,7 @@ export default function listItems($list, items, callback, sort = true) {
 
     if (item.value !== undefined) {
       $valueText = <small className='value'></small>;
-      setValueText($valueText, item.value, item.valueText);
+      setValueText($valueText, item.value, item.valueText?.bind(item));
       $setting.append($valueText);
     } else if (item.checkbox !== undefined) {
       $checkbox = Checkbox('', item.checkbox);
@@ -105,7 +105,7 @@ export default function listItems($list, items, callback, sort = true) {
     }
 
     item.value = res;
-    setValueText($valueText, res, valueText);
+    setValueText($valueText, res, valueText?.bind(item));
     callback(key, item.value);
   }
 

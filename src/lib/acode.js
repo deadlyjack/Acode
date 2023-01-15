@@ -39,6 +39,7 @@ export default class Acode {
     this.define('prompt', dialogs.prompt);
     this.define('select', dialogs.select);
     this.define('loader', dialogs.loader);
+    this.define('colorPicker', dialogs.color);
     this.define('fileBrowser', FileBrowser);
     this.define('confirm', dialogs.confirm);
     this.define('selectionMenu', selectionMenu);
@@ -229,7 +230,7 @@ export default class Acode {
     return res;
   }
 
-  async toIneternalUrl(url) {
+  async toInternalUrl(url) {
     url = await helpers.toInternalUri(url);
     return url;
   }

@@ -7,14 +7,24 @@ import Url from '../../utils/Url';
 import installPlugin from '../../lib/installPlugin';
 import fsOperation from '../../fileSystem/fsOperation';
 import settingsPage from '../../components/settingPage';
+import constants from '../../lib/constants';
+import purchaseListner from '../../handlers/purchase';
+import ajax from '@deadlyjack/ajax';
+import alert from '../../components/dialogboxes/alert';
 
 export default async function PluginInclude(id, installed, onInstall, onUninstall) {
   installed = installed === 'true';
   const $page = Page(strings['plugin']);
+
   let plugin = {};
+  let currentVersion = '';
+  let purchaseNeeded = false;
+  let purchased = false;
   let cancelled = false;
   let update = false;
-  let currentVersion = '';
+  let price = 0;
+  let product;
+  let purchaseToken;
 
   actionStack.push({
     id: 'plugin',
@@ -58,24 +68,45 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       }
     }
 
-    try {
-      if (navigator.onLine && (isValidSource(plugin.source) || !installed)) {
-        helpers.showTitleLoader();
-        const remotePlugin = await fsOperation(`https://acode.foxdebug.com/api/plugin/${id}`)
-          .readFile('json');
-        if (cancelled) return;
+    await (async () => {
+      try {
+        if (navigator.onLine && (isValidSource(plugin.source) || !installed)) {
+          helpers.showTitleLoader();
+          const remotePlugin = await fsOperation(constants.API_BASE, `plugin/${id}`)
+            .readFile('json')
+            .catch(() => null);
+          if (cancelled || !remotePlugin) return;
 
-        if (remotePlugin) {
           if (installed && remotePlugin?.version !== plugin.version) {
             currentVersion = plugin.version;
             update = true;
           }
           plugin = Object.assign({}, remotePlugin);
+
+          if (installed || !parseFloat(remotePlugin.price)) return;
+
+          price = `INR ${remotePlugin.price}`;
+          purchaseNeeded = true;
+
+          try {
+            [product] = await helpers.promisify(iap.getProducts, [remotePlugin.sku]);
+            if (product) {
+              const purchase = await getPurchase(product.productId);
+              purchaseNeeded = !purchase;
+              purchased = !!purchase;
+              purchaseToken = purchase?.purchaseToken;
+              price = product.price;
+            } else {
+              alert(strings.error, 'Product not available right now. Please try again later.');
+            }
+          } catch (error) {
+            helpers.error(error);
+          }
         }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
-    }
+    })();
 
     $page.settitle(plugin.name);
     render();
@@ -91,12 +122,12 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
     try {
       await Promise.all([
         loadAd(this),
-        installPlugin(plugin.source || id, plugin.name),
+        installPlugin(plugin.source || id, plugin.name, purchaseToken),
       ]);
       if (onInstall) onInstall(plugin.id);
       installed = true;
       update = false;
-      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
+      if (!plugin.price && IS_FREE_VERSION && await window.iad?.isLoaded()) {
         window.iad.show();
       }
       render();
@@ -117,7 +148,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       if (onUninstall) onUninstall(plugin.id);
       installed = false;
       update = false;
-      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
+      if (!plugin.price && IS_FREE_VERSION && await window.iad?.isLoaded()) {
         window.iad.show();
       }
       render();
@@ -126,15 +157,63 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
     }
   }
 
+  async function buy(e) {
+    const $button = e.target;
+    const oldText = $button.textContent;
+
+    try {
+      if (!product) throw new Error('Product not found');
+      const apiStatus = await helpers.checkAPIStatus();
+
+      if (!apiStatus) {
+        alert(strings.error, strings.api_error);
+        return;
+      }
+
+      iap.setPurchaseUpdatedListener(...purchaseListner(onpurchase, onerror));
+      $button.textContent = strings['loading...'];
+      await helpers.promisify(iap.purchase, product.json);
+
+      async function onpurchase(e) {
+        const purchase = await getPurchase(product.productId);
+        await ajax.post(Url.join(constants.API_BASE, 'plugin/order'), {
+          data: {
+            id: plugin.id,
+            token: purchase?.purchaseToken,
+            package: BuildInfo.packageName,
+          }
+        });
+        purchaseToken = purchase?.purchaseToken;
+        purchased = !!purchase;
+        purchaseNeeded = !purchase;
+        $button.textContent = oldText;
+        install();
+      }
+
+      async function onerror(error) {
+        helpers.error(error);
+        $button.textContent = oldText;
+      }
+
+    } catch (error) {
+      helpers.error(error);
+      $button.textContent = oldText;
+    }
+  }
+
   async function render() {
     $page.body = view({
       ...plugin,
       body: marked(plugin.description),
+      purchased,
       installed,
       update,
-      currentVersion,
+      price,
+      buy,
       install,
       uninstall,
+      currentVersion,
+      purchaseNeeded,
     });
   }
 
@@ -149,8 +228,14 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       }
     } catch (error) { }
   }
+
+  async function getPurchase(sku) {
+    const purchases = await helpers.promisify(iap.getPurchases);
+    const purchase = purchases.find((p) => p.productIds.includes(sku));
+    return purchase;
+  }
 }
 
 function isValidSource(source) {
-  return source ? source.startsWith('https://acode.foxdebug.com/api/plugin/') : true;
+  return source ? source.startsWith(Url.join(constants.API_BASE, 'plugin')) : true;
 }

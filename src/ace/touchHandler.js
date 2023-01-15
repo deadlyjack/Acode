@@ -316,11 +316,16 @@ export default function addTouchListeners(editor) {
 
   function isIn($el, cX, cY) {
     const {
-      x: sx,
-      y: sy,
+      x,
+      y,
+      left,
+      top,
       width: sWidth,
       height: sHeight,
     } = $el.getBoundingClientRect();
+
+    const sx = x || left;
+    const sy = y || top;
 
     return (cX > sx && cX < sx + sWidth
       && cY > sy && cY < sy + sHeight)

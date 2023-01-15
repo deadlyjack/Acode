@@ -3,13 +3,20 @@ import pallete from './pallete';
 
 export default async function commandPallete() {
   const recentlyUsedCommands = RecentlyUsedCommands();
-  const commands = Object.values(editorManager.editor.commands.commands);
+  const { editor } = editorManager;
+  const commands = Object.values(editor.commands.commands);
 
-  pallete(generateHints, onselect, strings['type command']);
+  const isEditorFocused = editor.isFocused();
+
+  pallete(generateHints, onselect, strings['type command'], () => {
+    if (isEditorFocused) editor.focus();
+  });
 
   function generateHints() {
     recentlyUsedCommands.commands.forEach((name) => {
-      const command = Object.assign({}, commands.find(command => command.name === name));
+      const recentCommand = commands.find(command => command.name === name);
+      if (!recentCommand) return;
+      const command = Object.assign({}, recentCommand);
       if (command) {
         command.recentlyUsed = true;
         commands.unshift(command);

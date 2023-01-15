@@ -1,5 +1,5 @@
 import Ref from 'html-tag-js/ref';
-import api from '../../lib/api';
+import fsOperation from '../../fileSystem/fsOperation';
 import constants from '../../lib/constants';
 import Url from '../../utils/Url';
 
@@ -40,7 +40,7 @@ export default (props) => {
       </div>
       <div style={moreInfoStyle} className='more-info'>
         <div className='icon-info' data-label='downloads'>
-          <div>{downloads} <span className='icon file_downloadget_app'></span></div>
+          <div>{downloads?.toLocaleString()} <span className='icon file_downloadget_app'></span></div>
         </div>
         <div className='icon-info' data-label='ratings'>
           <span style={{ margin: 'auto' }}>{rating}</span>
@@ -52,24 +52,29 @@ export default (props) => {
       <div className="button-container primary">
         <Buttons {...props} />
       </div>
+      <MoreInfo {...props} />
     </div>
     <div className="body md" innerHTML={body}></div>
   </div>;
 }
 
-function Buttons({ installed, update, install, uninstall }) {
+function Buttons({ installed, update, install, uninstall, purchaseNeeded, price, buy }) {
   if (installed && update) {
     return <>
       <button onclick={uninstall}>{strings.uninstall}</button>
       <button onclick={install}>{strings.update}</button>
-    </>
+    </>;
   }
 
   if (installed) {
-    return <button onclick={uninstall}>{strings.uninstall}</button>
+    return <button onclick={uninstall}>{strings.uninstall}</button>;
   }
 
-  return <button onclick={install}>{strings.install}</button>
+  if (purchaseNeeded) {
+    return <button onclick={buy}>{price}</button>;
+  }
+
+  return <button onclick={install}>{strings.install}</button>;
 }
 
 function Version({ currentVersion, version }) {
@@ -107,7 +112,7 @@ async function showReviews(pluginId, author) {
   );
 
   try {
-    const reviews = await api.get(`/comments/${pluginId}`);
+    const reviews = await fsOperation(constants.API_BASE, `/comments/${pluginId}`).readFile('json');
     if (!reviews.length) {
       body.style.textAlign = 'center';
       body.textContent = 'No reviews yet';
@@ -165,3 +170,10 @@ function Review({ name, github, vote, comment, author, author_reply: authorReply
   </div>;
 }
 
+function MoreInfo({ purchased, price }) {
+  if (!purchased) return '';
+
+  return <small className='more-info-small'>
+    <span>{strings.owned}</span> • <span>{price}</span>
+  </small>
+}
