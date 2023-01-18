@@ -15,7 +15,7 @@ import Ref from 'html-tag-js/ref';
 
 /**
  * 
- * @param {Array<PluginJson>} updates 
+ * @param {Array<object>} updates 
  */
 export default function PluginsInclude(updates) {
   const LOADING = 0;
@@ -32,8 +32,10 @@ export default function PluginsInclude(updates) {
   let section = 'installed';
   let allState = LOADING;
   let installedState = LOADING;
+  let moveX = 0;
+  let lastX = 0;
 
-  $page.body = <div className='main' id='plugins'>
+  $page.body = <div ontouchstart={ontouchstart} className='main' id='plugins'>
     <div className='options'>
       <span id='installed_plugins' onclick={renderInstalled} tabindex='0' className='active'>{strings.installed}</span>
       <span id='all_plugins' onclick={renderAll} tabindex='0'>{strings.all}</span>
@@ -165,6 +167,8 @@ export default function PluginsInclude(updates) {
       const [sku] = productIds;
       const url = Url.join(constants.API_BASE, 'plugin/owned', sku);
       const plugin = await fsOperation(url).readFile('json');
+      const isInstalled = plugins.installed.find(({ id }) => id === plugin.id);
+      plugin.installed = !!isInstalled;
       plugins.owned.push(plugin);
     });
   }
@@ -214,5 +218,32 @@ export default function PluginsInclude(updates) {
     } catch (error) {
       helpers.error(error);
     }
+  }
+
+  function ontouchstart(e) {
+    moveX = 0;
+    lastX = e.touches[0].clientX;
+    document.addEventListener('touchmove', omtouchmove, { passive: true });
+    document.addEventListener('touchend', omtouchend);
+    document.addEventListener('touchcancel', omtouchend);
+  }
+
+  function omtouchmove(e) {
+    const { clientX } = e.touches[0];
+    moveX += (lastX - clientX);
+    lastX = clientX;
+  }
+
+  function omtouchend(e) {
+    document.removeEventListener('touchmove', omtouchmove);
+    document.removeEventListener('touchend', omtouchend);
+    document.removeEventListener('touchcancel', omtouchend);
+    if (Math.abs(moveX) <= 100) return;
+    const tabs = Array.from($page.get('.options').children);
+    const currentTab = $page.get('.options>span.active');
+    const direction = moveX > 0 ? 1 : -1;
+    const currentTabIndex = tabs.indexOf(currentTab);
+    const nextTabIndex = (currentTabIndex + direction + tabs.length) % tabs.length;
+    tabs[nextTabIndex].click();
   }
 }

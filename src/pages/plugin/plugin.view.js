@@ -170,10 +170,10 @@ function Review({ name, github, vote, comment, author, author_reply: authorReply
   </div>;
 }
 
-function MoreInfo({ purchased, price }) {
+function MoreInfo({ purchased, price, refund }) {
   if (!purchased) return '';
 
   return <small className='more-info-small'>
-    <span>{strings.owned}</span> • <span>{price}</span>
-  </small>
+    <span>{strings.owned}</span> • <span>{price}</span> • <span className='link' onclick={refund}>{strings.refund}</span>
+  </small>;
 }

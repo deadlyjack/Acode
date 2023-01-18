@@ -310,5 +310,6 @@
   "api_error": "API 服务器未回应，请稍后再试",
   "installed": "已安装",
   "all": "所有",
-  "medium": "中等"
+  "medium": "中等",
+  "refund": "Refund"
 }

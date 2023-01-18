@@ -310,5 +310,6 @@
   "api_error": "APIサーバーDown。しばらくしてから実行してください。",
   "installed": "インストール済み",
   "all": "すべて",
-  "medium": "中"
+  "medium": "中",
+  "refund": "Refund"
 }

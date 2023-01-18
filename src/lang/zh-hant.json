@@ -310,5 +310,6 @@
   "api_error": "API 服務器未回應，請稍後再試",
   "installed": "已安裝",
   "all": "所有",
-  "medium": "中等"
+  "medium": "中等",
+  "refund": "Refund"
 }

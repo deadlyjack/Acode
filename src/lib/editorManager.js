@@ -27,7 +27,7 @@ async function EditorManager($sidebar, $header, $body) {
   let scrollBarVisiblityCount = 0;
   let timeoutQuicktoolToggler;
   let timeoutHeaderToggler;
-  const { scrollbarSize, editorFont, openFileListPos } = appSettings.value;
+  const { scrollbarSize, editorFont } = appSettings.value;
   const events = {
     'switch-file': [],
     'rename-file': [],
@@ -436,7 +436,7 @@ async function EditorManager($sidebar, $header, $body) {
     }
 
     // show open file list in header
-    if (openFileListPos === appSettings.OPEN_FILE_LIST_POS_HEADER) {
+    if (appSettings.value.openFileListPos === appSettings.OPEN_FILE_LIST_POS_HEADER) {
       $openFileList = <ul className='open-file-list'></ul>;
       if ($list) $openFileList.append(...$list);
       root.appendOuter($openFileList);
@@ -498,8 +498,11 @@ async function EditorManager($sidebar, $header, $body) {
       $style = <style id="font-style"></style>;
     }
 
-    $style.textContent = `.editor-container,.editor-container *{
-  font-family: "${font}", NotoMono, Monaco, MONOSPACE !important;
+    $style.textContent = `.editor-container.ace_editor{
+  font-family: monotty, "${font}", NotoMono, Monaco, MONOSPACE !important;
+}
+.ace_text{
+  font-family: inherit !important;
 }`;
     $container.dataset.font = font;
 

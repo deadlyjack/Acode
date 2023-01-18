@@ -70,7 +70,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
 
     await (async () => {
       try {
-        if (navigator.onLine && (isValidSource(plugin.source) || !installed)) {
+        if (await helpers.checkAPIStatus() && (isValidSource(plugin.source))) {
           helpers.showTitleLoader();
           const remotePlugin = await fsOperation(constants.API_BASE, `plugin/${id}`)
             .readFile('json')
@@ -83,7 +83,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
           }
           plugin = Object.assign({}, remotePlugin);
 
-          if (installed || !parseFloat(remotePlugin.price)) return;
+          if (!parseFloat(remotePlugin.price)) return;
 
           price = `INR ${remotePlugin.price}`;
           purchaseNeeded = true;
@@ -201,6 +201,39 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
     }
   }
 
+  async function refund(e) {
+    const $button = e.target;
+    const oldText = $button.textContent;
+    try {
+      if (!product) throw new Error('Product not found');
+      $button.textContent = strings['loading...'];
+      const { refer, refunded, error } = await ajax.post(Url.join(constants.API_BASE, 'plugin/refund'), {
+        data: {
+          id: plugin.id,
+          package: BuildInfo.packageName,
+          token: purchaseToken,
+        }
+      });
+      if (refer) {
+        system.openInBrowser(refer);
+        return;
+      }
+
+      if (refunded) {
+        toast(strings.success);
+        if (installed) uninstall();
+        else render();
+        return;
+      }
+
+      toast(error || strings.error);
+    } catch (error) {
+      helpers.error(error);
+    } finally {
+      $button.textContent = oldText;
+    }
+  }
+
   async function render() {
     $page.body = view({
       ...plugin,
@@ -210,6 +243,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       update,
       price,
       buy,
+      refund,
       install,
       uninstall,
       currentVersion,

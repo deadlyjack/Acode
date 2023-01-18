@@ -310,5 +310,6 @@
   "api_error": "Ocorreu um erro dá Api, por favor, tente mais tarde...",
   "installed": "Instalado",
   "all": "Todos",
-  "medium": "Médio"
+  "medium": "Médio",
+  "refund": "Refund"
 }

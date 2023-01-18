@@ -1,4 +1,9 @@
-version 1.7.0 261
+version 1.7.1 263
+☞ Swipe to change tab in plugins page
+☞ Fixed update paid plugin
+☞ Bugs fixes
+
+version 1.7.0 262
 ☞ New medium size teardrop
 ☞ Fixed some inidic languages rendering
 ☞ Fixed selection bug

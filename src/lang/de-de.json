@@ -310,5 +310,6 @@
   "api_error": "API server down, please try after some time.",
   "installed": "Installed",
   "all": "All",
-  "medium": "Medium"
+  "medium": "Medium",
+  "refund": "Refund"
 }
