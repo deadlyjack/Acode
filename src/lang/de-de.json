@@ -306,10 +306,10 @@
   "info-scroll-settings": "Diese Einstellungen enthalten Bildlaufeinstellungen einschließlich Textumbrüchen.",
   "info-animation": "Wenn die Anwendung träge reagiert, deaktivieren Sie die Animation.",
   "info-quicktoolstriggermode": "Wenn die Schaltfläche in den Quick-Tools nicht funktioniert, versuchen Sie diesen Wert zu ändern.",
-  "owned": "Owned",
-  "api_error": "API server down, please try after some time.",
-  "installed": "Installed",
-  "all": "All",
-  "medium": "Medium",
-  "refund": "Refund"
+  "owned": "Eigene",
+  "api_error": "API-Server nicht verfügbar, bitte nach kurzer Zeit nochmal versuchen.",
+  "installed": "Installiert",
+  "all": "Alle",
+  "medium": "Mittel",
+  "refund": "Erstattung"
 }
