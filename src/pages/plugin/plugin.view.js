@@ -1,4 +1,5 @@
 import Ref from 'html-tag-js/ref';
+import alert from '../../components/dialogboxes/alert';
 import fsOperation from '../../fileSystem/fsOperation';
 import constants from '../../lib/constants';
 import Url from '../../utils/Url';
@@ -58,7 +59,7 @@ export default (props) => {
   </div>;
 }
 
-function Buttons({ installed, update, install, uninstall, purchaseNeeded, price, buy }) {
+function Buttons({ isPaid, installed, update, install, uninstall, purchased, price, buy }) {
   if (installed && update) {
     return <>
       <button onclick={uninstall}>{strings.uninstall}</button>
@@ -70,8 +71,15 @@ function Buttons({ installed, update, install, uninstall, purchaseNeeded, price,
     return <button onclick={uninstall}>{strings.uninstall}</button>;
   }
 
-  if (purchaseNeeded) {
+  if (isPaid && !purchased && price) {
     return <button onclick={buy}>{price}</button>;
+  }
+
+  if (isPaid && !purchased && !price) {
+    return <div style={{ margin: 'auto' }} className='flex-center'>
+      <span onclick={() => alert(strings.info, strings['no-product-info'])} className='icon info'></span>
+      <span>{strings['product not available']}</span>
+    </div>;
   }
 
   return <button onclick={install}>{strings.install}</button>;

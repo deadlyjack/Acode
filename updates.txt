@@ -1,4 +1,4 @@
-version 1.7.1 263
+version 1.7.1 264
 ☞ Swipe to change tab in plugins page
 ☞ Fixed update paid plugin
 ☞ Bugs fixes

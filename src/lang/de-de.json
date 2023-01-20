@@ -311,5 +311,7 @@
   "installed": "Installiert",
   "all": "Alle",
   "medium": "Mittel",
-  "refund": "Erstattung"
+  "refund": "Erstattung",
+  "product not available": "Product not available",
+  "no-product-info": "This product is not available in your country at this moment, please try again later."
 }

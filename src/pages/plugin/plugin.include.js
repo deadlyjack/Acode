@@ -18,11 +18,11 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
 
   let plugin = {};
   let currentVersion = '';
-  let purchaseNeeded = false;
   let purchased = false;
   let cancelled = false;
   let update = false;
-  let price = 0;
+  let isPaid = false;
+  let price;
   let product;
   let purchaseToken;
 
@@ -61,6 +61,9 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
         source: installedPlugin.source,
         description,
       };
+
+      isPaid = installedPlugin.price > 0;
+
       if (settings) {
         $page.header.append(
           <span className="icon settings" onclick={() => settingsPage(plugin.name, settings.list, settings.cb)}></span>
@@ -75,29 +78,26 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
           const remotePlugin = await fsOperation(constants.API_BASE, `plugin/${id}`)
             .readFile('json')
             .catch(() => null);
+
           if (cancelled || !remotePlugin) return;
 
           if (installed && remotePlugin?.version !== plugin.version) {
             currentVersion = plugin.version;
             update = true;
           }
+
           plugin = Object.assign({}, remotePlugin);
 
           if (!parseFloat(remotePlugin.price)) return;
 
-          price = `INR ${remotePlugin.price}`;
-          purchaseNeeded = true;
-
+          isPaid = remotePlugin.price > 0;
           try {
             [product] = await helpers.promisify(iap.getProducts, [remotePlugin.sku]);
             if (product) {
               const purchase = await getPurchase(product.productId);
-              purchaseNeeded = !purchase;
               purchased = !!purchase;
-              purchaseToken = purchase?.purchaseToken;
               price = product.price;
-            } else {
-              alert(strings.error, 'Product not available right now. Please try again later.');
+              purchaseToken = purchase?.purchaseToken;
             }
           } catch (error) {
             helpers.error(error);
@@ -185,7 +185,6 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
         });
         purchaseToken = purchase?.purchaseToken;
         purchased = !!purchase;
-        purchaseNeeded = !purchase;
         $button.textContent = oldText;
         install();
       }
@@ -241,13 +240,13 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       purchased,
       installed,
       update,
+      isPaid,
       price,
       buy,
       refund,
       install,
       uninstall,
       currentVersion,
-      purchaseNeeded,
     });
   }
 

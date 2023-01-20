@@ -786,6 +786,12 @@ button {
   animation: sake 3s ease-out infinite;
 }
 
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .w-resize {
   cursor: w-resize;
 }
