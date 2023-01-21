@@ -311,7 +311,7 @@
   "installed": "已安装",
   "all": "所有",
   "medium": "中等",
-  "refund": "Refund",
-  "product not available": "Product not available",
-  "no-product-info": "This product is not available in your country at this moment, please try again later."
+  "refund": "退款",
+  "product not available": "产品不可用",
+  "no-product-info": "该产品目前在您所在的国家不可用，请稍后再试。"
 }
