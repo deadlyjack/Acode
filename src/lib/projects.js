@@ -25,9 +25,15 @@ export default {
   get(project) {
     return projects[project]?.();
   },
+  /**
+   * 
+   * @param {string} project Project name
+   * @param {()=>Promise<Map<string, string>>} files Async function that returns a map of files
+   * @param {string} iconSrc Icon source (data url)
+   */
   set(project, files, iconSrc) {
     const icon = `${project}-project-icon`;
     acode.addIcon(`${project}-project-icon`, iconSrc)
-    projects[project] = { files, icon };
+    projects[project] = () => ({ files, icon });
   }
 }
