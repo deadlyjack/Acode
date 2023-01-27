@@ -35,5 +35,8 @@ export default {
     const icon = `${project}-project-icon`;
     acode.addIcon(`${project}-project-icon`, iconSrc)
     projects[project] = () => ({ files, icon });
+  },
+  delete(project) {
+    delete projects[project];
   }
 }
