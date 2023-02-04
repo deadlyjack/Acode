@@ -87,6 +87,8 @@ export default function editorSettings() {
         'Source Code',
         'Cascadia Code',
         'Proggy Clean',
+        'VictorMono Italic',
+        'VictorMono Medium',
         'JetBrains Mono Bold',
         'JetBrains Mono Regular'
       ],
