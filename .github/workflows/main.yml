@@ -32,7 +32,7 @@ jobs:
       - name: Configure the platform
         run: yarn clean
 
-      - : Build Android dev apk
+      - name: Build Android dev apk
         run: yarn build android paid dev
 
       - name: Build Android prod aab
