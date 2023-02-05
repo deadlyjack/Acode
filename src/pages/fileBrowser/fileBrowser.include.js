@@ -94,7 +94,6 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         <li action="settings">${strings.settings.capitalize(0)}</li>
         ${currentDir.url === '/' ? `<li action="refresh">${strings['reset connections'].capitalize(0)}</li>` : ''}
         <li action="reload">${strings.reload.capitalize(0)}</li>
-        <li action="copy-path">${strings.copy}</li>
         `;
       },
       ...menuOption,
@@ -203,14 +202,6 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           () => { },
         );
         toast(strings.success);
-        return;
-      }
-
-      if(action === 'copy-path'){
-        const {url} = currentDir;
-        navigator.clipboard.writeText(url).then(() => {
-          toast(strings["copied to clipboard"]);
-        };
         return;
       }
     };
