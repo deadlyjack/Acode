@@ -1,7 +1,7 @@
 import inputhints from './inputhints';
 
 export default function pallete(getList, onselect, placeholder, onremove) {
-  const $input = <input type='search' placeholder={placeholder} onfocusout={remove} enterKeyHint='go' />;
+  const $input = <input onkeydown={onkeydown} type='search' placeholder={placeholder} onfocusout={remove} enterKeyHint='go' />;
   const $mask = <div className='mask' onclick={remove} />;
   const $pallete = <div id="command-pallete">{$input}</div>;
 
@@ -18,6 +18,12 @@ export default function pallete(getList, onselect, placeholder, onremove) {
     id: 'command-pallete',
     action: remove,
   });
+
+  function onkeydown(e) {
+    if (e.key === 'Escape') {
+      remove();
+    }
+  }
 
   async function generateHints(setHints) {
     setHints([{ text: strings['loading...'], value: '' }]);

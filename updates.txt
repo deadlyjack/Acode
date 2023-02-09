@@ -1,3 +1,8 @@
+version 1.7.2 267
+☞ Palette will close on ESC key
+☞ Plugin settings UI
+☞ Bugs fixes
+
 version 1.7.1 266
 ☞ Swipe to change tab in plugins page
 ☞ Fixed update paid plugin

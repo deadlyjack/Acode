@@ -19,7 +19,7 @@ export default {
   ERUDA_CDN: 'https://cdn.jsdelivr.net/npm/eruda',
   PAID_VERSION: 'https://play.google.com/store/apps/details?id=com.foxdebug.acode',
   API_BASE: 'https://acode.foxdebug.com/api',
-  // API_BASE: 'https://192.168.29.77:3001/api', // test api
+  // API_BASE: 'https://192.168.29.46:3001/api', // test api
   SKULIST: ["basic", "bronze", "silver", "gold", "platinum"],
   encodings: [
     'utf-8',

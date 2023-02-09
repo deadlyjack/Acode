@@ -3,15 +3,20 @@ import autosize from 'autosize';
 import appSettings from '../../lib/settings';
 
 /**
+ * @typedef {Object} PromptOptions
+ * @property {RegExp} [match]
+ * @property {boolean} [required]
+ * @property {string} [placeholder]
+ * @property {(any)=>boolean} [test]
+ */
+
+
+/**
  *
  * @param {string} message
  * @param {string} defaultValue
  * @param {"textarea"|"text"|"number"|"tel"|"search"|"email"|"url"} type
- * @param {object} options
- * @param {RegExp} options.match
- * @param {boolean} options.required
- * @param {string} options.placeholder
- * @param {(any)=>boolean} options.test
+ * @param {PromptOptions} options
  */
 function prompt(message, defaultValue, type = 'text', options = {}) {
   return new Promise((resolve) => {

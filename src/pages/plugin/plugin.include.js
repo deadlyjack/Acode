@@ -66,13 +66,14 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
 
       if (settings) {
         $page.header.append(
-          <span className="icon settings" onclick={() => settingsPage(plugin.name, settings.list, settings.cb)}></span>
+          <span attr-action='settings' className='icon settings' onclick={() => settingsPage(plugin.name, settings.list, settings.cb)}></span>
         );
       }
     }
 
     await (async () => {
       try {
+        helpers.showTitleLoader();
         if (await helpers.checkAPIStatus() && (isValidSource(plugin.source))) {
           helpers.showTitleLoader();
           const remotePlugin = await fsOperation(constants.API_BASE, `plugin/${id}`)
@@ -105,6 +106,8 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
         }
       } catch (error) {
         console.error(error);
+      } finally {
+        helpers.removeTitleLoader();
       }
     })();
 

@@ -93,7 +93,7 @@ export default class Acode {
   }
 
   getPluginSettings(id) {
-    this.#pluginSettings[id];
+    return this.#pluginSettings[id];
   }
 
   setPluginUnmount(id, unmountFunction) {
@@ -116,6 +116,8 @@ export default class Acode {
       this.#pluginUnmount[id]();
       fsOperation(Url.join(CACHE_STORAGE, id)).delete();
     }
+
+    delete this.#pluginSettings[id];
   }
 
   registerFormatter(id, extensions, format) {

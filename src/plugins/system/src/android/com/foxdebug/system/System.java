@@ -66,8 +66,7 @@ public class System extends CordovaPlugin {
     String action,
     final JSONArray args,
     final CallbackContext callbackContext
-  )
-    throws JSONException {
+  ) throws JSONException {
     final String arg1 = args.optString(0);
     final String arg2 = args.optString(1);
     final String arg3 = args.optString(2);
@@ -151,7 +150,7 @@ public class System extends CordovaPlugin {
                 getWebkitInfo(callbackContext);
                 break;
               case "file-action":
-                filAction(arg1, arg2, arg3, arg4, callbackContext);
+                fileAction(arg1, arg2, arg3, arg4, callbackContext);
                 break;
               case "is-powersave-mode":
                 isPowerSaveMode(callbackContext);
@@ -371,7 +370,7 @@ public class System extends CordovaPlugin {
     callback.success(powerSaveMode ? 1 : 0);
   }
 
-  private void filAction(
+  private void fileAction(
     String fileURI,
     String filename,
     String action,

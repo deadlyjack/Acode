@@ -126,10 +126,6 @@ export default class WCPage extends HTMLElement {
     this.appendChild($el);
   }
 
-  get header() {
-    return this.#header;
-  }
-
   get innerHTML() {
     return this.body?.innerHTML;
   }

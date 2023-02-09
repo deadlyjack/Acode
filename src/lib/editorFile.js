@@ -155,7 +155,7 @@ export default class EditorFile {
   onloaderror;
   onloadstart;
   onloadend;
-  onchangeMode;
+  onchangemode;
   onrun;
   oncanrun;
 

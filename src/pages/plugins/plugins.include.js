@@ -196,12 +196,14 @@ export default function PluginsInclude(updates) {
     return Url.join(PLUGIN_DIR, id, name);
   }
 
-  async function addSource(value = 'https://') {
+  async function addSource(value = 'https://', sourceType) {
 
-    const sourceType = await dialogs.select('', [
-      ['remote', strings.remote],
-      ['local', strings.local],
-    ], true);
+    if (!sourceType) {
+      sourceType = await dialogs.select('', [
+        ['remote', strings.remote],
+        ['local', strings.local],
+      ], true);
+    }
 
     let source;
 
@@ -216,7 +218,8 @@ export default function PluginsInclude(updates) {
       await getInstalledPlugins();
       render();
     } catch (error) {
-      helpers.error(error);
+      window.toast(helpers.errorMessage(error));
+      addSource(source, sourceType);
     }
   }
 

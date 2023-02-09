@@ -4,9 +4,24 @@ import Checkbox from './checkbox';
 import dialogs from './dialogs';
 
 /**
+ * @typedef {Object} ListItem
+ * @property {string} key
+ * @property {string} text
+ * @property {string} [icon]
+ * @property {string} [iconColor]
+ * @property {string} [info]
+ * @property {string} [value]
+ * @property {(value:string)=>string} [valueText]
+ * @property {boolean} [checkbox]
+ * @property {string} [prompt]
+ * @property {string} [promptType]
+ * @property {import('./dialogboxes/prompt').PromptOptions} [promptOptions]
+ */
+
+/**
  * 
  * @param {HTMLUListElement} $list 
- * @param {Array<Object>} items 
+ * @param {Array<ListItem>} items 
  * @param {()=>void} callback called when setting is changed
  */
 export default function listItems($list, items, callback, sort = true) {
