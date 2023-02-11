@@ -70,6 +70,10 @@ export default async function openFile(file, data = {}) {
         const blob = new Blob([binData], { type: fileInfo.type });
         dialogs.box(name, `<img src='${URL.createObjectURL(blob)}'>`);
         return;
+      }else if(/video/i.test(fileInfo.type)) {
+        const blob = new Blob([binData], { type: fileInfo.type });
+        dialogs.box(name, `<video src='${URL.createObjectURL(blob)}' controls></video>`);
+        return;
       }
 
       const confirmation = await dialogs.confirm(strings.info, strings['binary file']);

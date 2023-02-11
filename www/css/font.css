@@ -23,6 +23,19 @@
 }
 
 @font-face {
+  font-family: 'VictorMono Italic';
+  src: url('../res/fonts/VictorMono-Italic.otf') format('truetype');
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'VictorMono Medium';
+  src: url('../res/fonts/VictorMono-Medium.otf') format('truetype');
+  font-weight: medium;
+  font-style: normal;
+}
+
+@font-face {
   font-family: 'Cascadia Code';
   src: url('../res/fonts/CascadiaCode.ttf') format('truetype');
   font-weight: 300 700;
@@ -39,7 +52,7 @@
 @font-face {
   font-family: 'JetBrains Mono Bold';
   src: url('../res/fonts/JetBrainsMono-Bold.ttf') format('truetype');
-  font-weight: 300 700;
+  font-weight: bold;
 }
 
 @font-face {

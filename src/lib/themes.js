@@ -45,6 +45,7 @@ const editorThemes = {
   tomorrow_night_eighties: scheme('tomorrow_night_eighties', 'dark'),
   twilight: scheme('twilight', 'dark'),
   vibrant_ink: scheme('vibrant_ink', 'dark'),
+  vscode_default: scheme('vscode_default','dark'),
   xcode: scheme('xcode', 'light'),
 };
 
