@@ -31,7 +31,6 @@ class Settings {
   #defaultSettings;
   #oldSettings;
   #initialized = false;
-  #keyboardModes = ['NO_SUGGESTIONS', 'NO_SUGGESTIONS_AGGRESSIVE', 'NORMAL'];
   #on = {
     update: [],
     reset: [],
@@ -81,7 +80,7 @@ class Settings {
   };
 
   constructor() {
-    this.#defaultSettings = this.value = {
+    this.#defaultSettings = {
       animation: 'system',
       appTheme: 'dark',
       autosave: 0,
@@ -106,7 +105,7 @@ class Settings {
       formatOnSave: false,
       autoCorrect: true,
       openFileListPos: this.OPEN_FILE_LIST_POS_HEADER,
-      quickTools: true,
+      quickTools: 1,
       quickToolsTriggerMode: this.QUICKTOOLS_TRIGGER_MODE_TOUCH,
       editorFont: 'Roboto Mono',
       vibrateOnTap: true,
@@ -140,7 +139,7 @@ class Settings {
       useTextareaForIME: false,
       touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 10,
     };
-
+    this.value = { ...this.#defaultSettings };
   }
 
   async init() {
@@ -169,14 +168,8 @@ class Settings {
       // make sure that all the settings are present
       Object.keys(this.#defaultSettings).forEach((setting) => {
         const value = settings[setting];
-        if (value === undefined) {
+        if (value === undefined || typeof value !== typeof this.#defaultSettings[setting]) {
           settings[setting] = this.#defaultSettings[setting];
-        }
-
-        if (setting === 'keyboardMode') {
-          if (!this.#keyboardModes.includes(settings[setting])) {
-            settings[setting] = this.#defaultSettings[setting];
-          }
         }
       });
 
@@ -203,14 +196,16 @@ class Settings {
 
   /**
    *
-   * @param {Object} settings
-   * @param {Boolean} showToast
-   * @param {Boolean} saveFile
+   * @param {Object} [settings] - if provided, the settings will be updated
+   * @param {Boolean} [showToast] - if false, the toast will not be shown
+   * default is true
+   * @param {Boolean} [saveFile] - if false, the settings will not be saved to the file,
+   * default is true
    */
-  async update(settings = null, showToast = true, saveFile = true) {
+  async update(settings, showToast = true, saveFile = true) {
     if (typeof settings === 'boolean') {
       showToast = settings;
-      settings = null;
+      settings = undefined;
     }
 
     const onupdate = [...this.#on.update];
@@ -218,23 +213,12 @@ class Settings {
     if (settings) {
       Object.keys(settings).forEach((key) => {
         if (key in this.value) this.value[key] = settings[key];
-        switch (key) {
-          case 'animation':
-            this.applyAnimationSetting();
-            break;
-
-          case 'lang':
-            this.applyLangSetting();
-            break;
-
-          default:
-            break;
-        }
       });
     }
 
     const changedSettings = this.#getChangedKeys();
     changedSettings.forEach((setting) => {
+      this.#applySettings(setting);
       const listeners = this.#on[`update:${setting}`];
       if (Array.isArray(listeners)) {
         onupdate.push(...listeners);
@@ -308,6 +292,21 @@ class Settings {
       if (value !== this.value[key]) keys.push(key);
     });
     return keys;
+  }
+
+  #applySettings(setting) {
+    switch (setting) {
+      case 'animation':
+        this.applyAnimationSetting();
+        break;
+
+      case 'lang':
+        this.applyLangSetting();
+        break;
+
+      default:
+        break;
+    }
   }
 
   async applyAnimationSetting() {

@@ -6,6 +6,7 @@ import Commands from '../ace/commands';
 import touchListeners from '../ace/touchHandler';
 import appSettings from './settings';
 import EditorFile from './editorFile';
+import { $quickToolToggler } from '../handlers/quickTools';
 
 //TODO: Add option to work multiple files at same time in large display.
 
@@ -366,7 +367,7 @@ async function EditorManager($sidebar, $header, $body) {
   }
 
   function updateFloatingButton(show = false) {
-    const { $quickToolToggler, $headerToggler } = acode;
+    const { $headerToggler } = acode;
 
     if (show) {
       if (scrollBarVisiblityCount) --scrollBarVisiblityCount;

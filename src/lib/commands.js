@@ -9,7 +9,7 @@ import help from '../settings/help';
 import recents from '../lib/recents';
 import fsOperation from '../fileSystem/fsOperation';
 import Modes from '../pages/modes/modes';
-import { actions } from '../handlers/quickToolsActions';
+import { actions } from '../handlers/quickTools';
 import FileBrowser from '../pages/fileBrowser/fileBrowser';
 import path from '../utils/Path';
 import showFileInfo from './showFileInfo';
@@ -231,9 +231,6 @@ export default {
     localStorage.modeassoc = JSON.stringify(modeAssociated);
 
     activefile.setMode(mode);
-  },
-  'toggle-quick-tools'() {
-    actions('toggle-quick-tools');
   },
   'toggle-fullscreen'() {
     app.classList.toggle('fullscreen-mode');

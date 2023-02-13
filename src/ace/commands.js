@@ -1,4 +1,5 @@
 import fsOperation from "../fileSystem/fsOperation";
+import { actions } from '../handlers/quickTools';
 import keyBindings from "../lib/keyBindings";
 import helpers from "../utils/helpers";
 
@@ -239,6 +240,13 @@ export default async function Commands() {
       },
       readOnly: true,
     },
+    {
+      name: 'settings:toggleQuickTools',
+      description: 'Toggle quick tools',
+      exec() {
+        actions('toggle-quick-tools');
+      },
+    }
   ];
 
   commands.forEach((command) => {

@@ -1,4 +1,4 @@
-import { actions } from '../handlers/quickToolsActions';
+import { actions } from '../handlers/quickTools';
 import constants from './constants';
 import appSettings from '../lib/settings';
 
@@ -29,8 +29,6 @@ export default {
       root.classList.add('hide-floating-button');
     }
 
-    if (settings.quickTools) {
-      actions('enable-quick-tools');
-    }
+    actions('set-quick-tools-height', settings.quickTools);
   },
 };

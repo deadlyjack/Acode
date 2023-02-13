@@ -372,9 +372,11 @@ async function run(
       const fs = fsOperation(path);
       try {
         await fs.readFile(); // Because reading the remote file will create cache file
-        send(cacheFile, mimetype); // send the created file here
+        path = cacheFile;
       } catch (err) {
         error(id);
+        isLoading = false;
+        return;
       }
     } else if (protocol === 'content:') {
       path = await new Promise((resolve, reject) => {

@@ -3,6 +3,7 @@ import mimeTypes from 'mime-types';
 import dialogs from "../components/dialogs";
 import tile from "../components/tile";
 import fsOperation from "../fileSystem/fsOperation";
+import { $save } from '../handlers/quickTools';
 import helpers from "../utils/helpers";
 import Path from "../utils/Path";
 import Url from "../utils/Url";
@@ -891,7 +892,6 @@ export default class EditorFile {
   }
 
   #upadteSaveIcon() {
-    const $save = root.get('#quick-tools [action=save]');
     if (this.#isUnsaved) {
       $save?.classList.add('notice');
     } else {

@@ -147,17 +147,17 @@ body {
           &[footer-height='3'] {
             &.top-bar {
               main {
-                height: calc(100vh - 170px);
+                height: calc(100vh - 150px);
                 height: calc(100vh - (var(--footer-height) * 3 + 30px));
-                min-height: calc(100vh - 170px);
+                min-height: calc(100vh - 150px);
                 min-height: calc(100vh - (var(--footer-height) * 3 + 30px));
               }
             }
 
             main {
-              height: calc(100vh - 140px);
+              height: calc(100vh - 120px);
               height: calc(100vh - (var(--footer-height) * 3));
-              min-height: calc(100vh - 140px);
+              min-height: calc(100vh - 120px);
               min-height: calc(100vh - (var(--footer-height) * 3));
             }
           }
@@ -250,10 +250,6 @@ wc-page {
 
   &[footer-height] {
     #quicktool-toggler {
-      &::before {
-        content: '\e98d';
-      }
-
       opacity: 1;
     }
   }
@@ -317,18 +313,18 @@ wc-page {
 
       .main,
       main {
-        height: calc(100vh - 215px);
+        height: calc(100vh - 195px);
         height: calc(100vh - (var(--footer-height) * 3 + var(--header-height) + 30px));
-        min-height: calc(100vh - 215px);
+        min-height: calc(100vh - 195px);
         min-height: calc(100vh - (var(--footer-height) * 3 + var(--header-height) + 30px));
       }
     }
 
     .main,
     main {
-      height: calc(100vh - 185px);
+      height: calc(100vh - 165px);
       height: calc(100vh - (var(--footer-height) * 3 + var(--header-height)));
-      min-height: calc(100vh - 185px);
+      min-height: calc(100vh - 165px);
       min-height: calc(100vh - (var(--footer-height) * 3 + var(--header-height)));
     }
   }

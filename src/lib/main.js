@@ -24,7 +24,7 @@ import settings from './settings';
 import constants from './constants';
 import intentHandler from '../handlers/intent';
 import openFolder from './openFolder';
-import quickTools from '../handlers/quickTools';
+import quickToolsInit from '../handlers/quickToolsInit';
 import loadPolyFill from '../utils/polyfill';
 import Url from '../utils/Url';
 import applySettings from './applySettings';
@@ -84,8 +84,8 @@ async function ondeviceready() {
     dataDirectory,
   } = cordova.file;
 
-  window.root = document.body.get('#root');
   window.app = document.body;
+  window.root = tag.get('#root');
   window.addedFolder = [];
   window.restoreTheme = restoreTheme;
   window.editorManager = null;
@@ -241,7 +241,6 @@ async function loadApp() {
     lead: $navToggler,
     tail: $menuToggler,
   });
-  const $footer = <footer id='quick-tools' tabIndex={-1}></footer>;
   const $mainMenu = contextMenu({
     top: '6px',
     right: '6px',
@@ -283,14 +282,12 @@ async function loadApp() {
   const $runBtn = <span style={{ fontSize: '1.2em' }} className='icon play_arrow' attr-action='run' onclick={() => acode.exec('run')} oncontextmenu={() => acode.exec('run-file')}></span>;
   const $floatingNavToggler = <span id='sidebar-toggler' className='floating icon menu' onclick={() => acode.exec('toggle-sidebar')}></span>;
   const $headerToggler = <span className='floating icon keyboard_arrow_left' id='header-toggler'></span>;
-  const $quickToolToggler = <span className='floating icon keyboard_arrow_up' id='quicktool-toggler'></span>;
   const folders = helpers.parseJSON(localStorage.folders);
   const files = helpers.parseJSON(localStorage.files) || [];
   const editorManager = await EditorManager($sidebar, $header, $main);
   //#endregion
 
   window.editorManager = editorManager;
-  acode.$quickToolToggler = $quickToolToggler;
   acode.$headerToggler = $headerToggler;
 
   actionStack.onCloseApp = () => acode.exec('save-state');
@@ -301,25 +298,15 @@ async function loadApp() {
     this.classList.toggle('keyboard_arrow_left');
     this.classList.toggle('keyboard_arrow_right');
   };
-  $quickToolToggler.onclick = function () {
-    acode.exec('toggle-quick-tools');
-  };
 
   //#region rendering
   applySettings.beforeRender();
-  root.appendOuter($header, $main, $footer, $floatingNavToggler, $headerToggler, $quickToolToggler);
-  applySettings.afterRender();
+  root.appendOuter($header, $main, $floatingNavToggler, $headerToggler);
   //#endregion
-
-  //#endregion
-  setTimeout(() => {
-    document.body.removeAttribute('data-small-msg');
-    app.classList.remove('loading', 'splash');
-  }, 500);
 
   //#region Add event listeners
+  quickToolsInit();
   editorManager.onupdate = onEditorUpdate;
-  quickTools($footer);
   root.on('show', mainPageOnShow);
   app.addEventListener('click', onClickApp);
   editorManager.on('rename-file', onFileUpdate);
@@ -390,6 +377,12 @@ async function loadApp() {
   } else {
     onEditorUpdate(undefined, false);
   }
+
+  setTimeout(() => {
+    document.body.removeAttribute('data-small-msg');
+    app.classList.remove('loading', 'splash');
+    applySettings.afterRender();
+  }, 100);
 
   /**
    *

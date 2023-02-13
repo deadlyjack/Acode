@@ -1,4 +1,6 @@
-version 1.7.2 267
+version 1.7.2 268
+☞ Added new command to toggle quick tools
+☞ Added back search in quick tools
 ☞ Palette will close on ESC key
 ☞ Plugin settings UI
 ☞ Bugs fixes

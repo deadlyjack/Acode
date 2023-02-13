@@ -8,6 +8,7 @@ import Url from '../utils/Url';
 import settingsPage from '../components/settingPage';
 import lang from '../lib/lang';
 import appSettings from '../lib/settings';
+import { actions } from '../handlers/quickTools';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -110,7 +111,7 @@ export default function otherSettings() {
     {
       key: 'quickTools',
       text: strings['quick tools'],
-      checkbox: values.quickTools,
+      checkbox: !!values.quickTools,
       info: 'Show or hide quick tools.',
     },
     {
@@ -200,11 +201,6 @@ export default function otherSettings() {
         root.classList.toggle('hide-floating-button');
         break;
 
-      case 'quickTools':
-        acode.exec('toggle-quick-tools');
-        break;
-
-
       case 'keyboardMode':
         system.setInputType(value);
         break;
@@ -212,6 +208,16 @@ export default function otherSettings() {
       case 'fullscreen':
         if (value) acode.exec('enable-fullscreen');
         else acode.exec('disable-fullscreen');
+        break;
+
+      case 'quickTools':
+        if (value) {
+          value = 1;
+          actions('set-quick-tools-height', 1);
+        } else {
+          value = 0;
+          actions('set-quick-tools-height', 0);
+        }
         break;
 
       default:
