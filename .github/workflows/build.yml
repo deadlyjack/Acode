@@ -32,11 +32,11 @@ jobs:
       - name: Install app dependencies
         run: yarn setup
 
-      # - name: Configure the platform
-      #   run: yarn clean
+      - name: Configure the platform
+        run: yarn clean
 
-      - name: Add Android platform
-        run: cordova platform add android
+      # - name: Add Android platform
+      #   run: cordova platform add android
 
       - name: Build Android dev apk
         run: yarn build android paid dev
