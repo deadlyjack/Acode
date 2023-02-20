@@ -81,6 +81,12 @@ function actions(action, value) {
       );
       break;
 
+
+    case 'goto':
+      acode.exec('goto');
+      break;
+
+
     case 'shift':
       const $el = $footer.querySelector('#shift-key');
       state = $el.getAttribute('data-state') || 'off';
