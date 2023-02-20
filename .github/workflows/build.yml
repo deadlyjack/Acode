@@ -35,6 +35,9 @@ jobs:
       # - name: Configure the platform
       #   run: yarn clean
 
+      - name: Add Android platform
+        run: cordova platform add android
+
       - name: Build Android dev apk
         run: yarn build android paid dev
 
