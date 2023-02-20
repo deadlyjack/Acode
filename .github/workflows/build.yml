@@ -32,8 +32,8 @@ jobs:
       - name: Install app dependencies
         run: yarn setup
 
-      - name: Configure the platform
-        run: yarn clean
+      # - name: Configure the platform
+      #   run: yarn clean
 
       - name: Build Android dev apk
         run: yarn build android paid dev
@@ -43,8 +43,8 @@ jobs:
 
       - name: Sign
         run: |
-             sudo chmod 777 ./sign.sh
-             ./sign.sh
+              sudo chmod 777 ./sign.sh
+              ./sign.sh
 
       - name: Upload dev APK
         uses: actions/upload-artifact@v3
