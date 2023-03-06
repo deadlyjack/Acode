@@ -39,13 +39,13 @@ export default () => {
 
   if (settings.rememberFolders) {
     addedFolder.forEach((folder) => {
-      const { url, reloadOnResume, saveState, title } = folder;
+      const { url, saveState, title, listState } = folder;
       folders.push({
         url,
         opts: {
           saveState,
-          reloadOnResume,
           name: title,
+          listState,
         },
       });
     });

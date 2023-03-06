@@ -2,11 +2,14 @@ import tag from 'html-tag-js';
 import Picker from 'vanilla-picker';
 import helpers from '../../utils/helpers';
 
+let lastPicked = localStorage.__picker_last_picked || '#fff';
+
 /**
  * Choose color
  * @param {string} defaultColor
  */
 function color(defaultColor) {
+  defaultColor = defaultColor || lastPicked;
   let type = helpers.checkColorType(defaultColor) || 'hex';
   return new Promise((resolve) => {
     const colorModes = ['hsl', 'hex', 'rgb'];
@@ -20,6 +23,8 @@ function color(defaultColor) {
       textContent: strings.ok,
       onclick: function () {
         hide();
+        lastPicked = color;
+        localStorage.__picker_last_picked = color;
         resolve(color);
       },
     });

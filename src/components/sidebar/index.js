@@ -1,5 +1,7 @@
-import tag from 'html-tag-js';
-import openFolder from '../lib/openFolder';
+import Ref from 'html-tag-js/ref';
+import './style.scss';
+
+let $sidebar;
 
 /**
  * @typedef {object} SideBar
@@ -10,28 +12,31 @@ import openFolder from '../lib/openFolder';
 
 /**
  *
- * @param {HTMLElement} [$activator]
- * @param {HTMLElement} [toggler]
+ * @param {HTMLElement} [$container]
+ * @param {HTMLElement} [$toggler]
  * @returns {HTMLElement & SideBar}
  */
-function sidenav($activator, toggler) {
+function create($container, $toggler) {
   let { innerWidth } = window;
 
   const START_THRESHOLD = 20; //Point where to start swip
-  const MIN_WIDTH = 250; //Min width of the side bar
+  const MIN_WIDTH = 200; //Min width of the side bar
   const MAX_WIDTH = () => innerWidth * 0.7; //Max width of the side bar
+  const resizeBar = new Ref();
 
-  $activator = $activator || app;
-  let mode = innerWidth > 750 ? 'tab' : 'phone';
+  $container = $container || app;
+  let mode = innerWidth > 600 ? 'tab' : 'phone';
   let width = +(localStorage.sideBarWidth || MIN_WIDTH);
-  const $el = tag('div', {
-    id: 'sidenav',
-    className: mode,
-  });
-  const mask = tag('span', {
-    className: 'mask',
-    onclick: hide,
-  });
+  const $el = <div id='sidebar' className={mode}>
+    <div className='apps'></div>
+    <div className='container'></div>
+    <div
+      className='resize-bar w-resize'
+      onmousedown={onresize}
+      ontouchstart={onresize}
+    ></div>
+  </div>;
+  const mask = <span className='mask' onclick={hide}></span>;
   const touch = {
     startX: 0,
     totalX: 0,
@@ -41,29 +46,12 @@ function sidenav($activator, toggler) {
     endY: 0,
     target: null,
   };
-  const $resizeBar = tag('div', {
-    className: 'w-resize',
-    onmousedown: onresize,
-    ontouchstart: onresize,
-    style: {
-      position: 'fixed',
-      top: 0,
-      left: width + 'px',
-      height: '100vh',
-      width: '5px',
-      marginLeft: '-2.5px',
-      zIndex: 110,
-    }
-  });
   let openedFolders = [];
-  let flag = false;
-  let isScrolling = false;
-  let scrollTimeout = null;
   let resizeTimeout = null;
   let setWidthTimeout = null;
 
-  toggler?.addEventListener('click', toggle);
-  $activator.addEventListener('touchstart', ontouchstart);
+  $toggler?.addEventListener('click', toggle);
+  $container.addEventListener('touchstart', ontouchstart);
   window.addEventListener('resize', onWindowResize);
 
   if (mode === 'tab' && localStorage.sidebarShown === '1') {
@@ -94,70 +82,40 @@ function sidenav($activator, toggler) {
     $el.onclick = null;
 
     if (mode === 'phone') {
+      resizeBar.style.display = 'none';
       $el.onshow();
       app.append($el, mask);
       $el.classList.add('show');
       document.ontouchstart = ontouchstart;
 
       actionStack.push({
-        id: 'sidenav',
+        id: 'sidebar',
         action: hideMaster,
       });
     } else {
       setWidth(width);
-      app.append($el, $resizeBar);
+      resizeBar.style.display = 'block';
+      app.append($el);
       $el.onclick = () => {
         if (!$el.textContent) acode.exec('open-folder');
       };
     }
-
-    restoreScrollPos();
-    attachListner();
-
     onshow();
   }
 
   function onshow() {
     if ($el.onshow) $el.onshow.call($el);
-    openFolder.updateHeight();
-  }
-
-  function restoreScrollPos() {
-    openedFolders = [...$el.getAll(':scope>div>ul')];
-    openedFolders.map(($) => {
-      const scrollTop = $.getAttribute('scroll-pos');
-      if (scrollTop) $.scrollTop = scrollTop;
-      return $;
-    });
-  }
-
-  function attachListner() {
-    openedFolders.map(($) => {
-      $.onscroll = function () {
-        isScrolling = true;
-        if (flag) {
-          flag = false;
-          resetState();
-        }
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-          isScrolling = false;
-        }, 100);
-        this.setAttribute('scroll-pos', this.scrollTop);
-      };
-    });
   }
 
   function hide(hideIfTab = false) {
     localStorage.sidebarShown = 0;
     if (mode === 'phone') {
-      actionStack.remove('sidenav');
+      actionStack.remove('sidebar');
       hideMaster();
     } else if (hideIfTab) {
       $el.activated = false;
       root.style.removeProperty('margin-left');
       root.style.removeProperty('width');
-      $resizeBar.remove();
       $el.remove();
       editorManager.editor.resize(true);
     }
@@ -170,7 +128,7 @@ function sidenav($activator, toggler) {
       $el.activated = false;
       mask.remove();
       $el.remove();
-      $activator.style.overflow = null;
+      $container.style.overflow = null;
     }, 300);
     document.ontouchstart = null;
     resetState();
@@ -184,7 +142,13 @@ function sidenav($activator, toggler) {
    * @param {TouchEvent} e
    */
   function ontouchstart(e) {
-    if (isScrolling) return;
+    const { target } = e;
+    const $parent = target.closest('#sidebar>.container>.list>.scroll');
+    if (
+      $parent &&
+      $parent.offsetHeight < $parent.scrollHeight
+    ) return;
+
     const { clientX, clientY } = getClient(e);
 
     if (mode === 'tab') return;
@@ -196,14 +160,12 @@ function sidenav($activator, toggler) {
     if ($el.activated && !$el.contains(e.target) && e.target !== mask) return;
     else if (
       (!$el.activated && touch.startX > START_THRESHOLD) ||
-      e.target === toggler
+      e.target === $toggler
     )
       return;
 
-    document.addEventListener('touchmove', ontouchmove, {
-      passive: false,
-    });
-    document.ontouchend = ontouchend;
+    document.addEventListener('touchmove', ontouchmove);
+    document.addEventListener('touchend', ontouchend);
   }
 
   /**
@@ -254,47 +216,11 @@ function sidenav($activator, toggler) {
   function ontouchmove(e) {
     e.preventDefault();
 
-    const [{ clientX, clientY }, scroll] = [
-      getClient(e),
-      touch.target.getParent('.scroll'),
-    ];
+    const { clientX, clientY } = getClient(e);
     touch.endX = clientX;
     touch.endY = clientY;
     touch.totalX = touch.endX - touch.startX;
     touch.totalY = touch.endY - touch.startY;
-
-    if (!flag) {
-      flag = true;
-      const scrollLeft = () =>
-        scroll.scrollBy({
-          left: -touch.totalX,
-        });
-      const scrollTop = () =>
-        scroll.scrollBy({
-          top: -touch.totalY,
-        });
-      if (scroll) {
-        if (Math.abs(touch.totalX) > Math.abs(touch.totalY)) {
-          if (
-            (touch.totalX > 0 && scroll.scrollLeft > 0) ||
-            (touch.totalX < 0 &&
-              Math.round(scroll.scrollWidth - scroll.scrollLeft) >
-              scroll.clientWidth)
-          )
-            scrollLeft();
-        } else {
-          if (
-            (touch.totalY > 0 && scroll.scrollTop > 0) ||
-            (touch.totalY < 0 &&
-              Math.round(scroll.scrollHeight - scroll.scrollTop) >
-              scroll.clientHeight)
-          )
-            scrollTop();
-        }
-
-        return;
-      }
-    }
 
     let width = $el.getwidth();
 
@@ -305,8 +231,7 @@ function sidenav($activator, toggler) {
     ) {
       if (!$el.isConnected) {
         app.append($el, mask);
-        $activator.style.overflow = 'hidden';
-        restoreScrollPos();
+        $container.style.overflow = 'hidden';
       }
 
       $el.style.transform = `translate3d(${-(width - touch.totalX)}px, 0, 0)`;
@@ -320,13 +245,7 @@ function sidenav($activator, toggler) {
    * @param {TouchEvent} e
    */
   function ontouchend(e) {
-    flag = false;
-
-    if (e.target === $el && !$el.textContent && touch.totalX === 0) {
-      acode.exec('open-folder');
-      resetState();
-      return hide();
-    } else if (e.target !== mask && touch.totalX === 0) return resetState();
+    if (e.target !== mask && touch.totalX === 0) return resetState();
     else if (e.target === mask && touch.totalX === 0) return hide();
     e.preventDefault();
 
@@ -345,14 +264,13 @@ function sidenav($activator, toggler) {
     }
 
     function lclShow() {
-      attachListner();
       onshow();
       $el.activated = true;
       $el.style.transform = `translate3d(0, 0, 0)`;
       document.ontouchstart = ontouchstart;
-      actionStack.remove('sidenav');
+      actionStack.remove('sidebar');
       actionStack.push({
-        id: 'sidenav',
+        id: 'sidebar',
         action: hideMaster,
       });
       resetState();
@@ -367,21 +285,19 @@ function sidenav($activator, toggler) {
     touch.startX = 0;
     touch.endX = 0;
     touch.target = null;
-    document.removeEventListener('touchmove', ontouchmove, {
-      passive: false,
-    });
-    document.ontouchend = null;
     $el.style.transition = null;
+    document.removeEventListener('touchmove', ontouchmove);
+    document.removeEventListener('touchend', ontouchend);
   }
 
   function setWidth(width) {
-    root.style.marginLeft = width + 'px';
+    $el.style.transition = 'none';
     $el.style.maxWidth = width + 'px';
+    root.style.marginLeft = width + 'px';
     root.style.width = `calc(100% - ${width}px)`;
     clearTimeout(setWidthTimeout);
     setWidthTimeout = setTimeout(() => {
       editorManager?.editor?.resize(true);
-      $resizeBar.style.left = width + 'px';
     }, 300);
   }
 
@@ -400,6 +316,7 @@ function sidenav($activator, toggler) {
     return mode === 'phone' ? (width >= 350 ? 350 : width) : MIN_WIDTH;
   };
 
+  $el.show = show;
   $el.hide = hide;
   $el.toggle = toggle;
   $el.onshow = () => { };
@@ -407,4 +324,28 @@ function sidenav($activator, toggler) {
   return $el;
 }
 
-export default sidenav;
+/**
+ *
+ * @param {object} [arg0] - the element that will activate the sidebar
+ * @param {HTMLElement} [arg0.container] - the element that will contain the sidebar
+ * @param {HTMLElement} [arg0.toggler] - the element that will toggle the sidebar
+ * @returns {HTMLElement & SideBar}
+ */
+function Sidebar({ container, toggler }) {
+  $sidebar = $sidebar ?? create(container, toggler);
+  return $sidebar;
+}
+
+Sidebar.hide = () => $sidebar?.hide();
+Sidebar.show = () => $sidebar?.show();
+Sidebar.toggle = () => $sidebar?.toggle();
+/**@type {HTMLElement} */
+Sidebar.el = null;
+
+Object.defineProperty(Sidebar, 'el', {
+  get() {
+    return $sidebar;
+  }
+});
+
+export default Sidebar;

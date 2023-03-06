@@ -7,6 +7,7 @@ import $_row2 from '../views/footer/row2.hbs';
 import searchSettings from '../settings/searchSettings';
 import constants from '../lib/constants';
 import appSettings from '../lib/settings';
+import commandPallete from '../components/commandPallete';
 
 /**@type {HTMLElement} */
 const $quickToolToggler = <span
@@ -68,7 +69,7 @@ function actions(action, value) {
       break;
 
     case 'pallete':
-      acode.exec('command-pallete');
+      commandPallete();
       break;
 
     case 'tab':
@@ -168,11 +169,12 @@ function actions(action, value) {
 
   function toggleSearch() {
     if (!$footer.contains($searchRow1)) {
-      if ($footer.contains($row2)) {
-        $row2.remove();
-        incFooterHeightBy(-1);
-      }
-      $footer.append($searchRow1, $searchRow2);
+      const { className } = $quickToolToggler;
+      $quickToolToggler.className = 'floating icon clearclose';
+      const $content = [...$footer.children];
+      const footerHeight = getFooterHeight();
+      setFooterHeight(0);
+      $footer.content = [$searchRow1, $searchRow2];
       if (!$searchInput) $searchInput = $footer.querySelector('#searchInput');
       $searchInput.value = selectedText || '';
       if (!selectedText) $searchInput.focus();
@@ -186,6 +188,9 @@ function actions(action, value) {
         id: 'search-bar',
         action: () => {
           removeSearch();
+          $footer.content = $content;
+          $quickToolToggler.className = className;
+          setFooterHeight(footerHeight);
         },
       });
     } else {
@@ -204,6 +209,12 @@ function actions(action, value) {
   }
 
   function toggleQuickTools() {
+    const back = actionStack.get('search-bar');
+    if (back?.action) {
+      back.action();
+      return;
+    }
+
     if (!$footer.contains($row1)) {
       setQuickToolsHeight();
     } else if (!$footer.contains($row2)) {
@@ -214,7 +225,6 @@ function actions(action, value) {
   }
 
   function setQuickToolsHeight(height = 1) {
-    removeSearch();
     setFooterHeight(height);
     appSettings.update({ quickTools: height }, false);
     editor.resize(true);
@@ -303,6 +313,8 @@ function setFooterHeight(height) {
   if (height) root.setAttribute('footer-height', height);
   else root.removeAttribute('footer-height');
 
+  if ($quickToolToggler.classList.contains('clearclose')) return;
+
   if (height > 1 && !$footer.contains($searchRow1)) {
     $quickToolToggler.classList.remove('keyboard_arrow_up');
     $quickToolToggler.classList.add('keyboard_arrow_down');
@@ -310,4 +322,8 @@ function setFooterHeight(height) {
     $quickToolToggler.classList.remove('keyboard_arrow_down');
     $quickToolToggler.classList.add('keyboard_arrow_up');
   }
+}
+
+function getFooterHeight() {
+  return parseInt(root.getAttribute('footer-height')) || 0;
 }

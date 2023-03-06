@@ -35,17 +35,17 @@ main .ace_editor {
 }
 
 .ace_dark.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
-    background-color: var(--accent-color);
+  background-color: var(--active-color);
 }
 
-.ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight{
-    color: var(--popup-active-color);
+.ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight {
+  color: var(--popup-active-color);
 }
 
 .ace_dark.ace_editor.ace_autocomplete {
-    border: 1px  solid var(--popup-border-color);
-    box-shadow: 2px 3px 5px var(--box-shadow-color);
-    line-height: 1.4;
-    background: var(--primary-color);
-    color: var(--primary-text-color);
+  border: 1px solid var(--popup-border-color);
+  box-shadow: 2px 3px 5px var(--box-shadow-color);
+  line-height: 1.4;
+  background: var(--primary-color);
+  color: var(--primary-text-color);
 }

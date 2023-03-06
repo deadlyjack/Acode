@@ -1,4 +1,3 @@
-import tag from 'html-tag-js';
 import tile from '../tile';
 /**
  *
@@ -6,10 +5,11 @@ import tile from '../tile';
  * @param {string[]} options [value, text, icon, disable?] or string
  * @param {{
  *            onCancel: ()=>void,
+ *            onHide: ()=>void,
  *            hideOnSelect: boolean,
  *            textTransform: boolean,
  *            default: String
- *        } | boolean} opts
+ *        } | boolean} opts options or rejectOnCancel
  */
 function select(title, options, opts = {}) {
   let rejectOnCancel = false;
@@ -18,24 +18,12 @@ function select(title, options, opts = {}) {
     opts = {};
   }
   return new Promise((resolve, reject) => {
-    const titleSpan =
-      title &&
-      tag('strong', {
-        className: 'title',
-        textContent: title,
-      });
-    const $list = tag('ul', {
-      className:
-        'scroll' + (opts.textTransform === false ? ' no-text-transform' : ''),
-    });
-    const selectDiv = tag('div', {
-      className: 'prompt select',
-      children: titleSpan ? [titleSpan, $list] : [$list],
-    });
-    const mask = tag('span', {
-      className: 'mask',
-      onclick: cancel,
-    });
+    const $titleSpan = title ? <strong className='title'>{title}</strong> : null;
+    const $list = <ul className={`scroll ${opts.textTransform === false ? ' no-text-transform' : ''}`}></ul>;
+    const selectDiv = <div className='prompt select'>
+      {$titleSpan ? [$titleSpan, $list] : $list}
+    </div>;
+    const mask = <span className='mask' onclick={cancel}></span>;
     let $defaultVal;
 
     if (opts.hideOnSelect === undefined) opts.hideOnSelect = true;
@@ -64,10 +52,7 @@ function select(title, options, opts = {}) {
 
       const $item = tile({
         lead,
-        text: tag('span', {
-          className: 'text',
-          innerHTML: text,
-        }),
+        text: <span className='text' innerHTML={text}></span>,
       });
 
       if (opts.default === value) {
@@ -78,10 +63,9 @@ function select(title, options, opts = {}) {
       $item.tabIndex = '0';
 
       $item.onclick = function () {
-        if (value !== undefined) {
-          if (opts.hideOnSelect) hide();
-          resolve(value);
-        }
+        if (value === undefined) return;
+        if (opts.hideOnSelect) hide();
+        resolve(value);
       };
 
       if (disabled) $item.classList.add('disabled');
@@ -118,6 +102,7 @@ function select(title, options, opts = {}) {
     }
 
     function hide() {
+      if (typeof opts.onHide === 'function') opts.onHide();
       actionStack.remove('select');
       hideSelect();
       let listItems = [...$list.children];

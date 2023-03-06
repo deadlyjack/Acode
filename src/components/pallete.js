@@ -3,7 +3,7 @@ import inputhints from './inputhints';
 export default function pallete(getList, onselect, placeholder, onremove) {
   const $input = <input onkeydown={onkeydown} type='search' placeholder={placeholder} onfocusout={remove} enterKeyHint='go' />;
   const $mask = <div className='mask' onclick={remove} />;
-  const $pallete = <div id="command-pallete">{$input}</div>;
+  const $pallete = <div id="pallete">{$input}</div>;
 
   inputhints($input, generateHints, (value) => {
     onselect(value);
@@ -15,7 +15,7 @@ export default function pallete(getList, onselect, placeholder, onremove) {
   $input.focus();
 
   actionStack.push({
-    id: 'command-pallete',
+    id: 'pallete',
     action: remove,
   });
 
@@ -36,7 +36,7 @@ export default function pallete(getList, onselect, placeholder, onremove) {
   }
 
   function remove() {
-    actionStack.remove('command-pallete');
+    actionStack.remove('pallete');
     window.restoreTheme();
     $pallete.remove();
     $mask.remove();

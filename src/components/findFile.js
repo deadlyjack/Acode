@@ -1,4 +1,4 @@
-import fsOperation from '../fileSystem/fsOperation';
+import fsOperation from '../fileSystem';
 import openFile from '../lib/openFile';
 import recents from '../lib/recents';
 import helpers from '../utils/helpers';

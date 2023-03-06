@@ -176,10 +176,6 @@ body {
             top: 30px;
           }
         }
-
-        #quick-tools {
-          position: fixed;
-        }
       }
     }
   }
@@ -224,7 +220,7 @@ wc-page {
           width: 100%;
           animation: strech 300ms ease 1;
           background-color: rgb(51, 153, 255);
-          background-color: var(--accent-color);
+          background-color: var(--active-color);
 
           @keyframes strech {
             from {
@@ -375,7 +371,7 @@ wc-page {
   }
 
   footer {
-    position: sticky;
+    position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;

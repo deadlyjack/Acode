@@ -1,5 +1,5 @@
 import dialogs from '../components/dialogs';
-import fsOperation from '../fileSystem/fsOperation';
+import fsOperation from '../fileSystem';
 import EditorFile from './editorFile';
 
 let checkFileEnabled = true;

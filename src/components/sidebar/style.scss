@@ -1,0 +1,158 @@
+body.no-animation {
+  #sidebar {
+    border-right: solid 1px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.page-replacement~#sidebar {
+  opacity: 0;
+}
+
+#sidebar {
+  z-index: 109;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 70vw;
+  max-width: 350px;
+  height: 100vh;
+  display: flex;
+  background-color: rgb(153, 153, 255);
+  background-color: var(--primary-color);
+  color: rgb(255, 255, 255);
+  color: var(--primary-text-color);
+  overflow: hidden;
+  box-sizing: border-box;
+
+  &+.mask {
+    z-index: 108;
+  }
+
+  &.phone {
+    transition: all 300ms ease;
+    transform: translate(-100%, 0);
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.07);
+  }
+
+  &.tab {
+    max-width: 250px;
+  }
+
+  &.show {
+    transform: translate(0, 0);
+    animation: show 300ms ease 1;
+  }
+
+  .resize-bar {
+    height: 100vh;
+    width: 5px;
+    margin-left: -2.5px;
+    z-index: 110;
+  }
+
+  .apps {
+    width: 40px;
+    min-width: 40px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    overflow: auto;
+
+    .icon {
+      height: 40px;
+      width: 40px;
+      color: currentColor;
+      font-size: 1em;
+      border-radius: 0;
+      opacity: 0.5;
+
+      &.active {
+        opacity: 1;
+      }
+    }
+  }
+
+  .container {
+    overflow: hidden;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+
+    >.list {
+      max-width: 100%;
+      max-height: 100%;
+
+      &.hidden {
+        max-height: 30px !important;
+      }
+
+      .tile {
+        &:not(:first-child) {
+          background-color: inherit;
+        }
+
+        &.notice {
+          &::before {
+            content: '•';
+            color: rgb(212, 250, 150);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+          }
+        }
+      }
+
+      .icon {
+        height: 30px;
+        width: 30px;
+        color: currentColor;
+        font-size: 1em;
+      }
+
+      >ul {
+        overflow: auto;
+        max-width: 100%;
+        max-height: calc(100% - 30px);
+        height: calc(100% - 30px);
+
+        .tile:active {
+          >*:nth-child(2) {
+            color: rgb(255, 215, 0);
+          }
+        }
+
+        li {
+          >*:nth-child(2) {
+            color: currentColor;
+          }
+
+          &.active {
+            >*:nth-child(2) {
+              color: rgb(255, 215, 0);
+            }
+          }
+        }
+
+        .list {
+          min-width: fit-content;
+        }
+      }
+    }
+
+    .tile {
+      user-select: none;
+    }
+  }
+}
+
+@keyframes show {
+  0% {
+    transform: translate(-100%, 0);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}

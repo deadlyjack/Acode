@@ -66,6 +66,9 @@ function ActionStack() {
         exitApp();
       }
     },
+    get(id) {
+      return stack.find((act) => act.id === id);
+    },
     /**
      *
      * @param {String} id

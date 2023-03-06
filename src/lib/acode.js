@@ -1,11 +1,11 @@
 import appSettings from "./settings";
 import commands from "./commands";
-import fsOperation from "../fileSystem/fsOperation";
+import fsOperation from "../fileSystem";
 import Url from "../utils/Url";
 import EditorFile from "./editorFile";
 import defaultFormatter from "../settings/defaultFormatter";
 import dialogs from "../components/dialogs";
-import FileBrowser from "../pages/fileBrowser/fileBrowser";
+import FileBrowser from "../pages/fileBrowser";
 import helpers from "../utils/helpers";
 import projects from "./projects";
 import selectionMenu from "./selectionMenu";
@@ -13,6 +13,10 @@ import Page from '../components/page';
 import inputhints from '../components/inputhints';
 import pallete from '../components/pallete';
 import openFolder from './openFolder';
+import fonts from './fonts';
+import themes from './themes';
+import ThemeBuilder from './themeBuilder';
+import sidebarApps from '../sidebarApps';
 
 export default class Acode {
   #modules = {};
@@ -39,6 +43,7 @@ export default class Acode {
     this.define('prompt', dialogs.prompt);
     this.define('select', dialogs.select);
     this.define('loader', dialogs.loader);
+    this.define('dialogBox', dialogs.box);
     this.define('colorPicker', dialogs.color);
     this.define('fileBrowser', FileBrowser);
     this.define('confirm', dialogs.confirm);
@@ -53,6 +58,13 @@ export default class Acode {
     this.define('pallete', pallete);
     this.define('fsOperation', fsOperation);
     this.define('openfolder', openFolder);
+    this.define('fonts', fonts);
+    this.define('themes', themes);
+    this.define('themeBuilder', ThemeBuilder);
+    this.define('sidebarApps', {
+      add: sidebarApps.add,
+      get: sidebarApps.get,
+    });
   }
 
   /**

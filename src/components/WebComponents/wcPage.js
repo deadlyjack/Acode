@@ -1,4 +1,3 @@
-import tag from 'html-tag-js';
 import tile from '../tile';
 
 export default class WCPage extends HTMLElement {
@@ -27,13 +26,11 @@ export default class WCPage extends HTMLElement {
     this.off = this.off.bind(this);
 
 
-    this.#leadBtn = tag('span', {
-      className: 'icon arrow_back',
-      onclick: () => this.hide.call(this),
-      attr: {
-        action: 'go-back',
-      },
-    });
+    this.#leadBtn = <span
+      className='icon arrow_back'
+      onclick={() => this.hide.call(this)}
+      attr-action='go-back'
+    ></span>;
 
     this.#header = tile({
       type: 'header',
@@ -169,9 +166,7 @@ export default class WCPage extends HTMLElement {
   #addHeaderOrAssignHeader() {
     if (!this.classList.contains('primary')) {
       this.#append(this.#header);
-      this.#append(tag('div', {
-        className: 'main',
-      }));
+      this.#append(<div className='main'></div>);
     } else {
       this.#header = this.get('header');
       if (this.#header) {
@@ -196,7 +191,7 @@ class PageHandler {
     this.onhide = this.onhide.bind(this);
     this.onshow = this.onshow.bind(this);
 
-    this.$replacement = tag('span', { className: 'page-replacement' });
+    this.$replacement = <span className='page-replacement'></span>;
     this.$replacement.handler = this;
 
     this.$el.on('hide', this.onhide);

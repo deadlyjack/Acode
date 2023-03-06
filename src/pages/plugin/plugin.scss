@@ -124,6 +124,33 @@
     text-align: justify;
     padding: 10px;
     box-sizing: border-box;
+
+    pre,
+    code,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      text-align: left;
+    }
+
+    // class="language-xxx"
+    [class*="language-"] {
+      word-wrap: normal;
+      white-space: pre;
+      font-size: 0.8rem;
+      padding: 5px;
+      margin: 5px 0;
+      background-color: var(--primary-color);
+      color: var(--primary-text-color);
+      border-left: solid 5px var(--active-color);
+      overflow: auto;
+      width: calc(100% - 10px);
+      display: block;
+      user-select: text;
+    }
   }
 
   .version {
@@ -151,14 +178,14 @@
   bottom: 0;
   background-color: var(--secondary-color);
   z-index: 999;
-  box-shadow: 0 0 20px black;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.07);
   border-radius: 40px 40px 0 0;
   overflow: hidden;
   animation: slide-up 0.3s ease-in-out;
 
   &.hide {
-    transition: all 0.3s ease-in-out;
-    transform: translateY(100%);
+    transition: all 0.3s ease-in-out !important;
+    transform: translateY(100%) !important;
   }
 
   @keyframes slide-up {
@@ -177,32 +204,59 @@
     align-items: center;
     justify-content: center;
 
-    >div {
-      padding: 0 10px;
-      display: flex;
-      align-content: center;
-      justify-content: center;
-      width: fit-content;
+    &::after {
+      content: '';
+      width: 40px;
+      height: 5px;
+      border-radius: 2.5px;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
 
-      span {
-        height: fit-content;
-        margin: auto;
-      }
+  .write-review {
+    padding: 0 10px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    width: fit-content;
+    margin: auto;
 
-      &:not(:last-child) {
-        border-right: solid 1px rgba($color: white, $alpha: 0.2);
-      }
+    span {
+      height: fit-content;
+      margin: auto;
+    }
 
-      .icon {
-        height: 30px;
-        width: 30px;
-      }
+    .icon {
+      height: 30px;
+      margin-right: 10px;
     }
   }
 
   .reviews-body {
     flex: 1;
     overflow: auto;
+
+    &.loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &::after {
+        content: '';
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 3px solid var(--primary-text-color);
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      }
+    }
 
     .review {
       padding: 10px;

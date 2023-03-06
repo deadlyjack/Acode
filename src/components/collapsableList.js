@@ -8,7 +8,8 @@ import tile from './tile';
  * @property {function(void):void} ontoggle
  * @property {function(void):void} collapse
  * @property {function(void):void} uncollapse
- * @property {boolean} collasped
+ * @property {boolean} collapsed
+ * @property {boolean} uncollapsed
  */
 
 /**
@@ -47,7 +48,7 @@ function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
   if (!hidden) setTimeout(toggle, 0);
 
   function toggle() {
-    if ($mainWrapper.classList.contains('hidden')) {
+    if ($title.collapsed) {
       uncollapse();
     } else {
       collapse();
@@ -55,57 +56,67 @@ function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
   }
 
   function collapse() {
-    let state = 'collapsed';
     $mainWrapper.classList.add('hidden');
-    $title.setAttribute('state', state);
-    if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper, state);
+    if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper);
   }
 
   function uncollapse() {
-    let state = 'uncollapsed';
     $mainWrapper.classList.remove('hidden');
-    $title.setAttribute('state', state);
-    if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper, state);
+    if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper);
   }
 
-  Object.defineProperties($mainWrapper, {
-    $title: {
-      get() {
-        return $title;
-      },
-    },
-    $ul: {
-      get() {
-        return $ul;
-      },
-    },
-    ontoggle: {
-      get() {
-        return options.ontoggle;
-      },
-      set(fun) {
-        if (typeof fun === 'function') options.ontoggle = fun;
-      },
-    },
-    collapse: {
-      get() {
-        return collapse || (() => {});
-      },
-      set(fun) {
-        if (typeof fun === 'function') collapse = fun;
-      },
-    },
-    uncollapse: {
-      get() {
-        return uncollapse || (() => {});
-      },
-      set(fun) {
-        if (typeof fun === 'function') uncollapse = fun;
-      },
-    },
-  });
+  [$title, $mainWrapper].forEach(defineProperties);
 
   return $mainWrapper;
+
+  function defineProperties($el) {
+    Object.defineProperties($el, {
+      $title: {
+        get() {
+          return $title;
+        },
+      },
+      $ul: {
+        get() {
+          return $ul;
+        },
+      },
+      ontoggle: {
+        get() {
+          return options.ontoggle;
+        },
+        set(fun) {
+          if (typeof fun === 'function') options.ontoggle = fun;
+        },
+      },
+      collapse: {
+        get() {
+          return collapse || (() => { });
+        },
+        set(fun) {
+          if (typeof fun === 'function') collapse = fun;
+        },
+      },
+      uncollapse: {
+        get() {
+          return uncollapse || (() => { });
+        },
+        set(fun) {
+          if (typeof fun === 'function') uncollapse = fun;
+        },
+      },
+      collapsed: {
+        get() {
+          return $mainWrapper.classList.contains('hidden');
+        }
+      },
+      uncollapsed: {
+        get() {
+          return !this.collapsed;
+        }
+      },
+    })
+  }
 }
 
 export default collapsableList;

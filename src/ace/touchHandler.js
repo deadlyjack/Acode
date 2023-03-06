@@ -837,30 +837,11 @@ export default function addTouchListeners(editor) {
       items.push(item);
     });
 
-    const firstFour = items.slice(0, 4);
-    const rest = items.slice(4);
-
-    firstFour.forEach(({ onclick, text }) => {
+    items.forEach(({ onclick, text }) => {
       $menu.append(
         <div onclick={onclick}>{text}</div>
       );
     });
-
-    if (rest.length) {
-      const showMoreMenu = async () => {
-        try {
-          const res = await dialogs.select(strings.more, rest.map(({ text }, i) => ([i, text])));
-          rest[res].onclick();
-        } catch (error) {
-
-        }
-      };
-      $menu.append(
-        <div onclick={showMoreMenu}>
-          <span className="icon more_vert"></span>
-        </div>
-      );
-    }
   }
 
   /**

@@ -55,7 +55,7 @@
       background-color: rgb(255, 255, 255);
       background-color: var(--primary-text-color);
       color: rgb(51, 153, 255);
-      color: var(--accent-color);
+      color: var(--active-color);
       padding: 2px;
       border-radius: 2px;
       font-size: 0.6rem;
@@ -63,7 +63,7 @@
 
     &.active {
       background-color: rgb(51, 153, 255);
-      background-color: var(--accent-color);
+      background-color: var(--active-color);
       color: rgb(27, 26, 26);
       color: var(--primary-text-color);
     }
@@ -74,11 +74,6 @@
       color: rgb(27, 26, 26);
       color: var(--secondary-text-color);
     }
-
-    // &:not(:last-child) {
-    //   border-bottom: solid 1px rgb(204, 204, 204);
-    //   border-bottom: solid 1px var(--border-color);
-    // }
   }
 
   &.loading {

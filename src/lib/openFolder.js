@@ -1,5 +1,6 @@
-import tag from 'html-tag-js';
-import fsOperation from '../fileSystem/fsOperation';
+import URLParse from 'url-parse';
+import escapeStringRegexp from 'escape-string-regexp';
+import fsOperation from '../fileSystem';
 import collapsableList from '../components/collapsableList';
 import helpers from '../utils/helpers';
 import dialogs from '../components/dialogs';
@@ -9,10 +10,10 @@ import recents from './recents';
 import Path from '../utils/Path';
 import openFile from './openFile';
 import Url from '../utils/Url';
-import FileBrowser from '../pages/fileBrowser/fileBrowser';
-import URLParse from 'url-parse';
+import FileBrowser from '../pages/fileBrowser';
 import appSettings from './settings';
-import escapeStringRegexp from 'escape-string-regexp';
+import sidebarApps from '../sidebarApps';
+import Sidebar from '../components/sidebar';
 
 /**
  *
@@ -20,62 +21,50 @@ import escapeStringRegexp from 'escape-string-regexp';
  * @param {object} [opts]
  * @param {string} [opts.name]
  * @param {string} [opts.id]
- * @param {boolean} [opts.saveState=true]
- * @param {boolean} [opts.reloadOnResume=true]
+ * @param {boolean} [opts.saveState]
+ * @param {Map<string, boolean>} [opts.listState]
  */
 function openFolder(_path, opts = {}) {
   if (addedFolder.find((folder) => folder.url === _path)) {
     return;
   }
 
-  let saveState = true,
-    reloadOnResume = true;
-
-  if ('saveState' in opts) saveState = opts.saveState;
-  if ('reloadOnResume' in opts) reloadOnResume = opts.reloadOnResume;
-
-  const listState = {};
-  const title = opts.name || getTitle();
-  const $closeBtn = tag('span', {
-    className: 'icon cancel',
-    attr: {
-      action: 'close',
-    },
-    onclick: remove,
-  });
-  let $root = collapsableList(title, !listState[_path], 'folder', {
-    tail: $closeBtn,
-    allCaps: true,
-    ontoggle: function (state) {
-      if (state === 'uncollapsed') {
-        for (let folder of addedFolder) {
-          if (folder.url !== _path) folder.$node.collapse();
-        }
-      }
-      expandList.call(this);
-    },
-  });
   /**
    * @type {{url: string, $el: HTMLElement, action: "cut"|"copy"}}
    */
   let clipBoard = null;
-  const loading = {
-    start() {
-      $root?.$title?.classList.add('loading');
-    },
-    stop() {
-      $root?.$title?.classList.remove('loading');
+  let saveState = true;
+
+  if ('saveState' in opts) saveState = opts.saveState;
+
+  const listState = opts.listState || {};
+  const title = opts.name || getTitle();
+  const $root = collapsableList(title, !listState[_path], 'folder', {
+    tail: <Tail target={() => $root.$title} />,
+    allCaps: true,
+    ontoggle: expandList,
+  });
+  const $text = $root.$title.querySelector(':scope>span.text');
+  const startLoading = () => $root?.$title?.classList.add('loading');
+  const stopLoading = () => $root?.$title?.classList.remove('loading');
+  const folder = {
+    title,
+    remove,
+    saveState,
+    listState,
+    url: _path,
+    $node: $root,
+    id: opts.id,
+    reload() {
+      $root.collapse();
+      $root.uncollapse();
     },
   };
-  const $text = $root.$title.querySelector(':scope>span.text');
 
   $root.id = 'r' + _path.hashCode();
-
-  if ($text) {
-    $text.style.overflow = 'hidden';
-    $text.style.whiteSpace = 'nowrap';
-    $text.style.textOverflow = 'ellipsis';
-  }
+  $text.style.overflow = 'hidden';
+  $text.style.whiteSpace = 'nowrap';
+  $text.style.textOverflow = 'ellipsis';
   $root.$title.data_type = 'root';
   $root.$title.data_url = _path;
   $root.$title.data_name = title;
@@ -86,26 +75,118 @@ function openFolder(_path, opts = {}) {
     $root.$title.oncontextmenu =
     handleItems;
 
-  addedFolder.push({
-    url: _path,
-    remove,
-    $node: $root,
-    reload: () => {
-      if (!reloadOnResume) return;
-      $root.collapse();
-      $root.uncollapse();
-    },
-    reloadOnResume,
-    saveState,
-    title,
-    id: opts.id,
-  });
-
-  updateHeight();
+  addedFolder.push(folder);
   recents.addFolder(_path, opts);
-  editorManager.sidebar.appendChild($root);
+  sidebarApps.get('files').append($root);
   editorManager.onupdate('add-folder', _path);
   editorManager.emit('update', 'add-folder');
+
+  /**
+   *
+   * @param {"file"|"dir"|"root"} type
+   * @param {string} url
+   * @param {string} name
+   * @param {HTMLElement} $target
+   */
+  async function handleContextmenu(type, url, name, $target) {
+    if (appSettings.value.vibrateOnTap) {
+      navigator.vibrate(constants.VIBRATION_TIME);
+    }
+    const cancel = `${strings.cancel}${clipBoard ? ` (${strings[clipBoard.action]})` : ''}`;
+    const COPY = ['copy', strings.copy, 'copy'];
+    const CUT = ['cut', strings.cut, 'cut'];
+    const REMOVE = ['delete', strings.delete, 'delete'];
+    const RENAME = ['rename', strings.rename, 'edit'];
+    const PASTE = ['paste', strings.paste, 'paste', !!clipBoard];
+    const NEW_FILE = ['new file', strings['new file'], 'document-add'];
+    const NEW_FOLDER = ['new folder', strings['new folder'], 'folder-add'];
+    const CANCEL = ['cancel', cancel, 'clearclose'];
+    const OPEN_FOLDER = ['open-folder', strings['open folder'], 'folder'];
+    const INSERT_FILE = ['insert-file', strings['insert file'], 'file_copy'];
+    const CLOSE_FOLDER = ['close', strings['close'], 'folder-remove'];
+
+    let options;
+
+    if (helpers.isFile(type)) {
+      options = [
+        COPY,
+        CUT,
+        RENAME,
+        REMOVE,
+      ];
+    } else if (helpers.isDir(type)) {
+      options = [
+        COPY,
+        CUT,
+        REMOVE,
+        RENAME,
+        PASTE,
+        NEW_FILE,
+        NEW_FOLDER,
+        OPEN_FOLDER,
+        INSERT_FILE,
+      ];
+    } else if (type === 'root') {
+      options = [
+        PASTE,
+        NEW_FILE,
+        NEW_FOLDER,
+        INSERT_FILE,
+        CLOSE_FOLDER,
+      ];
+    }
+
+    if (clipBoard) options.push(CANCEL);
+
+    try {
+      const option = await dialogs.select(name, options);
+      await execOperation(type, option, url, $target, name)
+    } catch (error) {
+      console.error(error);
+      helpers.error(error);
+    } finally {
+      stopLoading();
+    }
+  }
+
+  /**
+   * Expand the list
+   * @this {import('../components/collapsableList').Collaspable}
+   */
+  async function expandList() {
+    const { $ul, $title } = this;
+    const { data_url: url } = $title;
+
+    if (!$ul) return;
+
+    $ul.textContent = null;
+
+    if (saveState) listState[url] = this.uncollapsed;
+    if (this.uncollapsed) {
+      try {
+        startLoading();
+        const entries = await fsOperation(url).lsDir();
+        helpers.sortDir(entries, {
+          sortByName: true,
+          showHiddenFiles: true,
+        }).map((entry) => {
+          const name = entry.name || Path.basename(entry.url);
+          if (entry.isDirectory) {
+            const $list = createFolderTile(name, entry.url);
+            $ul.appendChild($list);
+          } else {
+            const $item = createFileTile(name, entry.url);
+            $ul.append($item);
+          }
+        });
+      } catch (err) {
+        this.collapse();
+        helpers.error(err);
+      } finally {
+        stopLoading();
+      }
+    }
+  }
 
   function getTitle() {
     let title = '';
@@ -132,17 +213,11 @@ function openFolder(_path, opts = {}) {
 
     if ($root.parentElement) {
       $root.remove();
-      $root = null;
     }
 
     addedFolder = addedFolder.filter((folder) => folder.url !== _path);
-    updateHeight();
     editorManager.onupdate('remove-folder', _path);
     editorManager.emit('update', 'remove-folder');
-  }
-
-  function updateHeight() {
-    openFolder.updateHeight();
   }
 
   /**
@@ -173,73 +248,7 @@ function openFolder(_path, opts = {}) {
   function handleClick(type, uri) {
     if (helpers.isFile(type)) {
       openFile(uri, { render: true });
-      editorManager.sidebar.hide();
-    }
-  }
-
-  /**
-   *
-   * @param {"file"|"dir"|"root"} type
-   * @param {string} url
-   * @param {string} name
-   * @param {HTMLElement} $target
-   */
-  async function handleContextmenu(type, url, name, $target) {
-    if (appSettings.value.vibrateOnTap) {
-      navigator.vibrate(constants.VIBRATION_TIME);
-    }
-    const cancel = `${strings.cancel}${clipBoard ? ` (${strings[clipBoard.action]})` : ''}`;
-    const COPY = ['copy', strings.copy, 'copy'];
-    const CUT = ['cut', strings.cut, 'cut'];
-    const REMOVE = ['delete', strings.delete, 'delete'];
-    const RENAME = ['rename', strings.rename, 'edit'];
-    const PASTE = ['paste', strings.paste, 'paste', !!clipBoard];
-    const NEW_FILE = ['new file', strings['new file'], 'document-add'];
-    const NEW_FOLDER = ['new folder', strings['new folder'], 'folder-add'];
-    const CANCEL = ['cancel', cancel, 'clearclose'];
-    const OPEN_FOLDER = ['open-folder', strings['open folder'], 'folder'];
-    const INSERT_FILE = ['insert-file', strings['insert file'], 'file_copy'];
-
-    let options;
-
-    if (helpers.isFile(type)) {
-      options = [
-        COPY,
-        CUT,
-        RENAME,
-        REMOVE,
-      ];
-    } else if (helpers.isDir(type)) {
-      options = [
-        COPY,
-        CUT,
-        REMOVE,
-        RENAME,
-        PASTE,
-        NEW_FILE,
-        NEW_FOLDER,
-        OPEN_FOLDER,
-        INSERT_FILE,
-      ];
-    } else if (type === 'root') {
-      options = [
-        PASTE,
-        NEW_FILE,
-        NEW_FOLDER,
-        INSERT_FILE,
-      ];
-    }
-
-    if (clipBoard) options.push(CANCEL);
-
-    try {
-      const option = await dialogs.select(name, options);
-      await execOperation(type, option, url, $target, name)
-    } catch (error) {
-      console.error(error);
-      helpers.error(error);
-    } finally {
-      loading.stop();
+      Sidebar.hide();
     }
   }
 
@@ -254,8 +263,6 @@ function openFolder(_path, opts = {}) {
     if (helpers.isDir(type)) {
       Url.join(url, '/');
     }
-
-    const target = $target.getAttribute('state');
 
     switch (action) {
       case 'copy':
@@ -283,13 +290,16 @@ function openFolder(_path, opts = {}) {
 
       case 'insert-file':
         return insertFile();
+
+      case 'close':
+        return remove();
     }
 
     async function deleteFile() {
       const msg = strings['delete {name}'].replace('{name}', name);
       const confirmation = await dialogs.confirm(strings.warging, msg);
       if (!confirmation) return;
-      loading.start();
+      startLoading();
       await fsOperation(url).delete();
       recents.removeFile(url);
       if (helpers.isFile(type)) {
@@ -313,9 +323,10 @@ function openFolder(_path, opts = {}) {
         match: constants.FILE_NAME_REGEX,
         required: true,
       });
-
-      loading.start();
+      newName = helpers.fixFilename(newName);
       if (newName === name) return;
+
+      startLoading();
       const fs = fsOperation(url);
       const newUrl = await fs.renameTo(newName);
       newName = Url.basename(newUrl);
@@ -353,7 +364,8 @@ function openFolder(_path, opts = {}) {
         required: true,
       });
 
-      loading.start();
+      newName = newName.trim();
+      startLoading();
       const fs = fsOperation(url);
       let newUrl;
 
@@ -364,7 +376,7 @@ function openFolder(_path, opts = {}) {
       }
 
       newName = Url.basename(newUrl);
-      if (target === 'uncollapsed') {
+      if ($target.uncollapsed) {
         if (action === 'new file') {
           appendTile($target, createFileTile(newName, newUrl));
         } else {
@@ -380,11 +392,11 @@ function openFolder(_path, opts = {}) {
       const srcType = $src.data_type;
       const IS_FILE = helpers.isFile(srcType);
       const IS_DIR = helpers.isDir(srcType);
-      const srcState = getState($src, IS_FILE);
+      const srcCollapsed = collapsed($src, IS_FILE);
 
       CASE += IS_FILE ? 1 : 0;
-      CASE += srcState === 'collapsed' ? 1 : 0;
-      CASE += target === 'collapsed' ? 1 : 0;
+      CASE += srcCollapsed ? 1 : 0;
+      CASE += $target.collapsed ? 1 : 0;
 
       const fs = fsOperation(clipBoard.url);
       let newUrl;
@@ -477,18 +489,22 @@ function openFolder(_path, opts = {}) {
     }
 
     async function insertFile() {
-      loading.start();
-      const file = await FileBrowser('file', strings['insert file']);
-      const srcfs = fsOperation(file.url);
-      const data = await srcfs.readFile();
-      const stats = await srcfs.stat();
+      startLoading();
+      try {
+        const file = await FileBrowser('file', strings['insert file']);
+        const srcfs = fsOperation(file.url);
+        const data = await srcfs.readFile();
+        const stats = await srcfs.stat();
 
-      const name = stats.name;
-      const fileUrl = Url.join(url, name);
+        const name = stats.name;
+        const fileUrl = Url.join(url, name);
 
-      const destfs = fsOperation(url);
-      await destfs.createFile(name, data);
-      appendTile($target, createFileTile(name, fileUrl));
+        const destfs = fsOperation(url);
+        await destfs.createFile(name, data);
+        appendTile($target, createFileTile(name, fileUrl));
+      } catch (error) { } finally {
+        stopLoading();
+      }
     }
 
     async function clipBoardAction() {
@@ -503,9 +519,10 @@ function openFolder(_path, opts = {}) {
     }
 
     async function open() {
-      const obj = JSON.parse(JSON.stringify(opts));
-      obj.name = name;
-      openFolder(url, obj);
+      FileBrowser.openFolder({
+        url,
+        name,
+      });
     }
 
     async function cancel() {
@@ -538,22 +555,21 @@ function openFolder(_path, opts = {}) {
     }
   }
 
-  function getState($el, IS_FILE) {
-    if (!$el.isConnected) return 'uncollapsed';
+  function collapsed($el, IS_FILE) {
+    if (!$el.isConnected) return true;
     $el = $el.parentElement;
     if (!IS_FILE) {
       $el = $el.parentElement;
     }
 
-    return $el.previousElementSibling.getAttribute('state');
+    return $el.previousElementSibling.collapsed;
   }
 
   function createFileTile(name, url) {
     const $tile = tile({
-      lead: tag('span', {
-        className: helpers.getIconForFile(name),
-      }),
+      lead: <span className={helpers.getIconForFile(name)}></span>,
       text: name,
+      tail: <Tail target={() => $tile} />,
     });
     $tile.data_url = url;
     $tile.data_name = name;
@@ -563,7 +579,8 @@ function openFolder(_path, opts = {}) {
   }
 
   function createFolderTile(name, url) {
-    const $list = collapsableList(name, !!!listState[url], 'folder', {
+    const $list = collapsableList(name, !listState[url], 'folder', {
+      tail: <Tail target={() => $list.$title} />,
       ontoggle: expandList,
     });
     $list.$title.data_url = url;
@@ -573,75 +590,24 @@ function openFolder(_path, opts = {}) {
     return $list;
   }
 
-  /**
-   *
-   * @this {import('../components/collapsableList').Collaspable}
-   */
-  async function expandList() {
-    const $target = this.$title;
-    const $ul = this.$ul;
-    const url = $target.data_url;
-    const state = $target.getAttribute('state');
-
-    if (!$ul) return;
-    $ul.textContent = null;
-
-    if (saveState) listState[url] = false;
-
-    if (state === 'uncollapsed') {
-      loading.start();
-      if (saveState) listState[url] = true;
-
-      try {
-        const fs = fsOperation(url);
-        let entries = await fs.lsDir();
-        entries = helpers.sortDir(
-          entries,
-          {
-            sortByName: true,
-            showHiddenFiles: true,
-          },
-        );
-        entries.map((entry) => {
-          const name = entry.name || Path.basename(entry.url);
-          if (entry.isDirectory) {
-            const $list = createFolderTile(name, entry.url);
-            $ul.appendChild($list);
-          } else {
-            const $item = createFileTile(name, entry.url);
-            $ul.append($item);
-          }
+  function Tail({ target }) {
+    return <span
+      className='icon more_vert'
+      attr-action='close'
+      onclick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        handleItems({
+          target: target(),
+          type: 'contextmenu',
         });
-      } catch (err) {
-        this.collapse();
-        helpers.error(err);
-      }
-      loading.stop();
-    }
+      }}
+    ></span>
   }
 }
 
-openFolder.updateHeight = function () {
-  if (!addedFolder.length) return;
-  let activeFileListHeight = 0;
-
-  // show active files in sidebar
-  if (appSettings.value.openFileListPos === appSettings.OPEN_FILE_LIST_POS_SIDEBAR) {
-    const client = editorManager.openFileList.getBoundingClientRect();
-    activeFileListHeight = client.height;
-  }
-
-  let totalFolder = addedFolder.length - 1;
-  for (let folder of addedFolder) {
-    folder.$node.style.maxHeight = `calc(100% - ${totalFolder * 30 + activeFileListHeight
-      }px)`;
-    folder.$node.style.height = `calc(100% - ${totalFolder * 30 + activeFileListHeight
-      }px)`;
-  }
-};
-
 openFolder.updateItem = function (oldFile, newFile, newFilename) {
-  const $el = editorManager.sidebar.querySelector(`[url="${oldFile}"]`);
+  const $el = Sidebar.el.get(`[url="${oldFile}"]`);
   if ($el) {
     $el.data_url = newFile;
     $el.data_name = newFilename;
@@ -652,7 +618,7 @@ openFolder.updateItem = function (oldFile, newFile, newFilename) {
 };
 
 openFolder.removeItem = function (url) {
-  const $el = editorManager.sidebar.querySelector(`[url="${url}"]`);
+  const $el = Sidebar.el.querySelector(`[url="${url}"]`);
   if ($el) {
     const type = $el.data_type;
     if (helpers.isFile(type)) {

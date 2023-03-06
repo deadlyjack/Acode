@@ -1,4 +1,3 @@
-// @import './fonts.scss';
 @import './searchBar.scss';
 @import './hints.scss';
 @import './fileInfo.scss';
@@ -30,6 +29,10 @@ body {
 }
 
 body {
+  --footer-height: 40px;
+  --header-height: 45px;
+  --tail-spin: url(https://localhost/__cdvfile_assets__/www/res/tail-spin.svg);
+
   user-select: none;
   font-family: 'Roboto', sans-serif;
   -webkit-tap-highlight-color: transparent;
@@ -249,7 +252,7 @@ a.icon {
       height: 16px;
       width: 16px;
       border: solid 1px #a90000;
-      border: solid 1px var(--accent-color);
+      border: solid 1px var(--active-color);
       background-color: currentColor;
       color: inherit !important;
     }
@@ -463,27 +466,20 @@ input {
   box-sizing: border-box;
   color: #252525;
   color: var(--secondary-text-color);
+  caret-color: currentColor;
   text-indent: 10px;
-
-  ::placeholder {
-    color: #252525;
-    color: var(--secondary-text-color);
-    opacity: 0.5;
-  }
 
   &:focus {
     border-bottom-color: #a90000 !important;
-    border-bottom-color: var(--accent-color) !important;
+    border-bottom-color: var(--active-color) !important;
   }
 }
 
 input,
 textarea {
   &::placeholder {
-    color: #252525;
-    color: var(--secondary-text-color);
+    color: inherit;
     opacity: 0.8;
-    text-transform: lowercase;
   }
 }
 
@@ -557,7 +553,7 @@ textarea {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 8px var(--box-shadow-color);
   border: none;
-  border: var(--clipboard-menu-border);
+  border: solid 1px var(--popup-border-color);
   color: #252525;
   color: var(--secondary-text-color);
   transform-origin: left center;
