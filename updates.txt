@@ -1,4 +1,4 @@
-version 1.8.0.beta 270
+version 1.8.0 272
 ☞ Plugins can support themes, fonts and sidebar items
 ☞ Redesigned sidebar and quicktools
 ☞ UI improvements

@@ -33,7 +33,8 @@
       "cordova-plugin-system": {},
       "cordova-plugin-sftp": {},
       "cordova-plugin-iap": {},
-      "cordova-plugin-server": {}
+      "cordova-plugin-server": {},
+      "cordova-plugin-ftp": {}
     },
     "platforms": [
       "android"
@@ -64,6 +65,7 @@
     "cordova-plugin-buildinfo": "^4.0.0",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^7.0.0",
+    "cordova-plugin-ftp": "file:src/plugins/ftp",
     "cordova-plugin-iap": "file:src/plugins/iap",
     "cordova-plugin-sdcard": "file:src/plugins/sdcard",
     "cordova-plugin-server": "file:src/plugins/server",
