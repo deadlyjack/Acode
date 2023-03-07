@@ -1,8 +1,9 @@
 import tag from "html-tag-js";
 import mimeTypes from 'mime-types';
 import dialogs from "../components/dialogs";
+import Sidebar from '../components/sidebar';
 import tile from "../components/tile";
-import fsOperation from "../fileSystem/fsOperation";
+import fsOperation from "../fileSystem";
 import { $save } from '../handlers/quickTools';
 import helpers from "../utils/helpers";
 import Path from "../utils/Path";
@@ -130,6 +131,10 @@ export default class EditorFile {
    * Whether to show run button or not
    */
   #canRun = Promise.resolve(false);
+  /**
+   * @type {function} event handler
+   */
+  #onFilePosChange;
   #events = {
     save: [],
     change: [],
@@ -231,8 +236,17 @@ export default class EditorFile {
       this.editable = editable;
     }
 
+    this.#onFilePosChange = () => {
+      if (appSettings.value.openFileListPos === appSettings.OPEN_FILE_LIST_POS_HEADER) {
+        this.#tab.oncontextmenu = startDrag;
+      } else {
+        this.#tab.oncontextmenu = null;
+      }
+    };
+
+    this.#onFilePosChange();
     this.#tab.onclick = tabOnclick.bind(this);
-    this.#tab.oncontextmenu = startDrag;
+    appSettings.on('update:openFileListPos', this.#onFilePosChange);
 
     addFile(this);
     this.session = ace.createEditSession(options?.text || '');
@@ -570,12 +584,12 @@ export default class EditorFile {
     this.#destroy();
 
     editorManager.files = editorManager.files.filter((file) => file.id !== this.id);
-    const { files, sidebar, activeFile } = editorManager;
+    const { files, activeFile } = editorManager;
     if (activeFile.id === this.id) {
       editorManager.activeFile = null;
     }
     if (!files.length) {
-      sidebar.hide();
+      Sidebar.hide();
       editorManager.activeFile = null;
       new EditorFile();
     } else {
@@ -925,6 +939,7 @@ export default class EditorFile {
 
   #destroy() {
     this.#emit('close', createFileEvent(this));
+    appSettings.off('update:openFileListPos', this.#onFilePosChange);
     this.session.off('changeScrollTop', EditorFile.#onscrolltop);
     this.session.off('changeScrollLeft', EditorFile.#onscrollleft);
     this.session.off('changeFold', EditorFile.#onfold);

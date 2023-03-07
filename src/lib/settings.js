@@ -1,8 +1,10 @@
 import constants from './constants';
-import fsOperation from '../fileSystem/fsOperation';
+import fsOperation from '../fileSystem';
 import helpers from '../utils/helpers';
 import Url from '../utils/Url';
 import lang from './lang';
+import ThemeBuilder from './themeBuilder';
+import themes from './themes';
 /**
  * @typedef {object} fileBrowserSettings
  * @property {string} showHiddenFiles
@@ -16,18 +18,8 @@ import lang from './lang';
  * @property {boolean} regExp
  */
 
-/**
- * @typedef {object} settingsValue
- * @property {fileBrowserSettings} fileBrowser
- * @property {number} maxFileSize
- * @property {searchAndFindSettings} search
- * @property {string} lang
- */
-
 class Settings {
-  /**
-   * @type {settingsValue}
-   */
+  #customTheme = new ThemeBuilder('Custom').toJSON();
   #defaultSettings;
   #oldSettings;
   #initialized = false;
@@ -56,28 +48,6 @@ class Settings {
   CONSOLE_LEGACY = 'legacy';
   PREVIEW_MODE_INAPP = 'inapp';
   PREVIEW_MODE_BROWSER = 'browser';
-
-  customTheme = {
-    '--accent-color': 'rgb(51,153,255)',
-    '--active-icon-color': 'rgba(0, 0, 0, 0.2)',
-    '--border-color': 'rgba(122, 122, 122, 0.227)',
-    '--box-shadow-color': 'rgba(0, 0, 0, 0.2)',
-    '--button-active-color': 'rgb(44,142,240)',
-    '--button-background-color': 'rgb(51,153,255)',
-    '--button-text-color': 'rgb(255,255,255)',
-    '--error-text-color': 'rgb(255,185,92)',
-    '--link-text-color': 'rgb(97,94,253)',
-    '--popup-active-color': 'rgb(169,0,0)',
-    '--popup-background-color': 'rgb(255,255,255)',
-    '--popup-border-color': 'rgba(0, 0, 0, 0)',
-    '--popup-icon-color': 'rgb(153,153,255)',
-    '--popup-text-color': 'rgb(37,37,37)',
-    '--primary-color': 'rgb(153,153,255)',
-    '--primary-text-color': 'rgb(255,255,255)',
-    '--scrollbar-color': 'rgba(0, 0, 0, 0.33)',
-    '--secondary-color': 'rgb(255,255,255)',
-    '--secondary-text-color': 'rgb(37,37,37)',
-  };
 
   constructor() {
     this.#defaultSettings = {
@@ -117,7 +87,6 @@ class Settings {
       scrollbarSize: 20,
       showSpaces: false,
       confirmOnExit: true,
-      customThemeMode: 'dark',
       lineHeight: 2,
       leftMargin: 50,
       checkFiles: true,
@@ -131,7 +100,7 @@ class Settings {
       teardropTimeout: 3000,
       teardropSize: 30,
       scrollSpeed: constants.SCROLL_SPEED_NORMAL,
-      customTheme: this.customTheme,
+      customTheme: this.#customTheme,
       relativeLineNumbers: false,
       elasticTabstops: false,
       rtlText: false,
@@ -157,8 +126,8 @@ class Settings {
 
     if (!(await fs.exists())) {
       await this.#save();
-      this.value = { ...this.#defaultSettings };
-      this.#oldSettings = { ...this.#defaultSettings };
+      this.value = structuredClone(this.#defaultSettings);
+      this.#oldSettings = structuredClone(this.#defaultSettings);
       this.value.lang = navigator.language || 'en-us';
       return;
     }
@@ -173,8 +142,14 @@ class Settings {
         }
       });
 
-      this.value = { ...settings };
-      this.#oldSettings = { ...settings };
+      this.value = structuredClone(settings);
+      this.#oldSettings = structuredClone(settings);
+      try {
+        themes.update(ThemeBuilder.fromJSON(this.value.customTheme));
+      } catch (error) {
+        themes.update(new ThemeBuilder('Custom').toJSON());
+      }
+
       return;
     }
 

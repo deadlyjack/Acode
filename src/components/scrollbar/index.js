@@ -1,4 +1,4 @@
-import './scrollbar.scss';
+import './style.scss';
 import tag from 'html-tag-js';
 
 /**

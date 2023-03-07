@@ -1,6 +1,6 @@
 import Ref from 'html-tag-js/ref';
 import alert from '../../components/dialogboxes/alert';
-import fsOperation from '../../fileSystem/fsOperation';
+import fsOperation from '../../fileSystem';
 import constants from '../../lib/constants';
 import Url from '../../utils/Url';
 
@@ -103,19 +103,14 @@ async function showReviews(pluginId, author) {
   app.append(<span style={{ zIndex: 998 }} ref={mask} onclick={closeReviews} className='mask'></span>);
   app.append(
     <div ref={container} className='reviews-container'>
-      <div className='reviews-header'>
-        <div>
-          <span className='icon chat_bubble'></span>
-          <span className='title'>Reviews</span>
-        </div>
-        <div>
-          <a style={{ textDecoration: 'none', display: 'flex' }} href={Url.join(constants.API_BASE, `../plugin/${pluginId}/comments`)}>
-            <span className='icon edit'></span>
-            <span className='title'>Review</span>
-          </a>
-        </div>
+      <div className='reviews-header' ontouchstart={ontouchstart}></div>
+      <div className='write-review'>
+        <a style={{ textDecoration: 'none', display: 'flex' }} href={Url.join(constants.API_BASE, `../plugin/${pluginId}/comments`)}>
+          <span className='icon edit'></span>
+          <span className='title'>Review</span>
+        </a>
       </div>
-      <div ref={body} className='reviews-body'></div>
+      <div ref={body} className='reviews-body loading'></div>
     </div>
   );
 
@@ -134,16 +129,54 @@ async function showReviews(pluginId, author) {
     });
   } catch (error) {
     body.textContent = error.message;
+  } finally {
+    body.classList.remove('loading');
   }
 
   function closeReviews() {
     actionStack.remove('reviews');
-    container.el.classList.add('hide');
+    container.classList.add('hide');
 
     setTimeout(() => {
       mask.el.remove();
       container.el.remove();
     }, 300);
+  }
+
+  /**
+   * @param {TouchEvent} e 
+   */
+  function ontouchstart(e) {
+    const { clientY } = e.touches[0];
+    const { top } = container.el.getBoundingClientRect();
+    const y = clientY - top;
+    let dy = 0;
+
+    container.style.transition = 'none';
+    document.addEventListener('touchmove', ontouchmove);
+    document.addEventListener('touchend', ontouchend);
+    document.addEventListener('touchcancel', ontouchend);
+
+    function ontouchmove(e) {
+      const { clientY } = e.touches[0];
+      dy = clientY - top - y;
+
+      if (dy < 0) dy = 0;
+
+      container.style.transform = `translateY(${dy}px)`;
+    }
+
+    function ontouchend() {
+      document.removeEventListener('touchmove', ontouchmove);
+      document.removeEventListener('touchend', ontouchend);
+      document.removeEventListener('touchcancel', ontouchcancel);
+      if (dy < 100) {
+        container.style.transition = 'transform 0.3s ease-in-out';
+        container.style.transform = 'translateY(0)';
+        return;
+      }
+      closeReviews();
+    }
   }
 }
 

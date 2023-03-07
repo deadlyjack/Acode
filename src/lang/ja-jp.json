@@ -313,5 +313,7 @@
   "medium": "中",
   "refund": "払い戻し",
   "product not available": "利用不可の製品",
-  "no-product-info": "現在、この製品はお住まいの国でご利用できません。後でもう一度お試しください。"
+  "no-product-info": "現在、この製品はお住まいの国でご利用できません。後でもう一度お試しください。",
+  "close": "Close",
+  "explore": "Explore"
 }

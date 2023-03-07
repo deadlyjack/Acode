@@ -1,4 +1,4 @@
-import fsOperation from "../fileSystem/fsOperation";
+import fsOperation from "../fileSystem";
 import loadPlugin from "./loadPlugin";
 import Url from "../utils/Url";
 

@@ -1,3 +1,9 @@
+version 1.8.0.beta 270
+☞ Plugins can support themes, fonts and sidebar items
+☞ Redesigned sidebar and quicktools
+☞ UI improvements
+☞ Bugs fixes
+
 version 1.7.2 268
 ☞ Added new command to toggle quick tools
 ☞ Added back search in quick tools

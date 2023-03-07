@@ -2,6 +2,7 @@ import constants from '../lib/constants';
 import scrollSettings from './scrollSettings';
 import settingsPage from '../components/settingPage';
 import appSettings from '../lib/settings';
+import fonts from '../lib/fonts';
 
 export default function editorSettings() {
   const title = strings['editor settings'];
@@ -81,17 +82,9 @@ export default function editorSettings() {
       key: 'editorFont',
       text: strings['editor font'],
       value: values.editorFont,
-      select: [
-        'Fira Code',
-        'Roboto Mono',
-        'Source Code',
-        'Cascadia Code',
-        'Proggy Clean',
-        'VictorMono Italic',
-        'VictorMono Medium',
-        'JetBrains Mono Bold',
-        'JetBrains Mono Regular'
-      ],
+      get select() {
+        return fonts.getNames();
+      },
     },
     {
       key: 'liveAutoCompletion',
@@ -175,6 +168,9 @@ export default function editorSettings() {
       case 'scroll-settings':
         scrollSettings();
         break;
+
+      case 'editorFont':
+        fonts.setFont(value);
 
       default:
         appSettings.update({

@@ -1,4 +1,4 @@
-#command-pallete {
+#pallete {
   position: fixed;
   top: 0;
   left: 0;
@@ -20,10 +20,6 @@
   input {
     width: 100%;
     border: none;
+    color: var(--primary-text-color);
   }
 }
-
-// #command-pallete-hint-box {
-//   width: 90vw;
-//   max-width: 600px;
-// }

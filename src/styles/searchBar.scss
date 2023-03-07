@@ -12,13 +12,13 @@
 
   input {
     flex: 1;
-    // max-width: 600px;
     border-radius: 4px;
     box-shadow: rgba(0, 0, 0, 0.2);
     box-shadow: var(--box-shadow-color);
     border: none;
     margin: 5px;
     box-sizing: border-box;
+    color: var(--primary-text-color);
 
     &:focus {
       outline: none;

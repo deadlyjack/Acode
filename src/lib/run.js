@@ -6,7 +6,7 @@ import $_markdown from '../views/markdown.hbs';
 import helpers from '../utils/helpers';
 import dialogs from '../components/dialogs';
 import constants from './constants';
-import fsOperation from '../fileSystem/fsOperation';
+import fsOperation from '../fileSystem';
 import Url from '../utils/Url';
 import openFolder from './openFolder';
 import appSettings from './settings';

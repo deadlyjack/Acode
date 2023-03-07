@@ -313,5 +313,7 @@
   "medium": "Medium",
   "refund": "Refund",
   "product not available": "Product not available",
-  "no-product-info": "This product is not available in your country at this moment, please try again later."
+  "no-product-info": "This product is not available in your country at this moment, please try again later.",
+  "close": "Close",
+  "explore": "Explore"
 }

@@ -1,6 +1,8 @@
 import { actions } from '../handlers/quickTools';
 import constants from './constants';
 import appSettings from '../lib/settings';
+import fonts from './fonts';
+import themes from './themes';
 
 export default {
   beforeRender() {
@@ -30,5 +32,7 @@ export default {
     }
 
     actions('set-quick-tools-height', settings.quickTools);
+    fonts.setFont(settings.editorFont);
+    themes.apply(settings.appTheme);
   },
 };

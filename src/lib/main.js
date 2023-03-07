@@ -2,20 +2,18 @@ import 'core-js/stable';
 import 'html-tag-js/dist/polyfill';
 
 import '../styles/main.scss';
-import '../styles/themes.scss';
 import '../styles/page.scss';
 import '../styles/list.scss';
-import '../styles/sidenav.scss';
 import '../styles/tile.scss';
 import '../styles/contextMenu.scss';
 import '../styles/dialogs.scss';
 import '../styles/help.scss';
 import '../styles/overrideAceStyle.scss';
 import '../ace/modelist';
-import '../components/WebComponents/components';
+import '../components/WebComponents';
 import mustache from 'mustache';
 import tile from '../components/tile';
-import sidenav from '../components/sidenav';
+import Sidebar from '../components/sidebar';
 import contextMenu from '../components/contextMenu';
 import EditorManager from './editorManager';
 import ActionStack from './actionStack';
@@ -28,20 +26,21 @@ import quickToolsInit from '../handlers/quickToolsInit';
 import loadPolyFill from '../utils/polyfill';
 import Url from '../utils/Url';
 import applySettings from './applySettings';
-import fsOperation from '../fileSystem/fsOperation';
+import fsOperation from '../fileSystem';
 import toast from '../components/toast';
 import $_menu from '../views/menu.hbs';
 import $_fileMenu from '../views/file-menu.hbs';
-import Icon from '../components/icon';
 import restoreTheme from './restoreTheme';
 import openFiles from './openFiles';
 import loadPlugins from './loadPlugins';
 import checkPluginsUpdate from './checkPluginsUpdate';
-import plugins from '../pages/plugins/plugins';
+import plugins from '../pages/plugins';
 import Acode from './acode';
 import ajax from '@deadlyjack/ajax';
 import lang from './lang';
 import EditorFile from './editorFile';
+import sidebarApps from '../sidebarApps';
+import checkFiles from './checkFiles';
 
 window.onload = Main;
 
@@ -216,14 +215,6 @@ async function ondeviceready() {
       });
   }
 
-  acode.setLoadingMessage('Loading custom theme...');
-  document.head.append(
-    <style id='custom-theme'>{helpers.jsonToCSS(
-      constants.CUSTOM_THEME,
-      settings.value.customTheme,
-    )}</style>
-  );
-
   acode.setLoadingMessage('Loading language...');
   await lang.set(settings.value.lang);
 
@@ -234,7 +225,7 @@ async function loadApp() {
   //#region declaration
   const $editMenuToggler = <span className='icon edit' attr-action='toggle-edit-menu' style={{ fontSize: '1.2em' }} />;
   const $navToggler = <span className='icon menu' attr-action='toggle-sidebar'></span>;
-  const $menuToggler = Icon('more_vert', 'toggle-menu');
+  const $menuToggler = <span className='icon more_vert' attr-action='toggle-menu'></span>;
   const $header = tile({
     type: 'header',
     text: 'Acode',
@@ -278,20 +269,18 @@ async function loadApp() {
     },
   });
   const $main = <main></main>;
-  const $sidebar = sidenav($main, $navToggler);
+  const $sidebar = <Sidebar container={$main} toggler={$navToggler} />;
   const $runBtn = <span style={{ fontSize: '1.2em' }} className='icon play_arrow' attr-action='run' onclick={() => acode.exec('run')} oncontextmenu={() => acode.exec('run-file')}></span>;
   const $floatingNavToggler = <span id='sidebar-toggler' className='floating icon menu' onclick={() => acode.exec('toggle-sidebar')}></span>;
   const $headerToggler = <span className='floating icon keyboard_arrow_left' id='header-toggler'></span>;
   const folders = helpers.parseJSON(localStorage.folders);
   const files = helpers.parseJSON(localStorage.files) || [];
-  const editorManager = await EditorManager($sidebar, $header, $main);
+  window.editorManager = await EditorManager($header, $main);
   //#endregion
 
-  window.editorManager = editorManager;
   acode.$headerToggler = $headerToggler;
 
   actionStack.onCloseApp = () => acode.exec('save-state');
-  $sidebar.setAttribute('empty-msg', strings['open folder']);
 
   $headerToggler.onclick = function () {
     root.classList.toggle('show-header');
@@ -306,6 +295,7 @@ async function loadApp() {
 
   //#region Add event listeners
   quickToolsInit();
+  await sidebarApps.init($sidebar);
   editorManager.onupdate = onEditorUpdate;
   root.on('show', mainPageOnShow);
   app.addEventListener('click', onClickApp);
@@ -327,7 +317,8 @@ async function loadApp() {
     acode.exec('save-state');
   });
   document.addEventListener('resume', () => {
-    acode.exec('check-files');
+    if (!settings.value.checkFiles) return;
+    checkFiles();
   });
   //#endregion
 

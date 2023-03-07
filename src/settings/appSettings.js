@@ -2,7 +2,7 @@ import dialogs from '../components/dialogs';
 import constants from '../lib/constants';
 import helpers from '../utils/helpers';
 import openFile from '../lib/openFile';
-import fsOperation from '../fileSystem/fsOperation';
+import fsOperation from '../fileSystem';
 import ajax from '@deadlyjack/ajax';
 import Url from '../utils/Url';
 import settingsPage from '../components/settingPage';

@@ -1,5 +1,5 @@
 import Ref from 'html-tag-js/ref';
-import FileBrowser from '../pages/fileBrowser/fileBrowser';
+import FileBrowser from '../pages/fileBrowser';
 import Checkbox from './checkbox';
 import dialogs from './dialogs';
 

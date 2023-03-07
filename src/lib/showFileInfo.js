@@ -1,7 +1,7 @@
 import { filesize } from 'filesize';
 import mustache from 'mustache';
 import $_fileInfo from '../views/file-info.hbs';
-import fsOperation from '../fileSystem/fsOperation';
+import fsOperation from '../fileSystem';
 import Url from '../utils/Url';
 import dialogs from '../components/dialogs';
 import helpers from '../utils/helpers';

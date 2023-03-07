@@ -4,7 +4,6 @@
 
   #theme-preview:not(:empty) {
     height: 120px;
-    margin-top: 10px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
     box-shadow: 0 0 4px var(--box-shadow-color);
     pointer-events: none;
@@ -14,16 +13,11 @@
     background-color: var(--primary-color);
   }
 
-  #theme-preview-header {
-    position: fixed;
-    top: auto;
-    bottom: 120px;
-    left: 0;
-    height: 10px;
-    background-color: inherit;
-  }
-
   #theme-list {
     flex: 1;
+
+    .text {
+      text-transform: capitalize;
+    }
   }
 }

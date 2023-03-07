@@ -1,22 +1,22 @@
 import list from '../components/collapsableList';
 import helpers from '../utils/helpers';
 import openFolder from './openFolder';
-import ScrollBar from '../components/scrollbar/scrollbar';
+import ScrollBar from '../components/scrollbar';
 import Commands from '../ace/commands';
 import touchListeners from '../ace/touchHandler';
 import appSettings from './settings';
 import EditorFile from './editorFile';
 import { $quickToolToggler } from '../handlers/quickTools';
+import sidebarApps from '../sidebarApps';
 
 //TODO: Add option to work multiple files at same time in large display.
 
 /**
  *
- * @param {HTMLElement} $sidebar
  * @param {HTMLElement} $header
  * @param {HTMLElement} $body
  */
-async function EditorManager($sidebar, $header, $body) {
+async function EditorManager($header, $body) {
   /**
    * @type {Collaspable & HTMLElement}
    */
@@ -28,7 +28,7 @@ async function EditorManager($sidebar, $header, $body) {
   let scrollBarVisiblityCount = 0;
   let timeoutQuicktoolToggler;
   let timeoutHeaderToggler;
-  const { scrollbarSize, editorFont } = appSettings.value;
+  const { scrollbarSize } = appSettings.value;
   const events = {
     'switch-file': [],
     'rename-file': [],
@@ -65,11 +65,10 @@ async function EditorManager($sidebar, $header, $body) {
     getFile,
     switchFile,
     hasUnsavedFiles,
-    moveOpenFileList,
     header: $header,
-    sidebar: $sidebar,
     container: $container,
     get openFileList() {
+      if (!$openFileList) initFileTabContainer();
       return $openFileList;
     },
     get TIMEOUT_VALUE() {
@@ -88,8 +87,6 @@ async function EditorManager($sidebar, $header, $body) {
     }
   };
 
-  setFont(editorFont);
-  moveOpenFileList();
   $body.appendChild($container);
   await setupEditor();
 
@@ -136,16 +133,12 @@ async function EditorManager($sidebar, $header, $body) {
     editor.setOption('showInvisibles', value);
   });
 
-  appSettings.on('update:editorFont', function (value) {
-    setFont(value);
-  });
-
   appSettings.on('update:fontSize', function (value) {
     editor.setFontSize(value);
   });
 
   appSettings.on('update:openFileListPos', function (value) {
-    moveOpenFileList();
+    initFileTabContainer();
     $vScrollbar.resize();
   });
 
@@ -205,7 +198,7 @@ async function EditorManager($sidebar, $header, $body) {
   function addFile(file) {
     if (manager.files.includes(file)) return;
     manager.files.push(file);
-    $openFileList.append(file.tab);
+    manager.openFileList.append(file.tab);
     $header.text = file.name;
   }
 
@@ -424,7 +417,7 @@ async function EditorManager($sidebar, $header, $body) {
     events.emit('switch-file', file);
   }
 
-  function moveOpenFileList() {
+  function initFileTabContainer() {
     let $list;
 
     if ($openFileList) {
@@ -449,17 +442,14 @@ async function EditorManager($sidebar, $header, $body) {
       }
     } else {
       $openFileList = list(strings['active files']);
-      $openFileList.ontoggle = function () {
-        openFolder.updateHeight();
-      };
       if ($list) $openFileList.$ul.append(...$list);
-      $sidebar.insertBefore($openFileList, $sidebar.firstElementChild);
+      const files = sidebarApps.get('files');
+      files.insertBefore($openFileList, files.firstElementChild);
       root.classList.remove('top-bar');
 
       const oldAppend = $openFileList.$ul.append;
       $openFileList.append = (...args) => {
         oldAppend.apply($openFileList.$ul, args);
-        openFolder.updateHeight();
       }
     }
   }
@@ -491,25 +481,6 @@ async function EditorManager($sidebar, $header, $body) {
           return false;
       }
     });
-  }
-
-  function setFont(font) {
-    let $style = tag.get("#font-style");
-    if (!$style) {
-      $style = <style id="font-style"></style>;
-    }
-
-    $style.textContent = `.editor-container.ace_editor{
-  font-family: monotty, "${font}", NotoMono, Monaco, MONOSPACE !important;
-}
-.ace_text{
-  font-family: inherit !important;
-}`;
-    $container.dataset.font = font;
-
-    if (!$style.isConnected) {
-      document.head.append($style);
-    }
   }
 }
 

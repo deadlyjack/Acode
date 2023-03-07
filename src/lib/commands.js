@@ -7,20 +7,20 @@ import helpers from '../utils/helpers';
 import constants from './constants';
 import help from '../settings/help';
 import recents from '../lib/recents';
-import fsOperation from '../fileSystem/fsOperation';
+import fsOperation from '../fileSystem';
 import Modes from '../pages/modes/modes';
 import { actions } from '../handlers/quickTools';
-import FileBrowser from '../pages/fileBrowser/fileBrowser';
+import FileBrowser from '../pages/fileBrowser';
 import path from '../utils/Path';
 import showFileInfo from './showFileInfo';
 import checkFiles from './checkFiles';
 import saveState from './saveState';
 import commandPallete from '../components/commandPallete';
-import tag from 'html-tag-js';
-import TextEncodings from '../pages/textEncodings/textEncodings';
+import TextEncodings from '../pages/textEncodings';
 import EditorFile from './editorFile';
 import findFile from '../components/findFile';
 import appSettings from './settings';
+import Sidebar from '../components/sidebar';
 
 export default {
   'close-all-tabs'() {
@@ -109,7 +109,7 @@ export default {
       )
       .then((filename) => {
         if (filename) {
-          filename = helpers.removeLineBreaks(filename);
+          filename = helpers.fixFilename(filename);
           new EditorFile(filename, {
             isUnsaved: false,
           })
@@ -237,7 +237,7 @@ export default {
     this['resize-editor']();
   },
   'toggle-sidebar'() {
-    editorManager.sidebar.toggle();
+    Sidebar.toggle();
   },
   'toggle-menu'() {
     tag.get('[action=toggle-menu]')?.click();
@@ -247,14 +247,18 @@ export default {
   },
   'insert-color'() {
     const { editor } = editorManager;
-    const color = editor.session.getTextRange(editor.getSelectionRange());
+    let color = editor.session.getTextRange(editor.getSelectionRange());
+
+    if (!helpers.isValidColor(color)) {
+      color = undefined;
+    }
 
     editor.blur();
-    dialogs.color(color)
-      .then((res) => {
-        editor.insert(res);
-        editor.focus();
-      });
+    (async () => {
+      const res = await dialogs.color(color);
+      editor.insert(res);
+      editor.focus();
+    })();
   },
   'copy'() {
     editorManager.editor.execCommand('copy');
@@ -288,7 +292,7 @@ export default {
     );
 
     if (!newname || newname === file.filename) return;
-    newname = helpers.removeLineBreaks(newname);
+    newname = helpers.fixFilename(newname);
     const { uri } = file;
     if (uri) {
       const fs = fsOperation(uri);

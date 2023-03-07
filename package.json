@@ -29,7 +29,6 @@
       "cordova-plugin-file": {
         "ANDROIDX_WEBKIT_VERSION": "1.4.0"
       },
-      "cordova-plugin-ftp": {},
       "cordova-plugin-sdcard": {},
       "cordova-plugin-system": {},
       "cordova-plugin-sftp": {},
@@ -65,7 +64,6 @@
     "cordova-plugin-buildinfo": "^4.0.0",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^7.0.0",
-    "cordova-plugin-ftp": "file:src/plugins/ftp",
     "cordova-plugin-iap": "file:src/plugins/iap",
     "cordova-plugin-sdcard": "file:src/plugins/sdcard",
     "cordova-plugin-server": "file:src/plugins/server",
@@ -96,7 +94,7 @@
     "escape-string-regexp": "^5.0.0",
     "esprima": "^4.0.1",
     "filesize": "^10.0.5",
-    "html-tag-js": "^1.1.36",
+    "html-tag-js": "^1.1.37",
     "irid": "^4.0.0",
     "js-base64": "^3.7.4",
     "jszip": "^3.10.1",

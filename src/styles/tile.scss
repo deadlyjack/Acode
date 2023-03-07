@@ -82,6 +82,10 @@ header {
     width: var(--header-height);
     font-size: 2em;
 
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1.5em;
+
     &:active {
       transition: all 100ms ease;
       transform: scale(0.95) translateZ(0);

@@ -1,6 +1,5 @@
 import escapeStringRegexp from 'escape-string-regexp';
 import URLParse from 'url-parse';
-import { AES, enc } from 'crypto-js';
 import constants from '../lib/constants';
 import dialogs from '../components/dialogs';
 import keyBindings from '../lib/keyBindings';
@@ -9,25 +8,12 @@ import ajax from '@deadlyjack/ajax';
 import path from './Path';
 import Url from './Url';
 import Uri from './Uri';
-import fsOperation from '../fileSystem/fsOperation';
+import fsOperation from '../fileSystem';
 import appSettings from '../lib/settings';
-
-const credentials = {
-  key: 'xkism2wq3)(I#$MNkds0)*(73am)(*73_L:w3k[*(#WOd983jkdssap sduy*&T#W3elkiu8983hKLUYs*(&y))',
-
-  encrypt(str) {
-    return AES.encrypt(str, this.key).toString();
-  },
-
-  decrypt(str) {
-    return AES.decrypt(str, this.key).toString(enc.Utf8);
-  },
-};
 
 let loaderIsImmortal = false;
 
 export default {
-  credentials,
   showTitleLoader(immortal = false) {
     if (typeof immortal === 'boolean') {
       loaderIsImmortal = immortal;
@@ -379,52 +365,24 @@ export default {
     return null;
   },
   /**
+   * Checks if the value is a valid color
+   * @param {string} value 
+   * @returns 
+   */
+  isValidColor(value) {
+    return (
+      /#[0-9a-f]{3,8}/.test(value) ||
+      /rgba?\(\d{1,3},\s?\d{1,3},\s?\d{1,3}(,\s?[0-1])?\)/.test(value) ||
+      /hsla?\(\d{1,3},\s?\d{1,3}%,\s?\d{1,3}%(,\s?[0-1])?\)/.test(value)
+    )
+  },
+  /**
    *
    * @param {string} str
    * @returns {string}
    */
   removeLineBreaks(str) {
     return str.replace(/(\r\n)+|\r+|\n+|\t+/g, '');
-  },
-  /**
-   * Conversts base64 string ot Blob
-   * @param {Uint8Array} byteCharacters
-   * @param {String} contentType
-   * @param {Number} sliceSize
-   * @returns {Blob}
-   */
-  base64toBlob(byteCharacters, contentType, sliceSize) {
-    contentType = contentType || '';
-    sliceSize = sliceSize || 512;
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-      let slice = byteCharacters.slice(offset, offset + sliceSize);
-
-      let byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-
-      let byteArray = new Uint8Array(byteNumbers);
-
-      byteArrays.push(byteArray);
-    }
-
-    let blob = new Blob(byteArrays, {
-      type: contentType,
-    });
-    return blob;
-  },
-  blobToBase64(blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        resolve(reader.result);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
   },
   /**
    * Gets body for feedback email
@@ -449,26 +407,6 @@ export default {
       eol +
       'Info: '
     );
-  },
-  /**
-   * Converts Blob object to text
-   * @param {Blob} blob
-   * @returns {Promise<string>}
-   */
-  blob2text(blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = function () {
-        resolve(reader.result);
-      };
-
-      reader.onerror = function () {
-        reject(reader.error);
-      };
-
-      reader.readAsText(blob);
-    });
   },
   /**
    * Returns unique ID
@@ -498,64 +436,6 @@ export default {
     }
   },
   /**
-   * Loads script files to app
-   * @param  {...string} scripts
-   * @returns {Promise<void>}
-   */
-  loadScripts(...scripts) {
-    return new Promise((resolve) => {
-      load();
-
-      function load() {
-        const script = scripts.splice(0, 1);
-        ajax({
-          url: script,
-          responseType: 'text',
-        })
-          .then((res) => {
-            const $script = tag('script', {
-              id: script,
-              textContent: res,
-            });
-            document.head.append($script);
-          })
-          .finally(() => {
-            if (!scripts.length) resolve();
-            else load();
-          });
-      }
-    });
-  },
-  /**
-   * Loads style sheet to app
-   * @param  {...string} styles
-   * @returns {Promise<void>}
-   */
-  loadStyles(...styles) {
-    return new Promise((resolve) => {
-      load();
-
-      function load() {
-        const style = styles.splice(0, 1);
-        ajax({
-          url: style,
-          responseType: 'text',
-        })
-          .then((res) => {
-            const $style = tag('style', {
-              id: style,
-              textContent: res,
-            });
-            document.head.append($style);
-          })
-          .finally(() => {
-            if (!styles.length) resolve();
-            else load();
-          });
-      }
-    });
-  },
-  /**
    * Parses JSON string, if fails returns null
    * @param {Object|Array} string
    */
@@ -566,17 +446,6 @@ export default {
     } catch (e) {
       return null;
     }
-  },
-  /**
-   * Gets keyboard combination pressed by user
-   * @param {KeyboardEvent} e
-   * @returns {string}
-   */
-  getCombination(e) {
-    let key = e.ctrlKey ? 'Ctrl-' : '';
-    key += e.shiftKey ? 'Shift-' : '';
-    key += e.key;
-    return key.toLowerCase();
   },
   /**
    * Decodes arrayBuffer to String according given encoding type
@@ -594,21 +463,6 @@ export default {
       return this.parseJSON(result);
     }
     return result;
-  },
-  /**
-   * Converts JSON object to CSS string
-   * @param {String} selector
-   * @param {Map<String, String>} obj
-   * @returns {String}
-   */
-  jsonToCSS(selector, obj) {
-    let cssText = `${selector}{\n`;
-
-    for (let key in obj) {
-      cssText += `${key}: ${obj[key]};\n`;
-    }
-
-    return cssText + '}';
   },
   /**
    * Checks if content is binary
@@ -785,7 +639,6 @@ export default {
     const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
     return editorHeight;
   },
-
   getEditorWidth(editor) {
     const { renderer, session } = editor;
     const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
@@ -796,7 +649,6 @@ export default {
       return editorWidth + appSettings.value.leftMargin;
     }
   },
-
   async toInternalUri(uri) {
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURL(uri, (entry) => {
@@ -804,7 +656,6 @@ export default {
       }, reject);
     });
   },
-
   decodeUrl(url) {
     const uuid = this.uuid();
 
@@ -846,13 +697,11 @@ export default {
 
     return { username, password, hostname, pathname, port, query };
   },
-
   promisify(func, ...args) {
     return new Promise((resolve, reject) => {
       func(...args, resolve, reject);
     });
   },
-
   async checkAPIStatus() {
     try {
       const { status } = await ajax.get(Url.join(constants.API_BASE, 'status'));
@@ -860,5 +709,9 @@ export default {
     } catch (error) {
       return false;
     }
+  },
+  fixFilename(name) {
+    name = name.trim();
+    return this.removeLineBreaks(name);
   }
 };

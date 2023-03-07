@@ -1,5 +1,5 @@
 import ajax from "@deadlyjack/ajax";
-import fsOperation from "../fileSystem/fsOperation";
+import fsOperation from "../fileSystem";
 import Url from "../utils/Url";
 
 export default async function checkPluginsUpdate() {

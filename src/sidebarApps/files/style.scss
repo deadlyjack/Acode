@@ -1,0 +1,14 @@
+.container.files {
+  &:empty {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &::after {
+      content: attr(data-msg);
+      font-weight: 600;
+    }
+  }
+}
