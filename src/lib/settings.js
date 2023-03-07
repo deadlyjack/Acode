@@ -144,7 +144,12 @@ class Settings {
 
       this.value = structuredClone(settings);
       this.#oldSettings = structuredClone(settings);
-      themes.update(ThemeBuilder.fromJSON(this.value.customTheme));
+      try {
+        themes.update(ThemeBuilder.fromJSON(this.value.customTheme));
+      } catch (error) {
+        themes.update(new ThemeBuilder('Custom').toJSON());
+      }
+
       return;
     }
 
