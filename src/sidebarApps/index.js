@@ -9,6 +9,7 @@ let currentSection = null;
 const contents = new Map();
 
 /**
+ * @param {string} icon
  * @param {string} id
  * @param {HTMLElement} el
  * @param {string} title

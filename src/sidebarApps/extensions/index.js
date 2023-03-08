@@ -164,18 +164,17 @@ function ListItem({ icon, name, id, version, installed }) {
   if (installed === undefined) {
     installed = !!installedPlugins.find(({ id: _id }) => _id === id);
   }
-  const $el = <div className='tile'>
+  const $el = <div className='tile' data-pluing-id={id}>
     <span className='icon' style={{ backgroundImage: `url(${icon})` }}></span>
     <span className='text sub-text' data-subtext={`v${version}${installed ? ` • ${strings['installed']}` : ''}`}>{name}</span>
   </div>;
 
   $el.onclick = () => {
     plugin({ id, installed }, () => {
-      if ($installed.uncollapsed) {
-        $installed.$ul.append(
-          <ListItem icon={icon} name={name} id={id} version={version} installed={true} />,
-        );
-      }
+      const $item = () => <ListItem icon={icon} name={name} id={id} version={version} installed={true} />;
+      if ($installed.contains($el)) $installed.$ul?.append($item());
+      if ($explor.contains($el)) $explor.$ul?.replaceChild($item(), $el);
+      if ($searchResult.contains($el)) $searchResult?.replaceChild($item(), $el);
     }, () => {
       $el.remove();
     });
