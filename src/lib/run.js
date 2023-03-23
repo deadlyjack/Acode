@@ -11,6 +11,9 @@ import Url from '../utils/Url';
 import openFolder from './openFolder';
 import appSettings from './settings';
 
+/**@type {Server} */
+let webServer;
+
 /**
  * Starts the server and run the active file in browser
  * @param {Boolean} isConsole
@@ -149,18 +152,13 @@ async function run(
   }
 
   function startServer() {
-    let serverHandler = (msg) => {
-      openBrowser();
-    }
-    if (acode.webServer) {
-      acode.webServer.stop();
-    }
-    acode.webServer = CreateServer(
+    webServer?.stop();
+    webServer = CreateServer(
       port,
-      serverHandler,
+      openBrowser,
       onError,
     );
-    acode.webServer.setOnRequestHandler(handleRequest);
+    webServer.setOnRequestHandler(handleRequest);
 
     function onError(err) {
       if (err === 'Server already running') {
@@ -174,11 +172,7 @@ async function run(
 
   function handleRequest(req) {
     const reqId = req.requestId;
-    let reqPath = req.path.substr(1);
-
-    if (reqPath === '/') {
-      reqPath = 'index.html';
-    }
+    const reqPath = req.path.substr(1) || 'index.html';
 
     const ext = helpers.extname(reqPath);
     let url = null;
@@ -298,7 +292,7 @@ async function run(
   }
 
   function error(id) {
-    acode.webServer?.send(id, {
+    webServer?.send(id, {
       status: 404,
       body: 'File not found!',
     });
@@ -394,7 +388,7 @@ async function run(
       path = tempFile;
     }
 
-    acode.webServer?.send(id, {
+    webServer?.send(id, {
       status: 200,
       path,
       headers: {
@@ -425,7 +419,7 @@ async function run(
   }
 
   function sendText(text, id, mimeType, processText) {
-    acode.webServer?.send(id, {
+    webServer?.send(id, {
       status: 200,
       body: processText ? processText(text) : text,
       headers: {

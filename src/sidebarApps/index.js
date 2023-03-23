@@ -16,28 +16,38 @@ const contents = new Map();
  * @param {(container:HTMLElement)=>void} initFunction
  * @returns {void}
  */
-function add(icon, id, title, initFunction) {
+function add(icon, id, title, initFunction, prepend) {
   const container = <div className='container'></div>;
   if (!currentSection) {
     currentSection = id;
     $sidebar.replaceChild(container, getContainer());
   }
   contents.set(id, container);
-  $apps.append(
-    <Icon icon={icon} id={id} title={title} />,
-  );
+
+  if (prepend) {
+    $apps.prepend(
+      <Icon icon={icon} id={id} title={title} />,
+    );
+  } else {
+    $apps.append(
+      <Icon icon={icon} id={id} title={title} />,
+    );
+  }
+
 
   if (initFunction) {
     initFunction(container);
   }
 }
 
-async function init($el) {
+function init($el) {
   $sidebar = $el;
   $apps = $sidebar.get('.apps');
+}
 
-  add(...(await import('./files')).default);
-  add(...(await import('./extensions')).default);
+async function loadApps() {
+  add(...(await import('./extensions')).default, true);
+  add(...(await import('./files')).default, true);
 }
 
 /**
@@ -82,4 +92,5 @@ export default {
   init,
   add,
   get,
+  loadApps,
 };
