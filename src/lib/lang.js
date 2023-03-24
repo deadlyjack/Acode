@@ -89,6 +89,12 @@ const langMap = {
       return await import('../lang/zh-hant.json');
     },
   },
+  'zh-tw': {
+    name: '繁體中文 (台灣)',
+    async strings() {
+      return await import('../lang/zh-tw.json');
+    },
+  },
   'ir-fa': {
     name: 'فارسی',
     async strings() {
