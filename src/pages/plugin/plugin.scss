@@ -143,8 +143,11 @@
       font-size: 0.8rem;
       padding: 5px;
       margin: 5px 0;
+      background-color: rgb(153, 153, 255);
       background-color: var(--primary-color);
+      color: rgb(255, 255, 255);
       color: var(--primary-text-color);
+      border-left: solid 5px rgb(51, 153, 255);
       border-left: solid 5px var(--active-color);
       overflow: auto;
       width: calc(100% - 10px);
@@ -176,6 +179,7 @@
   height: 70vh;
   top: auto;
   bottom: 0;
+  background-color: rgb(255, 255, 255);
   background-color: var(--secondary-color);
   z-index: 999;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.07);
@@ -246,6 +250,7 @@
         width: 30px;
         height: 30px;
         border-radius: 50%;
+        border: 3px solid rgb(255, 255, 255);
         border: 3px solid var(--primary-text-color);
         border-top-color: transparent;
         animation: spin 1s linear infinite;

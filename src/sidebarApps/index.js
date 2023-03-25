@@ -1,9 +1,10 @@
+const SIDRBAR_APPS_LAST_SECTION = 'sidebarAppslastSection';
 /**@type {HTMLElement} */
 let $sidebar = null;
 /**@type {HTMLElement} */
 let $apps = null;
 /**@type {string} */
-let currentSection = null;
+let currentSection = localStorage.getItem(SIDRBAR_APPS_LAST_SECTION);
 
 /**@type {Map<string, HTMLElement>} */
 const contents = new Map();
@@ -18,11 +19,13 @@ const contents = new Map();
  */
 function add(icon, id, title, initFunction, prepend) {
   const container = <div className='container'></div>;
-  if (!currentSection) {
-    currentSection = id;
+  contents.set(id, container);
+
+  if (!currentSection) currentSection = id;
+
+  if (currentSection === id) {
     $sidebar.replaceChild(container, getContainer());
   }
-  contents.set(id, container);
 
   if (prepend) {
     $apps.prepend(
@@ -46,8 +49,8 @@ function init($el) {
 }
 
 async function loadApps() {
-  add(...(await import('./extensions')).default, true);
-  add(...(await import('./files')).default, true);
+  add(...(await import('./files')).default);
+  add(...(await import('./extensions')).default);
 }
 
 /**
@@ -60,6 +63,7 @@ async function loadApps() {
  */
 function Icon({ icon, id, title }) {
   const onclick = function () {
+    localStorage.setItem(SIDRBAR_APPS_LAST_SECTION, id);
     const currentContent = getContainer();
     const content = contents.get(id);
 

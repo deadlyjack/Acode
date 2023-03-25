@@ -6,12 +6,16 @@ export default class WCPage extends HTMLElement {
   #on = {
     hide: [],
     show: [],
+    willconnect: [],
+    willdisconnect: [],
   };
   #append;
   handler;
   onhide;
   onconnect;
   ondisconnect;
+  onwillconnect;
+  onwilldisconnect;
 
   constructor() {
     super();
@@ -25,6 +29,21 @@ export default class WCPage extends HTMLElement {
     this.on = this.on.bind(this);
     this.off = this.off.bind(this);
 
+    this.handler.onReplace = () => {
+      if (typeof this.onwilldisconnect === 'function') {
+        this.onwilldisconnect();
+      }
+
+      this.#on.willdisconnect.forEach(cb => cb.call(this));
+    };
+
+    this.handler.onRestore = () => {
+      if (typeof this.onwillconnect === 'function') {
+        this.onwillconnect();
+      }
+
+      this.#on.willconnect.forEach(cb => cb.call(this));
+    };
 
     this.#leadBtn = <span
       className='icon arrow_back'
@@ -179,7 +198,8 @@ export default class WCPage extends HTMLElement {
 class PageHandler {
   $el;
   $replacement;
-  onRemove;
+  onRestore;
+  onReplace;
 
   /**
    * 
@@ -204,6 +224,7 @@ class PageHandler {
   replaceEl() {
     this.$el.off('hide', this.onhide);
     if (!this.$el.isConnected || this.$replacement.isConnected) return;
+    if (typeof this.onReplace === 'function') this.onReplace();
     this.$el.parentElement.replaceChild(this.$replacement, this.$el);
     this.$el.classList.add('no-transition');
   }
@@ -213,6 +234,7 @@ class PageHandler {
    */
   restoreEl() {
     if (this.$el.isConnected || !this.$replacement.isConnected) return;
+    if (typeof this.onRestore === 'function') this.onRestore();
     this.$el.off('hide', this.onhide);
     this.$replacement.parentElement.replaceChild(this.$el, this.$replacement);
     this.$el.on('hide', this.onhide);
