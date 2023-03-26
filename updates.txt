@@ -1,3 +1,9 @@
+version 1.8.1 274
+☞ Clicking on gutter will go to that line
+☞ Plugin Stability improvement
+☞ Updated ace editor
+☞ Bugs fixes
+
 version 1.8.0 272
 ☞ Plugins can support themes, fonts and sidebar items
 ☞ Redesigned sidebar and quicktools

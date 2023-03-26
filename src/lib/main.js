@@ -10,7 +10,9 @@ import '../styles/dialogs.scss';
 import '../styles/help.scss';
 import '../styles/overrideAceStyle.scss';
 import '../ace/modelist';
+import '../ace/mode-smali';
 import '../components/WebComponents';
+import './polyfill';
 import mustache from 'mustache';
 import tile from '../components/tile';
 import Sidebar from '../components/sidebar';
@@ -295,7 +297,8 @@ async function loadApp() {
 
   //#region Add event listeners
   quickToolsInit();
-  await sidebarApps.init($sidebar);
+  sidebarApps.init($sidebar);
+  await sidebarApps.loadApps();
   editorManager.onupdate = onEditorUpdate;
   root.on('show', mainPageOnShow);
   app.addEventListener('click', onClickApp);

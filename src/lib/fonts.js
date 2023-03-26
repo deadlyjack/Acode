@@ -132,7 +132,8 @@ async function setFont(name) {
   }`;
     document.head.append($style);
   } catch (error) {
-    helpers.error(error);
+    toast(`${name} font not found`, 'error');
+    setFont('Roboto Mono');
   } finally {
     helpers.removeTitleLoader();
   }

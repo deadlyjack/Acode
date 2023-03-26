@@ -1,9 +1,10 @@
+const SIDRBAR_APPS_LAST_SECTION = 'sidebarAppslastSection';
 /**@type {HTMLElement} */
 let $sidebar = null;
 /**@type {HTMLElement} */
 let $apps = null;
 /**@type {string} */
-let currentSection = null;
+let currentSection = localStorage.getItem(SIDRBAR_APPS_LAST_SECTION);
 
 /**@type {Map<string, HTMLElement>} */
 const contents = new Map();
@@ -16,26 +17,38 @@ const contents = new Map();
  * @param {(container:HTMLElement)=>void} initFunction
  * @returns {void}
  */
-function add(icon, id, title, initFunction) {
+function add(icon, id, title, initFunction, prepend) {
   const container = <div className='container'></div>;
-  if (!currentSection) {
-    currentSection = id;
+  contents.set(id, container);
+
+  if (!currentSection) currentSection = id;
+
+  if (currentSection === id) {
     $sidebar.replaceChild(container, getContainer());
   }
-  contents.set(id, container);
-  $apps.append(
-    <Icon icon={icon} id={id} title={title} />,
-  );
+
+  if (prepend) {
+    $apps.prepend(
+      <Icon icon={icon} id={id} title={title} />,
+    );
+  } else {
+    $apps.append(
+      <Icon icon={icon} id={id} title={title} />,
+    );
+  }
+
 
   if (initFunction) {
     initFunction(container);
   }
 }
 
-async function init($el) {
+function init($el) {
   $sidebar = $el;
   $apps = $sidebar.get('.apps');
+}
 
+async function loadApps() {
   add(...(await import('./files')).default);
   add(...(await import('./extensions')).default);
 }
@@ -50,6 +63,7 @@ async function init($el) {
  */
 function Icon({ icon, id, title }) {
   const onclick = function () {
+    localStorage.setItem(SIDRBAR_APPS_LAST_SECTION, id);
     const currentContent = getContainer();
     const content = contents.get(id);
 
@@ -82,4 +96,5 @@ export default {
   init,
   add,
   get,
+  loadApps,
 };

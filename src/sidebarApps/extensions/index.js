@@ -170,14 +170,19 @@ function ListItem({ icon, name, id, version, installed }) {
   </div>;
 
   $el.onclick = () => {
-    plugin({ id, installed }, () => {
-      const $item = () => <ListItem icon={icon} name={name} id={id} version={version} installed={true} />;
-      if ($installed.contains($el)) $installed.$ul?.append($item());
-      if ($explor.contains($el)) $explor.$ul?.replaceChild($item(), $el);
-      if ($searchResult.contains($el)) $searchResult?.replaceChild($item(), $el);
-    }, () => {
-      $el.remove();
-    });
+    plugin(
+      { id, installed },
+      () => {
+        const $item = () => <ListItem icon={icon} name={name} id={id} version={version} installed={true} />;
+        if ($installed.contains($el)) $installed.$ul?.replaceChild($item(), $el);
+        else $installed.$ul?.append($item());
+        if ($explor.contains($el)) $explor.$ul?.replaceChild($item(), $el);
+        if ($searchResult.contains($el)) $searchResult?.replaceChild($item(), $el);
+      },
+      () => {
+        $el.remove();
+      },
+    );
   }
 
   return $el;

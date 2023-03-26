@@ -54,14 +54,14 @@ export default function listItems($list, items, callback, sort = true) {
       )
     }
 
-    if (item.value !== undefined) {
+    if (item.checkbox !== undefined || typeof item.value === 'boolean') {
+      $checkbox = Checkbox('', item.checkbox || item.value);
+      $item.appendChild($checkbox);
+      $item.style.paddingRight = '10px';
+    } else if (item.value !== undefined) {
       $valueText = <small className='value'></small>;
       setValueText($valueText, item.value, item.valueText?.bind(item));
       $setting.append($valueText);
-    } else if (item.checkbox !== undefined) {
-      $checkbox = Checkbox('', item.checkbox);
-      $item.appendChild($checkbox);
-      $item.style.paddingRight = '10px';
     }
 
     if (Number.isInteger(item.index)) {

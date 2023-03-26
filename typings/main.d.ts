@@ -77,8 +77,6 @@ interface Acode {
   toInternalUrl(url: string): Promise<string>;
   $menuToggler: HTMLElement;
   $editMenuToggler: HTMLElement;
-  pluginServer: Server;
-  webServer: Server;
   $quickToolToggler: HTMLElement;
   $headerToggler: HTMLElement;
 }

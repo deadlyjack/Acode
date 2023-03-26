@@ -1,8 +1,5 @@
-export default ({ plugins }) => plugins.map((plugin) => <Plugin {...plugin} />);
-
-
 /**
- * 
+ * Creates a plugin list item
  * @param {object} param0
  * @param {string} [param0.id]
  * @param {string} [param0.name]
@@ -12,7 +9,7 @@ export default ({ plugins }) => plugins.map((plugin) => <Plugin {...plugin} />);
  * @param {boolean} [param0.installed]
  * @returns 
  */
-function Plugin({ id, name, icon, version, downloads, installed }) {
+export default function Plugin({ id, name, icon, version, downloads, installed }) {
   return <div data-id={id} className='list-item' data-action='open' data-installed={(!!installed).toString()}>
     <span className='icon' style={{ backgroundImage: `url(${icon || './res/puzzle.png'})` }}></span>
     <div className='container'>

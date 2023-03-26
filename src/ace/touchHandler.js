@@ -169,6 +169,20 @@ export default function addTouchListeners(editor) {
       || $target.classList.contains('ace_fold')
       || $target.classList.contains('ace_inline_button')
     ) {
+      let lineNumber = parseInt($target.textContent, 10);
+      if (isNaN(lineNumber)) {
+        const $closet = $target.closest('.ace_gutter-cell');
+        lineNumber = parseInt($closet.textContent, 10);
+      }
+
+      if (isNaN(lineNumber)) {
+        return;
+      }
+
+      // if active line is not the same as clicked line
+      if (editor.selection.lead.row !== lineNumber - 1) {
+        editor.gotoLine(lineNumber);
+      }
       return;
     }
 

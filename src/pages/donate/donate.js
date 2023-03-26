@@ -62,7 +62,7 @@ export default function DonateInclude() {
           msg += strings['donation message'];
         }
 
-        dialogs.alert(strings.info.toUpperCase(), msg);
+        dialogs.box(strings.info.toUpperCase(), msg);
       })();
     }
   }, err => {
