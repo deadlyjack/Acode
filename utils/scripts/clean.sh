@@ -16,4 +16,5 @@ fi
 eval "
 cordova platform rm $platform_rm;
 cordova platform add $platform_add
+cordova plugin add cordova-plugin-file
 "
