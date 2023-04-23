@@ -69,6 +69,7 @@ module.exports = (env, options) => {
         path: require.resolve('path-browserify'),
         crypto: false,
       },
+      modules: ["node_modules", "src"],
     },
     plugins: [
       new MiniCssExtractPlugin({

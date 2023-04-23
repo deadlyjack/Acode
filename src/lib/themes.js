@@ -1,18 +1,28 @@
+import fsOperation from '../fileSystem';
+import Url from '../utils/Url';
 import fonts from './fonts';
-import { themes } from './preLoadedThemes';
+import themes from './preLoadedThemes';
 import restoreTheme from './restoreTheme';
 import settings from './settings';
 import ThemeBuilder from './themeBuilder';
 
 /** @type {Map<string, ThemeBuilder>} */
 const appThemes = new Map();
+let themeApplied = false;
 
-themes.forEach((theme) => add(theme));
+function init() {
+  themes.forEach((theme) => add(theme));
+}
 
+/**
+ * Returns a list of all themes
+ * @returns {{name: string, type: string, version: string, primaryColor: string}}
+ */
 function list() {
   return [...appThemes.keys()].map((name) => {
-    const { type, primaryColor, version } = appThemes.get(name);
+    const { id, type, primaryColor, version } = appThemes.get(name);
     return {
+      id,
       name,
       type,
       version,
@@ -37,22 +47,29 @@ function get(name) {
  */
 function add(theme) {
   if (!(theme instanceof ThemeBuilder)) return;
-  appThemes.set(theme.name.toLowerCase(), theme);
+  appThemes.set(theme.id, theme);
+  if (settings.value.appTheme === theme.id) {
+    apply(theme.id);
+  }
 }
 
 /**
  * Apply a theme
- * @param {string} name The name of the theme to apply
+ * @param {string} id The name of the theme to apply
  * @param {boolean} init Whether or not this is the first time the theme is being applied
  */
-function apply(name, init) {
-  const theme = get(name);
+async function apply(id, init) {
+  themeApplied = true;
+  const loaderFile = Url.join(ASSETS_DIRECTORY, 'res/tail-spin.svg');
+  const svgName = '__tail-spin__.svg';
+  const img = Url.join(DATA_STORAGE, svgName);
+  const theme = get(id);
   const $style = document.head.get('style#app-theme') ?? <style id="app-theme"></style>;
   const update = {
-    appTheme: name,
+    appTheme: id,
   };
 
-  if (name === 'custom') {
+  if (id === 'custom') {
     update.customTheme = theme.toJSON();
   }
 
@@ -72,6 +89,21 @@ function apply(name, init) {
   $style.textContent = theme.css;
   document.head.append($style);
   restoreTheme();
+
+  try {
+    let fs = fsOperation(loaderFile);
+    const svg = await fs.readFile('utf-8');
+
+    fs = fsOperation(img);
+    if (!(await fs.exists())) {
+      await fsOperation(DATA_STORAGE).createFile(svgName);
+    }
+    await fs.writeFile(
+      svg.replace(/#fff/g, theme.primaryColor),
+    );
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 /**
@@ -89,6 +121,10 @@ function update(theme) {
 }
 
 export default {
+  get applied() {
+    return themeApplied;
+  },
+  init,
   list,
   get,
   add,

@@ -1,4 +1,5 @@
-import tag from 'html-tag-js';
+import restoreTheme from 'lib/restoreTheme';
+
 /**
  *
  * @param {string} titleText
@@ -55,11 +56,11 @@ function confirm(titleText, message) {
     });
 
     app.append(confirmDiv, mask);
-    window.restoreTheme(true);
+    restoreTheme(true);
 
     function hideAlert() {
       confirmDiv.classList.add('hide');
-      window.restoreTheme();
+      restoreTheme();
       setTimeout(() => {
         app.removeChild(confirmDiv);
         app.removeChild(mask);

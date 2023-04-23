@@ -5,5 +5,13 @@
     "**/plugings",
     "**/www",
     "www/js/ace/**/*"
-  ]
+  ],
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "*": [
+        "*"
+      ],
+    }
+  }
 }

@@ -1,4 +1,5 @@
-import tag from 'html-tag-js';
+import restoreTheme from 'lib/restoreTheme';
+
 /**
  *
  * @param {string} titleText
@@ -84,7 +85,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
     document.body.append(box, mask);
     __then();
 
-    window.restoreTheme(true);
+    restoreTheme(true);
   }, 0);
 
   function decTime() {
@@ -101,7 +102,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
 
   function hideSelect() {
     box.classList.add('hide');
-    window.restoreTheme();
+    restoreTheme();
     setTimeout(() => {
       document.body.removeChild(box);
       document.body.removeChild(mask);

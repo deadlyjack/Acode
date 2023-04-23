@@ -11,7 +11,6 @@ import constants from "../../lib/constants";
 import FileBrowser from "../fileBrowser";
 import Plugin from './plugin';
 import installPlugin from '../../lib/installPlugin';
-import Ref from 'html-tag-js/ref';
 import TabView from '../../components/tabView';
 
 /**
@@ -96,7 +95,7 @@ export default function PluginsInclude(updates) {
     const $target = event.target;
     const { action } = $target.dataset;
     if (action === 'search') {
-      searchBar($list.el);
+      searchBar($currList);
       return;
     }
     if (action === 'open') {
@@ -192,6 +191,7 @@ export default function PluginsInclude(updates) {
   }
 
   function onIninstall(pluginId) {
+    if (updates) return;
     const plugin = plugins.all.find(plugin => plugin.id === pluginId);
     if (plugin) {
       plugin.installed = true;
@@ -202,6 +202,7 @@ export default function PluginsInclude(updates) {
   }
 
   function onUninstall(pluginId) {
+    if (updates) return;
     const plugin = plugins.all.find((plugin) => plugin.id === pluginId);
     plugins.installed = plugins.installed.filter((plugin) => plugin.id !== pluginId);
     if (plugin) {
@@ -217,7 +218,6 @@ export default function PluginsInclude(updates) {
   }
 
   async function addSource(value = 'https://', sourceType) {
-
     if (!sourceType) {
       sourceType = await dialogs.select('', [
         ['remote', strings.remote],

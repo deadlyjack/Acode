@@ -1,3 +1,4 @@
+import restoreTheme from 'lib/restoreTheme';
 import inputhints from './inputhints';
 
 export default function pallete(getList, onselect, placeholder, onremove) {
@@ -10,7 +11,7 @@ export default function pallete(getList, onselect, placeholder, onremove) {
     remove();
   });
 
-  window.restoreTheme(true);
+  restoreTheme(true);
   app.append($pallete, $mask);
   $input.focus();
 
@@ -37,7 +38,7 @@ export default function pallete(getList, onselect, placeholder, onremove) {
 
   function remove() {
     actionStack.remove('pallete');
-    window.restoreTheme();
+    restoreTheme();
     $pallete.remove();
     $mask.remove();
     if (typeof onremove === 'function') onremove();

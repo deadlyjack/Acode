@@ -1,6 +1,7 @@
 import tag from 'html-tag-js';
 import Picker from 'vanilla-picker';
-import helpers from '../../utils/helpers';
+import restoreTheme from 'lib/restoreTheme';
+import helpers from 'utils/helpers';
 
 let lastPicked = localStorage.__picker_last_picked || '#fff';
 
@@ -81,11 +82,11 @@ function color(defaultColor) {
 
     document.body.append(box, mask);
 
-    window.restoreTheme(true);
+    restoreTheme(true);
 
     function hideSelect() {
       box.classList.add('hide');
-      window.restoreTheme();
+      restoreTheme();
       setTimeout(() => {
         document.body.removeChild(box);
         document.body.removeChild(mask);

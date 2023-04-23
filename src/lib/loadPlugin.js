@@ -3,7 +3,7 @@ import fsOperation from "../fileSystem";
 import helpers from "../utils/helpers";
 import Url from "../utils/Url";
 
-export default async function loadPlugin(pluginId) {
+export default async function loadPlugin(pluginId, justInstalled = false) {
   const baseUrl = await helpers.toInternalUri(Url.join(PLUGIN_DIR, pluginId));
   const cacheFile = Url.join(CACHE_STORAGE, pluginId);
   const $script = <script src={Url.join(baseUrl, 'main.js')}></script>;
@@ -29,7 +29,8 @@ export default async function loadPlugin(pluginId) {
       }
       await acode.initPlugin(pluginId, baseUrl, $page, {
         cacheFileUrl: await helpers.toInternalUri(cacheFile),
-        cacheFile: fsOperation(cacheFile)
+        cacheFile: fsOperation(cacheFile),
+        firstInit: justInstalled,
       });
       resolve();
     }

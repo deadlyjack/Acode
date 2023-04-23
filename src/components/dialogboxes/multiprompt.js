@@ -1,9 +1,9 @@
-import tag from 'html-tag-js';
 import autosize from 'autosize';
 import inputhints from '../inputhints';
 import Checkbox from '../checkbox';
 import alert from './alert';
-import appSettings from '../../lib/settings';
+import appSettings from 'lib/settings';
+import restoreTheme from 'lib/restoreTheme';
 
 /**
  *
@@ -108,7 +108,7 @@ function multiPrompt(message, inputs, help) {
       action: hidePrompt,
     });
 
-    window.restoreTheme(true);
+    restoreTheme(true);
     system.setInputType("NORMAL");
     document.body.append($promptDiv, $mask);
     const $focusEl = [...$body.getAll('input[autofocus]')].pop();
@@ -116,7 +116,7 @@ function multiPrompt(message, inputs, help) {
 
     function hidePrompt() {
       $promptDiv.classList.add('hide');
-      window.restoreTheme();
+      restoreTheme();
       setTimeout(() => {
         if ($promptDiv.isConnected) $promptDiv.remove();
         if ($mask.isConnected) $mask.remove($mask);

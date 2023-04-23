@@ -167,8 +167,8 @@ light.popupIconColor = 'rgb(51, 62, 89)';
 const custom = new ThemeBuilder('Custom');
 custom.autoDarkened = true;
 
-export const themes = [
-  new ThemeBuilder('default'),
+export default [
+  new ThemeBuilder('default', 'dark', 'free'),
   dark,
   oled,
   ocean,

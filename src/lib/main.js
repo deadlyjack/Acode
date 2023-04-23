@@ -32,7 +32,6 @@ import fsOperation from '../fileSystem';
 import toast from '../components/toast';
 import $_menu from '../views/menu.hbs';
 import $_fileMenu from '../views/file-menu.hbs';
-import restoreTheme from './restoreTheme';
 import openFiles from './openFiles';
 import loadPlugins from './loadPlugins';
 import checkPluginsUpdate from './checkPluginsUpdate';
@@ -43,6 +42,7 @@ import lang from './lang';
 import EditorFile from './editorFile';
 import sidebarApps from '../sidebarApps';
 import checkFiles from './checkFiles';
+import themes from './themes';
 
 window.onload = Main;
 
@@ -88,17 +88,13 @@ async function ondeviceready() {
   window.app = document.body;
   window.root = tag.get('#root');
   window.addedFolder = [];
-  window.restoreTheme = restoreTheme;
   window.editorManager = null;
-  window.toastQueue = [];
   window.toast = toast;
   window.ASSETS_DIRECTORY = Url.join(cordova.file.applicationDirectory, 'www');
   window.DATA_STORAGE = externalDataDirectory || dataDirectory;
   window.CACHE_STORAGE = externalCacheDirectory || cacheDirectory;
   window.PLUGIN_DIR = Url.join(DATA_STORAGE, 'plugins');
   window.KEYBINDING_FILE = Url.join(DATA_STORAGE, '.key-bindings.json');
-  window.gitRecordFile = Url.join(DATA_STORAGE, 'git/.gitfiles');
-  window.gistRecordFile = Url.join(DATA_STORAGE, 'git/.gistfiles');
   window.actionStack = ActionStack();
   window.IS_FREE_VERSION = isFreePackage;
 
@@ -184,6 +180,7 @@ async function ondeviceready() {
 
   acode.setLoadingMessage('Loading settings...');
   await settings.init();
+  themes.init();
 
   if (localStorage.versionCode < 150) {
     localStorage.clear();
