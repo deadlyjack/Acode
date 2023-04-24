@@ -23,7 +23,6 @@ export default {
     });
 
     system.setInputType(appSettings.value.keyboardMode);
-    window.restoreTheme();
   },
   afterRender() {
     const { value: settings } = appSettings;
@@ -33,6 +32,8 @@ export default {
 
     actions('set-quick-tools-height', settings.quickTools);
     fonts.setFont(settings.editorFont);
-    themes.apply(settings.appTheme);
+    if (!themes.applied) {
+      themes.apply('dark');
+    }
   },
 };

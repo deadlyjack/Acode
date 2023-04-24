@@ -1,4 +1,6 @@
 import tile from '../tile';
+import restoreTheme from 'lib/restoreTheme';
+
 /**
  *
  * @param {string} title
@@ -84,7 +86,7 @@ function select(title, options, opts = {}) {
     const $firstChild = $defaultVal || $list.firstChild;
     if ($firstChild && $firstChild.focus) $firstChild.focus();
 
-    window.restoreTheme(true);
+    restoreTheme(true);
 
     function cancel() {
       hide();
@@ -94,7 +96,7 @@ function select(title, options, opts = {}) {
 
     function hideSelect() {
       selectDiv.classList.add('hide');
-      window.restoreTheme();
+      restoreTheme();
       setTimeout(() => {
         document.body.removeChild(selectDiv);
         document.body.removeChild(mask);

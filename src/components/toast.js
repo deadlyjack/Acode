@@ -1,4 +1,5 @@
-import tag from 'html-tag-js';
+/**@type {Array<HTMLElement>} */
+const toastQueue = [];
 
 export default function toast(message, duration) {
   const $oldToast = tag.get('#toast');

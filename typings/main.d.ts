@@ -303,10 +303,6 @@ interface Folder {
   id: string;
 }
 
-interface Window {
-  restoreTheme(): void;
-}
-
 interface ThemeData {
   name: string;
   type: 'light' | 'dark';
@@ -451,6 +447,5 @@ declare var freeze: boolean;
 declare var saveTimeout: number;
 declare var actionStack: ActionStack;
 declare var addedFolder: Array<Folder>;
-declare var toastQueue: Array<HTMLElement>;
 declare var toast: (message: string) => void;
 declare var editorManager: EditorManager;

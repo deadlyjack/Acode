@@ -45,6 +45,10 @@ export default class ThemeBuilder {
     this.version = version;
   }
 
+  get id() {
+    return this.name.toLowerCase();
+  }
+
   get popupBorderRadius() {
     return this.#theme['--popup-border-radius'];
   }

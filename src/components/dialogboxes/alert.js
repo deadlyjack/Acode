@@ -1,4 +1,5 @@
-import tag from 'html-tag-js';
+import restoreTheme from 'lib/restoreTheme';
+
 /**
  *
  * @param {string} titleText
@@ -52,11 +53,11 @@ function alert(titleText, message, onhide) {
   });
 
   app.append(alertDiv, mask);
-  window.restoreTheme(true);
+  restoreTheme(true);
 
   function hideAlert() {
     alertDiv.classList.add('hide');
-    window.restoreTheme();
+    restoreTheme();
     setTimeout(() => {
       app.removeChild(alertDiv);
       app.removeChild(mask);

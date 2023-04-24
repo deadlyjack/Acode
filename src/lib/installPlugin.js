@@ -87,7 +87,7 @@ export default async function installPlugin(id, name, purchaseToken) {
       });
 
       await Promise.all(promises);
-      await loadPlugin(id);
+      await loadPlugin(id, true);
     }
   } catch (err) {
     try {

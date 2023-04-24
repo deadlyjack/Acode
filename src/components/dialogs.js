@@ -6,6 +6,7 @@ import confirm from './dialogboxes/confirm';
 import box from './dialogboxes/box';
 import select from './dialogboxes/select';
 import color from './dialogboxes/color';
+import restoreTheme from 'lib/restoreTheme';
 
 const loader = {
   /**
@@ -88,7 +89,7 @@ const loader = {
     if (!oldLoaderDiv) {
       window.freeze = true;
       document.body.append($loaderDiv, mask);
-      window.restoreTheme(true);
+      restoreTheme(true);
     }
 
     return {
@@ -112,7 +113,7 @@ const loader = {
     if (!loaderDiv && !mask) return;
     if (loaderDiv) loaderDiv.classList.add('hide');
     window.freeze = false;
-    window.restoreTheme();
+    restoreTheme();
     setTimeout(() => {
       if (loaderDiv && loaderDiv.isConnected) loaderDiv.remove();
       if (mask && mask.isConnected) mask.remove();

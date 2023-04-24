@@ -73,7 +73,7 @@ export default function () {
     const currentTheme = appSettings.value.appTheme;
     let $currentItem;
     themes.list().forEach((theme) => {
-      const isCurrentTheme = theme.name === currentTheme;
+      const isCurrentTheme = theme.id === currentTheme;
       const isPremium = theme.version === 'paid' && IS_FREE_VERSION;
       const $item = <Item
         name={theme.name}

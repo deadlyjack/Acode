@@ -1,6 +1,6 @@
-import tag from 'html-tag-js';
 import autosize from 'autosize';
-import appSettings from '../../lib/settings';
+import appSettings from 'lib/settings';
+import restoreTheme from 'lib/restoreTheme';
 
 /**
  * @typedef {Object} PromptOptions
@@ -121,7 +121,7 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
     });
 
     system.setInputType("NORMAL");
-    window.restoreTheme(true);
+    restoreTheme(true);
     app.append(promptDiv, mask);
     input.focus();
     if (input.value) {
@@ -136,7 +136,7 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
 
     function hidePrompt() {
       promptDiv.classList.add('hide');
-      window.restoreTheme();
+      restoreTheme();
       setTimeout(() => {
         if (promptDiv.isConnected) promptDiv.remove();
         if (mask.isConnected) mask.remove();

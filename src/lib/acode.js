@@ -59,7 +59,14 @@ export default class Acode {
     this.define('fsOperation', fsOperation);
     this.define('openfolder', openFolder);
     this.define('fonts', fonts);
-    this.define('themes', themes);
+    this.define('themes', {
+      add: themes.add,
+      get: themes.get,
+      list: themes.list,
+      update: themes.update,
+      // Deprecated, not supported anymore
+      apply: () => { },
+    });
     this.define('themeBuilder', ThemeBuilder);
     this.define('sidebarApps', {
       add: sidebarApps.add,
@@ -111,6 +118,7 @@ export default class Acode {
   setPluginUnmount(id, unmountFunction) {
     this.#pluginUnmount[id] = unmountFunction;
   }
+
   /**
    * 
    * @param {string} id plugin id
