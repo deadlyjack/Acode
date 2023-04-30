@@ -1,4 +1,7 @@
-version 1.8.1 276
+version 1.8.3 277
+☞ Bugs fixes
+
+version 1.8.2 276
 ☞ Updated ace editor to version v1.18.0
 ☞ Bugs fixes
 

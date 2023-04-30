@@ -33,7 +33,7 @@ export default function PluginsInclude(updates) {
     owned: [],
   };
   let $currList = $list.installed;
-  let currSection;
+  let currSection = 'installed';
 
   $page.body = <TabView id='plugins'>
     <div className='options'>
@@ -107,10 +107,6 @@ export default function PluginsInclude(updates) {
   function render(section) {
     if (currSection === section) return;
 
-    if (!section && !currSection) {
-      section = 'installed';
-    }
-
     if (!section) {
       section = currSection;
     }
@@ -121,6 +117,8 @@ export default function PluginsInclude(updates) {
     $section.scrollTop = $section._scroll || 0;
     $currList = $section;
     currSection = section;
+    $page.get('.options .active').classList.remove('active');
+    $page.get(`#${section}_plugins`).classList.add('active');
   }
 
   function renderAll() {
@@ -136,11 +134,11 @@ export default function PluginsInclude(updates) {
   }
 
   async function getAllPlugins() {
-    plugins.all = [];
     try {
+      plugins.all = [];
+      $list.all.setAttribute('empty-msg', strings['loading...']);
       const installed = await fsOperation(PLUGIN_DIR).lsDir();
       plugins.all = await fsOperation(constants.API_BASE, 'plugins').readFile('json');
-      $list.all.setAttribute('empty-msg', strings['no plugins found']);
 
       installed.forEach(({ url }) => {
         const plugin = plugins.all.find(({ id }) => id === Url.basename(url));
@@ -153,15 +151,17 @@ export default function PluginsInclude(updates) {
       plugins.all.forEach((plugin) => {
         $list.all.append(<Plugin {...plugin} />);
       });
+
+      $list.all.setAttribute('empty-msg', strings['no plugins found']);
     } catch (error) {
       console.error(error);
     }
   }
 
   async function getInstalledPlugins(updates) {
+    $list.installed.setAttribute('empty-msg', strings['loading...']);
     plugins.installed = [];
     const installed = await fsOperation(PLUGIN_DIR).lsDir();
-    $list.installed.setAttribute('empty-msg', strings['no plugins found']);
     await Promise.all(installed.map(async (item) => {
       const id = Url.basename(item.url);
       if (!((updates && updates.includes(id)) || !updates)) return;
@@ -174,11 +174,12 @@ export default function PluginsInclude(updates) {
       if ($list.installed.get(`[data-id="${id}"]`)) return;
       $list.installed.append(<Plugin {...plugin} />);
     }));
+    $list.installed.setAttribute('empty-msg', strings['no plugins found']);
   }
 
   async function getOwned() {
+    $list.owned.setAttribute('empty-msg', strings['loading...']);
     const purchases = await helpers.promisify(iap.getPurchases);
-    $list.owned.setAttribute('empty-msg', strings['no plugins found']);
     purchases.forEach(async ({ productIds }) => {
       const [sku] = productIds;
       const url = Url.join(constants.API_BASE, 'plugin/owned', sku);
@@ -188,6 +189,7 @@ export default function PluginsInclude(updates) {
       plugins.owned.push(plugin);
       $list.owned.append(<Plugin {...plugin} />);
     });
+    $list.owned.setAttribute('empty-msg', strings['no plugins found']);
   }
 
   function onIninstall(pluginId) {
@@ -202,12 +204,13 @@ export default function PluginsInclude(updates) {
   }
 
   function onUninstall(pluginId) {
-    if (updates) return;
-    const plugin = plugins.all.find((plugin) => plugin.id === pluginId);
-    plugins.installed = plugins.installed.filter((plugin) => plugin.id !== pluginId);
-    if (plugin) {
-      plugin.installed = false;
-      plugin.localPlugin = null;
+    if (!updates) {
+      const plugin = plugins.all.find((plugin) => plugin.id === pluginId);
+      plugins.installed = plugins.installed.filter((plugin) => plugin.id !== pluginId);
+      if (plugin) {
+        plugin.installed = false;
+        plugin.localPlugin = null;
+      }
     }
 
     $list.installed.get(`[data-id="${pluginId}"]`).remove();
