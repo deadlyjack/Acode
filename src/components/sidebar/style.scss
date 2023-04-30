@@ -80,11 +80,14 @@ body.no-animation {
     height: 100%;
 
     >.list {
+      width: 100%;
       max-width: 100%;
       max-height: 100%;
 
       &.hidden {
         max-height: 30px !important;
+        min-height: 30px !important;
+        overflow: hidden !important;
       }
 
       .tile {
@@ -113,6 +116,7 @@ body.no-animation {
 
       >ul {
         overflow: auto;
+        width: 100%;
         max-width: 100%;
         max-height: calc(100% - 30px);
         height: calc(100% - 30px);
@@ -133,10 +137,6 @@ body.no-animation {
               color: rgb(255, 215, 0);
             }
           }
-        }
-
-        .list {
-          min-width: fit-content;
         }
       }
     }
