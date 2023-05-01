@@ -3,7 +3,7 @@
   flex-direction: column;
 
   .list:empty::after {
-    content: 'No plugins found';
+    content: attr(empty-msg);
   }
 
   .value {

@@ -15,7 +15,6 @@ import alert from '../../components/dialogboxes/alert';
 export default async function PluginInclude(id, installed, onInstall, onUninstall) {
   installed = typeof installed !== 'boolean' ? installed === 'true' : installed;
   const $page = Page(strings['plugin']);
-
   let plugin = {};
   let currentVersion = '';
   let purchased = false;
@@ -25,6 +24,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
   let price;
   let product;
   let purchaseToken;
+  let $settingsIcon;
 
   actionStack.push({
     id: 'plugin',
@@ -45,7 +45,6 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
   try {
     if (installed) {
       const installedPlugin = await fsOperation(Url.join(PLUGIN_DIR, id, 'plugin.json')).readFile('json');
-      const settings = acode.getPluginSettings(id);
       const { author } = installedPlugin;
       const description = await fsOperation(Url.join(PLUGIN_DIR, id, 'readme.md')).readFile('utf-8');
       const iconUrl = await helpers.toInternalUri(Url.join(PLUGIN_DIR, id, 'icon.png'));
@@ -63,12 +62,6 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       };
 
       isPaid = installedPlugin.price > 0;
-
-      if (settings) {
-        $page.header.append(
-          <span attr-action='settings' className='icon settings' onclick={() => settingsPage(plugin.name, settings.list, settings.cb)}></span>
-        );
-      }
     }
 
     await (async () => {
@@ -237,6 +230,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
   }
 
   async function render() {
+    const settings = acode.getPluginSettings(id);
     $page.body = view({
       ...plugin,
       body: marked(plugin.description),
@@ -251,6 +245,22 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       uninstall,
       currentVersion,
     });
+
+    if ($settingsIcon) {
+      $settingsIcon.remove();
+      $settingsIcon = null;
+    }
+
+    if (settings) {
+      $settingsIcon = <span
+        attr-action='settings'
+        className='icon settings'
+        onclick={() => settingsPage(plugin.name, settings.list, settings.cb)}
+      ></span>;
+      if (!$page.header.contains($settingsIcon)) {
+        $page.header.append($settingsIcon);
+      }
+    }
   }
 
   async function loadAd(el) {

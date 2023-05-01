@@ -43,7 +43,6 @@
 
         &::after {
           content: attr(data-label);
-          text-transform: capitalize;
           font-size: smaller;
           margin-top: 5px;
           text-align: center;
@@ -300,6 +299,7 @@
         display: flex;
         align-items: center;
         font-weight: 300;
+        overflow: auto;
       }
 
       .author-reply {

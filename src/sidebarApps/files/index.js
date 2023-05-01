@@ -47,4 +47,5 @@ function fixHeight(target) {
   });
 
   target.style.maxHeight = `calc(100% - ${height}px)`;
+  target.style.height = `calc(100% - ${height}px)`;
 }

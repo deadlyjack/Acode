@@ -16,6 +16,11 @@ let container = null;
 /** @type {HTMLElement} */
 let $searchResult = null;
 
+const $header = <div className='header'>
+  <span className='title'>{strings['plugins']}</span>
+  <input oninput={searchPlugin} type='search' name='search-ext' placeholder='Search' />
+</div>;
+
 let searchTimeout = null;
 let installedPlugins = [];
 
@@ -26,10 +31,7 @@ export default [
   (/**@type {HTMLElement} */ el) => {
     container = el;
     container.classList.add('extensions');
-    container.content = <div className='header'>
-      <span className='title'>{strings['plugins']}</span>
-      <input oninput={searchPlugin} type='search' name='search-ext' placeholder='Search' />
-    </div>;
+    container.content = $header;
 
     if (!$searchResult) {
       $searchResult = <ul className='list search-result'></ul>;
@@ -144,16 +146,33 @@ function stopLoading($list) {
  * @param {HTMLElement} $el 
  */
 function updateHeight($el) {
-  const divs = container.getAll(':scope > div');
-  let height = 0;
-  divs.forEach((div) => {
-    if (div === $el) return;
-    div.collapse?.();
-    div.style.removeProperty('height');
-    height += div.offsetHeight;
-  });
+  removeHeight($installed, $el !== $installed);
+  removeHeight($explor, $el !== $explor);
 
-  $el.style.maxHeight = `calc(100% - ${height}px)`;
+  let height = $header.getBoundingClientRect().height;
+  if ($el === $searchResult) {
+    height += 60;
+  } else {
+    height += $searchResult.getBoundingClientRect().height + 30;
+  }
+
+  setHeight($el, height);
+}
+
+function removeHeight($el, collapse = false) {
+  if (collapse) $el.collapse?.();
+  $el.style.removeProperty('max-height');
+  $el.style.removeProperty('height');
+}
+
+function setHeight($el, height) {
+  const calcHeight = height ? `calc(100% - ${height}px)` : '100%';
+  $el.style.maxHeight = calcHeight;
+  if ($el === $searchResult) {
+    $el.style.height = 'fit-content';
+    return;
+  }
+  $el.style.height = calcHeight;
 }
 
 function getLocalRes(id, name) {
