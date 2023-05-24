@@ -43,6 +43,72 @@ function add(icon, id, title, initFunction, prepend) {
   }
 }
 
+/**
+
+ * Removes a sidebar app with the given ID.
+
+ * @param {string} id - The ID of the sidebar app to remove.
+
+ * @returns {void}
+
+ */
+
+function removeApp(id) {
+
+  if (contents.has(id)) {
+
+    const appIcon = $sidebar.querySelector(`.icon#${id}`);
+
+    if (appIcon) {
+
+      appIcon.remove();
+
+    }
+
+    const container = contents.get(id);
+
+    if (container) {
+
+      container.remove();
+
+    }
+
+    contents.delete(id);
+
+    if (currentSection === id) {
+
+      const firstApp = $sidebar.querySelector('.icon');
+
+      if (firstApp) {
+
+        const newSectionId = firstApp.id;
+
+        currentSection = newSectionId;
+
+        localStorage.setItem(SIDRBAR_APPS_LAST_SECTION, newSectionId);
+
+        const newContainer = contents.get(newSectionId);
+
+        $sidebar.replaceChild(newContainer, getContainer());
+
+        firstApp.classList.add('active');
+
+      } else {
+
+        currentSection = null;
+
+        localStorage.removeItem(SIDRBAR_APPS_LAST_SECTION);
+
+        $sidebar.removeChild(getContainer());
+
+      }
+
+    }
+
+  }
+
+}
+
 function init($el) {
   $sidebar = $el;
   $apps = $sidebar.get('.apps');
@@ -96,6 +162,7 @@ function getContainer() {
 export default {
   init,
   add,
+  removeApp,
   get,
   loadApps,
 };
