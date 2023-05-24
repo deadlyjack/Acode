@@ -1,4 +1,4 @@
-import { actions } from '../handlers/quickTools';
+import actions from '../handlers/quickTools';
 import constants from './constants';
 import appSettings from '../lib/settings';
 import fonts from './fonts';
@@ -30,7 +30,7 @@ export default {
       root.classList.add('hide-floating-button');
     }
 
-    actions('set-quick-tools-height', settings.quickTools);
+    actions('set-height', settings.quickTools);
     fonts.setFont(settings.editorFont);
     if (!themes.applied) {
       themes.apply('dark');

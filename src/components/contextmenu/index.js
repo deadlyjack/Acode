@@ -1,4 +1,4 @@
-import tag from 'html-tag-js';
+import './style.scss';
 
 /**
  * @typedef {object} contextMenuObj
@@ -25,7 +25,7 @@ import tag from 'html-tag-js';
  * @param {contextMenuOptions} [options]
  * @returns {HTMLElement & contextMenuObj}
  */
-function contextMenu(content, options) {
+function contextmenu(content, options) {
   if (!options && typeof content === 'object') {
     options = content;
     content = null;
@@ -103,10 +103,10 @@ function contextMenu(content, options) {
 
   $el.hide = hide;
   $el.show = show;
-  $el.onshow = options.onshow || (() => {});
-  $el.onhide = options.onhide || (() => {});
+  $el.onshow = options.onshow || (() => { });
+  $el.onhide = options.onhide || (() => { });
 
   return $el;
 }
 
-export default contextMenu;
+export default contextmenu;

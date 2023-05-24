@@ -3,28 +3,28 @@ import './fileBrowser.scss';
 import escapeStringRegexp from 'escape-string-regexp';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
-import Page from '../../components/page';
-import helpers from '../../utils/helpers';
-import contextMenu from '../../components/contextMenu';
-import dialogs from '../../components/dialogs';
-import constants from '../../lib/constants';
-import filesSettings from '../../settings/filesSettings';
+import Page from 'components/page';
+import helpers from 'utils/helpers';
+import contextmenu from 'components/contextmenu';
+import dialogs from 'components/dialogs';
+import constants from 'lib/constants';
+import filesSettings from 'settings/filesSettings';
 import _template from './fileBrowser.hbs';
 import _list from './list.hbs';
 import _addMenu from './add-menu.hbs';
 import _addMenuHome from './add-menu-home.hbs';
-import externalFs from '../../fileSystem/externalFs';
-import fsOperation from '../../fileSystem';
-import searchBar from '../../components/searchbar';
-import Url from '../../utils/Url';
+import externalFs from 'fileSystem/externalFs';
+import fsOperation from 'fileSystem';
+import searchBar from 'components/searchbar';
+import Url from 'utils/Url';
 import util from './util';
-import openFolder from '../../lib/openFolder';
-import recents from '../../lib/recents';
-import remoteStorage from '../../lib/remoteStorage';
+import openFolder from 'lib/openFolder';
+import recents from 'lib/recents';
+import remoteStorage from 'lib/remoteStorage';
 import URLParse from 'url-parse';
-import checkFiles from '../../lib/checkFiles';
-import projects from '../../lib/projects';
-import appSettings from '../../lib/settings';
+import checkFiles from 'lib/checkFiles';
+import projects from 'lib/projects';
+import appSettings from 'lib/settings';
 
 /**
  * @typedef {{url: String, name: String}} Location
@@ -88,7 +88,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       toggle: $menuToggler,
       transformOrigin: 'top right',
     };
-    const $fbMenu = contextMenu({
+    const $fbMenu = contextmenu({
       innerHTML: () => {
         return `
         <li action="settings">${strings.settings.capitalize(0)}</li>
@@ -98,7 +98,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       },
       ...menuOption,
     });
-    const $addMenu = contextMenu({
+    const $addMenu = contextmenu({
       innerHTML: () => {
         if (currentDir.url === '/') {
           return mustache.render(_addMenuHome, {

@@ -10,6 +10,7 @@ import fsOperation from '../fileSystem';
 import Url from '../utils/Url';
 import openFolder from './openFolder';
 import appSettings from './settings';
+import EditorFile from './editorFile';
 
 /**@type {Server} */
 let webServer;
@@ -44,6 +45,7 @@ async function run(
     }
   }
 
+  /** @type {EditorFile} */
   const activeFile = isConsole ? null : editorManager.activeFile;
   if (!isConsole && !await activeFile?.canRun()) return;
 
@@ -239,7 +241,7 @@ async function run(
       }
 
       let url = activeFile.uri;
-      let file = null;
+      let file = activeFile.SAFMode === 'single' ? activeFile : null;
 
       if (pathName) {
         url = Url.join(pathName, reqPath);

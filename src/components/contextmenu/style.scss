@@ -102,18 +102,3 @@ body.no-animation {
     opacity: 0;
   }
 }
-
-@keyframes menu-grow {
-  0% {
-    transform: scale(0) translateZ(0);
-    opacity: 0;
-  }
-
-  80% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: scale(1) translateZ(0);
-  }
-}

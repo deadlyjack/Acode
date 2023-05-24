@@ -54,6 +54,7 @@ module.exports = (env, options) => {
     entry: {
       main: './src/lib/main.js',
       console: './src/lib/console.js',
+      searchInFilesWorker: './src/sidebarApps/searchInFiles/worker.js',
     },
     output: {
       path: path.resolve(__dirname, 'www/js/build/'),

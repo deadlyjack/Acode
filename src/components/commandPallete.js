@@ -2,7 +2,7 @@ import helpers from '../utils/helpers';
 import pallete from './pallete';
 
 export default async function commandPallete() {
-  const recentlyUsedCommands = RecentlyUsedCommands();
+  const recentCommands = RecentlyUsedCommands();
   const { editor } = editorManager;
   const commands = Object.values(editor.commands.commands);
 
@@ -13,19 +13,22 @@ export default async function commandPallete() {
   });
 
   function generateHints() {
-    recentlyUsedCommands.commands.forEach((name) => {
-      const recentCommand = commands.find(command => command.name === name);
-      if (!recentCommand) return;
-      const command = Object.assign({}, recentCommand);
-      if (command) {
-        command.recentlyUsed = true;
-        commands.unshift(command);
+    const hints = [];
+
+    commands.forEach(({ name, description, bindKey }) => {
+      /**
+       * @param {boolean} recentlyUsed 
+       */
+      const item = (recentlyUsed) => ({
+        value: name,
+        text: `<span ${recentlyUsed ? `data-str='${strings['recently used']}'` : ''}>${description ?? name}</span><small>${bindKey?.win ?? ''}</small>`,
+      });
+      if (recentCommands.commands.includes(name)) {
+        hints.unshift(item(true));
+        return;
       }
+      hints.push(item());
     });
-    const hints = commands.map(({ name, description, bindKey, recentlyUsed }) => ({
-      value: name,
-      text: `<span ${recentlyUsed ? `data-str='${strings['recently used']}'` : ''}>${description ?? name}</span><small>${bindKey?.win ?? ''}</small>`,
-    }));
 
     return hints;
   }
@@ -33,18 +36,25 @@ export default async function commandPallete() {
   function onselect(value) {
     const command = commands.find(({ name }) => name === value);
     if (!command) return;
-    recentlyUsedCommands.push(value);
+    recentCommands.push(value);
     command.exec(editorManager.editor);
   }
 }
 
 function RecentlyUsedCommands() {
   return {
+    /**
+     * @returns {string[]}
+     */
     get commands() {
       return helpers.parseJSON(localStorage.getItem('recentlyUsedCommands')) || [];
     },
+    /**
+     * Saves command to recently used commands
+     * @param {string} command 
+     */
     push(command) {
-      const commands = this.commands;
+      const { commands } = this;
       if (commands.length > 10) {
         commands.pop();
       }

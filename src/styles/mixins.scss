@@ -1,0 +1,39 @@
+@mixin circular-loader($size) {
+  display: block;
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  border: 3px solid rgb(255, 255, 255);
+  border: 3px solid var(--primary-text-color);
+  border-top-color: transparent;
+  animation: circular-loader-animation 1s linear infinite;
+  box-sizing: border-box;
+}
+
+@mixin loader($size) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after {
+    content: '';
+    @include circular-loader($size);
+  }
+}
+
+@mixin linear-loader($width, $height) {
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 30%;
+    height: 2px;
+    background-color: rgb(0, 0, 0);
+    animation: move ease 1s infinite;
+    border-radius: 1px;
+  }
+}

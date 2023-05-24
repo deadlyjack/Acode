@@ -9,7 +9,7 @@ import help from '../settings/help';
 import recents from '../lib/recents';
 import fsOperation from '../fileSystem';
 import Modes from '../pages/modes/modes';
-import { actions } from '../handlers/quickTools';
+import actions from '../handlers/quickTools';
 import FileBrowser from '../pages/fileBrowser';
 import path from '../utils/Path';
 import showFileInfo from './showFileInfo';
@@ -255,9 +255,13 @@ export default {
 
     editor.blur();
     (async () => {
-      const res = await dialogs.color(color);
+      const wasFocused = editorManager.activeFile.focused;
+      const res = await dialogs.color(color, () => {
+        if (wasFocused) {
+          editor.focus();
+        }
+      });
       editor.insert(res);
-      editor.focus();
     })();
   },
   'copy'() {

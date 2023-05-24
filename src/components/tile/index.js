@@ -1,4 +1,4 @@
-import tag from 'html-tag-js';
+import './style.scss';
 
 /**
  * @typedef {object} Tile

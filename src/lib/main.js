@@ -4,45 +4,45 @@ import 'html-tag-js/dist/polyfill';
 import '../styles/main.scss';
 import '../styles/page.scss';
 import '../styles/list.scss';
-import '../styles/tile.scss';
-import '../styles/contextMenu.scss';
 import '../styles/dialogs.scss';
-import '../styles/help.scss';
 import '../styles/overrideAceStyle.scss';
 import '../ace/modelist';
 import '../ace/mode-smali';
 import '../components/WebComponents';
 import './polyfill';
 import mustache from 'mustache';
-import tile from '../components/tile';
-import Sidebar from '../components/sidebar';
-import contextMenu from '../components/contextMenu';
+import ajax from '@deadlyjack/ajax';
+import tile from 'components/tile';
+import Sidebar from 'components/sidebar';
+import contextmenu from 'components/contextmenu';
 import EditorManager from './editorManager';
 import ActionStack from './actionStack';
-import helpers from '../utils/helpers';
+import helpers from 'utils/helpers';
 import settings from './settings';
 import constants from './constants';
-import intentHandler from '../handlers/intent';
+import intentHandler from 'handlers/intent';
 import openFolder from './openFolder';
-import quickToolsInit from '../handlers/quickToolsInit';
-import loadPolyFill from '../utils/polyfill';
-import Url from '../utils/Url';
+import quickToolsInit from 'handlers/quickToolsInit';
+import loadPolyFill from 'utils/polyfill';
+import Url from 'utils/Url';
 import applySettings from './applySettings';
-import fsOperation from '../fileSystem';
-import toast from '../components/toast';
-import $_menu from '../views/menu.hbs';
-import $_fileMenu from '../views/file-menu.hbs';
+import fsOperation from 'fileSystem';
+import toast from 'components/toast';
+import $_menu from 'views/menu.hbs';
+import $_fileMenu from 'views/file-menu.hbs';
 import openFiles from './openFiles';
 import loadPlugins from './loadPlugins';
 import checkPluginsUpdate from './checkPluginsUpdate';
-import plugins from '../pages/plugins';
+import plugins from 'pages/plugins';
 import Acode from './acode';
-import ajax from '@deadlyjack/ajax';
 import lang from './lang';
 import EditorFile from './editorFile';
-import sidebarApps from '../sidebarApps';
+import sidebarApps from 'sidebarApps';
 import checkFiles from './checkFiles';
 import themes from './themes';
+import { createEventInit } from 'utils/keyboardEvent';
+import { setKeyBindings } from 'ace/commands';
+import { initFileList } from './fileList';
 
 window.onload = Main;
 
@@ -231,7 +231,7 @@ async function loadApp() {
     lead: $navToggler,
     tail: $menuToggler,
   });
-  const $mainMenu = contextMenu({
+  const $mainMenu = contextmenu({
     top: '6px',
     right: '6px',
     toggle: $menuToggler,
@@ -240,7 +240,7 @@ async function loadApp() {
       return mustache.render($_menu, strings);
     },
   });
-  const $fileMenu = contextMenu({
+  const $fileMenu = contextmenu({
     toggle: $editMenuToggler,
     top: '6px',
     transformOrigin: 'top right',
@@ -293,6 +293,8 @@ async function loadApp() {
   //#endregion
 
   //#region Add event listeners
+  initFileList();
+  createEventInit();
   quickToolsInit();
   sidebarApps.init($sidebar);
   await sidebarApps.loadApps();
@@ -319,6 +321,10 @@ async function loadApp() {
   document.addEventListener('resume', () => {
     if (!settings.value.checkFiles) return;
     checkFiles();
+  });
+  sdcard.watchFile(KEYBINDING_FILE, async () => {
+    await setKeyBindings(editorManager.editor);
+    toast(strings['key bindings updated']);
   });
   //#endregion
 

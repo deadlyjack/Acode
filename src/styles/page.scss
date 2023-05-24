@@ -221,18 +221,6 @@ wc-page {
           animation: strech 300ms ease 1;
           background-color: rgb(51, 153, 255);
           background-color: var(--active-color);
-
-          @keyframes strech {
-            from {
-              opacity: 0;
-              transform: scale(0, 1);
-            }
-
-            to {
-              opacity: 1;
-              transform: scale(1, 1);
-            }
-          }
         }
       }
     }
@@ -470,41 +458,5 @@ wc-page {
 
   .editor-container {
     height: 100%;
-  }
-}
-
-@keyframes page-transition {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 50%, 0);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes page-transition-opacity {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes float-appear {
-  0% {
-    opacity: 0;
-    box-shadow: none;
-    transform: scale(0.6) rotate(360deg) translateZ(0);
-  }
-
-  100% {
-    opacity: 1;
-    box-shadow: none;
-    transform: scale(1) rotate(0deg) translateZ(0);
   }
 }

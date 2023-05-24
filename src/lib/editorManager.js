@@ -1,13 +1,12 @@
-import list from '../components/collapsableList';
-import helpers from '../utils/helpers';
-import openFolder from './openFolder';
-import ScrollBar from '../components/scrollbar';
-import Commands from '../ace/commands';
-import touchListeners from '../ace/touchHandler';
+import helpers from 'utils/helpers';
+import list from 'components/collapsableList';
+import ScrollBar from 'components/scrollbar';
+import touchListeners from 'ace/touchHandler';
 import appSettings from './settings';
 import EditorFile from './editorFile';
-import { $quickToolToggler } from '../handlers/quickTools';
-import sidebarApps from '../sidebarApps';
+import sidebarApps from 'sidebarApps';
+import quickTools from 'components/quickTools';
+import { setCommands, setKeyBindings } from 'ace/commands';
 
 //TODO: Add option to work multiple files at same time in large display.
 
@@ -35,6 +34,8 @@ async function EditorManager($header, $body) {
     'save-file': [],
     'file-loaded': [],
     'file-content-changed': [],
+    'add-folder': [],
+    'remove-folder': [],
     'update': [],
     emit(event, ...args) {
       if (!events[event]) return;
@@ -75,7 +76,7 @@ async function EditorManager($header, $body) {
       return TIMEOUT_VALUE;
     },
     on(event, callback) {
-      if (!events[event]) return;
+      if (!events[event]) events[event] = [];
       events[event].push(callback);
     },
     off(event, callback) {
@@ -83,7 +84,18 @@ async function EditorManager($header, $body) {
       events[event] = events[event].filter(c => c !== callback);
     },
     emit(event, ...args) {
+      let detailedEvent;
+      let detailedEventArgs = args.slice(1);
+      if (event === 'update') {
+        const subEvent = args[0];
+        if (subEvent) {
+          detailedEvent = `${event}:${subEvent}`;
+        }
+      }
       events.emit(event, ...args);
+      if (detailedEvent) {
+        events.emit(detailedEvent, ...detailedEventArgs);
+      }
     }
   };
 
@@ -207,7 +219,8 @@ async function EditorManager($header, $body) {
     let autosaveTimeout;
     const Emmet = ace.require('ace/ext/emmet');
     const settings = appSettings.value;
-    const commands = await Commands();
+    /**@type {HTMLTextAreaElement} */
+    const $input = editor.textInput.getElement();
 
     editor.on('focus', () => {
       const { activeFile } = manager;
@@ -252,16 +265,12 @@ async function EditorManager($header, $body) {
     });
 
     touchListeners(editor);
+    setCommands(editor)
+    await setKeyBindings(editor);
     Emmet.setCore(window.emmet);
-    commands.forEach((command) => {
-      editor.commands.addCommand(command);
-    });
     editor.setFontSize(settings.fontSize);
     editor.setHighlightSelectedWord(true);
     editor.container.style.lineHeight = settings.lineHeight;
-    editor.textInput.onContextMenu = (e) => {
-      e.preventDefault();
-    };
 
     ace.require('ace/ext/language_tools');
     editor.setOption('animatedScroll', false);
@@ -361,6 +370,7 @@ async function EditorManager($header, $body) {
 
   function updateFloatingButton(show = false) {
     const { $headerToggler } = acode;
+    const { $toggler } = quickTools;
 
     if (show) {
       if (scrollBarVisiblityCount) --scrollBarVisiblityCount;
@@ -370,8 +380,8 @@ async function EditorManager($header, $body) {
         clearTimeout(timeoutQuicktoolToggler);
 
         if (appSettings.value.floatingButton) {
-          $quickToolToggler.classList.remove('hide');
-          root.appendOuter($quickToolToggler);
+          $toggler.classList.remove('hide');
+          root.appendOuter($toggler);
         }
 
         $headerToggler.classList.remove('hide');
@@ -379,10 +389,10 @@ async function EditorManager($header, $body) {
       }
     } else {
       if (!scrollBarVisiblityCount) {
-        if ($quickToolToggler.isConnected) {
-          $quickToolToggler.classList.add('hide');
+        if ($toggler.isConnected) {
+          $toggler.classList.add('hide');
           timeoutQuicktoolToggler = setTimeout(
-            () => $quickToolToggler.remove(),
+            () => $toggler.remove(),
             300,
           );
         }

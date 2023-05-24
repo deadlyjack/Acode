@@ -1,5 +1,5 @@
-import tag from 'html-tag-js';
-import helpers from '../utils/helpers';
+import './style.scss';
+import helpers from 'utils/helpers';
 
 /**
  *

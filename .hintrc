@@ -4,6 +4,7 @@
   ],
   "hints": {
     "compat-api/css": "off",
-    "css-prefix-order": "off"
+    "css-prefix-order": "off",
+    "meta-viewport": "off"
   }
 }

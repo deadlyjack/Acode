@@ -139,6 +139,14 @@ interface ActionStack {
    * Callback function when app is to close
    */
   onCloseApp: () => void;
+  /**
+   * Freezes the action stack
+   */
+  freeze(): void;
+  /**
+   * Unfreezes the action stack
+   */
+  unfreeze(): void;
 }
 
 interface fileOptions {
@@ -414,6 +422,23 @@ interface PluginAuthor {
   email: string;
   website?: string;
   github: string;
+}
+
+interface EditorManager {
+  files: Array<EditorFile>;
+  activeFile: EditorFile;
+  addFile(file: EditorFile): void;
+  editor: AceAjax.Editor;
+  getFile: (checkFor: string, type: 'id' | 'name' | 'uri') => EditorFile;
+  switchFile: (file: EditorFile) => void;
+  hasUnsavedFiles: () => boolean;
+  container: HTMLElement;
+  header: HTMLElement;
+  openFileList: HTMLElement;
+  TIMEOUT_VALUE: number;
+  on(event: string, callback: Function): void;
+  off(event: string, callback: Function): void;
+  emit(event: string, ...args: any[]): void;
 }
 
 /**

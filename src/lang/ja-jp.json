@@ -315,5 +315,11 @@
   "product not available": "利用不可の製品",
   "no-product-info": "現在、この製品はお住まいの国でご利用できません。後でもう一度お試しください。",
   "close": "Close",
-  "explore": "Explore"
+  "explore": "Explore",
+  "key bindings updated": "Key bindings updated",
+  "search in files": "Search in files",
+  "exclude files": "Exclude files",
+  "include files": "Include files",
+  "search result": "{matches} results in {files} files.",
+  "replace warning": "Are you sure you want to replace all {matches} matches in {files} files? This action cannot be reversed."
 }

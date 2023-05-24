@@ -55,5 +55,14 @@ module.exports = {
   },
   stats: function (filename, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'SDcard', 'stats', [filename]);
-  }
+  },
+  watchFile: function (filename, listener, onFail) {
+    var id = parseInt(Date.now() + Math.random() * 1000000) + '';
+    cordova.exec(listener, onFail, 'SDcard', 'watch file', [filename, id]);
+    return {
+      unwatch: function () {
+        cordova.exec(null, null, 'SDcard', 'unwatch file', [id]);
+      }
+    }
+  },
 };

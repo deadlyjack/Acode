@@ -1,3 +1,5 @@
+import './style.scss';
+
 /**@type {Array<HTMLElement>} */
 const toastQueue = [];
 

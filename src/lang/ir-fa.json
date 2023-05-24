@@ -316,5 +316,11 @@
   "product not available": "Product not available",
   "no-product-info": "This product is not available in your country at this moment, please try again later.",
   "close": "Close",
-  "explore": "Explore"
+  "explore": "Explore",
+  "key bindings updated": "Key bindings updated",
+  "search in files": "Search in files",
+  "exclude files": "Exclude files",
+  "include files": "Include files",
+  "search result": "{matches} results in {files} files.",
+  "replace warning": "Are you sure you want to replace all {matches} matches in {files} files? This action cannot be reversed."
 }

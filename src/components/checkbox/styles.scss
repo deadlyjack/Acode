@@ -1,0 +1,41 @@
+.input-checkbox {
+  display: inline-flex;
+  align-items: center;
+
+  input {
+    display: none;
+  }
+
+  .box {
+    display: flex;
+    height: 1.2rem;
+    width: 1.2rem;
+    border-radius: 4px;
+    border: solid 1px #252525;
+    border: solid 1px var(--secondary-text-color);
+    margin: 0 5px;
+
+    &::after {
+      content: '';
+      display: block;
+      height: 80%;
+      width: 80%;
+      background-color: #3399ff;
+      background-color: var(--button-background-color);
+      margin: auto;
+      border-radius: 2px;
+    }
+  }
+
+  input:checked {
+    &+.box::after {
+      opacity: 1;
+    }
+  }
+
+  input:not(:checked) {
+    &+.box::after {
+      opacity: 0;
+    }
+  }
+}

@@ -244,6 +244,17 @@ interface SDcard {
     onSuccess: (stats: Stats) => void,
     onFail: (err: any) => void,
   ): void;
+  /**
+   * Listens for file changes
+   * @param src File url
+   * @param listener Callback function on file change returns file stats
+   */
+  watchFile(
+    src: String,
+    listener: () => void,
+  ): {
+    unwatch: () => void;
+  };
 }
 
 declare var sdcard: SDcard;

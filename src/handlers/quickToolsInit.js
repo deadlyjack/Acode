@@ -1,14 +1,8 @@
-import tag from 'html-tag-js';
-import constants from "../lib/constants";
-import appSettings from "../lib/settings";
-import { $footer, $quickToolToggler, actions } from './quickTools';
+import quickTools from 'components/quickTools';
+import constants from "lib/constants";
+import appSettings from "lib/settings";
+import actions, { key } from './quickTools';
 
-const keyMapping = {
-  37: 'ArrowLeft',
-  38: 'ArrowUp',
-  39: 'ArrowRight',
-  40: 'ArrowDown',
-};
 const CONTEXT_MENU_TIMEOUT = 500;
 const MOVEX_THRESHOLD = 50;
 
@@ -19,13 +13,14 @@ let touchmoved;
 let isClickMode;
 let contextmenu;
 let contextmenuTimeout;
+let active = false; // is button already active
 
 /**@type {HTMLElement} */
 let $row;
+/**@type {number} */
 let timeout;
+/**@type {HTMLElement} */
 let $touchstart;
-
-export default init;
 
 function reset() {
   movex = 0;
@@ -36,14 +31,49 @@ function reset() {
   contextmenu = false;
   touchmoved = undefined;
   contextmenuTimeout = null;
+  active = false;
 }
 
 /**
- * 
+ * Initialize quick tools
  * @param {HTMLElement} $footer 
  */
-function init() {
-  root.append($footer, $quickToolToggler);
+export default function init() {
+  const { $footer, $toggler, $input, $shift, $ctrl, $save } = quickTools;
+
+  $toggler.addEventListener('click', () => {
+    actions('toggle');
+  });
+
+  key.on('shift', (value) => {
+    if (value) $shift.classList.add('active');
+    else $shift.classList.remove('active');
+  });
+
+  key.on('ctrl', (value) => {
+    if (value) $ctrl.classList.add('active');
+    else $ctrl.classList.remove('active');
+  });
+
+  editorManager.on('file-content-changed', (event) => {
+    if (editorManager.activeFile?.isUnsaved) {
+      $save.classList.add('notice');
+    } else {
+      $save.classList.remove('notice');
+    }
+  });
+
+  editorManager.on('save-file', () => {
+    $save.classList.remove('notice');
+  });
+
+  editorManager.editor.on('focus', () => {
+    if (key.shift || key.ctrl || key.alt || key.meta) {
+      quickTools.$input.focus();
+    }
+  });
+
+  root.append($footer, $toggler, $input);
   if (appSettings.value.quickToolsTriggerMode === appSettings.QUICKTOOLS_TRIGGER_MODE_CLICK) {
     isClickMode = true;
     $footer.addEventListener('click', onclick);
@@ -71,17 +101,9 @@ function init() {
 function onclick(e) {
   reset();
 
-  const $el = e.target;
-  const { which } = $el.dataset;
-
-  if (which === undefined) {
-    execQuickToolAction(e);
-    return;
-  }
-
   e.preventDefault();
   e.stopPropagation();
-  oncontextmenu(e);
+  click(e.target);
   clearTimeout(timeout);
 }
 
@@ -89,32 +111,27 @@ function touchstart(e) {
   reset();
 
   const $el = e.target;
-
   if ($el instanceof HTMLInputElement) {
     return;
   }
 
   $touchstart = $el;
-
-  if (isClickMode && $footer?.classList?.contains('active')) {
-    $footer.classList.remove('active');
-    clearTimeout(timeout);
-    return;
-  }
-
   e.preventDefault();
   e.stopPropagation();
 
-  if ($el.dataset.which) {
+  if ($el.dataset.repeate === 'true') {
     contextmenuTimeout = setTimeout(() => {
       if (touchmoved) return;
-
       contextmenu = true;
       oncontextmenu(e);
     }, CONTEXT_MENU_TIMEOUT);
   }
 
-  $el.classList.add('active');
+  if ($el.classList.contains('active')) {
+    active = true;
+  } else {
+    $el.classList.add('active');
+  }
   document.addEventListener('touchmove', touchmove);
   document.addEventListener('keyup', touchcancel);
   document.addEventListener('touchend', touchend);
@@ -122,12 +139,13 @@ function touchstart(e) {
 }
 
 /**
- *
+ * Event handler for touchmove event
  * @param {TouchEvent} e 
  */
 function touchmove(e) {
   if (contextmenu || touchmoved === false) return;
 
+  const { $row1, $row2 } = quickTools;
   const $el = e.target;
   const { clientX } = e.touches[0];
 
@@ -155,9 +173,6 @@ function touchmove(e) {
   movedx += diff;
 
   if (!$row) {
-    const $row1 = tag.get('#row1');
-    const $row2 = tag.get('#row2');
-
     if ($row1?.contains($el)) {
       $row = $row1;
     } else if ($row2?.contains($el)) {
@@ -167,20 +182,19 @@ function touchmove(e) {
 
   if ($row) {
     $row.style.scrollBehavior = 'unset';
-    // $row.scrollBy(diff, 0);
-    // scrollBy is not working on mobile
     $row.scrollLeft += diff;
   }
 
-  $touchstart.classList.remove('active');
+  if (!active) $touchstart.classList.remove('active');
   movex = clientX;
 }
 
 /**
- * 
+ * Event handler for touchend event
  * @param {TouchEvent} e 
  */
 function touchend(e) {
+  const { $row1 } = quickTools;
   const $el = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
 
   if (touchmoved && $row) {
@@ -195,7 +209,7 @@ function touchend(e) {
       scroll = slide * $row.clientWidth;
     }
 
-    if ($row.id === 'row1') {
+    if ($row === $row1) {
       localStorage.quickToolRow1ScrollLeft = scroll;
     } else {
       localStorage.quickToolRow2ScrollLeft = scroll;
@@ -212,15 +226,8 @@ function touchend(e) {
     return;
   }
 
-  const { which } = $el.dataset;
-
-  if (which) {
-    oncontextmenu(e);
-    touchcancel(e);
-  } else {
-    touchcancel(e);
-    execQuickToolAction(e);
-  }
+  touchcancel(e);
+  click($el);
 }
 
 /**
@@ -234,26 +241,33 @@ function touchcancel(e) {
   document.removeEventListener('touchmove', touchmove);
   clearTimeout(timeout);
   clearTimeout(contextmenuTimeout);
-  $touchstart.classList.remove('active');
+  if (!active) $touchstart.classList.remove('active');
 }
 
+/**
+ * Handler for contextmenu event
+ * @param {TouchEvent|MouseEvent} e 
+ */
 function oncontextmenu(e) {
+  const $el = e.target;
+  const { lock } = $el.dataset;
+
+  if (lock === 'true') {
+    return; // because button with lock=true is locked when clicked so contextmenu doesn't make sense
+  }
+
+  const { editor, activeFile } = editorManager;
+
   if (isClickMode && appSettings.value.vibrateOnTap) {
     navigator.vibrate(constants.VIBRATION_TIME_LONG);
-    $footer.classList.add('active');
+    $el.classList.add('active');
   }
-  const $el = e.target;
-  const { which } = $el.dataset;
-  const { editor, activeFile } = editorManager;
-  const $textarea = editor.textInput.getElement();
-  const shiftKey = tag.get('#shift-key').dataset.state === 'on';
 
   const dispatchEventWithTimeout = () => {
     if (time > 50) {
       time -= 10;
     }
-
-    dispatchKey({ which }, shiftKey, $textarea);
+    click($el);
     timeout = setTimeout(dispatchEventWithTimeout, time);
   };
 
@@ -263,25 +277,19 @@ function oncontextmenu(e) {
   dispatchEventWithTimeout();
 }
 
-function dispatchKey({ which }, shiftKey, $textarea) {
-  const keyevent = window.createKeyboardEvent('keydown', {
-    key: keyMapping[which],
-    keyCode: which,
-    shiftKey,
-  });
-
-  $textarea.dispatchEvent(keyevent);
-}
-
 /**
- * Executes quick tool action
- * @param {MouseEvent} event 
+ * Executes the action associated with the button
+ * @param {HTMLElement} $el 
  */
-function execQuickToolAction(event) {
-  if (!event.target) return;
-
-  const el = event.target;
-  const action = el.getAttribute('action');
+function click($el) {
+  const { action } = $el.dataset;
   if (!action) return;
-  actions(action, el.getAttribute('value'));
+
+  let { value } = $el.dataset;
+
+  if (!value) {
+    value = $el.value;
+  }
+
+  actions(action, value);
 }

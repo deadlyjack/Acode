@@ -40,7 +40,7 @@ export default async function openFile(file, data = {}) {
         render,
         onsave,
         readOnly,
-        mode,
+        SAFMode: mode,
       });
     };
 
