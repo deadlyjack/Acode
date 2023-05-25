@@ -131,26 +131,6 @@ export default function actions(action, value) {
       break;
 
 
-    case 'shift':
-      const $el = $footer.querySelector('#shift-key');
-      state = $el.getAttribute('data-state') || 'off';
-      if (state === 'off') {
-        if (appSettings.value.vibrateOnTap) {
-          navigator.vibrate(constants.VIBRATION_TIME_LONG);
-        }
-        $textarea.dispatchEvent(window.createKeyboardEvent('keydown', {}));
-        $el.setAttribute('data-state', 'on');
-        $el.classList.add('active');
-      } else {
-        if (appSettings.value.vibrateOnTap) {
-          navigator.vibrate(constants.VIBRATION_TIME);
-        }
-        $textarea.dispatchEvent(window.createKeyboardEvent('keyup', {}));
-        $el.setAttribute('data-state', 'off');
-        $el.classList.remove('active');
-      }
-      break;
-
     case 'undo':
       editor.undo(true);
       break;
