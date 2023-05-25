@@ -8,7 +8,7 @@ import Url from '../utils/Url';
 import settingsPage from '../components/settingPage';
 import lang from '../lib/lang';
 import appSettings from '../lib/settings';
-import { actions } from '../handlers/quickTools';
+import actions from '../handlers/quickTools';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -147,18 +147,16 @@ export default function otherSettings() {
 
   function callback(key, value) {
     switch (key) {
-      case 'keybindings':
+      case 'keybindings': {
         if (value === 'edit') {
           actionStack.pop();
           actionStack.pop();
-          openFile(KEYBINDING_FILE, {
-            render: true,
-            isUnsaved: false,
-          });
+          openFile(KEYBINDING_FILE);
         } else {
           helpers.resetKeyBindings();
         }
         return;
+      }
 
       case 'console':
         (async () => {
@@ -213,10 +211,10 @@ export default function otherSettings() {
       case 'quickTools':
         if (value) {
           value = 1;
-          actions('set-quick-tools-height', 1);
+          actions('set-height', 1);
         } else {
           value = 0;
-          actions('set-quick-tools-height', 0);
+          actions('set-height', 0);
         }
         break;
 

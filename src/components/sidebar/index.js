@@ -143,10 +143,15 @@ function create($container, $toggler) {
    */
   function ontouchstart(e) {
     const { target } = e;
-    const $parent = target.closest('#sidebar>.container>.list>.scroll');
+    const $parent = target.closest('.list.scroll');
+    const canScroll = $parent ? $parent.scrollHeight > $parent.offsetHeight : false;
+
     if (
-      $parent &&
-      $parent.offsetHeight < $parent.scrollHeight
+      canScroll
+      || target instanceof HTMLInputElement
+      || target instanceof HTMLTextAreaElement
+      || target.contentEditable === 'true'
+      || target.closest('.ace_editor')
     ) return;
 
     const { clientX, clientY } = getClient(e);
@@ -157,12 +162,14 @@ function create($container, $toggler) {
     touch.startY = clientY;
     touch.target = e.target;
 
-    if ($el.activated && !$el.contains(e.target) && e.target !== mask) return;
-    else if (
+    if ($el.activated && !$el.contains(e.target) && e.target !== mask) {
+      return;
+    } else if (
       (!$el.activated && touch.startX > START_THRESHOLD) ||
       e.target === $toggler
-    )
+    ) {
       return;
+    }
 
     document.addEventListener('touchmove', ontouchmove);
     document.addEventListener('touchend', ontouchend);

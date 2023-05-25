@@ -4,7 +4,6 @@ import dialogs from "../components/dialogs";
 import Sidebar from '../components/sidebar';
 import tile from "../components/tile";
 import fsOperation from "../fileSystem";
-import { $save } from '../handlers/quickTools';
 import helpers from "../utils/helpers";
 import Path from "../utils/Path";
 import Url from "../utils/Url";
@@ -431,7 +430,6 @@ export default class EditorFile {
     if (this.#isUnsaved === value) return;
     this.#isUnsaved = value;
 
-    this.#upadteSaveIcon();
     this.#updateTab();
   }
 
@@ -460,6 +458,10 @@ export default class EditorFile {
 
   get tab() {
     return this.#tab;
+  }
+
+  get SAFMode() {
+    return this.#SAFMode;
   }
 
   async writeToCache() {
@@ -657,7 +659,6 @@ export default class EditorFile {
       editor.blur();
     }
 
-    this.#upadteSaveIcon();
     this.#tab.classList.add('active');
     this.#tab.scrollIntoView();
     if (!this.loaded && !this.loading) {
@@ -903,14 +904,6 @@ export default class EditorFile {
     this.#emit('run', event);
     if (event.defaultPrevented) return;
     run(false, file ? 'inapp' : appSettings.value.previewMode, file);
-  }
-
-  #upadteSaveIcon() {
-    if (this.#isUnsaved) {
-      $save?.classList.add('notice');
-    } else {
-      $save?.classList.remove('notice');
-    }
   }
 
   #updateTab() {

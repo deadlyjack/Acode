@@ -1,22 +1,23 @@
 import appSettings from "./settings";
 import commands from "./commands";
 import fsOperation from "../fileSystem";
-import Url from "../utils/Url";
+import Url from "utils/Url";
 import EditorFile from "./editorFile";
-import defaultFormatter from "../settings/defaultFormatter";
-import dialogs from "../components/dialogs";
-import FileBrowser from "../pages/fileBrowser";
-import helpers from "../utils/helpers";
+import defaultFormatter from "settings/defaultFormatter";
+import dialogs from "components/dialogs";
+import FileBrowser from "pages/fileBrowser";
+import helpers from "utils/helpers";
 import projects from "./projects";
 import selectionMenu from "./selectionMenu";
-import Page from '../components/page';
-import inputhints from '../components/inputhints';
-import pallete from '../components/pallete';
+import Page from 'components/page';
+import inputhints from 'components/inputhints';
+import pallete from 'components/pallete';
 import openFolder from './openFolder';
 import fonts from './fonts';
 import themes from './themes';
 import ThemeBuilder from './themeBuilder';
-import sidebarApps from '../sidebarApps';
+import sidebarApps from 'sidebarApps';
+import files from './fileList';
 
 export default class Acode {
   #modules = {};
@@ -72,6 +73,7 @@ export default class Acode {
       add: sidebarApps.add,
       get: sidebarApps.get,
     });
+    this.define('fileList', files);
   }
 
   /**

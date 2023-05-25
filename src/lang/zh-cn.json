@@ -315,5 +315,11 @@
   "product not available": "产品不可用",
   "no-product-info": "该产品目前在您所在的国家不可用，请稍后再试。",
   "close": "关闭",
-  "explore": "探索"
+  "explore": "探索",
+  "key bindings updated": "Key bindings updated",
+  "search in files": "Search in files",
+  "exclude files": "Exclude files",
+  "include files": "Include files",
+  "search result": "{matches} results in {files} files.",
+  "replace warning": "Are you sure you want to replace all {matches} matches in {files} files? This action cannot be reversed."
 }

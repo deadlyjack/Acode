@@ -80,6 +80,7 @@ function openFolder(_path, opts = {}) {
   sidebarApps.get('files').append($root);
   editorManager.onupdate('add-folder', _path);
   editorManager.emit('update', 'add-folder');
+  editorManager.emit('add-folder', _path);
 
   /**
    *
@@ -218,6 +219,7 @@ function openFolder(_path, opts = {}) {
     addedFolder = addedFolder.filter((folder) => folder.url !== _path);
     editorManager.onupdate('remove-folder', _path);
     editorManager.emit('update', 'remove-folder');
+    editorManager.emit('remove-folder', _path);
   }
 
   /**

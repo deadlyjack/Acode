@@ -87,7 +87,7 @@ const loader = {
     }
 
     if (!oldLoaderDiv) {
-      window.freeze = true;
+      actionStack.freeze();
       document.body.append($loaderDiv, mask);
       restoreTheme(true);
     }
@@ -112,7 +112,7 @@ const loader = {
     const mask = document.querySelector('#__loader-mask');
     if (!loaderDiv && !mask) return;
     if (loaderDiv) loaderDiv.classList.add('hide');
-    window.freeze = false;
+    actionStack.unfreeze();
     restoreTheme();
     setTimeout(() => {
       if (loaderDiv && loaderDiv.isConnected) loaderDiv.remove();

@@ -1,4 +1,19 @@
 export default {
+  copy: {
+    description: 'Copy',
+    key: 'Ctrl-C',
+    readOnly: true,
+  },
+  cut: {
+    description: 'Cut',
+    key: 'Ctrl-X',
+    readOnly: false,
+  },
+  paste: {
+    description: 'Paste',
+    key: 'Ctrl-V',
+    readOnly: false,
+  },
   findFile: {
     description: 'Find a file',
     key: 'Ctrl-P',
@@ -363,7 +378,7 @@ export default {
   },
   selecttomatching: {
     description: 'Select to matching',
-    key: 'Ctrl-Shift-\\|Ctrl-Shift-P',
+    key: 'Ctrl-Shift-\\',
     readOnly: false,
   },
   expandToMatching: {
@@ -543,7 +558,7 @@ export default {
   },
   openCommandPallete: {
     description: 'Open command pallete',
-    key: 'F1',
+    key: 'Ctrl-Shift-P',
     readOnly: true,
   },
   modeSelect: {

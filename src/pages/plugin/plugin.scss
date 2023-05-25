@@ -1,3 +1,5 @@
+@import '../../styles/mixins.scss';
+
 #plugin {
   overflow: auto;
 
@@ -191,16 +193,6 @@
     transform: translateY(100%) !important;
   }
 
-  @keyframes slide-up {
-    0% {
-      transform: translateY(100%);
-    }
-
-    100% {
-      transform: translateY(0);
-    }
-  }
-
   .reviews-header {
     height: 40px;
     display: flex;
@@ -240,26 +232,7 @@
     overflow: auto;
 
     &.loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      &::after {
-        content: '';
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        border: 3px solid rgb(255, 255, 255);
-        border: 3px solid var(--primary-text-color);
-        border-top-color: transparent;
-        animation: spin 1s linear infinite;
-
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      }
+      @include loader(30px);
     }
 
     .review {

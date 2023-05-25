@@ -8,19 +8,17 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
+import android.os.FileObserver;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.provider.DocumentsContract;
 import android.provider.DocumentsContract.Document;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import androidx.documentfile.provider.DocumentFile;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +27,7 @@ import java.io.PrintWriter;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -36,6 +35,7 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,6 +56,7 @@ public class SDcard extends CordovaPlugin {
   private ContentResolver contentResolver;
   private DocumentFile originalRootFile;
   private CallbackContext activityResultCallback;
+  private HashMap<String, MyFileObserver> fileObservers = new HashMap();
 
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
@@ -70,8 +71,7 @@ public class SDcard extends CordovaPlugin {
     String action,
     JSONArray args,
     CallbackContext callback
-  )
-    throws JSONException {
+  ) throws JSONException {
     String arg1 = null, arg2 = null, arg3 = null, arg4 = null;
     int argLen = args.length();
 
@@ -140,6 +140,12 @@ public class SDcard extends CordovaPlugin {
       case "stats":
         getStats(arg1, callback);
         break;
+      case "watch file":
+        watchFile(arg1, arg2, callback);
+        break;
+      case "unwatch file":
+        unwatchingFile(arg1);
+        break;
       default:
         return false;
     }
@@ -159,6 +165,44 @@ public class SDcard extends CordovaPlugin {
     } else {
       return filename;
     }
+  }
+
+  private void watchFile(
+    final String fileUri,
+    final String id,
+    final CallbackContext listener
+  ) {
+    activity.runOnUiThread(
+      new Runnable() {
+        @Override
+        public void run() {
+          MyFileObserver observer;
+          Uri uri = Uri.parse(fileUri);
+          File file = new File(uri.getPath());
+
+          if (!file.exists()) {
+            listener.error("File not found");
+            return;
+          }
+
+          if (SDK_INT >= 29) {
+            observer = new MyFileObserver(file, listener);
+          } else {
+            observer = new MyFileObserver(fileUri, listener);
+          }
+
+          observer.startObserving();
+          fileObservers.put(id, observer);
+        }
+      }
+    );
+  }
+
+  private void unwatchingFile(String id) {
+    MyFileObserver observer = fileObservers.get(id);
+    if (observer == null) return;
+    observer.stopObserving();
+    fileObservers.remove(id);
   }
 
   public void openDocumentFile(String mimeType, CallbackContext callback) {
@@ -859,7 +903,7 @@ public class SDcard extends CordovaPlugin {
       File file = new File(fileUri.getPath());
       documentFile = DocumentFile.fromFile(file);
     } else {
-      documentFile = DocumentFile.fromSingleUri(context, Uri.parse(filePath));
+      documentFile = DocumentFile.fromSingleUri(context, fileUri);
     }
 
     return documentFile;
@@ -889,5 +933,40 @@ public class SDcard extends CordovaPlugin {
       // if we don't have write-permission or the file doesn't exist, canWrite can stay on false
     }
     return canWrite;
+  }
+}
+
+class MyFileObserver extends FileObserver {
+
+  private CallbackContext listener;
+  private static final int mask =
+    (FileObserver.DELETE_SELF | FileObserver.MODIFY | FileObserver.MOVE_SELF);
+
+  public MyFileObserver(String path, CallbackContext listener) {
+    super(path, mask);
+    this.listener = listener;
+    Log.d("MyFileObserver", "MyFileObserver: " + path);
+  }
+
+  public MyFileObserver(File file, CallbackContext listener) {
+    super(file, mask);
+    this.listener = listener;
+    Log.d("MyFileObserver", "MyFileObserver: " + file.getAbsolutePath());
+  }
+
+  @Override
+  public void onEvent(int event, String path) {
+    Log.d("MyFileObserver", "onEvent: " + event);
+    PluginResult result = new PluginResult(PluginResult.Status.OK);
+    result.setKeepCallback(true);
+    listener.sendPluginResult(result);
+  }
+
+  public void startObserving() {
+    startWatching();
+  }
+
+  public void stopObserving() {
+    stopWatching();
   }
 }

@@ -5,6 +5,7 @@ function ActionStack() {
   const stack = [];
   let mark = null;
   let oncloseappCallback;
+  let freeze = false;
 
   return {
     get onCloseApp() {
@@ -22,7 +23,7 @@ function ActionStack() {
       stack.push(fun);
     },
     pop() {
-      if (window.freeze) return;
+      if (freeze) return;
       const fun = stack.pop();
       if (fun) {
         fun.action();
@@ -108,6 +109,12 @@ function ActionStack() {
         stack.splice(mark);
         mark = null;
       }
+    },
+    freeze() {
+      freeze = true;
+    },
+    unfreeze() {
+      freeze = false;
     },
     get length() {
       return stack.length;

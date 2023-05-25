@@ -91,3 +91,26 @@
     });
   });
 })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
+// polyfill for toggleAttribute
+
+(function (arr) {
+  arr.forEach(function (item) {
+    if (item.hasOwnProperty('toggleAttribute')) {
+      return;
+    }
+    Object.defineProperty(item, 'toggleAttribute', {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function toggleAttribute() {
+        var attr = arguments[0];
+        if (this.hasAttribute(attr)) {
+          this.removeAttribute(attr);
+        } else {
+          this.setAttribute(attr, arguments[1] || '');
+        }
+      },
+    });
+  });
+})([Element.prototype]);

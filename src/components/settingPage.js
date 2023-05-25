@@ -1,7 +1,6 @@
 import Page from "./page";
 import searchBar from "./searchbar";
 import listItems from "./listItems";
-import tag from "html-tag-js";
 import helpers from "../utils/helpers";
 
 /**

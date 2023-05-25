@@ -9,16 +9,6 @@
   transition: all 300ms ease;
   opacity: 1;
 
-  @keyframes scrollbar-show {
-    0% {
-      opacity: 0;
-    }
-
-    100% {
-      opacity: 1;
-    }
-  }
-
   &.hide {
     opacity: 0;
   }

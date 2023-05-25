@@ -1,3 +1,5 @@
+@import './mixins.scss';
+
 .prompt {
   position: fixed;
   left: 50%;
@@ -195,24 +197,7 @@
       align-items: center;
 
       .loader {
-        height: 30px;
-        width: 30px;
-        border-radius: 50%;
-        border: solid 4px rgb(37, 37, 37);
-        border: solid 4px var(--popup-text-color);
-        border-bottom: solid 4px rgba($color: #000000, $alpha: 0) !important;
-        margin: 15px;
-        animation: rotate 1s linear infinite !important;
-
-        @keyframes rotate {
-          0% {
-            transform: rotate(0deg) translateZ(0);
-          }
-
-          100% {
-            transform: rotate(360deg) translateZ(0);
-          }
-        }
+        @include circular-loader(30px);
       }
 
       .message {

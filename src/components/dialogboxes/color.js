@@ -8,8 +8,9 @@ let lastPicked = localStorage.__picker_last_picked || '#fff';
 /**
  * Choose color
  * @param {string} defaultColor
+ * @param {Function} onhide
  */
-function color(defaultColor) {
+function color(defaultColor, onhide) {
   defaultColor = defaultColor || lastPicked;
   let type = helpers.checkColorType(defaultColor) || 'hex';
   return new Promise((resolve) => {
@@ -95,8 +96,9 @@ function color(defaultColor) {
 
     function hide() {
       actionStack.remove('box');
-      hideSelect();
       picker.destroy();
+      hideSelect();
+      if (typeof onhide === 'function') onhide();
     }
 
     function onChange(c) {

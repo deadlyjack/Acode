@@ -46,7 +46,6 @@ FileBrowser.openFile = (res) => {
 };
 
 FileBrowser.openFileError = (err) => {
-  console.error(err);
   const ERROR = strings.error.toUpperCase();
   const message = `${strings['unable to open file']}. ${helpers.errorMessage(err.code)}`;
   if (err.code) {
@@ -76,7 +75,6 @@ FileBrowser.openFolder = async (res) => {
 };
 
 FileBrowser.openFolderError = (err) => {
-  console.error(err);
   const ERROR = strings.error.toUpperCase();
   const message = `${strings['unable to open folder']}. ${helpers.errorMessage(err.code)}`;
   if (err.code) {
