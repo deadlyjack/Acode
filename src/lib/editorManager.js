@@ -27,6 +27,8 @@ async function EditorManager($header, $body) {
   let scrollBarVisiblityCount = 0;
   let timeoutQuicktoolToggler;
   let timeoutHeaderToggler;
+  let isScrolling = false;
+
   const { scrollbarSize } = appSettings.value;
   const events = {
     'switch-file': [],
@@ -116,7 +118,15 @@ async function EditorManager($header, $body) {
     } else {
       activeFile.focusedBefore = activeFile.focused;
     }
-    editor.renderer.scrollCursorIntoView();
+    if (isScrolling) return;
+    $vScrollbar.hide();
+    $hScrollbar.hide();
+    setTimeout(() => {
+      if (isCursorVisible()) return;
+      editor.renderer.scrollCursorIntoView();
+      editor.renderer.scrollBy(0, appSettings.value.teardropSize + 10);
+      editor._emit('scroll-intoview');
+    }, 100);
   });
 
   appSettings.on('update:textWrap', function (value) {
@@ -217,10 +227,9 @@ async function EditorManager($header, $body) {
   async function setupEditor() {
     let checkTimeout = null;
     let autosaveTimeout;
+    let scrollTimeout;
     const Emmet = ace.require('ace/ext/emmet');
     const settings = appSettings.value;
-    /**@type {HTMLTextAreaElement} */
-    const $input = editor.textInput.getElement();
 
     editor.on('focus', () => {
       const { activeFile } = manager;
@@ -256,13 +265,21 @@ async function EditorManager($header, $body) {
       }, TIMEOUT_VALUE);
     });
 
-    editor.on('scrolltop', onscrolltop);
-    editor.on('scrollleft', onscrollleft);
+    editor.on('scroll', () => {
+      clearTimeout(scrollTimeout);
+      isScrolling = true;
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+      }, 100);
+    });
 
     editor.renderer.on('resize', () => {
       $vScrollbar.resize($vScrollbar.visible);
       $hScrollbar.resize($hScrollbar.visible);
     });
+
+    editor.on('scrolltop', onscrolltop);
+    editor.on('scrollleft', onscrollleft);
 
     touchListeners(editor);
     setCommands(editor)
@@ -300,6 +317,22 @@ async function EditorManager($header, $body) {
     if (appSettings.value.linenumbers) {
       editor.renderer.setMargin(0, 0, -16, 0);
     }
+  }
+
+  /**
+   * Checks if the cursor is visible within the Ace editor.
+   * @returns {boolean} - True if the cursor is visible, false otherwise.
+   */
+  function isCursorVisible() {
+    const renderer = editor.renderer;
+    const cursorPos = editor.getCursorPosition();
+    const contentTop = $container.getBoundingClientRect().top;
+    const contentBottom = contentTop + $container.clientHeight;
+    let cursorTop = renderer.textToScreenCoordinates(cursorPos.row, cursorPos.column).pageY;
+
+    cursorTop -= appSettings.value.teardropSize + 10;
+
+    return cursorTop >= contentTop && cursorTop <= contentBottom;
   }
 
   /**

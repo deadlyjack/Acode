@@ -102,9 +102,13 @@ export default function addTouchListeners(editor, minimal) {
     editor.on('scroll', onscroll);
     editor.on('changeSession', onchangesession);
     editor.on('blur', () => {
-      clearCursorMode();
-      hideMenu();
+      setTimeout(() => {
+        if (editor.isFocused()) return;
+        clearCursorMode();
+        hideMenu();
+      }, 100);
     });
+    editor.on('scroll-intoview', cursorMode);
 
     appSettings.on('update:diagonalScrolling', (value) => {
       diagonalScrolling = value;
