@@ -143,7 +143,7 @@ function create($container, $toggler) {
    */
   function ontouchstart(e) {
     const { target } = e;
-    const $parent = target.closest('.list.scroll');
+    const $parent = target.closest('.scroll');
     const canScroll = $parent ? $parent.scrollHeight > $parent.offsetHeight : false;
 
     if (
