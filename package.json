@@ -26,9 +26,7 @@
       "cordova-plugin-vibration": {},
       "cordova-plugin-buildinfo": {},
       "cordova-plugin-device": {},
-      "cordova-plugin-file": {
-        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
-      },
+      "cordova-plugin-file": {},
       "cordova-plugin-system": {},
       "cordova-plugin-sftp": {},
       "cordova-plugin-iap": {},
