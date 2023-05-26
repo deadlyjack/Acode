@@ -1,6 +1,6 @@
 name: Build Android
 
-on: [push, pull_request, the]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
