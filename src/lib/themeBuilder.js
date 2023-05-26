@@ -29,12 +29,12 @@ export default class ThemeBuilder {
   type = 'light';
   darkenedPrimaryColor = 'rgb(92, 92, 153)';
   /** Whether Auto update darkened primary color when primary color is updated. */
-  autoDarkened = false;
+  autoDarkened = true;
   preferredEditorTheme = null;
   preferredFont = null;
 
   /**
-   * 
+   * Creates a theme
    * @param {string} [name] name of the theme
    * @param {'dark'|'light'} [type] type of the theme 
    * @param {'free'|'paid'} [version]  version of the theme
@@ -127,8 +127,7 @@ export default class ThemeBuilder {
 
   set primaryColor(value) {
     if (this.autoDarkened) {
-      const hex = Irid(value).toHexString();
-      this.darkenedPrimaryColor = Irid(hex).darken(0.4).toHexString();
+      this.darkenedPrimaryColor = Irid(value).darken(0.4).toHexString();
     }
     this.#theme['--primary-color'] = value;
   }
@@ -238,6 +237,14 @@ export default class ThemeBuilder {
   }
 
   /**
+   * This method is used to set a darkened primary color.
+   */
+  darkenPrimaryColor() {
+    const hex = Irid(this.primaryColor).toHexString();
+    this.darkenedPrimaryColor = Irid(hex).darken(0.4).toHexString();
+  }
+
+  /**
    * Creates a theme from a CSS string
    * @param {string} name 
    * @param {string} css 
@@ -287,4 +294,10 @@ export default class ThemeBuilder {
     // e.g. '--primary-color' => 'PrimaryColor'
     return str.replace(/^--/, '').replace(/-([a-z])/g, (g) => g[1].toUpperCase());
   }
+}
+
+export function createBuiltInTHeme(name, type, version = 'paid') {
+  const theme = new ThemeBuilder(name, type, version);
+  theme.autoDarkened = false;
+  return theme;
 }

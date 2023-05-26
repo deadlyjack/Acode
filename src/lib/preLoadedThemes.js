@@ -1,9 +1,9 @@
-import ThemeBuilder from './themeBuilder';
+import { createBuiltInTHeme } from './themeBuilder';
 
 const WHITE = 'rgb(255, 255, 255)';
 const BLACK = 'rgb(0, 0, 0)';
 
-const dark = new ThemeBuilder('Dark', 'dark', 'free');
+const dark = createBuiltInTHeme('Dark', 'dark', 'free');
 dark.primaryColor = 'rgb(49, 49, 49)';
 dark.primaryTextColor = WHITE;
 dark.darkenedPrimaryColor = 'rgb(29, 29, 29)';
@@ -17,7 +17,7 @@ dark.popupBackgroundColor = 'rgb(49, 49, 49)';
 dark.popupTextColor = WHITE;
 dark.popupActiveColor = 'rgb(255, 215, 0)';
 
-const oled = new ThemeBuilder('OLED');
+const oled = createBuiltInTHeme('OLED');
 oled.primaryColor = 'rgb(0, 0, 0)';
 oled.primaryTextColor = WHITE;
 oled.darkenedPrimaryColor = 'rgb(0, 0, 0)';
@@ -34,7 +34,7 @@ oled.popupActiveColor = 'rgb(121, 103, 0)';
 oled.popupBorderColor = 'rgba(255, 255, 255, 0.4)';
 oled.boxShadowColor = BLACK;
 
-const ocean = new ThemeBuilder('Ocean');
+const ocean = createBuiltInTHeme('Ocean');
 ocean.darkenedPrimaryColor = 'rgb(19, 19, 26)';
 ocean.primaryColor = 'rgb(32, 32, 44)';
 ocean.primaryTextColor = WHITE;
@@ -51,7 +51,7 @@ ocean.boxShadowColor = 'rgba(0, 0, 0, 0.5)';
 ocean.preferredEditorTheme = 'ace/theme/solarized_dark';
 ocean.preferredFont = 'Fira Code';
 
-const bump = new ThemeBuilder('Bump');
+const bump = createBuiltInTHeme('Bump');
 bump.darkenedPrimaryColor = 'rgb(28, 33, 38)';
 bump.primaryColor = 'rgb(48, 56, 65)';
 bump.primaryTextColor = 'rgb(236, 236, 236)';
@@ -68,7 +68,7 @@ bump.buttonBackgroundColor = 'rgb(242, 163, 101)';
 bump.buttonTextColor = 'rgb(236, 236, 236)';
 bump.buttonActiveColor = 'rgb(212, 137, 79)';
 
-const bling = new ThemeBuilder('Bling');
+const bling = createBuiltInTHeme('Bling');
 bling.darkenedPrimaryColor = 'rgb(19, 19, 38)';
 bling.primaryColor = 'rgb(32, 32, 64)';
 bling.primaryTextColor = 'rgb(255, 189, 105)';
@@ -85,7 +85,7 @@ bling.buttonBackgroundColor = 'rgb(255, 99, 99)';
 bling.buttonTextColor = 'rgb(255, 189, 105)';
 bling.buttonActiveColor = 'rgb(160, 99, 52)';
 
-const moon = new ThemeBuilder('Moon');
+const moon = createBuiltInTHeme('Moon');
 moon.darkenedPrimaryColor = 'rgb(20, 24, 29)';
 moon.primaryColor = 'rgb(34, 40, 49)';
 moon.primaryTextColor = 'rgb(0, 255, 245)';
@@ -102,7 +102,7 @@ moon.buttonBackgroundColor = 'rgb(0, 173, 181)';
 moon.buttonTextColor = 'rgb(0, 142, 149)';
 moon.buttonActiveColor = 'rgb(0, 173, 181)';
 
-const atticus = new ThemeBuilder('Atticus');
+const atticus = createBuiltInTHeme('Atticus');
 atticus.darkenedPrimaryColor = 'rgb(32, 30, 30)';
 atticus.primaryColor = 'rgb(54, 51, 51)';
 atticus.primaryTextColor = 'rgb(246, 233, 233)';
@@ -119,7 +119,7 @@ atticus.buttonBackgroundColor = 'rgb(225, 100, 40)';
 atticus.buttonTextColor = 'rgb(246, 233, 233)';
 atticus.buttonActiveColor = 'rgb(0, 145, 153)';
 
-const tomyris = new ThemeBuilder('Tomyris');
+const tomyris = createBuiltInTHeme('Tomyris');
 tomyris.darkenedPrimaryColor = 'rgb(32, 30, 30)';
 tomyris.primaryColor = 'rgb(59, 9, 68)';
 tomyris.primaryTextColor = 'rgb(241, 187, 213)';
@@ -136,7 +136,7 @@ tomyris.buttonBackgroundColor = 'rgb(161, 37, 89)';
 tomyris.buttonTextColor = 'rgb(241, 187, 213)';
 tomyris.buttonActiveColor = 'rgb(0, 145, 153)';
 
-const menes = new ThemeBuilder('Menes');
+const menes = createBuiltInTHeme('Menes');
 menes.darkenedPrimaryColor = 'rgb(31, 34, 38)';
 menes.primaryColor = 'rgb(53, 57, 65)';
 menes.primaryTextColor = 'rgb(144, 184, 248)';
@@ -153,7 +153,7 @@ menes.buttonBackgroundColor = 'rgb(95, 133, 219)';
 menes.buttonTextColor = 'rgb(144, 184, 248)';
 menes.buttonActiveColor = 'rgb(0, 145, 153)';
 
-const light = new ThemeBuilder('Light', 'light');
+const light = createBuiltInTHeme('Light', 'light');
 light.darkenedPrimaryColor = 'rgb(153, 153, 153)';
 light.primaryColor = WHITE;
 light.primaryTextColor = 'rgb(51, 62, 89)';
@@ -164,11 +164,11 @@ light.linkTextColor = 'rgb(104, 103, 149)';
 light.borderColor = 'rgb(153, 153, 153)';
 light.popupIconColor = 'rgb(51, 62, 89)';
 
-const custom = new ThemeBuilder('Custom');
+const custom = createBuiltInTHeme('Custom');
 custom.autoDarkened = true;
 
 export default [
-  new ThemeBuilder('default', 'dark', 'free'),
+  createBuiltInTHeme('default', 'dark', 'free'),
   dark,
   oled,
   ocean,

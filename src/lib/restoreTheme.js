@@ -23,6 +23,10 @@ export default function restoreTheme(darken) {
   }
 
   busy = true;
+  if (!theme.darkenedPrimaryColor ||
+    theme.darkenedPrimaryColor === theme.primaryColor) {
+    theme.darkenPrimaryColor();
+  }
   const hexColor = Irid(
     darken ? theme.darkenedPrimaryColor : theme.primaryColor,
   ).toHexString();
