@@ -217,7 +217,17 @@ async function ondeviceready() {
   acode.setLoadingMessage('Loading language...');
   await lang.set(settings.value.lang);
 
-  loadApp();
+  try {
+    await loadApp();
+  } catch (error) {
+    toast(`Error: ${error.message}`);
+  } finally {
+    setTimeout(() => {
+      document.body.removeAttribute('data-small-msg');
+      app.classList.remove('loading', 'splash');
+      applySettings.afterRender();
+    }, 100);
+  }
 }
 
 async function loadApp() {
@@ -328,11 +338,6 @@ async function loadApp() {
   });
   //#endregion
 
-  acode.setLoadingMessage('Loading folders...');
-  if (Array.isArray(folders)) {
-    folders.forEach((folder) => openFolder(folder.url, folder.opts));
-  }
-
   new EditorFile();
 
   checkPluginsUpdate()
@@ -343,7 +348,7 @@ async function loadApp() {
           plugins(updates);
           $icon.remove();
         }
-      } attr-action='' style={{ fontSize: '1.2rem' }} className='octicon octicon-bell'></span>
+      } attr-action='' style={{ fontSize: '1.2rem' }} className='octicon octicon-bell'></span>;
 
       if ($editMenuToggler.isConnected) {
         $header.insertBefore($icon, $editMenuToggler);
@@ -357,9 +362,14 @@ async function loadApp() {
 
   //load plugins
   try {
-    await loadPlugins()
+    await loadPlugins();
   } catch (error) {
     toast('Plugins loading failed!');
+  }
+
+  acode.setLoadingMessage('Loading folders...');
+  if (Array.isArray(folders)) {
+    folders.forEach((folder) => openFolder(folder.url, folder.opts));
   }
 
   if (Array.isArray(files) && files.length) {
@@ -374,12 +384,6 @@ async function loadApp() {
   } else {
     onEditorUpdate(undefined, false);
   }
-
-  setTimeout(() => {
-    document.body.removeAttribute('data-small-msg');
-    app.classList.remove('loading', 'splash');
-    applySettings.afterRender();
-  }, 100);
 
   /**
    *

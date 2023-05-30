@@ -4,7 +4,11 @@ import recents from '../lib/recents';
 import helpers from '../utils/helpers';
 import pallete from './pallete';
 
-/**@type {import('./inputhints').HintModification} */
+/**
+ * @typedef {import('./inputhints').HintModification} HintModification
+ */
+
+/**@type {HintModification} */
 let hintsModification;
 
 export default async function findFile() {
@@ -19,7 +23,7 @@ export default async function findFile() {
 
   /**
    * Generates hint for inputhints
-   * @param {import('./inputhints').HintModification} hints
+   * @param {HintModification} hints Hint modification object
    */
   async function generateHints(hints) {
     hintsModification = hints;
@@ -48,10 +52,10 @@ export default async function findFile() {
 
 /**
  * Generates hint item for inputhints
- * @param {string|{name: string, path: string, url: string}} name 
- * @param {string} path 
- * @param {string} url 
- * @returns 
+ * @param {string|{name: string, path: string, url: string}} name Hint text
+ * @param {string} path Hint subtext
+ * @param {string} url Hint value
+ * @returns {{text: string, value: string}}
  */
 function hintItem(name, path, url) {
   if (typeof name === 'object') {

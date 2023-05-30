@@ -27,7 +27,7 @@ const events = {
  */
 
 quickTools.$input.addEventListener('input', (e) => {
-  const key = e.target.value.toUpperCase();
+  const key = e.target.value;
   quickTools.$input.value = '';
   if (!key || key.length > 1) return;
   const keyCombination = getKeys({ key });
@@ -64,16 +64,16 @@ export const key = {
   },
   /**
    * Add listener when key changes
-   * @param {QuickToolsEvent} event 
-   * @param {QuickToolsEventListener} callback 
+   * @param {QuickToolsEvent} event QuickTools event
+   * @param {QuickToolsEventListener} callback Callback to call when key changes
    */
   on(event, callback) {
     events[event].push(callback);
   },
   /**
    * Remove listener
-   * @param {QuickToolsEvent} event 
-   * @param {QuickToolsEventListener} callback 
+   * @param {QuickToolsEvent} event QuickTools event
+   * @param {QuickToolsEventListener} callback Callback to remove
    */
   off(event, callback) {
     events[event] = events[event].filter((cb) => cb !== callback);
@@ -83,8 +83,9 @@ export const key = {
 
 /**
  * Performs quick actions
- * @param {string} action 
- * @param {string} value 
+ * @param {string} action Action to perform
+ * @param {string} value Value for the action
+ * @returns {boolean} Whether the action was performed
  */
 export default function actions(action, value) {
   const { editor } = editorManager;
@@ -331,9 +332,9 @@ function updateSearchState() {
 }
 
 /**
- * 
- * @param {number} height 
- * @returns 
+ * Sets the height of the footer
+ * @param {number} height Height of the footer
+ * @returns {void}
  */
 function setFooterHeight(height) {
   const { $toggler, $footer, $searchRow1 } = quickTools;
@@ -376,10 +377,10 @@ function resetKeys() {
 
 /**
  * Gets the current state of the modifier keys
- * @param {object} key
- * @param {int} [key.keyCode]
- * @param {string} [key.key]
- * @returns 
+ * @param {object} key Key object
+ * @param {int} [key.keyCode] Key code
+ * @param {string} [key.key] Key
+ * @returns {KeyboardEventInit}
  */
 function getKeys(key = {}) {
   return {

@@ -77,13 +77,19 @@ async function EditorManager($header, $body) {
     get TIMEOUT_VALUE() {
       return TIMEOUT_VALUE;
     },
-    on(event, callback) {
-      if (!events[event]) events[event] = [];
-      events[event].push(callback);
+    on(types, callback) {
+      if (!Array.isArray(types)) types = [types];
+      types.forEach((type) => {
+        if (!events[type]) events[type] = [];
+        events[type].push(callback);
+      });
     },
-    off(event, callback) {
-      if (!events[event]) return;
-      events[event] = events[event].filter(c => c !== callback);
+    off(types, callback) {
+      if (!Array.isArray(types)) types = [types];
+      types.forEach((type) => {
+        if (!events[type]) return;
+        events[type] = events[type].filter(c => c !== callback);
+      });
     },
     emit(event, ...args) {
       let detailedEvent;
@@ -282,7 +288,7 @@ async function EditorManager($header, $body) {
     editor.on('scrollleft', onscrollleft);
 
     touchListeners(editor);
-    setCommands(editor)
+    setCommands(editor);
     await setKeyBindings(editor);
     Emmet.setCore(window.emmet);
     editor.setFontSize(settings.fontSize);
@@ -473,16 +479,28 @@ async function EditorManager($header, $body) {
     }
 
     // show open file list in header
-    if (appSettings.value.openFileListPos === appSettings.OPEN_FILE_LIST_POS_HEADER) {
-      $openFileList = <ul className='open-file-list'></ul>;
+    const { openFileListPos } = appSettings.value;
+    if (
+      openFileListPos === appSettings.OPEN_FILE_LIST_POS_HEADER ||
+      openFileListPos === appSettings.OPEN_FILE_LIST_POS_BOTTOM
+    ) {
+      if (!$openFileList?.classList.contains('open-file-list')) {
+        $openFileList = <ul className='open-file-list'></ul>;
+      }
       if ($list) $openFileList.append(...$list);
-      root.appendOuter($openFileList);
+
+      if (openFileListPos === appSettings.OPEN_FILE_LIST_POS_BOTTOM) {
+        $container.insertAdjacentElement('afterend', $openFileList);
+      } else {
+        $header.insertAdjacentElement('afterend', $openFileList);
+      }
+
       root.classList.add('top-bar');
 
       const oldAppend = $openFileList.append;
       $openFileList.append = (...args) => {
         oldAppend.apply($openFileList, args);
-      }
+      };
     } else {
       $openFileList = list(strings['active files']);
       if ($list) $openFileList.$ul.append(...$list);
@@ -493,8 +511,10 @@ async function EditorManager($header, $body) {
       const oldAppend = $openFileList.$ul.append;
       $openFileList.append = (...args) => {
         oldAppend.apply($openFileList.$ul, args);
-      }
+      };
     }
+
+    root.setAttribute('open-file-list-pos', openFileListPos);
   }
 
   function hasUnsavedFiles() {

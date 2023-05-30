@@ -41,6 +41,7 @@ class Settings {
   QUICKTOOLS_TRIGGER_MODE_CLICK = 'click';
   OPEN_FILE_LIST_POS_HEADER = 'header';
   OPEN_FILE_LIST_POS_SIDEBAR = 'sidebar';
+  OPEN_FILE_LIST_POS_BOTTOM = 'bottom';
   KEYBOARD_MODE_NO_SUGGESTIONS = 'NO_SUGGESTIONS';
   KEYBOARD_MODE_NO_SUGGESTIONS_AGGRESSIVE = 'NO_SUGGESTIONS_AGGRESSIVE';
   KEYBOARD_MODE_NORMAL = 'NORMAL';
@@ -218,7 +219,7 @@ class Settings {
       await this.update(false);
     }
 
-    this.#on.reset.forEach((onreset) => onreset(this.value))
+    this.#on.reset.forEach((onreset) => onreset(this.value));
   }
 
   /**

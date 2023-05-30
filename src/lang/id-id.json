@@ -323,5 +323,6 @@
   "exclude files": "Exclude files",
   "include files": "Include files",
   "search result": "{matches} results in {files} files.",
-  "replace warning": "Are you sure you want to replace all {matches} matches in {files} files? This action cannot be reversed."
+  "invalid regex": "Invalid regular expression: {message}.",
+  "bottom": "Bottom"
 }

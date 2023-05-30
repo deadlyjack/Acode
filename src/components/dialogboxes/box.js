@@ -1,11 +1,12 @@
 import restoreTheme from 'lib/restoreTheme';
 
 /**
- *
- * @param {string} titleText
- * @param {string} html
- * @param {string} [hideButtonText]
- * @param {string} [cancelButtonText]
+ * Confirm dialog box
+ * @param {string} titleText Title text
+ * @param {string} html HTML string
+ * @param {string} [hideButtonText] Text for hide button
+ * @param {string} [cancelButtonText] Text for cancel button
+ * @returns {PromiseLike}
  */
 function box(titleText, html, hideButtonText, cancelButtonText) {
   let waitFor = 0,
@@ -141,8 +142,9 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
   }
 
   /**
-   *
-   * @param {function(HTMLCollection)} callback
+   * Set callback function
+   * @param {function(HTMLCollection)} callback Callback function
+   * @returns {PromiseLike}
    */
   function then(callback) {
     _then = callback;
@@ -150,8 +152,9 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
   }
 
   /**
-   *
-   * @param {function(this:HTMLElement, Event):void} onclick
+   * Set onclick callback function
+   * @param {function(this:HTMLElement, Event):void} onclick Callback function
+   * @returns {PromiseLike}
    */
   function onclick(onclick) {
     _onclick = onclick;
@@ -159,8 +162,9 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
   }
 
   /**
-   *
-   * @param {function():void} onhide
+   * Set onhide callback function
+   * @param {function():void} onhide Callback function
+   * @returns {PromiseLike}
    */
   function onhide(onhide) {
     _onhide = onhide;
@@ -168,8 +172,9 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
   }
 
   /**
-   *
-   * @param {function():void} onOk
+   * Set onOk callback function
+   * @param {function():void} onOk Callback function
+   * @returns {PromiseLike}
    */
   function ok(onOk) {
     _onOk = onOk;
@@ -177,8 +182,9 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
   }
 
   /**
-   *
-   * @param {function():void} onCancel
+   * Set onCancel callback function
+   * @param {function():void} onCancel Callback function
+   * @returns {PromiseLike}
    */
   function cancle(onCancel) {
     _onCancel = onCancel;

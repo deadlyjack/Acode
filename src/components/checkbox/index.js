@@ -14,13 +14,14 @@ import Ref from 'html-tag-js/ref';
 
 /**
  * Create a checkbox
- * @param {string | Checkbox} text
- * @param {Boolean} checked
- * @param {string} [name]
- * @param {string} [id]
- * @param {string} [size]
- * @param {"checkbox"|"radio"} [type]
- * @param {Ref} [ref]
+ * @param {string | Checkbox} text Checkbox label
+ * @param {Boolean} checked Whether checkbox is checked or not
+ * @param {string} [name] Name of checkbox
+ * @param {string} [id] Id of checkbox
+ * @param {"checkbox"|"radio"} [type] Type of checkbox
+ * @param {Ref} [ref] A refence to the input element
+ * @param {string} [size] Size of checkbox
+ * @returns {Checkbox}
  */
 function Checkbox(text, checked, name, id, type, ref, size) {
   if (typeof text === 'object') {

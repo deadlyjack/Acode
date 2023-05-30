@@ -1,3 +1,4 @@
+import settings from 'lib/settings';
 import './style.scss';
 
 /**@type {HTMLElement} */
@@ -37,8 +38,18 @@ function fixHeight(target) {
     return;
   }
   const lists = [...container.getAll(':scope > div')];
-
   let height = 0;
+
+  if (
+    settings.value.openFileListPos === settings.OPEN_FILE_LIST_POS_SIDEBAR &&
+    lists[0] === target
+  ) {
+    height = 30 * (target.$ul.children.length + 1);
+    target.style.maxHeight = `${height}px`;
+    target.style.height = `${height}px`;
+    return;
+  }
+
   lists.forEach((list) => {
     if (list === target) return;
     list.collapse?.();

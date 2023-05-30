@@ -17,7 +17,8 @@ export default async function commandPallete() {
 
     commands.forEach(({ name, description, bindKey }) => {
       /**
-       * @param {boolean} recentlyUsed 
+       * @param {boolean} recentlyUsed Is the command recently used
+       * @returns {{value: string, text: string}}
        */
       const item = (recentlyUsed) => ({
         value: name,
@@ -51,7 +52,8 @@ function RecentlyUsedCommands() {
     },
     /**
      * Saves command to recently used commands
-     * @param {string} command 
+     * @param {string} command Command name
+     * @returns {void}
      */
     push(command) {
       const { commands } = this;
@@ -64,5 +66,5 @@ function RecentlyUsedCommands() {
       commands.unshift(command);
       localStorage.setItem('recentlyUsedCommands', JSON.stringify(commands));
     }
-  }
+  };
 }

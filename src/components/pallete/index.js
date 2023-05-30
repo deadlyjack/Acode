@@ -9,11 +9,13 @@ import inputhints from 'components/inputhints';
 
 /**
  * Opens a pallete with input and hints
- * @param {(hints:HintModification)=>string[]} getList 
- * @param {()=>string} onselect 
- * @param {string} placeholder 
- * @param {function} onremove 
+ * @param {(hints:HintModification)=>string[]} getList Callback to get list of hints
+ * @param {()=>string} onselect Callback to call when a hint is selected
+ * @param {string} placeholder Placeholder for input
+ * @param {function} onremove Callback to call when pallete is removed
+ * @returns {void}
  */
+
 export default function pallete(getList, onselect, placeholder, onremove) {
   const $input = <input onkeydown={onkeydown} type='search' placeholder={placeholder} onfocusout={remove} enterKeyHint='go' />;
   const $mask = <div className='mask' onclick={remove} />;
@@ -41,8 +43,8 @@ export default function pallete(getList, onselect, placeholder, onremove) {
 
   /**
    * Generates hint for inputhints
-   * @param {HintCallback} setHints 
-   * @param {HintModification} hintModification 
+   * @param {HintCallback} setHints Set hints callback
+   * @param {HintModification} hintModification Hint modification object
    */
   async function generateHints(setHints, hintModification) {
     setHints([{ text: strings['loading...'], value: '' }]);

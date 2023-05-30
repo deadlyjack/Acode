@@ -86,7 +86,7 @@ export default {
     action: 'run',
   },
   selectWord: {
-    description: 'Open previous file tab',
+    description: 'Select current word',
     key: 'Ctrl-D',
     readOnly: false,
     action: 'select-word',

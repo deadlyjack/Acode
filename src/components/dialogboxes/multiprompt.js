@@ -6,10 +6,28 @@ import appSettings from 'lib/settings';
 import restoreTheme from 'lib/restoreTheme';
 
 /**
- *
- * @param {string} message
- * @param {Array<Input|Array<Input>>} inputs
- * @param {String} help
+ * @typedef {object} Input
+ * @property {string} id Input id
+ * @property {boolean} [required] Is required
+ * @property {string} [type] Input type
+ * @property {RegExp} [match] Input match
+ * @property {string} [value] Input value
+ * @property {string} [placeholder] Input placeholder
+ * @property {string} [hints] Input hints
+ * @property {string} [name] Input name
+ * @property {boolean} [disabled] Is disabled
+ * @property {function} [onclick] On click
+ * @property {function} [onchange] On change
+ * @property {boolean} [readOnly] Is read only
+ * @property {boolean} [autofocus] Is autofocus
+ * @property {boolean} [hidden] Is hidden
+ */
+
+/**
+ * Opens a multi prompt dialog
+ * @param {string} message Message
+ * @param {Array<Input|Array<Input>>} inputs Inputs
+ * @param {String} help Help text
  * @returns {Promise<Strings>}
  */
 function multiPrompt(message, inputs, help) {
@@ -142,8 +160,8 @@ function multiPrompt(message, inputs, help) {
     }
 
     /**
-     *
-     * @param {Array<input>} inputs
+     * Creates a group of inputs
+     * @param {Array<Input>} inputs Array of inputs
      */
     function createGroup(inputs) {
       const $text = tag('span', {
@@ -169,8 +187,9 @@ function multiPrompt(message, inputs, help) {
     }
 
     /**
-     *
-     * @param {Input} input
+     * Creates an input
+     * @param {Input} input Input object
+     * @returns {HTMLInputElement|HTMLTextAreaElement}
      */
     function createInput(input) {
       const {

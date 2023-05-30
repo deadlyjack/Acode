@@ -6,31 +6,54 @@ import EditorFile from './editorFile';
 import appSettings from './settings';
 
 /**
- *
- * @param {String & fileOptions} file
- * @param {object} data
+ * @typedef {object} FileOptions
+ * @property {string} text
+ * @property {{ row: number, column: number }} cursorPos
+ * @property {boolean} render
+ * @property {function} onsave
+ * @property {string} mode
+ * @property {string} uri
  */
 
-export default async function openFile(file, data = {}) {
-  try {
-    let uri = file.uri || file;
-    if (!uri && typeof uri !== 'string') return;
+/**
+ * Opens a editor file
+ * @param {String & FileOptions} file
+ * @param {FileOptions} options
+ */
 
+export default async function openFile(file, options = {}) {
+  try {
+    let uri = typeof file === 'string' ? file : file.uri;
+    if (!uri) return;
+
+    /**@type {EditorFile} */
     const existingFile = editorManager.getFile(uri, 'uri');
+    const { cursorPos, render, onsave, text, mode } = options;
 
     if (existingFile) {
       // If file is already opened
       existingFile.makeActive();
+      if (onsave) {
+        existingFile.onsave = onsave;
+      }
+      if (mode) {
+        existingFile.SAFMode = mode;
+      }
+      if (text) {
+        existingFile.session.setValue(text);
+      }
+      if (cursorPos) {
+        existingFile.session.selection.moveCursorTo(cursorPos.row, cursorPos.column);
+      }
       return;
     }
 
     helpers.showTitleLoader();
+    const settings = appSettings.value;
     const fs = fsOperation(uri);
     const fileInfo = await fs.stat();
     const name = fileInfo.name || file.filename || uri;
-    const settings = appSettings.value;
     const readOnly = fileInfo.canWrite ? false : true;
-    const { cursorPos, render, onsave, text, mode } = data;
     const createEditor = (isUnsaved, text) => {
       new EditorFile(name, {
         uri,

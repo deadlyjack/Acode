@@ -1,16 +1,16 @@
-import tag from "html-tag-js";
-import constants from "../lib/constants";
-import selectionMenu from "../lib/selectionMenu";
-import helpers from "../utils/helpers";
-import appSettings from '../lib/settings';
+import tag from 'html-tag-js';
+import constants from 'lib/constants';
+import selectionMenu from 'lib/selectionMenu';
+import helpers from 'utils/helpers';
+import appSettings from 'lib/settings';
 import { key } from 'handlers/quickTools';
 
 /**
  * Handler for touch events
- * @param {AceAjax.Editor} editor 
+ * @param {AceAjax.Editor} editor Ace editor instance
  * @param {boolean} minimal if true, disable selection, menu and cursor
  */
-export default function addTouchListeners(editor, minimal) {
+export default function addTouchListeners(editor, minimal, onclick) {
   const { renderer, container: $el } = editor;
   const { scroller, $gutter } = renderer;
 
@@ -22,11 +22,17 @@ export default function addTouchListeners(editor, minimal) {
     scrollSpeed,
   } = appSettings.value;
 
+  if (minimal) {
+    diagonalScrolling = false;
+    reverseScrolling = false;
+    teardropSize = 0;
+  }
+
   /**
    * Selection controller start
    */
   const $start = tag('span', {
-    className: "cursor start",
+    className: 'cursor start',
     dataset: {
       size: teardropSize,
     },
@@ -37,7 +43,7 @@ export default function addTouchListeners(editor, minimal) {
    * Selection controller end
    */
   const $end = tag('span', {
-    className: "cursor end",
+    className: 'cursor end',
     dataset: {
       size: teardropSize,
     },
@@ -48,7 +54,7 @@ export default function addTouchListeners(editor, minimal) {
    * Tear drop cursor
    */
   const $cursor = tag('span', {
-    className: "cursor single",
+    className: 'cursor single',
     dataset: {
       size: teardropSize,
     },
@@ -96,20 +102,29 @@ export default function addTouchListeners(editor, minimal) {
   $el.addEventListener('touchstart', touchStart, config, true);
   scroller.addEventListener('contextmenu', contextmenu, config);
 
-  if (!minimal) {
-    editor.on('change', onupdate);
-    editor.on('fold', onfold);
-    editor.on('scroll', onscroll);
-    editor.on('changeSession', onchangesession);
-    editor.on('blur', () => {
-      setTimeout(() => {
-        if (editor.isFocused()) return;
-        clearCursorMode();
-        hideMenu();
-      }, 100);
-    });
-    editor.on('scroll-intoview', cursorMode);
+  editor.on('change', onupdate);
+  editor.on('fold', onfold);
+  editor.on('scroll', onscroll);
+  editor.on('changeSession', onchangesession);
+  editor.on('scroll-intoview', cursorMode.bind({}, $cursor));
+  editor.on('select-word', selectionMode.bind({}, $end));
+  editor.on('blur', () => {
+    setTimeout(() => {
+      if (editor.isFocused()) return;
+      clearCursorMode();
+      hideMenu();
+    }, 100);
+  });
 
+  editor.setSelection = (value) => {
+    selectionActive = value;
+  };
+
+  editor.setMenu = (value) => {
+    menuActive = value;
+  };
+
+  if (!minimal) {
     appSettings.on('update:diagonalScrolling', (value) => {
       diagonalScrolling = value;
     });
@@ -126,19 +141,11 @@ export default function addTouchListeners(editor, minimal) {
     appSettings.on('update:scrollSpeed', (value) => {
       scrollSpeed = value;
     });
-
-    editor.setSelection = (value) => {
-      selectionActive = value;
-    };
-
-    editor.setMenu = (value) => {
-      menuActive = value;
-    };
   }
 
   /**
    * Editor container on touch start
-   * @param {TouchEvent} e 
+   * @param {TouchEvent} e Touch event
    */
   function touchStart(e) {
     const $target = e.target;
@@ -191,7 +198,7 @@ export default function addTouchListeners(editor, minimal) {
 
   /**
    * Editor container on touch move
-   * @param {TouchEvent} e 
+   * @param {TouchEvent} e Event
    */
   function touchMove(e) {
     if (mode === 'selection') {
@@ -240,7 +247,7 @@ export default function addTouchListeners(editor, minimal) {
 
   /**
    * Editor container on touch end
-   * @param {TouchEvent} e 
+   * @param {TouchEvent} e Event
    */
   function touchEnd(e) {
     // why I was using e.preventDefault() ? 🤔
@@ -297,6 +304,7 @@ export default function addTouchListeners(editor, minimal) {
         cursorMode();
       } else {
         moveCursorTo(clientX, clientY);
+        if (onclick) onclick();
       }
       return;
     }
@@ -323,7 +331,7 @@ export default function addTouchListeners(editor, minimal) {
       selectionMode($end);
       vibrate();
     }
-  };
+  }
 
   function isIn($el, cX, cY) {
     const {
@@ -339,7 +347,7 @@ export default function addTouchListeners(editor, minimal) {
     const sy = y || top;
 
     return (cX > sx && cX < sx + sWidth
-      && cY > sy && cY < sy + sHeight)
+      && cY > sy && cY < sy + sHeight);
   }
 
   function vibrate() {
@@ -350,7 +358,7 @@ export default function addTouchListeners(editor, minimal) {
 
   /**
    * 
-   * @param {MouseEvent} e 
+   * @param {MouseEvent} e Event
    */
   function contextmenu(e) {
     e.preventDefault();
@@ -407,9 +415,9 @@ export default function addTouchListeners(editor, minimal) {
   /**
    * BUG: not reliable
    * Test if scrolling is possible
-   * @param {number} moveX 
-   * @param {number} moveY 
-   * @returns 
+   * @param {number} moveX move in x direction
+   * @param {number} moveY move in y direction
+   * @returns {[number, number]}
    */
   function testScroll(moveX, moveY) {
     const UP = reverseScrolling ? 'down' : 'up';
@@ -423,9 +431,9 @@ export default function addTouchListeners(editor, minimal) {
     const { getEditorHeight, getEditorWidth } = helpers;
     // Why I used it in first place?
     // const { scrollLeft } = editor.renderer.scrollBarH;
-    const { scrollLeft } = editor.renderer.getScrollLeft();
+    const scrollLeft = editor.renderer.getScrollLeft();
     // const { scrollTop } = editor.renderer.scrollBarV;
-    const { scrollTop } = editor.renderer.getScrollTop();
+    const scrollTop = editor.renderer.getScrollTop();
     const [editorWidth, editorHeight] = [getEditorWidth(editor), getEditorHeight(editor)];
 
     if (
@@ -508,7 +516,7 @@ export default function addTouchListeners(editor, minimal) {
 
   /**
    * Remove cursor mode
-   * @returns 
+   * @returns {void}
    */
   function clearCursorMode() {
     if (!$el.contains($cursor)) return;
@@ -538,7 +546,7 @@ export default function addTouchListeners(editor, minimal) {
     const range = editor.getSelectionRange();
     const { pageX, pageY } = renderer.textToScreenCoordinates(range.start);
     const { lineHeight } = renderer;
-    const [x, y] = relativePosition(pageX - teardropSize, pageY + lineHeight)
+    const [x, y] = relativePosition(pageX - teardropSize, pageY + lineHeight);
 
     $start.style.left = `${x}px`;
     $start.style.top = `${y}px`;
@@ -560,11 +568,11 @@ export default function addTouchListeners(editor, minimal) {
 
   /**
    * Remove selection mode
-   * @param {Event} ev 
-   * @param {boolean} clearActive 
-   * @returns 
+   * @param {Event} e Event
+   * @param {boolean} clearActive whether to clear selectionActive
+   * @returns {void}
    */
-  function clearSelectionMode(ev, clearActive = true) {
+  function clearSelectionMode(e, clearActive = true) {
     const $els = [$start.dataset.immortal, $end.dataset.immortal];
     if ($els.includes('true')) return;
     if ($el.contains($start)) $start.remove();
@@ -579,7 +587,7 @@ export default function addTouchListeners(editor, minimal) {
 
   /**
    * 
-   * @param {HTMLElement} [$trigger] 
+   * @param {HTMLElement} [$trigger] A trigger element that triggered the menu, if not provided, menu will be shown at the current cursor position
    */
   function showMenu($trigger) {
     menuActive = true;
@@ -604,8 +612,8 @@ export default function addTouchListeners(editor, minimal) {
   }
 
   /**
-   * @param {boolean} clearActive 
-   * @returns 
+   * @param {boolean} clearActive whether to clear menuActive
+   * @returns {void}
    */
   function hideMenu(clearActive = true) {
     if (!$el.parentElement.contains($menu)) return;
@@ -675,7 +683,7 @@ export default function addTouchListeners(editor, minimal) {
 
   /**
    * Handles teardrop
-   * @param {HTMLDivElement} $teardrop
+   * @param {HTMLDivElement} $teardrop Teardrop element to handle
    */
   function teardropHandler($teardrop) {
     $activeTeardrop = $teardrop;
@@ -760,7 +768,7 @@ export default function addTouchListeners(editor, minimal) {
     $activeTeardrop.style.left = `${left}px`;
     $activeTeardrop.style.top = `${top}px`;
     teardropDoesShowMenu = false;
-  };
+  }
 
   function teardropTouchEndHandler() {
     teardropTouchEnded = true;
@@ -853,9 +861,9 @@ export default function addTouchListeners(editor, minimal) {
 
   /**
    * 
-   * @param {number} x 
-   * @param {number} y 
-   * @returns 
+   * @param {number} x x coordinate
+   * @param {number} y y coordinate
+   * @returns {[number, number]}
    */
   function relativePosition(x, y) {
     const { top, left } = $el.getBoundingClientRect();

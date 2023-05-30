@@ -1,6 +1,5 @@
 import dialogs from '../components/dialogs';
 import fsOperation from '../fileSystem';
-import EditorFile from './editorFile';
 
 let checkFileEnabled = true;
 
@@ -24,8 +23,8 @@ export default async function checkFiles() {
   recursiveFileCheck([...files]);
 
   /**
-   * 
-   * @param {EditorFile[]} files 
+   * Checks if the file has been changed
+   * @param {EditorFile[]} files List of files to check
    */
   async function recursiveFileCheck(files) {
     const file = files.pop();
@@ -37,16 +36,22 @@ export default async function checkFiles() {
   }
 
   /**
-   * 
-   * @param {import('./editorFile').default} file
+   * @typedef {import('./editorFile').default} EditorFile
+   */
+
+  /**
+   * Checks a file for changes
+   * @param {EditorFile} file File to check
+   * @returns {Promise<void>}
    */
   async function checkFile(file) {
     if (file.isUnsaved || !file.loaded || file.loading) return;
 
     if (file.uri) {
       const fs = fsOperation(file.uri);
+      const exists = await fs.exists();
 
-      if (!(await fs.exists()) && !file.readOnly) {
+      if (!exists && !file.readOnly) {
         file.isUnsaved = true;
         file.uri = null;
         editorManager.onupdate('file-changed');
@@ -80,7 +85,9 @@ export default async function checkFiles() {
           file.session.setValue(text);
           editor.gotoLine(cursorPos.row, cursorPos.column);
           editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
-        } catch (error) { }
+        } catch (error) {
+          // ignore
+        }
       }
     }
   }
@@ -88,4 +95,4 @@ export default async function checkFiles() {
   if (!editorManager.activeFile) {
     app.focus();
   }
-};
+}

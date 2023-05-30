@@ -24,10 +24,12 @@ import './style.scss';
 
 /**
  * Generate a list of hints for an input field
- * @param {HTMLInputElement} $input
- * @param {Array<Hint>|HintCallback} hints
- * @param {function(value):void} onSelect
+ * @param {HTMLInputElement} $input Input field
+ * @param {Array<Hint>|HintCallback} hints Hints or a callback to generate hints
+ * @param {(value: string) => void} onSelect Callback to call when a hint is selected
+ * @returns {{getSelected: ()=>HTMLLIElement, container: HTMLUListElement}}
  */
+
 export default function inputhints($input, hints, onSelect) {
   /**@type {HTMLUListElement} */
   let $ul = <Ul />;
@@ -46,8 +48,8 @@ export default function inputhints($input, hints, onSelect) {
   }
 
   /**
-   *
-   * @param {MouseEvent} e
+   * Handle click event
+   * @param {MouseEvent} e Event
    */
   function handleClick(e) {
     e.preventDefault();
@@ -68,8 +70,8 @@ export default function inputhints($input, hints, onSelect) {
   }
 
   /**
-   *
-   * @param {KeyboardEvent} e
+   * Handle keypress event
+   * @param {KeyboardEvent} e Event
    */
   function handleKeypress(e) {
     if (e.key === 'Enter') {
@@ -84,8 +86,8 @@ export default function inputhints($input, hints, onSelect) {
   }
 
   /**
-   *
-   * @param {KeyboardEvent} e
+   * Handle keydown event
+   * @param {KeyboardEvent} e Event
    */
   function handleKeydown(e) {
     const code = e.key;
@@ -96,6 +98,10 @@ export default function inputhints($input, hints, onSelect) {
     moveDown(code);
   }
 
+  /**
+   * Moves the active hint up or down
+   * @param {"ArrowDown" | "ArrowUp"} key Direction to move
+   */
   function moveDown(key) {
     let nextHint;
     let activeHint = $ul.get('.active');
@@ -157,7 +163,7 @@ export default function inputhints($input, hints, onSelect) {
 
   /**
    * Update the position of the hint list
-   * @param {boolean} append 
+   * @param {boolean} append Append the list to the body or not
    */
   function position() {
     const activeHint = $ul.get('.active');
@@ -186,7 +192,7 @@ export default function inputhints($input, hints, onSelect) {
 
   /**
    * Set hint items
-   * @param {Array<Hint>} list 
+   * @param {Array<Hint>} list Hint items 
    */
   function setHints(list) {
     if (Array.isArray(list)) {
@@ -251,24 +257,24 @@ export default function inputhints($input, hints, onSelect) {
   return {
     getSelected: () => $ul.get('.active'),
     container: $ul,
-  }
+  };
 }
 
 /**
  * Create a hint item
- * @param {object} param0
- * @param {string} param0.value
- * @param {string} param0.text 
+ * @param {object} param0 Hint item
+ * @param {string} param0.value Hint value
+ * @param {string} param0.text Hint text
  * @returns {HTMLLIElement}
  */
 function Hint({ value, text }) {
-  return <li attr-action='hint' attr-value={value} innerHTML={text}></li>
+  return <li attr-action='hint' attr-value={value} innerHTML={text}></li>;
 }
 
 /**
  * Create a hint list
- * @param {object} param0
- * @param {Array<Hint>} param0.hints 
+ * @param {object} param0 Attributes
+ * @param {Array<Hint>} param0.hints Hint items
  * @returns {HTMLUListElement}
  */
 function Ul({ hints = [] }) {
@@ -279,5 +285,5 @@ function Ul({ hints = [] }) {
       }
       return <Hint {...hint} />;
     })}
-  </ul>
+  </ul>;
 }

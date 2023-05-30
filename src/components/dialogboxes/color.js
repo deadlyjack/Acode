@@ -7,8 +7,9 @@ let lastPicked = localStorage.__picker_last_picked || '#fff';
 
 /**
  * Choose color
- * @param {string} defaultColor
- * @param {Function} onhide
+ * @param {string} defaultColor Default color
+ * @param {Function} onhide Callback function
+ * @returns {Promise<string>}
  */
 function color(defaultColor, onhide) {
   defaultColor = defaultColor || lastPicked;

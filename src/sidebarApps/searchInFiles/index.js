@@ -4,14 +4,13 @@ import Ref from 'html-tag-js/ref';
 import autosize from 'autosize';
 import files from 'lib/fileList';
 import fsOperation from 'fileSystem';
-import collapsableList from 'components/collapsableList';
-import tile from 'components/tile';
 import openFile from 'lib/openFile';
-import dialogs from 'components/dialogs';
 import addTouchListeners from 'ace/touchHandler';
+import defineMode from './searchResultMode';
 
 const workers = [];
 const results = [];
+const filesSearched = [];
 
 const $container = new Ref();
 const $regExp = new Ref();
@@ -24,7 +23,6 @@ const $caseSensitive = new Ref();
 const $btnReplaceAll = new Ref();
 const $resultOverview = new Ref();
 
-const debounceInput = debounce(onInput, 500);
 const resultOverview = {
   filesCount: 0,
   matchesCount: 0,
@@ -74,21 +72,21 @@ const store = {
   },
 };
 
+const debounceSearch = debounce(searchFiles, 500);
+
 let useIncludeAndExclude = false;
 /**@type {AceAjax.Editor} */
 let searchResult = null;
-let loader;
 
-addEventListener($regExp, 'change', debounceInput);
-addEventListener($wholeWord, 'change', debounceInput);
-addEventListener($caseSensitive, 'change', debounceInput);
-addEventListener($search, 'input', debounceInput);
-addEventListener($include, 'input', debounceInput);
-addEventListener($exclude, 'input', debounceInput);
+addEventListener($regExp, 'change', onInput);
+addEventListener($wholeWord, 'change', onInput);
+addEventListener($caseSensitive, 'change', onInput);
+addEventListener($search, 'input', onInput);
+addEventListener($include, 'input', onInput);
+addEventListener($exclude, 'input', onInput);
 addEventListener($btnReplaceAll, 'click', replaceAll);
 $container.onref = ($el) => {
   searchResult = ace.edit($el, {
-    mode: 'ace/mode/yaml',
     readOnly: true,
     useWorker: false,
     showLineNumbers: false,
@@ -97,12 +95,12 @@ $container.onref = ($el) => {
   $container.style.lineHeight = '1.5';
   searchResult.session.setTabSize(1);
   searchResult.renderer.setMargin(0, 0, -20, 0);
-  addTouchListeners(searchResult, true);
-  searchResult.textInput.onContextMenu = (e) => e.preventDefault();
+  addTouchListeners(searchResult, true, onCursorChange);
+  searchResult.session.setUseWrapMode(true);
 };
 
-editorManager.on('add-folder', debounceInput);
-editorManager.on('remove-folder', debounceInput);
+editorManager.on('add-folder', onInput);
+editorManager.on('remove-folder', onInput);
 
 export default [
   'search',
@@ -129,7 +127,7 @@ export default [
         </Details>
         <Details onexpand={(expanded) => {
           useIncludeAndExclude = expanded;
-          debounceInput();
+          onInput();
         }}>
           <Summary marker={false} className='extras'>...</Summary>
           <input value={store.exclude} ref={$exclude} type='search' name='exclude' placeholder={strings['exclude files']} />
@@ -137,7 +135,7 @@ export default [
         </Details>
       </div>
       <span ref={$resultOverview} className='search-result' innerHTML={searchResultText(0, 0)}></span>
-      <div ref={$container} ></div>
+      <div ref={$container} className='editor-container' ></div>
     </>;
   }
 ];
@@ -158,10 +156,15 @@ async function onWorkerMessage(e) {
       let content;
       let readError;
 
-      try {
-        content = await fsOperation(data).readFile('utf-8');
-      } catch (er) {
-        readError = er;
+      const editorFile = editorManager.getFile(data, 'uri');
+      if (editorFile) {
+        content = editorFile.session.getValue();
+      } else {
+        try {
+          content = await fsOperation(data).readFile('utf-8');
+        } catch (er) {
+          readError = er;
+        }
       }
 
       e.target.postMessage({
@@ -182,16 +185,31 @@ async function onWorkerMessage(e) {
         resultOverview.filesCount,
         resultOverview.matchesCount,
       );
-      searchResult.moveCursorTo(Infinity, Infinity);
+      filesSearched.push(file);
+
+      const index = filesSearched.length - 1;
+      results.push({
+        file: index,
+        match: null,
+        position: null,
+      });
+      for (let i = 0; i < matches.length; i++) {
+        const result = matches[i];
+        result.file = index;
+        results.push(result);
+      }
+
+      searchResult.navigateFileEnd();
       searchResult.insert(text);
       break;
     }
 
     case 'replace-result': {
       const { file, text } = data;
-      if (!text) return;
-      loader.setMessage(file.relativeUrl);
-      await fsOperation(file.url).writeFile(text);
+      openFile(file.url, {
+        render: true,
+        text,
+      });
       break;
     }
 
@@ -202,6 +220,7 @@ async function onWorkerMessage(e) {
         break;
       }
 
+      $resultOverview.classList.remove('loading');
       break;
     }
 
@@ -211,6 +230,8 @@ async function onWorkerMessage(e) {
       if (workers.find(worker => worker.started && !worker.doneSearching)) {
         break;
       }
+
+      $resultOverview.classList.remove('loading');
       break;
     }
 
@@ -225,8 +246,9 @@ async function onWorkerMessage(e) {
  * @param {InputEvent} e 
  */
 function onInput(e) {
+  if (!searchResult) return;
+
   const { target } = e || {};
-  const search = $search.value.trim();
 
   if (target === $caseSensitive.el) {
     store.caseSensitive = $caseSensitive.el.checked;
@@ -250,13 +272,23 @@ function onInput(e) {
 
   terminateWorker();
   results.length = 0;
-  searchResult.setValue('');
-  searchResult.container.classList.add('loading');
+  filesSearched.length = 0;
   resultOverview.reset();
+  searchResult.setValue('');
+  $resultOverview.classList.remove('loading');
+  debounceSearch();
+}
 
+function searchFiles() {
+  const options = getOptions();
+  const search = $search.value.trim();
   if (!search) return;
+  const regex = toRegex(search, options);
+  if (!regex) return;
 
-  sendMessage('search-files', files(), search, getOptions());
+  setMode();
+  $resultOverview.classList.add('loading');
+  sendMessage('search-files', files(), regex, options);
 }
 
 /**
@@ -264,22 +296,16 @@ function onInput(e) {
  * Sends a message to the worker threads to perform the replacement.
  */
 async function replaceAll() {
+  terminateWorker();
   const search = $search.value.trim();
   const replace = $replace.value.trim();
+  const options = getOptions();
   if (!search || !replace) return;
+  const regex = toRegex(search, options);
+  if (!regex) return;
 
-  loader = dialogs.loader.create(strings['loading...']);
-  const confirmation = await dialogs.confirm(
-    strings['warning'],
-    replaceWarningText(
-      resultOverview.filesCount,
-      resultOverview.matchesCount
-    ),
-  );
-
-  if (!confirmation) return;
-  sendMessage('replace-all', files(), search, getOptions(), replace);
-  loader.show();
+  $resultOverview.classList.add('loading');
+  sendMessage('replace-files', filesSearched, regex, options, replace);
 }
 
 /**
@@ -305,8 +331,8 @@ function sendMessage(action, files, search, options, replace) {
       data: {
         files: filesForThisWorker,
         search,
-        options,
         replace,
+        options,
       },
     });
   }
@@ -325,7 +351,7 @@ function onErrorMessage(e) {
  * Also sets the onmessage and onerror handlers for these workers.
  */
 function terminateWorker() {
-  const len = navigator.hardwareConcurrency || 2;
+  const len = navigator.hardwareConcurrency - 1 || 2;
   workers.forEach(worker => worker.terminate());
   workers.length = 0;
 
@@ -347,6 +373,15 @@ function getWorker() {
 }
 
 /**
+ * @typedef {object} Options
+ * @property {boolean} caseSensitive
+ * @property {boolean} wholeWord
+ * @property {boolean} regExp
+ * @property {string} exclude
+ * @property {string} include
+ */
+
+/**
  * Retrieves the search options currently set in the user interface. This includes
  * search parameters such as 'case sensitive', 'whole word', 'regular expressions',
  * 'exclude' and 'include' depending on whether they are checked or filled in the UI.
@@ -354,12 +389,7 @@ function getWorker() {
  * Note that the 'exclude' and 'include' options are only retrieved when
  * the corresponding UI section is expanded (i.e., `useIncludeAndExclude` is true).
  * 
- * @returns {Object} An object containing the current search options.
- * @property {boolean} caseSensitive - Whether to perform a case-sensitive search.
- * @property {boolean} wholeWord - Whether to match only whole words in the search.
- * @property {boolean} regExp - Whether the search query is a regular expression.
- * @property {string} exclude - File paths to be excluded from the search, as a comma-separated string.
- * @property {string} include - File paths to be included in the search, as a comma-separated string.
+ * @returns {Options}
  */
 function getOptions() {
   const exclude = useIncludeAndExclude ? $exclude.el.value.trim() : '';
@@ -421,36 +451,6 @@ function addEventListener($ref, type, handler) {
 }
 
 /**
- * Handles the click event on the "open-file" action.
- *
- * @param {MouseEvent} e - The click event object.
- * @returns {Promise<void>} - A promise that resolves after opening the file.
- */
-async function onTileClick(e) {
-  const { target } = e;
-  const { action } = target.dataset;
-  if (action !== 'open-file') return;
-  const { start, end, file } = target.dataset;
-  const { editor } = editorManager;
-  const [startLine, startColumn] = start.split(':');
-  const [endLine, endColumn] = end.split(':');
-
-  await openFile(file, { render: true });
-  editor.moveCursorTo(startLine, startColumn);
-  editor.selection.setRange({
-    start: {
-      row: startLine,
-      column: startColumn,
-    },
-    end: {
-      row: endLine,
-      column: endColumn,
-    },
-  });
-  actionStack.pop();
-}
-
-/**
  * Generates a search result text based on the number of files and matches.
  *
  * @param {number} files - The number of files searched.
@@ -461,50 +461,6 @@ function searchResultText(files, matches) {
   return strings['search result']
     .replace('{files}', `<strong>${files}</strong>`)
     .replace('{matches}', `<strong>${matches}</strong>`);
-}
-
-/**
- * Generate a warning message for replacing all matches in multiple files.
- * The message indicates the number of files and matches to be replaced.
- *
- * @param {number} files - The number of files to be affected by the replacement.
- * @param {number} matches - The number of matches to be replaced.
- * @returns {string} - The warning message.
- */
-function replaceWarningText(files, matches) {
-  return strings['replace warning']
-    .replace('{files}', `<strong>${files}</strong>`)
-    .replace('{matches}', `<strong>${matches}</strong>`);
-}
-
-/**
- * `Result` component that generates a collapsible and expandable list (ul HTML element) 
- * of matching lines from a given file.
- *
- * @param {object} props - The properties for the component.
- * @param {object} props.file - The file object, which contains name and url properties.
- * @param {Array.<object>} props.matches - An array of match objects, each containing a line and a position.
- * @param {string} props.matches[].line - The line from the file where the match occurred.
- * @param {object} props.matches[].position - The position of the match in the file.
- * @param {object} props.matches[].position.start - The starting position of the match, with line and column properties.
- * @param {object} props.matches[].position.end - The ending position of the match, with line and column properties.
- *
- * @returns {HTMLULElement} Returns a collapsible and expandable list (ul HTML element). 
- *                          The list's title is the file name, and its content consists of the matches.
- */
-function Result({ file, matches }) {
-  const $list = collapsableList(file.name, false);
-  $list.$ul.content = matches.map(({ line, position: { start, end } }) => {
-    const $item = tile({
-      text: <span innerHTML={line}></span>
-    });
-    $item.dataset.action = 'open-file';
-    $item.dataset.start = `${start.line}:${start.column}`;
-    $item.dataset.end = `${end.line}:${end.column}`;
-    $item.dataset.file = file.url;
-    return $item;
-  });
-  return $list;
 }
 
 /**
@@ -577,4 +533,75 @@ function Summary({ marker = true, className }, children) {
  */
 function Textarea({ name, placeholder, ref }) {
   return autosize(<textarea ref={ref} name={name} placeholder={placeholder} ></textarea>);
+}
+
+/**
+ * Converts a search string and options into a regular expression.
+ *
+ * @param {string} search - The search string.
+ * @param {object} options - The search options.
+ * @param {boolean} [options.caseSensitive=false] - Whether the search is case-sensitive.
+ * @param {boolean} [options.wholeWord=false] - Whether to match whole words only.
+ * @param {boolean} [options.regExp=false] - Whether the search string is a regular expression.
+ * @param {boolean} [lookBehind] - Whether to match the search string at the beginning of the line.
+ * @returns {RegExp} - The regular expression created from the search string and options.
+ */
+function toRegex(search, options, lookBehind = false) {
+  const { caseSensitive = false, wholeWord = false, regExp = false } = options;
+
+  let flags = caseSensitive ? 'gm' : 'gim';
+  let regexString = regExp ? search : search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  if (wholeWord) {
+    const wordBoundary = '\\b';
+    regexString = `${wordBoundary}${regexString}${wordBoundary}`;
+  }
+
+  if (lookBehind) {
+    regexString = `(?:${regexString})`;
+    flags = '';
+  }
+
+  try {
+    return new RegExp(regexString, flags);
+  } catch (error) {
+    $resultOverview.textContent = strings['invalid regex'].replace('{message}', error.message);
+    return null;
+  }
+}
+
+/**
+ * Sets highlight mode for search result 
+ */
+function setMode() {
+  const MODE = `ace/mode/search_result`;
+  const { session } = searchResult;
+
+  const options = getOptions();
+  const regex = toRegex($search.value.trim(), options, true);
+  session.$modes[MODE] = null;
+  defineMode(regex, options.caseSensitive);
+  session.setMode('ace/mode/text');
+  session.setMode(MODE);
+}
+
+/**
+ * On cursor change event handler
+ */
+async function onCursorChange() {
+  const line = searchResult.selection.getCursor().row;
+  const result = results[line];
+  if (!result) return;
+  const { file, position } = result;
+  const { url } = filesSearched[file];
+
+  actionStack.pop();
+  await openFile(url, { render: true });
+
+  if (position) {
+    const { editor } = editorManager;
+    editor.moveCursorTo(position.start.row, position.start.column, false);
+    editor.selection.setRange(position);
+    editor.centerSelection();
+  }
 }

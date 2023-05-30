@@ -71,16 +71,9 @@ function processFiles(data, mode = 'search') {
  * @param {object} arg - The content of the file to search.
  * @param {import('lib/fileList').Tree} arg.file - The file.
  * @param {string} arg.content - The file content.
- * @param {string} arg.search - The string to search for.
- * @param {object} arg.options - The search options.
- * @param {boolean} [arg.options.caseSensitive=false] - Whether the search is case-sensitive.
- * @param {boolean} [arg.options.wholeWord=false] - Whether to match whole words only.
- * @param {boolean} [arg.options.regExp=false] - Whether the search string is a regular expression.
- * @returns {Array<Match>} - An array of matched items with their start and end positions.
- *                   Each matched item has the properties: line, start, and end.
+ * @param {RegExp} arg.search - The string to search for.
  */
-function searchInFile({ file, content, search, options }) {
-  const searchPattern = toRegex(search, options);
+function searchInFile({ file, content, search }) {
   const matches = [];
 
   let text = `${file.name}`;
@@ -90,16 +83,17 @@ function searchInFile({ file, content, search, options }) {
     text = `...${text.slice(-30)}`;
   }
 
-  while ((match = searchPattern.exec(content))) {
-    const [line] = match;
+  while ((match = search.exec(content))) {
+    const [word] = match;
     const start = match.index;
-    const end = start + line.length;
+    const end = start + word.length;
     const position = {
       start: getLineColumn(content, start),
       end: getLineColumn(content, end)
     };
-    text += `\n\t${getSurrounding(content, line, start, end).trim()}`;
-    matches.push({ line, position });
+    const line = getSurrounding(content, word, start, end);
+    text += `\n\t${line.trim()}`;
+    matches.push({ match: word, position });
   }
 
   text = text + '\n';
@@ -115,18 +109,35 @@ function searchInFile({ file, content, search, options }) {
 }
 
 /**
+ * Replace a string in the content of a file.
+ * @param {object} arg - The content of the file to search.
+ * @param {import('lib/fileList').Tree} arg.file - The content of the file to search.
+ * @param {string} content - The content of the file to search.
+ * @param {RegExp} arg.search - The string to search for.
+ * @param {string} arg.replace - The string to replace with.
+ */
+function replaceInFile({ file, content, search, replace }) {
+  const text = content.replace(search, replace);
+
+  self.postMessage({
+    action: 'replace-result',
+    data: { file, text },
+  });
+}
+
+/**
  * Gets surrounding text of a match.
  * @param {string} content 
- * @param {string} line 
+ * @param {string} word 
  * @param {number} start 
  * @param {number} end 
  */
-function getSurrounding(content, line, start, end) {
+function getSurrounding(content, word, start, end) {
   const max = 26;
   const remaining = max - (end - start);
 
   if (!remaining || remaining < 0) {
-    return `...${line.substring(start, end + remaining)}`;
+    return `...${word.substring(start, end + remaining)}`;
   }
 
   let left = Math.floor(remaining / 2);
@@ -143,57 +154,7 @@ function getSurrounding(content, line, start, end) {
   if (/[\r\n]+/.test(leftText)) leftText = '';
   if (/[\r\n]+/.test(rightText)) rightText = '';
 
-  return `${leftText}${line}${rightText}`;
-}
-
-/**
- * Replace a string in the content of a file.
- * @param {object} arg - The content of the file to search.
- * @param {import('lib/fileList').Tree} arg.file - The content of the file to search.
- * @param {string} arg.search - The string to search for.
- * @param {string} arg.replace - The string to replace with.
- * @param {object} arg.options - The search options.
- * @param {boolean} [arg.options.caseSensitive=false] - Whether the search is case-sensitive.
- * @param {boolean} [arg.options.wholeWord=false] - Whether to match whole words only.
- * @param {boolean} [arg.options.regExp=false] - Whether the search string is a regular expression.
- * @returns {string} - The modified content of the file with replacements.
- */
-function replaceInFile({ file, search, replace, options }) {
-  const searchPattern = toRegex(search, options);
-  const newFile = file.replace(searchPattern, replace);
-
-  self.postMessage({
-    action: 'replace-result',
-    data: {
-      file,
-      text: newFile,
-    },
-  });
-}
-
-/**
- * Converts a search string and options into a regular expression.
- *
- * @param {string} search - The search string.
- * @param {object} options - The search options.
- * @param {boolean} [options.caseSensitive=false] - Whether the search is case-sensitive.
- * @param {boolean} [options.wholeWord=false] - Whether to match whole words only.
- * @param {boolean} [options.regExp=false] - Whether the search string is a regular expression.
- * @returns {RegExp} - The regular expression created from the search string and options.
- */
-function toRegex(search, options) {
-  const { caseSensitive = false, wholeWord = false, regExp = false } = options;
-
-  const flags = caseSensitive ? 'gm' : 'gim';
-  let regexString = regExp ? search : escapeRegExp(search);
-
-  if (wholeWord) {
-    const wordBoundary = '\\b';
-    const wholeWordPattern = `${wordBoundary}${regexString}${wordBoundary}`;
-    regexString = wholeWordPattern;
-  }
-
-  return new RegExp(regexString, flags);
+  return `${leftText}${word}${rightText}`;
 }
 
 /**
@@ -218,26 +179,7 @@ function getLineColumn(file, position) {
   const lines = file.substring(0, position).split('\n');
   const lineNumber = lines.length - 1;
   const columnNumber = lines[lineNumber].length;
-  return { line: lineNumber, column: columnNumber };
-}
-
-/**
- * Escapes special characters for use in a regular expression.
- *
- * @param {string} string - The string to be escaped.
- *
- * @returns {string} The string with special characters escaped for use in a
- * regular expression.
- *
- * @example
- *
- * const string = 'Hello. This is a test [string].';
- * const escapedString = escapeRegExp(string);
- * 
- * // escapedString: 'Hello\\. This is a test \\[string\\]\\.'
- */
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return { row: lineNumber, column: columnNumber };
 }
 
 /**
@@ -263,8 +205,9 @@ function getFile(url, cb) {
  */
 function done(condition, mode) {
   if (condition) {
+    let verb = mode === 'search' ? 'searching' : 'replacing';
     self.postMessage({
-      action: `done-${mode}ing`,
+      action: `done-${verb}`,
     });
   }
 }

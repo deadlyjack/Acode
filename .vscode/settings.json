@@ -1,13 +1,16 @@
 {
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "autoimport.doubleQuotes": false,
-  "prettier.singleQuote": true,
   "java.configuration.updateBuildConfiguration": "disabled",
+  "prettier.requireConfig": true,
+  "javascript.format.enable": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.tabWidth": 2,
+  "prettier.useTabs": false,
+  "javascript.format.semicolons": "insert",
   "[scss]": {
     "editor.defaultFormatter": "vscode.css-language-features"
   },
-  "propTypes.quote": "single",
   "emmet.syntaxProfiles": {
     "xml": {
       "attr_quotes": "single"

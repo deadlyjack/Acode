@@ -55,7 +55,7 @@ export default function init() {
     else $ctrl.classList.remove('active');
   });
 
-  editorManager.on('file-content-changed', (event) => {
+  editorManager.on(['file-content-changed', 'switch-file'], () => {
     if (editorManager.activeFile?.isUnsaved) {
       $save.classList.add('notice');
     } else {
@@ -73,7 +73,8 @@ export default function init() {
     }
   });
 
-  root.append($footer, $toggler, $input);
+  root.append($footer, $toggler);
+  document.body.append($input);
   if (appSettings.value.quickToolsTriggerMode === appSettings.QUICKTOOLS_TRIGGER_MODE_CLICK) {
     isClickMode = true;
     $footer.addEventListener('click', onclick);

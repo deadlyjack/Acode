@@ -92,10 +92,8 @@ a {
 }
 
 .open-file-list {
-  position: absolute;
-  top: 44px;
-  top: var(--header-height);
-  height: 31px;
+  position: relative;
+  height: 30px;
   width: 100%;
   background-color: #9999ff;
   background-color: var(--primary-color);

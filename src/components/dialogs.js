@@ -14,6 +14,7 @@ const loader = {
    * @param {string} titleText Title text
    * @param {string} message Loading message
    * @param {{timeout: Number, callback: function():void}} cancel Loading message
+   * @returns {{setTitle: function(title:string):void, setMessage: function(message:string):void, hide: function():void, destroy: function():void, show: function():void}}
    */
   create(titleText, message, cancel = null) {
     if (!message && titleText) {
@@ -102,7 +103,7 @@ const loader = {
       hide: this.hide.bind(this),
       destroy: this.destroy.bind(this),
       show: this.show.bind(this),
-    }
+    };
   },
   /**
    * Removes the loader from DOM permanently

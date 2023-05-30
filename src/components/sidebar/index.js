@@ -5,16 +5,17 @@ let $sidebar;
 
 /**
  * @typedef {object} SideBar
+ * @extends HTMLElement
  * @property {function():void} hide
  * @property {function():void} toggle
  * @property {function():void} onshow
  */
 
 /**
- *
- * @param {HTMLElement} [$container]
- * @param {HTMLElement} [$toggler]
- * @returns {HTMLElement & SideBar}
+ * Create a sidebar
+ * @param {HTMLElement} [$container] - the element that will contain the sidebar
+ * @param {HTMLElement} [$toggler] - the element that will toggle the sidebar
+ * @returns {Sidebar}
  */
 function create($container, $toggler) {
   let { innerWidth } = window;

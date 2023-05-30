@@ -3,6 +3,7 @@ import tile from './tile';
 
 /**
  * @typedef {object} Collaspable
+ * @extends HTMLElement
  * @property {HTMLElement} $title
  * @property {HTMLUListElement} $ul
  * @property {function(void):void} ontoggle
@@ -13,16 +14,16 @@ import tile from './tile';
  */
 
 /**
- *
- * @param {string} titleText
- * @param {boolean} hidden
- * @param {"indicator"|"folder"} type
- * @param {object} [options]
- * @param {HTMLElement} [options.tail]
- * @param {string} [options.type]
- * @param {boolean} [options.allCaps]
- * @param {function(this:Collaspable):void} [options.ontoggle]
- * @returns {HTMLElement & Collaspable}
+ * Create a collapsable list
+ * @param {string} titleText Title of the list
+ * @param {boolean} hidden If true, the list will be hidden
+ * @param {"indicator"|"folder"} type Type of the list toggle indicator
+ * @param {object} [options] Configuration options
+ * @param {HTMLElement} [options.tail] Tail element of the title
+ * @param {string} [options.type] Type of the list element
+ * @param {boolean} [options.allCaps] If true, the title will be in all caps
+ * @param {function(this:Collaspable):void} [options.ontoggle] Called when the list is toggled
+ * @returns {Collaspable}
  */
 function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
   const $ul = tag('ul', {
@@ -42,6 +43,16 @@ function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
     children: [$title, $ul],
   });
 
+  let collapse = () => {
+    $mainWrapper.classList.add('hidden');
+    if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper);
+  };
+
+  let uncollapse = () => {
+    $mainWrapper.classList.remove('hidden');
+    if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper);
+  };
+
   $title.classList.add('light');
   $title.addEventListener('click', toggle);
 
@@ -53,16 +64,6 @@ function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
     } else {
       collapse();
     }
-  }
-
-  function collapse() {
-    $mainWrapper.classList.add('hidden');
-    if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper);
-  }
-
-  function uncollapse() {
-    $mainWrapper.classList.remove('hidden');
-    if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper);
   }
 
   [$title, $mainWrapper].forEach(defineProperties);
@@ -115,7 +116,7 @@ function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
           return !this.collapsed;
         }
       },
-    })
+    });
   }
 }
 

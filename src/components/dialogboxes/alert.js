@@ -1,10 +1,10 @@
 import restoreTheme from 'lib/restoreTheme';
 
 /**
- *
- * @param {string} titleText
- * @param {string} message
- * @param {function():void} [onhide]
+ * Alert dialog
+ * @param {string} titleText Title text
+ * @param {string} message Alert message
+ * @param {function():void} [onhide] Callback function
  */
 function alert(titleText, message, onhide) {
   if (!message && titleText) {

@@ -1,9 +1,9 @@
 import restoreTheme from 'lib/restoreTheme';
 
 /**
- *
- * @param {string} titleText
- * @param {string} message
+ * Confirm dialog box
+ * @param {string} titleText Title text
+ * @param {string} message Alert message
  * @returns {Promise<boolean>}
  */
 function confirm(titleText, message) {

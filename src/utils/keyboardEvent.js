@@ -12,6 +12,7 @@
  * @property {boolean} metaKey whether the meta key was pressed or not
  */
 
+const keys = ace.require('ace/lib/keys');
 let createEvent = keyboardEvent;
 
 /**
@@ -67,7 +68,7 @@ export function createEventInit() {
  */
 export default function createKeyboardEvent(type, event) {
   if (!event.keyCode && event.key) {
-    event.keyCode = event.key.charCodeAt(0);
+    event.keyCode = keys[event.key.toLowerCase()] || event.key.charCodeAt(0);
   }
   return createEvent({ type, ...event });
 }

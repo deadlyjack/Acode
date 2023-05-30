@@ -2,16 +2,20 @@ import tile from '../tile';
 import restoreTheme from 'lib/restoreTheme';
 
 /**
- *
- * @param {string} title
+ * @typedef {object} SelectOptions
+ * @property {boolean} [hideOnSelect]
+ * @property {boolean} [textTransform]
+ * @property {string} [default]
+ * @property {function():void} [onCancel]
+ * @property {function():void} [onHide]
+ */
+
+/**
+ * Create a select dialog
+ * @param {string} title Title of the select
  * @param {string[]} options [value, text, icon, disable?] or string
- * @param {{
- *            onCancel: ()=>void,
- *            onHide: ()=>void,
- *            hideOnSelect: boolean,
- *            textTransform: boolean,
- *            default: String
- *        } | boolean} opts options or rejectOnCancel
+ * @param {SelectOptions | boolean} opts options or rejectOnCancel
+ * @returns {Promise<string>}
  */
 function select(title, options, opts = {}) {
   let rejectOnCancel = false;

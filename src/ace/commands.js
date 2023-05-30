@@ -1,7 +1,7 @@
-import fsOperation from "fileSystem";
+import fsOperation from 'fileSystem';
 import actions from 'handlers/quickTools';
-import keyBindings from "lib/keyBindings";
-import helpers from "utils/helpers";
+import keyBindings from 'lib/keyBindings';
+import helpers from 'utils/helpers';
 
 const commands = [
   {
@@ -223,11 +223,19 @@ const commands = [
     readOnly: true,
   },
   {
-    name: 'settings:toggleQuickTools',
+    name: 'toggleQuickTools',
     description: 'Toggle quick tools',
     exec() {
       actions('toggle-quick-tools');
     },
+  },
+  {
+    name: 'selectWord',
+    description: 'Select current word',
+    exec(editor) {
+      editor.selection.selectAWord();
+      editor._emit('select-word');
+    }
   }
 ];
 
@@ -239,7 +247,7 @@ export function setCommands(editor) {
 
 /**
  * Sets key bindings for the editor
- * @param {AceAjax.Editor} editor 
+ * @param {AceAjax.Editor} editor Ace editor
  */
 export async function setKeyBindings({ commands }) {
   let keyboardShortcuts = keyBindings;
@@ -247,7 +255,8 @@ export async function setKeyBindings({ commands }) {
     const bindingsFile = fsOperation(KEYBINDING_FILE);
     if (await bindingsFile.exists()) {
       const bindings = await bindingsFile.readFile('json');
-      keyboardShortcuts = compareAndFixKeyBindings(keyboardShortcuts, bindings);
+      // keyboardShortcuts = compareAndFixKeyBindings(keyboardShortcuts, bindings);
+      keyboardShortcuts = bindings;
     } else {
       helpers.resetKeyBindings();
     }
@@ -258,54 +267,14 @@ export async function setKeyBindings({ commands }) {
 
   Object.keys(commands.byName).forEach((name) => {
     const shortcut = keyboardShortcuts[name];
+    const command = commands.byName[name];
 
-    if (!shortcut || !shortcut.key) return;
-
-    const command = { ...commands.byName[name] };
-
-    if (shortcut.description) {
+    if (shortcut?.description) {
       command.description = shortcut.description;
     }
 
-    if (shortcut.key) {
-      command.bindKey = { win: shortcut.key };
-    }
-
-    commands.removeCommand(name);
+    // not cheking if shortcut is empty because it can be used to remove shortcut
+    command.bindKey = { win: shortcut?.key ?? null };
     commands.addCommand(command);
   });
-}
-
-/**
- * @typedef {Object} KeyBinding
- * @property {string} key
- * @property {string} description
- * @property {string} action
- * @property {boolean} [readOnly]
- */
-
-/**
- *  @typedef {Map<string, KeyBinding>} KeyBindings
- */
-
-/** 
- * @param {KeyBindings} def Default key bindings
- * @param {KeyBindings} saved Saved key bindings
- * @returns {KeyBindings} Fixed key bindings
- */
-function compareAndFixKeyBindings(def, saved) {
-  const fixed = {};
-  Object.keys(def).map((name) => {
-    const key = def[name].key;
-    const savedKey = saved[name]?.key;
-    if (savedKey && savedKey !== key) {
-      fixed[name] = {
-        ...def[name],
-        key: savedKey,
-      };
-    } else {
-      fixed[name] = def[name];
-    }
-  });
-  return fixed;
 }

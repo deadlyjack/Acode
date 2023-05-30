@@ -1,12 +1,14 @@
-import Ref from 'html-tag-js/ref';
+/**
+ * @typedef {import('html-tag-js/ref')} Ref
+ */
 
 /**
  * Create a row with common buttons
- * @param {object} param0 
- * @param {Array<RowItem>} param0.extras
- * @param {Ref} param0.shift
- * @param {Ref} param0.ctrl
- * @returns 
+ * @param {object} param0 Attributes
+ * @param {Array<RowItem>} param0.extras Extra buttons
+ * @param {Ref} param0.shift shift button refence
+ * @param {Ref} param0.ctrl ctrl button refence
+ * @returns {HTMLElement}
  */
 export const Row1 = ({ extras, shift, ctrl, save }) => <div id='row1' className='button-container'>
   <div className='section'>
@@ -24,9 +26,9 @@ export const Row1 = ({ extras, shift, ctrl, save }) => <div id='row1' className=
 
 /**
  * Create a row with arrow keys and other buttons
- * @param {object} param0 
- * @param {Array<RowItem>} param0.extras
- * @returns 
+ * @param {object} param0 Attributes
+ * @param {Array<RowItem>} param0.extras Extra buttons
+ * @returns {HTMLElement}
  */
 export const Row2 = ({ extras }) => <div id='row2' className='button-container'>
   <div className='section'>
@@ -72,7 +74,7 @@ export const SearchRow2 = ({ inputRef, posRef, totalRef }) => <div className='bu
 export const $footer = <footer id='quick-tools' tabIndex={-1}></footer>;
 
 /**@type {HTMLElement} */
-export const $toggler = <span className='floating icon keyboard_arrow_up' id='quicktool-toggler'></span>
+export const $toggler = <span className='floating icon keyboard_arrow_up' id='quicktool-toggler'></span>;
 
 /**@type {HTMLTextAreaElement} */
 export const $input = <textarea
@@ -83,13 +85,22 @@ export const $input = <textarea
     width: 0,
     pointerEvent: 'none',
     pointerEvents: 'none',
+    position: 'fixed',
+    top: 0,
+    left: 0,
   }}
 ></textarea>;
 
 /**
  * 
- * @param {RowItem} param0 
- * @returns 
+ * @param {RowItem} param0 Attributes
+ * @param {string} param0.icon Icon name
+ * @param {string} param0.letters Letters to show on button
+ * @param {'insert'|'command'|'key'|'custom'} param0.action Action type
+ * @param {string|Function} param0.value Value of button
+ * @param {Ref} param0.ref Refence to button
+ * @param {boolean} param0.repeate Whether to repeate the action or not
+ * @returns {HTMLButtonElement}
  */
 export function RowItem({ icon, letters, action, value, ref, repeate }) {
   const $item = <button
@@ -111,8 +122,8 @@ export function RowItem({ icon, letters, action, value, ref, repeate }) {
 
 /**
  * Create a list of RowItem components
- * @param {object} param0 
- * @param {Array<RowItem>} param0.extras
+ * @param {object} param0 Attributes
+ * @param {Array<RowItem>} param0.extras Extra buttons
  * @returns {Array<Element>}
  */
 function Extras({ extras }) {

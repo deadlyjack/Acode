@@ -106,6 +106,7 @@ export default function otherSettings() {
       select: [
         [appSettings.OPEN_FILE_LIST_POS_SIDEBAR, strings.sidebar],
         [appSettings.OPEN_FILE_LIST_POS_HEADER, strings.header],
+        [appSettings.OPEN_FILE_LIST_POS_BOTTOM, strings.bottom],
       ],
     },
     {
@@ -142,7 +143,7 @@ export default function otherSettings() {
       get() {
         return strings[`info-${this.key.toLocaleLowerCase()}`];
       }
-    })
+    });
   });
 
   function callback(key, value) {
@@ -228,7 +229,7 @@ export default function otherSettings() {
   }
 
   function getModeString(mode) {
-    return strings[mode.replace(/_/g, ' ').toLocaleLowerCase()]
+    return strings[mode.replace(/_/g, ' ').toLocaleLowerCase()];
   }
 
   settingsPage(title, items, callback);

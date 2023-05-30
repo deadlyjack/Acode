@@ -1,7 +1,8 @@
 import './style.scss';
 
 /**
- * @typedef {object} contextMenuObj
+ * @typedef {object} ContextMenuObj
+ * @extends HTMLElement
  * @property {function():void} hide hides the menu
  * @property {function():void} show shows the page
  */
@@ -20,10 +21,10 @@ import './style.scss';
  */
 
 /**
- *
- * @param {string|contextMenuOptions} content
- * @param {contextMenuOptions} [options]
- * @returns {HTMLElement & contextMenuObj}
+ * Create a context menu
+ * @param {string|contextMenuOptions} content Context menu content or options
+ * @param {contextMenuOptions} [options] Options
+ * @returns {ContextMenuObj}
  */
 function contextmenu(content, options) {
   if (!options && typeof content === 'object') {

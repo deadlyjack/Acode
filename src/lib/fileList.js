@@ -2,6 +2,15 @@ import fsOperation from 'fileSystem';
 import Url from 'utils/Url';
 import helpers from 'utils/helpers';
 
+/**
+ * @typedef {object} Tree
+ * @property {string} name - File name
+ * @property {string} path - Visible path
+ * @property {string} url - File url
+ * @property {string} relativeUrl - File relative url
+ * @property {Array<Tree>} [children] - Children files
+ */
+
 const filesTree = {};
 const events = {
   'add-file': [],
@@ -11,6 +20,35 @@ const events = {
 export function initFileList() {
   editorManager.on('add-folder', onAddFolder);
   editorManager.on('remove-folder', onRemoveFolder);
+}
+
+/**
+ * Add a file to the list
+ * @param {string} parent file directory
+ * @param {string} child file url
+ */
+export async function append(parent, child) {
+  if (parent.endsWith('/')) parent = parent.slice(0, -1);
+  const tree = getTree(Object.values(filesTree), parent);
+  if (!tree) return;
+  const childTree = await Tree(child, tree.root || parent);
+  tree.children?.push(childTree);
+}
+
+/**
+ * Remove a file from the list
+ * @param {string} parent file directory
+ * @param {string} child file url
+ */
+export function remove(parent, child) {
+  if (parent.endsWith('/')) parent = parent.slice(0, -1);
+  const tree = getTree(Object.values(filesTree), parent);
+  if (!tree) return;
+  const index = tree.children.findIndex(({ url }) => url === child);
+  if (index > -1) {
+    const [removed] = tree.children.splice(index, 1);
+    emit('remove-file', removed);
+  }
 }
 
 /**
@@ -52,6 +90,28 @@ files.off = function (event, callback) {
   if (!events[event]) return;
   events[event] = events[event].filter((cb) => cb !== callback);
 };
+
+/**
+ * Get directory tree
+ * @param {Tree[]} treeList list of tree
+ * @param {string} dir path to find
+ * @returns {Tree}
+ */
+function getTree(treeList, dir) {
+  if (!treeList) return;
+
+  let tree = treeList.find(({ url }) => url === dir);
+
+  if (tree) return tree;
+
+  for (let i = 0; i < treeList.length; i++) {
+    const item = treeList[i];
+    tree = getTree(item.children, dir);
+    if (tree) return tree;
+  }
+
+  return null;
+}
 
 /**
  * Get all files in a folder
@@ -102,15 +162,33 @@ function flattenTree(tree, transform = (item) => item) {
  */
 async function onAddFolder(folder) {
   try {
-    const { name } = await fsOperation(folder).stat();
-    const path = helpers.getVirtualPath(folder);
-    const tree = { name, url: folder, path };
-    tree.children = [];
+    const tree = await Tree(folder, '');
     getAllFiles(tree.children, folder);
     filesTree[folder] = tree;
   } catch (error) {
     // ignore
+    console.error(error);
   }
+}
+
+/**
+ * Create a tree
+ * @param {string} url file url 
+ * @param {object} [stat] file name 
+ */
+async function Tree(url, root, name, isDirectory) {
+  if (!name && !isDirectory) {
+    const stat = await fsOperation(url).stat();
+    name = stat.name;
+    isDirectory = stat.isDirectory;
+  }
+  const path = virtualPath(root, url);
+  const relativeUrl = Url.join(path, name);
+  const tree = { name, root, url, path, relativeUrl };
+  if (isDirectory) {
+    tree.children = [];
+  }
+  return tree;
 }
 
 /**
@@ -134,24 +212,24 @@ function onRemoveFolder(folder) {
  * @param {string} [root] - Root path
  */
 async function getAllFiles(list, dir, root) {
+  root ??= dir;
+
   const ls = await fsOperation(dir).lsDir();
-  ls.forEach((item) => {
+  await Promise.all(ls.map(async (item) => {
     const { name, url, isDirectory } = item;
-    const path = virtualPath(root ?? dir, url);
     const exists = list.findIndex(({ value }) => value === url);
     if (exists > -1) {
       return;
     }
-    const relativeUrl = Url.join(path, name);
-    const file = { name, path, url, relativeUrl };
+
+    const file = await Tree(url, root, name, isDirectory);
     list.push(file);
     if (isDirectory) {
-      file.children = [];
-      getAllFiles(file.children, url, root ?? dir);
+      getAllFiles(file.children, url, root);
       return;
     }
     emit('push-file', file);
-  });
+  }));
 }
 
 /**
@@ -180,12 +258,3 @@ function emit(event, ...args) {
   if (!list) return;
   list.forEach((fn) => fn(...args));
 }
-
-/**
- * @typedef {Object} Tree
- * @property {string} name - File name
- * @property {string} path - Visible path
- * @property {string} url - File url
- * @property {string} relativeUrl - File relative url
- * @property {Array<Tree>} [children] - Children files
- */

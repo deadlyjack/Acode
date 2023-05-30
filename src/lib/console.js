@@ -258,7 +258,7 @@ import loadPolyFill from '../utils/polyfill';
           ...Object.keys(value),
           ...Object.getOwnPropertyNames(value),
           ...Object.keys(value['__proto__'] || {}),
-        ])
+        ]);
 
         if (value['__proto__']) possibleKeys.push('__proto__');
         if (value['prototype']) possibleKeys.push('prototype');
@@ -315,7 +315,7 @@ import loadPolyFill from '../utils/polyfill';
         $val.append(...getBody(obj, ...keys, key));
       } else {
         if (type === 'function') {
-          val = parseFuntion(val);
+          val = parseFunction(val);
         }
         $val.textContent = val + '';
       }
@@ -360,7 +360,7 @@ import loadPolyFill from '../utils/polyfill';
     });
   }
 
-  function parseFuntion(data) {
+  function parseFunction(data) {
     let parsed;
     let str;
 
@@ -447,7 +447,7 @@ import loadPolyFill from '../utils/polyfill';
             $msg.append(...getBody(arg));
             break;
           case 'function':
-            $msg.innerHTML = parseFuntion(arg);
+            $msg.innerHTML = parseFunction(arg);
             $msg.append(tag('c-line', {
               children: getBody(arg),
             }));
@@ -588,7 +588,7 @@ import loadPolyFill from '../utils/polyfill';
     if (location && lineno) {
       src = escapeHTML(`${location} ${lineno}${colno ? ':' + colno : ''}`);
     } else {
-      const res = /\((.*)\)/.exec(stack[1])
+      const res = /\((.*)\)/.exec(stack[1]);
       src = res && res[1] ? res[1] : '';
     }
     const index = src.indexOf(')');
@@ -598,7 +598,7 @@ import loadPolyFill from '../utils/polyfill';
     return {
       location: src,
       stack: stack.join('\n'),
-    }
+    };
   }
 
   function execute(code) {

@@ -65,11 +65,9 @@
     color: rgb(255, 255, 255);
     color: var(--primary-text-color);
 
-    @include linear-loader(30%, 2px);
-
-    .ace_line span {
-      color: inherit !important;
-    }
+    // .ace_line span {
+    //   color: inherit !important;
+    // }
 
     .ace_gutter,
     .ace_gutter-cell {
@@ -123,5 +121,16 @@
     border: none;
     color: rgb(37, 37, 37);
     color: var(--secondary-text-color);
+  }
+
+  .search-result {
+    position: relative;
+    overflow: hidden;
+
+    padding-bottom: 5px;
+
+    &.loading {
+      @include linear-loader(30%, 2px);
+    }
   }
 }

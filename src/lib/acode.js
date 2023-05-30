@@ -18,6 +18,7 @@ import themes from './themes';
 import ThemeBuilder from './themeBuilder';
 import sidebarApps from 'sidebarApps';
 import files from './fileList';
+import contextmenu from 'components/contextmenu';
 
 export default class Acode {
   #modules = {};
@@ -29,7 +30,7 @@ export default class Acode {
     name: 'Default',
     exts: ['*'],
     format: async () => {
-      const { beautify } = ace.require('ace/ext/beautify')
+      const { beautify } = ace.require('ace/ext/beautify');
       const cursorPos = editorManager.editor.getCursorPosition();
       beautify(editorManager.editor.session);
       editorManager.editor.gotoLine(cursorPos.row + 1, cursorPos.column);
@@ -46,6 +47,7 @@ export default class Acode {
     this.define('loader', dialogs.loader);
     this.define('dialogBox', dialogs.box);
     this.define('colorPicker', dialogs.color);
+    this.define('contextMenu', contextmenu);
     this.define('fileBrowser', FileBrowser);
     this.define('confirm', dialogs.confirm);
     this.define('selectionMenu', selectionMenu);
@@ -224,7 +226,7 @@ export default class Acode {
   addIcon(className, src) {
     let style = document.head.get(`style[icon="${className}"]`);
     if (!style) {
-      style = <style icon={className}>{`.icon.${className}{background-image: url(${src})}`}</style>
+      style = <style icon={className}>{`.icon.${className}{background-image: url(${src})}`}</style>;
       document.head.appendChild(style);
     }
   }
@@ -250,7 +252,7 @@ export default class Acode {
   }
 
   async fileBrowser(mode, info, openLast) {
-    const res = await FileBrowser(mode, info, openLast)
+    const res = await FileBrowser(mode, info, openLast);
     return res;
   }
 

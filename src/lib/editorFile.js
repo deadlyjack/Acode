@@ -236,7 +236,11 @@ export default class EditorFile {
     }
 
     this.#onFilePosChange = () => {
-      if (appSettings.value.openFileListPos === appSettings.OPEN_FILE_LIST_POS_HEADER) {
+      const { openFileListPos } = appSettings.value;
+      if (
+        openFileListPos === appSettings.OPEN_FILE_LIST_POS_HEADER ||
+        openFileListPos === appSettings.OPEN_FILE_LIST_POS_BOTTOM
+      ) {
         this.#tab.oncontextmenu = startDrag;
       } else {
         this.#tab.oncontextmenu = null;
@@ -244,7 +248,10 @@ export default class EditorFile {
     };
 
     this.#onFilePosChange();
-    this.#tab.onclick = tabOnclick.bind(this);
+    this.#tab.addEventListener('click', tabOnclick.bind(this));
+    this.#tab.addEventListener('touchstart', () => {
+      this.focusedBefore = editorManager.editor.isFocused();
+    });
     appSettings.on('update:openFileListPos', this.#onFilePosChange);
 
     addFile(this);
@@ -320,7 +327,7 @@ export default class EditorFile {
     if (this.#SAFMode === 'single') return null;
     if (this.#uri) {
       try {
-        return Url.dirname(this.#uri)
+        return Url.dirname(this.#uri);
       } catch (error) {
         return null;
       }
@@ -453,7 +460,7 @@ export default class EditorFile {
   get icon() {
     const modeName = this.#mode.split('/').pop();
     const fileType = helpers.getFileType(this.filename);
-    return `file file_type_${modeName} file_type_${fileType}`
+    return `file file_type_${modeName} file_type_${fileType}`;
   }
 
   get tab() {
@@ -979,41 +986,29 @@ export default class EditorFile {
 }
 
 /**
- * 
- * @param {MouseEvent} e 
- * @returns 
- */
-function tabOnclick(e) {
-  e.preventDefault();
-  const { action } = e.target.dataset;
-  if (action === 'close-file') {
-    this.remove();
-    return;
-  }
-  this.makeActive();
-}
-
-/**
- * 
+ * Handles file drag
  * @param {MouseEvent} e 
  */
 function startDrag(e) {
+  const { editor } = editorManager;
+
+  if (editorManager.activeFile.focusedBefore) editor.focus();
+
   const $el = e.target;
   const $parent = $el.parentElement;
   const event = (e) => (e.touches && e.touches[0]) || e;
-  const opts = {
-    passive: false,
-  };
+  const opts = { passive: false };
 
   let startX = event(e).clientX;
   let startY = event(e).clientY;
   let prevEnd = startX;
   let position;
   let left = $el.offsetLeft;
-  let $placeholder = tag('div');
+  let $placeholder = $el.cloneNode();
 
   const rect = $el.getBoundingClientRect();
   $el.style.zIndex = 999;
+  $placeholder.style.opacity = 0;
   $placeholder.style.height = `${rect.height}px`;
   $placeholder.style.width = `${rect.width}px`;
 
@@ -1080,6 +1075,21 @@ function startDrag(e) {
       }
     }
   }
+}
+
+/**
+ * 
+ * @param {MouseEvent} e 
+ * @returns 
+ */
+function tabOnclick(e) {
+  e.preventDefault();
+  const { action } = e.target.dataset;
+  if (action === 'close-file') {
+    this.remove();
+    return;
+  }
+  this.makeActive();
 }
 
 function updateFileList($parent) {

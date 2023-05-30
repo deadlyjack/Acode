@@ -1,20 +1,42 @@
 # Change Log
 
-## [1.8.4] - Build 280
+## [1.8.4] - Build 278
 
 - New Features
-  - [x] **Search in All Files**
-    - Clicking on search results does not currently perform any action.
-    - Replace function is currently non-operational; work is in progress.
+  - [x] **Updated Ace editor**
+    - Updated Ace editor to version 1.22.0
+  - [x] **Open files position**
+    - **Bottom** `beta`: This is new option for open files position. You can change
+      this from settings. This will open files in bottom of the screen.
+  - [x] **Search in All Files** `beta`
+    - This feature can be used to search and replace in all files in the opened projects.
+    - To use this feature, open side bar and click on the search icon.
+    - Note: This feature is in beta, so it may not work as expected.
   - [x] **Fast File Listing in Find Files (Ctrl + P)**
+    - Loads files at startup and caches them for faster loading.
+    - Watches file being created or modified from sidebar and updates the list
+      accordingly.
   - [x] **Ctrl Key Functionality**
     - Keyboard shortcuts:
       - Ctrl+S: Save
-      - Ctrl+Shift+P: Open the command palette.
+      - Ctrl+Shift+P: Open the command palette. (Your shortcut may be different
+        depending on what is saved in .keybindings.json file.)
+  - [x] **Plugin API**
+    - `contextMenu` is a component that can be used to show context menu in your plutin page.
 - Fixes
   - [x] **Scrolling Issue**
     - Resolved an issue causing automatic scrolling from the cursor's
       position when the back button is pressed with the soft keyboard up.
+    - Fixed a bug where scrollbar gets visible even when the file is not
+      scrollable.
+  - [x] **Active files in sidebar**
+    - Fixed active files taking whole height of sidebar.
+  - [x] **File opened using itent**
+    - Fixed file opened using intent is not set as active file.
+  - [x] **App doesn't load**
+    - Fixed an issue where the app wouldn't load when an error occurred.
+  - [x] **File tabbar**
+    - Changing file tabbar position will not make editor lose focus.
 
 ## [1.8.3] - Build 278
 

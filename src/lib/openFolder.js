@@ -14,6 +14,7 @@ import FileBrowser from '../pages/fileBrowser';
 import appSettings from './settings';
 import sidebarApps from '../sidebarApps';
 import Sidebar from '../components/sidebar';
+import * as FileList from './fileList';
 
 /**
  *
@@ -141,7 +142,7 @@ function openFolder(_path, opts = {}) {
 
     try {
       const option = await dialogs.select(name, options);
-      await execOperation(type, option, url, $target, name)
+      await execOperation(type, option, url, $target, name);
     } catch (error) {
       console.error(error);
       helpers.error(error);
@@ -317,6 +318,8 @@ function openFolder(_path, opts = {}) {
         editorManager.onupdate('delete-folder');
         editorManager.emit('update', 'delete-folder');
       }
+
+      FileList.remove(Url.dirname(url), url);
       toast(strings.success);
     }
 
@@ -350,6 +353,8 @@ function openFolder(_path, opts = {}) {
         $target.click(); //expand
       }
       toast(strings.success);
+      FileList.remove(Url.dirname(url), url);
+      FileList.append(Url.dirname(url), newUrl);
     }
 
     async function createNew() {
@@ -385,6 +390,8 @@ function openFolder(_path, opts = {}) {
           appendList($target, createFolderTile(newName, newUrl));
         }
       }
+
+      FileList.append(url, newUrl);
       toast(strings.success);
     }
 
@@ -461,6 +468,7 @@ function openFolder(_path, opts = {}) {
           default:
             break;
         }
+        FileList.remove(Url.dirname(clipBoard.url), clipBoard.url);
       } else {
         //copy
 
@@ -486,6 +494,7 @@ function openFolder(_path, opts = {}) {
         }
       }
 
+      FileList.append(url, newUrl);
       toast(strings.success);
       clipBoard = null;
     }
@@ -504,6 +513,7 @@ function openFolder(_path, opts = {}) {
         const destfs = fsOperation(url);
         await destfs.createFile(name, data);
         appendTile($target, createFileTile(name, fileUrl));
+        FileList.append(url, fileUrl);
       } catch (error) { } finally {
         stopLoading();
       }
@@ -604,7 +614,7 @@ function openFolder(_path, opts = {}) {
           type: 'contextmenu',
         });
       }}
-    ></span>
+    ></span>;
   }
 }
 
