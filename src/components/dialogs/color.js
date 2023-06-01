@@ -1,7 +1,6 @@
 import tag from 'html-tag-js';
 import Picker from 'vanilla-picker';
 import restoreTheme from 'lib/restoreTheme';
-import helpers from 'utils/helpers';
 
 let lastPicked = localStorage.__picker_last_picked || '#fff';
 
@@ -13,7 +12,7 @@ let lastPicked = localStorage.__picker_last_picked || '#fff';
  */
 function color(defaultColor, onhide) {
   defaultColor = defaultColor || lastPicked;
-  let type = helpers.checkColorType(defaultColor) || 'hex';
+  let type = checkColorType(defaultColor) || 'hex';
   return new Promise((resolve) => {
     const colorModes = ['hsl', 'hex', 'rgb'];
     let mode = colorModes.indexOf(type);
@@ -125,6 +124,20 @@ function color(defaultColor, onhide) {
       }
     }
   });
+}
+
+/**
+ *
+ * @param {string} color
+ * @returns {'hex'|'rgb'|'hsl'}
+ */
+function checkColorType(color) {
+  const { HEX_COLOR, RGB_COLOR, HSL_COLOR } = constants;
+
+  if (HEX_COLOR.test(color)) return 'hex';
+  if (RGB_COLOR.test(color)) return 'rgb';
+  if (HSL_COLOR.test(color)) return 'hsl';
+  return null;
 }
 
 export default color;

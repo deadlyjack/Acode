@@ -39,8 +39,9 @@ export default [
     }
 
     if (!$explor) {
-      $explor = collapsableList(strings['explore'], true);
+      $explor = collapsableList(strings['explore']);
       $explor.ontoggle = loadExplore;
+      $explor.uncollapse();
       container.append($explor);
     }
 
@@ -202,7 +203,7 @@ function ListItem({ icon, name, id, version, installed }) {
         $el.remove();
       },
     );
-  }
+  };
 
   return $el;
 }

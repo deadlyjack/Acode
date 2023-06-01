@@ -15,7 +15,7 @@ import dialogs from './dialogs';
  * @property {boolean} [checkbox]
  * @property {string} [prompt]
  * @property {string} [promptType]
- * @property {import('./dialogboxes/prompt').PromptOptions} [promptOptions]
+ * @property {import('./dialogs/prompt').PromptOptions} [promptOptions]
  */
 
 /**
@@ -51,7 +51,7 @@ export default function listItems($list, items, callback, sort = true) {
         <span className='icon info info-button' data-action='info' onclick={() => {
           dialogs.alert(strings.info, item.info);
         }}></span>
-      )
+      );
     }
 
     if (item.checkbox !== undefined || typeof item.value === 'boolean') {

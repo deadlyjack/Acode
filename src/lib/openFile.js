@@ -4,6 +4,7 @@ import recents from './recents';
 import fsOperation from '../fileSystem';
 import EditorFile from './editorFile';
 import appSettings from './settings';
+import loader from 'components/dialogs/loader';
 
 /**
  * @typedef {object} FileOptions
@@ -48,7 +49,7 @@ export default async function openFile(file, options = {}) {
       return;
     }
 
-    helpers.showTitleLoader();
+    loader.showTitleLoader();
     const settings = appSettings.value;
     const fs = fsOperation(uri);
     const fileInfo = await fs.stat();
@@ -88,7 +89,7 @@ export default async function openFile(file, options = {}) {
     const binData = await fs.readFile();
     const fileContent = helpers.decodeText(binData);
 
-    if (helpers.isBinary(fileContent)) {
+    if (/[\x00-\x08\x0E-\x1F]/.test(fileContent)) {
       if (/image/i.test(fileInfo.type)) {
         const blob = new Blob([binData], { type: fileInfo.type });
         dialogs.box(name, `<img src='${URL.createObjectURL(blob)}'>`);
@@ -109,6 +110,6 @@ export default async function openFile(file, options = {}) {
   } catch (error) {
     console.error(error);
   } finally {
-    helpers.removeTitleLoader();
+    loader.removeTitleLoader();
   }
 }

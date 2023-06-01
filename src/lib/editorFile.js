@@ -1,12 +1,12 @@
 import tag from "html-tag-js";
 import mimeTypes from 'mime-types';
-import dialogs from "../components/dialogs";
-import Sidebar from '../components/sidebar';
-import tile from "../components/tile";
-import fsOperation from "../fileSystem";
-import helpers from "../utils/helpers";
-import Path from "../utils/Path";
-import Url from "../utils/Url";
+import dialogs from "components/dialogs";
+import Sidebar from 'components/sidebar';
+import tile from "components/tile";
+import fsOperation from "fileSystem";
+import helpers from "utils/helpers";
+import Path from "utils/Path";
+import Url from "utils/Url";
 import constants from "./constants";
 import openFolder from "./openFolder";
 import run from './run';
@@ -255,6 +255,7 @@ export default class EditorFile {
     appSettings.on('update:openFileListPos', this.#onFilePosChange);
 
     addFile(this);
+    editorManager.emit('new-file', this);
     this.session = ace.createEditSession(options?.text || '');
     this.setMode();
     this.#setupSession();
@@ -307,8 +308,10 @@ export default class EditorFile {
         editorManager.header.text = value;
       }
 
-      const oldExt = helpers.extname(this.#name);
-      const newExt = helpers.extname(value);
+      // const oldExt = helpers.extname(this.#name);
+      const oldExt = Url.extname(this.#name);
+      // const newExt = helpers.extname(value);
+      const newExt = Url.extname(value);
 
       this.#tab.text = value;
       this.#name = value;
@@ -565,7 +568,7 @@ export default class EditorFile {
   }
 
   /**
-   * 
+   * Set weather to show run button or not
    * @param {()=>(boolean|Promise<boolean>)} cb callback function that return true if file can run
    */
   async writeCanRun(cb) {
@@ -1056,6 +1059,8 @@ function startDrag(e) {
     prevEnd = end;
     const move = end - startX;
     const $newEl = document.elementFromPoint(end, startY);
+
+    if (!$newEl) return;
 
     $el.style.transform = `translate3d(${left + move}px, 0, 0)`;
 

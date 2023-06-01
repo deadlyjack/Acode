@@ -84,7 +84,7 @@ function select(title, options, opts = {}) {
       action: cancel,
     });
 
-    document.body.append(selectDiv, mask);
+    app.append(selectDiv, mask);
     if ($defaultVal) $defaultVal.scrollIntoView();
 
     const $firstChild = $defaultVal || $list.firstChild;
@@ -102,8 +102,8 @@ function select(title, options, opts = {}) {
       selectDiv.classList.add('hide');
       restoreTheme();
       setTimeout(() => {
-        document.body.removeChild(selectDiv);
-        document.body.removeChild(mask);
+        selectDiv.remove();
+        mask.remove();
       }, 300);
     }
 

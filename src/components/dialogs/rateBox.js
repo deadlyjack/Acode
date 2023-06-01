@@ -1,13 +1,11 @@
 import dialogs from '../dialogs';
 import template from '../../views/rating.hbs';
 import constants from '../../lib/constants';
-import helpers from '../../utils/helpers';
 
 function rateBox() {
   const box = dialogs
     .box('Did you like the app?', template, strings.cancel)
-    .onclick(onInteract)
-    .onhide(() => ++localStorage.count);
+    .onclick(onInteract);
 
   function onInteract(e) {
     /**
@@ -36,32 +34,57 @@ function rateBox() {
         const stars = getStars(val);
         const subject = 'feedback - Acode editor';
         const textBody =
-          stars + '</br>%0A' + helpers.getFeedbackBody('</br>%0A');
+          stars + '</br>%0A' + getFeedbackBody('</br>%0A');
         const email = constants.FEEDBACK_EMAIL;
         system.openInBrowser(
           `mailto:${email}?subject=${subject}&body=${textBody}`,
         );
       }
-      ++localStorage.count;
     }, 100);
 
     box.hide();
   }
+}
 
-  /**
-   *
-   * @param {number} num
-   */
-  function getStars(num) {
-    let star = num;
-    let nostar = 5 - num;
-    let str = '';
 
-    while (star--) str += '★';
-    while (nostar--) str += '☆';
+/**
+ * Gets body for feedback email
+ * @param {String} eol
+ * @returns
+ */
+function getFeedbackBody(eol) {
+  const buildInfo = window.BuildInfo || {};
+  const device = window.device || {};
+  return (
+    'Version: ' +
+    `${buildInfo.version} (${buildInfo.versionCode})` +
+    eol +
+    'Device: ' +
+    (device.model || '') +
+    eol +
+    'Manufacturer: ' +
+    (device.manufacturer || '') +
+    eol +
+    'Android version: ' +
+    device.version +
+    eol +
+    'Info: '
+  );
+}
 
-    return str;
-  }
+/**
+ *
+ * @param {number} num
+ */
+function getStars(num) {
+  let star = num;
+  let nostar = 5 - num;
+  let str = '';
+
+  while (star--) str += '★';
+  while (nostar--) str += '☆';
+
+  return str;
 }
 
 export default rateBox;

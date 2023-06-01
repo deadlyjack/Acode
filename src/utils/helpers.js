@@ -1,84 +1,13 @@
 import escapeStringRegexp from 'escape-string-regexp';
-import URLParse from 'url-parse';
 import constants from '../lib/constants';
 import dialogs from '../components/dialogs';
-import keyBindings from '../lib/keyBindings';
 import tag from 'html-tag-js';
 import ajax from '@deadlyjack/ajax';
 import path from './Path';
 import Url from './Url';
 import Uri from './Uri';
-import fsOperation from '../fileSystem';
-import appSettings from '../lib/settings';
-
-let loaderIsImmortal = false;
 
 export default {
-  showTitleLoader(immortal = false) {
-    if (typeof immortal === 'boolean') {
-      loaderIsImmortal = immortal;
-    }
-
-    setTimeout(() => {
-      app.classList.remove('title-loading-hide');
-      app.classList.add('title-loading');
-    }, 0);
-  },
-  removeTitleLoader(immortal = undefined) {
-    if (typeof immortal === 'boolean') {
-      loaderIsImmortal = immortal;
-    }
-
-    if (loaderIsImmortal) return;
-    setTimeout(() => {
-      app.classList.add('title-loading-hide');
-    }, 0);
-  },
-  /**
-   * Get extension name
-   * @param {String} pathname
-   * @returns
-   */
-  extname(pathname) {
-    const res = path.extname(pathname);
-    if (res) return res.slice(1).toLowerCase();
-    return res;
-  },
-  /**
-   * Get error message for file error code
-   * @param {number} code
-   * @returns {string}
-   */
-  getErrorMessage(code) {
-    switch (code) {
-      case 1:
-        return 'Path not found';
-      case 2:
-        return 'Security error';
-      case 3:
-        return 'Action aborted';
-      case 4:
-        return 'File not readable';
-      case 5:
-        return 'File encoding error';
-      case 6:
-        return 'Modification not allowed';
-      case 7:
-        return 'Invalid state';
-      case 8:
-        return 'Syntax error';
-      case 9:
-        return 'Invalid modification';
-      case 10:
-        return 'Quota exceeded';
-      case 11:
-        return 'Type mismatch';
-      case 12:
-        return 'Path already exists';
-      default:
-        return 'Uncaught error';
-    }
-  },
   /**
    * Gets programming language name according to filename
    * @param {String} filename
@@ -166,6 +95,7 @@ export default {
       powershell: /\.ps1$/i,
       prolog: /\.(plg|prolog)$/i,
       protobug: /\.proto$/i,
+      python: /\.(py|pyc|pyd|pyo|pyw|pyz|gyp)$/i,
       razor: /\.(cshtml|asp)$/i,
       red: /\.(red|reds)$/i,
       ruby: /^rakefile$|^guardfile$|^rakefile$|^gemfile$|\.(rb|ru|gemspec|rake)$/i,
@@ -201,20 +131,18 @@ export default {
     const fileType = Object.keys(regex).find((type) => regex[type].test(filename));
     if (fileType) return fileType;
 
-    const EXCEL = ['xl', 'xls', 'xlr', 'xlsx', 'xltx', 'sdc', 'ods', 'dex', 'cell', 'def', 'ods', 'ots', 'uos'];
-    const PYTHON = ['py', 'pyc', 'pyd', 'pyo', 'pyw', 'pyz', 'gyp'];
-    const WORD = ['doc', 'docx', 'odt', 'rtf', 'wpd'];
-    const TEXT = ['txt', 'csv'];
-    const ext = this.extname(filename);
+    const EXCEL = /\.(xl|xls|xlr|xlsx|xltx|sdc|ods|dex|cell|def|ods|ots|uos)$/i;
+    const WORD = /\.(doc|docx|odt|rtf|wpd)$/i;
+    const TEXT = /\.(txt|csv)$/i;
+    const ext = Url.extname(filename);
 
-    if (ext === 'mdb') return 'access';
-    if (ext === 'any') return 'anyscript';
-    if (ext === 'pde') return 'processinglang';
-    if (ext === 'src') return 'source';
-    if (TEXT.includes(ext)) return 'text';
-    if (WORD.includes(ext)) return 'word';
-    if (PYTHON.includes(ext)) return 'python';
-    if (EXCEL.includes(ext)) return 'excel';
+    if (ext === '.mdb') return 'access';
+    if (ext === '.any') return 'anyscript';
+    if (ext === '.pde') return 'processinglang';
+    if (ext === '.src') return 'source';
+    if (TEXT.test(ext)) return 'text';
+    if (WORD.test(ext)) return 'word';
+    if (EXCEL.test(ext)) return 'excel';
     return ext;
   },
   /**
@@ -222,7 +150,7 @@ export default {
    * @param {string} filename
    */
   getIconForFile(filename) {
-    let ext = this.extname(filename);
+    let ext = Url.extname(filename);
 
     const MOVIE = ['mp4', 'm4a', 'mov', '3gp', 'wmv', 'flv', 'avi'];
     const IMAGE = ['png', 'jpeg', 'jpg', 'gif', 'ico', 'webp'];
@@ -307,8 +235,6 @@ export default {
       msg = err;
     } else if (err instanceof Error) {
       msg = err.message;
-    } else if (err.code !== null) {
-      msg = this.getErrorMessage(err.code);
     } else {
       msg = strings['an error occurred'];
     }
@@ -323,7 +249,7 @@ export default {
    */
   error(err, ...args) {
     if (err.code === 0) {
-      this.toast(err);
+      toast(err);
       return;
     }
 
@@ -344,27 +270,6 @@ export default {
     return promise;
   },
   /**
-   *
-   * @param {Error} err
-   * @param  {...string} args
-   */
-  toast(err, ...args) {
-    window.toast(this.errorMessage(err, ...args));
-  },
-  /**
-   *
-   * @param {string} color
-   * @returns {'hex'|'rgb'|'hsl'}
-   */
-  checkColorType(color) {
-    const { HEX_COLOR, RGB_COLOR, HSL_COLOR } = constants;
-
-    if (HEX_COLOR.test(color)) return 'hex';
-    if (RGB_COLOR.test(color)) return 'rgb';
-    if (HSL_COLOR.test(color)) return 'hsl';
-    return null;
-  },
-  /**
    * Checks if the value is a valid color
    * @param {string} value 
    * @returns 
@@ -374,38 +279,6 @@ export default {
       /#[0-9a-f]{3,8}/.test(value) ||
       /rgba?\(\d{1,3},\s?\d{1,3},\s?\d{1,3}(,\s?[0-1])?\)/.test(value) ||
       /hsla?\(\d{1,3},\s?\d{1,3}%,\s?\d{1,3}%(,\s?[0-1])?\)/.test(value)
-    )
-  },
-  /**
-   *
-   * @param {string} str
-   * @returns {string}
-   */
-  removeLineBreaks(str) {
-    return str.replace(/(\r\n)+|\r+|\n+|\t+/g, '');
-  },
-  /**
-   * Gets body for feedback email
-   * @param {String} eol
-   * @returns
-   */
-  getFeedbackBody(eol) {
-    const buildInfo = window.BuildInfo || {};
-    const device = window.device || {};
-    return (
-      'Version: ' +
-      `${buildInfo.version} (${buildInfo.versionCode})` +
-      eol +
-      'Device: ' +
-      (device.model || '') +
-      eol +
-      'Manufacturer: ' +
-      (device.manufacturer || '') +
-      eol +
-      'Android version: ' +
-      device.version +
-      eol +
-      'Info: '
     );
   },
   /**
@@ -416,24 +289,6 @@ export default {
     return (
       new Date().getTime() + parseInt(Math.random() * 100000000000)
     ).toString(36);
-  },
-  /**
-   * Resets key binding
-   */
-  async resetKeyBindings() {
-    try {
-      const fs = fsOperation(KEYBINDING_FILE);
-      const fileName = Url.basename(KEYBINDING_FILE);
-      const content = JSON.stringify(keyBindings, undefined, 2);
-      if (!(await fs.exists())) {
-        await fsOperation(DATA_STORAGE)
-          .createFile(fileName, content);
-        return;
-      }
-      await fs.writeFile(content);
-    } catch (error) {
-      console.error(error);
-    }
   },
   /**
    * Parses JSON string, if fails returns null
@@ -463,14 +318,6 @@ export default {
       return this.parseJSON(result);
     }
     return result;
-  },
-  /**
-   * Checks if content is binary
-   * @param {any} content
-   * @returns {boolean}
-   */
-  isBinary(content) {
-    return /[\x00-\x08\x0E-\x1F]/.test(content);
   },
   /**
    * Checks whether given type is directory or not
@@ -549,26 +396,6 @@ export default {
     editorManager.emit('update', 'file-delete');
   },
   /**
-   * Checks whether given objects are equal or not
-   * @param {Object} obj1
-   * @param {Object} obj2
-   * @returns
-   */
-  areEqual(obj1, obj2) {
-    if (obj1 === obj2) return true;
-    if (obj1 == null || obj2 == null) return false;
-    if (obj1.constructor !== obj2.constructor) return false;
-
-    for (let key in obj1) {
-      if (!obj2.hasOwnProperty(key)) return false;
-      if (obj1[key] === obj2[key]) continue;
-      if (typeof obj1[key] !== 'object') return false;
-      if (!this.isObjectEqual(obj1[key], obj2[key])) return false;
-    }
-
-    return true;
-  },
-  /**
    * Displays ad on the current page
    */
   showAd() {
@@ -600,102 +427,12 @@ export default {
       }
     }
   },
-  /**
-  * Create directory recursively 
-  * @param {string} parent 
-  * @param {Array<string> | string} dir 
-  */
-  async createFileRecursive(parent, dir) {
-    let isDir = false;
-    if (typeof dir === 'string') {
-      if (dir.endsWith('/')) {
-        isDir = true;
-        dir = dir.slice(0, -1);
-      }
-      dir = dir.split('/');
-    }
-    dir = dir.filter(d => d);
-    const cd = dir.shift();
-    const newParent = Url.join(parent, cd);
-    if (!(await fsOperation(newParent).exists())) {
-      if (dir.length || isDir) {
-        await fsOperation(parent).createDirectory(cd);
-      } else {
-        await fsOperation(parent).createFile(cd);
-      }
-    }
-    if (dir.length) {
-      await this.createFileRecursive(newParent, dir);
-    }
-  },
-  /**
-   * 
-   * @param {AceAjax.Editor} editor 
-   * @returns 
-   */
-  getEditorHeight(editor) {
-    const { renderer, session } = editor;
-    const offset = (renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5;
-    const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
-    return editorHeight;
-  },
-  getEditorWidth(editor) {
-    const { renderer, session } = editor;
-    const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
-    const editorWidth = session.getScreenWidth() * renderer.characterWidth - offset;
-    if (appSettings.value.textWrap) {
-      return editorWidth;
-    } else {
-      return editorWidth + appSettings.value.leftMargin;
-    }
-  },
   async toInternalUri(uri) {
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURL(uri, (entry) => {
         resolve(entry.toInternalURL());
       }, reject);
     });
-  },
-  decodeUrl(url) {
-    const uuid = this.uuid();
-
-    if (/#/.test(url)) {
-      url = url.replace(/#/g, uuid);
-    }
-
-    let { username, password, hostname, pathname, port, query } = URLParse(
-      url,
-      true,
-    );
-
-    if (pathname) {
-      pathname = decodeURIComponent(pathname);
-      pathname = pathname.replace(new RegExp(uuid, 'g'), '#');
-    }
-
-    if (username) {
-      username = decodeURIComponent(username);
-    }
-
-    if (password) {
-      password = decodeURIComponent(password);
-    }
-
-    if (port) {
-      port = parseInt(port);
-    }
-
-    let { keyFile, passPhrase } = query;
-
-    if (keyFile) {
-      query.keyFile = decodeURIComponent(keyFile);
-    }
-
-    if (passPhrase) {
-      query.passPhrase = decodeURIComponent(passPhrase);
-    }
-
-    return { username, password, hostname, pathname, port, query };
   },
   promisify(func, ...args) {
     return new Promise((resolve, reject) => {
@@ -711,7 +448,6 @@ export default {
     }
   },
   fixFilename(name) {
-    name = name.trim();
-    return this.removeLineBreaks(name);
+    return name.replace(/(\r\n)+|\r+|\n+|\t+/g, '').trim();
   }
 };

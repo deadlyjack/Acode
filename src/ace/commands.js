@@ -258,11 +258,10 @@ export async function setKeyBindings({ commands }) {
       // keyboardShortcuts = compareAndFixKeyBindings(keyboardShortcuts, bindings);
       keyboardShortcuts = bindings;
     } else {
-      helpers.resetKeyBindings();
+      throw new Error('Key binding file not found');
     }
   } catch (error) {
-    console.error(error);
-    helpers.resetKeyBindings();
+    await resetKeyBindings();
   }
 
   Object.keys(commands.byName).forEach((name) => {
@@ -277,4 +276,23 @@ export async function setKeyBindings({ commands }) {
     command.bindKey = { win: shortcut?.key ?? null };
     commands.addCommand(command);
   });
+}
+
+/**
+ * Resets key binding
+ */
+export async function resetKeyBindings() {
+  try {
+    const fs = fsOperation(KEYBINDING_FILE);
+    const fileName = Url.basename(KEYBINDING_FILE);
+    const content = JSON.stringify(keyBindings, undefined, 2);
+    if (!(await fs.exists())) {
+      await fsOperation(DATA_STORAGE)
+        .createFile(fileName, content);
+      return;
+    }
+    await fs.writeFile(content);
+  } catch (error) {
+    console.error(error);
+  }
 }

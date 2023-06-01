@@ -5,6 +5,7 @@ import './style.scss';
  * @extends HTMLElement
  * @property {function():void} hide hides the menu
  * @property {function():void} show shows the page
+ * @property {function():void} destroy destroys the menu
  */
 
 /**
@@ -14,7 +15,7 @@ import './style.scss';
  * @property {number} bottom
  * @property {number} right
  * @property {string} transformOrigin
- * @property {HTMLElement} toggle
+ * @property {HTMLElement} toggler
  * @property {function} onshow
  * @property {function} onhide
  * @property {function(this:HTMLElement):string} innerHTML
@@ -26,7 +27,7 @@ import './style.scss';
  * @param {contextMenuOptions} [options] Options
  * @returns {ContextMenuObj}
  */
-function contextmenu(content, options) {
+export default function contextmenu(content, options) {
   if (!options && typeof content === 'object') {
     options = content;
     content = null;
@@ -42,7 +43,7 @@ function contextmenu(content, options) {
       left: options.left || 'auto',
       right: options.right || 'auto',
       bottom: options.bottom || 'auto',
-      transformOrigin: options.transformOrigin || null,
+      transformOrigin: options.transformOrigin,
     },
   });
   const $mask = tag('span', {
@@ -66,11 +67,14 @@ function contextmenu(content, options) {
       addTabindex();
     }
 
-    if (options.toggle) {
-      const client = options.toggle.getBoundingClientRect();
-      if (!options.top && !options.bottom) $el.style.top = client.top + 'px';
-      if (!options.left && !options.right)
+    if (options.toggler) {
+      const client = options.toggler.getBoundingClientRect();
+      if (!options.top && !options.bottom) {
+        $el.style.top = client.top + 'px';
+      }
+      if (!options.left && !options.right) {
         $el.style.right = innerWidth - client.right + 'px';
+      }
     }
 
     app.append($el, $mask);
@@ -100,14 +104,21 @@ function contextmenu(content, options) {
     for (let $el of children) $el.tabIndex = '0';
   }
 
-  if (options.toggle) options.toggle.addEventListener('click', toggle);
+  function destroy() {
+    $el.remove();
+    $mask.remove();
+    options.toggler?.removeEventListener('click', toggle);
+  }
+
+  if (options.toggler) {
+    options.toggler.addEventListener('click', toggle);
+  }
 
   $el.hide = hide;
   $el.show = show;
+  $el.destroy = destroy;
   $el.onshow = options.onshow || (() => { });
   $el.onhide = options.onhide || (() => { });
 
   return $el;
 }
-
-export default contextmenu;

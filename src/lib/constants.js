@@ -14,6 +14,7 @@ export default {
   SCROLL_SPEED_FAST: 0.01,
   SCROLL_SPEED_NORMAL: 0.04,
   SCROLL_SPEED_SLOW: 0.08,
+  SIDEBAR_SLIDE_START_THRESHOLD_PX: 20,
   CUSTOM_THEME: 'body[theme="custom"]',
   FEEDBACK_EMAIL: 'acode@foxdebug.com',
   ERUDA_CDN: 'https://cdn.jsdelivr.net/npm/eruda',

@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.8.4] - Build 278
+## [1.8.4] - Build 279
 
 - New Features
   - [x] **Updated Ace editor**
@@ -37,6 +37,14 @@
     - Fixed an issue where the app wouldn't load when an error occurred.
   - [x] **File tabbar**
     - Changing file tabbar position will not make editor lose focus.
+  - [x] **Sidebar**
+    - Fixed sidebar resized unknowingly when dragged to open or close it.
+  - [x] **Close all tabs**
+    - Fixed "close all" action opens up multiple confrim dialog for every unsaved file.
+    - Now it will ask what to do with unsaved files.
+  - [x] **Minor bugs**
+    - Fixed many minor bugs.
+    - Improved stability.
 
 ## [1.8.3] - Build 278
 

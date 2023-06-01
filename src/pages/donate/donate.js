@@ -8,6 +8,7 @@ import ajax from '@deadlyjack/ajax';
 import helpers from '../../utils/helpers';
 import dialogs from '../../components/dialogs';
 import tag from 'html-tag-js';
+import loader from 'components/dialogs/loader';
 
 //TODO: fix (-1 means, user is not logged in to any google account)
 
@@ -43,7 +44,7 @@ export default function DonateInclude() {
                 reject(err);
               });
             })
-          )
+          );
         }
 
         const settledPromises = await Promise.allSettled(promises);
@@ -89,7 +90,7 @@ export default function DonateInclude() {
     }
   };
 
-  helpers.showTitleLoader();
+  loader.showTitleLoader();
 
   (async function render() {
 
@@ -116,7 +117,7 @@ export default function DonateInclude() {
     const col1 = [];
     const col2 = [];
     products.forEach((product, i) => {
-      const html = mustache.render(productHBS, product)
+      const html = mustache.render(productHBS, product);
       if (i % 2 === 0) {
         col1.push(html);
         return;
@@ -136,6 +137,6 @@ export default function DonateInclude() {
       helpers.error(error);
     })
     .finally(() => {
-      helpers.removeTitleLoader();
+      loader.removeTitleLoader();
     });
 }

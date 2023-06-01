@@ -1,9 +1,8 @@
 import mimeType from 'mime-types';
-import helpers from '../utils/helpers';
-import Path from "../utils/Path";
-import Url from "../utils/Url";
+import Path from "utils/Path";
+import Url from "utils/Url";
+import settings from "lib/settings";
 import internalFs from "./internalFs";
-import appSettings from "../lib/settings";
 
 // set path not implemented
 
@@ -43,7 +42,7 @@ class FtpClient {
         security: this.#security,
         mode: this.#mode
       }
-    })
+    });
   }
 
   connect() {
@@ -56,7 +55,7 @@ class FtpClient {
         this.#conId = conId;
         resolve();
       }, (err) => {
-        if (appSettings.value.retryRemoteFsAfterFail) {
+        if (settings.value.retryRemoteFsAfterFail) {
           if (++this.#try > this.#MAX_TRY) {
             this.#try = 0;
             reject(err);
@@ -259,13 +258,13 @@ export default function Ftp(path, host, port, username, password, security, mode
 }
 
 Ftp.fromUrl = (url) => {
-  const { username, password, hostname, pathname, port, query } = helpers.decodeUrl(url);
+  const { username, password, hostname, pathname, port, query } = Url.decodeUrl(url);
   const { security, mode } = query;
   const ftp = new FtpClient(hostname, username, password, port || 21, security, mode);
   ftp.setPath(pathname);
 
   return createFs(ftp);
-}
+};
 
 Ftp.test = (url) => /^ftp:/.test(url);
 
@@ -310,5 +309,5 @@ function createFs(ftp) {
     get localName() {
       return ftp.localName;
     }
-  }
+  };
 }

@@ -25,7 +25,7 @@ import tile from './tile';
  * @param {function(this:Collaspable):void} [options.ontoggle] Called when the list is toggled
  * @returns {Collaspable}
  */
-function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
+export default function collapsableList(titleText, type = 'indicator', options = {}) {
   const $ul = tag('ul', {
     className: 'scroll',
   });
@@ -55,8 +55,6 @@ function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
 
   $title.classList.add('light');
   $title.addEventListener('click', toggle);
-
-  if (!hidden) setTimeout(toggle, 0);
 
   function toggle() {
     if ($title.collapsed) {
@@ -119,5 +117,3 @@ function collapsableList(titleText, hidden, type = 'indicator', options = {}) {
     });
   }
 }
-
-export default collapsableList;
