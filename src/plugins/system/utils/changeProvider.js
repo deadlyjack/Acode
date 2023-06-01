@@ -1,5 +1,5 @@
 module.exports = {
-  changeProvider(reset) {
+  changeProvider(reset=true) {
     const fs = require('fs');
     const path = require('path');
 
