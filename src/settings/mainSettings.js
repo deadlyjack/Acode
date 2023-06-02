@@ -4,7 +4,7 @@ import backupRestore from './backupRestore';
 import themeSetting from '../pages/themeSetting';
 import otherSettings from './appSettings';
 import defaultFormatter from './defaultFormatter';
-import rateBox from '../components/dialogboxes/rateBox';
+import rateBox from '../components/dialogs/rateBox';
 import Donate from '../pages/donate';
 import plugins from '../pages/plugins';
 import settingsPage from '../components/settingPage';
@@ -94,7 +94,7 @@ export default function settingsMain() {
 
   removeAds.callback = () => {
     $list.get('[data-key="removeads"]').remove();
-  }
+  };
 
   async function callback(key) {
     switch (key) {

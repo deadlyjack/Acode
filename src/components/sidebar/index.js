@@ -1,7 +1,10 @@
-import Ref from 'html-tag-js/ref';
 import './style.scss';
+import Ref from 'html-tag-js/ref';
+import constants from 'lib/constants';
 
 let $sidebar;
+/**@type {Array<(el:HTMLElement)=>boolean>} */
+let preventSlideTests = [];
 
 /**
  * @typedef {object} SideBar
@@ -20,7 +23,7 @@ let $sidebar;
 function create($container, $toggler) {
   let { innerWidth } = window;
 
-  const START_THRESHOLD = 20; //Point where to start swip
+  const START_THRESHOLD = constants.SIDEBAR_SLIDE_START_THRESHOLD_PX; //Point where to start swip
   const MIN_WIDTH = 200; //Min width of the side bar
   const MAX_WIDTH = () => innerWidth * 0.7; //Max width of the side bar
   const resizeBar = new Ref();
@@ -28,6 +31,8 @@ function create($container, $toggler) {
   $container = $container || app;
   let mode = innerWidth > 600 ? 'tab' : 'phone';
   let width = +(localStorage.sideBarWidth || MIN_WIDTH);
+
+  const eventOptions = { passive: false };
   const $el = <div id='sidebar' className={mode}>
     <div className='apps'></div>
     <div className='container'></div>
@@ -52,7 +57,7 @@ function create($container, $toggler) {
   let setWidthTimeout = null;
 
   $toggler?.addEventListener('click', toggle);
-  $container.addEventListener('touchstart', ontouchstart);
+  $container.addEventListener('touchstart', ontouchstart, eventOptions);
   window.addEventListener('resize', onWindowResize);
 
   if (mode === 'tab' && localStorage.sidebarShown === '1') {
@@ -139,53 +144,44 @@ function create($container, $toggler) {
   }
 
   /**
-   *
+   * Event handler for touchstart event
    * @param {TouchEvent} e
    */
   function ontouchstart(e) {
     const { target } = e;
-    const $parent = target.closest('.scroll');
-    const canScroll = $parent ? $parent.scrollHeight > $parent.offsetHeight : false;
+    const { clientX, clientY } = getClientCoords(e);
 
-    if (
-      canScroll
-      || target instanceof HTMLInputElement
-      || target instanceof HTMLTextAreaElement
-      || target.contentEditable === 'true'
-      || target.closest('.ace_editor')
-    ) return;
-
-    const { clientX, clientY } = getClient(e);
-
+    if (preventSlideTests.find((test) => test(target))) return;
     if (mode === 'tab') return;
+
     $el.style.transition = 'none';
     touch.startX = clientX;
     touch.startY = clientY;
-    touch.target = e.target;
+    touch.target = target;
 
-    if ($el.activated && !$el.contains(e.target) && e.target !== mask) {
+    if ($el.activated && !$el.contains(target) && target !== mask) {
       return;
     } else if (
       (!$el.activated && touch.startX > START_THRESHOLD) ||
-      e.target === $toggler
+      target === $toggler
     ) {
       return;
     }
 
-    document.addEventListener('touchmove', ontouchmove);
-    document.addEventListener('touchend', ontouchend);
+    document.addEventListener('touchmove', ontouchmove, eventOptions);
+    document.addEventListener('touchend', ontouchend, eventOptions);
   }
 
   /**
-   * 
+   * Event handler for resize event
    * @param {MouseEvent | TouchEvent} e 
    * @returns 
    */
   function onresize(e) {
-    const { clientX } = getClient(e);
+    const { clientX } = getClientCoords(e);
     let deltaX = 0;
     const onMove = (e) => {
-      const { clientX: currentX } = getClient(e);
+      const { clientX: currentX } = getClientCoords(e);
       deltaX = currentX - clientX;
       resize(deltaX);
     };
@@ -195,21 +191,27 @@ function create($container, $toggler) {
       else if (newWidth >= MAX_WIDTH()) width = MAX_WIDTH();
       else width = newWidth;
       localStorage.sideBarWidth = width;
-      document.ontouchmove = null;
-      document.onmousemove = null
-      document.ontouchend = null;
-      document.onmouseup = null;
-      document.onmouseout = null;
-      document.onmouseleave = null;
+      document.removeEventListener('touchmove', onMove, eventOptions);
+      document.removeEventListener('mousemove', onMove, eventOptions);
+      document.removeEventListener('touchend', onEnd, eventOptions);
+      document.removeEventListener('mouseup', onEnd, eventOptions);
+      document.removeEventListener('mouseleave', onEnd, eventOptions);
+      document.removeEventListener('touchcancel', onEnd, eventOptions);
     };
-    document.ontouchmove = onMove;
-    document.onmousemove = onMove
-    document.ontouchend = onEnd;
-    document.onmouseup = onEnd;
-    document.onmouseleave = onEnd;
+    document.addEventListener('touchmove', onMove, eventOptions);
+    document.addEventListener('mousemove', onMove, eventOptions);
+    document.addEventListener('touchend', onEnd, eventOptions);
+    document.addEventListener('mouseup', onEnd, eventOptions);
+    document.addEventListener('mouseleave', onEnd, eventOptions);
+    document.addEventListener('touchcancel', onEnd, eventOptions);
     return;
   }
 
+  /**
+   * Resize the sidebar
+   * @param {number} deltaX 
+   * @returns 
+   */
   function resize(deltaX) {
     const newWidth = width + deltaX;
     if (newWidth >= MAX_WIDTH()) return;
@@ -218,13 +220,13 @@ function create($container, $toggler) {
   }
 
   /**
-   *
+   * Event handler for touchmove event
    * @param {TouchEvent} e
    */
   function ontouchmove(e) {
     e.preventDefault();
 
-    const { clientX, clientY } = getClient(e);
+    const { clientX, clientY } = getClientCoords(e);
     touch.endX = clientX;
     touch.endY = clientY;
     touch.totalX = touch.endX - touch.startX;
@@ -249,7 +251,7 @@ function create($container, $toggler) {
   }
 
   /**
-   *
+   * Event handler for touchend event
    * @param {TouchEvent} e
    */
   function ontouchend(e) {
@@ -275,7 +277,7 @@ function create($container, $toggler) {
       onshow();
       $el.activated = true;
       $el.style.transform = `translate3d(0, 0, 0)`;
-      document.ontouchstart = ontouchstart;
+      document.addEventListener('touchstart', ontouchstart, eventOptions);
       actionStack.remove('sidebar');
       actionStack.push({
         id: 'sidebar',
@@ -285,6 +287,9 @@ function create($container, $toggler) {
     }
   }
 
+  /**
+   * Reset the touch state
+   */
   function resetState() {
     touch.totalY = 0;
     touch.startY = 0;
@@ -294,10 +299,14 @@ function create($container, $toggler) {
     touch.endX = 0;
     touch.target = null;
     $el.style.transition = null;
-    document.removeEventListener('touchmove', ontouchmove);
-    document.removeEventListener('touchend', ontouchend);
+    document.removeEventListener('touchmove', ontouchmove, eventOptions);
+    document.removeEventListener('touchend', ontouchend, eventOptions);
   }
 
+  /**
+   * Set the width of the sidebar
+   * @param {number} width 
+   */
   function setWidth(width) {
     $el.style.transition = 'none';
     $el.style.maxWidth = width + 'px';
@@ -310,30 +319,29 @@ function create($container, $toggler) {
   }
 
   /**
-   * 
+   * Get the clientX and clientY from the event
    * @param {TouchEvent | MouseEvent} e 
    * @returns {{clientX: number, clientY: number}}
    */
-  function getClient(e) {
+  function getClientCoords(e) {
     const { clientX, clientY } = (e.touches ?? [])[0] ?? e;
     return { clientX, clientY };
   }
-
-  $el.getwidth = function () {
-    const width = innerWidth * 0.7;
-    return mode === 'phone' ? (width >= 350 ? 350 : width) : MIN_WIDTH;
-  };
 
   $el.show = show;
   $el.hide = hide;
   $el.toggle = toggle;
   $el.onshow = () => { };
+  $el.getwidth = function () {
+    const width = innerWidth * 0.7;
+    return mode === 'phone' ? (width >= 350 ? 350 : width) : MIN_WIDTH;
+  };
 
   return $el;
 }
 
 /**
- *
+ * Create a sidebar or return the existing one
  * @param {object} [arg0] - the element that will activate the sidebar
  * @param {HTMLElement} [arg0.container] - the element that will contain the sidebar
  * @param {HTMLElement} [arg0.toggler] - the element that will toggle the sidebar
@@ -351,9 +359,44 @@ Sidebar.toggle = () => $sidebar?.toggle();
 Sidebar.el = null;
 
 Object.defineProperty(Sidebar, 'el', {
-  get() {
-    return $sidebar;
+  get() { return $sidebar; }
+});
+
+preventSlideTests.push((target) => {
+  let lastEl;
+  return testScrollable(target.closest('.scroll'));
+
+  /**
+   * Test if the element is scrollable recursively
+   * @param {HTMLElement} container 
+   * @returns 
+   */
+  function testScrollable(container) {
+    if (!container || container === lastEl) return false;
+
+    const { scrollHeight, offsetHeight, scrollWidth, offsetWidth } = container;
+
+    if (scrollHeight > offsetHeight) return true;
+    if (scrollWidth > offsetWidth) return true;
+
+    lastEl = container;
+
+    return testScrollable(container.parentElement.closest('.scroll'));
   }
 });
 
+preventSlideTests.push((target) => {
+  return target instanceof HTMLInputElement
+    || target instanceof HTMLTextAreaElement
+    || target.contentEditable === 'true';
+});
+
 export default Sidebar;
+
+/**
+ * Prevent the sidebar from sliding when the test returns true
+ * @param {(target:Element)=>boolean} test 
+ */
+export function preventSlide(test) {
+  preventSlideTests.push(test);
+}

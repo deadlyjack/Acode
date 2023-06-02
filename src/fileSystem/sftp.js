@@ -1,9 +1,8 @@
 import mimeType from 'mime-types';
-import helpers from '../utils/helpers';
-import Path from '../utils/Path';
-import Url from '../utils/Url';
+import Path from 'utils/Path';
+import Url from 'utils/Url';
+import settings from 'lib/settings';
 import internalFs from './internalFs';
-import appSettings from '../lib/settings';
 
 class SftpClient {
   #MAX_TRY = 3;
@@ -406,7 +405,7 @@ class SftpClient {
   async connect() {
     await new Promise((resolve, reject) => {
       const retry = (err) => {
-        if (appSettings.value.retryRemoteFsAfterFail) {
+        if (settings.value.retryRemoteFsAfterFail) {
           if (++this.#retry > this.#MAX_TRY) {
             this.#retry = 0;
             reject(err);
@@ -644,7 +643,7 @@ function Sftp(host, port, username, authentication) {
 }
 
 Sftp.fromUrl = (url) => {
-  const { username, password, hostname, pathname, port, query } = helpers.decodeUrl(url);
+  const { username, password, hostname, pathname, port, query } = Url.decodeUrl(url);
   const { keyFile, passPhrase } = query;
 
   const sftp = new SftpClient(hostname, port || 22, username, {
@@ -655,7 +654,7 @@ Sftp.fromUrl = (url) => {
 
   sftp.setPath(pathname);
   return createFs(sftp);
-}
+};
 
 Sftp.test = (url) => /^sftp:/.test(url);
 

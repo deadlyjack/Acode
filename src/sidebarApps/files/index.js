@@ -1,8 +1,8 @@
-import settings from 'lib/settings';
 import './style.scss';
+import settings from 'lib/settings';
 
 /**@type {HTMLElement} */
-let container = null;
+let container;
 
 export default [
   'documents',
@@ -13,10 +13,16 @@ export default [
     container.classList.add('files');
     container.setAttribute('data-msg', strings['open folder']);
     container.addEventListener('click', clickHandler);
+    editorManager.on(['new-file', 'int-open-file-list', 'remove-file'], (position) => {
+      if (typeof position === 'string' && position !== settings.OPEN_FILE_LIST_POS_SIDEBAR) return;
+      const fileList = container.get(':scope > div.file-list');
+      if (fileList) fixHeight(fileList);
+    });
+    editorManager.on('add-folder', () => {
+      fixHeight();
+    });
   }
 ];
-
-export const fixFilesHeight = fixHeight;
 
 function clickHandler(e) {
   if (!container.children.length) {
@@ -24,39 +30,61 @@ function clickHandler(e) {
     return;
   }
 
-  fixHeight(e.target);
+  const { target } = e;
+  if (target.matches('.files>.list>.tile')) {
+    fixHeight(target.parentElement);
+  }
 }
 
 /**
  * Update list height
- * @param {HTMLElement} e 
+ * @param {HTMLElement} target Target element
  */
-function fixHeight(target) {
-  if (target.matches('.files>.list>.tile')) {
-    target = target.parentElement;
-  } else if (!target.matches('.files>.list')) {
-    return;
-  }
-  const lists = [...container.getAll(':scope > div')];
-  let height = 0;
+export function fixHeight(target) {
+  const lists = Array.from(container.getAll(':scope > div'));
+  const ITEM_HEIGHT = 30;
 
-  if (
-    settings.value.openFileListPos === settings.OPEN_FILE_LIST_POS_SIDEBAR &&
-    lists[0] === target
-  ) {
-    height = 30 * (target.$ul.children.length + 1);
-    target.style.maxHeight = `${height}px`;
-    target.style.height = `${height}px`;
-    return;
+  let height = (lists.length - 1) * ITEM_HEIGHT;
+  let activeFileList;
+
+  if (settings.value.openFileListPos === settings.OPEN_FILE_LIST_POS_SIDEBAR) {
+    const [firstList] = lists;
+    if (firstList.classList.contains('file-list')) {
+      activeFileList = firstList;
+      if (firstList.uncollapsed) {
+        const heightOffset = height - ITEM_HEIGHT;
+        const totalHeight = (ITEM_HEIGHT * activeFileList.$ul.children.length) + ITEM_HEIGHT;
+        const maxHeight = lists.length === 1 || !lists.slice(1).find((list) => list.uncollapsed)
+          ? window.innerHeight
+          : window.innerHeight / 2;
+        const minHeight = Math.min(totalHeight, maxHeight - heightOffset);
+
+        activeFileList.style.maxHeight = `${minHeight}px`;
+        activeFileList.style.height = `${minHeight}px`;
+        height += minHeight - ITEM_HEIGHT;
+      }
+    }
   }
 
   lists.forEach((list) => {
-    if (list === target) return;
-    list.collapse?.();
-    list.style.removeProperty('height');
-    height += list.offsetHeight;
-  });
+    if (list === activeFileList) return;
 
-  target.style.maxHeight = `calc(100% - ${height}px)`;
-  target.style.height = `calc(100% - ${height}px)`;
+    if (target === activeFileList) {
+      if (list.collapsed) return;
+      target = list;
+    }
+
+    if (list === target && target.uncollapsed) {
+      list.style.maxHeight = `calc(100% - ${height}px)`;
+      list.style.height = `calc(100% - ${height}px)`;
+      return;
+    }
+
+    if (list.collapsed) return;
+
+    list.collapse();
+    list.style.removeProperty('max-height');
+    list.style.removeProperty('height');
+    return;
+  });
 }

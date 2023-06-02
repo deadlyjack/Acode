@@ -84,7 +84,7 @@ function backupRestore() {
       );
     } catch (error) {
       console.error(error);
-      helpers.toast(error);
+      toast(error);
     }
   }
 
@@ -93,7 +93,7 @@ function backupRestore() {
       (data) => {
         backupRestore.restore(data.uri);
       },
-      helpers.toast,
+      toast,
       'application/octet-stream',
     );
   }
@@ -122,7 +122,7 @@ backupRestore.restore = async function (url) {
     await appSettings.update(settings);
     location.reload();
   } catch (err) {
-    helpers.toast(err);
+    toast(err);
   }
 };
 

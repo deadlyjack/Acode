@@ -15,19 +15,28 @@ function init() {
 }
 
 /**
+ * @typedef {object} Theme
+ * @property {string} id
+ * @property {string} name
+ * @property {string} type
+ * @property {string} version
+ * @property {string} primaryColor
+ */
+
+/**
  * Returns a list of all themes
- * @returns {{name: string, type: string, version: string, primaryColor: string}}
+ * @returns {Theme[]}
  */
 function list() {
-  return [...appThemes.keys()].map((name) => {
+  return Array.from(appThemes.keys()).map((name) => {
     const { id, type, primaryColor, version } = appThemes.get(name);
     return {
       id,
-      name,
       type,
       version,
       primaryColor,
-    }
+      name: name.capitalize(),
+    };
   });
 }
 
@@ -121,13 +130,11 @@ function update(theme) {
 }
 
 export default {
-  get applied() {
-    return themeApplied;
-  },
+  get applied() { return themeApplied; },
   init,
   list,
   get,
   add,
   apply,
   update,
-}
+};

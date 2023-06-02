@@ -261,7 +261,7 @@ class Settings {
     Object.keys(this.#oldSettings).forEach((key) => {
       const value = this.#oldSettings[key];
       if (typeof value === 'object') {
-        if (!helpers.areEqual(value, this.value[key])) keys.push(key);
+        if (!areEqual(value, this.value[key])) keys.push(key);
         return;
       }
 
@@ -306,6 +306,27 @@ class Settings {
     const value = this.value.lang;
     lang.set(value);
   }
+}
+
+/**
+ * Checks whether given objects are equal or not
+ * @param {Object} obj1
+ * @param {Object} obj2
+ * @returns
+ */
+function areEqual(obj1, obj2) {
+  if (obj1 === obj2) return true;
+  if (obj1 == null || obj2 == null) return false;
+  if (obj1.constructor !== obj2.constructor) return false;
+
+  for (let key in obj1) {
+    if (!obj2.hasOwnProperty(key)) return false;
+    if (obj1[key] === obj2[key]) continue;
+    if (typeof obj1[key] !== 'object') return false;
+    if (!this.isObjectEqual(obj1[key], obj2[key])) return false;
+  }
+
+  return true;
 }
 
 export default new Settings();

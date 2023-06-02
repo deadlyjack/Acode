@@ -73,7 +73,7 @@ async function run(
   if (activeFile) {
     filename = activeFile.filename;
     pathName = activeFile.location;
-    extension = helpers.extname(filename);
+    extension = Url.extname(filename);
 
     if (!pathName && activeFile.uri) {
       pathName = Url.dirname(activeFile.uri);
@@ -176,7 +176,7 @@ async function run(
     const reqId = req.requestId;
     const reqPath = req.path.substr(1) || 'index.html';
 
-    const ext = helpers.extname(reqPath);
+    const ext = Url.extname(reqPath);
     let url = null;
 
     switch (reqPath) {
@@ -440,7 +440,7 @@ async function run(
     const browser = system.inAppBrowser(src, filename, !isConsole, appSettings.value.disableCache);
     browser.onOpenExternalBrowser = () => {
       target = "browser";
-    }
+    };
   }
 }
 

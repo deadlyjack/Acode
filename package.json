@@ -96,7 +96,7 @@
     "escape-string-regexp": "^5.0.0",
     "esprima": "^4.0.1",
     "filesize": "^10.0.7",
-    "html-tag-js": "^1.1.37",
+    "html-tag-js": "^1.1.38",
     "irid": "^4.0.0",
     "js-base64": "^3.7.4",
     "jszip": "^3.10.1",

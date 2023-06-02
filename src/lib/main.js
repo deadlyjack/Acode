@@ -4,12 +4,13 @@ import 'html-tag-js/dist/polyfill';
 import '../styles/main.scss';
 import '../styles/page.scss';
 import '../styles/list.scss';
-import '../styles/dialogs.scss';
 import '../styles/overrideAceStyle.scss';
+
 import '../ace/modelist';
 import '../ace/mode-smali';
 import '../components/WebComponents';
 import './polyfill';
+
 import mustache from 'mustache';
 import ajax from '@deadlyjack/ajax';
 import tile from 'components/tile';
@@ -95,7 +96,6 @@ async function ondeviceready() {
   window.CACHE_STORAGE = externalCacheDirectory || cacheDirectory;
   window.PLUGIN_DIR = Url.join(DATA_STORAGE, 'plugins');
   window.KEYBINDING_FILE = Url.join(DATA_STORAGE, '.key-bindings.json');
-  window.actionStack = ActionStack();
   window.IS_FREE_VERSION = isFreePackage;
 
   try {
@@ -231,7 +231,8 @@ async function ondeviceready() {
 }
 
 async function loadApp() {
-  //#region declaration
+  let $mainMenu;
+  let $fileMenu;
   const $editMenuToggler = <span className='icon edit' attr-action='toggle-edit-menu' style={{ fontSize: '1.2em' }} />;
   const $navToggler = <span className='icon menu' attr-action='toggle-sidebar'></span>;
   const $menuToggler = <span className='icon more_vert' attr-action='toggle-menu'></span>;
@@ -241,42 +242,6 @@ async function loadApp() {
     lead: $navToggler,
     tail: $menuToggler,
   });
-  const $mainMenu = contextmenu({
-    top: '6px',
-    right: '6px',
-    toggle: $menuToggler,
-    transformOrigin: 'top right',
-    innerHTML: () => {
-      return mustache.render($_menu, strings);
-    },
-  });
-  const $fileMenu = contextmenu({
-    toggle: $editMenuToggler,
-    top: '6px',
-    transformOrigin: 'top right',
-    innerHTML: () => {
-      const file = editorManager.activeFile;
-
-      if (file.loading) {
-        $fileMenu.classList.add('disabled');
-      } else {
-        $fileMenu.classList.remove('disabled');
-      }
-
-      return mustache.render(
-        $_fileMenu,
-        Object.assign(strings, {
-          file_mode: (file.session.getMode().$id || '').split('/').pop(),
-          file_encoding: file.encoding,
-          file_read_only: !file.editable,
-          file_info: !!file.uri,
-          file_eol: file.eol,
-          copy_text: !!editorManager.editor.getCopyText(),
-          new_file: file.name === constants.DEFAULT_FILE_NAME && !file.session.getValue(),
-        }),
-      );
-    },
-  });
   const $main = <main></main>;
   const $sidebar = <Sidebar container={$main} toggler={$navToggler} />;
   const $runBtn = <span style={{ fontSize: '1.2em' }} className='icon play_arrow' attr-action='run' onclick={() => acode.exec('run')} oncontextmenu={() => acode.exec('run-file')}></span>;
@@ -284,13 +249,43 @@ async function loadApp() {
   const $headerToggler = <span className='floating icon keyboard_arrow_left' id='header-toggler'></span>;
   const folders = helpers.parseJSON(localStorage.folders);
   const files = helpers.parseJSON(localStorage.files) || [];
-  window.editorManager = await EditorManager($header, $main);
-  //#endregion
+  const editorManager = await EditorManager($header, $main);
+  const actionStack = new ActionStack();
+
+  const setMainMenu = () => {
+    if ($mainMenu) {
+      $mainMenu.removeEventListener('click', handleMenu);
+      $mainMenu.destroy();
+    }
+    const { openFileListPos, fullscreen } = settings.value;
+    if (openFileListPos === settings.OPEN_FILE_LIST_POS_BOTTOM && fullscreen) {
+      $mainMenu = createMainMenu({ bottom: '6px', toggler: $menuToggler });
+    } else {
+      $mainMenu = createMainMenu({ top: '6px', toggler: $menuToggler });
+    }
+    $mainMenu.addEventListener('click', handleMenu);
+  };
+
+  const setFileMenu = () => {
+    if ($fileMenu) {
+      $fileMenu.removeEventListener('click', handleMenu);
+      $fileMenu.destroy();
+    }
+    const { openFileListPos, fullscreen } = settings.value;
+    if (openFileListPos === settings.OPEN_FILE_LIST_POS_BOTTOM && fullscreen) {
+      $fileMenu = createFileMenu({ bottom: '6px', toggler: $editMenuToggler });
+    } else {
+      $fileMenu = createFileMenu({ top: '6px', toggler: $editMenuToggler });
+    }
+    $fileMenu.addEventListener('click', handleMenu);
+  };
 
   acode.$headerToggler = $headerToggler;
-
+  window.actionStack = actionStack;
+  window.editorManager = editorManager;
+  setMainMenu(settings.value.openFileListPos);
+  setFileMenu(settings.value.openFileListPos);
   actionStack.onCloseApp = () => acode.exec('save-state');
-
   $headerToggler.onclick = function () {
     root.classList.toggle('show-header');
     this.classList.toggle('keyboard_arrow_left');
@@ -314,13 +309,20 @@ async function loadApp() {
   editorManager.on('rename-file', onFileUpdate);
   editorManager.on('switch-file', onFileUpdate);
   editorManager.on('file-loaded', onFileUpdate);
-  $fileMenu.addEventListener('click', handleMenu);
-  $mainMenu.addEventListener('click', handleMenu);
   document.addEventListener('backbutton', actionStack.pop);
   document.addEventListener('menubutton', $sidebar.toggle);
   navigator.app.overrideButton('menubutton', true);
   system.setIntentHandler(intentHandler, intentHandler.onError);
   system.getCordovaIntent(intentHandler, intentHandler.onError);
+  settings.on('update:openFileListPos', () => {
+    setMainMenu();
+    setFileMenu();
+  });
+  settings.on('update:fullscreen', () => {
+    setMainMenu();
+    setFileMenu();
+  });
+
   $sidebar.onshow = function () {
     const activeFile = editorManager.activeFile;
     if (activeFile) editorManager.editor.blur();
@@ -466,4 +468,48 @@ function onClickApp(e) {
 function mainPageOnShow() {
   const { editor } = editorManager;
   editor.resize(true);
+}
+
+function createMainMenu({ top, bottom, toggler }) {
+  return contextmenu({
+    right: '6px',
+    top,
+    bottom,
+    toggler,
+    transformOrigin: top ? 'top right' : 'bottom right',
+    innerHTML: () => {
+      return mustache.render($_menu, strings);
+    },
+  });
+}
+
+function createFileMenu({ top, bottom, toggler }) {
+  const $menu = contextmenu({
+    top,
+    bottom,
+    toggler,
+    transformOrigin: top ? 'top right' : 'bottom right',
+    innerHTML: () => {
+      const file = editorManager.activeFile;
+
+      if (file.loading) {
+        $menu.classList.add('disabled');
+      } else {
+        $menu.classList.remove('disabled');
+      }
+
+      return mustache.render($_fileMenu, {
+        ...strings,
+        file_mode: (file.session.getMode().$id || '').split('/').pop(),
+        file_encoding: file.encoding,
+        file_read_only: !file.editable,
+        file_info: !!file.uri,
+        file_eol: file.eol,
+        copy_text: !!editorManager.editor.getCopyText(),
+        new_file: file.name === constants.DEFAULT_FILE_NAME && !file.session.getValue(),
+      });
+    },
+  });
+
+  return $menu;
 }

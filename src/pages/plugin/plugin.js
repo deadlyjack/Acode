@@ -10,7 +10,8 @@ import settingsPage from '../../components/settingPage';
 import constants from '../../lib/constants';
 import purchaseListner from '../../handlers/purchase';
 import ajax from '@deadlyjack/ajax';
-import alert from '../../components/dialogboxes/alert';
+import alert from '../../components/dialogs/alert';
+import loader from 'components/dialogs/loader';
 
 export default async function PluginInclude(id, installed, onInstall, onUninstall) {
   installed = typeof installed !== 'boolean' ? installed === 'true' : installed;
@@ -34,7 +35,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
   $page.onhide = function () {
     helpers.hideAd();
     actionStack.remove('plugin');
-    helpers.removeTitleLoader();
+    loader.removeTitleLoader();
     cancelled = true;
   };
 
@@ -66,9 +67,8 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
 
     await (async () => {
       try {
-        helpers.showTitleLoader();
         if (await helpers.checkAPIStatus() && (isValidSource(plugin.source))) {
-          helpers.showTitleLoader();
+          loader.showTitleLoader();
           const remotePlugin = await fsOperation(constants.API_BASE, `plugin/${id}`)
             .readFile('json')
             .catch(() => null);
@@ -100,7 +100,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       } catch (error) {
         console.error(error);
       } finally {
-        helpers.removeTitleLoader();
+        loader.removeTitleLoader();
       }
     })();
 
@@ -111,7 +111,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
     helpers.error(err);
   } finally {
     helpers.hideAd();
-    helpers.removeTitleLoader();
+    loader.removeTitleLoader();
   }
 
   async function install() {

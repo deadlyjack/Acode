@@ -1,4 +1,3 @@
-import helpers from 'utils/helpers';
 import list from 'components/collapsableList';
 import ScrollBar from 'components/scrollbar';
 import touchListeners from 'ace/touchHandler';
@@ -39,6 +38,9 @@ async function EditorManager($header, $body) {
     'add-folder': [],
     'remove-folder': [],
     'update': [],
+    'new-file': [],
+    'remove-file': [],
+    'int-open-file-list': [],
     emit(event, ...args) {
       if (!events[event]) return;
       events[event].forEach((fn) => fn(...args));
@@ -68,6 +70,8 @@ async function EditorManager($header, $body) {
     getFile,
     switchFile,
     hasUnsavedFiles,
+    getEditorHeight,
+    getEditorWidth,
     header: $header,
     container: $container,
     get openFileList() {
@@ -336,6 +340,8 @@ async function EditorManager($header, $body) {
     const contentBottom = contentTop + $container.clientHeight;
     let cursorTop = renderer.textToScreenCoordinates(cursorPos.row, cursorPos.column).pageY;
 
+    if (cursorTop === 0) return true;
+
     cursorTop -= appSettings.value.teardropSize + 10;
 
     return cursorTop >= contentTop && cursorTop <= contentBottom;
@@ -348,7 +354,7 @@ async function EditorManager($header, $body) {
   function onscrollV(value) {
     preventScrollbarV = true;
     const session = editor.getSession();
-    const editorHeight = helpers.getEditorHeight(editor);
+    const editorHeight = getEditorHeight(editor);
     const scroll = editorHeight * value;
 
     session.setScrollTop(scroll);
@@ -366,7 +372,7 @@ async function EditorManager($header, $body) {
   function onscrollH(value) {
     preventScrollbarH = true;
     const session = editor.getSession();
-    const editorWidth = helpers.getEditorWidth(editor);
+    const editorWidth = getEditorWidth(editor);
     const scroll = editorWidth * value;
 
     session.setScrollLeft(scroll);
@@ -384,7 +390,7 @@ async function EditorManager($header, $body) {
   function onscrollleft(render = true) {
     if (preventScrollbarH) return;
     const session = editor.getSession();
-    const editorWidth = helpers.getEditorWidth(editor);
+    const editorWidth = getEditorWidth(editor);
     const factor = (session.getScrollLeft() / editorWidth).toFixed(2);
 
     $hScrollbar.value = factor;
@@ -399,7 +405,7 @@ async function EditorManager($header, $body) {
   function onscrolltop(render = true) {
     if (preventScrollbarV) return;
     const session = editor.getSession();
-    const editorHeight = helpers.getEditorHeight(editor);
+    const editorHeight = getEditorHeight(editor);
     const factor = (session.getScrollTop() / editorHeight).toFixed(2);
 
     $vScrollbar.value = factor;
@@ -471,9 +477,9 @@ async function EditorManager($header, $body) {
 
     if ($openFileList) {
       if ($openFileList.classList.contains('collaspable')) {
-        $list = [...$openFileList.$ul.children];
+        $list = Array.from($openFileList.$ul.children);
       } else {
-        $list = [...$openFileList.children];
+        $list = Array.from($openFileList.children);
       }
       $openFileList.remove();
     }
@@ -490,7 +496,7 @@ async function EditorManager($header, $body) {
       if ($list) $openFileList.append(...$list);
 
       if (openFileListPos === appSettings.OPEN_FILE_LIST_POS_BOTTOM) {
-        $container.insertAdjacentElement('afterend', $openFileList);
+        $container.parentElement.insertAdjacentElement('afterend', $openFileList);
       } else {
         $header.insertAdjacentElement('afterend', $openFileList);
       }
@@ -503,18 +509,22 @@ async function EditorManager($header, $body) {
       };
     } else {
       $openFileList = list(strings['active files']);
+      $openFileList.classList.add('file-list');
       if ($list) $openFileList.$ul.append(...$list);
-      const files = sidebarApps.get('files');
-      files.insertBefore($openFileList, files.firstElementChild);
-      root.classList.remove('top-bar');
+      $openFileList.uncollapse();
 
       const oldAppend = $openFileList.$ul.append;
       $openFileList.append = (...args) => {
         oldAppend.apply($openFileList.$ul, args);
       };
+
+      const files = sidebarApps.get('files');
+      files.insertBefore($openFileList, files.firstElementChild);
+      root.classList.remove('top-bar');
     }
 
     root.setAttribute('open-file-list-pos', openFileListPos);
+    manager.emit('int-open-file-list', openFileListPos);
   }
 
   function hasUnsavedFiles() {
@@ -544,6 +554,34 @@ async function EditorManager($header, $body) {
           return false;
       }
     });
+  }
+
+  /**
+   * Gets the height of the editor
+   * @param {AceAjax.Editor} editor 
+   * @returns 
+   */
+  function getEditorHeight(editor) {
+    const { renderer, session } = editor;
+    const offset = (renderer.$size.scrollerHeight + renderer.lineHeight) * 0.5;
+    const editorHeight = session.getScreenLength() * renderer.lineHeight - offset;
+    return editorHeight;
+  }
+
+  /**
+   * Gets the height of the editor
+   * @param {AceAjax.Editor} editor 
+   * @returns 
+   */
+  function getEditorWidth(editor) {
+    const { renderer, session } = editor;
+    const offset = renderer.$size.scrollerWidth - renderer.characterWidth;
+    const editorWidth = session.getScreenWidth() * renderer.characterWidth - offset;
+    if (appSettings.value.textWrap) {
+      return editorWidth;
+    } else {
+      return editorWidth + appSettings.value.leftMargin;
+    }
   }
 }
 

@@ -85,7 +85,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
     const menuOption = {
       top: '8px',
       right: '8px',
-      toggle: $menuToggler,
+      toggler: $menuToggler,
       transformOrigin: 'top right',
     };
     const $fbMenu = contextmenu({
@@ -108,7 +108,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           return mustache.render(_addMenu, strings);
         }
       },
-      ...((menuOption.toggle = $addMenuToggler) && menuOption),
+      ...((menuOption.toggler = $addMenuToggler) && menuOption),
     });
     const progress = {};
     let cachedDir = {};
@@ -173,7 +173,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         const onshow = () => {
           $page.off('show', onshow);
           reload();
-        }
+        };
         $page.on('show', onshow);
         return;
       }

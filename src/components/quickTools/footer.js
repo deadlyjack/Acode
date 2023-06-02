@@ -113,7 +113,7 @@ export function RowItem({ icon, letters, action, value, ref, repeate }) {
 
   if (typeof value === 'function') {
     $item.value = value;
-  } else {
+  } else if (value !== undefined) {
     $item.dataset.value = value;
   }
 

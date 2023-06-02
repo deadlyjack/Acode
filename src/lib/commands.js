@@ -23,9 +23,37 @@ import appSettings from './settings';
 import Sidebar from '../components/sidebar';
 
 export default {
-  'close-all-tabs'() {
-    editorManager.files.forEach((file) => {
-      file.remove();
+  async 'close-all-tabs'() {
+    let save = false;
+    const unsavedFiles = editorManager.files.filter((file) => file.isUnsaved).length;
+    if (unsavedFiles) {
+      const confirmation = await dialogs.confirm(strings['warning'], strings['unsaved files warning']);
+      if (!confirmation) return;
+      const option = await dialogs.select(strings['select'], [
+        ['save', strings['save all']],
+        ['close', strings['close all']],
+        ['cancel', strings['cancel']],
+      ]);
+      if (option === 'cancel') return;
+
+      if (option === 'save') {
+        const doSave = await dialogs.confirm(strings['warning'], strings['save all warning']);
+        if (!doSave) return;
+        save = true;
+      } else {
+        const doClose = await dialogs.confirm(strings['warning'], strings['close all warning']);
+        if (!doClose) return;
+      }
+    }
+
+    editorManager.files.forEach(async (file) => {
+      if (save) {
+        await file.save();
+        file.remove();
+        return;
+      }
+
+      file.remove(true);
     });
   },
   'close-current-tab'() {
@@ -112,7 +140,7 @@ export default {
           filename = helpers.fixFilename(filename);
           new EditorFile(filename, {
             isUnsaved: false,
-          })
+          });
         }
       })
       .catch((err) => {

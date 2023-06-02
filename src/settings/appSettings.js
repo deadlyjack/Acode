@@ -9,6 +9,7 @@ import settingsPage from '../components/settingPage';
 import lang from '../lib/lang';
 import appSettings from '../lib/settings';
 import actions from '../handlers/quickTools';
+import { resetKeyBindings } from 'ace/commands';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -154,7 +155,7 @@ export default function otherSettings() {
           actionStack.pop();
           openFile(KEYBINDING_FILE);
         } else {
-          helpers.resetKeyBindings();
+          resetKeyBindings();
         }
         return;
       }

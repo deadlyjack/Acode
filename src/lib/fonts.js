@@ -1,3 +1,4 @@
+import loader from 'components/dialogs/loader';
 import fsOperation from '../fileSystem';
 import helpers from '../utils/helpers';
 import Url from '../utils/Url';
@@ -106,7 +107,7 @@ function getNames() {
 }
 
 async function setFont(name) {
-  helpers.showTitleLoader();
+  loader.showTitleLoader();
   try {
     const $style = tag.get('style#font-style') ?? <style id="font-style"></style>;
     let css = get(name);
@@ -135,7 +136,7 @@ async function setFont(name) {
     toast(`${name} font not found`, 'error');
     setFont('Roboto Mono');
   } finally {
-    helpers.removeTitleLoader();
+    loader.removeTitleLoader();
   }
 }
 
@@ -161,4 +162,4 @@ export default {
   get,
   getNames,
   setFont,
-}
+};

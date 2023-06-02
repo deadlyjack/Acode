@@ -8,22 +8,27 @@ let currentSection = localStorage.getItem(SIDRBAR_APPS_LAST_SECTION);
 
 /**@type {Map<string, HTMLElement>} */
 const contents = new Map();
+/**@type {Map<string, (container:HTMLElement)=>void>} */
+const onselect = new Map();
 
 /**
- * @param {string} icon
- * @param {string} id
- * @param {HTMLElement} el
- * @param {string} title
+ * @param {string} icon icon of the app
+ * @param {string} id id of the app
+ * @param {HTMLElement} el element to show in sidebar
+ * @param {string} title title of the app
  * @param {(container:HTMLElement)=>void} initFunction
+ * @param {boolean} prepend weather to show this app at the top of the sidebar or not
+ * @param {(container:HTMLElement)=>void} onseleted
  * @returns {void}
  */
-function add(icon, id, title, initFunction, prepend) {
+function add(icon, id, title, initFunction, prepend, onseleted) {
   const container = <div className='container'></div>;
   contents.set(id, container);
-
+  if (onseleted) onselect.set(id, onseleted);
   if (!currentSection) currentSection = id;
 
   if (currentSection === id) {
+    onselect.get(id)?.(container);
     $sidebar.replaceChild(container, getContainer());
   }
 
@@ -44,71 +49,43 @@ function add(icon, id, title, initFunction, prepend) {
 }
 
 /**
-
  * Removes a sidebar app with the given ID.
-
  * @param {string} id - The ID of the sidebar app to remove.
-
  * @returns {void}
-
  */
-
 function removeApp(id) {
+  if (!contents.has(id)) return;
 
-  if (contents.has(id)) {
+  const appIcon = $sidebar.get(`.icon#${id}`);
+  appIcon?.remove();
 
-    const appIcon = $sidebar.querySelector(`.icon#${id}`);
+  const container = contents.get(id);
+  container?.remove();
+  contents.delete(id);
 
-    if (appIcon) {
+  if (currentSection !== id) return;
 
-      appIcon.remove();
+  const firstApp = $sidebar.querySelector('.icon');
+  if (firstApp) {
+    const newSectionId = firstApp.id;
+    const newContainer = contents.get(newSectionId);
 
-    }
-
-    const container = contents.get(id);
-
-    if (container) {
-
-      container.remove();
-
-    }
-
-    contents.delete(id);
-
-    if (currentSection === id) {
-
-      const firstApp = $sidebar.querySelector('.icon');
-
-      if (firstApp) {
-
-        const newSectionId = firstApp.id;
-
-        currentSection = newSectionId;
-
-        localStorage.setItem(SIDRBAR_APPS_LAST_SECTION, newSectionId);
-
-        const newContainer = contents.get(newSectionId);
-
-        $sidebar.replaceChild(newContainer, getContainer());
-
-        firstApp.classList.add('active');
-
-      } else {
-
-        currentSection = null;
-
-        localStorage.removeItem(SIDRBAR_APPS_LAST_SECTION);
-
-        $sidebar.removeChild(getContainer());
-
-      }
-
-    }
-
+    currentSection = newSectionId;
+    localStorage.setItem(SIDRBAR_APPS_LAST_SECTION, newSectionId);
+    $sidebar.replaceChild(newContainer, getContainer());
+    firstApp.classList.add('active');
+    return;
   }
 
+  currentSection = null;
+  localStorage.removeItem(SIDRBAR_APPS_LAST_SECTION);
+  getContainer()?.remove();
 }
 
+/**
+ * Initialize sidebar apps
+ * @param {HTMLElement} $el 
+ */
 function init($el) {
   $sidebar = $el;
   $apps = $sidebar.get('.apps');
@@ -138,11 +115,11 @@ function Icon({ icon, id, title }) {
     currentSection = id;
 
     $sidebar.replaceChild(content, currentContent);
-
     $sidebar.get('.apps .active')
       .classList.remove('active');
 
     this.classList.add('active');
+    onselect.get(id)?.(content);
   };
   return <span
     onclick={onclick}

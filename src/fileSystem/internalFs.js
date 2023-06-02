@@ -2,6 +2,19 @@ import ajax from '@deadlyjack/ajax';
 import helpers from '../utils/helpers';
 import Url from '../utils/Url';
 
+const { resolveLocalFileSystemURL } = window;
+
+window.resolveLocalFileSystemURL = (url, success, error) => {
+  const onError = (err) => {
+    if (err.code) {
+      err.message = getErrorMessage(err.code);
+    }
+    error(err);
+  };
+
+  resolveLocalFileSystemURL(url, success, onError);
+};
+
 const fs = {
   /**
    *
@@ -279,5 +292,41 @@ const fs = {
     });
   },
 };
+
+/**
+ * Get error message for file error code
+ * @param {number} code
+ * @returns {string}
+ */
+export function getErrorMessage(code) {
+  switch (code) {
+    case 1:
+      return 'Path not found';
+    case 2:
+      return 'Security error';
+    case 3:
+      return 'Action aborted';
+    case 4:
+      return 'File not readable';
+    case 5:
+      return 'File encoding error';
+    case 6:
+      return 'Modification not allowed';
+    case 7:
+      return 'Invalid state';
+    case 8:
+      return 'Syntax error';
+    case 9:
+      return 'Invalid modification';
+    case 10:
+      return 'Quota exceeded';
+    case 11:
+      return 'Type mismatch';
+    case 12:
+      return 'Path already exists';
+    default:
+      return 'Uncaught error';
+  }
+}
 
 export default fs;

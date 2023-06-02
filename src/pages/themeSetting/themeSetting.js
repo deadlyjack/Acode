@@ -1,14 +1,14 @@
 import './themeSetting.scss';
-import Page from '../../components/page';
-import searchBar from '../../components/searchbar';
-import CustomTheme from '../customTheme';
-import helpers from '../../utils/helpers';
-import removeAds from '../../lib/removeAds';
-import themes from '../../lib/themes';
-import appSettings from '../../lib/settings';
-import TabView from '../../components/tabView';
 import Ref from 'html-tag-js/ref';
-import ThemeBuilder from '../../lib/themeBuilder';
+import Page from 'components/page';
+import searchBar from 'components/searchbar';
+import CustomTheme from 'pages/customTheme';
+import helpers from 'utils/helpers';
+import removeAds from 'lib/removeAds';
+import themes from 'lib/themes';
+import appSettings from 'lib/settings';
+import ThemeBuilder from 'lib/themeBuilder';
+import TabView from 'components/tabView';
 
 export default function () {
   const $page = Page(strings.theme.capitalize());
@@ -67,7 +67,7 @@ export default function () {
             <span className='text'>{strings['unsupported device']}</span>
           </div>
         </div>
-      )
+      );
     }
 
     const currentTheme = appSettings.value.appTheme;
@@ -109,7 +109,7 @@ export default function () {
         isCurrent={isCurrent}
         isDark={theme.isDark}
         onclick={() => setEditorTheme(theme)}
-      />
+      />;
       if (isCurrent) $currentItem = $item;
       return $item;
     });
@@ -152,12 +152,12 @@ export default function () {
       }
     }
 
-    if (theme.name === 'custom') {
+    if (theme.id === 'custom') {
       CustomTheme();
       return;
     }
 
-    themes.apply(theme.name, true);
+    themes.apply(theme.id, true);
     updateCheckedItem(theme.name);
   }
 

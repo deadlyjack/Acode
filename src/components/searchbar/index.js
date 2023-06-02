@@ -71,7 +71,7 @@ function searchBar($list, setHide) {
    * @this {HTMLInputElement}
    */
   function search() {
-    const val = helpers.removeLineBreaks(this.value).toLowerCase();
+    const val = this.value.toLowerCase();
     const result = [];
 
     children.map((child) => {

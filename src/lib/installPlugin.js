@@ -72,7 +72,7 @@ export default async function installPlugin(id, name, purchaseToken) {
 
         const fileUrl = Url.join(pluginDir, correctFile);
         if (!await fsOperation(fileUrl).exists()) {
-          await helpers.createFileRecursive(pluginDir, correctFile);
+          await createFileRecursive(pluginDir, correctFile);
         }
 
         if (correctFile.endsWith('/')) return;
@@ -98,5 +98,34 @@ export default async function installPlugin(id, name, purchaseToken) {
     throw err;
   } finally {
     loader.destroy();
+  }
+}
+
+/**
+ * Create directory recursively 
+ * @param {string} parent 
+ * @param {Array<string> | string} dir 
+ */
+async function createFileRecursive(parent, dir) {
+  let isDir = false;
+  if (typeof dir === 'string') {
+    if (dir.endsWith('/')) {
+      isDir = true;
+      dir = dir.slice(0, -1);
+    }
+    dir = dir.split('/');
+  }
+  dir = dir.filter(d => d);
+  const cd = dir.shift();
+  const newParent = Url.join(parent, cd);
+  if (!(await fsOperation(newParent).exists())) {
+    if (dir.length || isDir) {
+      await fsOperation(parent).createDirectory(cd);
+    } else {
+      await fsOperation(parent).createFile(cd);
+    }
+  }
+  if (dir.length) {
+    await createFileRecursive(newParent, dir);
   }
 }

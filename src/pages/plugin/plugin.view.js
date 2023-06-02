@@ -1,5 +1,5 @@
 import Ref from 'html-tag-js/ref';
-import alert from '../../components/dialogboxes/alert';
+import alert from '../../components/dialogs/alert';
 import fsOperation from '../../fileSystem';
 import constants from '../../lib/constants';
 import Url from '../../utils/Url';
@@ -57,7 +57,7 @@ export default (props) => {
     </div>
     <div className="body md" innerHTML={body}></div>
   </div>;
-}
+};
 
 function Buttons({ isPaid, installed, update, install, uninstall, purchased, price, buy }) {
   if (installed && update) {
@@ -86,7 +86,7 @@ function Buttons({ isPaid, installed, update, install, uninstall, purchased, pri
 }
 
 function Version({ currentVersion, version }) {
-  if (!currentVersion) return <span>v{version}</span>
+  if (!currentVersion) return <span>v{version}</span>;
   return <span>v{currentVersion}&nbsp;&#8594;&nbsp;v{version}</span>;
 }
 

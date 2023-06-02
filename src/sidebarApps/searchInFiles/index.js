@@ -7,10 +7,12 @@ import fsOperation from 'fileSystem';
 import openFile from 'lib/openFile';
 import addTouchListeners from 'ace/touchHandler';
 import defineMode from './searchResultMode';
+import Sidebar, { preventSlide } from 'components/sidebar';
 
 const workers = [];
 const results = [];
 const filesSearched = [];
+const filesReplaced = [];
 
 const $container = new Ref();
 const $regExp = new Ref();
@@ -72,11 +74,12 @@ const store = {
   },
 };
 
-const debounceSearch = debounce(searchFiles, 500);
+const debounceSearch = debounce(searchAll, 500);
 
 let useIncludeAndExclude = false;
 /**@type {AceAjax.Editor} */
 let searchResult = null;
+let replacing = false;
 
 addEventListener($regExp, 'change', onInput);
 addEventListener($wholeWord, 'change', onInput);
@@ -85,6 +88,7 @@ addEventListener($search, 'input', onInput);
 addEventListener($include, 'input', onInput);
 addEventListener($exclude, 'input', onInput);
 addEventListener($btnReplaceAll, 'click', replaceAll);
+
 $container.onref = ($el) => {
   searchResult = ace.edit($el, {
     readOnly: true,
@@ -99,8 +103,9 @@ $container.onref = ($el) => {
   searchResult.session.setUseWrapMode(true);
 };
 
-editorManager.on('add-folder', onInput);
-editorManager.on('remove-folder', onInput);
+preventSlide((target) => {
+  return $container.el?.contains(target);
+});
 
 export default [
   'search',
@@ -135,8 +140,12 @@ export default [
         </Details>
       </div>
       <span ref={$resultOverview} className='search-result' innerHTML={searchResultText(0, 0)}></span>
-      <div ref={$container} className='editor-container' ></div>
+      <div ref={$container} className='search-in-file-editor editor-container' ></div>
     </>;
+  },
+  false, // show as first item
+  () => {
+    searchResult?.resize(true);
   }
 ];
 
@@ -206,8 +215,9 @@ async function onWorkerMessage(e) {
 
     case 'replace-result': {
       const { file, text } = data;
+      filesReplaced.push(file);
       openFile(file.url, {
-        render: true,
+        render: filesSearched.length === filesReplaced.length,
         text,
       });
       break;
@@ -221,6 +231,8 @@ async function onWorkerMessage(e) {
       }
 
       $resultOverview.classList.remove('loading');
+      terminateWorker(false);
+      replacing = false;
       break;
     }
 
@@ -232,6 +244,7 @@ async function onWorkerMessage(e) {
       }
 
       $resultOverview.classList.remove('loading');
+      terminateWorker(false);
       break;
     }
 
@@ -246,7 +259,7 @@ async function onWorkerMessage(e) {
  * @param {InputEvent} e 
  */
 function onInput(e) {
-  if (!searchResult) return;
+  if (!searchResult || replacing) return;
 
   const { target } = e || {};
 
@@ -277,18 +290,25 @@ function onInput(e) {
   searchResult.setValue('');
   $resultOverview.classList.remove('loading');
   debounceSearch();
+  removeEvents();
 }
 
-function searchFiles() {
-  const options = getOptions();
-  const search = $search.value.trim();
+async function searchAll() {
+  const search = $search.value;
   if (!search) return;
+
+  addEvents();
+
+  const allFiles = files();
+  if (!allFiles.length) return;
+
+  const options = getOptions();
   const regex = toRegex(search, options);
   if (!regex) return;
 
   setMode();
   $resultOverview.classList.add('loading');
-  sendMessage('search-files', files(), regex, options);
+  sendMessage('search-files', allFiles, regex, options);
 }
 
 /**
@@ -297,13 +317,16 @@ function searchFiles() {
  */
 async function replaceAll() {
   terminateWorker();
-  const search = $search.value.trim();
-  const replace = $replace.value.trim();
+  filesReplaced.length = 0;
+
+  const search = $search.value;
+  const replace = $replace.value;
   const options = getOptions();
   if (!search || !replace) return;
   const regex = toRegex(search, options);
   if (!regex) return;
 
+  replacing = true;
   $resultOverview.classList.add('loading');
   sendMessage('replace-files', filesSearched, regex, options, replace);
 }
@@ -349,11 +372,15 @@ function onErrorMessage(e) {
 /**
  * Terminates the existing Web Workers, if any, and then initializes new ones.
  * Also sets the onmessage and onerror handlers for these workers.
+ * @param {boolean} [initializeNewWorkers=true] - Whether to initialize new workers after terminating the existing ones.
  */
-function terminateWorker() {
-  const len = navigator.hardwareConcurrency - 1 || 2;
+function terminateWorker(initializeNewWorkers = true) {
   workers.forEach(worker => worker.terminate());
   workers.length = 0;
+
+  if (!initializeNewWorkers) return;
+
+  const len = navigator.hardwareConcurrency - 1 || 2;
 
   for (let i = 0; i < len; i++) {
     const worker = getWorker();
@@ -578,7 +605,7 @@ function setMode() {
   const { session } = searchResult;
 
   const options = getOptions();
-  const regex = toRegex($search.value.trim(), options, true);
+  const regex = toRegex($search.value, options, true);
   session.$modes[MODE] = null;
   defineMode(regex, options.caseSensitive);
   session.setMode('ace/mode/text');
@@ -595,7 +622,7 @@ async function onCursorChange() {
   const { file, position } = result;
   const { url } = filesSearched[file];
 
-  actionStack.pop();
+  Sidebar.hide();
   await openFile(url, { render: true });
 
   if (position) {
@@ -604,4 +631,37 @@ async function onCursorChange() {
     editor.selection.setRange(position);
     editor.centerSelection();
   }
+}
+
+/**
+ * When a file is added or removed from the file list
+ * @param {import('lib/fileList').Tree} tree 
+ */
+function onFileUpdate(tree) {
+  if (!tree || tree?.children) return;
+  onInput();
+}
+
+/**
+ * Add event listeners to file changes
+ */
+function addEvents() {
+  files.on('add-file', onFileUpdate);
+  files.on('remove-file', onFileUpdate);
+  files.on('add-folder', onInput);
+  files.on('remove-folder', onInput);
+  editorManager.on('rename-file', onInput);
+  editorManager.on('file-content-changed', onInput);
+}
+
+/**
+ * Remove event listeners to file changes
+ */
+function removeEvents() {
+  files.off('add-file', onFileUpdate);
+  files.off('remove-file', onFileUpdate);
+  files.off('add-folder', onInput);
+  files.off('remove-folder', onInput);
+  editorManager.off('rename-file', onInput);
+  editorManager.off('file-content-changed', onInput);
 }

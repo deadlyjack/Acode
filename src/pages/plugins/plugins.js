@@ -53,16 +53,15 @@ export default function PluginsInclude(updates) {
   $page.onhide = function () {
     helpers.hideAd();
     actionStack.remove('plugins');
-    helpers.removeTitleLoader();
   };
 
   $page.onconnect = () => {
     $currList.scrollTop = $currList._scroll || 0;
-  }
+  };
 
   $page.onwilldisconnect = () => {
     $currList._scroll = $currList.scrollTop;
-  }
+  };
 
   $page.onclick = handleClick;
 

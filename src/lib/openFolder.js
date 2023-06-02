@@ -1,19 +1,19 @@
 import URLParse from 'url-parse';
 import escapeStringRegexp from 'escape-string-regexp';
-import fsOperation from '../fileSystem';
-import collapsableList from '../components/collapsableList';
-import helpers from '../utils/helpers';
-import dialogs from '../components/dialogs';
-import tile from '../components/tile';
-import constants from './constants';
+import fsOperation from 'fileSystem';
+import collapsableList from 'components/collapsableList';
+import dialogs from 'components/dialogs';
+import tile from 'components/tile';
+import Sidebar from 'components/sidebar';
+import helpers from 'utils/helpers';
+import Path from 'utils/Path';
+import Url from 'utils/Url';
+import FileBrowser from 'pages/fileBrowser';
+import sidebarApps from 'sidebarApps';
 import recents from './recents';
-import Path from '../utils/Path';
+import constants from './constants';
 import openFile from './openFile';
-import Url from '../utils/Url';
-import FileBrowser from '../pages/fileBrowser';
 import appSettings from './settings';
-import sidebarApps from '../sidebarApps';
-import Sidebar from '../components/sidebar';
 import * as FileList from './fileList';
 
 /**
@@ -40,7 +40,7 @@ function openFolder(_path, opts = {}) {
 
   const listState = opts.listState || {};
   const title = opts.name || getTitle();
-  const $root = collapsableList(title, !listState[_path], 'folder', {
+  const $root = collapsableList(title, 'folder', {
     tail: <Tail target={() => $root.$title} />,
     allCaps: true,
     ontoggle: expandList,
@@ -70,12 +70,13 @@ function openFolder(_path, opts = {}) {
   $root.$title.data_url = _path;
   $root.$title.data_name = title;
 
-  $root.$ul.onclick =
-    $root.$ul.oncontextmenu =
-    $root.$title.onclick =
-    $root.$title.oncontextmenu =
-    handleItems;
+  $root.$ul.onclick
+    = $root.$ul.oncontextmenu
+    = $root.$title.onclick
+    = $root.$title.oncontextmenu
+    = handleItems;
 
+  if (listState[_path]) $root.uncollapse();
   addedFolder.push(folder);
   recents.addFolder(_path, opts);
   sidebarApps.get('files').append($root);
@@ -591,7 +592,7 @@ function openFolder(_path, opts = {}) {
   }
 
   function createFolderTile(name, url) {
-    const $list = collapsableList(name, !listState[url], 'folder', {
+    const $list = collapsableList(name, 'folder', {
       tail: <Tail target={() => $list.$title} />,
       ontoggle: expandList,
     });

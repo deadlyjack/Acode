@@ -15,6 +15,8 @@ const filesTree = {};
 const events = {
   'add-file': [],
   'remove-file': [],
+  'add-folder': [],
+  'remove-folder': [],
 };
 
 export function initFileList() {
@@ -33,6 +35,7 @@ export async function append(parent, child) {
   if (!tree) return;
   const childTree = await Tree(child, tree.root || parent);
   tree.children?.push(childTree);
+  emit('add-file', childTree);
 }
 
 /**
@@ -165,10 +168,22 @@ async function onAddFolder(folder) {
     const tree = await Tree(folder, '');
     getAllFiles(tree.children, folder);
     filesTree[folder] = tree;
+    emit('add-folder', tree);
   } catch (error) {
     // ignore
     console.error(error);
   }
+}
+
+/**
+ * Called when a folder is removed
+ * @param {string} folder - Folder path 
+ */
+function onRemoveFolder(folder) {
+  const tree = filesTree[folder];
+  if (!tree) return;
+  delete filesTree[folder];
+  emit('remove-folder', tree);
 }
 
 /**
@@ -189,20 +204,6 @@ async function Tree(url, root, name, isDirectory) {
     tree.children = [];
   }
   return tree;
-}
-
-/**
- * Called when a folder is removed
- * @param {string} folder - Folder path 
- */
-function onRemoveFolder(folder) {
-  const tree = filesTree[folder];
-  if (!tree) return;
-  delete filesTree[folder];
-  const files = flattenTree(tree);
-  files.forEach((file) => {
-    emit('remove-file', file);
-  });
 }
 
 /**
