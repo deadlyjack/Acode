@@ -24,6 +24,7 @@ const $wholeWord = new Ref();
 const $caseSensitive = new Ref();
 const $btnReplaceAll = new Ref();
 const $resultOverview = new Ref();
+const $progress = <>0</>;
 
 const resultOverview = {
   filesCount: 0,
@@ -139,7 +140,9 @@ export default [
           <input value={store.include} ref={$include} type='search' name='include' placeholder={strings['include files']} />
         </Details>
       </div>
-      <span ref={$resultOverview} className='search-result' innerHTML={searchResultText(0, 0)}></span>
+      <div className='search-result'>
+        <span ref={$resultOverview} innerHTML={searchResultText(0, 0)}></span> ({$progress}%)
+      </div>
       <div ref={$container} className='search-in-file-editor editor-container' ></div>
     </>;
   },
@@ -230,7 +233,7 @@ async function onWorkerMessage(e) {
         break;
       }
 
-      $resultOverview.classList.remove('loading');
+      stopLoading();
       terminateWorker(false);
       replacing = false;
       break;
@@ -243,8 +246,15 @@ async function onWorkerMessage(e) {
         break;
       }
 
-      $resultOverview.classList.remove('loading');
+      stopLoading();
       terminateWorker(false);
+      break;
+    }
+
+    case 'progress': {
+      e.target.progress = data;
+      const progress = Math.round(workers.reduce((acc, { progress = 0 }) => acc + progress, 0) / workers.length);
+      $progress.value = progress;
       break;
     }
 
@@ -288,9 +298,10 @@ function onInput(e) {
   filesSearched.length = 0;
   resultOverview.reset();
   searchResult.setValue('');
-  $resultOverview.classList.remove('loading');
+  stopLoading();
   debounceSearch();
   removeEvents();
+  $progress.value = 0;
 }
 
 async function searchAll() {
@@ -300,14 +311,17 @@ async function searchAll() {
   addEvents();
 
   const allFiles = files();
-  if (!allFiles.length) return;
+  if (!allFiles.length) {
+    $progress.value = 100;
+    return;
+  }
 
   const options = getOptions();
   const regex = toRegex(search, options);
   if (!regex) return;
 
   setMode();
-  $resultOverview.classList.add('loading');
+  startLoading();
   sendMessage('search-files', allFiles, regex, options);
 }
 
@@ -327,7 +341,7 @@ async function replaceAll() {
   if (!regex) return;
 
   replacing = true;
-  $resultOverview.classList.add('loading');
+  startLoading();
   sendMessage('replace-files', filesSearched, regex, options, replace);
 }
 
@@ -664,4 +678,12 @@ function removeEvents() {
   files.off('remove-folder', onInput);
   editorManager.off('rename-file', onInput);
   editorManager.off('file-content-changed', onInput);
+}
+
+function startLoading() {
+  $resultOverview.el.parentElement.classList.add('loading');
+}
+
+function stopLoading() {
+  $resultOverview.el.parentElement.classList.remove('loading');
 }

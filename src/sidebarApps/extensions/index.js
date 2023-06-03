@@ -41,13 +41,13 @@ export default [
     if (!$explor) {
       $explor = collapsableList(strings['explore']);
       $explor.ontoggle = loadExplore;
-      $explor.uncollapse();
       container.append($explor);
     }
 
     if (!$installed) {
       $installed = collapsableList(strings['installed']);
       $installed.ontoggle = loadInstalled;
+      $installed.uncollapse();
       container.append($installed);
     }
   }
@@ -88,6 +88,9 @@ async function loadInstalled() {
   if (this.collapsed) return;
 
   const plugins = await listInstalledPluings();
+  if (!plugins.length) {
+    $installed.collapse();
+  }
   $installed.$ul.content = plugins.map(ListItem);
   updateHeight($installed);
 }

@@ -49,18 +49,18 @@ function processFiles(data, mode = 'search') {
   */
   function processFile(file) {
     if (skip(file)) {
-      done(++count === total, mode);
+      done(++count / total, mode);
       return;
     }
 
     getFile(file.url, (res, err) => {
       if (err) {
-        done(++count === total, mode);
+        done(++count / total, mode);
         throw err;
       }
 
       process({ file, content: res, search, replace, options });
-      done(++count === total, mode);
+      done(++count / total, mode);
     });
   }
 }
@@ -200,14 +200,19 @@ function getFile(url, cb) {
 /**
  * Sends a message to the main thread to indicate that the worker is done searching
  * or replacing.
- * @param {boolean} condition
+ * @param {boolean} ratio
  * @param {'search'|'replace'} mode
  */
-function done(condition, mode) {
-  if (condition) {
+function done(ratio, mode) {
+  if (ratio === 1) {
     let verb = mode === 'search' ? 'searching' : 'replacing';
     self.postMessage({
       action: `done-${verb}`,
+    });
+  } else {
+    self.postMessage({
+      action: 'progress',
+      data: Math.ceil(ratio * 100),
     });
   }
 }
