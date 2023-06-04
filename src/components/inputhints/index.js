@@ -187,7 +187,7 @@ export default function inputhints($input, hints, onSelect) {
     }
 
     $ul.style.left = `${inputLeft}px`;
-    $ul.style.width = `calc(${client.width}px - var(--scrollbar-width))`;
+    $ul.style.width = `${client.width}px`;
   }
 
   /**

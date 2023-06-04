@@ -1,3 +1,4 @@
+import 'core-js/stable';
 import { minimatch } from 'minimatch';
 
 const resolvers = {};

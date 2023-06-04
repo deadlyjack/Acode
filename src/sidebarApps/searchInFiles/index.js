@@ -134,7 +134,9 @@ export default [
         </Details>
         <Details onexpand={(expanded) => {
           useIncludeAndExclude = expanded;
-          onInput();
+          if ($exclude.value || $include.value) {
+            onInput();
+          }
         }}>
           <Summary marker={false} className='extras'>...</Summary>
           <input value={store.exclude} ref={$exclude} type='search' name='exclude' placeholder={strings['exclude files']} />

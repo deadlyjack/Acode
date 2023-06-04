@@ -13,6 +13,11 @@
   background-color: inherit;
   box-shadow: 0 0 4px black;
 
+  &~#hints {
+    width: 90vw;
+    box-sizing: border-box;
+  }
+
   &~.mask {
     opacity: 0.4;
   }
