@@ -925,6 +925,9 @@ public class SDcard extends CordovaPlugin {
       OutputStream os = context
         .getContentResolver()
         .openOutputStream(uri, "wa");
+
+      if (os == null) return false;
+
       os.close(); // we don't actually want to write anything, so we close immediately
       canWrite = true;
     } catch (

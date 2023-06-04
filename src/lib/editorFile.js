@@ -906,7 +906,10 @@ export default class EditorFile {
     this.#emit('save', event);
 
     if (event.defaultPrevented) return Promise.resolve(false);
-    return saveFile(this, as);
+    return Promise.all([
+      this.writeToCache(),
+      saveFile(this, as)
+    ]);
   }
 
   #run(file) {
