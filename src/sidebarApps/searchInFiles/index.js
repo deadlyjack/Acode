@@ -140,7 +140,7 @@ export default [
           <input value={store.include} ref={$include} type='search' name='include' placeholder={strings['include files']} />
         </Details>
       </div>
-      <div className='search-result'>
+      <div className='search-result scroll'>
         <span ref={$resultOverview} innerHTML={searchResultText(0, 0)}></span> ({$progress}%)
       </div>
       <div ref={$container} className='search-in-file-editor editor-container' ></div>
@@ -233,6 +233,9 @@ async function onWorkerMessage(e) {
         break;
       }
 
+      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
+        window.iad.show();
+      }
       stopLoading();
       terminateWorker(false);
       replacing = false;
@@ -246,6 +249,16 @@ async function onWorkerMessage(e) {
         break;
       }
 
+      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
+        window.iad.show();
+      }
+
+      if (!results.length) {
+        searchResult.setGhostText(
+          strings['no result'],
+          { row: 0, column: 0 },
+        );
+      }
       stopLoading();
       terminateWorker(false);
       break;
@@ -295,30 +308,38 @@ function onInput(e) {
 
   terminateWorker();
   results.length = 0;
+  $progress.value = 0;
   filesSearched.length = 0;
   resultOverview.reset();
   searchResult.setValue('');
+  searchResult.setGhostText(strings['searching...'], { row: 0, column: 0 });
   stopLoading();
-  debounceSearch();
   removeEvents();
-  $progress.value = 0;
+  debounceSearch();
 }
 
 async function searchAll() {
   const search = $search.value;
-  if (!search) return;
+  if (!search) {
+    searchResult.removeGhostText();
+    return;
+  }
 
   addEvents();
 
   const allFiles = files();
   if (!allFiles.length) {
+    searchResult.removeGhostText();
     $progress.value = 100;
     return;
   }
 
   const options = getOptions();
   const regex = toRegex(search, options);
-  if (!regex) return;
+  if (!regex) {
+    searchResult.removeGhostText();
+    return;
+  }
 
   setMode();
   startLoading();

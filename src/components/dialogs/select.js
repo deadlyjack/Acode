@@ -44,9 +44,13 @@ function select(title, options, opts = {}) {
         text = option[1];
 
         if (option.length > 2 && typeof option[2] === 'string') {
-          lead = tag('i', {
-            className: `icon ${option[2]}`,
-          });
+          const icon = option[2];
+          if (icon === 'letters') {
+            const letters = option[4];
+            lead = <i className='icon letters' data-letters={letters}></i>;
+          } else {
+            lead = <i className={`icon ${icon}`}></i>;
+          }
         }
 
         option.map((o, i) => {

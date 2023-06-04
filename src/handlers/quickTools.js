@@ -22,7 +22,6 @@ const events = {
 
 /**
  * @typedef { 'shift' | 'alt' | 'ctrl' | 'meta' } QuickToolsEvent
- * 
  * @typedef {(value: boolean)=>void} QuickToolsEventListener
  */
 
@@ -45,9 +44,26 @@ quickTools.$input.addEventListener('input', (e) => {
   input.dispatchEvent(event);
 });
 
-// quickTools.$input.addEventListener('focus', () => {
-//   system.setInputType(appSettings.value.keyboardMode);
-// });
+quickTools.$input.addEventListener('keydown', (e) => {
+  const { keyCode, key, which } = e;
+  const keyCombination = getKeys({ keyCode, key, which });
+
+  if (!['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(keyCombination.key)) return;
+  e.preventDefault();
+
+  const event = createKeyboardEvent('keydown', keyCombination);
+  input = input || editorManager.editor.textInput.getElement();
+  input.dispatchEvent(event);
+});
+
+appSettings.on('update:quicktoolsItems:after', () => {
+  setTimeout(() => {
+    if (actionStack.has('search-bar')) return;
+    const { $footer, $row1, $row2 } = quickTools;
+    const height = getFooterHeight();
+    $footer.content = [$row1, $row2].slice(0, height);
+  }, 100);
+});
 
 export const key = {
   get shift() {
@@ -118,7 +134,9 @@ export default function actions(action, value) {
 
     case 'key': {
       const event = createKeyboardEvent('keydown', getKeys({ keyCode: value }));
-      resetKeys();
+      if (value > 40 && value < 37) {
+        resetKeys();
+      }
       setInput();
       input.dispatchEvent(event);
       return true;
@@ -137,11 +155,11 @@ export default function actions(action, value) {
       return true;
 
     case 'search-prev':
-      find(false, true);
+      find(1, true);
       return true;
 
     case 'search-next':
-      find(true, true);
+      find(1, false);
       return true;
 
     case 'search-settings':
@@ -163,8 +181,7 @@ export default function actions(action, value) {
 
 function setInput() {
   const { activeElement } = document;
-  if (
-    !activeElement
+  if (!activeElement
     || activeElement === quickTools.$input
     || activeElement === document.body
   ) return;
@@ -188,14 +205,17 @@ function toggleSearch() {
     $toggler.className = 'floating icon clearclose';
     $footer.content = [$searchRow1, $searchRow2];
     $searchInput.value = selectedText || '';
-    if (!selectedText) $searchInput.focus();
 
-    $searchInput.oninput = function () {
-      if (this.value) find(false, false);
+    $searchInput.oninput = function (e) {
+      if (this.value) find(0, false);
+    };
+
+    $searchInput.onsearch = function () {
+      if (this.value) find(1, false);
     };
 
     setFooterHeight(2);
-    find(false, false);
+    find(0, false);
 
     actionStack.push({
       id: 'search-bar',
@@ -210,13 +230,14 @@ function toggleSearch() {
     const inputValue = $searchInput?.value || '';
     if (inputValue !== selectedText) {
       $searchInput.value = selectedText;
-      $searchInput.focus();
-      find(false, false);
+      find(0, false);
       return;
     }
 
     actionStack.get('search-bar').action();
   }
+
+  $searchInput.focus();
   editor.resize(true);
 }
 

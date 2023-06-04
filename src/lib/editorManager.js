@@ -340,7 +340,7 @@ async function EditorManager($header, $body) {
     const contentBottom = contentTop + $container.clientHeight;
     let cursorTop = renderer.textToScreenCoordinates(cursorPos.row, cursorPos.column).pageY;
 
-    if (cursorTop === 0) return true;
+    if (cursorTop === contentTop) return true;
 
     cursorTop -= appSettings.value.teardropSize + 10;
 

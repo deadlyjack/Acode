@@ -5,6 +5,7 @@ import Url from '../utils/Url';
 import lang from './lang';
 import ThemeBuilder from './themeBuilder';
 import themes from './themes';
+
 /**
  * @typedef {object} fileBrowserSettings
  * @property {string} showHiddenFiles
@@ -25,6 +26,7 @@ class Settings {
   #initialized = false;
   #on = {
     update: [],
+    'update:after': [],
     reset: [],
   };
   #searchSettings = {
@@ -36,6 +38,13 @@ class Settings {
     showHiddenFiles: false,
     sortByName: true,
   };
+
+  QUICKTOOLS_ROWS = 2;
+  QUICKTOOLS_GROUP_CAPACITY = 8;
+  QUICKTOOLS_GROUPS = 2;
+  #QUICKTOOLS_SIZE = this.QUICKTOOLS_GROUP_CAPACITY // items per group
+    * this.QUICKTOOLS_GROUPS // number of groups
+    * this.QUICKTOOLS_ROWS; // number of rows
 
   QUICKTOOLS_TRIGGER_MODE_TOUCH = 'touch';
   QUICKTOOLS_TRIGGER_MODE_CLICK = 'click';
@@ -108,8 +117,9 @@ class Settings {
       hardWrap: false,
       useTextareaForIME: false,
       touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 10,
+      quicktoolsItems: [...Array(this.#QUICKTOOLS_SIZE).keys()],
     };
-    this.value = { ...this.#defaultSettings };
+    this.value = structuredClone(this.#defaultSettings);
   }
 
   async init() {
@@ -167,7 +177,7 @@ class Settings {
     }
 
     await fs.writeFile(settingsText);
-    this.#oldSettings = { ...this.value };
+    this.#oldSettings = structuredClone(this.value);
   }
 
   /**
@@ -185,6 +195,7 @@ class Settings {
     }
 
     const onupdate = [...this.#on.update];
+    const onupdateAfter = [...this.#on['update:after']];
 
     if (settings) {
       Object.keys(settings).forEach((key) => {
@@ -204,6 +215,14 @@ class Settings {
 
     if (saveFile) await this.#save();
     if (showToast) toast(strings['settings saved']);
+
+    changedSettings.forEach((setting) => {
+      const listeners = this.#on[`update:${setting}:after`];
+      if (Array.isArray(listeners)) {
+        onupdateAfter.push(...listeners);
+      }
+      onupdateAfter.forEach((listener) => listener(this.value[setting]));
+    });
   }
 
   async reset(setting) {
@@ -223,8 +242,8 @@ class Settings {
   }
 
   /**
-   *
-   * @param {'update' | 'reset'} event
+   * Adds a listener for the given event
+   * @param {'update:<setting>' | 'update:<setting>:after' | 'reset'} event
    * @param {function():void} callback
    */
   on(event, callback) {
@@ -233,7 +252,7 @@ class Settings {
   }
 
   /**
-   *
+   * Removes the given callback from the given event
    * @param {'update' | 'reset'} event
    * @param {function():void} callback
    */
@@ -243,7 +262,7 @@ class Settings {
   }
 
   /**
-   *
+   * Gets a setting with the given key
    * @param {String} key
    * @returns
    */

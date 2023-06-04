@@ -39,7 +39,7 @@ function reset() {
  * @param {HTMLElement} $footer 
  */
 export default function init() {
-  const { $footer, $toggler, $input, $shift, $ctrl, $save } = quickTools;
+  const { $footer, $toggler, $input, $shift, $ctrl, $alt, $meta, $save } = quickTools;
 
   $toggler.addEventListener('click', () => {
     actions('toggle');
@@ -53,6 +53,16 @@ export default function init() {
   key.on('ctrl', (value) => {
     if (value) $ctrl.classList.add('active');
     else $ctrl.classList.remove('active');
+  });
+
+  key.on('alt', (value) => {
+    if (value) $alt.classList.add('active');
+    else $alt.classList.remove('active');
+  });
+
+  key.on('meta', (value) => {
+    if (value) $meta.classList.add('active');
+    else $meta.classList.remove('active');
   });
 
   editorManager.on(['file-content-changed', 'switch-file'], () => {
