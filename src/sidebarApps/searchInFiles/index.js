@@ -33,6 +33,7 @@ const resultOverview = {
     this.filesCount = 0;
     this.matchesCount = 0;
     $resultOverview.innerHTML = searchResultText(0, 0);
+    $resultOverview.classList.remove('error');
   },
 };
 
@@ -140,7 +141,7 @@ export default [
           <input value={store.include} ref={$include} type='search' name='include' placeholder={strings['include files']} />
         </Details>
       </div>
-      <div className='search-result scroll'>
+      <div className='search-result'>
         <span ref={$resultOverview} innerHTML={searchResultText(0, 0)}></span> ({$progress}%)
       </div>
       <div ref={$container} className='search-in-file-editor editor-container' ></div>
@@ -325,6 +326,13 @@ async function searchAll() {
     return;
   }
 
+  const options = getOptions();
+  const regex = toRegex(search, options);
+  if (!regex) {
+    searchResult.removeGhostText();
+    return;
+  }
+
   addEvents();
 
   const allFiles = files();
@@ -334,15 +342,9 @@ async function searchAll() {
     return;
   }
 
-  const options = getOptions();
-  const regex = toRegex(search, options);
-  if (!regex) {
-    searchResult.removeGhostText();
-    return;
-  }
-
-  setMode();
+  setMode(); // set mode removes ghost text
   startLoading();
+  searchResult.setGhostText(strings['searching...'], { row: 0, column: 0 });
   sendMessage('search-files', allFiles, regex, options);
 }
 
@@ -627,7 +629,9 @@ function toRegex(search, options, lookBehind = false) {
   try {
     return new RegExp(regexString, flags);
   } catch (error) {
-    $resultOverview.textContent = strings['invalid regex'].replace('{message}', error.message);
+    const [, message] = error.message.split(/:(.*)/);
+    $resultOverview.classList.add('error');
+    $resultOverview.textContent = strings['invalid regex'].replace('{message}', message || error.message);
     return null;
   }
 }
@@ -702,9 +706,9 @@ function removeEvents() {
 }
 
 function startLoading() {
-  $resultOverview.el.parentElement.classList.add('loading');
+  // $resultOverview.el.parentElement.classList.add('loading');
 }
 
 function stopLoading() {
-  $resultOverview.el.parentElement.classList.remove('loading');
+  // $resultOverview.el.parentElement.classList.remove('loading');
 }

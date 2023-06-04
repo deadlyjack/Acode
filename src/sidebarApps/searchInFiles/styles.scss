@@ -119,15 +119,16 @@
     color: var(--secondary-text-color);
   }
 
+  .error {
+    color: orangered;
+  }
+
   .search-result {
     position: relative;
-    min-height: fit-content;
     padding-bottom: 5px;
-    overflow-x: hidden;
-    overflow-y: auto;
 
-    &.loading {
-      @include linear-loader(30%, 2px);
-    }
+    // &.loading {
+    //   @include linear-loader(30%, 2px);
+    // }
   }
 }
