@@ -33,6 +33,7 @@ const resultOverview = {
     this.filesCount = 0;
     this.matchesCount = 0;
     $resultOverview.innerHTML = searchResultText(0, 0);
+    $resultOverview.classList.remove('error');
   },
 };
 
@@ -133,7 +134,9 @@ export default [
         </Details>
         <Details onexpand={(expanded) => {
           useIncludeAndExclude = expanded;
-          onInput();
+          if ($exclude.value || $include.value) {
+            onInput();
+          }
         }}>
           <Summary marker={false} className='extras'>...</Summary>
           <input value={store.exclude} ref={$exclude} type='search' name='exclude' placeholder={strings['exclude files']} />
@@ -233,6 +236,9 @@ async function onWorkerMessage(e) {
         break;
       }
 
+      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
+        window.iad.show();
+      }
       stopLoading();
       terminateWorker(false);
       replacing = false;
@@ -246,6 +252,16 @@ async function onWorkerMessage(e) {
         break;
       }
 
+      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
+        window.iad.show();
+      }
+
+      if (!results.length) {
+        searchResult.setGhostText(
+          strings['no result'],
+          { row: 0, column: 0 },
+        );
+      }
       stopLoading();
       terminateWorker(false);
       break;
@@ -295,33 +311,42 @@ function onInput(e) {
 
   terminateWorker();
   results.length = 0;
+  $progress.value = 0;
   filesSearched.length = 0;
   resultOverview.reset();
   searchResult.setValue('');
+  searchResult.setGhostText(strings['searching...'], { row: 0, column: 0 });
   stopLoading();
-  debounceSearch();
   removeEvents();
-  $progress.value = 0;
+  debounceSearch();
 }
 
 async function searchAll() {
   const search = $search.value;
-  if (!search) return;
-
-  addEvents();
-
-  const allFiles = files();
-  if (!allFiles.length) {
-    $progress.value = 100;
+  if (!search) {
+    searchResult.removeGhostText();
     return;
   }
 
   const options = getOptions();
   const regex = toRegex(search, options);
-  if (!regex) return;
+  if (!regex) {
+    searchResult.removeGhostText();
+    return;
+  }
 
-  setMode();
+  addEvents();
+
+  const allFiles = files();
+  if (!allFiles.length) {
+    searchResult.removeGhostText();
+    $progress.value = 100;
+    return;
+  }
+
+  setMode(); // set mode removes ghost text
   startLoading();
+  searchResult.setGhostText(strings['searching...'], { row: 0, column: 0 });
   sendMessage('search-files', allFiles, regex, options);
 }
 
@@ -606,7 +631,9 @@ function toRegex(search, options, lookBehind = false) {
   try {
     return new RegExp(regexString, flags);
   } catch (error) {
-    $resultOverview.textContent = strings['invalid regex'].replace('{message}', error.message);
+    const [, message] = error.message.split(/:(.*)/);
+    $resultOverview.classList.add('error');
+    $resultOverview.textContent = strings['invalid regex'].replace('{message}', message || error.message);
     return null;
   }
 }
@@ -681,9 +708,9 @@ function removeEvents() {
 }
 
 function startLoading() {
-  $resultOverview.el.parentElement.classList.add('loading');
+  // $resultOverview.el.parentElement.classList.add('loading');
 }
 
 function stopLoading() {
-  $resultOverview.el.parentElement.classList.remove('loading');
+  // $resultOverview.el.parentElement.classList.remove('loading');
 }

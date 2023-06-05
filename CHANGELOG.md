@@ -22,7 +22,9 @@
       - Ctrl+Shift+P: Open the command palette. (Your shortcut may be different
         depending on what is saved in .keybindings.json file.)
   - [x] **Plugin API**
-    - `contextMenu` is a component that can be used to show context menu in your plutin page.
+    - `contextMenu` is a component that can be used to show context menu in your plugin page.
+  - [x] **Customisable quick tools**
+    - You can now customise quick tools from settings.
 - Fixes
   - [x] **Scrolling Issue**
     - Resolved an issue causing automatic scrolling from the cursor's

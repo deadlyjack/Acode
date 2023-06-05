@@ -1,7 +1,7 @@
 import fsOperation from 'fileSystem';
 import actions from 'handlers/quickTools';
 import keyBindings from 'lib/keyBindings';
-import helpers from 'utils/helpers';
+import Url from 'utils/Url';
 
 const commands = [
   {

@@ -3,33 +3,12 @@ import {
   $footer,
   $input,
   $toggler,
-  Row1,
-  Row2,
-  RowItem,
+  Row,
   SearchRow1,
   SearchRow2,
 } from './footer';
-
-const row1Extras = [
-  <RowItem icon='letters' action='insert' value='{' letters='{' />,
-  <RowItem icon='letters' action='insert' value='}' letters='}' />,
-  <RowItem icon='letters' action='insert' value='[' letters='[' />,
-  <RowItem icon='letters' action='insert' value=']' letters=']' />,
-  <RowItem icon='letters' action='insert' value='(' letters='(' />,
-  <RowItem icon='letters' action='insert' value=')' letters=')' />,
-  <RowItem icon='letters' action='insert' value='<' letters='<' />,
-  <RowItem icon='letters' action='insert' value='>' letters='>' />,
-];
-const row2Extras = [
-  <RowItem icon='letters' action='insert' value=';' letters=';' />,
-  <RowItem icon='letters' action='insert' value="'" letters="'" />,
-  <RowItem icon='letters' action='insert' value='"' letters='"' />,
-  <RowItem icon='letters' action='insert' value='&' letters='&' />,
-  <RowItem icon='letters' action='insert' value='|' letters='|' />,
-  <RowItem icon='letters' action='insert' value='=' letters='=' />,
-  <RowItem icon='letters' action='insert' value='/' letters='/' />,
-  <RowItem icon='letters' action='insert' value='!' letters='!' />,
-];
+import { setRef } from './items';
+import settings from 'lib/settings';
 
 
 /**@type {HTMLElement} */
@@ -49,6 +28,14 @@ const $searchTotal = new Ref();
 const $shift = new Ref();
 const $ctrl = new Ref();
 const $save = new Ref();
+const $alt = new Ref();
+const $meta = new Ref();
+
+setRef("save", $save);
+setRef("ctrl", $ctrl);
+setRef("shift", $shift);
+setRef("alt", $alt);
+setRef("meta", $meta);
 
 export default {
   get $footer() {
@@ -56,12 +43,22 @@ export default {
   },
   get $row1() {
     if ($row1) return $row1;
-    $row1 = <Row1 extras={row1Extras} ctrl={$ctrl} shift={$shift} save={$save} />;
+    $row1 = <Row row={1} />;
+
+    settings.on('update:quicktoolsItems:after', () => {
+      $row1 = <Row row={1} />;
+    });
+
     return $row1;
   },
   get $row2() {
     if ($row2) return $row2;
-    $row2 = <Row2 extras={row2Extras} />;
+    $row2 = <Row row={2} />;
+
+    settings.on('update:quicktoolsItems:after', () => {
+      $row2 = <Row row={2} />;
+    });
+
     return $row2;
   },
   get $searchRow1() {
@@ -97,6 +94,12 @@ export default {
   },
   get $ctrl() {
     return $ctrl;
+  },
+  get $alt() {
+    return $alt;
+  },
+  get $meta() {
+    return $meta;
   },
   get $save() {
     return $save;

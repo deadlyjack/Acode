@@ -10,6 +10,7 @@ import lang from '../lib/lang';
 import appSettings from '../lib/settings';
 import actions from '../handlers/quickTools';
 import { resetKeyBindings } from 'ace/commands';
+import QuickToolsSettings from 'pages/quickTools';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -137,6 +138,11 @@ export default function otherSettings() {
         }
       },
     },
+    {
+      key: 'quickToolsSettings',
+      text: strings['shortcut buttons'],
+      index: 0,
+    },
   ];
 
   items.forEach((item) => {
@@ -159,6 +165,10 @@ export default function otherSettings() {
         }
         return;
       }
+
+      case 'quickToolsSettings':
+        QuickToolsSettings();
+        return;
 
       case 'console':
         (async () => {

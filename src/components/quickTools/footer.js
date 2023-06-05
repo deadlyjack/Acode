@@ -2,54 +2,40 @@
  * @typedef {import('html-tag-js/ref')} Ref
  */
 
+import items, { ref } from './items';
+import settings from 'lib/settings';
+
 /**
  * Create a row with common buttons
  * @param {object} param0 Attributes
- * @param {Array<RowItem>} param0.extras Extra buttons
- * @param {Ref} param0.shift shift button refence
- * @param {Ref} param0.ctrl ctrl button refence
- * @returns {HTMLElement}
+ * @param {number} [param0.row] Row number
  */
-export const Row1 = ({ extras, shift, ctrl, save }) => <div id='row1' className='button-container'>
-  <div className='section'>
-    <RowItem ref={ctrl} icon='letters' action='ctrl' letters='ctrl' />
-    <RowItem icon='keyboard_tab' action='key' value={9} />
-    <RowItem ref={shift} icon='letters' action='shift' letters='shft' />
-    <RowItem icon='undo' action='command' value='undo' />
-    <RowItem icon='redo' action='command' value='redo' />
-    <RowItem icon='search' action='search' />
-    <RowItem ref={save} icon='save' action='command' value='saveFile' />
-    <RowItem icon='letters' action='key' value={27} letters='esc' />
-  </div>
-  <Extras extras={extras} />
-</div>;
-
-/**
- * Create a row with arrow keys and other buttons
- * @param {object} param0 Attributes
- * @param {Array<RowItem>} param0.extras Extra buttons
- * @returns {HTMLElement}
- */
-export const Row2 = ({ extras }) => <div id='row2' className='button-container'>
-  <div className='section'>
-    <RowItem icon='keyboard_arrow_left' action='key' value={37} repeate={true} />
-    <RowItem icon='keyboard_arrow_right' action='key' value={39} repeate={true} />
-    <RowItem icon='keyboard_arrow_up' action='key' value={38} repeate={true} />
-    <RowItem icon='keyboard_arrow_down' action='key' value={40} repeate={true} />
-    <RowItem icon='moveline-up' action='command' value='movelinesup' />
-    <RowItem icon='moveline-down' action='command' value='movelinesdown' />
-    <RowItem icon='copyline-up' action='command' value='copylinesup' />
-    <RowItem icon='copyline-down' action='command' value='copylinesdown' />
-  </div>
-  <Extras extras={extras} />
-</div>;
+export const Row = ({ row }) => {
+  const startIndex = (row - 1) * settings.QUICKTOOLS_GROUP_CAPACITY * settings.QUICKTOOLS_GROUPS;
+  return <div id={`row${row}`} className='button-container'>{
+    (() => {
+      const sections = [];
+      for (let i = 0; i < settings.QUICKTOOLS_GROUPS; ++i) {
+        const section = [];
+        for (let j = 0; j < settings.QUICKTOOLS_GROUP_CAPACITY; ++j) {
+          const index = startIndex + (i * settings.QUICKTOOLS_GROUP_CAPACITY + j);
+          const itemIndex = settings.value.quicktoolsItems[index]; // saved item index
+          const item = items[itemIndex]; // item object
+          section.push(<RowItem {...item} index={index} />);
+        }
+        sections.push(<div className='section'>{section}</div>);
+      }
+      return sections;
+    })()
+  }</div>;
+};
 
 /**
  * Create a search row with search input and buttons
  * @returns {Element}
  */
 export const SearchRow1 = ({ inputRef }) => <div className='button-container' id='search_row1'>
-  <input ref={inputRef} type='text' placeholder={strings.search} />
+  <input ref={inputRef} type='search' placeholder={strings.search} />
   <RowItem icon='arrow_back' action='search-prev' />
   <RowItem icon='arrow_forward' action='search-next' />
   <RowItem icon='settings' action='search-settings' />

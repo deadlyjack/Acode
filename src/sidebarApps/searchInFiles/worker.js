@@ -1,3 +1,4 @@
+import 'core-js/stable';
 import { minimatch } from 'minimatch';
 
 const resolvers = {};
@@ -205,14 +206,17 @@ function getFile(url, cb) {
  */
 function done(ratio, mode) {
   if (ratio === 1) {
-    let verb = mode === 'search' ? 'searching' : 'replacing';
     self.postMessage({
-      action: `done-${verb}`,
+      action: 'progress',
+      data: 100,
+    });
+    self.postMessage({
+      action: `done-${mode === 'search' ? 'searching' : 'replacing'}`,
     });
   } else {
     self.postMessage({
       action: 'progress',
-      data: Math.ceil(ratio * 100),
+      data: Math.floor(ratio * 100),
     });
   }
 }

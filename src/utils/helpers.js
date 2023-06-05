@@ -44,6 +44,7 @@ export default {
       csharp: /\.cs$/i,
       coffeescript: /(\.(coffee|cf|cson))$|(^cakefile)$/i,
       cmake: /^cmake$/i,
+      css: /\.css$/i,
       dartlang: /\.dart$/i,
       diff: /\.diff$/i,
       dlang: /\.(d|di)$/i,
@@ -143,7 +144,7 @@ export default {
     if (TEXT.test(ext)) return 'text';
     if (WORD.test(ext)) return 'word';
     if (EXCEL.test(ext)) return 'excel';
-    return ext;
+    return ext.substring(1);
   },
   /**
    * Gets icon according to filename
