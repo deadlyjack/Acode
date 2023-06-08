@@ -2,8 +2,7 @@ import tag from 'html-tag-js';
 import tile from './tile';
 
 /**
- * @typedef {object} Collaspable
- * @extends HTMLElement
+ * @typedef {object} CollaspableBase
  * @property {HTMLElement} $title
  * @property {HTMLUListElement} $ul
  * @property {function(void):void} ontoggle
@@ -11,6 +10,10 @@ import tile from './tile';
  * @property {function(void):void} uncollapse
  * @property {boolean} collapsed
  * @property {boolean} uncollapsed
+ */
+
+/**
+ * @typedef {CollaspableBase & HTMLElement} Collaspable
  */
 
 /**

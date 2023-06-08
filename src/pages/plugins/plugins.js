@@ -235,6 +235,8 @@ export default function PluginsInclude(updates) {
       source = (await FileBrowser('file', 'Select plugin source')).url;
     }
 
+    if (!source) return;
+
     try {
       await installPlugin(source);
       await getInstalledPlugins();

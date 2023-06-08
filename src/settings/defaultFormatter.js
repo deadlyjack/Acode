@@ -1,4 +1,4 @@
-import settingsPage from '../components/settingPage';
+import settingsPage from '../components/settinggPage';
 import appSettings from '../lib/settings';
 
 export default function defaultFormatter(languageName) {
@@ -23,7 +23,7 @@ export default function defaultFormatter(languageName) {
         if (formatter) {
           return formatter.name;
         }
-        return strings.none
+        return strings.none;
       },
       select: options
     };

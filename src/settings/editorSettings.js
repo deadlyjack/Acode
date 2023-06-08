@@ -1,6 +1,6 @@
 import constants from '../lib/constants';
 import scrollSettings from './scrollSettings';
-import settingsPage from '../components/settingPage';
+import settingsPage from '../components/settinggPage';
 import appSettings from '../lib/settings';
 import fonts from '../lib/fonts';
 
@@ -160,7 +160,7 @@ export default function editorSettings() {
       get() {
         return strings[`info-${this.key.toLocaleLowerCase()}`];
       }
-    })
+    });
   });
 
   function callback(key, value) {

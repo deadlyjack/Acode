@@ -1,9 +1,6 @@
 export default {
   FILE_NAME_REGEX: /^((?![:<>"\/\\\|\?\*]).)*$/,
   FONT_SIZE: /^[0-9\.]{1,3}(px|rem|em|pt|mm|pc|in)$/,
-  HEX_COLOR: /^#([a-f0-9]{3}){1,2}([a-f0-9]{2})?$/i,
-  RGB_COLOR: /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(\s*,\s*\d?(\.\d+)?)?\)$/i,
-  HSL_COLOR: /^hsla?\(([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(\s*,\s*\d?(\.\d+)?)?\)$/i,
   DEFAULT_FILE_SESSION: 'default-session',
   DEFAULT_FILE_NAME: 'untitled.txt',
   CONSOLE_PORT: 8159,

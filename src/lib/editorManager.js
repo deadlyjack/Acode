@@ -27,6 +27,8 @@ async function EditorManager($header, $body) {
   let timeoutQuicktoolToggler;
   let timeoutHeaderToggler;
   let isScrolling = false;
+  let lastScrollTop = 0;
+  let lastScrollLeft = 0;
 
   const { scrollbarSize } = appSettings.value;
   const events = {
@@ -129,8 +131,8 @@ async function EditorManager($header, $body) {
       activeFile.focusedBefore = activeFile.focused;
     }
     if (isScrolling) return;
-    $vScrollbar.hide();
-    $hScrollbar.hide();
+    // $vScrollbar.hide();
+    // $hScrollbar.hide();
     setTimeout(() => {
       if (isCursorVisible()) return;
       editor.renderer.scrollCursorIntoView();
@@ -388,11 +390,16 @@ async function EditorManager($header, $body) {
    * @param {Boolean} render
    */
   function onscrollleft(render = true) {
-    if (preventScrollbarH) return;
+    if (appSettings.value.textWrap || preventScrollbarH) return;
     const session = editor.getSession();
-    const editorWidth = getEditorWidth(editor);
-    const factor = (session.getScrollLeft() / editorWidth).toFixed(2);
+    const scrollLeft = session.getScrollLeft();
 
+    if (scrollLeft === lastScrollLeft) return;
+
+    const editorWidth = getEditorWidth(editor);
+    const factor = (scrollLeft / editorWidth).toFixed(2);
+
+    lastScrollLeft = scrollLeft;
     $hScrollbar.value = factor;
     if (render) $hScrollbar.render();
     editor._emit('scroll', 'horizontal');
@@ -405,9 +412,14 @@ async function EditorManager($header, $body) {
   function onscrolltop(render = true) {
     if (preventScrollbarV) return;
     const session = editor.getSession();
-    const editorHeight = getEditorHeight(editor);
-    const factor = (session.getScrollTop() / editorHeight).toFixed(2);
+    const scrollTop = session.getScrollTop();
 
+    if (scrollTop === lastScrollTop) return;
+
+    const editorHeight = getEditorHeight(editor);
+    const factor = (scrollTop / editorHeight).toFixed(2);
+
+    lastScrollTop = scrollTop;
     $vScrollbar.value = factor;
     if (render) $vScrollbar.render();
     editor._emit('scroll', 'verticle');

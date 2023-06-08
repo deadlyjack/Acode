@@ -7,7 +7,7 @@ import defaultFormatter from './defaultFormatter';
 import rateBox from '../components/dialogs/rateBox';
 import Donate from '../pages/donate';
 import plugins from '../pages/plugins';
-import settingsPage from '../components/settingPage';
+import settingsPage from '../components/settinggPage';
 import dialogs from '../components/dialogs';
 import previewSettings from './previewSettings';
 import removeAds from '../lib/removeAds';

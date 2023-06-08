@@ -1,8 +1,8 @@
-import Checkbox from 'components/checkbox';
 import './styles.scss';
+import Checkbox from 'components/checkbox';
 import Ref from 'html-tag-js/ref';
 import autosize from 'autosize';
-import files from 'lib/fileList';
+import files, { Tree } from 'lib/fileList';
 import fsOperation from 'fileSystem';
 import openFile from 'lib/openFile';
 import addTouchListeners from 'ace/touchHandler';
@@ -24,6 +24,7 @@ const $wholeWord = new Ref();
 const $caseSensitive = new Ref();
 const $btnReplaceAll = new Ref();
 const $resultOverview = new Ref();
+const $error = <></>;
 const $progress = <>0</>;
 
 const resultOverview = {
@@ -82,6 +83,7 @@ let useIncludeAndExclude = false;
 /**@type {AceAjax.Editor} */
 let searchResult = null;
 let replacing = false;
+let newFiles = 0;
 
 addEventListener($regExp, 'change', onInput);
 addEventListener($wholeWord, 'change', onInput);
@@ -90,6 +92,10 @@ addEventListener($search, 'input', onInput);
 addEventListener($include, 'input', onInput);
 addEventListener($exclude, 'input', onInput);
 addEventListener($btnReplaceAll, 'click', replaceAll);
+
+files.on('push-file', () => {
+  $error.value = strings['missed files'].replace('{count}', ++newFiles);
+});
 
 $container.onref = ($el) => {
   searchResult = ace.edit($el, {
@@ -146,6 +152,7 @@ export default [
       <div className='search-result'>
         <span ref={$resultOverview} innerHTML={searchResultText(0, 0)}></span> ({$progress}%)
       </div>
+      <div className='error'>{$error}</div>
       <div ref={$container} className='search-in-file-editor editor-container' ></div>
     </>;
   },
@@ -193,14 +200,17 @@ async function onWorkerMessage(e) {
 
     case 'search-result': {
       const { file, matches, text } = data;
+
       if (!matches.length) return;
+      if (filesSearched.includes(file)) return;
+
+      filesSearched.push(file);
       resultOverview.filesCount += 1;
       resultOverview.matchesCount += matches.length;
       $resultOverview.innerHTML = searchResultText(
         resultOverview.filesCount,
         resultOverview.matchesCount,
       );
-      filesSearched.push(file);
 
       const index = filesSearched.length - 1;
       results.push({
@@ -239,7 +249,6 @@ async function onWorkerMessage(e) {
       if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
         window.iad.show();
       }
-      stopLoading();
       terminateWorker(false);
       replacing = false;
       break;
@@ -262,7 +271,6 @@ async function onWorkerMessage(e) {
           { row: 0, column: 0 },
         );
       }
-      stopLoading();
       terminateWorker(false);
       break;
     }
@@ -310,13 +318,14 @@ function onInput(e) {
   }
 
   terminateWorker();
+  newFiles = 0;
+  $error.value = '';
   results.length = 0;
   $progress.value = 0;
   filesSearched.length = 0;
   resultOverview.reset();
   searchResult.setValue('');
   searchResult.setGhostText(strings['searching...'], { row: 0, column: 0 });
-  stopLoading();
   removeEvents();
   debounceSearch();
 }
@@ -345,7 +354,6 @@ async function searchAll() {
   }
 
   setMode(); // set mode removes ghost text
-  startLoading();
   searchResult.setGhostText(strings['searching...'], { row: 0, column: 0 });
   sendMessage('search-files', allFiles, regex, options);
 }
@@ -366,7 +374,6 @@ async function replaceAll() {
   if (!regex) return;
 
   replacing = true;
-  startLoading();
   sendMessage('replace-files', filesSearched, regex, options, replace);
 }
 
@@ -374,7 +381,7 @@ async function replaceAll() {
  * Sends a message to the worker threads to perform a specific action on a subset of files.
  *
  * @param {string} action - The action to be performed by the worker threads.
- * @param {Array<import('lib/fileList').Tree>} files - The files to be processed.
+ * @param {Array<Tree>} files - The files to be processed.
  * @param {string} search - The search query.
  * @param {object} options - The search options.
  * @param {string} replace - The replacement text (if applicable).
@@ -385,7 +392,7 @@ function sendMessage(action, files, search, options, replace) {
   for (let i = 0; i < len; i++) {
     const worker = workers[i];
     const offset = i * limit;
-    const filesForThisWorker = files.slice(offset, offset + limit);
+    const filesForThisWorker = files.slice(offset, offset + limit).map((file) => file.toJSON());
     if (!filesForThisWorker.length) break;
     worker.started = true;
     worker.postMessage({
@@ -691,6 +698,7 @@ function addEvents() {
   files.on('remove-file', onFileUpdate);
   files.on('add-folder', onInput);
   files.on('remove-folder', onInput);
+  files.on('refresh', onInput);
   editorManager.on('rename-file', onInput);
   editorManager.on('file-content-changed', onInput);
 }
@@ -703,14 +711,7 @@ function removeEvents() {
   files.off('remove-file', onFileUpdate);
   files.off('add-folder', onInput);
   files.off('remove-folder', onInput);
+  files.off('refresh', onInput);
   editorManager.off('rename-file', onInput);
   editorManager.off('file-content-changed', onInput);
-}
-
-function startLoading() {
-  // $resultOverview.el.parentElement.classList.add('loading');
-}
-
-function stopLoading() {
-  // $resultOverview.el.parentElement.classList.remove('loading');
 }

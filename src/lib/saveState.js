@@ -1,4 +1,5 @@
 import constants from './constants';
+import { addedFolder } from './openFolder';
 import appSettings from './settings';
 
 export default () => {

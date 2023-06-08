@@ -449,6 +449,7 @@ export default {
     }
   },
   fixFilename(name) {
+    if (!name) return name;
     return name.replace(/(\r\n)+|\r+|\n+|\t+/g, '').trim();
   }
 };

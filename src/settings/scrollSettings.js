@@ -1,5 +1,5 @@
 import constants from '../lib/constants';
-import settingsPage from '../components/settingPage';
+import settingsPage from '../components/settinggPage';
 import appSettings from '../lib/settings';
 
 export default function scrollSettings() {

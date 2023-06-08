@@ -1,0 +1,33 @@
+@import '../../styles/mixins.scss';
+
+#quick-tools {
+  &[data-alt="true"] {
+    [data-id="alt-key"] {
+      @include active-icon;
+    }
+  }
+
+  &[data-shift="true"] {
+    [data-id="shift-key"] {
+      @include active-icon;
+    }
+  }
+
+  &[data-ctrl="true"] {
+    [data-id="ctrl-key"] {
+      @include active-icon;
+    }
+  }
+
+  &[data-meta="true"] {
+    [data-id="meta-key"] {
+      @include active-icon;
+    }
+  }
+
+  &[data-unsaved="true"] {
+    [data-id="save"] {
+      @include icon-badge;
+    }
+  }
+}

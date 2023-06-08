@@ -109,43 +109,36 @@ export default {
   'file-info'(url) {
     showFileInfo(url);
   },
-  'goto'() {
-    dialogs
-      .prompt(strings['enter line number'], '', 'number', {
-        placeholder: 'line.column',
-      })
-      .then((lineNumber) => {
-        const editor = editorManager.editor;
-        editor.focus();
-        const [line, col] = `${lineNumber}`.split('.');
-        editor.gotoLine(line, col, true);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  async 'goto'() {
+    const res = await dialogs.prompt(strings['enter line number'], '', 'number', {
+      placeholder: 'line.column',
+    });
+
+    if (!res) return;
+
+    const [line, col] = `${res}`.split('.');
+    const editor = editorManager.editor;
+
+    editor.focus();
+    editor.gotoLine(line, col, true);
   },
-  'new-file'() {
-    dialogs
-      .prompt(
-        strings['enter file name'],
-        constants.DEFAULT_FILE_NAME,
-        'filename',
-        {
-          match: constants.FILE_NAME_REGEX,
-          required: true,
-        },
-      )
-      .then((filename) => {
-        if (filename) {
-          filename = helpers.fixFilename(filename);
-          new EditorFile(filename, {
-            isUnsaved: false,
-          });
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  async 'new-file'() {
+    const filename = await dialogs.prompt(
+      strings['enter file name'],
+      constants.DEFAULT_FILE_NAME,
+      'filename',
+      {
+        match: constants.FILE_NAME_REGEX,
+        required: true,
+      },
+    );
+
+    filename = helpers.fixFilename(filename);
+    if (!filename) return;
+
+    new EditorFile(filename, {
+      isUnsaved: false,
+    });
   },
   'next-file'() {
     const len = editorManager.files.length;
@@ -323,8 +316,9 @@ export default {
       },
     );
 
-    if (!newname || newname === file.filename) return;
     newname = helpers.fixFilename(newname);
+    if (!newname || newname === file.filename) return;
+
     const { uri } = file;
     if (uri) {
       const fs = fsOperation(uri);
@@ -333,7 +327,7 @@ export default {
         file.uri = newUri;
         file.filename = newname;
 
-        openFolder.updateItem(uri, newUri, newname);
+        openFolder.renameItem(uri, newUri, newname);
         toast(strings['file renamed']);
       } catch (err) {
         helpers.error(err);

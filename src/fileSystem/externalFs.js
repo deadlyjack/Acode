@@ -157,6 +157,25 @@ export default {
   },
 
   async stats(uri) {
+    const storageList = helpers.parseJSON(localStorage.getItem('storageList'));
+
+    if (Array.isArray(storageList)) {
+      const storage = storageList.find(s => s.uri === uri);
+      if (storage) {
+        return {
+          name: storage.name,
+          canRead: true,
+          canWrite: true,
+          size: 0,
+          modifidedDate: new Date(),
+          isDirectory: true,
+          isFile: false,
+          url: uri,
+          uri,
+        };
+      }
+    }
+
     uri = await this.formatUri(uri);
     return new Promise((resolve, reject) => {
       sdcard.stats(

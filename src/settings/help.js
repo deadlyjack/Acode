@@ -1,4 +1,4 @@
-import settingsPage from 'components/settingPage';
+import settingsPage from 'components/settinggPage';
 
 export default function help() {
   const title = strings.help;

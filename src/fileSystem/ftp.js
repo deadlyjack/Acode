@@ -4,8 +4,6 @@ import Url from "utils/Url";
 import settings from "lib/settings";
 import internalFs from "./internalFs";
 
-// set path not implemented
-
 class FtpClient {
   #MAX_TRY = 3;
   #path = '/';
@@ -121,8 +119,10 @@ class FtpClient {
     await internalFs.writeFile(localFile, content, true, false);
 
     return new Promise((resolve, reject) => {
-      ftp.uploadFile(this.#conId, this.#cacheFile, Path.join(this.#path, name), () => {
-        resolve(Url.join(this.#origin, this.#path, name));
+      ftp.uploadFile(this.#conId, this.#cacheFile, Path.join(this.#path, name), async () => {
+        const url = Url.join(this.#origin, this.#path, name);
+        const stat = await this.stat(url);
+        resolve(stat.url);
       }, reject);
     });
   }
@@ -130,8 +130,10 @@ class FtpClient {
   async createDir(name) {
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
-      ftp.createDirectory(this.#conId, Path.join(this.#path, name), () => {
-        resolve(Url.join(this.#origin, this.#path, name));
+      ftp.createDirectory(this.#conId, Path.join(this.#path, name), async () => {
+        const url = Url.join(this.#origin, this.#path, name);
+        const stat = await this.stat(url);
+        resolve(stat.url);
       }, reject);
     });
   }
@@ -161,9 +163,11 @@ class FtpClient {
     const path = Path.dirname(this.#path);
     const newPath = Path.join(path, newName);
     return new Promise((resolve, reject) => {
-      ftp.rename(this.#conId, this.#path, newPath, () => {
+      ftp.rename(this.#conId, this.#path, newPath, async () => {
         this.#path = newPath;
-        resolve(Url.join(this.#origin, newPath));
+        const url = Url.join(this.#origin, newPath);
+        const stat = await this.stat(url);
+        resolve(stat.url);
       }, reject);
     });
   }
@@ -175,9 +179,11 @@ class FtpClient {
     );
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
-      ftp.rename(this.#conId, this.#path, newPath, () => {
+      ftp.rename(this.#conId, this.#path, newPath, async () => {
         this.#path = newPath;
-        resolve(Url.join(this.#origin, newPath));
+        const url = Url.join(this.#origin, newPath);
+        const stat = await this.stat(url);
+        resolve(stat.url);
       }, reject);
     });
   }
@@ -214,9 +220,9 @@ class FtpClient {
     return this.#cacheFile;
   }
 
-  async #getStat() {
+  async #getStat(url = this.#path) {
     return new Promise((resolve, reject) => {
-      ftp.getStat(this.#conId, this.#path, (stat) => {
+      ftp.getStat(this.#conId, url, (stat) => {
         this.#stat = stat;
         if (this.#stat.isFile) {
           this.#stat.type = mimeType.lookup(this.#stat.name);

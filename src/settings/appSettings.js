@@ -5,7 +5,7 @@ import openFile from '../lib/openFile';
 import fsOperation from '../fileSystem';
 import ajax from '@deadlyjack/ajax';
 import Url from '../utils/Url';
-import settingsPage from '../components/settingPage';
+import settingsPage from '../components/settinggPage';
 import lang from '../lib/lang';
 import appSettings from '../lib/settings';
 import actions from '../handlers/quickTools';
@@ -143,6 +143,20 @@ export default function otherSettings() {
       text: strings['shortcut buttons'],
       index: 0,
     },
+    {
+      key: 'excludeFolders',
+      text: strings['exclude files'],
+      value: values.excludeFolders.join('\n'),
+      prompt: strings['exclude files'],
+      promptType: 'textarea',
+      promptOptions: {
+        test(value) {
+          return value.split('\n').every((item) => {
+            return item.trim().length > 0;
+          });
+        }
+      }
+    }
   ];
 
   items.forEach((item) => {
@@ -228,6 +242,10 @@ export default function otherSettings() {
           value = 0;
           actions('set-height', 0);
         }
+        break;
+
+      case 'excludeFolders':
+        value = value.split('\n').map((item) => item.trim()).filter((item) => item.length > 0);
         break;
 
       default:

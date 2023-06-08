@@ -4,7 +4,7 @@ import fsOperation from '../fileSystem';
 import Url from '../utils/Url';
 import FileBrowser from '../pages/fileBrowser';
 import Uri from '../utils/Uri';
-import settingsPage from '../components/settingPage';
+import settingsPage from '../components/settinggPage';
 import appSettings from '../lib/settings';
 
 function backupRestore() {

@@ -55,12 +55,10 @@ class SftpClient {
 
   /**
    * List directory or get file info
+   * @param {String} filename
    * @param {boolean} stat
    */
-  lsDir(stat) {
-    if (!this.#path) {
-      throw new Error('Path is not set');
-    }
+  lsDir(filename = this.#path, stat = false) {
     return new Promise((resolve, reject) => {
       sftp.isConnected(async (connectionID) => {
         (async () => {
@@ -73,7 +71,7 @@ class SftpClient {
             }
           }
 
-          const path = this.#safeName(this.#path);
+          const path = this.#safeName(filename);
           let options = '-gaAG';
           if (stat) options += 'd';
 
@@ -82,10 +80,10 @@ class SftpClient {
             (res) => {
               if (res.code <= 0) {
                 if (stat) {
-                  resolve(this.#parseFile(res.result, Url.dirname(this.#path)));
+                  resolve(this.#parseFile(res.result, Url.dirname(filename)));
                   return;
                 }
-                resolve(this.#parseDir(this.#path, res.result));
+                resolve(this.#parseDir(filename, res.result));
                 return;
               }
               reject(this.#errorCodes(res.code));
@@ -106,7 +104,6 @@ class SftpClient {
    */
   createFile(filename, content) {
     filename = Path.join(this.#path, filename);
-    const fullFilename = Url.join(this.#base, filename);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -123,16 +120,18 @@ class SftpClient {
           const cmd = `[[ -f "${file}" ]] && echo "Already exists" || touch "${filename}"`;
           sftp.exec(
             cmd,
-            (res) => {
+            async (res) => {
               if (res.code <= 0) {
                 if (content) {
-                  this.writeFile(content, filename)
-                    .then(() => resolve(fullFilename))
-                    .catch(reject);
-                  return;
+                  try {
+                    await this.writeFile(content, filename);
+                  } catch (error) {
+                    return reject(error);
+                  }
                 }
 
-                resolve(fullFilename);
+                const stat = await this.lsDir(filename, true);
+                resolve(stat.url);
                 return;
               }
               reject(this.#errorCodes(res.code));
@@ -152,7 +151,6 @@ class SftpClient {
    */
   createDir(dirname) {
     dirname = Path.join(this.#path, dirname);
-    const fullDirname = Url.join(this.#base, dirname);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -167,9 +165,10 @@ class SftpClient {
 
           sftp.exec(
             `mkdir "${this.#safeName(dirname)}"`,
-            (res) => {
+            async (res) => {
               if (res.code <= 0) {
-                resolve(fullDirname);
+                const stat = await this.lsDir(dirname, true);
+                resolve(stat.url);
                 return;
               }
 
@@ -250,7 +249,6 @@ class SftpClient {
 
   copyTo(dest) {
     const src = this.#path;
-    const fullDest = Url.join(this.#base, dest, Url.basename(src));
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -266,9 +264,10 @@ class SftpClient {
           const cmd = `cp -r "${this.#safeName(src)}" "${this.#safeName(dest)}"`;
           sftp.exec(
             cmd,
-            (res) => {
+            async (res) => {
               if (res.code <= 0) {
-                resolve(fullDest);
+                const stat = await this.lsDir(dest, true);
+                resolve(stat.url);
                 return;
               }
 
@@ -294,7 +293,6 @@ class SftpClient {
    */
   rename(newname, move) {
     const src = this.#path;
-    const fullNewname = Url.join(this.#base, newname);
     return new Promise((resolve, reject) => {
       sftp.isConnected((connectionID) => {
         (async () => {
@@ -311,13 +309,11 @@ class SftpClient {
           const cmd = `mv "${this.#safeName(src)}" "${this.#safeName(newname)}"`;
           sftp.exec(
             cmd,
-            (res) => {
+            async (res) => {
               if (res.code <= 0) {
-                resolve(
-                  move
-                    ? Url.join(fullNewname, Url.basename(src))
-                    : fullNewname,
-                );
+                const url = move ? Url.join(newname, Url.basename(src)) : newname;
+                const stat = await this.lsDir(url, true);
+                resolve(stat.url);
                 return;
               }
 
@@ -466,6 +462,7 @@ class SftpClient {
       lastModified: file.modifiedDate,
       type: mimeType.lookup(filename),
       uri: file.url,
+      url: file.url,
     };
   }
 
@@ -530,17 +527,22 @@ class SftpClient {
     name = Url.basename(name.join(' '));
     if (['..', '.', '`'].includes(name)) return null;
 
+    let url = dirname
+      ? Url.join(this.#base, dirname, name)
+      : Url.join(this.#base, name);
+
     return {
+      url,
       name,
       size,
+      type,
+      uri: url,
       canRead: /r/.test(canrw),
       canWrite: /w/.test(canrw),
       isDirectory: type === 'directory',
       isLink: type === 'link',
       isFile: type === 'file',
       modifiedDate: date,
-      type,
-      url: Url.join(this.#base, dirname || '', name),
     };
   }
 

@@ -251,8 +251,8 @@ async function run(
       }
 
       switch (ext) {
-        case 'htm':
-        case 'html':
+        case '.htm':
+        case '.html':
           if (file) {
             sendHTML(file.session.getValue(), reqId);
           } else {
@@ -260,7 +260,7 @@ async function run(
           }
           break;
 
-        case 'md':
+        case '.md':
           if (file) {
             const html = marked.parse(file.session.getValue());
             const doc = mustache.render($_markdown, {

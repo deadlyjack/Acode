@@ -1,6 +1,5 @@
 import './fileBrowser.scss';
 
-import escapeStringRegexp from 'escape-string-regexp';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from 'components/page';
@@ -18,7 +17,7 @@ import fsOperation from 'fileSystem';
 import searchBar from 'components/searchbar';
 import Url from 'utils/Url';
 import util from './util';
-import openFolder from 'lib/openFolder';
+import openFolder, { addedFolder } from 'lib/openFolder';
 import recents from 'lib/recents';
 import remoteStorage from 'lib/remoteStorage';
 import URLParse from 'url-parse';
@@ -199,7 +198,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       }
     };
 
-    $addMenu.onclick = function (e) {
+    $addMenu.onclick = async (e) => {
       $addMenu.hide();
       const $target = e.target;
       const action = $target.getAttribute('action');
@@ -207,24 +206,31 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       if (!action) return;
 
       switch (action) {
-        case 'create':
-          create(value);
+        case 'create': {
+          try {
+            const newUrl = await create(value);
+            if (!newUrl) break;
+
+            const type = value === 'file' ? 'file' : 'folder';
+            openFolder.add(newUrl, type);
+            reload();
+          } catch (error) {
+            console.error(error);
+            helpers.error(error);
+          }
           break;
+        }
 
         case 'add-path':
           addStorage();
           break;
 
         case 'addFtp':
-        case 'addSftp':
-          remoteStorage[action]()
-            .then((storage) => {
-              updateStorage(storage);
-            })
-            .catch((err) => {
-              if (err) console.error(err);
-            });
+        case 'addSftp': {
+          const storage = await remoteStorage[action]();
+          updateStorage(storage);
           break;
+        }
 
         default:
           break;
@@ -273,8 +279,8 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       let action = $el.getAttribute('action') || $el.dataset.action;
       if (!action) return;
 
-      let url = $el.data_url;
-      let name = $el.data_name || $el.getAttribute('name');
+      let url = $el.dataset.url;
+      let name = $el.dataset.name || $el.getAttribute('name');
       const opendoc = $el.hasAttribute('open-doc');
       const uuid = $el.getAttribute('uuid');
       const type = $el.getAttribute('type');
@@ -368,7 +374,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         });
       }
 
-      function cmhandler() {
+      async function cmhandler() {
         if (appSettings.value.vibrateOnTap) {
           navigator.vibrate(constants.VIBRATION_TIME);
         }
@@ -387,59 +393,44 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           options.push(['info', strings.info, 'info']);
         }
 
-        dialogs.select('', options).then((res) => {
-          switch (res) {
-            case 'delete':
-              dialogs.confirm(
-                strings.warning.toUpperCase(),
-                strings['delete {name}'].replace('{name}', name),
-              ).then((confirmation) => {
-                if (!confirmation) return;
-                remove();
-              });
-              break;
-            case 'rename':
-              dialogs.prompt(strings.rename, name, 'text', {
-                match: constants.FILE_NAME_REGEX,
-              }).then((newname) => {
-                rename(newname);
-              });
-              break;
+        const option = await dialogs.select(strings['select'], options);
+        switch (option) {
+          case 'delete': {
+            const confirmation = await dialogs.confirm(
+              strings.warning.toUpperCase(),
+              strings['delete {name}'].replace('{name}', name),
+            );
+            if (!confirmation) break;
 
-            case 'edit':
-              remoteStorage
-                .edit(storageList.find((storage) => storage.uuid === uuid))
-                .then((storage) => {
-                  if (storage) {
-                    storage.uuid = uuid;
-                    updateStorage(storage);
-                  }
-                })
-                .catch((err) => {
-                  if (err) console.error(err);
-                });
-              break;
-
-            case 'info':
-              acode.exec('file-info', url);
-              break;
+            if (uuid) removeStorage();
+            else removeFile();
+            break;
           }
-        });
-      }
 
-      function rename(newname) {
-        if (uuid) {
-          renameStorage(newname);
-        } else {
-          renameFile(newname);
-        }
-      }
+          case 'rename': {
+            let newname = await dialogs.prompt(strings.rename, name, 'text', {
+              match: constants.FILE_NAME_REGEX,
+            });
 
-      function remove() {
-        if (uuid) {
-          removeStorage();
-        } else {
-          removeFile();
+            newname = helpers.fixFilename(newname);
+            if (!newname || newname === name) break;
+
+            if (uuid) renameStorage(newname);
+            else renameFile(newname);
+            break;
+          }
+
+          case 'edit': {
+            const storage = await remoteStorage.edit(storageList.find((storage) => storage.uuid === uuid));
+            if (!storage) break;
+            storage.uuid = uuid;
+            updateStorage(storage);
+            break;
+          }
+
+          case 'info':
+            acode.exec('file-info', url);
+            break;
         }
       }
 
@@ -447,7 +438,14 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         const fs = fsOperation(url);
         try {
           const newUrl = await fs.renameTo(newname);
-          openFolder.updateItem(url, newUrl, newname);
+          recents.removeFile(url);
+          recents.addFile(newUrl);
+          const file = editorManager.getFile(url, 'uri');
+          if (file) {
+            file.uri = newUrl;
+            file.filename = newname;
+          }
+          openFolder.renameItem(url, newUrl, newname);
           toast(strings.success);
           reload();
         } catch (err) {
@@ -460,18 +458,18 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           const fs = fsOperation(url);
           await fs.delete();
           recents.removeFile(url);
+          openFolder.removeItem(url);
+
           if (helpers.isDir(type)) {
             helpers.updateUriOfAllActiveFiles(url);
             recents.removeFolder(url);
-            openFolder.removeItem(url);
-            openFolder.removeFolders(url);
           } else {
             const openedFile = editorManager.getFile(url, 'uri');
             if (openedFile) openedFile.uri = null;
           }
+          toast(strings.success);
           delete cachedDir[url];
           reload();
-          toast(strings.success);
         } catch (err) {
           helpers.error(err);
         }
@@ -694,7 +692,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       if ($nav) {
         let $topNav;
         while (($topNav = $navigation.lastChild) !== $nav) {
-          const url = $topNav.data_url;
+          const url = $topNav.dataset.url;
           actionStack.remove(url);
           $topNav.remove();
         }
@@ -740,6 +738,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       let projectFiles = '';
       let projectName = '';
       let project = '';
+      let newUrl;
 
       if (arg === 'file' || arg === 'folder') {
         let title = strings['enter folder name'];
@@ -757,17 +756,14 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         if (!entryName) return;
         entryName = helpers.fixFilename(entryName);
 
-        try {
-          const fs = fsOperation(url);
-          if (arg === 'folder') await fs.createDirectory(entryName);
-          if (arg === 'file') await fs.createFile(entryName);
-          updateAddedFolder(url);
-          reload();
-        } catch (err) {
-          helpers.error(err);
+        const fs = fsOperation(url);
+        if (arg === 'folder') {
+          newUrl = await fs.createDirectory(entryName);
         }
-
-        return;
+        if (arg === 'file') {
+          newUrl = await fs.createFile(entryName);
+        }
+        return newUrl;
       }
 
       if (arg === 'project') {
@@ -793,24 +789,20 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           },
         );
 
-        try {
-          const fs = fsOperation(url);
-          dialogs.loader.create(projectName, strings.loading + '...');
-          await fs.createDirectory(projectName);
-          projectLocation = Url.join(url, projectName, '/');
-          const files = Object.keys(projectFiles); // All project files
-          await createProject(files); // Creating project
-        } catch (err) {
-          helpers.error(err);
-        }
+        dialogs.loader.create(projectName, strings.loading + '...');
+        const fs = fsOperation(url);
+        const files = Object.keys(projectFiles); // All project files
 
+        newUrl = await fs.createDirectory(projectName);
+        projectLocation = Url.join(url, projectName, '/');
+        await createProject(files); // Creating project
         dialogs.loader.destroy();
+        return newUrl;
       }
 
       async function createProject(files) {
         // checking if it's the last file
         if (!files.length) {
-          updateAddedFolder(url);
           reload();
           return;
         }
@@ -855,17 +847,15 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
      */
     function pushToNavbar(name, url, action) {
       $navigation.append(
-        tag('span', {
-          id: getNavId(url),
-          className: 'nav',
-          data_url: url,
-          data_name: name,
-          attr: {
-            action: 'navigation',
-            text: name,
-          },
-          tabIndex: -1,
-        }),
+        <span
+          id={getNavId(url)}
+          className='nav'
+          data-url={url}
+          data-name={name}
+          attr-action='navigation'
+          attr-text={name}
+          tabIndex={-1}
+        ></span>
       );
       $navigation.scrollLeft = $navigation.scrollWidth;
 
@@ -916,25 +906,6 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
      */
     function getNavId(url) {
       return `nav_${url.hashCode()}`;
-    }
-
-    /**
-     * Updates folders that are added in sidebar
-     * @param {String} url
-     */
-    function updateAddedFolder(url) {
-      if (cachedDir[url]) delete cachedDir[url];
-      if (cachedDir[currentDir.url]) delete cachedDir[currentDir.url];
-
-      const regex = new RegExp(escapeStringRegexp(Url.parse(url).url));
-
-      for (let folder of addedFolder) {
-        if (folder.url === url) {
-          folder.remove();
-        } else if (regex.test(currentDir.url)) {
-          folder.reload();
-        }
-      }
     }
 
     /**
