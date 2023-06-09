@@ -22,7 +22,7 @@ import helpers from 'utils/helpers';
 import settings from './settings';
 import constants from './constants';
 import intentHandler from 'handlers/intent';
-import openFolder from './openFolder';
+import openFolder, { addedFolder } from './openFolder';
 import quickToolsInit from 'handlers/quickToolsInit';
 import loadPolyFill from 'utils/polyfill';
 import Url from 'utils/Url';
@@ -88,7 +88,7 @@ async function ondeviceready() {
 
   window.app = document.body;
   window.root = tag.get('#root');
-  window.addedFolder = [];
+  window.addedFolder = addedFolder;
   window.editorManager = null;
   window.toast = toast;
   window.ASSETS_DIRECTORY = Url.join(cordova.file.applicationDirectory, 'www');
@@ -220,6 +220,7 @@ async function ondeviceready() {
   try {
     await loadApp();
   } catch (error) {
+    console.error(error);
     toast(`Error: ${error.message}`);
   } finally {
     setTimeout(() => {

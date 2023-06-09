@@ -80,6 +80,7 @@ export const $input = <textarea
 /**
  * 
  * @param {RowItem} param0 Attributes
+ * @param {string} param0.id Button id
  * @param {string} param0.icon Icon name
  * @param {string} param0.letters Letters to show on button
  * @param {'insert'|'command'|'key'|'custom'} param0.action Action type
@@ -88,10 +89,11 @@ export const $input = <textarea
  * @param {boolean} param0.repeate Whether to repeate the action or not
  * @returns {HTMLButtonElement}
  */
-export function RowItem({ icon, letters, action, value, ref, repeate }) {
+export function RowItem({ id, icon, letters, action, value, ref, repeate }) {
   const $item = <button
     ref={ref}
     className={`icon ${icon}`}
+    data-id={id}
     data-letters={letters}
     data-action={action}
     data-repeate={repeate}

@@ -12,13 +12,14 @@ import restoreTheme from 'lib/restoreTheme';
 
 
 /**
- *
+ * Opens a prompt dialog
  * @param {string} message
  * @param {string} defaultValue
  * @param {"textarea"|"text"|"number"|"tel"|"search"|"email"|"url"} type
  * @param {PromptOptions} options
+ * @returns {Promise<string|number|null>} Returns null if cancelled
  */
-function prompt(message, defaultValue, type = 'text', options = {}) {
+export default function prompt(message, defaultValue, type = 'text', options = {}) {
   return new Promise((resolve) => {
     const inputType = type === 'textarea' ? 'textarea' : 'input';
     type = type === 'filename' ? 'text' : type;
@@ -52,6 +53,7 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
       type: 'button',
       onclick: function () {
         hide();
+        resolve(null);
       },
     });
     const errorMessage = tag('span', {
@@ -150,5 +152,3 @@ function prompt(message, defaultValue, type = 'text', options = {}) {
     }
   });
 }
-
-export default prompt;

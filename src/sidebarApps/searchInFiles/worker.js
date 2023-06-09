@@ -237,12 +237,12 @@ function Skip({ exclude, include }) {
    * Tests whether a file should be skipped based on exclusion and inclusion patterns.
    *
    * @param {object} file - The file to be tested.
-   * @param {string} file.relativeUrl - The relative URL of the file.
+   * @param {string} file.path - The relative URL of the file.
    * @returns {boolean} - Returns true if the file should be skipped, false otherwise.
    */
   function test(file) {
-    return excludeFiles.some((pattern) => minimatch(file.relativeUrl, pattern)) ||
-      !includeFiles.some((pattern) => minimatch(file.relativeUrl, pattern));
+    const match = (pattern) => minimatch(file.path, pattern, { matchBase: true });
+    return excludeFiles.some(match) || !includeFiles.some(match);
   }
 
   return {

@@ -9,6 +9,45 @@ import helpers from '../utils/helpers';
 const fsList = [];
 
 /**
+ * @typedef {Object} Stat
+ * @property {string} name
+ * @property {string} url
+ * @property {string} uri - deprecated
+ * @property {boolean} isFile
+ * @property {boolean} isDirectory
+ * @property {boolean} isLink
+ * @property {number} size
+ * @property {number} modifiedDate
+ * @property {boolean} canRead
+ * @property {boolean} canWrite
+ */
+
+/**
+ * @typedef {Object} File
+ * @property {string} name
+ * @property {string} url
+ * @property {boolean} isFile
+ * @property {boolean} isDirectory
+ * @property {boolean} isLink
+ */
+
+/**
+ * @typedef {string|Blob|ArrayBuffer} FileContent
+ * @typedef {Object} FileSystem
+ * @property {function():Promise<File[]>} lsDir List directory
+ * @property {(url:string) =>Promise<FileContent>} readFile Read file
+ * @property {(url:string, data:FileContent) =>Promise<void>} writeFile Write file content
+ * @property {(url:string, data:FileContent) =>Promise<string>} createFile Create file and return url of the created file
+ * @property {(url:string) =>Promise<string>} createDirectory Create directory and return url of the created directory
+ * @property {(url:string) =>Promise<void>} delete Delete file or directory
+ * @property {(url:string, dest:string) =>Promise<string>} copyTo Copy file or directory to destination
+ * @property {(url:string, dest:string) =>Promise<string>} moveTo Move file or directory to destination
+ * @property {(url:string, newname:string) =>Promise<string>} renameTo Rename file or directory
+ * @property {(url:string) =>Promise<boolean>} exists Check if file or directory exists
+ * @property {(url:string) =>Promise<Stat>} stat Get file or directory stat
+ */
+
+/**
  *
  * @param {...string} url
  * @returns {FileSystem}
@@ -23,8 +62,7 @@ function fsOperation(...url) {
 }
 
 /**
- *
- * @param {InternalFs} internalFs
+ * Initialize file system
  * @param {string} url
  */
 function internalFsOperation(url) {
@@ -54,7 +92,16 @@ function internalFsOperation(url) {
     moveTo(dest) {
       return internalFs.moveOrCopy('moveTo', url, dest);
     },
-    renameTo(newname) {
+    async renameTo(newname) {
+      const name = Url.basename(url).toLowerCase();
+
+      if (name === newname.toLowerCase()) {
+        const uuid = helpers.uuid();
+        let newUrl = await this.renameTo(uuid);
+        newUrl = await fsOperation(newUrl).renameTo(newname);
+        return newUrl;
+      }
+
       return internalFs.renameFile(url, newname);
     },
     exists() {
@@ -67,8 +114,7 @@ function internalFsOperation(url) {
 }
 
 /**
- *
- * @param {ExternalFs} externalFs
+ * Initialize external file system
  * @param {string} url
  */
 function externalFsOperation(url) {
@@ -118,38 +164,39 @@ function externalFsOperation(url) {
   };
 }
 
-function listDir(url) {
-  return new Promise((resolve, reject) => {
-    const files = [];
-    internalFs
-      .listDir(url)
-      .then((entries) => {
-        entries.map((entry) => {
-          const url = decodeURIComponent(entry.nativeURL);
-          const name = Url.basename(url);
-          files.push({
-            name,
-            url,
-            isDirectory: entry.isDirectory,
-            isFile: entry.isFile,
-          });
-        });
-        resolve(files);
-      })
-      .catch(reject);
+/**
+ * List directory
+ * @param {string} url 
+ * @returns {Promise<File[]>}
+ */
+async function listDir(url) {
+  const files = [];
+  const entries = await internalFs.listDir(url);
+
+  entries.map((entry) => {
+    const url = decodeURIComponent(entry.nativeURL);
+    const name = Url.basename(url);
+    files.push({
+      name,
+      url,
+      isDirectory: entry.isDirectory,
+      isFile: entry.isFile,
+    });
   });
+
+  return files;
 }
 
 fsOperation.extend = (test, fs) => {
   fsList.push({ test, fs });
-}
+};
 
 fsOperation.remove = (test) => {
   const index = fsList.findIndex((fs) => fs.test === test);
   if (index !== -1) {
     fsList.splice(index, 1);
   }
-}
+};
 
 fsOperation.extend(Sftp.test, Sftp.fromUrl);
 fsOperation.extend(Ftp.test, Ftp.fromUrl);
@@ -176,7 +223,7 @@ fsOperation.extend((url) => /^https?:/.test(url), (url) => {
         onprogress: progress,
       });
     }
-  }
+  };
 });
 
 export default fsOperation;

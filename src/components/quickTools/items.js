@@ -1,15 +1,3 @@
-import Ref from 'html-tag-js/ref';
-
-/**
- * @typedef {'save'|'ctrl'|'shift'|'alt'|'meta'} RefId
- */
-
-let $save;
-let $ctrl;
-let $shift;
-let $alt;
-let $meta;
-
 export default [
   item('ctrl-key', 'letters', 'ctrl', undefined, 'ctrl', false),
   item('tab-key', 'keyboard_tab', 'key', 9),
@@ -49,64 +37,6 @@ export default [
 ];
 
 /**
- * Sets reference
- * @param {RefId} id
- * @param {Ref} reference
- */
-export function setRef(id, reference) {
-  ref(id, reference);
-}
-
-/**
- * Gets reference 
- * @param {RefId} id 
- * @returns {Ref}
- */
-export function getRef(id) {
-  return ref(id);
-}
-
-/**
- * Set or get ref
- * @param {RefId} id 
- * @param {Ref} [reference] 
- */
-function ref(id, reference) {
-  switch (id) {
-    case 'save':
-      if (reference) {
-        $save = reference;
-        return;
-      }
-      return $save;
-    case 'ctrl':
-      if (reference) {
-        $ctrl = reference;
-        return;
-      }
-      return $ctrl;
-    case 'shift':
-      if (reference) {
-        $shift = reference;
-        return;
-      }
-      return $shift;
-    case 'alt':
-      if (reference) {
-        $alt = reference;
-        return;
-      }
-      return $alt;
-    case 'meta':
-      if (reference) {
-        $meta = reference;
-        return;
-      }
-      return $meta;
-  }
-}
-
-/**
  * Get description of a button
  * @param {string} id button id 
  * @returns 
@@ -133,8 +63,5 @@ function item(id, icon, action, value, letters, repeate) {
     value,
     letters,
     repeate,
-    get ref() {
-      return ref(action);
-    },
   };
 }

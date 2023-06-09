@@ -39,42 +39,42 @@ function reset() {
  * @param {HTMLElement} $footer 
  */
 export default function init() {
-  const { $footer, $toggler, $input, $shift, $ctrl, $alt, $meta, $save } = quickTools;
+  const { $footer, $toggler, $input } = quickTools;
 
   $toggler.addEventListener('click', () => {
     actions('toggle');
   });
 
   key.on('shift', (value) => {
-    if (value) $shift.classList.add('active');
-    else $shift.classList.remove('active');
+    if (value) $footer.setAttribute('data-shift', 'true');
+    else $footer.removeAttribute('data-shift');
   });
 
   key.on('ctrl', (value) => {
-    if (value) $ctrl.classList.add('active');
-    else $ctrl.classList.remove('active');
+    if (value) $footer.setAttribute('data-ctrl', 'true');
+    else $footer.removeAttribute('data-ctrl');
   });
 
   key.on('alt', (value) => {
-    if (value) $alt.classList.add('active');
-    else $alt.classList.remove('active');
+    if (value) $footer.setAttribute('data-alt', 'true');
+    else $footer.removeAttribute('data-alt');
   });
 
   key.on('meta', (value) => {
-    if (value) $meta.classList.add('active');
-    else $meta.classList.remove('active');
+    if (value) $footer.setAttribute('data-meta', 'true');
+    else $footer.removeAttribute('data-meta');
   });
 
   editorManager.on(['file-content-changed', 'switch-file'], () => {
     if (editorManager.activeFile?.isUnsaved) {
-      $save.classList.add('notice');
+      $footer.setAttribute('data-unsaved', 'true');
     } else {
-      $save.classList.remove('notice');
+      $footer.removeAttribute('data-unsaved');
     }
   });
 
   editorManager.on('save-file', () => {
-    $save.classList.remove('notice');
+    $footer.removeAttribute('data-unsaved');
   });
 
   editorManager.editor.on('focus', () => {

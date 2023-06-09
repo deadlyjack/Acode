@@ -2,20 +2,7 @@ import ajax from '@deadlyjack/ajax';
 import helpers from '../utils/helpers';
 import Url from '../utils/Url';
 
-const { resolveLocalFileSystemURL } = window;
-
-window.resolveLocalFileSystemURL = (url, success, error) => {
-  const onError = (err) => {
-    if (err.code) {
-      err.message = getErrorMessage(err.code);
-    }
-    error(err);
-  };
-
-  resolveLocalFileSystemURL(url, success, onError);
-};
-
-const fs = {
+export default {
   /**
    *
    * @param {string} url
@@ -23,6 +10,7 @@ const fs = {
    */
   listDir(url) {
     return new Promise((resolve, reject) => {
+      reject = setMessage(reject);
       window.resolveLocalFileSystemURL(url, success, reject);
 
       function success(fs) {
@@ -52,6 +40,7 @@ const fs = {
     if (data instanceof ArrayBuffer) data = new Blob([data]);
 
     return new Promise((resolve, reject) => {
+      reject = setMessage(reject);
       window.resolveLocalFileSystemURL(
         dirname,
         (entry) => {
@@ -80,6 +69,7 @@ const fs = {
    */
   delete(filename) {
     return new Promise((resolve, reject) => {
+      reject = setMessage(reject);
       window.resolveLocalFileSystemURL(
         filename,
         (entry) => {
@@ -102,7 +92,7 @@ const fs = {
    */
   readFile(filename, encoding) {
     return new Promise((resolve, reject) => {
-      if (!filename) return reject('Invalid valud of fileURL: ' + filename);
+      reject = setMessage(reject);
       window.resolveLocalFileSystemURL(
         filename,
         (fileEntry) => {
@@ -122,15 +112,11 @@ const fs = {
             } catch (error) {
               fileEntry.file((file) => {
                 const fileReader = new FileReader();
-                fileReader.onloadend = function () {
-                  resolve({
-                    data: this.result,
-                  });
-                };
-
                 fileReader.onerror = reject;
-
                 fileReader.readAsArrayBuffer(file);
+                fileReader.onloadend = () => {
+                  resolve({ data: fileReader.result });
+                };
               }, reject);
             }
           })();
@@ -146,13 +132,17 @@ const fs = {
    */
   renameFile(url, newname) {
     return new Promise((resolve, reject) => {
+      reject = setMessage(reject);
       window.resolveLocalFileSystemURL(
         url,
         (fs) => {
           fs.getParent((parent) => {
             const parentUrl = parent.nativeURL;
-            const newUrl = Url.join(parentUrl, newname);
-            fs.moveTo(parent, newname, () => resolve(newUrl), reject);
+            let newUrl = Url.join(parentUrl, newname);
+            fs.moveTo(parent, newname, async () => {
+              const stats = await this.stats(newUrl);
+              resolve(stats.url);
+            }, reject);
           }, reject);
         },
         reject,
@@ -168,15 +158,17 @@ const fs = {
    */
   createDir(path, dirname) {
     return new Promise((resolve, reject) => {
+      reject = setMessage(reject);
       window.resolveLocalFileSystemURL(
         path,
         (fs) => {
           fs.getDirectory(
             dirname,
-            {
-              create: true,
+            { create: true },
+            async () => {
+              const stats = await this.stats(Url.join(path, dirname));
+              resolve(stats.url);
             },
-            () => resolve(Url.join(path, dirname)),
             reject,
           );
         },
@@ -201,6 +193,7 @@ const fs = {
    */
   moveOrCopy(action, src, dest) {
     return new Promise((resolve, reject) => {
+      reject = setMessage(reject);
       this.verify(src, dest)
         .then((res) => {
           const { src, dest } = res;
@@ -216,14 +209,21 @@ const fs = {
     });
   },
 
+  /**
+   * Return the stats of a file or directory
+   * @param {string} filename 
+   * @returns {object}
+   */
   stats(filename) {
     return new Promise((resolve, reject) => {
+      reject = setMessage(reject);
       window.resolveLocalFileSystemURL(filename, (entry) => {
         filename = entry.nativeURL;
         sdcard.stats(
           filename,
           (stats) => {
             stats.uri = filename;
+            stats.url = filename;
             resolve(stats);
           },
           reject,
@@ -240,6 +240,7 @@ const fs = {
    */
   verify(src, dest) {
     return new Promise((resolve, reject) => {
+      reject = setMessage(reject);
       window.resolveLocalFileSystemURL(
         src,
         (srcEntry) => {
@@ -279,6 +280,7 @@ const fs = {
    */
   exists(url) {
     return new Promise((resolve, reject) => {
+      reject = setMessage(reject);
       window.resolveLocalFileSystemURL(
         url,
         (entry) => {
@@ -292,6 +294,16 @@ const fs = {
     });
   },
 };
+
+function setMessage(reject) {
+  return function (err) {
+    if (err.code) {
+      const error = new Error(getErrorMessage(err.code));
+      return reject(error);
+    }
+    reject(err);
+  };
+}
 
 /**
  * Get error message for file error code
@@ -328,5 +340,3 @@ export function getErrorMessage(code) {
       return 'Uncaught error';
   }
 }
-
-export default fs;

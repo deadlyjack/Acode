@@ -38,6 +38,20 @@ class Settings {
     showHiddenFiles: false,
     sortByName: true,
   };
+  #excludeFolders = [
+    '**/node_modules/**',
+    '**/.git/**',
+    '**/.vscode/**',
+    '**/.idea/**',
+    '**/bower_components/**',
+    '**/dist/**',
+    '**/build/**',
+    '**/coverage/**',
+    '**/temp/**',
+    '**/tmp/**',
+    '**/logs/**',
+    '**/flow-typed/**',
+  ];
 
   QUICKTOOLS_ROWS = 2;
   QUICKTOOLS_GROUP_CAPACITY = 8;
@@ -118,6 +132,7 @@ class Settings {
       useTextareaForIME: false,
       touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 10,
       quicktoolsItems: [...Array(this.#QUICKTOOLS_SIZE).keys()],
+      excludeFolders: this.#excludeFolders,
     };
     this.value = structuredClone(this.#defaultSettings);
   }

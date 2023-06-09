@@ -6,6 +6,7 @@ export default {
   /**
    * Returns basename from a url eg. 'index.html' from 'ftp://localhost/foo/bar/index.html'
    * @param {string} url
+   * @returns {string}
    */
   basename(url) {
     url = this.parse(url).url;
@@ -31,6 +32,7 @@ export default {
   /**
    * Checks if given urls are same or not
    * @param  {...String} urls 
+   * @returns {Boolean}
    */
   areSame(...urls) {
     let firstUrl = urls[0];
@@ -49,6 +51,7 @@ export default {
    * If there is no . in the last portion of the path, or if there are no .
    * characters other than the first character of the basename of path (see path.basename()),
    * an empty string is returned.
+   * @returns {String}
    */
   extname(url) {
     const name = this.basename(url);
@@ -56,7 +59,7 @@ export default {
     else return null;
   },
   /**
-   *
+   * Join all arguments together and normalize the resulting path.
    * @param  {...string} pathnames
    * @returns {String}
    */
@@ -99,6 +102,7 @@ export default {
   /**
    * Make url safe by encoding url components
    * @param {string} url
+   * @returns {string}
    */
   safe(url) {
     let { url: uri, query } = this.parse(url);
@@ -120,6 +124,7 @@ export default {
   /**
    * Gets pathname from url eg. gets '/foo/bar' from 'ftp://myhost.com/foo/bar'
    * @param {string} url
+   * @returns {string}
    */
   pathname(url) {
     if (typeof url !== 'string' || !this.PROTOCOL_PATTERN.test(url)) return url;
@@ -148,6 +153,7 @@ export default {
   /**
    * Returns dirname from url eg. 'ftp://localhost/foo/'  from 'ftp://localhost/foo/bar'
    * @param {string} url
+   * @returns {string}
    */
   dirname(url) {
     if (typeof url !== 'string') throw new Error('URL must be string');
@@ -178,7 +184,7 @@ export default {
   /**
    * Parse given url into url and query
    * @param {string} url
-   * @returns {URLObject}
+   * @returns {{url:string, query:string}}}
    */
   parse(url) {
     const [uri, query = ''] = url.split(/(?=\?)/);
@@ -198,6 +204,7 @@ export default {
    * @param {string} [urlObj.password]
    * @param {string|number} [urlObj.port]
    * @param {object} [urlObj.query]
+   * @returns {string}
    */
   formate(urlObj) {
     let { protocol, hostname, username, password, path, port, query } = urlObj;
@@ -256,7 +263,7 @@ export default {
   /**
    * Decodes url and returns username, password, hostname, pathname, port and query
    * @param {string} url 
-   * @returns 
+   * @returns {URLObject}
    */
   decodeUrl(url) {
     const uuid = 'uuid' + Math.floor(Math.random() + Date.now() * 1000000);
@@ -298,6 +305,18 @@ export default {
     }
 
     return { username, password, hostname, pathname, port, query };
+  },
+  /**
+   * Removes trailing slash from url
+   * @param {string} url 
+   * @returns 
+   */
+  trimSlash(url) {
+    const parsed = this.parse(url);
+    if (parsed.url.endsWith('/')) {
+      parsed.url = parsed.url.slice(0, -1);
+    }
+    return this.join(parsed.url, parsed.query);
   },
   PROTOCOL_PATTERN: /^[a-z]+:\/\/\/?/i,
 };

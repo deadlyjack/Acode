@@ -1,3 +1,4 @@
+@import './mixins.scss';
 @import './keyframes.scss';
 @import './fileInfo.scss';
 @import './markdown.scss';
@@ -239,19 +240,7 @@ a.icon {
   }
 
   &.notice {
-    position: relative;
-
-    &::after {
-      content: '•';
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      color: #ffda0c;
-      font-size: 1.4em;
-      height: fit-content;
-      line-height: 4px;
-      text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
-    }
+    @include icon-badge;
   }
 
   &.angularjs::before {
@@ -326,10 +315,7 @@ footer {
       min-width: 100%;
 
       .icon.active {
-        background-color: inherit !important;
-        color: rgba(0, 0, 0, 0.2);
-        color: var(--active-color);
-        text-shadow: 0 0 0.5rem var(--box-shadow-color);
+        @include active-icon;
       }
     }
 

@@ -106,6 +106,7 @@ export default function listItems($list, items, callback, sort = true) {
         res = $checkbox.checked;
       } else if (prompt) {
         res = await dialogs.prompt(prompt, value, promptType, promptOptions);
+        if (res === null) return;
       } else if (file || folder) {
         const { url } = await FileBrowser(mode);
         res = url;
@@ -126,10 +127,19 @@ export default function listItems($list, items, callback, sort = true) {
 
   function setValueText($valueText, value, valueText) {
     if (!$valueText) return;
+
     if (valueText) {
-      $valueText.textContent = valueText(value);
-    } else {
-      $valueText.textContent = value;
+      value = valueText(value);
     }
+
+    if (typeof value === 'string') {
+      if (value.match('\n')) [value] = value.split('\n');
+
+      if (value.length > 47) {
+        value = value.slice(0, 47) + '...';
+      }
+    }
+
+    $valueText.textContent = value;
   }
 }

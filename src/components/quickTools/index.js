@@ -1,3 +1,4 @@
+import './style.scss';
 import Ref from 'html-tag-js/ref';
 import {
   $footer,
@@ -7,7 +8,6 @@ import {
   SearchRow1,
   SearchRow2,
 } from './footer';
-import { setRef } from './items';
 import settings from 'lib/settings';
 
 
@@ -25,17 +25,6 @@ const $searchInput = new Ref();
 const $replaceInput = new Ref();
 const $searchPos = new Ref();
 const $searchTotal = new Ref();
-const $shift = new Ref();
-const $ctrl = new Ref();
-const $save = new Ref();
-const $alt = new Ref();
-const $meta = new Ref();
-
-setRef("save", $save);
-setRef("ctrl", $ctrl);
-setRef("shift", $shift);
-setRef("alt", $alt);
-setRef("meta", $meta);
 
 export default {
   get $footer() {
@@ -89,19 +78,4 @@ export default {
   get $searchTotal() {
     return $searchTotal;
   },
-  get $shift() {
-    return $shift;
-  },
-  get $ctrl() {
-    return $ctrl;
-  },
-  get $alt() {
-    return $alt;
-  },
-  get $meta() {
-    return $meta;
-  },
-  get $save() {
-    return $save;
-  }
 };
