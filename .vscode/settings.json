@@ -26,5 +26,27 @@
     "jsx": {
       "attr_quotes": "single"
     }
-  }
+  },
+  "cSpell.words": [
+    "Acode",
+    "addedfolder",
+    "addedfolders",
+    "backbutton",
+    "deadlyjack",
+    "deviceready",
+    "endregion",
+    "ERUDA",
+    "INAPP",
+    "inputhints",
+    "lastfile",
+    "menubutton",
+    "modelist",
+    "nord",
+    "openfolder",
+    "pallete",
+    "QUICKTOOLS",
+    "Roboto",
+    "sdcard",
+    "smali"
+  ]
 }
