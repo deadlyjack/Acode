@@ -1,10 +1,4 @@
 body {
-  header {
-    .icon {
-      font-size: 1.5em !important;
-    }
-  }
-
   &.no-animation {
     footer {
       border-top: solid 1px rgba(0, 0, 0, 0.2);
@@ -28,19 +22,6 @@ body {
     wc-page {
       &#root {
         &[open-file-list-pos='bottom'] {
-          header {
-            bottom: 0;
-            top: auto !important;
-            z-index: 99;
-          }
-
-          #sidebar-toggler {
-            bottom: 0;
-            top: auto !important;
-            z-index: 99;
-            transition: none !important;
-          }
-
           &[footer-height='1'] {
             header {
               bottom: 40px;
@@ -70,13 +51,22 @@ body {
               bottom: 120px;
             }
           }
+
+          header {
+            bottom: 0;
+            top: auto !important;
+            z-index: 99;
+          }
+
+          #sidebar-toggler {
+            bottom: 0;
+            top: auto !important;
+            z-index: 99;
+            transition: none !important;
+          }
         }
 
         &:not(.top-bar) {
-          #header-toggler {
-            display: flex;
-          }
-
           &.show-header {
             #header-toggler {
               opacity: 1;
@@ -93,10 +83,10 @@ body {
               border: solid 1px var(--primary-text-color);
             }
           }
-        }
 
-        #sidebar-toggler {
-          display: flex;
+          #header-toggler {
+            display: flex;
+          }
         }
 
         &.top-bar {
@@ -109,6 +99,76 @@ body {
             border-radius: 0;
             border: none;
             box-shadow: none !important;
+          }
+
+          .open-file-list {
+            top: 0;
+            width: calc(100% - 140px);
+          }
+
+          >header {
+            display: flex;
+            justify-content: flex-end;
+
+            .icon {
+              margin: 0;
+            }
+          }
+        }
+
+        &.primary {
+          &.top-bar {
+            >main {
+              height: calc(100vh - 30px);
+              min-height: calc(100vh - 30px);
+            }
+          }
+
+          >main {
+            height: 100vh;
+            min-height: 100vh;
+          }
+
+          &[footer-height='1'] {
+            &.top-bar {
+              >main {
+                height: calc(100vh - 70px);
+                min-height: calc(100vh - 70px);
+              }
+            }
+
+            >main {
+              height: calc(100vh - 40px);
+              min-height: calc(100vh - 40px);
+            }
+          }
+
+          &[footer-height='2'] {
+            &.top-bar {
+              main {
+                height: calc(100vh - 110px);
+                min-height: calc(100vh - 110px);
+              }
+            }
+
+            main {
+              height: calc(100vh - 80px);
+              min-height: calc(100vh - 80px);
+            }
+          }
+
+          &[footer-height='3'] {
+            &.top-bar {
+              main {
+                height: calc(100vh - 150px);
+                min-height: calc(100vh - 150px);
+              }
+            }
+
+            main {
+              height: calc(100vh - 120px);
+              min-height: calc(100vh - 120px);
+            }
           }
         }
 
@@ -138,84 +198,16 @@ body {
           }
         }
 
-        &.top-bar {
-          .open-file-list {
-            top: 0;
-            width: calc(100% - 140px);
-          }
-
-          >header {
-            display: flex;
-            justify-content: flex-end;
-
-            .icon {
-              margin: 0;
-            }
-          }
-        }
-
-        &.primary {
-          &[footer-height='1'] {
-            &.top-bar {
-              >main {
-                height: calc(100vh - 70px);
-                height: calc(100vh - (var(--footer-height) + 30px));
-                min-height: calc(100vh - 70px);
-                min-height: calc(100vh - (var(--footer-height) + 30px));
-              }
-            }
-
-            >main {
-              height: calc(100vh - 40px);
-              height: calc(100vh - var(--footer-height));
-              min-height: calc(100vh - 40px);
-              min-height: calc(100vh - var(--footer-height));
-            }
-          }
-
-          &[footer-height='2'] {
-            &.top-bar {
-              main {
-                height: calc(100vh - 110px);
-                height: calc(100vh - (var(--footer-height) * 2 + 30px));
-                min-height: calc(100vh - 110px);
-                min-height: calc(100vh - (var(--footer-height) * 2 + 30px));
-              }
-            }
-
-            main {
-              height: calc(100vh - 80px);
-              height: calc(100vh - (var(--footer-height) * 2));
-              min-height: calc(100vh - 80px);
-              min-height: calc(100vh - (var(--footer-height) * 2));
-            }
-          }
-
-          &[footer-height='3'] {
-            &.top-bar {
-              main {
-                height: calc(100vh - 150px);
-                height: calc(100vh - (var(--footer-height) * 3 + 30px));
-                min-height: calc(100vh - 150px);
-                min-height: calc(100vh - (var(--footer-height) * 3 + 30px));
-              }
-            }
-
-            main {
-              height: calc(100vh - 120px);
-              height: calc(100vh - (var(--footer-height) * 3));
-              min-height: calc(100vh - 120px);
-              min-height: calc(100vh - (var(--footer-height) * 3));
-            }
-          }
-        }
-
-        &.top-bar {
-          main {
-            height: calc(100% - 30px);
-          }
+        #sidebar-toggler {
+          display: flex;
         }
       }
+    }
+  }
+
+  header {
+    .icon {
+      font-size: 1.5em !important;
     }
   }
 }
@@ -315,18 +307,14 @@ wc-page {
       main,
       .main {
         height: calc(100vh - 115px);
-        height: calc(100vh - (var(--footer-height) + var(--header-height) + 30px));
         min-height: calc(100vh - 115px);
-        min-height: calc(100vh - (var(--footer-height) + var(--header-height) + 30px));
       }
     }
 
     main,
     .main {
       height: calc(100vh - 85px);
-      height: calc(100vh - (var(--footer-height) + var(--header-height)));
       min-height: calc(100vh - 85px);
-      min-height: calc(100vh - (var(--footer-height) + var(--header-height)));
     }
   }
 
@@ -348,18 +336,14 @@ wc-page {
       .main,
       main {
         height: calc(100vh - 155px);
-        height: calc(100vh - (var(--footer-height) * 2 + var(--header-height) + 30px));
         min-height: calc(100vh - 155px);
-        min-height: calc(100vh - (var(--footer-height) * 2 + var(--header-height) + 30px));
       }
     }
 
     .main,
     main {
       height: calc(100vh - 125px);
-      height: calc(100vh - (var(--footer-height) * 2 + var(--header-height)));
       min-height: calc(100vh - 125px);
-      min-height: calc(100vh - (var(--footer-height) * 2 + var(--header-height)));
     }
   }
 
@@ -381,18 +365,14 @@ wc-page {
       .main,
       main {
         height: calc(100vh - 195px);
-        height: calc(100vh - (var(--footer-height) * 3 + var(--header-height) + 30px));
         min-height: calc(100vh - 195px);
-        min-height: calc(100vh - (var(--footer-height) * 3 + var(--header-height) + 30px));
       }
     }
 
     .main,
     main {
       height: calc(100vh - 165px);
-      height: calc(100vh - (var(--footer-height) * 3 + var(--header-height)));
       min-height: calc(100vh - 165px);
-      min-height: calc(100vh - (var(--footer-height) * 3 + var(--header-height)));
     }
   }
 
@@ -406,9 +386,7 @@ wc-page {
   &.top-bar {
     main {
       height: calc(100vh - 75px);
-      height: calc(100vh - (var(--header-height) + 30px));
       min-height: calc(100vh - 75px);
-      min-height: calc(100vh - (var(--header-height) + 30px));
     }
   }
 
@@ -418,9 +396,7 @@ wc-page {
     &:empty {
       position: fixed;
       top: 45px;
-      top: var(--header-height);
       height: calc(100% - 45px);
-      height: calc(100% - var(--header-height));
       width: 100%;
       display: flex;
 
@@ -480,9 +456,7 @@ wc-page {
   main,
   .main {
     height: calc(100vh - 45px);
-    height: calc(100vh - var(--header-height));
     min-height: calc(100vh - 45px);
-    min-height: calc(100vh - var(--header-height));
     margin: auto;
     z-index: 1;
 

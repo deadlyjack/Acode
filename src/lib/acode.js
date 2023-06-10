@@ -74,6 +74,7 @@ export default class Acode {
     this.define('sidebarApps', {
       add: sidebarApps.add,
       get: sidebarApps.get,
+      remove: sidebarApps.remove,
     });
     this.define('fileList', files);
   }

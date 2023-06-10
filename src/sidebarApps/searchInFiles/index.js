@@ -84,6 +84,7 @@ let useIncludeAndExclude = false;
 let searchResult = null;
 let replacing = false;
 let newFiles = 0;
+let searching = false;
 
 addEventListener($regExp, 'change', onInput);
 addEventListener($wholeWord, 'change', onInput);
@@ -94,6 +95,7 @@ addEventListener($exclude, 'input', onInput);
 addEventListener($btnReplaceAll, 'click', replaceAll);
 
 files.on('push-file', () => {
+  if (!searching) return;
   $error.value = strings['missed files'].replace('{count}', ++newFiles);
 });
 
@@ -271,6 +273,7 @@ async function onWorkerMessage(e) {
           { row: 0, column: 0 },
         );
       }
+      searching = false;
       terminateWorker(false);
       break;
     }
@@ -318,6 +321,7 @@ function onInput(e) {
   }
 
   terminateWorker();
+  searching = false;
   newFiles = 0;
   $error.value = '';
   results.length = 0;
@@ -353,6 +357,7 @@ async function searchAll() {
     return;
   }
 
+  searching = true;
   setMode(); // set mode removes ghost text
   searchResult.setGhostText(strings['searching...'], { row: 0, column: 0 });
   sendMessage('search-files', allFiles, regex, options);
