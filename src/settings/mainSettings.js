@@ -7,12 +7,14 @@ import defaultFormatter from './defaultFormatter';
 import rateBox from '../components/dialogs/rateBox';
 import Donate from '../pages/donate';
 import plugins from '../pages/plugins';
-import settingsPage from '../components/settinggPage';
+import settingsPage from '../components/settingsPage';
 import dialogs from '../components/dialogs';
 import previewSettings from './previewSettings';
 import removeAds from '../lib/removeAds';
 import appSettings from '../lib/settings';
 import helpers from '../utils/helpers';
+import openFile from 'lib/openFile';
+import settings from '../lib/settings';
 
 export default function settingsMain() {
   const title = strings.settings.capitalize();
@@ -81,6 +83,11 @@ export default function settingsMain() {
       text: strings['preview settings'],
       icon: 'play_arrow',
       index: 4,
+    },
+    {
+      key: 'editSettings',
+      text: `${strings['edit']} settings.json`,
+      icon: 'edit',
     }
   ];
 
@@ -137,6 +144,12 @@ export default function settingsMain() {
       case 'preview':
         previewSettings();
         break;
+
+      case 'editSettings': {
+        actionStack.pop();
+        openFile(settings.settingsFile);
+        break;
+      }
 
       case 'reset':
         const confirmation = await dialogs.confirm(strings.warning, strings['restore default settings']);

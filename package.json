@@ -36,9 +36,7 @@
       "cordova-plugin-ftp": {},
       "cordova-plugin-sdcard": {}
     },
-    "platforms": [
-      "android"
-    ]
+    "platforms": []
   },
   "repository": {
     "type": "git",
@@ -48,9 +46,6 @@
     "url": "https://github.com/deadlyjack/acode/issues"
   },
   "homepage": "https://github.com/deadlyjack/acode#readme",
-  "browserslist": [
-    "> 0.25%, not dead"
-  ],
   "devDependencies": {
     "@babel/cli": "^7.21.5",
     "@babel/core": "^7.22.1",
@@ -109,5 +104,5 @@
     "vanilla-picker": "^2.11.2",
     "yargs": "^17.7.2"
   },
-  "resolutions": {}
+  "browserslist": "cover 100%,not android < 5"
 }

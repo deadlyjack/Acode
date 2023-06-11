@@ -153,16 +153,17 @@ export default {
   getIconForFile(filename) {
     let ext = Url.extname(filename);
 
-    const MOVIE = ['mp4', 'm4a', 'mov', '3gp', 'wmv', 'flv', 'avi'];
-    const IMAGE = ['png', 'jpeg', 'jpg', 'gif', 'ico', 'webp'];
-    const SONG = ['wav', 'mp3', 'flac'];
-    const ZIP = ['zip', 'rar', 'tar', 'deb'];
+    const MOVIE = /\.(mp4|m4a|mov|3gp|wmv|flv|avi)$/i;
+    const IMAGE = /\.(png|jpg|jpeg|gif|bmp|svg|ico|webp)$/i;
+    const SONG = /\.(mp3|wav|ogg|flac|aac)$/i;
+    const ZIP = /\.(zip|rar|7z|tar|gz|gzip|dmg|iso)$/i;
+    const ANDROID = /\.(apk|aab)$/i;
 
-    if (ext === 'apk') return 'icon android';
-    if (SONG.includes(ext)) return 'icon audiotrack';
-    if (ZIP.includes(ext)) return 'icon zip';
-    if (IMAGE.includes(ext)) return 'icon image';
-    if (MOVIE.includes(ext)) return 'icon movie';
+    if (ANDROID.test(ext)) return 'icon android';
+    if (SONG.test(ext)) return 'icon audiotrack';
+    if (ZIP.test(ext)) return 'icon zip';
+    if (IMAGE.test(ext)) return 'icon image';
+    if (MOVIE.test(ext)) return 'icon movie';
 
     return `file file_type_${this.getFileType(filename)}`;
   },

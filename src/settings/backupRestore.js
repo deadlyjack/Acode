@@ -1,11 +1,10 @@
-import helpers from '../utils/helpers';
-import dialogs from '../components/dialogs';
-import fsOperation from '../fileSystem';
-import Url from '../utils/Url';
-import FileBrowser from '../pages/fileBrowser';
-import Uri from '../utils/Uri';
-import settingsPage from '../components/settinggPage';
-import appSettings from '../lib/settings';
+import dialogs from 'components/dialogs';
+import fsOperation from 'fileSystem';
+import Url from 'utils/Url';
+import FileBrowser from 'pages/fileBrowser';
+import Uri from 'utils/Uri';
+import settingsPage from 'components/settingsPage';
+import appSettings from 'lib/settings';
 
 function backupRestore() {
   const title = strings.backup.capitalize() + '/' + strings.restore.capitalize();

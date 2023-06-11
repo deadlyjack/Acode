@@ -353,7 +353,7 @@ public class SDcard extends CordovaPlugin {
             activityResultCallback.success(uri.toString());
           } else {
             activityResultCallback.error(
-              "No write permisson: " + uri.toString()
+              "No write permission: " + uri.toString()
             );
           }
         }
@@ -746,7 +746,14 @@ public class SDcard extends CordovaPlugin {
                   null,
                   null
                 );
-            } catch (SecurityException | IllegalArgumentException | Error e) {
+            } catch (
+              NullPointerException
+              | SecurityException
+              | IllegalArgumentException
+              | Error e
+            ) {
+              Log.d("sdCard", "lsDir: " + src);
+              Log.e("sdCard", "lsDir", e);
               callback.error("Cannot read directory.");
               return;
             }

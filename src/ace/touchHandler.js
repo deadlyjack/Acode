@@ -13,6 +13,8 @@ export default function addTouchListeners(editor, minimal, onclick) {
   const { renderer, container: $el } = editor;
   const { scroller, $gutter } = renderer;
 
+  const { Range } = ace.require('ace/range');
+
   let {
     diagonalScrolling,
     reverseScrolling,
@@ -305,6 +307,12 @@ export default function addTouchListeners(editor, minimal, onclick) {
       e.preventDefault();
       if (!minimal) {
         const shiftKey = key.shift;
+        const ctrlKey = key.ctrl;
+        if (ctrlKey) {
+          moveCursorTo(clientX, clientY, false, true);
+          return;
+        }
+
         moveCursorTo(clientX, clientY, shiftKey);
         if (shiftKey) {
           selectionMode($end);
@@ -518,8 +526,15 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * @param {number} y 
    * @param {boolean} [shiftKey] 
    */
-  function moveCursorTo(x, y, shiftKey = false) {
+  function moveCursorTo(x, y, shiftKey = false, ctrlKey = false) {
     const pos = renderer.screenToTextCoordinates(x, y);
+
+    if (ctrlKey) {
+      const range = new Range(pos.row, pos.column, pos.row, pos.column);
+      editor.selection.addRange(range);
+      return;
+    }
+
     editor.blur();
     if (shiftKey) {
       let anchor = editor.selection.getSelectionAnchor();

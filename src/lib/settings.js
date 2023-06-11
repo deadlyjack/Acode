@@ -1,7 +1,7 @@
 import constants from './constants';
-import fsOperation from '../fileSystem';
-import helpers from '../utils/helpers';
-import Url from '../utils/Url';
+import fsOperation from 'fileSystem';
+import helpers from 'utils/helpers';
+import Url from 'utils/Url';
 import lang from './lang';
 import ThemeBuilder from './themeBuilder';
 import themes from './themes';
@@ -134,6 +134,9 @@ class Settings {
       touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 10,
       quicktoolsItems: [...Array(this.#QUICKTOOLS_SIZE).keys()],
       excludeFolders: this.#excludeFolders,
+      maxFilesCount: 500,
+      maxDirDepth: 10,
+      maxDirCount: 100,
     };
     this.value = structuredClone(this.#defaultSettings);
   }

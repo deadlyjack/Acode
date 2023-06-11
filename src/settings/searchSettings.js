@@ -1,4 +1,4 @@
-import settingsPage from '../components/settinggPage';
+import settingsPage from '../components/settingsPage';
 import appSettings from '../lib/settings';
 
 export default function searchSettings() {
