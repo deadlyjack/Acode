@@ -123,7 +123,7 @@ export default {
     editor.gotoLine(line, col, true);
   },
   async 'new-file'() {
-    const filename = await dialogs.prompt(
+    let filename = await dialogs.prompt(
       strings['enter file name'],
       constants.DEFAULT_FILE_NAME,
       'filename',
@@ -324,6 +324,9 @@ export default {
       const fs = fsOperation(uri);
       try {
         const newUri = await fs.renameTo(newname);
+        const stat = await fsOperation(newUri).stat();
+
+        newname = stat.name;
         file.uri = newUri;
         file.filename = newname;
 

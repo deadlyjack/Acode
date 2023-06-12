@@ -5,7 +5,7 @@ import openFile from '../lib/openFile';
 import fsOperation from '../fileSystem';
 import ajax from '@deadlyjack/ajax';
 import Url from '../utils/Url';
-import settingsPage from '../components/settinggPage';
+import settingsPage from '../components/settingsPage';
 import lang from '../lib/lang';
 import appSettings from '../lib/settings';
 import actions from '../handlers/quickTools';

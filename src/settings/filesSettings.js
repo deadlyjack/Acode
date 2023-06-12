@@ -1,5 +1,5 @@
-import settingsPage from '../components/settinggPage';
-import appSettings from '../lib/settings';
+import settingsPage from 'components/settingsPage';
+import appSettings from 'lib/settings';
 
 export default function filesSettings() {
   const title = strings.settings;

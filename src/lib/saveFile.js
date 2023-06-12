@@ -122,7 +122,7 @@ async function saveFile(file, isSaveAs = false) {
   }
 
   async function getfilename(url, name) {
-    const filename = await dialogs.prompt(
+    let filename = await dialogs.prompt(
       strings['enter file name'],
       name || '',
       strings['new file'],

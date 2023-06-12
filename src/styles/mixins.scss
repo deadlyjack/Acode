@@ -3,8 +3,8 @@
   width: $size;
   height: $size;
   border-radius: 50%;
-  border: 3px solid rgb(255, 255, 255);
-  border: 3px solid var(--primary-text-color);
+  border: 3px solid rgb(153, 153, 255);
+  border: 3px solid var(--popup-icon-color);
   border-top-color: transparent;
   animation: circular-loader-animation 1s linear infinite;
   box-sizing: border-box;

@@ -12,7 +12,7 @@ import selectionMenu from "./selectionMenu";
 import Page from 'components/page';
 import inputhints from 'components/inputhints';
 import pallete from 'components/pallete';
-import openFolder from './openFolder';
+import openFolder, { addedFolder } from './openFolder';
 import fonts from './fonts';
 import themes from './themes';
 import ThemeBuilder from './themeBuilder';
@@ -38,6 +38,7 @@ export default class Acode {
   }];
 
   constructor() {
+    this.define('addedfolder', addedFolder);
     this.define('Url', Url);
     this.define('fs', fsOperation);
     this.define('projects', projects);

@@ -6,7 +6,7 @@ import { marked } from 'marked';
 import Url from '../../utils/Url';
 import installPlugin from '../../lib/installPlugin';
 import fsOperation from '../../fileSystem';
-import settingsPage from '../../components/settinggPage';
+import settingsPage from '../../components/settingsPage';
 import constants from '../../lib/constants';
 import purchaseListner from '../../handlers/purchase';
 import ajax from '@deadlyjack/ajax';

@@ -1,15 +1,15 @@
 import 'core-js/stable';
 import 'html-tag-js/dist/polyfill';
 
-import '../styles/main.scss';
-import '../styles/page.scss';
-import '../styles/list.scss';
-import '../styles/overrideAceStyle.scss';
+import 'styles/main.scss';
+import 'styles/page.scss';
+import 'styles/list.scss';
+import 'styles/overrideAceStyle.scss';
 
-import '../ace/modelist';
-import '../ace/mode-smali';
-import '../components/WebComponents';
-import './polyfill';
+import 'ace/modelist';
+import 'ace/mode-smali';
+import 'components/WebComponents';
+import 'lib/polyfill';
 
 import mustache from 'mustache';
 import ajax from '@deadlyjack/ajax';
@@ -73,12 +73,12 @@ async function Main() {
     }
   });
 
-  document.addEventListener('deviceready', ondeviceready);
+  document.addEventListener('deviceready', onDeviceReady);
 }
 
-async function ondeviceready() {
+async function onDeviceReady() {
   const isFreePackage = /(free)$/.test(BuildInfo.packageName);
-  const oldRURL = window.resolveLocalFileSystemURL;
+  const oldResolveURL = window.resolveLocalFileSystemURL;
   const {
     externalCacheDirectory, //
     externalDataDirectory,
@@ -167,7 +167,7 @@ async function ondeviceready() {
   acode.setLoadingMessage('Loading settings...');
 
   window.resolveLocalFileSystemURL = function (url, ...args) {
-    oldRURL.call(this, Url.safe(url), ...args);
+    oldResolveURL.call(this, Url.safe(url), ...args);
   };
 
   setTimeout(() => {
@@ -445,14 +445,14 @@ async function loadApp() {
 
 function onClickApp(e) {
   let el = e.target;
-  if (el instanceof HTMLAnchorElement || checkIfInsideAncher()) {
+  if (el instanceof HTMLAnchorElement || checkIfInsideAnchor()) {
     e.preventDefault();
     e.stopPropagation();
 
     system.openInBrowser(el.href);
   }
 
-  function checkIfInsideAncher() {
+  function checkIfInsideAnchor() {
     const allAs = [...document.body.getAll('a')];
 
     for (let a of allAs) {

@@ -1,7 +1,7 @@
 import constants from './constants';
-import fsOperation from '../fileSystem';
-import helpers from '../utils/helpers';
-import Url from '../utils/Url';
+import fsOperation from 'fileSystem';
+import helpers from 'utils/helpers';
+import Url from 'utils/Url';
 import lang from './lang';
 import ThemeBuilder from './themeBuilder';
 import themes from './themes';
@@ -52,6 +52,7 @@ class Settings {
     '**/logs/**',
     '**/flow-typed/**',
   ];
+  #IS_LANDSCAPE = innerWidth > innerHeight;
 
   QUICKTOOLS_ROWS = 2;
   QUICKTOOLS_GROUP_CAPACITY = 8;
@@ -99,12 +100,12 @@ class Settings {
       formatOnSave: false,
       autoCorrect: true,
       openFileListPos: this.OPEN_FILE_LIST_POS_HEADER,
-      quickTools: 1,
+      quickTools: this.#IS_LANDSCAPE ? 0 : 1,
       quickToolsTriggerMode: this.QUICKTOOLS_TRIGGER_MODE_TOUCH,
       editorFont: 'Roboto Mono',
       vibrateOnTap: true,
       fullscreen: false,
-      floatingButton: true,
+      floatingButton: !this.#IS_LANDSCAPE,
       liveAutoCompletion: true,
       showPrintMargin: false,
       printMargin: 80,
@@ -133,6 +134,9 @@ class Settings {
       touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 10,
       quicktoolsItems: [...Array(this.#QUICKTOOLS_SIZE).keys()],
       excludeFolders: this.#excludeFolders,
+      maxFilesCount: 500,
+      maxDirDepth: 10,
+      maxDirCount: 100,
     };
     this.value = structuredClone(this.#defaultSettings);
   }

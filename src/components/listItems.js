@@ -108,6 +108,7 @@ export default function listItems($list, items, callback, sort = true) {
         res = await dialogs.prompt(prompt, value, promptType, promptOptions);
         if (res === null) return;
       } else if (file || folder) {
+        const mode = file ? 'file' : 'folder';
         const { url } = await FileBrowser(mode);
         res = url;
       } else if (color) {

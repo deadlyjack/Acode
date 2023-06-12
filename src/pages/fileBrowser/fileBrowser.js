@@ -380,8 +380,9 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         }
         if ($el.getAttribute('open-doc') === 'true') return;
 
+        const deleteText = currentDir.url === '/' ? strings.remove : strings.delete;
         const options = [
-          ['delete', strings.delete, 'delete'],
+          ['delete', deleteText, 'delete'],
           ['rename', strings.rename, 'text_format'],
         ];
 
@@ -767,9 +768,6 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       }
 
       if (arg === 'project') {
-        /**
-         * Initiating project options
-         */
         projects.list().map((project) => {
           const { name, icon } = project;
           options.push([name, name, icon]);
@@ -789,6 +787,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           },
         );
 
+        if (!projectName) return;
         dialogs.loader.create(projectName, strings.loading + '...');
         const fs = fsOperation(url);
         const files = Object.keys(projectFiles); // All project files

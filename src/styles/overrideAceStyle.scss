@@ -49,3 +49,7 @@ main .ace_editor {
   background: var(--primary-color);
   color: var(--primary-text-color);
 }
+
+.ace_hidden-cursors .ace_cursor {
+  opacity: 0.8 !important;
+}
