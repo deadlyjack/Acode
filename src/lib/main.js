@@ -42,10 +42,13 @@ import sidebarApps from 'sidebarApps';
 import checkFiles from './checkFiles';
 import themes from './themes';
 import { createEventInit } from 'utils/keyboardEvent';
-import { setKeyBindings } from 'ace/commands';
+import { resetKeyBindings, setKeyBindings } from 'ace/commands';
 import { initFileList } from './fileList';
 import QuickTools from 'pages/quickTools/quickTools';
 import tutorial from 'components/tutorial';
+import openFile from './openFile';
+
+const previousVersionCode = parseInt(localStorage.versionCode, 10);
 
 window.onload = Main;
 
@@ -149,15 +152,8 @@ async function onDeviceReady() {
 
   const { versionCode } = BuildInfo;
 
-  if (parseInt(localStorage.versionCode) !== versionCode) {
+  if (previousVersionCode !== versionCode) {
     system.clearCache();
-  }
-
-  // remove plugin dir if version code is lower than 246
-  if (parseInt(localStorage.versionCode) < 246) {
-    delete localStorage.files;
-    await fsOperation(PLUGIN_DIR).delete();
-    // create plugin dir
   }
 
   if (!await fsOperation(PLUGIN_DIR).exists()) {
@@ -183,12 +179,6 @@ async function onDeviceReady() {
   acode.setLoadingMessage('Loading settings...');
   await settings.init();
   themes.init();
-
-  if (localStorage.versionCode < 150) {
-    localStorage.clear();
-    settings.reset();
-    window.location.reload();
-  }
 
   if (IS_FREE_VERSION && admob) {
     admob
@@ -306,7 +296,6 @@ async function loadApp() {
   quickToolsInit();
   sidebarApps.init($sidebar);
   await sidebarApps.loadApps();
-  setTimeout(showTutorials, 1000);
   editorManager.onupdate = onEditorUpdate;
   root.on('show', mainPageOnShow);
   app.addEventListener('click', onClickApp);
@@ -318,6 +307,7 @@ async function loadApp() {
   navigator.app.overrideButton('menubutton', true);
   system.setIntentHandler(intentHandler, intentHandler.onError);
   system.getCordovaIntent(intentHandler, intentHandler.onError);
+  setTimeout(showTutorials, 1000);
   settings.on('update:openFileListPos', () => {
     setMainMenu();
     setFileMenu();
@@ -528,7 +518,26 @@ function showTutorials() {
 
     return <p>
       Command palette icon has been removed from shortcuts, but you can modify shortcuts.
-      <span className='link' onclick={onclick}>Click here</span> to configure shortcuts.
+      <span className='link' onclick={onclick}>Click here</span> to configure quick tools.
     </p>;
   });
+
+  if (previousVersionCode < 284) {
+    tutorial('keybinding-tutorials', (hide) => {
+      const reset = () => {
+        resetKeyBindings();
+        hide();
+      };
+
+      const edit = () => {
+        openFile(KEYBINDING_FILE);
+        hide();
+      };
+
+      return <p>
+        Keybinding file is misconfigured. Please <span className='link' onclick={edit}>edit</span> or <span className='link' onclick={reset}>reset</span> it.
+        There was a typo in keybinding file. Search 'pallete' and replace it with 'palette'.
+      </p>;
+    });
+  }
 }
