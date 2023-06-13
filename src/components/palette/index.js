@@ -8,18 +8,18 @@ import inputhints from 'components/inputhints';
  */
 
 /**
- * Opens a pallete with input and hints
+ * Opens a palette with input and hints
  * @param {(hints:HintModification)=>string[]} getList Callback to get list of hints
  * @param {()=>string} onselect Callback to call when a hint is selected
  * @param {string} placeholder Placeholder for input
- * @param {function} onremove Callback to call when pallete is removed
+ * @param {function} onremove Callback to call when palette is removed
  * @returns {void}
  */
 
-export default function pallete(getList, onselect, placeholder, onremove) {
+export default function palette(getList, onselect, placeholder, onremove) {
   const $input = <input onkeydown={onkeydown} type='search' placeholder={placeholder} onfocusout={remove} enterKeyHint='go' />;
   const $mask = <div className='mask' onclick={remove} />;
-  const $pallete = <div id="pallete">{$input}</div>;
+  const $palette = <div id="palette">{$input}</div>;
 
   inputhints($input, generateHints, (value) => {
     onselect(value);
@@ -27,11 +27,11 @@ export default function pallete(getList, onselect, placeholder, onremove) {
   });
 
   restoreTheme(true);
-  app.append($pallete, $mask);
+  app.append($palette, $mask);
   $input.focus();
 
   actionStack.push({
-    id: 'pallete',
+    id: 'palette',
     action: remove,
   });
 
@@ -54,9 +54,9 @@ export default function pallete(getList, onselect, placeholder, onremove) {
   }
 
   function remove() {
-    actionStack.remove('pallete');
+    actionStack.remove('palette');
     restoreTheme();
-    $pallete.remove();
+    $palette.remove();
     $mask.remove();
     if (typeof onremove === 'function') {
       onremove();

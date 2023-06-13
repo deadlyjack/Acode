@@ -31,7 +31,7 @@ export default [
   item('equal', 'letters', 'insert', '=', '='),
   item('slash', 'letters', 'insert', '/', '/'),
   item('exclamation', 'letters', 'insert', '!', '!'),
-  item('command-pallete', 'keyboard_control', 'command', 'openCommandPallete'),
+  item('command-palette', 'keyboard_control', 'command', 'openCommandPalette'),
   item('alt-key', 'letters', 'alt', undefined, 'alt', false),
   item('meta-key', 'letters', 'meta', undefined, 'meta', false)
 ];
@@ -52,16 +52,16 @@ export function description(id) {
  * @param {string} action 
  * @param {string|number} value 
  * @param {string} letters 
- * @param {boolean} repeate 
+ * @param {boolean} repeat 
  * @returns 
  */
-function item(id, icon, action, value, letters, repeate) {
+function item(id, icon, action, value, letters, repeat) {
   return {
     id,
     icon,
     action,
     value,
     letters,
-    repeate,
+    repeat,
   };
 }

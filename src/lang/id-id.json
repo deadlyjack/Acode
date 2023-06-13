@@ -364,10 +364,10 @@
   "quicktools:alt-key": "Alt key",
   "quicktools:meta-key": "Windows/Meta key",
   "info-quicktoolssettings": "Kustomisasi tombol pintasan dan tombol keyboard di Quicktools di bawah editor untuk menyempurnakan pengalaman pengkodean Anda.",
-  "quicktools:command-pallete": "Buka command pallete",
   "info-excludefolders": "Use the pattern **/node_modules/** to ignore all files from the node_modules folder. This will exclude the files from being listed and will also prevent them from being included in file searches.",
   "missed files": "Scanned {count} files after search started and will not be included in search.",
   "remove": "Hapus",
   "too many files": "Terlalu banyak berkas. Hanya {count} yang akan dihitung.",
-  "too many folders": "Terlalu banyak folder. Hanya {count} yang akan dihitung."
+  "too many folders": "Terlalu banyak folder. Hanya {count} yang akan dihitung.",
+  "quicktools:command-palette": "Command palette"
 }

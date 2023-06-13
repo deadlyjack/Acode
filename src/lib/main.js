@@ -44,6 +44,8 @@ import themes from './themes';
 import { createEventInit } from 'utils/keyboardEvent';
 import { setKeyBindings } from 'ace/commands';
 import { initFileList } from './fileList';
+import QuickTools from 'pages/quickTools/quickTools';
+import tutorial from 'components/tutorial';
 
 window.onload = Main;
 
@@ -227,7 +229,7 @@ async function onDeviceReady() {
       document.body.removeAttribute('data-small-msg');
       app.classList.remove('loading', 'splash');
       applySettings.afterRender();
-    }, 100);
+    }, 500);
   }
 }
 
@@ -304,6 +306,7 @@ async function loadApp() {
   quickToolsInit();
   sidebarApps.init($sidebar);
   await sidebarApps.loadApps();
+  setTimeout(showTutorials, 1000);
   editorManager.onupdate = onEditorUpdate;
   root.on('show', mainPageOnShow);
   app.addEventListener('click', onClickApp);
@@ -323,6 +326,7 @@ async function loadApp() {
     setMainMenu();
     setFileMenu();
   });
+
 
   $sidebar.onshow = function () {
     const activeFile = editorManager.activeFile;
@@ -513,4 +517,18 @@ function createFileMenu({ top, bottom, toggler }) {
   });
 
   return $menu;
+}
+
+function showTutorials() {
+  tutorial('main-tutorials', (hide) => {
+    const onclick = () => {
+      QuickTools();
+      hide();
+    };
+
+    return <p>
+      Command palette icon has been removed from shortcuts, but you can modify shortcuts.
+      <span className='link' onclick={onclick}>Click here</span> to configure shortcuts.
+    </p>;
+  });
 }

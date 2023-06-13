@@ -33,16 +33,16 @@
       scrollable.
   - [x] **Active files in sidebar**
     - Fixed active files taking whole height of sidebar.
-  - [x] **File opened using itent**
+  - [x] **File opened using intent**
     - Fixed file opened using intent is not set as active file.
   - [x] **App doesn't load**
     - Fixed an issue where the app wouldn't load when an error occurred.
-  - [x] **File tabbar**
-    - Changing file tabbar position will not make editor lose focus.
+  - [x] **File tab bar**
+    - Changing file tab bar position will not make editor lose focus.
   - [x] **Sidebar**
     - Fixed sidebar resized unknowingly when dragged to open or close it.
   - [x] **Close all tabs**
-    - Fixed "close all" action opens up multiple confrim dialog for every unsaved file.
+    - Fixed "close all" action opens up multiple confirm dialog for every unsaved file.
     - Now it will ask what to do with unsaved files.
   - [x] **File changed alert**
     - Fixed file changed alert showing up even when file is not changed.
