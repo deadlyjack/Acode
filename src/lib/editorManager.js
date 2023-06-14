@@ -16,7 +16,7 @@ import { setCommands, setKeyBindings } from 'ace/commands';
  */
 async function EditorManager($header, $body) {
   /**
-   * @type {Collaspable & HTMLElement}
+   * @type {Collapsible & HTMLElement}
    */
   let $openFileList;
   let TIMEOUT_VALUE = 500;
@@ -488,7 +488,7 @@ async function EditorManager($header, $body) {
     let $list;
 
     if ($openFileList) {
-      if ($openFileList.classList.contains('collaspable')) {
+      if ($openFileList.classList.contains('collapsible')) {
         $list = Array.from($openFileList.$ul.children);
       } else {
         $list = Array.from($openFileList.children);
@@ -523,7 +523,7 @@ async function EditorManager($header, $body) {
       $openFileList = list(strings['active files']);
       $openFileList.classList.add('file-list');
       if ($list) $openFileList.$ul.append(...$list);
-      $openFileList.uncollapse();
+      $openFileList.expand();
 
       const oldAppend = $openFileList.$ul.append;
       $openFileList.append = (...args) => {

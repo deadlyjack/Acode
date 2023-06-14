@@ -51,10 +51,10 @@ export function fixHeight(target) {
     const [firstList] = lists;
     if (firstList.classList.contains('file-list')) {
       activeFileList = firstList;
-      if (firstList.uncollapsed) {
+      if (firstList.unclasped) {
         const heightOffset = height - ITEM_HEIGHT;
         const totalHeight = (ITEM_HEIGHT * activeFileList.$ul.children.length) + ITEM_HEIGHT;
-        const maxHeight = lists.length === 1 || !lists.slice(1).find((list) => list.uncollapsed)
+        const maxHeight = lists.length === 1 || !lists.slice(1).find((list) => list.unclasped)
           ? window.innerHeight
           : window.innerHeight / 2;
         const minHeight = Math.min(totalHeight, maxHeight - heightOffset);
@@ -74,7 +74,7 @@ export function fixHeight(target) {
       target = list;
     }
 
-    if (list === target && target.uncollapsed) {
+    if (list === target && target.unclasped) {
       list.style.maxHeight = `calc(100% - ${height}px)`;
       list.style.height = `calc(100% - ${height}px)`;
       return;

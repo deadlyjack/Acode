@@ -16,7 +16,7 @@ import appSettings from './settings';
 import * as FileList from './fileList';
 
 /**
- * @typedef {import('../components/collapsableList').Collaspable} Collaspable
+ * @typedef {import('../components/collapsableList').Collapsible} Collapsible
  */
 
 /**
@@ -32,7 +32,7 @@ import * as FileList from './fileList';
  * @property {string} url
  * @property {string} title
  * @property {boolean} saveState
- * @property {Collaspable} $node
+ * @property {Collapsible} $node
  * @property {ClipBoard} clipBoard
  * @property {function(): void} remove
  * @property {function(): void} reload
@@ -107,12 +107,12 @@ function openFolder(_path, opts = {}) {
     clipBoard: {},
     reload() {
       $root.collapse();
-      $root.uncollapse();
+      $root.expand();
     },
   });
 
   if (listState[_path]) {
-    $root.uncollapse();
+    $root.expand();
   }
 
   function remove(e) {
@@ -138,7 +138,7 @@ function openFolder(_path, opts = {}) {
 
 /**
  * Expand the list
- * @param {Collaspable} $list
+ * @param {Collapsible} $list
  */
 async function expandList($list) {
   const { $ul, $title } = $list;
@@ -151,8 +151,8 @@ async function expandList($list) {
   if (!$ul) return;
 
   $ul.textContent = null;
-  if (saveState) listState[url] = $list.uncollapsed;
-  if (!$list.uncollapsed) return;
+  if (saveState) listState[url] = $list.unclasped;
+  if (!$list.unclasped) return;
 
   try {
     startLoading();
@@ -165,6 +165,10 @@ async function expandList($list) {
       if (entry.isDirectory) {
         const $list = createFolderTile(name, entry.url);
         $ul.appendChild($list);
+
+        if (listState[entry.url]) {
+          $list.expand();
+        }
       } else {
         const $item = createFileTile(name, entry.url);
         $ul.append($item);
@@ -328,7 +332,7 @@ function execOperation(type, action, url, $target, name) {
 
   async function deleteFile() {
     const msg = strings['delete {name}'].replace('{name}', name);
-    const confirmation = await dialogs.confirm(strings.warging, msg);
+    const confirmation = await dialogs.confirm(strings.warning, msg);
     if (!confirmation) return;
     startLoading();
     await fsOperation(url).delete();
@@ -377,8 +381,8 @@ function execOperation(type, action, url, $target, name) {
       }
     } else {
       helpers.updateUriOfAllActiveFiles(url, newUrl);
-      //Reloading the folder by collasping and expanding the folder
-      $target.click(); //collaspe
+      //Reloading the folder by collapsing and expanding the folder
+      $target.click(); //collapse
       $target.click(); //expand
     }
     toast(strings.success);
@@ -412,7 +416,7 @@ function execOperation(type, action, url, $target, name) {
     }
 
     newName = Url.basename(newUrl);
-    if ($target.uncollapsed) {
+    if ($target.unclasped) {
       if (action === 'new file') {
         appendTile($target, createFileTile(newName, newUrl));
       } else {
@@ -444,13 +448,13 @@ function execOperation(type, action, url, $target, name) {
     /**
      * CASES:
      * CASE 111: src is file and parent is collapsed where target is also collapsed
-     * CASE 110: src is file and parent is collapsed where target is uncollapsed
-     * CASE 101: src is file and parent is uncollapsed where target is collapsed
-     * CASE 100: src is file and parent is uncollapsed where target is also uncollapsed
+     * CASE 110: src is file and parent is collapsed where target is unclasped
+     * CASE 101: src is file and parent is unclasped where target is collapsed
+     * CASE 100: src is file and parent is unclasped where target is also unclasped
      * CASE 011: src is directory and parent is collapsed where target is also collapsed
-     * CASE 001: src is directory and parent is uncollapsed where target is also collapsed
-     * CASE 010: src is directory and parent is collapsed where target is also uncollapsed
-     * CASE 000: src is directory and parent is uncollapsed where target is also uncollapsed
+     * CASE 001: src is directory and parent is unclasped where target is also collapsed
+     * CASE 010: src is directory and parent is collapsed where target is also unclasped
+     * CASE 000: src is directory and parent is unclasped where target is also unclasped
      */
 
     if (clipBoard.action === 'cut') {
@@ -532,14 +536,14 @@ function execOperation(type, action, url, $target, name) {
     startLoading();
     try {
       const file = await FileBrowser('file', strings['insert file']);
-      const srcfs = fsOperation(file.url);
-      const data = await srcfs.readFile();
-      const stats = await srcfs.stat();
+      const sourceFs = fsOperation(file.url);
+      const data = await sourceFs.readFile();
+      const stats = await sourceFs.stat();
       const name = stats.name;
       const fileUrl = (await fsOperation(Url.join(url, name)).stat()).url;
-      const destfs = fsOperation(url);
+      const destFs = fsOperation(url);
 
-      await destfs.createFile(name, data);
+      await destFs.createFile(name, data);
       appendTile($target, createFileTile(name, fileUrl));
       FileList.append(url, fileUrl);
     } catch (error) { } finally {
@@ -581,10 +585,9 @@ function execOperation(type, action, url, $target, name) {
  * @param {string} url
  */
 function handleClick(type, uri) {
-  if (helpers.isFile(type)) {
-    openFile(uri, { render: true });
-    Sidebar.hide();
-  }
+  if (!helpers.isFile(type)) return;
+  openFile(uri, { render: true });
+  Sidebar.hide();
 }
 
 /**
@@ -705,7 +708,7 @@ openFolder.renameItem = (oldFile, newFile, newFilename) => {
       $el = $el.$title;
       setTimeout(() => {
         $el.collapse();
-        $el.uncollapse();
+        $el.expand();
       }, 0);
     } else {
       $el.querySelector(':scope>span').className = helpers.getIconForFile(newFilename);
