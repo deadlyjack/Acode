@@ -3,12 +3,21 @@ import './style.scss';
 /**@type {Array<HTMLElement>} */
 const toastQueue = [];
 
-export default function toast(message, duration) {
+/**
+ * Show a toast message
+ * @param {string|HTMLElement} message 
+ * @param {number|false} duration 
+ */
+export default function toast(message, duration = 0, bgColor, color) {
   const $oldToast = tag.get('#toast');
-  const $toast = tag('span', {
-    id: 'toast',
-    textContent: message,
-  });
+  const $toast = <div id='toast' attr-clickable={message instanceof HTMLElement} style={{ backgroundColor: bgColor, color }}>
+    <span className='message'>{message}</span>
+    {
+      duration === false
+        ? <button className='icon clearclose' onclick={() => $toast.hide()}></button>
+        : ''
+    }
+  </div>;
 
   Object.defineProperties($toast, {
     hide: {
@@ -25,9 +34,11 @@ export default function toast(message, duration) {
       value() {
         app.append(this);
 
-        setTimeout(() => {
-          this.hide();
-        }, duration || 3000);
+        if (typeof duration === 'number') {
+          setTimeout(() => {
+            this.hide();
+          }, duration || 3000);
+        }
       },
     },
   });
@@ -38,3 +49,8 @@ export default function toast(message, duration) {
     toastQueue.push($toast);
   }
 }
+
+toast.hide = () => {
+  const $toast = tag.get('#toast');
+  if ($toast) $toast.hide();
+};

@@ -306,8 +306,8 @@ export default function addTouchListeners(editor, minimal, onclick) {
     if (mode === 'cursor') {
       e.preventDefault();
       if (!minimal) {
-        const shiftKey = key.shift;
-        const ctrlKey = key.ctrl;
+        const shiftKey = key.shift || e.shiftKey;
+        const ctrlKey = key.ctrl || e.ctrlKey;
         if (ctrlKey) {
           moveCursorTo(clientX, clientY, false, true);
           return;

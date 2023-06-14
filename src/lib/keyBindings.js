@@ -556,8 +556,8 @@ export default {
     key: null,
     readOnly: false,
   },
-  openCommandPallete: {
-    description: 'Open command pallete',
+  openCommandPalette: {
+    description: 'Open command palette',
     key: 'Ctrl-Shift-P',
     readOnly: true,
   },

@@ -241,7 +241,7 @@ wc-page {
       }
     }
 
-    #quicktool-toggler {
+    #quicktools-toggler {
       margin-bottom: 30px;
     }
   }
@@ -278,13 +278,13 @@ wc-page {
   }
 
   &.hide-floating-button {
-    #quicktool-toggler {
+    #quicktools-toggler {
       display: none;
     }
   }
 
   &[footer-height] {
-    #quicktool-toggler {
+    #quicktools-toggler {
       opacity: 1;
     }
   }
@@ -298,7 +298,7 @@ wc-page {
       }
     }
 
-    #quicktool-toggler {
+    #quicktools-toggler {
       transform: translate3d(0, -40px, 0);
     }
 
@@ -327,7 +327,7 @@ wc-page {
       }
     }
 
-    #quicktool-toggler {
+    #quicktools-toggler {
       transform: translate3d(0, -80px, 0);
     }
 
@@ -356,7 +356,7 @@ wc-page {
       }
     }
 
-    #quicktool-toggler {
+    #quicktools-toggler {
       transform: translate3d(0, -140px, 0);
     }
 

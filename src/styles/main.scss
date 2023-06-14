@@ -654,7 +654,7 @@ button {
   width: 40px;
 }
 
-#quicktool-toggler {
+#quicktools-toggler {
   top: auto;
   bottom: 10px;
   right: 10px;
@@ -669,6 +669,11 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.link {
+  color: rgb(3, 14, 55);
+  text-decoration: underline;
 }
 
 .w-resize {

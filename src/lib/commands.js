@@ -15,7 +15,7 @@ import path from '../utils/Path';
 import showFileInfo from './showFileInfo';
 import checkFiles from './checkFiles';
 import saveState from './saveState';
-import commandPallete from '../components/commandPallete';
+import commandPalette from '../components/commandPalette';
 import TextEncodings from '../pages/textEncodings';
 import EditorFile from './editorFile';
 import findFile from '../components/findFile';
@@ -66,8 +66,8 @@ export default {
     if (!appSettings.value.checkFiles) return;
     checkFiles();
   },
-  'command-pallete'() {
-    commandPallete();
+  'command-palette'() {
+    commandPalette();
   },
   'disable-fullscreen'() {
     app.classList.remove('fullscreen-mode');

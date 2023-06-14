@@ -1,14 +1,14 @@
 import helpers from '../utils/helpers';
-import pallete from './pallete';
+import palette from './palette';
 
-export default async function commandPallete() {
+export default async function commandPalette() {
   const recentCommands = RecentlyUsedCommands();
   const { editor } = editorManager;
   const commands = Object.values(editor.commands.commands);
 
   const isEditorFocused = editor.isFocused();
 
-  pallete(generateHints, onselect, strings['type command'], () => {
+  palette(generateHints, onselect, strings['type command'], () => {
     if (isEditorFocused) editor.focus();
   });
 

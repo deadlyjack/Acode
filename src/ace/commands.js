@@ -207,10 +207,10 @@ const commands = [
     },
   },
   {
-    name: 'openCommandPallete',
-    description: 'Open command pallete',
+    name: 'openCommandPalette',
+    description: 'Open command palette',
     exec() {
-      acode.exec('command-pallete');
+      acode.exec('command-palette');
     },
     readOnly: true,
   },
