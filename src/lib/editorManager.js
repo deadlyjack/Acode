@@ -23,8 +23,8 @@ async function EditorManager($header, $body) {
   let heightOffset = Math.round(screen.height - innerHeight);
   let preventScrollbarV = false;
   let preventScrollbarH = false;
-  let scrollBarVisiblityCount = 0;
-  let timeoutQuicktoolToggler;
+  let scrollBarVisibilityCount = 0;
+  let timeoutQuicktoolsToggler;
   let timeoutHeaderToggler;
   let isScrolling = false;
   let lastScrollTop = 0;
@@ -59,7 +59,7 @@ async function EditorManager($header, $body) {
   const $hScrollbar = ScrollBar({
     width: scrollbarSize,
     onscroll: onscrollH,
-    onscrollend: onscrollHend,
+    onscrollend: onscrollHEnd,
     parent: $body,
     placement: 'bottom',
   });
@@ -381,7 +381,7 @@ async function EditorManager($header, $body) {
     editor._emit('scroll', editor);
   }
 
-  function onscrollHend() {
+  function onscrollHEnd() {
     preventScrollbarH = false;
   }
 
@@ -422,7 +422,7 @@ async function EditorManager($header, $body) {
     lastScrollTop = scrollTop;
     $vScrollbar.value = factor;
     if (render) $vScrollbar.render();
-    editor._emit('scroll', 'verticle');
+    editor._emit('scroll', 'vertical');
   }
 
   function updateFloatingButton(show = false) {
@@ -430,11 +430,11 @@ async function EditorManager($header, $body) {
     const { $toggler } = quickTools;
 
     if (show) {
-      if (scrollBarVisiblityCount) --scrollBarVisiblityCount;
+      if (scrollBarVisibilityCount) --scrollBarVisibilityCount;
 
-      if (!scrollBarVisiblityCount) {
+      if (!scrollBarVisibilityCount) {
         clearTimeout(timeoutHeaderToggler);
-        clearTimeout(timeoutQuicktoolToggler);
+        clearTimeout(timeoutQuicktoolsToggler);
 
         if (appSettings.value.floatingButton) {
           $toggler.classList.remove('hide');
@@ -445,10 +445,10 @@ async function EditorManager($header, $body) {
         root.appendOuter($headerToggler);
       }
     } else {
-      if (!scrollBarVisiblityCount) {
+      if (!scrollBarVisibilityCount) {
         if ($toggler.isConnected) {
           $toggler.classList.add('hide');
-          timeoutQuicktoolToggler = setTimeout(
+          timeoutQuicktoolsToggler = setTimeout(
             () => $toggler.remove(),
             300,
           );
@@ -459,7 +459,7 @@ async function EditorManager($header, $body) {
         }
       }
 
-      ++scrollBarVisiblityCount;
+      ++scrollBarVisibilityCount;
     }
   }
 

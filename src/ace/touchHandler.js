@@ -108,13 +108,6 @@ export default function addTouchListeners(editor, minimal, onclick) {
   editor.on('scroll', onscroll);
   editor.on('changeSession', onchangesession);
   editor.on('select-word', selectionMode.bind({}, $end));
-  // editor.on('blur', () => {
-  // setTimeout(() => {
-  //   if (editor.isFocused()) return;
-  //   clearCursorMode();
-  //   hideMenu();
-  // }, 100);
-  // });
   editor.on('scroll-intoview', () => {
     if (selectionActive) {
       selectionMode($end);

@@ -19,7 +19,7 @@ export default () => {
       isUnsaved: file.isUnsaved,
       readOnly: file.readOnly,
       SAFMode: file.SAFMode,
-      deltedFile: file.deltedFile,
+      deletedFile: file.deletedFile,
       cursorPos: editor.getCursorPosition(),
       scrollTop: editor.session.getScrollTop(),
       scrollLeft: editor.session.getScrollLeft(),
@@ -28,12 +28,6 @@ export default () => {
       render: activeFile.id === file.id,
       folds: parseFolds(file.session.getAllFolds()),
     };
-
-    if (fileJson.type === 'git') fileJson.sha = file.record.sha;
-    else if (fileJson.type === 'gist') {
-      fileJson.recordid = file.record.id;
-      fileJson.isNew = file.record.isNew;
-    }
 
     if (settings.rememberFiles || fileJson.isUnsaved) filesToSave.push(fileJson);
   });

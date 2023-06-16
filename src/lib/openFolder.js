@@ -93,9 +93,6 @@ function openFolder(_path, opts = {}) {
     name: title,
   };
 
-  editorManager.emit('update', 'add-folder');
-  editorManager.onupdate('add-folder', event);
-  editorManager.emit('add-folder', event);
   addedFolder.push({
     title,
     remove,
@@ -110,6 +107,10 @@ function openFolder(_path, opts = {}) {
       $root.expand();
     },
   });
+
+  editorManager.emit('update', 'add-folder');
+  editorManager.onupdate('add-folder', event);
+  editorManager.emit('add-folder', event);
 
   if (listState[_path]) {
     $root.expand();
@@ -126,10 +127,8 @@ function openFolder(_path, opts = {}) {
       $root.remove();
     }
 
-    addedFolder.length = 0;
-    addedFolder.push(
-      ...addedFolder.filter((folder) => folder.url !== _path),
-    );
+    const index = addedFolder.findIndex((folder) => folder.url === _path);
+    if (index !== -1) addedFolder.splice(index, 1);
     editorManager.emit('update', 'remove-folder');
     editorManager.onupdate('remove-folder', event);
     editorManager.emit('remove-folder', event);
