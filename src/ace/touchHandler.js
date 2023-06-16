@@ -108,13 +108,6 @@ export default function addTouchListeners(editor, minimal, onclick) {
   editor.on('scroll', onscroll);
   editor.on('changeSession', onchangesession);
   editor.on('select-word', selectionMode.bind({}, $end));
-  editor.on('blur', () => {
-    setTimeout(() => {
-      if (editor.isFocused()) return;
-      clearCursorMode();
-      hideMenu();
-    }, 100);
-  });
   editor.on('scroll-intoview', () => {
     if (selectionActive) {
       selectionMode($end);
@@ -710,7 +703,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
     const margin = 10;
 
 
-    // if menu is positioned off screen horizonatally from the right
+    // if menu is positioned off screen horizontally from the right
     const menuRight = getProp($menu, 'right');
     if (menuRight + margin > containerRight) {
       const menuLeft = getProp($menu, 'left');
@@ -718,7 +711,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
       $menu.style.left = `${x - margin}px`;
     }
 
-    // if menu is positioned off screen horizonatally from the left
+    // if menu is positioned off screen horizontally from the left
     const menuLeft = getProp($menu, 'left');
     if (menuLeft - margin < containerLeft) {
       const [x] = relativePosition(menuLeft + Math.abs(menuLeft - containerLeft));
@@ -770,7 +763,8 @@ export default function addTouchListeners(editor, minimal, onclick) {
     teardropTouchEnded = false;
 
     if (mode === 'cursor') {
-      clearTimeout($cursor.dataset.timeout);
+      const timeout = parseInt($cursor.dataset.timeout, 10);
+      clearTimeout(timeout);
     }
 
     document.addEventListener('touchmove', teardropTouchMoveHandler, config);

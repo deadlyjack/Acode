@@ -47,7 +47,7 @@ export default [
     if (!$installed) {
       $installed = collapsableList(strings['installed']);
       $installed.ontoggle = loadInstalled;
-      $installed.uncollapse();
+      $installed.expand();
       container.append($installed);
     }
   }

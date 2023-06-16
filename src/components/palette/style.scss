@@ -12,6 +12,7 @@
   align-items: center;
   background-color: inherit;
   box-shadow: 0 0 4px black;
+  z-index: 999;
 
   &~#hints {
     width: 90vw;
