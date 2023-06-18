@@ -206,7 +206,7 @@ async function onWorkerMessage(e) {
       if (!matches.length) return;
       if (filesSearched.includes(file)) return;
 
-      filesSearched.push(file);
+      filesSearched.push(Tree.fromJSON(file));
       resultOverview.filesCount += 1;
       resultOverview.matchesCount += matches.length;
       $resultOverview.innerHTML = searchResultText(
@@ -220,6 +220,7 @@ async function onWorkerMessage(e) {
         match: null,
         position: null,
       });
+
       for (let i = 0; i < matches.length; i++) {
         const result = matches[i];
         result.file = index;
@@ -263,7 +264,8 @@ async function onWorkerMessage(e) {
         break;
       }
 
-      if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
+      const showAd = results.length > 100;
+      if (IS_FREE_VERSION && showAd && await window.iad?.isLoaded()) {
         window.iad.show();
       }
 
@@ -280,7 +282,8 @@ async function onWorkerMessage(e) {
 
     case 'progress': {
       e.target.progress = data;
-      const progress = Math.round(workers.reduce((acc, { progress = 0 }) => acc + progress, 0) / workers.length);
+      const startedWorkers = workers.filter(worker => worker.started);
+      const progress = Math.round(startedWorkers.reduce((acc, { progress = 0 }) => acc + progress, 0) / startedWorkers.length);
       $progress.value = progress;
       break;
     }

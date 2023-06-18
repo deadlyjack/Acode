@@ -77,13 +77,13 @@ const exec = promisify(require('child_process').exec);
             );
 
             if (id === ID_FREE) {
-              const { stderr: stderr2 } = await exec(`cordova plugin add admob-plus-cordova --save --variable APP_ID_ANDROID="${AD_APP_ID}"`);
-              if (stderr2) console.error(stderr2);
-              else console.log('DONE! Installing admob-plus-cordova');
+              await exec(`cordova plugin add cordova-plugin-consent --save`);
+              await exec(`cordova plugin add admob-plus-cordova@1.28.0 --save --variable APP_ID_ANDROID="${AD_APP_ID}"`);
+              console.log('DONE! Installing admob-plus-cordova');
             } else {
-              const { stderr: stderr2 } = await exec(`cordova plugin remove admob-plus-cordova --save`);
-              if (stderr2) console.error(stderr2);
-              else console.log('DONE! Removing admob-plus-cordova');
+              await exec(`cordova plugin remove cordova-plugin-consent --save`);
+              await exec(`cordova plugin remove admob-plus-cordova --save`);
+              console.log('DONE! Removing admob-plus-cordova');
             }
 
             const { stderr } = await exec(`yarn clean`);

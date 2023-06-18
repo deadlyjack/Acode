@@ -9,7 +9,7 @@
  * @param {boolean} [param0.installed]
  * @returns 
  */
-export default function Plugin({ id, name, icon, version, downloads, installed }) {
+export default function Item({ id, name, icon, version, downloads, installed }) {
   return <div data-id={id} className='list-item' data-action='open' data-installed={(!!installed).toString()}>
     <span className='icon' style={{ backgroundImage: `url(${icon || './res/puzzle.png'})` }}></span>
     <div className='container'>
@@ -28,5 +28,5 @@ export default function Plugin({ id, name, icon, version, downloads, installed }
         }
       </small>
     </div>
-  </div>
+  </div>;
 }

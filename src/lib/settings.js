@@ -52,7 +52,7 @@ class Settings {
     '**/logs/**',
     '**/flow-typed/**',
   ];
-  #IS_LANDSCAPE = innerWidth > innerHeight;
+  #IS_TABLET = innerWidth > 768;
 
   QUICKTOOLS_ROWS = 2;
   QUICKTOOLS_GROUP_CAPACITY = 8;
@@ -100,12 +100,12 @@ class Settings {
       formatOnSave: false,
       autoCorrect: true,
       openFileListPos: this.OPEN_FILE_LIST_POS_HEADER,
-      quickTools: this.#IS_LANDSCAPE ? 0 : 1,
+      quickTools: this.#IS_TABLET ? 0 : 1,
       quickToolsTriggerMode: this.QUICKTOOLS_TRIGGER_MODE_TOUCH,
       editorFont: 'Roboto Mono',
       vibrateOnTap: true,
       fullscreen: false,
-      floatingButton: !this.#IS_LANDSCAPE,
+      floatingButton: !this.#IS_TABLET,
       liveAutoCompletion: true,
       showPrintMargin: false,
       printMargin: 80,
