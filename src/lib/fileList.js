@@ -475,17 +475,17 @@ export class Tree {
   }
 
   /**
-   * @typedef {object} TreeInput
+   * @typedef {object} TreeJson
    * @property {string} name
    * @property {string} url
    * @property {string} path
    * @property {string} parent
-   * @property {Array<Tree>} children
+   * @property {boolean} isDirectory
    */
 
   /**
    * To tree object to json
-   * @returns {TreeInput}
+   * @returns {TreeJson}
    */
   toJSON() {
     return {
@@ -493,19 +493,19 @@ export class Tree {
       url: this.#url,
       path: this.#path,
       parent: this.#parent.url,
-      children: this.#children,
+      isDirectory: !!this.#children,
     };
   }
 
   /**
    * Create a tree from json
-   * @param {TreeInput} json
+   * @param {TreeJson} json
    * @returns {Tree}
    */
   static fromJSON(json) {
-    const { name, url, path, children, parent } = json;
-    const tree = new Tree(name, url, children);
-    tree.#parent = getTree(parent);
+    const { name, url, path, parent, isDirectory } = json;
+    const tree = new Tree(name, url, isDirectory);
+    tree.#parent = getTree(Object.values(filesTree), parent);
     tree.#path = path;
     return tree;
   }

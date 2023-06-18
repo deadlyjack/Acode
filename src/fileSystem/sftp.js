@@ -556,7 +556,7 @@ class SftpClient {
     return ar.map((dirname) => escapeCh(dirname)).join('/');
   }
 
-  #errorCodes(code, dlft = strings['an error occurred']) {
+  #errorCodes(code, defaultMessage = strings['an error occurred']) {
     switch (code) {
       case 0:
         return strings['success'];
@@ -600,7 +600,7 @@ class SftpClient {
         return strings['owner died'];
 
       default:
-        return dlft;
+        return defaultMessage;
     }
   }
 

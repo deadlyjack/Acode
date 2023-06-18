@@ -1,17 +1,17 @@
 import './plugins.scss';
 
-import Page from "../../components/page";
-import helpers from "../../utils/helpers";
-import searchBar from "../../components/searchbar";
-import fsOperation from "../../fileSystem";
-import Url from "../../utils/Url";
-import plugin from "../plugin";
-import dialogs from "../../components/dialogs";
-import constants from "../../lib/constants";
-import FileBrowser from "../fileBrowser";
-import Plugin from './plugin';
-import installPlugin from '../../lib/installPlugin';
-import TabView from '../../components/tabView';
+import Item from './item';
+import Url from "utils/Url";
+import Plugin from "pages/plugin";
+import Page from "components/page";
+import helpers from "utils/helpers";
+import fsOperation from "fileSystem";
+import constants from "lib/constants";
+import dialogs from "components/dialogs";
+import TabView from 'components/tabView';
+import searchBar from "components/searchbar";
+import FileBrowser from "pages/fileBrowser";
+import installPlugin from 'lib/installPlugin';
 
 /**
  * 
@@ -98,7 +98,7 @@ export default function PluginsInclude(updates) {
       return;
     }
     if (action === 'open') {
-      plugin($target.dataset, onIninstall, onUninstall);
+      Plugin($target.dataset, onInstall, onUninstall);
       return;
     }
   }
@@ -148,7 +148,7 @@ export default function PluginsInclude(updates) {
       });
 
       plugins.all.forEach((plugin) => {
-        $list.all.append(<Plugin {...plugin} />);
+        $list.all.append(<Item {...plugin} />);
       });
 
       $list.all.setAttribute('empty-msg', strings['no plugins found']);
@@ -171,7 +171,7 @@ export default function PluginsInclude(updates) {
       plugin.installed = true;
       plugins.installed.push(plugin);
       if ($list.installed.get(`[data-id="${id}"]`)) return;
-      $list.installed.append(<Plugin {...plugin} />);
+      $list.installed.append(<Item {...plugin} />);
     }));
     $list.installed.setAttribute('empty-msg', strings['no plugins found']);
   }
@@ -186,12 +186,12 @@ export default function PluginsInclude(updates) {
       const isInstalled = plugins.installed.find(({ id }) => id === plugin.id);
       plugin.installed = !!isInstalled;
       plugins.owned.push(plugin);
-      $list.owned.append(<Plugin {...plugin} />);
+      $list.owned.append(<Item {...plugin} />);
     });
     $list.owned.setAttribute('empty-msg', strings['no plugins found']);
   }
 
-  function onIninstall(pluginId) {
+  function onInstall(pluginId) {
     if (updates) return;
     const plugin = plugins.all.find(plugin => plugin.id === pluginId);
     if (plugin) {
@@ -199,7 +199,7 @@ export default function PluginsInclude(updates) {
       plugins.installed.push(plugin);
     }
 
-    $list.installed.append(<Plugin {...plugin} />);
+    $list.installed.append(<Item {...plugin} />);
   }
 
   function onUninstall(pluginId) {

@@ -47,6 +47,8 @@ import { initFileList } from './fileList';
 import QuickTools from 'pages/quickTools/quickTools';
 import tutorial from 'components/tutorial';
 import openFile from './openFile';
+import startAd from './startAd';
+import otherSettings from 'settings/appSettings';
 
 const previousVersionCode = parseInt(localStorage.versionCode, 10);
 
@@ -82,6 +84,7 @@ async function Main() {
 }
 
 async function onDeviceReady() {
+
   const isFreePackage = /(free)$/.test(BuildInfo.packageName);
   const oldResolveURL = window.resolveLocalFileSystemURL;
   const {
@@ -102,6 +105,8 @@ async function onDeviceReady() {
   window.PLUGIN_DIR = Url.join(DATA_STORAGE, 'plugins');
   window.KEYBINDING_FILE = Url.join(DATA_STORAGE, '.key-bindings.json');
   window.IS_FREE_VERSION = isFreePackage;
+
+  startAd();
 
   try {
     await helpers.promisify(iap.startConnection)
@@ -179,32 +184,6 @@ async function onDeviceReady() {
   acode.setLoadingMessage('Loading settings...');
   await settings.init();
   themes.init();
-
-  if (IS_FREE_VERSION && admob) {
-    admob
-      .start()
-      .then(async () => {
-        const banner = new admob.BannerAd({
-          adUnitId: 'ca-app-pub-5911839694379275/9157899592', // Production
-          // adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test
-          position: 'bottom',
-        });
-
-        const interstitial = new admob.InterstitialAd({
-          adUnitId: 'ca-app-pub-5911839694379275/9570937608', // Production
-          // adUnitId: 'ca-app-pub-3940256099942544/5224354917', // Test
-        });
-
-        interstitial.load();
-
-        interstitial.on('dismiss', () => {
-          interstitial.load();
-        });
-
-        window.ad = banner;
-        window.iad = interstitial;
-      });
-  }
 
   acode.setLoadingMessage('Loading language...');
   await lang.set(settings.value.lang);
@@ -521,6 +500,20 @@ function showTutorials() {
       <span className='link' onclick={onclick}>Click here</span> to configure quick tools.
     </p>;
   });
+
+  if (window.innerWidth > 750) {
+    tutorial('quicktools-tutorials', (hide) => {
+      const onclick = () => {
+        otherSettings();
+        hide();
+      };
+
+      return <p>
+        Quicktools has been <strong>disabled</strong> because it seems like you are on a bigger screen and probably using a keyboard.
+        To enable it, <span className='link' onclick={onclick}>click here</span> or press <kbd>Ctrl + Shift + P</kbd> and search for <code>quicktools</code>.
+      </p>;
+    });
+  }
 
   if (previousVersionCode < 284) {
     tutorial('keybinding-tutorials', (hide) => {

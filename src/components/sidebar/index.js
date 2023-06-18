@@ -23,7 +23,7 @@ let preventSlideTests = [];
 function create($container, $toggler) {
   let { innerWidth } = window;
 
-  const START_THRESHOLD = constants.SIDEBAR_SLIDE_START_THRESHOLD_PX; //Point where to start swip
+  const START_THRESHOLD = constants.SIDEBAR_SLIDE_START_THRESHOLD_PX; //Point where to start swipe
   const MIN_WIDTH = 200; //Min width of the side bar
   const MAX_WIDTH = () => innerWidth * 0.7; //Max width of the side bar
   const resizeBar = new Ref();

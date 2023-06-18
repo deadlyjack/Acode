@@ -167,7 +167,7 @@ export default {
           canRead: true,
           canWrite: true,
           size: 0,
-          modifidedDate: new Date(),
+          modifiedDate: new Date(),
           isDirectory: true,
           isFile: false,
           url: uri,

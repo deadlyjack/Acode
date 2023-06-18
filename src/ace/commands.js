@@ -226,7 +226,7 @@ const commands = [
     name: 'toggleQuickTools',
     description: 'Toggle quick tools',
     exec() {
-      actions('toggle-quick-tools');
+      actions('toggle');
     },
   },
   {
@@ -272,7 +272,7 @@ export async function setKeyBindings({ commands }) {
       command.description = shortcut.description;
     }
 
-    // not cheking if shortcut is empty because it can be used to remove shortcut
+    // not chekiang if shortcut is empty because it can be used to remove shortcut
     command.bindKey = { win: shortcut?.key ?? null };
     commands.addCommand(command);
   });

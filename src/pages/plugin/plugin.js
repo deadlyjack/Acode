@@ -8,7 +8,7 @@ import installPlugin from '../../lib/installPlugin';
 import fsOperation from '../../fileSystem';
 import settingsPage from '../../components/settingsPage';
 import constants from '../../lib/constants';
-import purchaseListner from '../../handlers/purchase';
+import purchaseListener from '../../handlers/purchase';
 import ajax from '@deadlyjack/ajax';
 import alert from '../../components/dialogs/alert';
 import loader from 'components/dialogs/loader';
@@ -166,7 +166,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
         return;
       }
 
-      iap.setPurchaseUpdatedListener(...purchaseListner(onpurchase, onerror));
+      iap.setPurchaseUpdatedListener(...purchaseListener(onpurchase, onerror));
       $button.textContent = strings['loading...'];
       await helpers.promisify(iap.purchase, product.json);
 
