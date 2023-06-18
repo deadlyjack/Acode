@@ -393,7 +393,7 @@ function resetKeys() {
   events.ctrl.forEach((cb) => cb(false));
   state.meta = false;
   events.meta.forEach((cb) => cb(false));
-  editorManager.editor.focus();
+  input.focus();
 }
 
 /**

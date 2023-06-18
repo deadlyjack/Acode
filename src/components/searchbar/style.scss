@@ -3,7 +3,6 @@
   top: 0;
   left: 0;
   height: 45px;
-  height: var(--header-height);
   width: 100%;
   animation: show-searchbar 300ms ease 1;
   z-index: 200;
@@ -35,9 +34,7 @@
 
   .icon {
     height: 45px;
-    height: var(--header-height);
     width: 45px;
-    width: var(--header-height);
     font-size: 1.2em;
     color: rgb(255, 255, 255);
   }

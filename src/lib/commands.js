@@ -15,7 +15,7 @@ import path from '../utils/Path';
 import showFileInfo from './showFileInfo';
 import checkFiles from './checkFiles';
 import saveState from './saveState';
-import commandPallete from '../components/commandPallete';
+import commandPalette from '../components/commandPalette';
 import TextEncodings from '../pages/textEncodings';
 import EditorFile from './editorFile';
 import findFile from '../components/findFile';
@@ -66,8 +66,8 @@ export default {
     if (!appSettings.value.checkFiles) return;
     checkFiles();
   },
-  'command-pallete'() {
-    commandPallete();
+  'command-palette'() {
+    commandPalette();
   },
   'disable-fullscreen'() {
     app.classList.remove('fullscreen-mode');
@@ -123,7 +123,7 @@ export default {
     editor.gotoLine(line, col, true);
   },
   async 'new-file'() {
-    const filename = await dialogs.prompt(
+    let filename = await dialogs.prompt(
       strings['enter file name'],
       constants.DEFAULT_FILE_NAME,
       'filename',
@@ -324,6 +324,9 @@ export default {
       const fs = fsOperation(uri);
       try {
         const newUri = await fs.renameTo(newname);
+        const stat = await fsOperation(newUri).stat();
+
+        newname = stat.name;
         file.uri = newUri;
         file.filename = newname;
 

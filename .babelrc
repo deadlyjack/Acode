@@ -8,19 +8,11 @@
       }
     ]
   ],
-  "env": {
-    "test": {
-      "presets": [
-        "@babel/env"
-      ]
-    }
-  },
   "plugins": [
     "html-tag-js/jsx/jsx-to-tag.js",
     "html-tag-js/jsx/syntax-parser.js",
-    [
-      "@babel/plugin-transform-runtime"
-    ]
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-transform-block-scoping"
   ],
   "compact": false,
   "sourceMaps": "inline"

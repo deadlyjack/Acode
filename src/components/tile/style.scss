@@ -3,7 +3,6 @@ header {
   &.tile {
     z-index: 98;
     height: 45px;
-    height: var(--header-height);
     background-color: rgb(153, 153, 255);
     background-color: var(--primary-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -77,9 +76,7 @@ header {
   .octicon,
   .icon {
     height: 45px;
-    height: var(--header-height);
     width: 45px;
-    width: var(--header-height);
     font-size: 2em;
 
     background-repeat: no-repeat;

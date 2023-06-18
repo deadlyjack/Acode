@@ -1,4 +1,4 @@
-#pallete {
+#palette {
   position: fixed;
   top: 0;
   left: 0;
@@ -12,6 +12,7 @@
   align-items: center;
   background-color: inherit;
   box-shadow: 0 0 4px black;
+  z-index: 999;
 
   &~#hints {
     width: 90vw;

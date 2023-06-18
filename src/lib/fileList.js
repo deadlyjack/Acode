@@ -3,6 +3,7 @@ import Url from 'utils/Url';
 import settings from './settings';
 import { minimatch } from 'minimatch';
 import { addedFolder } from './openFolder';
+import toast from 'components/toast';
 
 /**
  * @typedef {import('fileSystem').File} File
@@ -16,6 +17,9 @@ const events = {
   'remove-folder': [],
   'refresh': [],
 };
+
+let dirCount = 0;
+let fileCount = 0;
 
 export function initFileList() {
   editorManager.on('add-folder', onAddFolder);
@@ -61,6 +65,8 @@ export function remove(item) {
  * Refresh file list
  */
 export async function refresh() {
+  dirCount = 0;
+  fileCount = 0;
   Object.keys(filesTree).forEach((key) => {
     delete filesTree[key];
   });
@@ -95,7 +101,8 @@ export function rename(oldUrl, newUrl) {
  * @returns {Tree[]}
  */
 export default function files(dir) {
-  let transform;
+  const listedDirs = [];
+  let transform = (item) => item;
   if (typeof dir === 'string') {
     return Object.values(filesTree).find((item) => getFile(dir, item));
   } else if (typeof dir === 'function') {
@@ -104,7 +111,7 @@ export default function files(dir) {
 
   const allFiles = [];
   Object.values(filesTree).forEach((item) => {
-    allFiles.push(...flattenTree(item, transform));
+    allFiles.push(...flattenTree(item, transform, listedDirs));
   });
   return allFiles;
 }
@@ -180,14 +187,19 @@ function getFile(path, tree) {
  * @param {Tree} tree 
  * @param {(item:Tree)=>object} transform
  */
-function flattenTree(tree, transform = (item) => item) {
+function flattenTree(tree, transform, listedDirs) {
   const list = [];
   const { children } = tree;
   if (!children) {
     return [transform(tree)];
   };
+
+  if (listedDirs.includes(tree.url)) return list;
+
+  listedDirs.push(tree.url);
+
   children.forEach((item) => {
-    if (item.children) list.push(...flattenTree(item, transform));
+    if (item.children) list.push(...flattenTree(item, transform, listedDirs));
     else list.push(transform(item));
   });
   return list;
@@ -217,7 +229,38 @@ function onRemoveFolder({ url }) {
   const tree = filesTree[url];
   if (!tree) return;
   delete filesTree[url];
+  const [i, j] = countEntries(tree);
+  dirCount -= i;
+  fileCount -= j;
   emit('remove-folder', tree);
+}
+
+/**
+ * Called when a directory is added
+ */
+function incDirCount() {
+  const { maxDirCount } = settings.value;
+
+  dirCount++;
+
+  if (dirCount > maxDirCount) {
+    const message = strings['too many folders'].replace('{count}', maxDirCount);
+    toast(message);
+  }
+}
+
+/**
+ * Called when a file is added
+*/
+function incFileCount() {
+  const { maxFilesCount } = settings.value;
+
+  fileCount++;
+
+  if (fileCount > maxFilesCount) {
+    const message = strings['too many files'].replace('{count}', maxFilesCount);
+    toast(message);
+  }
 }
 
 /**
@@ -225,10 +268,17 @@ function onRemoveFolder({ url }) {
  * @param {Tree} parent - An array to store files
  * @param {string} [root] - Root path
  */
-async function getAllFiles(parent) {
+async function getAllFiles(parent, depth = 0) {
   if (!parent.children) return;
+  if (skip()) return;
+  if (depth > settings.value.maxDirDepth) return;
+
+  incDirCount();
+
   const ls = await fsOperation(parent.url).lsDir();
   await Promise.all(ls.map(async (item) => {
+    if (skip()) return;
+
     const { name, url, isDirectory } = item;
     const exists = parent.children.findIndex(({ value }) => value === url);
     if (exists > -1) {
@@ -236,19 +286,37 @@ async function getAllFiles(parent) {
     }
 
     const file = await Tree.create(url, name, isDirectory);
-    parent.children.push(file);
 
+    if (skip()) return;
+
+    const existingTree = getTree(Object.values(filesTree), file.url);
+
+    if (existingTree) {
+      file.children = existingTree.children;
+      parent.children.push(file);
+      return;
+    }
+
+    parent.children.push(file);
     if (isDirectory) {
       const ignore = !!settings.value.excludeFolders.find(
         (folder) => minimatch(Url.join(file.path, ''), folder, { matchBase: true }),
       );
       if (ignore) return;
 
-      getAllFiles(file);
+      getAllFiles(file, depth + 1);
       return;
     }
+
+    incFileCount();
     emit('push-file', file);
   }));
+}
+
+function skip() {
+  if (fileCount > settings.value.maxFilesCount) return true;
+  if (dirCount > settings.value.maxDirCount) return true;
+  return false;
 }
 
 /**
@@ -260,6 +328,23 @@ function emit(event, ...args) {
   const list = events[event];
   if (!list) return;
   list.forEach((fn) => fn(...args));
+}
+
+/**
+ * Count number of directories
+ * @param {Tree} tree
+ * @returns {[number, number]} [directories, files]
+ */
+function countEntries(tree, dirs = 0, files = 0) {
+  if (!tree.children) return [dirs, files];
+  dirs += tree.children.filter(({ children }) => children).length;
+  files += tree.children.length - dirs;
+  tree.children.forEach((item) => {
+    const [i, j] = countEntries(item);
+    dirs += i;
+    files += j;
+  });
+  return [dirs, files];
 }
 
 export class Tree {
@@ -349,6 +434,11 @@ export class Tree {
     return this.#children;
   }
 
+  set children(value) {
+    if (!Array.isArray(value)) throw new Error('Invalid children');
+    this.#children = value;
+  }
+
   /**@returns {Tree} */
   get parent() {
     return this.#parent;
@@ -374,7 +464,12 @@ export class Tree {
     this.#name = name;
     this.#path = Url.join(this.#parent.path, name);
     if (Array.isArray(this.#children)) {
+      const [dirs, files] = countEntries(this.#children);
+      console.log('before', dirs, files);
+      dirCount -= dirs;
+      fileCount -= files;
       this.#children.length = 0;
+      console.log('after', dirs, files);
     }
     getAllFiles(this);
   }

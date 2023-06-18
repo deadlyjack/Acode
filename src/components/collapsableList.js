@@ -2,18 +2,18 @@ import tag from 'html-tag-js';
 import tile from './tile';
 
 /**
- * @typedef {object} CollaspableBase
+ * @typedef {object} CollapsibleBase
  * @property {HTMLElement} $title
  * @property {HTMLUListElement} $ul
  * @property {function(void):void} ontoggle
  * @property {function(void):void} collapse
- * @property {function(void):void} uncollapse
+ * @property {function(void):void} expand
  * @property {boolean} collapsed
- * @property {boolean} uncollapsed
+ * @property {boolean} unclasped
  */
 
 /**
- * @typedef {CollaspableBase & HTMLElement} Collaspable
+ * @typedef {CollapsibleBase & HTMLElement} Collapsible
  */
 
 /**
@@ -25,24 +25,24 @@ import tile from './tile';
  * @param {HTMLElement} [options.tail] Tail element of the title
  * @param {string} [options.type] Type of the list element
  * @param {boolean} [options.allCaps] If true, the title will be in all caps
- * @param {function(this:Collaspable):void} [options.ontoggle] Called when the list is toggled
- * @returns {Collaspable}
+ * @param {function(this:Collapsible):void} [options.ontoggle] Called when the list is toggled
+ * @returns {Collapsible}
  */
 export default function collapsableList(titleText, type = 'indicator', options = {}) {
   const $ul = tag('ul', {
     className: 'scroll',
   });
-  const $collaspeIndicator = tag('span', {
+  const $collapseIndicator = tag('span', {
     className: `icon ${type}`,
   });
   const $title = tile({
-    lead: $collaspeIndicator,
+    lead: $collapseIndicator,
     type: 'div',
     text: options.allCaps ? titleText.toUpperCase() : titleText,
     tail: options.tail,
   });
   const $mainWrapper = tag(options.type || 'div', {
-    className: 'list collaspable hidden',
+    className: 'list collapsible hidden',
     children: [$title, $ul],
   });
 
@@ -51,7 +51,7 @@ export default function collapsableList(titleText, type = 'indicator', options =
     if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper);
   };
 
-  let uncollapse = () => {
+  let expand = () => {
     $mainWrapper.classList.remove('hidden');
     if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper);
   };
@@ -61,7 +61,7 @@ export default function collapsableList(titleText, type = 'indicator', options =
 
   function toggle() {
     if ($title.collapsed) {
-      uncollapse();
+      expand();
     } else {
       collapse();
     }
@@ -99,12 +99,12 @@ export default function collapsableList(titleText, type = 'indicator', options =
           if (typeof fun === 'function') collapse = fun;
         },
       },
-      uncollapse: {
+      expand: {
         get() {
-          return uncollapse || (() => { });
+          return expand || (() => { });
         },
         set(fun) {
-          if (typeof fun === 'function') uncollapse = fun;
+          if (typeof fun === 'function') expand = fun;
         },
       },
       collapsed: {
@@ -112,7 +112,7 @@ export default function collapsableList(titleText, type = 'indicator', options =
           return $mainWrapper.classList.contains('hidden');
         }
       },
-      uncollapsed: {
+      unclasped: {
         get() {
           return !this.collapsed;
         }

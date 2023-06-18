@@ -60,7 +60,7 @@ export const SearchRow2 = ({ inputRef, posRef, totalRef }) => <div className='bu
 export const $footer = <footer id='quick-tools' tabIndex={-1}></footer>;
 
 /**@type {HTMLElement} */
-export const $toggler = <span className='floating icon keyboard_arrow_up' id='quicktool-toggler'></span>;
+export const $toggler = <span className='floating icon keyboard_arrow_up' id='quicktools-toggler'></span>;
 
 /**@type {HTMLTextAreaElement} */
 export const $input = <textarea
@@ -85,18 +85,18 @@ export const $input = <textarea
  * @param {string} param0.letters Letters to show on button
  * @param {'insert'|'command'|'key'|'custom'} param0.action Action type
  * @param {string|Function} param0.value Value of button
- * @param {Ref} param0.ref Refence to button
- * @param {boolean} param0.repeate Whether to repeate the action or not
+ * @param {Ref} param0.ref Reference to button
+ * @param {boolean} param0.repeat Whether to repeat the action or not
  * @returns {HTMLButtonElement}
  */
-export function RowItem({ id, icon, letters, action, value, ref, repeate }) {
+export function RowItem({ id, icon, letters, action, value, ref, repeat }) {
   const $item = <button
     ref={ref}
     className={`icon ${icon}`}
     data-id={id}
     data-letters={letters}
     data-action={action}
-    data-repeate={repeate}
+    data-repeat={repeat}
   ></button>;
 
   if (typeof value === 'function') {

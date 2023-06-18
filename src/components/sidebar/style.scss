@@ -101,7 +101,7 @@ body.no-animation {
 
         &.notice {
           &::before {
-            content: '•';
+            content: '\2022';
             color: rgb(212, 250, 150);
             display: flex;
             align-items: center;

@@ -2,7 +2,7 @@ import files from 'lib/fileList';
 import openFile from '../lib/openFile';
 import recents from '../lib/recents';
 import helpers from '../utils/helpers';
-import pallete from './pallete';
+import palette from './palette';
 
 /**
  * @typedef {import('./inputhints').HintModification} HintModification
@@ -12,7 +12,7 @@ import pallete from './pallete';
 let hintsModification;
 
 export default async function findFile() {
-  pallete(generateHints, onselect, strings['type filename'], () => {
+  palette(generateHints, onselect, strings['type filename'], () => {
     files.off('add-file', onAddFile);
     files.off('remove-file', onRemoveFile);
   });

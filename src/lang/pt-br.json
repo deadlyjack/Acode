@@ -362,7 +362,10 @@
   "quicktools:alt-key": "Todas as chaves",
   "quicktools:meta-key": "Tecla Windows/Meta",
   "info-quicktoolssettings": "Personalize os botões de atalho e as teclas do teclado no contêiner Quicktools abaixo do editor para aprimorar sua experiência de codificação.",
-  "quicktools:command-pallete": "Abrir a paleta de comandos",
   "info-excludefolders": "Use o padrão **/node_modules/** para ignorar todos os arquivos da pasta node_modules. Isso excluirá os arquivos da lista e também impedirá que sejam incluídos nas pesquisas de arquivos.",
-  "missed files": "{count} arquivos verificados após o início da pesquisa e não serão incluídos na pesquisa."
+  "missed files": "{count} arquivos verificados após o início da pesquisa e não serão incluídos na pesquisa.",
+  "remove": "Remove",
+  "too many files": "Too many files. Only {count} will be listed.",
+  "too many folders": "Too many folders. Only {count} will be listed.",
+  "quicktools:command-pallete": "Paleta de comandos"
 }

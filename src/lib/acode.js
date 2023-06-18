@@ -11,14 +11,16 @@ import projects from "./projects";
 import selectionMenu from "./selectionMenu";
 import Page from 'components/page';
 import inputhints from 'components/inputhints';
-import pallete from 'components/pallete';
-import openFolder from './openFolder';
+import palette from 'components/palette';
+import openFolder, { addedFolder } from './openFolder';
 import fonts from './fonts';
 import themes from './themes';
 import ThemeBuilder from './themeBuilder';
 import sidebarApps from 'sidebarApps';
 import files from './fileList';
 import contextmenu from 'components/contextmenu';
+import toast from 'components/toast';
+import tutorial from 'components/tutorial';
 
 export default class Acode {
   #modules = {};
@@ -46,6 +48,7 @@ export default class Acode {
     this.define('select', dialogs.select);
     this.define('loader', dialogs.loader);
     this.define('dialogBox', dialogs.box);
+    this.define('addedfolder', addedFolder);
     this.define('colorPicker', dialogs.color);
     this.define('contextMenu', contextmenu);
     this.define('fileBrowser', FileBrowser);
@@ -58,10 +61,12 @@ export default class Acode {
     this.define('settings', appSettings);
     this.define('helpers', helpers);
     this.define('inputhints', inputhints);
-    this.define('pallete', pallete);
+    this.define('palette', palette);
     this.define('fsOperation', fsOperation);
     this.define('openfolder', openFolder);
     this.define('fonts', fonts);
+    this.define('toast', toast);
+    this.define('tutorial', tutorial);
     this.define('themes', {
       add: themes.add,
       get: themes.get,
@@ -74,6 +79,7 @@ export default class Acode {
     this.define('sidebarApps', {
       add: sidebarApps.add,
       get: sidebarApps.get,
+      remove: sidebarApps.remove,
     });
     this.define('fileList', files);
   }

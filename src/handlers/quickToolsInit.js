@@ -4,12 +4,12 @@ import appSettings from "lib/settings";
 import actions, { key } from './quickTools';
 
 const CONTEXT_MENU_TIMEOUT = 500;
-const MOVEX_THRESHOLD = 50;
+const MOVE_X_THRESHOLD = 50;
 
 let time;
-let movex;
-let movedx; // total moved x
-let touchmoved;
+let moveX;
+let movedX; // total moved x
+let touchMoved;
 let isClickMode;
 let contextmenu;
 let contextmenuTimeout;
@@ -23,13 +23,13 @@ let timeout;
 let $touchstart;
 
 function reset() {
-  movex = 0;
-  movedx = 0;
+  moveX = 0;
+  movedX = 0;
   time = 300;
   $row = null;
   $touchstart = null;
   contextmenu = false;
-  touchmoved = undefined;
+  touchMoved = undefined;
   contextmenuTimeout = null;
   active = false;
 }
@@ -130,9 +130,9 @@ function touchstart(e) {
   e.preventDefault();
   e.stopPropagation();
 
-  if ($el.dataset.repeate === 'true') {
+  if ($el.dataset.repeat === 'true') {
     contextmenuTimeout = setTimeout(() => {
-      if (touchmoved) return;
+      if (touchMoved) return;
       contextmenu = true;
       oncontextmenu(e);
     }, CONTEXT_MENU_TIMEOUT);
@@ -154,21 +154,21 @@ function touchstart(e) {
  * @param {TouchEvent} e 
  */
 function touchmove(e) {
-  if (contextmenu || touchmoved === false) return;
+  if (contextmenu || touchMoved === false) return;
 
   const { $row1, $row2 } = quickTools;
   const $el = e.target;
   const { clientX } = e.touches[0];
 
-  if (movex === 0) {
-    movex = clientX;
+  if (moveX === 0) {
+    moveX = clientX;
     return;
   }
 
-  const diff = movex - clientX;
-  if (touchmoved === undefined) {
+  const diff = moveX - clientX;
+  if (touchMoved === undefined) {
     if (Math.abs(diff) > appSettings.value.touchMoveThreshold) {
-      touchmoved = true;
+      touchMoved = true;
     } else {
       if ($row) {
         const movedX = $row.scrollLeft % $row.clientWidth;
@@ -176,12 +176,12 @@ function touchmove(e) {
         // scrollBy is not working on mobile
         $row.scrollLeft -= movedX;
       }
-      touchmoved = false;
+      touchMoved = false;
       return;
     }
   }
 
-  movedx += diff;
+  movedX += diff;
 
   if (!$row) {
     if ($row1?.contains($el)) {
@@ -197,7 +197,7 @@ function touchmove(e) {
   }
 
   if (!active) $touchstart.classList.remove('active');
-  movex = clientX;
+  moveX = clientX;
 }
 
 /**
@@ -208,13 +208,13 @@ function touchend(e) {
   const { $row1 } = quickTools;
   const $el = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
 
-  if (touchmoved && $row) {
+  if (touchMoved && $row) {
     $row.style.scrollBehavior = 'smooth';
     const slide = parseInt($row.scrollLeft / $row.clientWidth, 10);
     let scroll = 0;
-    if (movedx < 0 && movedx > -MOVEX_THRESHOLD) {
+    if (movedX < 0 && movedX > -MOVE_X_THRESHOLD) {
       scroll = (slide - 1) * $row.clientWidth;
-    } else if (movedx > 0 && movedx > MOVEX_THRESHOLD) {
+    } else if (movedX > 0 && movedX > MOVE_X_THRESHOLD) {
       scroll = (slide + 1) * $row.clientWidth;
     } else {
       scroll = slide * $row.clientWidth;

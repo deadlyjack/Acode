@@ -28,10 +28,6 @@ body {
 }
 
 body {
-  --footer-height: 40px;
-  --header-height: 45px;
-  --tail-spin: url(https://localhost/__cdvfile_assets__/www/res/tail-spin.svg);
-
   user-select: none;
   font-family: 'Roboto', sans-serif;
   -webkit-tap-highlight-color: transparent;
@@ -68,7 +64,6 @@ body {
       left: 50%;
       transform: translateX(-50%);
       background-image: url(https://localhost/__cdvfile_assets__/www/res/tail-spin.svg);
-      background-image: var(--tail-spin);
       background-repeat: no-repeat;
       background-position: center;
       background-size: 30px;
@@ -330,7 +325,6 @@ footer {
 .button-container {
   display: flex;
   min-height: 40px;
-  min-height: var(--footer-height);
   background-color: inherit;
   color: inherit;
   user-select: none;
@@ -660,7 +654,7 @@ button {
   width: 40px;
 }
 
-#quicktool-toggler {
+#quicktools-toggler {
   top: auto;
   bottom: 10px;
   right: 10px;
@@ -675,6 +669,11 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.link {
+  color: rgb(3, 14, 55);
+  text-decoration: underline;
 }
 
 .w-resize {
