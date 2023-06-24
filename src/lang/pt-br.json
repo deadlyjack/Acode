@@ -364,8 +364,8 @@
   "info-quicktoolssettings": "Personalize os botões de atalho e as teclas do teclado no contêiner Quicktools abaixo do editor para aprimorar sua experiência de codificação.",
   "info-excludefolders": "Use o padrão **/node_modules/** para ignorar todos os arquivos da pasta node_modules. Isso excluirá os arquivos da lista e também impedirá que sejam incluídos nas pesquisas de arquivos.",
   "missed files": "{count} arquivos verificados após o início da pesquisa e não serão incluídos na pesquisa.",
-  "remove": "Remove",
-  "too many files": "Too many files. Only {count} will be listed.",
-  "too many folders": "Too many folders. Only {count} will be listed.",
+  "remove":"Remover",
+  "too many files":"Muitos ficheiros. Apenas {count} será listado.",
+  "too many folders":"Muitas pastas. Apenas {count} será listado.",
   "quicktools:command-palette": "Paleta de comandos"
 }
