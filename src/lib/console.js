@@ -1,8 +1,7 @@
 import 'core-js/stable';
 import 'html-tag-js/dist/polyfill';
-import tag from 'html-tag-js';
 import * as esprima from 'esprima';
-import loadPolyFill from '../utils/polyfill';
+import loadPolyFill from 'utils/polyfill';
 
 (function () {
   loadPolyFill.apply(window);
@@ -98,9 +97,9 @@ import loadPolyFill from '../utils/polyfill';
 
   function assignCustomConsole() {
     window.console = {
-      assert(condition, msg, ...substituion) {
+      assert(condition, msg, ...substitution) {
         if (!condition) {
-          log('error', getStack(new Error()), msg, ...substituion);
+          log('error', getStack(new Error()), msg, ...substitution);
         }
       },
       clear() {
@@ -145,9 +144,9 @@ import loadPolyFill from '../utils/polyfill';
         originalConsole.info(...args);
         log('info', getStack(new Error()), ...args);
       },
-      log(msg, ...substituion) {
-        originalConsole.log(msg, ...substituion);
-        log('log', getStack(new Error()), msg, ...substituion);
+      log(msg, ...substitution) {
+        originalConsole.log(msg, ...substitution);
+        log('log', getStack(new Error()), msg, ...substitution);
       },
       table(...args) {
         log('log', getStack(new Error()), ...args);
@@ -182,9 +181,9 @@ import loadPolyFill from '../utils/polyfill';
       trace(...args) {
         log('trace', getStack(new Error()), ...args);
       },
-      warn(msg, ...substituion) {
-        originalConsole.warn(msg, ...substituion);
-        log('warn', getStack(new Error()), msg, ...substituion);
+      warn(msg, ...substitution) {
+        originalConsole.warn(msg, ...substitution);
+        log('warn', getStack(new Error()), msg, ...substitution);
       },
     };
   }
@@ -621,8 +620,8 @@ import loadPolyFill from '../utils/polyfill';
           if (['const', 'let'].indexOf(st.kind) < 0) return;
 
           const range = st.range;
-          const excode = code.substring(range[0], range[1]) + ';';
-          extra += excode;
+          const exCode = code.substring(range[0], range[1]) + ';';
+          extra += exCode;
         }
       });
 
@@ -895,12 +894,12 @@ import loadPolyFill from '../utils/polyfill';
       color: rgb(59, 161, 59);
   }
   
-  c-text.__c-string:not(.no-qoutes)::before {
+  c-text.__c-string:not(.no-quotes)::before {
       content: '"';
       margin-right: 2px;
   }
   
-  c-text.__c-string:not(.no-qoutes)::after {
+  c-text.__c-string:not(.no-quotes)::after {
       content: '"';
       margin-left: 2px;
   }

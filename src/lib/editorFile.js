@@ -13,8 +13,8 @@ import run from './run';
 import saveFile from './saveFile';
 import appSettings from './settings';
 import startDrag from 'handlers/editorFileTab';
+import encodings from './encodings';
 
-const modelist = ace.require('ace/ext/modelist');
 const { Fold } = ace.require('ace/edit_session/fold');
 const { Range } = ace.require('ace/range');
 
@@ -212,7 +212,7 @@ export default class EditorFile {
     this.#SAFMode = options?.SAFMode;
     this.isUnsaved = options?.isUnsaved ?? false;
 
-    if (options?.encoding) {
+    if (options?.encoding && encodings[options.encoding]) {
       this.encoding = options?.encoding;
     }
 
@@ -631,6 +631,7 @@ export default class EditorFile {
    * @param {string} [mode] 
    */
   setMode(mode) {
+    const modelist = ace.require('ace/ext/modelist');
     const event = createFileEvent(this);
     this.#emit('changemode', event);
     if (event.defaultPrevented) return;
@@ -638,8 +639,11 @@ export default class EditorFile {
     if (!mode) {
       const ext = Path.extname(this.filename);
       const modes = helpers.parseJSON(localStorage.modeassoc);
-      if (modes?.[ext]) mode = modes[ext];
-      else mode = modelist.getModeForPath(this.filename).mode;
+      if (modes?.[ext]) {
+        mode = modes[ext];
+      } else {
+        mode = modelist.getModeForPath(this.filename).mode;
+      }
     }
 
     // sets ace editor EditSession mode
