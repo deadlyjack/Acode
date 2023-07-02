@@ -1,13 +1,13 @@
 import SidebarApp from './sidebarApp';
 
-const SIDRBAR_APPS_LAST_SECTION = 'sidebarAppslastSection';
+const SIDEBAR_APPS_LAST_SECTION = 'sidebarAppsLastSection';
 
 /**@type {HTMLElement} */
 let $apps;
 /**@type {HTMLElement} */
 let $sidebar;
 /**@type {string} */
-let currentSection = localStorage.getItem(SIDRBAR_APPS_LAST_SECTION);
+let currentSection = localStorage.getItem(SIDEBAR_APPS_LAST_SECTION);
 /**@type {SidebarApp[]} */
 const apps = [];
 
@@ -18,14 +18,14 @@ const apps = [];
  * @param {string} title title of the app
  * @param {(container:HTMLElement)=>void} initFunction
  * @param {boolean} prepend weather to show this app at the top of the sidebar or not
- * @param {(container:HTMLElement)=>void} onseleted
+ * @param {(container:HTMLElement)=>void} onSelected
  * @returns {void}
  */
-function add(icon, id, title, initFunction, prepend = false, onseleted = () => { }) {
+function add(icon, id, title, initFunction, prepend = false, onSelected = () => { }) {
   currentSection ??= id;
 
   const active = currentSection === id;
-  const app = new SidebarApp(icon, id, title, initFunction, onseleted);
+  const app = new SidebarApp(icon, id, title, initFunction, onSelected);
 
   app.active = active;
   app.install(prepend);
@@ -88,7 +88,7 @@ function onclick(e) {
 
   if (action !== 'sidebar-app') return;
 
-  localStorage.setItem(SIDRBAR_APPS_LAST_SECTION, id);
+  localStorage.setItem(SIDEBAR_APPS_LAST_SECTION, id);
   const activeApp = apps.find(app => app.active);
   const app = apps.find(app => app.id === id);
   activeApp.active = false;

@@ -1,10 +1,11 @@
 import { filesize } from 'filesize';
 import mustache from 'mustache';
-import $_fileInfo from '../views/file-info.hbs';
-import fsOperation from '../fileSystem';
-import Url from '../utils/Url';
-import dialogs from '../components/dialogs';
-import helpers from '../utils/helpers';
+import $_fileInfo from 'views/file-info.hbs';
+import fsOperation from 'fileSystem';
+import Url from 'utils/Url';
+import dialogs from 'dialogs';
+import helpers from 'utils/helpers';
+import settings from './settings';
 
 /**
  * Shows file info
@@ -16,7 +17,7 @@ export default async function showFileInfo(url) {
   try {
     const fs = fsOperation(url);
     const stats = await fs.stat();
-    const value = await fs.readFile('utf-8');
+    const value = await fs.readFile(settings.value.defaultFileEncoding);
 
     let { name, lastModified, length, uri, type } = stats;
     length = filesize(length);

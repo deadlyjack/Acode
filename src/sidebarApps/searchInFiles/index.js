@@ -8,6 +8,7 @@ import openFile from 'lib/openFile';
 import addTouchListeners from 'ace/touchHandler';
 import defineMode from './searchResultMode';
 import Sidebar, { preventSlide } from 'components/sidebar';
+import settings from 'lib/settings';
 
 const workers = [];
 const results = [];
@@ -185,7 +186,7 @@ async function onWorkerMessage(e) {
         content = editorFile.session.getValue();
       } else {
         try {
-          content = await fsOperation(data).readFile('utf-8');
+          content = await fsOperation(data).readFile(settings.value.defaultFileEncoding);
         } catch (er) {
           readError = er;
         }

@@ -368,5 +368,6 @@
   "remove": "Удалить",
   "too many files": "Слишком много файлов. Только {count} файлов будут указаны.",
   "too many folders": "Слишком много папок. Только {count} папок будут указаны.",
-  "quicktools:command-palette": "Палитра команд"
+  "quicktools:command-palette": "Палитра команд",
+  "default file encoding": "Default file encoding"
 }

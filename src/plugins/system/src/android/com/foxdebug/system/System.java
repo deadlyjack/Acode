@@ -16,7 +16,6 @@ import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.PowerManager;
 import android.provider.Settings.Global;
 import android.view.View;
@@ -578,7 +577,7 @@ public class System extends CordovaPlugin {
       return;
     }
 
-    callback.error("Not suppported");
+    callback.error("Not supported");
   }
 
   private void removeShortcut(String id, CallbackContext callback) {

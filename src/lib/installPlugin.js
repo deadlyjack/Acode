@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 import constants from './constants';
-import dialogs from "../components/dialogs";
+import dialogs from "../dialogs";
 import fsOperation from "../fileSystem";
 import loadPlugin from "./loadPlugin";
 import helpers from "../utils/helpers";

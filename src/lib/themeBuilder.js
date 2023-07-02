@@ -22,6 +22,7 @@ export default class ThemeBuilder {
     "--popup-background-color": "rgb(255, 255, 255)",
     "--popup-text-color": "rgb(37, 37, 37)",
     "--popup-active-color": "rgb(169, 0, 0)",
+    "--file-tab-width": "120px",
   };
 
   version = 'free';
@@ -210,6 +211,14 @@ export default class ThemeBuilder {
 
   set popupActiveColor(value) {
     this.#theme['--popup-active-color'] = value;
+  }
+
+  get fileTabWidth() {
+    return this.#theme['--file-tab-width'];
+  }
+
+  set fileTabWidth(value) {
+    this.#theme['--file-tab-width'] = value;
   }
 
   get css() {

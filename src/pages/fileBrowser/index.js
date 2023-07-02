@@ -1,4 +1,4 @@
-import dialogs from 'components/dialogs';
+import dialogs from 'dialogs';
 import openFile from 'lib/openFile';
 import openFolder, { addedFolder } from 'lib/openFolder';
 import helpers from 'utils/helpers';

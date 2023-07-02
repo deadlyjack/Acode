@@ -102,7 +102,7 @@
   "encoding": "Text encoding",
   "syntax highlighting": "Syntax highlighting",
   "read only": "Read only",
-  "select all": "select all",
+  "select all": "Select all",
   "select branch": "Select branch",
   "create new branch": "Create new branch",
   "use branch": "Use branch",
@@ -367,5 +367,6 @@
   "remove": "Remove",
   "too many files": "Too many files. Only {count} will be listed.",
   "too many folders": "Too many folders. Only {count} will be listed.",
-  "quicktools:command-palette": "Command palette"
+  "quicktools:command-palette": "Command palette",
+  "default file encoding": "Default file encoding"
 }

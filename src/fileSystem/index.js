@@ -34,17 +34,17 @@ const fsList = [];
 /**
  * @typedef {string|Blob|ArrayBuffer} FileContent
  * @typedef {Object} FileSystem
- * @property {function():Promise<File[]>} lsDir List directory
- * @property {(url:string) =>Promise<FileContent>} readFile Read file
- * @property {(url:string, data:FileContent) =>Promise<void>} writeFile Write file content
- * @property {(url:string, data:FileContent) =>Promise<string>} createFile Create file and return url of the created file
- * @property {(url:string) =>Promise<string>} createDirectory Create directory and return url of the created directory
- * @property {(url:string) =>Promise<void>} delete Delete file or directory
- * @property {(url:string, dest:string) =>Promise<string>} copyTo Copy file or directory to destination
- * @property {(url:string, dest:string) =>Promise<string>} moveTo Move file or directory to destination
- * @property {(url:string, newname:string) =>Promise<string>} renameTo Rename file or directory
- * @property {(url:string) =>Promise<boolean>} exists Check if file or directory exists
- * @property {(url:string) =>Promise<Stat>} stat Get file or directory stat
+ * @property {() => Promise<File[]>} lsDir List directory
+ * @property {() => Promise<void>} delete Delete file or directory
+ * @property {() => Promise<boolean>} exists Check if file or directory exists
+ * @property {() => Promise<Stat>} stat Get file or directory stat
+ * @property {(encoding:string) => Promise<FileContent>} readFile Read file
+ * @property {(data:FileContent) => Promise<void>} writeFile Write file content
+ * @property {(name:string, data:FileContent) => Promise<string>} createFile Create file and return url of the created file
+ * @property {(name:string) => Promise<string>} createDirectory Create directory and return url of the created directory
+ * @property {(dest:string) => Promise<string>} copyTo Copy file or directory to destination
+ * @property {(dest:string) => Promise<string>} moveTo Move file or directory to destination
+ * @property {(newname:string) => Promise<string>} renameTo Rename file or directory
  */
 
 /**
@@ -214,6 +214,7 @@ fsOperation.extend((url) => /^https?:/.test(url), (url) => {
       if (encoding) {
         return helpers.decodeText(data, encoding);
       }
+
       return data;
     },
     async writeFile(content, progress) {

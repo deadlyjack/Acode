@@ -1,10 +1,12 @@
-import helpers from '../utils/helpers';
-import dialogs from '../components/dialogs';
+import helpers from 'utils/helpers';
 import recents from './recents';
-import fsOperation from '../fileSystem';
+import fsOperation from 'fileSystem';
 import EditorFile from './editorFile';
 import appSettings from './settings';
-import loader from 'components/dialogs/loader';
+import loader from 'dialogs/loader';
+import alert from 'dialogs/alert';
+import box from 'dialogs/box';
+import confirm from 'dialogs/confirm';
 
 /**
  * @typedef {object} FileOptions
@@ -12,6 +14,7 @@ import loader from 'components/dialogs/loader';
  * @property {{ row: number, column: number }} cursorPos
  * @property {boolean} render
  * @property {function} onsave
+ * @property {string} encoding
  * @property {string} mode
  * @property {string} uri
  */
@@ -29,18 +32,19 @@ export default async function openFile(file, options = {}) {
 
     /**@type {EditorFile} */
     const existingFile = editorManager.getFile(uri, 'uri');
-    const { cursorPos, render, onsave, text, mode } = options;
+    const { cursorPos, render, onsave, text, mode, encoding } = options;
 
     if (existingFile) {
       // If file is already opened
       existingFile.makeActive();
+
       if (onsave) {
         existingFile.onsave = onsave;
       }
-      if (mode) {
+      if (existingFile.SAFMode !== mode) {
         existingFile.SAFMode = mode;
       }
-      if (text) {
+      if (existingFile.session.getValue() !== text) {
         existingFile.session.setValue(text);
       }
       if (cursorPos) {
@@ -64,6 +68,7 @@ export default async function openFile(file, options = {}) {
         render,
         onsave,
         readOnly,
+        encoding,
         SAFMode: mode,
       });
     };
@@ -71,6 +76,28 @@ export default async function openFile(file, options = {}) {
     if (text) {
       // If file is not opened and has unsaved text
       createEditor(true, text);
+      return;
+    }
+
+    const videoRegex = /\.(mp4|webm|ogg)$/i;
+    const imageRegex = /\.(jpe?g|png|gif|webp)$/i;
+    const audioRegex = /\.(mp3|wav|ogg)$/i;
+
+    if (videoRegex.test(name)) {
+      const objectUrl = await fileToDataUrl(uri);
+      box(name, `<video src="${objectUrl}" controls autoplay loop style="max-width: 100%; max-height: 100%;"></video>`);
+      return;
+    }
+
+    if (imageRegex.test(name)) {
+      const objectUrl = await fileToDataUrl(uri);
+      box(name, `<img src="${objectUrl}" style="max-width: 100%; max-height: 100%;" />`);
+      return;
+    }
+
+    if (audioRegex.test(name)) {
+      const objectUrl = await fileToDataUrl(uri);
+      box(name, `<audio src="${objectUrl}" controls autoplay loop style="max-width: 100%; max-height: 100%;"></audio>`);
       return;
     }
 
@@ -90,17 +117,7 @@ export default async function openFile(file, options = {}) {
     const fileContent = helpers.decodeText(binData);
 
     if (/[\x00-\x08\x0E-\x1F]/.test(fileContent)) {
-      if (/image/i.test(fileInfo.type)) {
-        const blob = new Blob([binData], { type: fileInfo.type });
-        dialogs.box(name, `<img src='${URL.createObjectURL(blob)}'>`);
-        return;
-      } else if (/video/i.test(fileInfo.type)) {
-        const blob = new Blob([binData], { type: fileInfo.type });
-        dialogs.box(name, `<video src='${URL.createObjectURL(blob)}' controls></video>`);
-        return;
-      }
-
-      const confirmation = await dialogs.confirm(strings.info, strings['binary file']);
+      const confirmation = await confirm(strings.info, strings['binary file']);
       if (!confirmation) return;
     }
 
@@ -112,4 +129,15 @@ export default async function openFile(file, options = {}) {
   } finally {
     loader.removeTitleLoader();
   }
+}
+
+/**
+ * Converts file to data url
+ * @param {string} file file url
+ */
+async function fileToDataUrl(file) {
+  const fs = fsOperation(file);
+  const fileInfo = await fs.stat();
+  const binData = await fs.readFile();
+  return URL.createObjectURL(new Blob([binData], { type: fileInfo.mime }));
 }

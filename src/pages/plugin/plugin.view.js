@@ -1,5 +1,5 @@
 import Ref from 'html-tag-js/ref';
-import alert from '../../components/dialogs/alert';
+import alert from '../../dialogs/alert';
 import fsOperation from '../../fileSystem';
 import constants from '../../lib/constants';
 import Url from '../../utils/Url';

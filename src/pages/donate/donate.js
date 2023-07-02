@@ -6,9 +6,9 @@ import Page from "../../components/page";
 import constants from "../../lib/constants";
 import ajax from '@deadlyjack/ajax';
 import helpers from '../../utils/helpers';
-import dialogs from '../../components/dialogs';
+import dialogs from '../../dialogs';
 import tag from 'html-tag-js';
-import loader from 'components/dialogs/loader';
+import loader from 'dialogs/loader';
 
 //TODO: fix (-1 means, user is not logged in to any google account)
 
@@ -95,7 +95,7 @@ export default function DonateInclude() {
   (async function render() {
 
     let products = await new Promise((resolve, reject) => {
-      iap.getProducts(constants.SKULIST, products => {
+      iap.getProducts(constants.SKU_LIST, products => {
         resolve(products);
       }, err => {
         reject(err);

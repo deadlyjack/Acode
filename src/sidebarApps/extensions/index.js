@@ -1,16 +1,17 @@
 import './style.scss';
 
-import collapsableList from '../../components/collapsableList';
-import Url from '../../utils/Url';
-import fsOperation from '../../fileSystem';
-import helpers from '../../utils/helpers';
-import plugin from '../../pages/plugin';
-import constants from '../../lib/constants';
+import Url from 'utils/Url';
+import plugin from 'pages/plugin';
+import helpers from 'utils/helpers';
+import fsOperation from 'fileSystem';
+import constants from 'lib/constants';
+import collapsableList from 'components/collapsableList';
+import Sidebar from 'components/sidebar';
 
 /** @type {HTMLElement} */
 let $installed = null;
 /** @type {HTMLElement} */
-let $explor = null;
+let $explore = null;
 /** @type {HTMLElement} */
 let container = null;
 /** @type {HTMLElement} */
@@ -25,33 +26,54 @@ let searchTimeout = null;
 let installedPlugins = [];
 
 export default [
-  'extension',
-  'extensions',
-  strings['plugins'],
-  (/**@type {HTMLElement} */ el) => {
-    container = el;
-    container.classList.add('extensions');
-    container.content = $header;
-
-    if (!$searchResult) {
-      $searchResult = <ul className='list search-result'></ul>;
-      container.append($searchResult);
-    }
-
-    if (!$explor) {
-      $explor = collapsableList(strings['explore']);
-      $explor.ontoggle = loadExplore;
-      container.append($explor);
-    }
-
-    if (!$installed) {
-      $installed = collapsableList(strings['installed']);
-      $installed.ontoggle = loadInstalled;
-      $installed.expand();
-      container.append($installed);
-    }
-  }
+  'extension',          // icon
+  'extensions',         // id
+  strings['plugins'],   // title
+  initApp,              // init function
+  false,                // prepend
+  onSelected,           // onSelected function
 ];
+
+/**
+ * On selected handler for files app
+ * @param {HTMLElement} el 
+ */
+function onSelected(el) {
+  const $scrollableLists = container.getAll(':scope .scroll[data-scroll-top]');
+  $scrollableLists.forEach(($el) => {
+    $el.scrollTop = $el.dataset.scrollTop;
+  });
+}
+
+/**
+ * Initialize extension app
+ * @param {HTMLElement} el 
+ */
+function initApp(el) {
+  container = el;
+  container.classList.add('extensions');
+  container.content = $header;
+
+  if (!$searchResult) {
+    $searchResult = <ul className='list search-result'></ul>;
+    container.append($searchResult);
+  }
+
+  if (!$explore) {
+    $explore = collapsableList(strings['explore']);
+    $explore.ontoggle = loadExplore;
+    container.append($explore);
+  }
+
+  if (!$installed) {
+    $installed = collapsableList(strings['installed']);
+    $installed.ontoggle = loadInstalled;
+    $installed.expand();
+    container.append($installed);
+  }
+
+  Sidebar.on('show', onSelected);
+}
 
 async function searchPlugin() {
   clearTimeout(searchTimeout);
@@ -72,7 +94,7 @@ async function searchPlugin() {
         Url.join(constants.API_BASE, `plugins?name=${query}`),
       ).readFile('json');
 
-      installedPlugins = await listInstalledPluings();
+      installedPlugins = await listInstalledPlugins();
       $searchResult.content = plugins.map(ListItem);
       updateHeight($searchResult);
     } catch (error) {
@@ -87,7 +109,7 @@ async function searchPlugin() {
 async function loadInstalled() {
   if (this.collapsed) return;
 
-  const plugins = await listInstalledPluings();
+  const plugins = await listInstalledPlugins();
   if (!plugins.length) {
     $installed.collapse();
   }
@@ -101,27 +123,27 @@ async function loadExplore() {
 
   const status = helpers.checkAPIStatus();
   if (!status) {
-    $explor.$ul.content = <span className='error'>{strings['api_error']}</span>;
+    $explore.$ul.content = <span className='error'>{strings['api_error']}</span>;
     return;
   }
 
   try {
-    startLoading($explor);
+    startLoading($explore);
     const plugins = await fsOperation(
       Url.join(constants.API_BASE, 'plugins?explore=random'),
     ).readFile('json');
 
-    installedPlugins = await listInstalledPluings();
-    $explor.$ul.content = plugins.map(ListItem);
-    updateHeight($explor);
+    installedPlugins = await listInstalledPlugins();
+    $explore.$ul.content = plugins.map(ListItem);
+    updateHeight($explore);
   } catch (error) {
-    $explor.$ul.content = <span className='error'>{strings['error']}</span>;
+    $explore.$ul.content = <span className='error'>{strings['error']}</span>;
   } finally {
-    stopLoading($explor);
+    stopLoading($explore);
   }
 }
 
-async function listInstalledPluings() {
+async function listInstalledPlugins() {
   const plugins = await Promise.all(
     (await fsOperation(PLUGIN_DIR).lsDir())
       .map(async (item) => {
@@ -151,7 +173,7 @@ function stopLoading($list) {
  */
 function updateHeight($el) {
   removeHeight($installed, $el !== $installed);
-  removeHeight($explor, $el !== $explor);
+  removeHeight($explore, $el !== $explore);
 
   let height = $header.getBoundingClientRect().height;
   if ($el === $searchResult) {
@@ -187,7 +209,7 @@ function ListItem({ icon, name, id, version, installed }) {
   if (installed === undefined) {
     installed = !!installedPlugins.find(({ id: _id }) => _id === id);
   }
-  const $el = <div className='tile' data-pluing-id={id}>
+  const $el = <div className='tile' data-plugin-id={id}>
     <span className='icon' style={{ backgroundImage: `url(${icon})` }}></span>
     <span className='text sub-text' data-subtext={`v${version}${installed ? ` • ${strings['installed']}` : ''}`}>{name}</span>
   </div>;
@@ -199,7 +221,7 @@ function ListItem({ icon, name, id, version, installed }) {
         const $item = () => <ListItem icon={icon} name={name} id={id} version={version} installed={true} />;
         if ($installed.contains($el)) $installed.$ul?.replaceChild($item(), $el);
         else $installed.$ul?.append($item());
-        if ($explor.contains($el)) $explor.$ul?.replaceChild($item(), $el);
+        if ($explore.contains($el)) $explore.$ul?.replaceChild($item(), $el);
         if ($searchResult.contains($el)) $searchResult?.replaceChild($item(), $el);
       },
       () => {

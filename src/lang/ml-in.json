@@ -367,5 +367,6 @@
   "remove": "നീക്കം ചെയ്യുക",
   "too many files": "നിറയെ അധികം ഫയൽസ് . Only {count} ഇണമേ ലിസ്റ്റ് ചെയ്യുകയുള്ളൂ",
   "too many folders": "നിറയെ അധികം ഫോയിഫെറ്സ് . {count} എണ്ണമേ ലിസ്റ്റ് ചെയപെടു.",
-  "quicktools:command-palette": "കമാൻഡ് പല്ലെറ്റ്"
+  "quicktools:command-palette": "കമാൻഡ് പല്ലെറ്റ്",
+  "default file encoding": "Default file encoding"
 }

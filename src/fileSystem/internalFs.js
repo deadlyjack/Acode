@@ -37,8 +37,6 @@ export default {
     const name = filename.split('/').pop();
     const dirname = Url.dirname(filename);
 
-    if (data instanceof ArrayBuffer) data = new Blob([data]);
-
     return new Promise((resolve, reject) => {
       reject = setMessage(reject);
       window.resolveLocalFileSystemURL(

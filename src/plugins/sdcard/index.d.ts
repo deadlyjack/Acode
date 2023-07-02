@@ -2,19 +2,19 @@ interface Storage {
   /**
    * Name of the storage
    */
-  name: String;
+  name: string;
   /**
    * UUID of the storage
    */
-  uuid: String;
+  uuid: string;
 }
 
 interface DirListItem {
-  name: String;
-  mime: String;
+  name: string;
+  mime: string;
   isDirectory: Boolean;
   isFile: Boolean;
-  uri: String;
+  uri: string;
 }
 
 interface Stats {
@@ -48,9 +48,9 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   copy(
-    src: String,
-    dest: String,
-    onSuccess: (url: String) => void,
+    src: string,
+    dest: string,
+    onSuccess: (url: string) => void,
     onFail: (err: any) => void,
   ): void;
   /**
@@ -61,9 +61,9 @@ interface SDcard {
    * @param onFail callback function on error returns error object
    */
   createDir(
-    src: String,
-    dirName: String,
-    onSuccess: (url: String) => void,
+    src: string,
+    dirName: string,
+    onSuccess: (url: string) => void,
     onFail: (err: any) => void,
   ): void;
   /**
@@ -74,9 +74,9 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   createFile(
-    src: String,
-    fileName: String,
-    onSuccess: (url: String) => void,
+    src: string,
+    fileName: string,
+    onSuccess: (url: string) => void,
     onFail: (err: any) => void,
   ): void;
   /**
@@ -86,8 +86,8 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   delete(
-    src: String,
-    onSuccess: (url: String) => void,
+    src: string,
+    onSuccess: (url: string) => void,
     onFail: (err: any) => void,
   ): void;
   /**
@@ -97,7 +97,7 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   exists(
-    src: String,
+    src: string,
     onSuccess: (exists: 'TRUE' | 'FALSE') => void,
     onFail: (err: any) => void,
   ): void;
@@ -108,22 +108,22 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   formatUri(
-    src: String,
-    onSuccess: (url: String) => void,
+    src: string,
+    onSuccess: (url: string) => void,
     onFail: (err: any) => void,
   ): void;
   /**
    * Gets actual url for relative path to src
    * e.g. getPath(src, "../path/to/file.txt") => actual url
    * @param src Directory url
-   * @param path Relative file/direcotry path
+   * @param path Relative file/directory path
    * @param onSuccess Callback function on success returns actual url
    * @param onFail Callback function on error returns error object
    */
   getPath(
-    src: String,
-    path: String,
-    onSuccess: (url: String) => void,
+    src: string,
+    path: string,
+    onSuccess: (url: string) => void,
     onFail: (err: any) => void,
   ): void;
   /**
@@ -133,8 +133,8 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   getStorageAccessPermission(
-    uuid: String,
-    onSuccess: (url: String) => void,
+    uuid: string,
+    onSuccess: (url: string) => void,
     onFail: (err: any) => void,
   ): void;
   /**
@@ -153,7 +153,7 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   listDir(
-    src: String,
+    src: string,
     onSuccess: (list: Array<DirListItem>) => void,
     onFail: (err: any) => void,
   ): void;
@@ -165,9 +165,9 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   move(
-    src: String,
-    dest: String,
-    onSuccess: (url: String) => void,
+    src: string,
+    dest: string,
+    onSuccess: (url: string) => void,
     onFail: (err: any) => void,
   ): void;
   /**
@@ -179,10 +179,10 @@ interface SDcard {
   openDocumentFile(
     onSuccess: (url: DocumentFile) => void,
     onFail: (err: any) => void,
-    mimeType: String,
+    mimeType: string,
   ): void;
   /**
-   * Opens gallary to select image
+   * Opens gallery to select image
    * @param onSuccess Callback function on success returns url of selected file
    * @param onFail Callback function on error returns error object
    * @param mimeType MimeType of file to be selected
@@ -190,7 +190,7 @@ interface SDcard {
   getImage(
     onSuccess: (url: DocumentFile) => void,
     onFail: (err: any) => void,
-    mimeType: String,
+    mimeType: string,
   ): void;
   /**
    * Renames the given file/directory to given new name
@@ -200,9 +200,9 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   rename(
-    src: String,
-    newname: String,
-    onSuccess: (url: String) => void,
+    src: string,
+    newname: string,
+    onSuccess: (url: string) => void,
     onFail: (err: any) => void,
   ): void;
   /**
@@ -213,8 +213,8 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   write(
-    src: String,
-    content: String,
+    src: string,
+    content: string,
     onSuccess: (res: 'OK') => void,
     onFail: (err: any) => void,
   ): void;
@@ -227,8 +227,8 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   write(
-    src: String,
-    content: String,
+    src: string,
+    content: string,
     isBinary: Boolean,
     onSuccess: (res: 'OK') => void,
     onFail: (err: any) => void,
@@ -240,7 +240,7 @@ interface SDcard {
    * @param onFail Callback function on error returns error object
    */
   stats(
-    src: String,
+    src: string,
     onSuccess: (stats: Stats) => void,
     onFail: (err: any) => void,
   ): void;
@@ -250,7 +250,7 @@ interface SDcard {
    * @param listener Callback function on file change returns file stats
    */
   watchFile(
-    src: String,
+    src: string,
     listener: () => void,
   ): {
     unwatch: () => void;

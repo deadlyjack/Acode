@@ -550,7 +550,10 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * @returns {void}
    */
   function cursorMode() {
-    if (!teardropSize || !editor.isFocused()) return;
+    if (!teardropSize || !editor.isFocused()) {
+      $cursor.remove();
+      return;
+    }
 
     clearTimeout($cursor.dataset.timeout);
     clearSelectionMode();
@@ -903,8 +906,8 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * Editor container on update
    */
   function onupdate() {
-    clearCursorMode();
     clearSelectionMode();
+    clearCursorMode();
     hideMenu();
   }
 
@@ -912,14 +915,17 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * Editor container on change session
    */
   function onchangesession() {
-    const copyText = editor.session.getTextRange(editor.getSelectionRange());
-    if (!copyText) {
-      menuActive = false;
-      selectionActive = false;
-    } else {
-      selectionActive = true;
-      menuActive = true;
-    }
+    setTimeout(() => {
+      const copyText = editor.session.getTextRange(editor.getSelectionRange());
+      if (copyText) {
+        selectionMode($end);
+        return;
+      }
+
+      clearSelectionMode();
+      cursorMode();
+      hideMenu();
+    }, 0);
   }
 
   /**

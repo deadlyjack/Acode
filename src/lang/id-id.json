@@ -369,5 +369,6 @@
   "remove": "Hapus",
   "too many files": "Terlalu banyak berkas. Hanya {count} yang akan dihitung.",
   "too many folders": "Terlalu banyak folder. Hanya {count} yang akan dihitung.",
-  "quicktools:command-palette": "Command palette"
+  "quicktools:command-palette": "Command palette",
+  "default file encoding": "Default file encoding"
 }

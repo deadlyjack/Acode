@@ -1,4 +1,4 @@
-import loader from 'components/dialogs/loader';
+import loader from 'dialogs/loader';
 import fsOperation from '../fileSystem';
 import helpers from '../utils/helpers';
 import Url from '../utils/Url';

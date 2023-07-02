@@ -20,7 +20,6 @@ import EditorManager from './editorManager';
 import ActionStack from './actionStack';
 import helpers from 'utils/helpers';
 import settings from './settings';
-import constants from './constants';
 import intentHandler from 'handlers/intent';
 import openFolder, { addedFolder } from './openFolder';
 import quickToolsInit from 'handlers/quickToolsInit';
@@ -31,7 +30,7 @@ import fsOperation from 'fileSystem';
 import toast from 'components/toast';
 import $_menu from 'views/menu.hbs';
 import $_fileMenu from 'views/file-menu.hbs';
-import openFiles from './openFiles';
+import restoreFiles from './restoreFiles';
 import loadPlugins from './loadPlugins';
 import checkPluginsUpdate from './checkPluginsUpdate';
 import plugins from 'pages/plugins';
@@ -41,14 +40,14 @@ import EditorFile from './editorFile';
 import sidebarApps from 'sidebarApps';
 import checkFiles from './checkFiles';
 import themes from './themes';
-import { createEventInit } from 'utils/keyboardEvent';
-import { resetKeyBindings, setKeyBindings } from 'ace/commands';
 import { initFileList } from './fileList';
+import { resetKeyBindings, setKeyBindings } from 'ace/commands';
 import QuickTools from 'pages/quickTools/quickTools';
+import otherSettings from 'settings/appSettings';
 import tutorial from 'components/tutorial';
 import openFile from './openFile';
 import startAd from './startAd';
-import otherSettings from 'settings/appSettings';
+import encodings from 'lib/encodings';
 
 const previousVersionCode = parseInt(localStorage.versionCode, 10);
 
@@ -70,21 +69,25 @@ async function Main() {
   };
 
   window.addEventListener('resize', () => {
-    if (window.ad?.shown && (innerHeight * devicePixelRatio) < 600) {
-      ad.hide();
-      return;
+    const bannerIsActive = !!window.ad?.active;
+    const $activeElement = document.activeElement;
+    const isEditable = $activeElement instanceof HTMLInputElement
+      || $activeElement instanceof HTMLTextAreaElement
+      || $activeElement?.isContentEditable;
+
+    if (isEditable && bannerIsActive) {
+      window.ad?.hide();
+    } else if (bannerIsActive) {
+      window.ad?.show();
     }
 
-    if (window.ad?.shown) {
-      ad.show();
-    }
+    $activeElement.addEventListener('blur', activeElementOnBlur);
   });
 
   document.addEventListener('deviceready', onDeviceReady);
 }
 
 async function onDeviceReady() {
-
   const isFreePackage = /(free)$/.test(BuildInfo.packageName);
   const oldResolveURL = window.resolveLocalFileSystemURL;
   const {
@@ -271,7 +274,6 @@ async function loadApp() {
 
   //#region Add event listeners
   initFileList();
-  createEventInit();
   quickToolsInit();
   sidebarApps.init($sidebar);
   await sidebarApps.loadApps();
@@ -349,7 +351,7 @@ async function loadApp() {
   }
 
   if (Array.isArray(files) && files.length) {
-    openFiles(files)
+    restoreFiles(files)
       .then(() => {
         onEditorUpdate(undefined, false);
       })
@@ -464,7 +466,7 @@ function createFileMenu({ top, bottom, toggler }) {
     toggler,
     transformOrigin: top ? 'top right' : 'bottom right',
     innerHTML: () => {
-      const file = editorManager.activeFile;
+      const file = window.editorManager.activeFile;
 
       if (file.loading) {
         $menu.classList.add('disabled');
@@ -472,15 +474,16 @@ function createFileMenu({ top, bottom, toggler }) {
         $menu.classList.remove('disabled');
       }
 
+      const { label: encoding } = encodings[file.encoding];
+
       return mustache.render($_fileMenu, {
         ...strings,
         file_mode: (file.session.getMode().$id || '').split('/').pop(),
-        file_encoding: file.encoding,
+        file_encoding: encoding,
         file_read_only: !file.editable,
-        file_info: !!file.uri,
+        file_on_disk: !!file.uri,
         file_eol: file.eol,
-        copy_text: !!editorManager.editor.getCopyText(),
-        new_file: file.name === constants.DEFAULT_FILE_NAME && !file.session.getValue(),
+        copy_text: !!window.editorManager.editor.getCopyText(),
       });
     },
   });
@@ -533,4 +536,17 @@ function showTutorials() {
       </p>;
     });
   }
+}
+
+/**
+ * Hide banner ad when focused element is blurred
+ * @this {HTMLElement}
+ */
+function activeElementOnBlur() {
+  const active = !!window.ad?.active;
+  if (active) {
+    window.ad.show();
+  }
+
+  this.removeEventListener('blur', activeElementOnBlur);
 }

@@ -6,8 +6,10 @@ ace.define("ace/ext/modelist", ["require", "exports", "module"], function (requi
     let mode = modesByName.text;
     let fileName = path.split(/[\/\\]/).pop();
     for (let i = 0; i < modes.length; i++) {
-      if (modes[i].supportsFile(fileName)) {
-        mode = modes[i];
+      const iMode = modes[i];
+      if (iMode.constructor.name !== 'Mode') continue;
+      if (iMode.supportsFile(fileName)) {
+        mode = iMode;
         break;
       }
     }

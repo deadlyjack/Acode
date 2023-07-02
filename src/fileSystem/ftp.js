@@ -48,7 +48,7 @@ class FtpClient {
       ftp.connect(this.#host, +this.#port, this.#username, this.#password, {
         securityType: this.#security,
         connectionMode: this.#mode,
-        encoding: 'utf8'
+        encoding: settings.value.defaultFileEncoding
       }, (conId) => {
         this.#conId = conId;
         resolve();

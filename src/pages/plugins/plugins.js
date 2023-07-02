@@ -7,7 +7,7 @@ import Page from "components/page";
 import helpers from "utils/helpers";
 import fsOperation from "fileSystem";
 import constants from "lib/constants";
-import dialogs from "components/dialogs";
+import dialogs from "dialogs";
 import TabView from 'components/tabView';
 import searchBar from "components/searchbar";
 import FileBrowser from "pages/fileBrowser";

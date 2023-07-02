@@ -1,4 +1,4 @@
-import dialogs from '../components/dialogs';
+import dialogs from '../dialogs';
 import helpers from '../utils/helpers';
 
 export default {
@@ -14,42 +14,15 @@ export default {
     });
   },
 
-  async writeFile(filename, content) {
+  async writeFile(filename, data) {
     return new Promise(async (resolve, reject) => {
-      if (content instanceof ArrayBuffer) {
-        content = await toBase64(content);
-        sdcard.write(
-          filename,
-          content,
-          true,
-          resolve,
-          reject,
-        );
-        return;
-      }
-
       sdcard.write(
         filename,
-        content,
+        data,
         resolve,
         reject,
       );
     });
-
-    function toBase64(data) {
-      const blob = new Blob([data]);
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const data = e.target.result;
-          resolve(data.substr(data.indexOf(',') + 1));
-        };
-        reader.onerror = (err) => {
-          reject(err);
-        };
-        reader.readAsDataURL(blob);
-      });
-    }
   },
 
   async copy(src, dest) {

@@ -29,11 +29,11 @@
       "cordova-plugin-file": {
         "ANDROIDX_WEBKIT_VERSION": "1.4.0"
       },
-      "cordova-plugin-system": {},
       "cordova-plugin-sftp": {},
       "cordova-plugin-iap": {},
       "cordova-plugin-server": {},
       "cordova-plugin-ftp": {},
+      "cordova-plugin-system": {},
       "cordova-plugin-sdcard": {}
     },
     "platforms": [

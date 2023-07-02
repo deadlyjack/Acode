@@ -1,171 +1,65 @@
-import escapeStringRegexp from 'escape-string-regexp';
-import constants from '../lib/constants';
-import dialogs from '../components/dialogs';
-import tag from 'html-tag-js';
+import iconv from 'iconv-lite';
 import ajax from '@deadlyjack/ajax';
+import escapeStringRegexp from 'escape-string-regexp';
+import constants from 'lib/constants';
+import dialogs from 'dialogs';
 import path from './Path';
 import Url from './Url';
 import Uri from './Uri';
+import settings from 'lib/settings';
+
+/**
+ * Gets programming language name according to filename
+ * @param {String} filename
+ * @returns
+ */
+function getFileType(filename) {
+  const regex = {
+    babel: /\.babelrc$/i,
+    jsmap: /\.js\.map$/i,
+    yarn: /^yarn\.lock$/i,
+    testjs: /\.test\.js$/i,
+    testts: /\.test\.ts$/i,
+    cssmap: /\.css\.map$/i,
+    typescriptdef: /\.d\.ts$/i,
+    clojurescript: /\.cljs$/i,
+    cppheader: /\.(hh|hpp)$/i,
+    jsconfig: /^jsconfig.json$/i,
+    tsconfig: /^tsconfig.json$/i,
+    jsbeautify: /^\.jsbeautifyrc$/i,
+    webpack: /^webpack\.config\.js$/i,
+    audio: /\.(mp3|wav|ogg|flac|aac)$/i,
+    android: /\.(apk|aab|slim|smali)$/i,
+    git: /(^\.gitignore$)|(^\.gitmodules$)/i,
+    video: /\.(mp4|m4a|mov|3gp|wmv|flv|avi)$/i,
+    image: /\.(png|jpg|jpeg|gif|bmp|ico|webp)$/i,
+    npm: /(^package\.json$)|(^package\-lock\.json$)/i,
+    compressed: /\.(zip|rar|7z|tar|gz|gzip|dmg|iso)$/i,
+    eslint: /(^\.eslintrc(\.(json5?|ya?ml|toml))?$|eslint\.config\.(c?js|json)$)/i,
+    postcssconfig: /(^\.postcssrc(\.(json5?|ya?ml|toml))?$|postcss\.config\.(c?js|json)$)/i,
+    prettier: /(^\.prettierrc(\.(json5?|ya?ml|toml))?$|prettier\.config\.(c?js|json)$)/i,
+  };
+
+  const fileType = Object.keys(regex).find((type) => regex[type].test(filename));
+  if (fileType) return fileType;
+
+  return Url.extname(filename).substring(1);
+}
 
 export default {
-  /**
-   * Gets programming language name according to filename
-   * @param {String} filename
-   * @returns
-   */
-  getFileType(filename) {
-    const regex = {
-      postcssconfig: /^postcss\.config\.js$/i,
-      typescriptdef: /\.d\.ts$/i,
-      webpack: /^webpack\.config\.js$/i,
-      yarn: /^yarn\.lock$/i,
-      npm: /(^package\.json$)|(^package\-lock\.json$)/i,
-      testjs: /\.test\.js$/i,
-      testts: /\.test\.ts$/i,
-      eslint: /(^\.eslintrc$)|(^\.eslintignore$)/i,
-      git: /(^\.gitignore$)|(^\.gitmodules$)/i,
-      jsmap: /\.map\.js$/i,
-      jsconfig: /^jsconfig.json$/i,
-      jsbeautify: /^jsbeautifyrc$/i,
-      actionscript: /\.as$/i,
-      ada: /\.(ada|adb)$/i,
-      apache: /\.?(htaccess|htgroups|conf|htaccess|htpasswd)$/i,
-      asciidoc: /\.(asciidoc|adoc)$/i,
-      assembly: /\.(a|asm)$/i,
-      autohotkey: /\.ahk$/i,
-      apex: /\.(apex|cls|trigger|tgr)$/i,
-      babel: /\.babelrc$/i,
-      crystal: /\.cr$/i,
-      cpp: /\.(cpp|cc|cxx|ino)$/i,
-      cppheader: /\.(hh|hpp)$/i,
-      clojure: /\.clj$/i,
-      clojurescript: /\.cljs$/i,
-      cobol: /\.(cbl|cob)$/i,
-      csharp: /\.cs$/i,
-      coffeescript: /(\.(coffee|cf|cson))$|(^cakefile)$/i,
-      cmake: /^cmake$/i,
-      css: /\.css$/i,
-      dartlang: /\.dart$/i,
-      diff: /\.diff$/i,
-      dlang: /\.(d|di)$/i,
-      docker: /^dockerfile$/i,
-      drools: /\.drl$/i,
-      ejs: /\.ejs$/i,
-      elixir: /\.(ex|exs)$/i,
-      elm: /\.elm$/i,
-      erlang: /\.(erl|hrl)$/i,
-      fortran: /\.(f|f90)$/i,
-      fsharp: /\.(fsi|fs|fsx|fsscript)$/i,
-      gcode: /\.gcode$/i,
-      glsl: /\.(glsl|frag|vert)$/i,
-      graphql: /\.gql$/i,
-      groovy: /\.(groovy|gradle)$/i,
-      haml: /\.haml$/i,
-      handlebars: /\.(hbs|handlebars|tpl|mustache)$/i,
-      haskell: /\.hs$/i,
-      cabal: /\.cabal$/i,
-      haxe: /\.hx$/i,
-      hjson: /\.hjson$/i,
-      html: /\.(html|htm|xhtml|we|wpy)$/i,
-      ini: /\.(ini|conf|cfg|prefs)$/i,
-      io: /\.io$/i,
-      javascript: /\.(js|jsm|jsx|mjs|cjs)$/i,
-      jsp: /\.jsp$/i,
-      julia: /\.jl$/i,
-      kotlin: /\.(kt|kts)$/i,
-      license: /^license$/i,
-      less: /\.less$/i,
-      liquid: /\.liquid$/i,
-      lisp: /\.lisp$/i,
-      livescript: /\.ls$/i,
-      lsl: /\.lsl$/i,
-      lua: /\.(lua|lp)$/i,
-      makefile: /^makefile$|^GNUmakefile$|^OCamlMakefile$|\.?make$/i,
-      markdown: /\.(md|markdown)$/i,
-      matlab: /\.matlab$/i,
-      mysql: /\.mysql$/i,
-      nginx: /\.(nginx|conf)$/i,
-      nim: /\.nim$/i,
-      objectivec: /\.m$/i,
-      objectivecpp: /\.mm$/i,
-      ocaml: /\.(ml|mli)$/i,
-      perl: /\.(pl|pm|p6|pl6|pm6)$/i,
-      pgsql: /\.pgsql$/i,
-      php: /\.(php|inc|phtml|shtml|php3|php4|php5|phps|phpt|aw|ctp|module)$/i,
-      puppet: /\.(epp|pp)$/i,
-      powershell: /\.ps1$/i,
-      prolog: /\.(plg|prolog)$/i,
-      protobug: /\.proto$/i,
-      python: /\.(py|pyc|pyd|pyo|pyw|pyz|gyp)$/i,
-      razor: /\.(cshtml|asp)$/i,
-      red: /\.(red|reds)$/i,
-      ruby: /^rakefile$|^guardfile$|^rakefile$|^gemfile$|\.(rb|ru|gemspec|rake)$/i,
-      rust: /\.rs$/i,
-      sass: /\.sass$/i,
-      scss: /\.scss$/i,
-      scala: /\.(scala|sbt)$/i,
-      shell: /\.(sh|bash)$|^..*rc$/i,
-      android: /\.slim$/i,
-      smali: /\.(smali)$/i,
-      smarty: /\.(smarty|tpl)$/i,
-      sql: /\.sql$/i,
-      stylus: /\.(styl|stylus)$/i,
-      svelte: /\.svelte$/i,
-      svg: /\.svg$/i,
-      swift: /\.swift$/i,
-      tcl: /\.tcl$/i,
-      terraform: /\.(tf|tfvars|terragrunt)$/i,
-      tex: /\.tex$/i,
-      textile: /\.textile$/i,
-      toml: /\.toml$/i,
-      typescript: /\.(ts|typescript|str|tsx)$/i,
-      vala: /\.vala$/i,
-      vb: /\.(vb|vbs)$/i,
-      velocity: /\.vm$/i,
-      verilog: /\.(v|vh|sv|svh)$/i,
-      vhdl: /\.(vhd|vhdl)$/i,
-      xml: /\.(xml|rdf|rss|wsdl|xslt|atom|mathml|mml|xul|xbl|xaml)$/i,
-      xquery: /\.xq$/i,
-      yaml: /\.(yaml|yml)$/i,
-    };
-
-    const fileType = Object.keys(regex).find((type) => regex[type].test(filename));
-    if (fileType) return fileType;
-
-    const EXCEL = /\.(xl|xls|xlr|xlsx|xltx|sdc|ods|dex|cell|def|ods|ots|uos)$/i;
-    const WORD = /\.(doc|docx|odt|rtf|wpd)$/i;
-    const TEXT = /\.(txt|csv)$/i;
-    const ext = Url.extname(filename);
-
-    if (ext === '.mdb') return 'access';
-    if (ext === '.any') return 'anyscript';
-    if (ext === '.pde') return 'processinglang';
-    if (ext === '.src') return 'source';
-    if (TEXT.test(ext)) return 'text';
-    if (WORD.test(ext)) return 'word';
-    if (EXCEL.test(ext)) return 'excel';
-    return ext.substring(1);
-  },
   /**
    * Gets icon according to filename
    * @param {string} filename
    */
   getIconForFile(filename) {
-    let ext = Url.extname(filename);
+    const { getModeForPath } = ace.require('ace/ext/modelist');
+    const type = getFileType(filename);
+    const { name } = getModeForPath(filename);
 
-    const MOVIE = /\.(mp4|m4a|mov|3gp|wmv|flv|avi)$/i;
-    const IMAGE = /\.(png|jpg|jpeg|gif|bmp|svg|ico|webp)$/i;
-    const SONG = /\.(mp3|wav|ogg|flac|aac)$/i;
-    const ZIP = /\.(zip|rar|7z|tar|gz|gzip|dmg|iso)$/i;
-    const ANDROID = /\.(apk|aab)$/i;
+    const iconForMode = `file_type_${name}`;
+    const iconForType = `file_type_${type}`;
 
-    if (ANDROID.test(ext)) return 'icon android';
-    if (SONG.test(ext)) return 'icon audiotrack';
-    if (ZIP.test(ext)) return 'icon zip';
-    if (IMAGE.test(ext)) return 'icon image';
-    if (MOVIE.test(ext)) return 'icon movie';
-
-    return `file file_type_${this.getFileType(filename)}`;
+    return `file file_type_default ${iconForMode} ${iconForType}`;
   },
   /**
    *
@@ -306,20 +200,29 @@ export default {
   },
   /**
    * Decodes arrayBuffer to String according given encoding type
-   * @param {ArrayBuffer} arrayBuffer
-   * @param {String} [encoding='utf-8']
+   * @param {ArrayBuffer} data
+   * @param {String} [encoding]
+   * @returns {Promise<string>}
    */
-  decodeText(arrayBuffer, encoding = 'utf-8') {
+  decodeText(data, encoding) {
+    let isJson = false;
 
-    const isJson = encoding === 'json';
-    if (isJson) encoding = 'utf-8';
-
-    const uint8Array = new Uint8Array(arrayBuffer);
-    const result = new TextDecoder(encoding).decode(uint8Array);
-    if (isJson) {
-      return this.parseJSON(result);
+    if (encoding === 'json') {
+      encoding = null;
+      isJson = true;
     }
-    return result;
+
+    if (!encoding) {
+      encoding = settings.value.defaultFileEncoding;
+    }
+
+    const text = new TextDecoder(encoding).decode(data);
+
+    if (isJson) {
+      return this.parseJSON(text);
+    }
+
+    return text;
   },
   /**
    * Checks whether given type is directory or not
@@ -408,8 +311,8 @@ export default {
     ) {
       const $page = tag.getAll('wc-page:not(#root)').pop();
       if ($page) {
+        ad.active = true;
         ad.show();
-        ad.shown = true;
       }
     }
   },
@@ -419,13 +322,13 @@ export default {
    */
   hideAd(force = false) {
     const { ad } = window;
-    if (IS_FREE_VERSION && ad?.shown) {
+    if (IS_FREE_VERSION && ad?.active) {
       const $pages = tag.getAll('.page-replacement');
       const hide = $pages.length === 1;
 
       if (force || hide) {
+        ad.active = false;
         ad.hide();
-        ad.shown = false;
       }
     }
   },

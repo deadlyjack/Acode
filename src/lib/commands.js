@@ -1,26 +1,26 @@
 import run from './run';
-import settingsMain from '../settings/mainSettings';
-import dialogs from '../components/dialogs';
+import path from 'utils/Path';
+import settingsMain from 'settings/mainSettings';
+import dialogs from 'dialogs';
 import openFile from './openFile';
 import openFolder from './openFolder';
-import helpers from '../utils/helpers';
+import helpers from 'utils/helpers';
 import constants from './constants';
-import help from '../settings/help';
-import recents from '../lib/recents';
-import fsOperation from '../fileSystem';
-import Modes from '../pages/modes/modes';
-import actions from '../handlers/quickTools';
-import FileBrowser from '../pages/fileBrowser';
-import path from '../utils/Path';
+import help from 'settings/help';
+import recents from 'lib/recents';
+import fsOperation from 'fileSystem';
+import Modes from 'pages/modes/modes';
+import actions from 'handlers/quickTools';
+import FileBrowser from 'pages/fileBrowser';
 import showFileInfo from './showFileInfo';
 import checkFiles from './checkFiles';
 import saveState from './saveState';
-import commandPalette from '../components/commandPalette';
-import TextEncodings from '../pages/textEncodings';
 import EditorFile from './editorFile';
-import findFile from '../components/findFile';
+import findFile from 'palettes/findFile';
 import appSettings from './settings';
-import Sidebar from '../components/sidebar';
+import Sidebar from 'components/sidebar';
+import commandPalette from 'palettes/commandPalette';
+import encodingPalette from 'palettes/encoding';
 
 export default {
   async 'close-all-tabs'() {
@@ -77,17 +77,8 @@ export default {
     app.classList.add('fullscreen-mode');
     this['resize-editor']();
   },
-  async 'encoding'() {
-    const encoding = await TextEncodings();
-    const file = editorManager.activeFile;
-    file.encoding = encoding;
-    const text = file.session.getValue();
-    const decodedText = new TextEncoder().encode(text);
-    const newText = new TextDecoder(encoding).decode(decodedText);
-    file.session.setValue(newText);
-    file.isUnsaved = false;
-    editorManager.onupdate('encoding');
-    editorManager.emit('update', 'encoding');
+  'encoding'() {
+    encodingPalette();
   },
   'exit'() {
     navigator.app.exitApp();
@@ -239,7 +230,7 @@ export default {
   async 'syntax'() {
     editorManager.editor.blur();
     const mode = await Modes();
-    const activefile = editorManager.activeFile;
+    const activeFile = editorManager.activeFile;
 
     let modeAssociated;
     try {
@@ -248,10 +239,10 @@ export default {
       modeAssociated = {};
     }
 
-    modeAssociated[path.extname(activefile.filename)] = mode;
+    modeAssociated[path.extname(activeFile.filename)] = mode;
     localStorage.modeassoc = JSON.stringify(modeAssociated);
 
-    activefile.setMode(mode);
+    activeFile.setMode(mode);
   },
   'toggle-fullscreen'() {
     app.classList.toggle('fullscreen-mode');

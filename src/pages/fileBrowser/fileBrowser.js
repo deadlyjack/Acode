@@ -5,7 +5,7 @@ import mustache from 'mustache';
 import Page from 'components/page';
 import helpers from 'utils/helpers';
 import contextmenu from 'components/contextmenu';
-import dialogs from 'components/dialogs';
+import dialogs from 'dialogs';
 import constants from 'lib/constants';
 import filesSettings from 'settings/filesSettings';
 import _template from './fileBrowser.hbs';

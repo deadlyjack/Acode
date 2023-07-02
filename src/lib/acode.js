@@ -1,10 +1,9 @@
 import appSettings from "./settings";
 import commands from "./commands";
-import fsOperation from "../fileSystem";
+import fsOperation from "fileSystem";
 import Url from "utils/Url";
 import EditorFile from "./editorFile";
 import defaultFormatter from "settings/defaultFormatter";
-import dialogs from "components/dialogs";
 import FileBrowser from "pages/fileBrowser";
 import helpers from "utils/helpers";
 import projects from "./projects";
@@ -21,6 +20,15 @@ import files from './fileList';
 import contextmenu from 'components/contextmenu';
 import toast from 'components/toast';
 import tutorial from 'components/tutorial';
+import KeyboardEvent from 'utils/keyboardEvent';
+import alert from 'dialogs/alert';
+import prompt from 'dialogs/prompt';
+import select from 'dialogs/select';
+import loader from 'dialogs/loader';
+import box from 'dialogs/box';
+import confirm from 'dialogs/confirm';
+import multiPrompt from 'dialogs/multiPrompt';
+import color from 'dialogs/color';
 
 export default class Acode {
   #modules = {};
@@ -43,18 +51,18 @@ export default class Acode {
     this.define('Url', Url);
     this.define('fs', fsOperation);
     this.define('projects', projects);
-    this.define('alert', dialogs.alert);
-    this.define('prompt', dialogs.prompt);
-    this.define('select', dialogs.select);
-    this.define('loader', dialogs.loader);
-    this.define('dialogBox', dialogs.box);
+    this.define('alert', alert);
+    this.define('prompt', prompt);
+    this.define('select', select);
+    this.define('dialogBox', box);
+    this.define('loader', loader);
+    this.define('confirm', confirm);
+    this.define('colorPicker', color);
+    this.define('multiPrompt', multiPrompt);
     this.define('addedfolder', addedFolder);
-    this.define('colorPicker', dialogs.color);
     this.define('contextMenu', contextmenu);
     this.define('fileBrowser', FileBrowser);
-    this.define('confirm', dialogs.confirm);
     this.define('selectionMenu', selectionMenu);
-    this.define('multiPrompt', dialogs.multiPrompt);
     this.define('toInternalUrl', helpers.toInternalUri);
     this.define('EditorFile', EditorFile);
     this.define('page', Page);
@@ -82,6 +90,7 @@ export default class Acode {
       remove: sidebarApps.remove,
     });
     this.define('fileList', files);
+    this.define('createKeyboardEvent', KeyboardEvent);
   }
 
   /**
@@ -218,11 +227,11 @@ export default class Acode {
   }
 
   alert(title, message, onhide) {
-    dialogs.alert(title, message, onhide);
+    alert(title, message, onhide);
   }
 
   loader(title, message, cancel) {
-    return dialogs.loader.create(title, message, cancel);
+    return loader.create(title, message, cancel);
   }
 
   joinUrl(...args) {
@@ -238,22 +247,22 @@ export default class Acode {
   }
 
   async prompt(message, defaultValue, type, options) {
-    const response = await dialogs.prompt(message, defaultValue, type, options);
+    const response = await prompt(message, defaultValue, type, options);
     return response;
   }
 
   async confirm(title, message) {
-    const confirmation = await dialogs.confirm(title, message);
+    const confirmation = await confirm(title, message);
     return confirmation;
   }
 
   async select(title, options, config) {
-    const response = await dialogs.select(title, options, config);
+    const response = await select(title, options, config);
     return response;
   }
 
   async multiPrompt(title, inputs, help) {
-    const values = await dialogs.multiPrompt(title, inputs, help);
+    const values = await multiPrompt(title, inputs, help);
     return values;
   }
 

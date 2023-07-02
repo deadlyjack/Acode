@@ -29,8 +29,10 @@ import tile from './tile';
  * @returns {Collapsible}
  */
 export default function collapsableList(titleText, type = 'indicator', options = {}) {
+  let onscroll = null;
   const $ul = tag('ul', {
     className: 'scroll',
+    onscroll: onUlScroll,
   });
   const $collapseIndicator = tag('span', {
     className: `icon ${type}`,
@@ -49,6 +51,7 @@ export default function collapsableList(titleText, type = 'indicator', options =
   let collapse = () => {
     $mainWrapper.classList.add('hidden');
     if ($mainWrapper.ontoggle) $mainWrapper.ontoggle.call($mainWrapper);
+    delete $ul.dataset.scrollTop;
   };
 
   let expand = () => {
@@ -59,6 +62,15 @@ export default function collapsableList(titleText, type = 'indicator', options =
   $title.classList.add('light');
   $title.addEventListener('click', toggle);
 
+  [$title, $mainWrapper].forEach(defineProperties);
+
+  return $mainWrapper;
+
+  function onUlScroll() {
+    if (onscroll) onscroll.call($ul);
+    $ul.dataset.scrollTop = $ul.scrollTop;
+  }
+
   function toggle() {
     if ($title.collapsed) {
       expand();
@@ -66,10 +78,6 @@ export default function collapsableList(titleText, type = 'indicator', options =
       collapse();
     }
   }
-
-  [$title, $mainWrapper].forEach(defineProperties);
-
-  return $mainWrapper;
 
   function defineProperties($el) {
     Object.defineProperties($el, {
@@ -117,6 +125,25 @@ export default function collapsableList(titleText, type = 'indicator', options =
           return !this.collapsed;
         }
       },
+      onscroll: {
+        get() {
+          return onscroll;
+        },
+        set(fun) {
+          if (typeof fun === 'function') {
+            onscroll = fun;
+          }
+        }
+      },
+      scrollTop: {
+        get() {
+          return $ul.dataset.scrollTop || 0;
+        },
+        set(val) {
+          $ul.dataset.scrollTop = val;
+          $ul.scrollTop = val;
+        }
+      }
     });
   }
 }

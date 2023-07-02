@@ -1,7 +1,7 @@
 import Ref from 'html-tag-js/ref';
-import FileBrowser from '../pages/fileBrowser';
+import FileBrowser from 'pages/fileBrowser';
 import Checkbox from './checkbox';
-import dialogs from './dialogs';
+import dialogs from 'dialogs';
 
 /**
  * @typedef {Object} ListItem
@@ -15,7 +15,7 @@ import dialogs from './dialogs';
  * @property {boolean} [checkbox]
  * @property {string} [prompt]
  * @property {string} [promptType]
- * @property {import('./dialogs/prompt').PromptOptions} [promptOptions]
+ * @property {import('../dialogs/prompt').PromptOptions} [promptOptions]
  */
 
 /**

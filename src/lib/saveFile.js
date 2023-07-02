@@ -1,5 +1,5 @@
 import FileBrowser from '../pages/fileBrowser';
-import dialogs from '../components/dialogs';
+import dialogs from '../dialogs';
 import helpers from '../utils/helpers';
 import constants from './constants';
 import recents from '../lib/recents';

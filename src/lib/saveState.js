@@ -13,9 +13,9 @@ export default () => {
 
     const fileJson = {
       id: file.id,
-      filename: file.filename,
-      type: file.type,
       uri: file.uri,
+      type: file.type,
+      filename: file.filename,
       isUnsaved: file.isUnsaved,
       readOnly: file.readOnly,
       SAFMode: file.SAFMode,

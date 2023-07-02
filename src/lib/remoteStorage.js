@@ -1,5 +1,5 @@
 import helpers from '../utils/helpers';
-import dialogs from '../components/dialogs';
+import dialogs from '../dialogs';
 import Url from '../utils/Url';
 import Sftp from '../fileSystem/sftp';
 import Ftp from '../fileSystem/ftp';
@@ -208,8 +208,7 @@ export default {
       let localKeyFile = '';
       if (keyFile) {
         let fs = fsOperation(keyFile);
-        const rawData = await fs.readFile();
-        const text = new TextDecoder('utf-8').decode(new Uint8Array(rawData));
+        const text = await fs.readFile('utf8');
 
         //Original key file sometimes gives permission error
         //To solve permission error

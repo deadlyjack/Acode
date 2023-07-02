@@ -367,5 +367,6 @@
   "remove": "Entfernen",
   "too many files": "Zu viele Dateien. Nur {count} werden aufgelistet.",
   "too many folders": "Zu viele Ordner. Nur {count} werden aufgelistet.",
-  "quicktools:command-palette": "Befehlspalette"
+  "quicktools:command-palette": "Befehlspalette",
+  "default file encoding": "Default file encoding"
 }

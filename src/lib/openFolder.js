@@ -1,7 +1,7 @@
 import escapeStringRegexp from 'escape-string-regexp';
 import fsOperation from 'fileSystem';
 import collapsableList from 'components/collapsableList';
-import dialogs from 'components/dialogs';
+import dialogs from 'dialogs';
 import tile from 'components/tile';
 import Sidebar from 'components/sidebar';
 import helpers from 'utils/helpers';
@@ -537,14 +537,10 @@ function execOperation(type, action, url, $target, name) {
       const file = await FileBrowser('file', strings['insert file']);
       const sourceFs = fsOperation(file.url);
       const data = await sourceFs.readFile();
-      const stats = await sourceFs.stat();
-      const name = stats.name;
-      const fileUrl = (await fsOperation(Url.join(url, name)).stat()).url;
-      const destFs = fsOperation(url);
-
-      await destFs.createFile(name, data);
-      appendTile($target, createFileTile(name, fileUrl));
-      FileList.append(url, fileUrl);
+      const sourceStats = await sourceFs.stat();
+      const insertedFile = await fsOperation(url).createFile(sourceStats.name, data);
+      appendTile($target, createFileTile(sourceStats.name, insertedFile));
+      FileList.append(url, insertedFile);
     } catch (error) { } finally {
       stopLoading();
     }

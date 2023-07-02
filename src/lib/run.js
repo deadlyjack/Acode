@@ -1,13 +1,13 @@
+import Url from 'utils/Url';
 import mimeType from 'mime-types';
 import { marked } from 'marked';
 import mustache from 'mustache';
 import $_console from 'views/console.hbs';
 import $_markdown from 'views/markdown.hbs';
 import helpers from 'utils/helpers';
-import dialogs from 'components/dialogs';
+import dialogs from 'dialogs';
 import constants from './constants';
 import fsOperation from 'fileSystem';
-import Url from 'utils/Url';
 import openFolder from './openFolder';
 import appSettings from './settings';
 import EditorFile from './editorFile';
@@ -118,7 +118,7 @@ async function run(
   next();
 
   function next() {
-    if (extension === 'js' || isConsole) startConsole();
+    if (extension === '.js' || isConsole) startConsole();
     else start();
   }
 
@@ -185,12 +185,11 @@ async function run(
         sendFileContent(url, reqId, 'application/javascript');
         break;
 
-      case EXECUTING_SCRIPT:
-        let text;
-        if (extension === 'js') text = activeFile.session.getValue();
-        else text = '';
+      case EXECUTING_SCRIPT: {
+        const text = activeFile?.session.getValue() || '';
         sendText(text, reqId, 'application/javascript');
         break;
+      }
 
       case MARKDOWN_STYLE:
         url = appSettings.value.markdownStyle;
@@ -407,7 +406,7 @@ async function run(
       return;
     }
 
-    let text = await fs.readFile('utf-8');
+    let text = await fs.readFile(appSettings.value.defaultFileEncoding);
     text = processText ? processText(text) : text;
     if (mime === MIMETYPE_HTML) {
       sendHTML(text, id);

@@ -1,4 +1,4 @@
-import dialogs from '../components/dialogs';
+import dialogs from '../dialogs';
 import fsOperation from '../fileSystem';
 
 let checkFileEnabled = true;
@@ -66,7 +66,7 @@ export default async function checkFiles() {
         return;
       }
 
-      const text = await fs.readFile(file.encoding ?? 'utf-8');
+      const text = await fs.readFile(file.encoding);
       const loadedText = file.session.getValue();
 
       if (text !== loadedText) {

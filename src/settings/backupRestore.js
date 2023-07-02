@@ -1,4 +1,4 @@
-import dialogs from 'components/dialogs';
+import dialogs from 'dialogs';
 import fsOperation from 'fileSystem';
 import Url from 'utils/Url';
 import FileBrowser from 'pages/fileBrowser';

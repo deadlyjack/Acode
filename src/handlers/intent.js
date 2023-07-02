@@ -1,5 +1,5 @@
 import openFile from '../lib/openFile';
-import dialogs from '../components/dialogs';
+import dialogs from '../dialogs';
 import helpers from '../utils/helpers';
 
 export default HandleIntent;
@@ -21,4 +21,4 @@ async function HandleIntent(intent = {}) {
 
 HandleIntent.onError = (error) => {
   helpers.error(error);
-}
+};

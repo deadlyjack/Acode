@@ -1,6 +1,6 @@
 import tag from "html-tag-js";
 import mimeTypes from 'mime-types';
-import dialogs from "components/dialogs";
+import dialogs from "dialogs";
 import Sidebar from 'components/sidebar';
 import tile from "components/tile";
 import fsOperation from "fileSystem";
@@ -12,6 +12,7 @@ import openFolder from "./openFolder";
 import run from './run';
 import saveFile from './saveFile';
 import appSettings from './settings';
+import startDrag from 'handlers/editorFileTab';
 
 const modelist = ace.require('ace/ext/modelist');
 const { Fold } = ace.require('ace/edit_session/fold');
@@ -28,7 +29,7 @@ const { Range } = ace.require('ace/range');
  * @property {string} [id] ID fo the file
  * @property {string} [uri] uri of the file
  * @property {string} [text] session text
- * @property {boolean} [editable] eable file to edit or not
+ * @property {boolean} [editable] enable file to edit or not
  * @property {boolean} [deletedFile] file do not exists at source
  * @property {'single' | 'tree'} [SAFMode] storage access framework mode
  * @property {string} [encoding] text encoding
@@ -68,10 +69,10 @@ export default class EditorFile {
    */
   session = null;
   /**
-   * Encoding of the text e.e. 'utf-8'
+   * Encoding of the text e.g. 'gbk'
    * @type {string}
    */
-  encoding = 'utf-8';
+  encoding = appSettings.value.defaultFileEncoding;
   /**
    * Weather file is readonly
    * @type {boolean}
@@ -82,10 +83,6 @@ export default class EditorFile {
    * @type {boolean}
    */
   markChanged = true;
-  /**
-   * @type {string} file syntax highliting mode
-   */
-  #mode = 'ace/mode/text';
   /**
    * Storage access framework file mode
    * @type {'single' | 'tree' | null}
@@ -107,7 +104,7 @@ export default class EditorFile {
    */
   #id = constants.DEFAULT_FILE_SESSION;
   /**
-   * Associated tile for the file, that is appened in the open file list,
+   * Associated tile for the file, that is append in the open file list,
    * when clicked make the file active.
    * @type {HTMLElement}
    */
@@ -214,9 +211,13 @@ export default class EditorFile {
 
     this.#SAFMode = options?.SAFMode;
     this.isUnsaved = options?.isUnsaved ?? false;
-    this.encoding = options?.encoding ?? 'utf-8';
+
+    if (options?.encoding) {
+      this.encoding = options?.encoding;
+    }
+
     // if options contains text property then there is no need to load
-    // set loaded true i.e. text is no undefi
+    // set loaded true
 
     if (this.#id !== constants.DEFAULT_FILE_SESSION) {
       this.loaded = options?.text !== undefined;
@@ -356,14 +357,14 @@ export default class EditorFile {
   }
 
   /**
-   * File location on the deive
+   * File location on the device
    */
   get uri() {
     return this.#uri;
   }
 
   /**
-   *  File location on the deive
+   *  File location on the device
    * @param {string} value
    */
   set uri(value) {
@@ -451,9 +452,9 @@ export default class EditorFile {
   }
 
   /**
-   * Readonly, cahce file url
+   * Readonly, cache file url
    */
-  get cahceFile() {
+  get cacheFile() {
     return Url.join(CACHE_STORAGE, this.#id);
   }
 
@@ -461,9 +462,7 @@ export default class EditorFile {
    * File icon
    */
   get icon() {
-    const modeName = this.#mode.split('/').pop();
-    const fileType = helpers.getFileType(this.filename);
-    return `file file_type_${modeName} file_type_${fileType}`;
+    return helpers.getIconForFile(this.filename);
   }
 
   get tab() {
@@ -476,7 +475,7 @@ export default class EditorFile {
 
   async writeToCache() {
     const text = this.session.getValue();
-    const fs = fsOperation(this.cahceFile);
+    const fs = fsOperation(this.cacheFile);
 
     try {
       if (!await fs.exists()) {
@@ -500,7 +499,7 @@ export default class EditorFile {
     // and need to saved to a location.
     // here readonly means file has uri but has no write permission.
     if (!this.uri || this.readOnly) {
-      // if file is defautl file and text is changed
+      // if file is default file and text is changed
       if (this.id === constants.DEFAULT_FILE_SESSION) {
         // change id when text is changed
         this.id = helpers.uuid();
@@ -511,7 +510,7 @@ export default class EditorFile {
     const protocol = Url.getProtocol(this.#uri);
     let fs;
     if (/s?ftp:/.test(protocol)) {
-      // if file is a ftp or sftp file, get file content forom cahced file.
+      // if file is a ftp or sftp file, get file content from cached file.
       // remove ':' from protocol because cache file of remote files are
       // stored as ftp102525465N i.e. protocol + id
       const cacheFilename = protocol.slice(0, -1) + this.id;
@@ -645,7 +644,6 @@ export default class EditorFile {
 
     // sets ace editor EditSession mode
     this.session.setMode(mode);
-    this.#mode = mode;
 
     // sets file icon
     this.#tab.lead(
@@ -769,11 +767,11 @@ export default class EditorFile {
    */
   async #renameCacheFile(newId) {
     try {
-      const fs = fsOperation(this.cahceFile);
+      const fs = fsOperation(this.cacheFile);
       if (!await fs.exists()) return;
       fs.renameTo(newId);
     } catch (error) {
-      console.error('renameCahceFile', error);
+      console.error('renameCacheFile', error);
     }
   }
 
@@ -782,7 +780,7 @@ export default class EditorFile {
    */
   async #removeCache() {
     try {
-      const fs = fsOperation(this.cahceFile);
+      const fs = fsOperation(this.cacheFile);
       if (!await fs.exists()) return;
       await fs.delete();
     } catch (error) {
@@ -810,9 +808,9 @@ export default class EditorFile {
     this.session.setValue(strings['loading...']);
 
     try {
-      const cacheFs = fsOperation(this.cahceFile);
+      const cacheFs = fsOperation(this.cacheFile);
       if (await cacheFs.exists()) {
-        value = await cacheFs.readFile('utf-8');
+        value = await cacheFs.readFile(this.encoding);
       }
 
       if (this.uri) {
@@ -821,7 +819,7 @@ export default class EditorFile {
           this.deletedFile = true;
           this.isUnsaved = true;
         } else if (value === undefined) {
-          value = await file.readFile('utf-8');
+          value = await file.readFile(this.encoding);
         }
       }
 
@@ -992,100 +990,6 @@ export default class EditorFile {
 }
 
 /**
- * Handles file drag
- * @param {MouseEvent} e 
- */
-function startDrag(e) {
-  const { editor } = editorManager;
-
-  if (editorManager.activeFile.focusedBefore) editor.focus();
-
-  const $el = e.target;
-  const $parent = $el.parentElement;
-  const event = (e) => (e.touches && e.touches[0]) || e;
-  const opts = { passive: false };
-
-  let startX = event(e).clientX;
-  let startY = event(e).clientY;
-  let prevEnd = startX;
-  let position;
-  let left = $el.offsetLeft;
-  let $placeholder = $el.cloneNode();
-
-  const rect = $el.getBoundingClientRect();
-  $el.style.zIndex = 999;
-  $placeholder.style.opacity = 0;
-  $placeholder.style.height = `${rect.height}px`;
-  $placeholder.style.width = `${rect.width}px`;
-
-  if (appSettings.value.vibrateOnTap) {
-    navigator.vibrate(constants.VIBRATION_TIME);
-    $el.classList.add('select');
-    $el.style.transform = `translate3d(${left}px, 0, 0)`;
-    $parent.insertBefore($placeholder, $el);
-  }
-  document.addEventListener('mousemove', drag, opts);
-  document.addEventListener('touchmove', drag, opts);
-  document.ontouchmove = null;
-  document.onmousemove = null;
-  document.ontouchend = cancelDrag;
-  document.onmouseup = cancelDrag;
-  document.ontouchcancel = cancelDrag;
-  document.onmouseleave = cancelDrag;
-
-  function cancelDrag() {
-    $el.classList.remove('select');
-    $el.style.zIndex = 0;
-    $el.style.transform = `translate3d(0, 0, 0)`;
-    document.removeEventListener('mousemove', drag, opts);
-    document.removeEventListener('touchmove', drag, opts);
-    document.ontouchend = document.onmouseup = null;
-    if ($placeholder.isConnected) {
-      $parent.replaceChild($el, $placeholder);
-      updateFileList($parent);
-    }
-    $el.eventAdded = false;
-    document.ontouchend = null;
-    document.onmouseup = null;
-    document.ontouchcancel = null;
-    document.onmouseleave = null;
-  }
-
-  function drag(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-
-    const end = event(e).clientX;
-
-    position = prevEnd - end > 0 ? 'l' : 'r';
-    prevEnd = end;
-    const move = end - startX;
-    const $newEl = document.elementFromPoint(end, startY);
-
-    if (!$newEl) return;
-
-    $el.style.transform = `translate3d(${left + move}px, 0, 0)`;
-
-    if (
-      $newEl.classList.contains('tile') &&
-      $el !== $newEl &&
-      $parent.contains($newEl)
-    ) {
-      if (position === 'r') {
-        if ($newEl.nextElementSibling) {
-          $parent.insertBefore($placeholder, $newEl.nextElementSibling);
-        } else {
-          $parent.append($placeholder);
-        }
-      } else {
-        $parent.insertBefore($placeholder, $newEl);
-      }
-    }
-  }
-}
-
-/**
  * 
  * @param {MouseEvent} e 
  * @returns 
@@ -1098,21 +1002,6 @@ function tabOnclick(e) {
     return;
   }
   this.makeActive();
-}
-
-function updateFileList($parent) {
-  const children = [...$parent.children];
-  const newFileList = [];
-  for (let el of children) {
-    for (let file of editorManager.files) {
-      if (file.tab === el) {
-        newFileList.push(file);
-        break;
-      }
-    }
-  }
-
-  editorManager.files = newFileList;
 }
 
 function createFileEvent(file) {

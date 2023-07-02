@@ -1,4 +1,4 @@
-import dialogs from '../components/dialogs';
+import dialogs from '../dialogs';
 import appSettings from '../lib/settings';
 
 function ActionStack() {

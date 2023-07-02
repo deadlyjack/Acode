@@ -1,16 +1,17 @@
-import dialogs from '../components/dialogs';
-import constants from '../lib/constants';
-import helpers from '../utils/helpers';
-import openFile from '../lib/openFile';
-import fsOperation from '../fileSystem';
+import Url from 'utils/Url';
+import lang from 'lib/lang';
+import constants from 'lib/constants';
+import helpers from 'utils/helpers';
+import openFile from 'lib/openFile';
+import fsOperation from 'fileSystem';
 import ajax from '@deadlyjack/ajax';
-import Url from '../utils/Url';
-import settingsPage from '../components/settingsPage';
-import lang from '../lib/lang';
-import appSettings from '../lib/settings';
-import actions from '../handlers/quickTools';
+import appSettings from 'lib/settings';
+import dialogs from 'dialogs';
+import actions from 'handlers/quickTools';
 import { resetKeyBindings } from 'ace/commands';
 import QuickToolsSettings from 'pages/quickTools';
+import settingsPage from 'components/settingsPage';
+import encodings from 'lib/encodings';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -156,6 +157,16 @@ export default function otherSettings() {
           });
         }
       }
+    },
+    {
+      key: 'defaultFileEncoding',
+      text: strings['default file encoding'],
+      value: values.defaultFileEncoding,
+      valueText: (value) => encodings[value].label,
+      select: Object.keys(encodings).map((id) => {
+        const encoding = encodings[id];
+        return [id, encoding.label];
+      }),
     }
   ];
 

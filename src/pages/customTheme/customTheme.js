@@ -1,10 +1,10 @@
 import './customTheme.scss';
 
 import Page from '../../components/page';
-import color from '../../components/dialogs/color';
+import color from '../../dialogs/color';
 import helpers from '../../utils/helpers';
-import select from '../../components/dialogs/select';
-import dialogs from '../../components/dialogs';
+import select from '../../dialogs/select';
+import dialogs from '../../dialogs';
 import settings from '../../lib/settings';
 import themes from '../../lib/themes';
 import ThemeBuilder from '../../lib/themeBuilder';

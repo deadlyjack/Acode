@@ -1,5 +1,5 @@
 import tag from 'html-tag-js';
-import dialogs from '../../components/dialogs';
+import dialogs from '../../dialogs';
 import helpers from '../../utils/helpers';
 
 export default {

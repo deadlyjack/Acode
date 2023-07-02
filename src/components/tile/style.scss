@@ -25,13 +25,24 @@ header {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  // padding: 0 5px;
   box-sizing: border-box;
 
-  &.select {
+  &.drag {
     pointer-events: none;
-    border: solid 2px rgb(255, 215, 0);
+    border: solid 1px rgb(255, 215, 0);
     background-color: inherit !important;
+    pointer-events: none;
+    position: fixed;
+    font-size: 0.8em;
+    z-index: 9999;
+
+    .file {
+      padding: 0 !important;
+    }
+
+    .cancel {
+      display: none;
+    }
   }
 
   &:disabled,
