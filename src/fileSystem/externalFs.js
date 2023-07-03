@@ -1,16 +1,12 @@
-import dialogs from '../dialogs';
-import helpers from '../utils/helpers';
+import { decode, encode } from 'utils/encodings';
+import dialogs from 'dialogs';
+import helpers from 'utils/helpers';
 
-export default {
-  async readFile(url, encoding) {
+const externalFs = {
+  async readFile(url) {
     url = await this.formatUri(url);
     return new Promise((resolve, reject) => {
-      sdcard.read(url, (data) => {
-        if (encoding) {
-          data = helpers.decodeText(data, encoding);
-        }
-        resolve({ data });
-      }, reject);
+      sdcard.read(url, (data) => resolve({ data }), reject);
     });
   },
 
@@ -162,6 +158,11 @@ export default {
     });
   },
 
+  /**
+   * Format the virtual uri to a real uri
+   * @param {string} uri 
+   * @returns 
+   */
   formatUri(uri) {
     return new Promise((resolve, reject) => {
       sdcard.formatUri(
@@ -170,5 +171,77 @@ export default {
         reject,
       );
     });
-  }
+  },
+
+  /**
+   * Test if url supports this file system
+   * @param {string} url 
+   * @returns 
+   */
+  test(url) {
+    return /^content:/.test(url);
+  },
+
+  createFs,
 };
+
+/**
+ * Initialize external file system
+ * @param {string} url
+ */
+function createFs(url) {
+  return {
+    lsDir() {
+      return externalFs.listDir(url);
+    },
+    async readFile(encoding) {
+      let { data } = await externalFs.readFile(url, encoding);
+
+      if (encoding) {
+        data = await decode(data, encoding);
+      }
+
+      return data;
+    },
+    async writeFile(content, encoding) {
+      if (typeof content === 'string' && encoding) {
+        content = await encode(content, encoding);
+      }
+      return externalFs.writeFile(url, content);
+    },
+    createFile(name, data) {
+      data = data || '';
+      return externalFs.createFile(url, name, data);
+    },
+    createDirectory(name) {
+      return externalFs.createDir(url, name);
+    },
+    delete() {
+      return externalFs.delete(url);
+    },
+    copyTo(dest) {
+      return externalFs.copy(url, dest);
+    },
+    moveTo(dest) {
+      const src = Url.dirname(url);
+      if (Url.areSame(src, dest)) return Promise.resolve(url);
+      return externalFs.move(url, dest);
+    },
+    renameTo(newname) {
+      return externalFs.renameFile(url, newname);
+    },
+    async exists() {
+      try {
+        const stats = await externalFs.stats(url);
+        return stats.exists;
+      } catch (error) {
+        return false;
+      }
+    },
+    stat() {
+      return externalFs.stats(url);
+    },
+  };
+}
+
+export default externalFs;

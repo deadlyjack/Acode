@@ -54,8 +54,6 @@
 
     small:not(:empty) {
       margin-left: auto;
-      background-color: rgb(255, 255, 255);
-      background-color: var(--primary-text-color);
       color: rgb(51, 153, 255);
       color: var(--active-color);
       padding: 2px;
@@ -68,6 +66,11 @@
       background-color: var(--active-color);
       color: rgb(27, 26, 26);
       color: var(--primary-text-color);
+
+      small {
+        color: rgb(255, 215, 0);
+        color: var(--active-text-color);
+      }
     }
 
     &:hover {

@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings.Global;
+import android.util.Base64;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
@@ -29,8 +30,12 @@ import com.foxdebug.system.BrowserDialog;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -88,6 +93,9 @@ public class System extends CordovaPlugin {
       case "open-in-browser":
       case "launch-app":
       case "get-global-setting":
+      case "get-available-encodings":
+      case "decode":
+      case "encode":
         break;
       case "set-input-type":
         setInputType(arg1);
@@ -195,6 +203,15 @@ public class System extends CordovaPlugin {
               case "get-global-setting":
                 getGlobalSetting(arg1, callbackContext);
                 break;
+              case "get-available-encodings":
+                getAvailableEncodings(callbackContext);
+                break;
+              case "decode":
+                decode(arg1, arg2, callbackContext);
+                break;
+              case "encode":
+                encode(arg1, arg2, callbackContext);
+                break;
               default:
                 break;
             }
@@ -203,6 +220,67 @@ public class System extends CordovaPlugin {
       );
 
     return true;
+  }
+
+  private void decode(
+    String content, // base64 encoded string
+    String charSetName,
+    CallbackContext callback
+  ) {
+    try {
+      byte[] bytes = Base64.decode(content, Base64.DEFAULT);
+
+      if (Charset.isSupported(charSetName) == false) {
+        callback.error("Charset not supported: " + charSetName);
+        return;
+      }
+
+      Charset charSet = Charset.forName(charSetName);
+      CharBuffer charBuffer = charSet.decode(ByteBuffer.wrap(bytes));
+      String result = String.valueOf(charBuffer);
+      callback.success(result);
+    } catch (Exception e) {
+      callback.error(e.toString());
+    }
+  }
+
+  private void encode(
+    String content, // string to encode
+    String charSetName,
+    CallbackContext callback
+  ) {
+    try {
+      if (Charset.isSupported(charSetName) == false) {
+        callback.error("Charset not supported: " + charSetName);
+        return;
+      }
+
+      Charset charSet = Charset.forName(charSetName);
+      ByteBuffer byteBuffer = charSet.encode(content);
+      byte[] bytes = new byte[byteBuffer.remaining()];
+      byteBuffer.get(bytes);
+      callback.success(bytes);
+    } catch (Exception e) {
+      callback.error(e.toString());
+    }
+  }
+
+  private void getAvailableEncodings(CallbackContext callback) {
+    try {
+      Map<String, Charset> charsets = Charset.availableCharsets();
+      JSONObject result = new JSONObject();
+      for (Map.Entry<String, Charset> entry : charsets.entrySet()) {
+        JSONObject obj = new JSONObject();
+        Charset charset = entry.getValue();
+        obj.put("label", charset.displayName());
+        obj.put("aliases", new JSONArray(charset.aliases()));
+        obj.put("name", charset.name());
+        result.put(charset.name(), obj);
+      }
+      callback.success(result);
+    } catch (Exception e) {
+      callback.error(e.toString());
+    }
   }
 
   private void requestPermissions(JSONArray arr, CallbackContext callback) {

@@ -1,7 +1,7 @@
-import Page from "../components/page";
-import fsOperation from "../fileSystem";
-import helpers from "../utils/helpers";
-import Url from "../utils/Url";
+import Page from "components/page";
+import fsOperation from "fileSystem";
+import helpers from "utils/helpers";
+import Url from "utils/Url";
 
 export default async function loadPlugin(pluginId, justInstalled = false) {
   const baseUrl = await helpers.toInternalUri(Url.join(PLUGIN_DIR, pluginId));
@@ -33,6 +33,6 @@ export default async function loadPlugin(pluginId, justInstalled = false) {
         firstInit: justInstalled,
       });
       resolve();
-    }
+    };
   });
 }

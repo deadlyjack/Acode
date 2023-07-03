@@ -1,5 +1,5 @@
-import dialogs from 'dialogs';
 import './style.scss';
+import dialogs from 'dialogs';
 import Page from 'components/page';
 import items, { description } from 'components/quickTools/items';
 import settings from 'lib/settings';

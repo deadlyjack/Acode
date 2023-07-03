@@ -137,7 +137,7 @@ class Settings {
       maxFilesCount: 500,
       maxDirDepth: 10,
       maxDirCount: 100,
-      defaultFileEncoding: 'utf8',
+      defaultFileEncoding: 'UTF-8',
     };
     this.value = structuredClone(this.#defaultSettings);
   }

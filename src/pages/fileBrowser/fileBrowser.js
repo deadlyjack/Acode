@@ -17,7 +17,7 @@ import fsOperation from 'fileSystem';
 import searchBar from 'components/searchbar';
 import Url from 'utils/Url';
 import util from './util';
-import openFolder, { addedFolder } from 'lib/openFolder';
+import openFolder from 'lib/openFolder';
 import recents from 'lib/recents';
 import remoteStorage from 'lib/remoteStorage';
 import URLParse from 'url-parse';
@@ -281,7 +281,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
       let url = $el.dataset.url;
       let name = $el.dataset.name || $el.getAttribute('name');
-      const opendoc = $el.hasAttribute('open-doc');
+      const idOpenDoc = $el.hasAttribute('open-doc');
       const uuid = $el.getAttribute('uuid');
       const type = $el.getAttribute('type');
       const storageType = $el.getAttribute('storageType');
@@ -307,7 +307,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         return;
       }
 
-      if (!url && action === 'open' && isDir && !opendoc && !isContextMenu) {
+      if (!url && action === 'open' && isDir && !idOpenDoc && !isContextMenu) {
         dialogs.loader.hide();
         util.addPath(name, uuid).then((res) => {
           const storage = allStorages.find((storage) => storage.uuid === uuid);
@@ -321,15 +321,15 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         return;
       }
 
-      if (opendoc) action = 'open-doc';
       if (isContextMenu) action = 'contextmenu';
+      else if (idOpenDoc) action = 'open-doc';
 
       switch (action) {
         case 'navigation':
           folder();
           break;
         case 'contextmenu':
-          cmhandler();
+          contextMenuHandler();
           break;
         case 'open':
           if (isDir) folder();
@@ -349,20 +349,20 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       }
 
       function navigateToHome() {
-        const navigations = [];
+        const navigationArray = [];
         const dirs = home.split('/');
         const { url: parsedUrl, query } = Url.parse(url);
         let path = '';
 
         for (let dir of dirs) {
           path = Url.join(path, dir);
-          navigations.push({
+          navigationArray.push({
             url: `${Url.join(parsedUrl, path, '')}${query}`,
             name: dir || name,
           });
         }
 
-        loadStates(navigations);
+        loadStates(navigationArray);
       }
 
       function file() {
@@ -374,7 +374,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         });
       }
 
-      async function cmhandler() {
+      async function contextMenuHandler() {
         if (appSettings.value.vibrateOnTap) {
           navigator.vibrate(constants.VIBRATION_TIME);
         }
@@ -397,14 +397,16 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         const option = await dialogs.select(strings['select'], options);
         switch (option) {
           case 'delete': {
-            const confirmation = await dialogs.confirm(
-              strings.warning.toUpperCase(),
-              strings['delete {name}'].replace('{name}', name),
-            );
-            if (!confirmation) break;
+            let deleteFunction = removeFile;
+            let message = strings['delete entry'].replace('{name}', name);
+            if (uuid) {
+              deleteFunction = removeStorage;
+              message = strings['remove entry'].replace('{name}', name);
+            }
 
-            if (uuid) removeStorage();
-            else removeFile();
+            const confirmation = await dialogs.confirm(strings.warning, message);
+            if (!confirmation) break;
+            deleteFunction();
             break;
           }
 
@@ -584,7 +586,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       } catch (err) { }
 
       storageList.forEach((storage) => {
-        let url = storage.url || /**@drepreceted */ storage['uri'];
+        let url = storage.url || /**@deprecated */ storage['uri'];
 
         util.pushFolder(allStorages, storage.name, url, {
           storageType: storage.storageType,
@@ -734,7 +736,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       const { url } = currentDir;
       const alreadyCreated = [];
       const options = [];
-      let cturl = '';
+      let ctUrl = '';
       let projectLocation = null;
       let projectFiles = '';
       let projectName = '';
@@ -805,24 +807,24 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           reload();
           return;
         }
-        cturl = '';
+        ctUrl = '';
         const file = files.pop();
         await createFile(file);
         return await createProject(files);
       }
 
-      function createFile(fileurl) {
-        const paths = fileurl.split('/');
+      function createFile(fileUrl) {
+        const paths = fileUrl.split('/');
         const filename = paths.pop();
-        return createDir(projectFiles, fileurl, filename, paths);
+        return createDir(projectFiles, fileUrl, filename, paths);
       }
 
-      async function createDir(project, fileurl, filename, paths) {
-        const lclUrl = Url.join(projectLocation, cturl);
+      async function createDir(project, fileUrl, filename, paths) {
+        const lclUrl = Url.join(projectLocation, ctUrl);
         const fs = fsOperation(lclUrl);
 
         if (paths.length === 0) {
-          const data = project[fileurl].replace(/<%name%>/g, projectName);
+          const data = project[fileUrl].replace(/<%name%>/g, projectName);
           await fs.createFile(filename, data);
           return;
         }
@@ -833,8 +835,8 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           await fs.createDirectory(name);
           alreadyCreated.push(toCreate);
         }
-        cturl += name + '/';
-        return await createDir(project, fileurl, filename, paths);
+        ctUrl += name + '/';
+        return await createDir(project, fileUrl, filename, paths);
       }
     }
 
@@ -910,9 +912,9 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
     /**
      *
      * @param {Storage} storage
-     * @param {Boolean} doesRleoad
+     * @param {Boolean} doesReload
      */
-    function updateStorage(storage, doesRleoad = true) {
+    function updateStorage(storage, doesReload = true) {
       if (storage.uuid) {
         storageList = storageList.filter((s) => s.uuid !== storage.uuid);
       } else {
@@ -929,7 +931,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
       storageList.push(storage);
       localStorage.storageList = JSON.stringify(storageList);
-      if (doesRleoad) reload();
+      if (doesReload) reload();
     }
 
     function render(dir) {

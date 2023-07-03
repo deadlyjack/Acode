@@ -1,7 +1,7 @@
 import escapeStringRegexp from 'escape-string-regexp';
-import Url from '../utils/Url';
-import dialogs from '../dialogs';
-import helpers from '../utils/helpers';
+import Url from 'utils/Url';
+import dialogs from 'dialogs';
+import helpers from 'utils/helpers';
 
 const recents = {
   /**

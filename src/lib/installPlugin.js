@@ -1,10 +1,9 @@
 import JSZip from 'jszip';
 import constants from './constants';
-import dialogs from "../dialogs";
-import fsOperation from "../fileSystem";
+import dialogs from "dialogs";
+import fsOperation from "fileSystem";
 import loadPlugin from "./loadPlugin";
-import helpers from "../utils/helpers";
-import Url from "../utils/Url";
+import Url from "utils/Url";
 
 /**
  * Installs a plugin.

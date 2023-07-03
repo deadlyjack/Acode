@@ -2,12 +2,11 @@ import './donate.scss';
 import bodyHBS from "./donate.hbs";
 import productHBS from "./product.hbs";
 import mustache from "mustache";
-import Page from "../../components/page";
-import constants from "../../lib/constants";
+import Page from "components/page";
+import constants from "lib/constants";
 import ajax from '@deadlyjack/ajax';
-import helpers from '../../utils/helpers';
-import dialogs from '../../dialogs';
-import tag from 'html-tag-js';
+import helpers from 'utils/helpers';
+import dialogs from 'dialogs';
 import loader from 'dialogs/loader';
 
 //TODO: fix (-1 means, user is not logged in to any google account)

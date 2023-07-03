@@ -1,7 +1,4 @@
 import run from './run';
-import path from 'utils/Path';
-import settingsMain from 'settings/mainSettings';
-import dialogs from 'dialogs';
 import openFile from './openFile';
 import openFolder from './openFolder';
 import helpers from 'utils/helpers';
@@ -9,7 +6,6 @@ import constants from './constants';
 import help from 'settings/help';
 import recents from 'lib/recents';
 import fsOperation from 'fileSystem';
-import Modes from 'pages/modes/modes';
 import actions from 'handlers/quickTools';
 import FileBrowser from 'pages/fileBrowser';
 import showFileInfo from './showFileInfo';
@@ -19,17 +15,23 @@ import EditorFile from './editorFile';
 import findFile from 'palettes/findFile';
 import appSettings from './settings';
 import Sidebar from 'components/sidebar';
+import settingsMain from 'settings/mainSettings';
 import commandPalette from 'palettes/commandPalette';
-import encodingPalette from 'palettes/encoding';
+import changeEncoding from 'palettes/changeEncoding';
+import changeMode from 'palettes/changeMode';
+import confirm from 'dialogs/confirm';
+import select from 'dialogs/select';
+import prompt from 'dialogs/prompt';
+import color from 'dialogs/color';
 
 export default {
   async 'close-all-tabs'() {
     let save = false;
     const unsavedFiles = editorManager.files.filter((file) => file.isUnsaved).length;
     if (unsavedFiles) {
-      const confirmation = await dialogs.confirm(strings['warning'], strings['unsaved files warning']);
+      const confirmation = await confirm(strings['warning'], strings['unsaved files warning']);
       if (!confirmation) return;
-      const option = await dialogs.select(strings['select'], [
+      const option = await select(strings['select'], [
         ['save', strings['save all']],
         ['close', strings['close all']],
         ['cancel', strings['cancel']],
@@ -37,11 +39,11 @@ export default {
       if (option === 'cancel') return;
 
       if (option === 'save') {
-        const doSave = await dialogs.confirm(strings['warning'], strings['save all warning']);
+        const doSave = await confirm(strings['warning'], strings['save all warning']);
         if (!doSave) return;
         save = true;
       } else {
-        const doClose = await dialogs.confirm(strings['warning'], strings['close all warning']);
+        const doClose = await confirm(strings['warning'], strings['close all warning']);
         if (!doClose) return;
       }
     }
@@ -78,7 +80,7 @@ export default {
     this['resize-editor']();
   },
   'encoding'() {
-    encodingPalette();
+    changeEncoding();
   },
   'exit'() {
     navigator.app.exitApp();
@@ -101,7 +103,7 @@ export default {
     showFileInfo(url);
   },
   async 'goto'() {
-    const res = await dialogs.prompt(strings['enter line number'], '', 'number', {
+    const res = await prompt(strings['enter line number'], '', 'number', {
       placeholder: 'line.column',
     });
 
@@ -114,7 +116,7 @@ export default {
     editor.gotoLine(line, col, true);
   },
   async 'new-file'() {
-    let filename = await dialogs.prompt(
+    let filename = await prompt(
       strings['enter file name'],
       constants.DEFAULT_FILE_NAME,
       'filename',
@@ -227,22 +229,8 @@ export default {
   'share'() {
     editorManager.activeFile.share();
   },
-  async 'syntax'() {
-    editorManager.editor.blur();
-    const mode = await Modes();
-    const activeFile = editorManager.activeFile;
-
-    let modeAssociated;
-    try {
-      modeAssociated = JSON.parse(localStorage.modeassoc || '{}');
-    } catch (error) {
-      modeAssociated = {};
-    }
-
-    modeAssociated[path.extname(activeFile.filename)] = mode;
-    localStorage.modeassoc = JSON.stringify(modeAssociated);
-
-    activeFile.setMode(mode);
+  'syntax'() {
+    changeMode();
   },
   'toggle-fullscreen'() {
     app.classList.toggle('fullscreen-mode');
@@ -259,16 +247,16 @@ export default {
   },
   'insert-color'() {
     const { editor } = editorManager;
-    let color = editor.session.getTextRange(editor.getSelectionRange());
+    let selectedText = editor.session.getTextRange(editor.getSelectionRange());
 
-    if (!helpers.isValidColor(color)) {
-      color = undefined;
+    if (!helpers.isValidColor(selectedText)) {
+      selectedText = undefined;
     }
 
     editor.blur();
     (async () => {
       const wasFocused = editorManager.activeFile.focused;
-      const res = await dialogs.color(color, () => {
+      const res = await color(selectedText, () => {
         if (wasFocused) {
           editor.focus();
         }
@@ -294,11 +282,11 @@ export default {
     file = file || editorManager.activeFile;
 
     if (file.mode === 'single') {
-      dialogs.alert(strings.info.toUpperCase(), strings['unable to rename']);
+      alert(strings.info.toUpperCase(), strings['unable to rename']);
       return;
     }
 
-    let newname = await dialogs.prompt(
+    let newname = await prompt(
       strings.rename,
       file.filename,
       'filename',
@@ -338,7 +326,7 @@ export default {
     editor.selection.moveCursorToPosition(pos);
   },
   async 'eol'() {
-    const eol = await dialogs.select(
+    const eol = await select(
       strings['new line mode'],
       ['unix', 'windows'],
       {

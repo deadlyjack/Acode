@@ -30,11 +30,11 @@
         "ANDROIDX_WEBKIT_VERSION": "1.4.0"
       },
       "cordova-plugin-sftp": {},
-      "cordova-plugin-iap": {},
       "cordova-plugin-server": {},
       "cordova-plugin-ftp": {},
-      "cordova-plugin-system": {},
-      "cordova-plugin-sdcard": {}
+      "cordova-plugin-sdcard": {},
+      "cordova-plugin-iap": {},
+      "cordova-plugin-system": {}
     },
     "platforms": [
       "android"
@@ -103,7 +103,6 @@
     "minimatch": "^9.0.1",
     "mustache": "^4.2.0",
     "url-parse": "^1.5.10",
-    "utf8": "^3.0.0",
     "vanilla-picker": "^2.11.2",
     "yargs": "^17.7.2"
   },

@@ -1,13 +1,13 @@
 import './customTheme.scss';
 
-import Page from '../../components/page';
-import color from '../../dialogs/color';
-import helpers from '../../utils/helpers';
-import select from '../../dialogs/select';
-import dialogs from '../../dialogs';
-import settings from '../../lib/settings';
-import themes from '../../lib/themes';
-import ThemeBuilder from '../../lib/themeBuilder';
+import Page from 'components/page';
+import color from 'dialogs/color';
+import helpers from 'utils/helpers';
+import select from 'dialogs/select';
+import dialogs from 'dialogs';
+import settings from 'lib/settings';
+import themes from 'lib/themes';
+import ThemeBuilder from 'lib/themeBuilder';
 
 export default function CustomThemeInclude() {
   const theme = themes.get('custom');

@@ -1,19 +1,17 @@
-import tag from "html-tag-js";
 import mimeTypes from 'mime-types';
 import dialogs from "dialogs";
-import Sidebar from 'components/sidebar';
-import tile from "components/tile";
+import run from './run';
 import fsOperation from "fileSystem";
 import helpers from "utils/helpers";
 import Path from "utils/Path";
 import Url from "utils/Url";
+import saveFile from './saveFile';
 import constants from "./constants";
 import openFolder from "./openFolder";
-import run from './run';
-import saveFile from './saveFile';
 import appSettings from './settings';
+import tile from "components/tile";
+import Sidebar from 'components/sidebar';
 import startDrag from 'handlers/editorFileTab';
-import encodings from './encodings';
 
 const { Fold } = ace.require('ace/edit_session/fold');
 const { Range } = ace.require('ace/range');
@@ -212,8 +210,8 @@ export default class EditorFile {
     this.#SAFMode = options?.SAFMode;
     this.isUnsaved = options?.isUnsaved ?? false;
 
-    if (options?.encoding && encodings[options.encoding]) {
-      this.encoding = options?.encoding;
+    if (options?.encoding) {
+      this.encoding = options.encoding;
     }
 
     // if options contains text property then there is no need to load

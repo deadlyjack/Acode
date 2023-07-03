@@ -29,6 +29,7 @@ import box from 'dialogs/box';
 import confirm from 'dialogs/confirm';
 import multiPrompt from 'dialogs/multiPrompt';
 import color from 'dialogs/color';
+import encodings, { decode, encode } from 'utils/encodings';
 
 export default class Acode {
   #modules = {};
@@ -48,6 +49,30 @@ export default class Acode {
   }];
 
   constructor() {
+    const encodingsModule = {
+      get encodings() {
+        return encodings;
+      },
+      encode,
+      decode,
+    };
+
+    const themesModule = {
+      add: themes.add,
+      get: themes.get,
+      list: themes.list,
+      update: themes.update,
+      // Deprecated, not supported anymore
+      apply: () => { },
+    };
+
+    const sidebarAppsModule = {
+      add: sidebarApps.add,
+      get: sidebarApps.get,
+      remove: sidebarApps.remove,
+    };
+
+    this.define('encodings', encodingsModule);
     this.define('Url', Url);
     this.define('fs', fsOperation);
     this.define('projects', projects);
@@ -75,20 +100,9 @@ export default class Acode {
     this.define('fonts', fonts);
     this.define('toast', toast);
     this.define('tutorial', tutorial);
-    this.define('themes', {
-      add: themes.add,
-      get: themes.get,
-      list: themes.list,
-      update: themes.update,
-      // Deprecated, not supported anymore
-      apply: () => { },
-    });
+    this.define('themes', themesModule);
     this.define('themeBuilder', ThemeBuilder);
-    this.define('sidebarApps', {
-      add: sidebarApps.add,
-      get: sidebarApps.get,
-      remove: sidebarApps.remove,
-    });
+    this.define('sidebarApps', sidebarAppsModule);
     this.define('fileList', files);
     this.define('createKeyboardEvent', KeyboardEvent);
   }

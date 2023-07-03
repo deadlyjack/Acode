@@ -1,14 +1,15 @@
 import './style.scss';
 
+
 /**
  * @typedef {Object} HintObj
  * @property {string} value
  * @property {string} text
- */
+*/
 
 /**
  * @typedef {HintObj|string} Hint
- */
+*/
 
 /**
  * @typedef {Object} HintModification
@@ -19,7 +20,7 @@ import './style.scss';
 
 /**
  * @typedef {(setHints:(hints:Array<Hint>)=>void, modification: HintModification) => void} HintCallback
- */
+*/
 
 
 /**
@@ -28,11 +29,12 @@ import './style.scss';
  * @param {Array<Hint>|HintCallback} hints Hints or a callback to generate hints
  * @param {(value: string) => void} onSelect Callback to call when a hint is selected
  * @returns {{getSelected: ()=>HTMLLIElement, container: HTMLUListElement}}
- */
-
+*/
 export default function inputhints($input, hints, onSelect) {
   /**@type {HTMLUListElement} */
   let $ul = <Ul />;
+  let preventUpdate = false;
+
   $input.addEventListener('focus', onfocus);
 
   if (typeof hints === 'function') {
@@ -45,6 +47,18 @@ export default function inputhints($input, hints, onSelect) {
     cb(setHints, hintModification());
   } else {
     setHints(hints);
+  }
+
+  /**
+   * Retain the focus on the input field 
+   */
+  function handleMouseDown() {
+    preventUpdate = true;
+  }
+
+  function handleMouseUp() {
+    $input.focus();
+    preventUpdate = false;
   }
 
   /**
@@ -142,6 +156,8 @@ export default function inputhints($input, hints, onSelect) {
   }
 
   function onfocus() {
+    if (preventUpdate) return;
+
     $input.addEventListener('keypress', handleKeypress);
     $input.addEventListener('keydown', handleKeydown);
     $input.addEventListener('blur', onblur);
@@ -153,6 +169,8 @@ export default function inputhints($input, hints, onSelect) {
   }
 
   function onblur() {
+    if (preventUpdate) return;
+
     removeUl();
     $input.removeEventListener('keypress', handleKeypress);
     $input.removeEventListener('keydown', handleKeydown);
@@ -237,11 +255,19 @@ export default function inputhints($input, hints, onSelect) {
   }
 
   function ulAddEventListeners($el = $ul) {
-    $el.addEventListener('mousedown', handleClick);
+    $el.addEventListener('click', handleClick);
+    $el.addEventListener('mousedown', handleMouseDown);
+    $el.addEventListener('mouseup', handleMouseUp);
+    $el.addEventListener('touchstart', handleMouseDown);
+    $el.addEventListener('touchend', handleMouseUp);
   }
 
   function ulRemoveEventListeners($el = $ul) {
-    $el.removeEventListener('mousedown', handleClick);
+    $el.removeEventListener('click', handleClick);
+    $el.removeEventListener('mousedown', handleMouseDown);
+    $el.removeEventListener('mouseup', handleMouseUp);
+    $el.removeEventListener('touchstart', handleMouseDown);
+    $el.removeEventListener('touchend', handleMouseUp);
   }
 
   function updateUl($newUl) {

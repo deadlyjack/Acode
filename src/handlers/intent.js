@@ -1,14 +1,11 @@
-import openFile from '../lib/openFile';
-import dialogs from '../dialogs';
-import helpers from '../utils/helpers';
-
-export default HandleIntent;
+import openFile from 'lib/openFile';
+import helpers from 'utils/helpers';
 
 /**
  *
  * @param {Intent} intent
  */
-async function HandleIntent(intent = {}) {
+export default async function HandleIntent(intent = {}) {
   const type = intent.action.split('.').slice(-1)[0];
 
   if (['SEND', 'VIEW', 'EDIT'].includes(type)) {

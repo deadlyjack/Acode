@@ -3,6 +3,7 @@ import Path from 'utils/Path';
 import Url from 'utils/Url';
 import settings from 'lib/settings';
 import internalFs from './internalFs';
+import { encode } from 'utils/encodings';
 
 class SftpClient {
   #MAX_TRY = 3;
@@ -185,7 +186,8 @@ class SftpClient {
 
   /**
    * Write to a file on server
-   * @param {String} content
+   * @param {String|ArrayBuffer} content
+   * @param {String} remotefile
    */
   writeFile(content, remotefile) {
     const filename = remotefile || this.#path;
@@ -660,6 +662,10 @@ Sftp.fromUrl = (url) => {
 
 Sftp.test = (url) => /^sftp:/.test(url);
 
+/**
+ * 
+ * @param {SftpClient} sftp 
+ */
 function createFs(sftp) {
   return {
     lsDir() {
@@ -669,8 +675,12 @@ function createFs(sftp) {
       const { data } = await sftp.readFile(encoding);
       return data;
     },
-    writeFile(content) {
-      return sftp.writeFile(content);
+    async writeFile(content, encoding) {
+      if (typeof content === 'string' && encoding) {
+        content = await encode(content, encoding);
+      }
+
+      return sftp.writeFile(content, null, encoding);
     },
     createFile(name, data) {
       return sftp.createFile(name, data);

@@ -4,6 +4,7 @@ export default class ThemeBuilder {
   #theme = {
     "--popup-border-radius": "4px",
     "--active-color": "rgb(51, 153, 255)",
+    "--active-text-color": "rgb(255, 215, 0)",
     "--active-icon-color": "rgba(0, 0, 0, 0.2)",
     "--border-color": "rgba(122, 122, 122, 0.2)",
     "--box-shadow-color": "rgba(0, 0, 0, 0.2)",
@@ -219,6 +220,14 @@ export default class ThemeBuilder {
 
   set fileTabWidth(value) {
     this.#theme['--file-tab-width'] = value;
+  }
+
+  get activeTextColor() {
+    return this.#theme['--active-text-color'];
+  }
+
+  set activeTextColor(value) {
+    this.#theme['--active-text-color'] = value;
   }
 
   get css() {

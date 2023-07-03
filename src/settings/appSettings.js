@@ -11,7 +11,7 @@ import actions from 'handlers/quickTools';
 import { resetKeyBindings } from 'ace/commands';
 import QuickToolsSettings from 'pages/quickTools';
 import settingsPage from 'components/settingsPage';
-import encodings from 'lib/encodings';
+import encodings, { getEncoding } from 'utils/encodings';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -162,7 +162,7 @@ export default function otherSettings() {
       key: 'defaultFileEncoding',
       text: strings['default file encoding'],
       value: values.defaultFileEncoding,
-      valueText: (value) => encodings[value].label,
+      valueText: (value) => getEncoding(value).label,
       select: Object.keys(encodings).map((id) => {
         const encoding = encodings[id];
         return [id, encoding.label];

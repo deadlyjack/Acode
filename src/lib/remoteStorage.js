@@ -1,9 +1,9 @@
-import helpers from '../utils/helpers';
-import dialogs from '../dialogs';
-import Url from '../utils/Url';
-import Sftp from '../fileSystem/sftp';
-import Ftp from '../fileSystem/ftp';
-import fsOperation from '../fileSystem';
+import helpers from 'utils/helpers';
+import dialogs from 'dialogs';
+import Url from 'utils/Url';
+import Sftp from 'fileSystem/sftp';
+import Ftp from 'fileSystem/ftp';
+import fsOperation from 'fileSystem';
 import URLParse from 'url-parse';
 
 export default {

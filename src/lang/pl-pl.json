@@ -18,7 +18,6 @@
   "create folder error": "Nie udało się utworzyć folderu",
   "cut": "Wytnij",
   "delete": "Usuń",
-  "delete {name}": "Usunąć {name}?",
   "dependencies": "Zależności",
   "delay": "Czas w milisekundach",
   "editor settings": "Ustawienia edytora",
@@ -368,5 +367,9 @@
   "too many files": "Too many files. Only {count} will be listed.",
   "too many folders": "Too many folders. Only {count} will be listed.",
   "quicktools:command-palette": "Command palette",
-  "default file encoding": "Default file encoding"
+  "default file encoding": "Default file encoding",
+  "remove entry": "Are you sure you want to remove '{name}' from the saved paths? Please note that removing it will not delete the path itself.",
+  "delete entry": "Confirm deletion: '{name}'. This action cannot be undone. Proceed?",
+  "change encoding": "Reopen '{file}' with '{encoding}' encoding? This action will result in the loss of any unsaved changes made to the file. Do you want to proceed with reopening?",
+  "reopen file": "Are you sure you want to reopen '{file}'? Any unsaved changes will be lost."
 }

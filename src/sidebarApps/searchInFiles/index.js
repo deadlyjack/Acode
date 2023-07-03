@@ -9,6 +9,7 @@ import addTouchListeners from 'ace/touchHandler';
 import defineMode from './searchResultMode';
 import Sidebar, { preventSlide } from 'components/sidebar';
 import settings from 'lib/settings';
+import helpers from 'utils/helpers';
 
 const workers = [];
 const results = [];
@@ -78,7 +79,7 @@ const store = {
   },
 };
 
-const debounceSearch = debounce(searchAll, 500);
+const debounceSearch = helpers.debounce(searchAll, 500);
 
 let useIncludeAndExclude = false;
 /**@type {AceAjax.Editor} */
@@ -486,31 +487,6 @@ function getOptions() {
     regExp,
     exclude,
     include
-  };
-}
-
-/**
- * Creates a debounced function that delays invoking the input function until after 'wait' milliseconds have elapsed 
- * since the last time the debounced function was invoked. Useful for implementing behavior that should only happen 
- * after the input is complete.
- *
- * @param {Function} func - The function to debounce.
- * @param {number} wait - The number of milliseconds to delay.
- * @returns {Function} The new debounced function.
- * @example
- * 
- * // Avoid costly calculations while the window size is in flux.
- * window.addEventListener('resize', debounce(myFunction, 200));
- */
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
   };
 }
 

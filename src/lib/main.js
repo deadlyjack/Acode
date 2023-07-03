@@ -41,13 +41,13 @@ import sidebarApps from 'sidebarApps';
 import checkFiles from './checkFiles';
 import themes from './themes';
 import { initFileList } from './fileList';
+import { getEncoding, initEncodings } from 'utils/encodings';
 import { resetKeyBindings, setKeyBindings } from 'ace/commands';
 import QuickTools from 'pages/quickTools/quickTools';
 import otherSettings from 'settings/appSettings';
 import tutorial from 'components/tutorial';
 import openFile from './openFile';
 import startAd from './startAd';
-import encodings from 'lib/encodings';
 
 const previousVersionCode = parseInt(localStorage.versionCode, 10);
 
@@ -88,6 +88,8 @@ async function Main() {
 }
 
 async function onDeviceReady() {
+  await initEncodings(); // important to load encodings before anything else
+
   const isFreePackage = /(free)$/.test(BuildInfo.packageName);
   const oldResolveURL = window.resolveLocalFileSystemURL;
   const {
@@ -474,7 +476,7 @@ function createFileMenu({ top, bottom, toggler }) {
         $menu.classList.remove('disabled');
       }
 
-      const { label: encoding } = encodings[file.encoding];
+      const { label: encoding } = getEncoding(file.encoding);
 
       return mustache.render($_fileMenu, {
         ...strings,

@@ -1,4 +1,3 @@
-import helpers from 'utils/helpers';
 import recents from './recents';
 import fsOperation from 'fileSystem';
 import EditorFile from './editorFile';
@@ -7,6 +6,8 @@ import loader from 'dialogs/loader';
 import alert from 'dialogs/alert';
 import box from 'dialogs/box';
 import confirm from 'dialogs/confirm';
+import { decode } from 'utils/encodings';
+import { reopenWithNewEncoding } from 'palettes/changeEncoding';
 
 /**
  * @typedef {object} FileOptions
@@ -35,20 +36,35 @@ export default async function openFile(file, options = {}) {
     const { cursorPos, render, onsave, text, mode, encoding } = options;
 
     if (existingFile) {
+      // If file is already opened and new text is provided
+      const existingText = existingFile.session.getValue();
+      const existingCursorPos = existingFile.session.selection.getCursor();
+
       // If file is already opened
       existingFile.makeActive();
 
       if (onsave) {
         existingFile.onsave = onsave;
       }
-      if (existingFile.SAFMode !== mode) {
-        existingFile.SAFMode = mode;
+
+
+      if (text && existingText !== text) {
+        let confirmation = true;
+        if (existingFile.isUnsaved) {
+          const message = strings['reopen file'].replace('{file}', existingFile.filename);
+          confirmation = await confirm(strings.warning, message);
+        }
+        if (confirmation) {
+          existingFile.session.setValue(text);
+        }
       }
-      if (existingFile.session.getValue() !== text) {
-        existingFile.session.setValue(text);
-      }
-      if (cursorPos) {
+
+      if (cursorPos && existingCursorPos.row !== cursorPos.row && existingCursorPos.column !== cursorPos.column) {
         existingFile.session.selection.moveCursorTo(cursorPos.row, cursorPos.column);
+      }
+
+      if (encoding && existingFile.encoding !== encoding) {
+        reopenWithNewEncoding(encoding);
       }
       return;
     }
@@ -114,7 +130,7 @@ export default async function openFile(file, options = {}) {
     }
 
     const binData = await fs.readFile();
-    const fileContent = helpers.decodeText(binData);
+    const fileContent = await decode(binData, file.encoding || appSettings.value.defaultFileEncoding);
 
     if (/[\x00-\x08\x0E-\x1F]/.test(fileContent)) {
       const confirmation = await confirm(strings.info, strings['binary file']);
