@@ -367,7 +367,7 @@
   "too many files": "Zu viele Dateien. Nur {count} werden aufgelistet.",
   "too many folders": "Zu viele Ordner. Nur {count} werden aufgelistet.",
   "quicktools:command-palette": "Befehlspalette",
-  "default file encoding": "Standard-Filekodierung",
+  "default file encoding": "Standard-Dateikodierung",
   "remove entry": "Sind Sie sicher, das sie '{name}' von den Speicherpfaden entfernen möchten? Bitte beachten Sie, das der Pfad selbst nicht gelöscht wird.",
   "delete entry": "Löschen bestätigen: '{name}'. Diese Aktion kann nicht zurückgenommen werden. Fortfahren?",
   "change encoding": "Neuladen von '{file}' mit '{encoding}' Kodierung? Bei dieser Aktion gehen alle ungespeicherten Änderungen an dieser Datei verloren. Wollen Sie mit dem Neuladen fortfahren?",
