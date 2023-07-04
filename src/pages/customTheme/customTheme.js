@@ -4,10 +4,11 @@ import Page from 'components/page';
 import color from 'dialogs/color';
 import helpers from 'utils/helpers';
 import select from 'dialogs/select';
-import dialogs from 'dialogs';
 import settings from 'lib/settings';
 import themes from 'lib/themes';
 import ThemeBuilder from 'lib/themeBuilder';
+import confirm from 'dialogs/confirm';
+import actionStack from 'lib/actionStack';
 
 export default function CustomThemeInclude() {
   const theme = themes.get('custom');
@@ -54,7 +55,7 @@ export default function CustomThemeInclude() {
       }
 
       if (action === 'reset-theme') {
-        const confirmation = await dialogs.confirm(strings['info'].toUpperCase(), strings['reset warning']);
+        const confirmation = await confirm(strings['info'].toUpperCase(), strings['reset warning']);
         if (!confirmation) return;
         settings.reset('customTheme');
         themes.update(ThemeBuilder.fromJSON(settings.value.customTheme));

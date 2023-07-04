@@ -1,4 +1,5 @@
 import Ref from 'html-tag-js/ref';
+import actionStack from 'lib/actionStack';
 import restoreTheme from 'lib/restoreTheme';
 
 let loaderIsImmortal = false;
@@ -108,7 +109,7 @@ function destroy() {
 }
 
 /**
- * Hides the loading dialoge box temporarily and can be restored using show method
+ * Hides the loading dialog box temporarily and can be restored using show method
  */
 function hide() {
   const loaderDiv = tag.get('#__loader');
@@ -125,7 +126,7 @@ function hide() {
 }
 
 /**
- * Shows previously hidden dialoge box.
+ * Shows previously hidden dialog box.
  */
 function show() {
   if ($currentDialog) {

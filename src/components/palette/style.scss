@@ -17,10 +17,12 @@
   &~#hints {
     width: 90vw;
     box-sizing: border-box;
+    z-index: 999;
   }
 
   &~.mask {
     opacity: 0.4;
+    z-index: 998;
   }
 
   input {

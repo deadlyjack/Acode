@@ -1,8 +1,9 @@
+import Url from 'utils/Url';
 import Ref from 'html-tag-js/ref';
-import alert from '../../dialogs/alert';
-import fsOperation from '../../fileSystem';
-import constants from '../../lib/constants';
-import Url from '../../utils/Url';
+import alert from 'dialogs/alert';
+import fsOperation from 'fileSystem';
+import constants from 'lib/constants';
+import actionStack from 'lib/actionStack';
 
 export default (props) => {
   const {

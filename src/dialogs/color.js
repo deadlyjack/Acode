@@ -1,6 +1,6 @@
-import tag from 'html-tag-js';
 import Picker from 'vanilla-picker';
 import restoreTheme from 'lib/restoreTheme';
+import actionStack from 'lib/actionStack';
 
 let lastPicked = localStorage.__picker_last_picked || '#fff';
 

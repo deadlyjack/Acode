@@ -1,10 +1,9 @@
-import dialogs from '.';
 import template from 'views/rating.hbs';
 import constants from 'lib/constants';
+import box from './box';
 
 function rateBox() {
-  const box = dialogs
-    .box('Did you like the app?', template, strings.cancel)
+  const $box = box('Did you like the app?', template, strings.cancel)
     .onclick(onInteract);
 
   function onInteract(e) {
@@ -42,7 +41,7 @@ function rateBox() {
       }
     }, 100);
 
-    box.hide();
+    $box.hide();
   }
 }
 
@@ -78,11 +77,11 @@ function getFeedbackBody(eol) {
  */
 function getStars(num) {
   let star = num;
-  let nostar = 5 - num;
+  let noStar = 5 - num;
   let str = '';
 
   while (star--) str += '★';
-  while (nostar--) str += '☆';
+  while (noStar--) str += '☆';
 
   return str;
 }

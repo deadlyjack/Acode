@@ -1,7 +1,6 @@
 import escapeStringRegexp from 'escape-string-regexp';
 import fsOperation from 'fileSystem';
 import collapsableList from 'components/collapsableList';
-import dialogs from 'dialogs';
 import tile from 'components/tile';
 import Sidebar from 'components/sidebar';
 import helpers from 'utils/helpers';
@@ -14,6 +13,9 @@ import constants from './constants';
 import openFile from './openFile';
 import appSettings from './settings';
 import * as FileList from './fileList';
+import select from 'dialogs/select';
+import confirm from 'dialogs/confirm';
+import prompt from 'dialogs/prompt';
 
 /**
  * @typedef {import('../components/collapsableList').Collapsible} Collapsible
@@ -276,7 +278,7 @@ async function handleContextmenu(type, url, name, $target) {
   if (clipBoard.action) options.push(CANCEL);
 
   try {
-    const option = await dialogs.select(name, options);
+    const option = await select(name, options);
     await execOperation(type, option, url, $target, name);
   } catch (error) {
     console.error(error);
@@ -330,8 +332,8 @@ function execOperation(type, action, url, $target, name) {
   }
 
   async function deleteFile() {
-    const msg = strings['delete {name}'].replace('{name}', name);
-    const confirmation = await dialogs.confirm(strings.warning, msg);
+    const msg = strings['delete entry'].replace('{name}', name);
+    const confirmation = await confirm(strings.warning, msg);
     if (!confirmation) return;
     startLoading();
     await fsOperation(url).delete();
@@ -355,7 +357,7 @@ function execOperation(type, action, url, $target, name) {
   }
 
   async function renameFile() {
-    let newName = await dialogs.prompt(strings.rename, name, 'text', {
+    let newName = await prompt(strings.rename, name, 'text', {
       match: constants.FILE_NAME_REGEX,
       required: true,
     });
@@ -397,7 +399,7 @@ function execOperation(type, action, url, $target, name) {
       ? constants.DEFAULT_FILE_NAME
       : strings['new folder'];
 
-    let newName = await dialogs.prompt(msg, defaultValue, 'text', {
+    let newName = await prompt(msg, defaultValue, 'text', {
       match: constants.FILE_NAME_REGEX,
       required: true,
     });

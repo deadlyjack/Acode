@@ -1,10 +1,10 @@
 import ajax from '@deadlyjack/ajax';
 import escapeStringRegexp from 'escape-string-regexp';
 import constants from 'lib/constants';
-import dialogs from 'dialogs';
 import path from './Path';
 import Url from './Url';
 import Uri from './Uri';
+import alert from 'dialogs/alert';
 
 /**
  * Gets programming language name according to filename
@@ -178,7 +178,7 @@ export default {
     };
 
     const msg = this.errorMessage(err, ...args);
-    dialogs.alert(strings.error, msg, onhide);
+    alert(strings.error, msg, onhide);
     return promise;
   },
   /**

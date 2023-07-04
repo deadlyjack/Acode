@@ -12,6 +12,7 @@ import settingsPage from 'components/settingsPage';
 import purchaseListener from 'handlers/purchase';
 import alert from 'dialogs/alert';
 import loader from 'dialogs/loader';
+import actionStack from 'lib/actionStack';
 
 export default async function PluginInclude(id, installed, onInstall, onUninstall) {
   installed = typeof installed !== 'boolean' ? installed === 'true' : installed;

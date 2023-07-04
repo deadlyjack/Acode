@@ -1,6 +1,7 @@
 import './style.scss';
 import restoreTheme from 'lib/restoreTheme';
 import inputhints from 'components/inputhints';
+import actionStack from 'lib/actionStack';
 
 /**
  * @typedef {import('./inputhints').HintCallback} HintCallback

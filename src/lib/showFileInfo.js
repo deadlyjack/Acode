@@ -3,9 +3,9 @@ import mustache from 'mustache';
 import $_fileInfo from 'views/file-info.hbs';
 import fsOperation from 'fileSystem';
 import Url from 'utils/Url';
-import dialogs from 'dialogs';
 import helpers from 'utils/helpers';
 import settings from './settings';
+import box from 'dialogs/box';
 
 /**
  * Shows file info
@@ -44,7 +44,7 @@ export default async function showFileInfo(url) {
       await fsOperation(CACHE_STORAGE).createFile(name, value);
     }
 
-    dialogs.box('', mustache.render($_fileInfo, options), true).onclick((e) => {
+    box('', mustache.render($_fileInfo, options), true).onclick((e) => {
       const $target = e.target;
       if ($target instanceof HTMLElement) {
         const action = $target.getAttribute('action');

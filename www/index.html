@@ -7,6 +7,16 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="stylesheet" href="./res/icons/style.css" />
     <link rel="stylesheet" href="./res/file-icons/style.css" />
+    
+    <script>
+      document.addEventListener('deviceready', function(){
+        if(BuildInfo.buildType !== 'debug') return;
+        var __script = document.createElement('script');
+        __script.src = './js/build/console.build.js';
+        document.body.appendChild(__script);
+      });
+    </script>
+
 
     <script>
       (function () {

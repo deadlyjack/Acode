@@ -17,7 +17,7 @@ import tile from 'components/tile';
 import Sidebar from 'components/sidebar';
 import contextmenu from 'components/contextmenu';
 import EditorManager from './editorManager';
-import ActionStack from './actionStack';
+import actionStack from './actionStack';
 import helpers from 'utils/helpers';
 import settings from './settings';
 import intentHandler from 'handlers/intent';
@@ -48,6 +48,7 @@ import otherSettings from 'settings/appSettings';
 import tutorial from 'components/tutorial';
 import openFile from './openFile';
 import startAd from './startAd';
+import keyboardHandler, { keydownState } from '../handlers/keyboard';
 
 const previousVersionCode = parseInt(localStorage.versionCode, 10);
 
@@ -68,23 +69,13 @@ async function Main() {
     }
   };
 
-  window.addEventListener('resize', () => {
-    const bannerIsActive = !!window.ad?.active;
-    const $activeElement = document.activeElement;
-    const isEditable = $activeElement instanceof HTMLInputElement
-      || $activeElement instanceof HTMLTextAreaElement
-      || $activeElement?.isContentEditable;
-
-    if (isEditable && bannerIsActive) {
-      window.ad?.hide();
-    } else if (bannerIsActive) {
-      window.ad?.show();
-    }
-
-    $activeElement.addEventListener('blur', activeElementOnBlur);
-  });
-
+  window.addEventListener('resize', resizeHandler);
+  document.addEventListener('pause', pauseHandler);
+  document.addEventListener('resume', resumeHandler);
+  document.addEventListener('keydown', keyboardHandler);
   document.addEventListener('deviceready', onDeviceReady);
+  document.addEventListener('backbutton', backButtonHandler);
+  document.addEventListener('menubutton', menuButtonHandler);
 }
 
 async function onDeviceReady() {
@@ -227,7 +218,6 @@ async function loadApp() {
   const folders = helpers.parseJSON(localStorage.folders);
   const files = helpers.parseJSON(localStorage.files) || [];
   const editorManager = await EditorManager($header, $main);
-  const actionStack = new ActionStack();
 
   const setMainMenu = () => {
     if ($mainMenu) {
@@ -258,7 +248,7 @@ async function loadApp() {
   };
 
   acode.$headerToggler = $headerToggler;
-  window.actionStack = actionStack;
+  window.actionStack = actionStack.windowCopy();
   window.editorManager = editorManager;
   setMainMenu(settings.value.openFileListPos);
   setFileMenu(settings.value.openFileListPos);
@@ -285,8 +275,6 @@ async function loadApp() {
   editorManager.on('rename-file', onFileUpdate);
   editorManager.on('switch-file', onFileUpdate);
   editorManager.on('file-loaded', onFileUpdate);
-  document.addEventListener('backbutton', actionStack.pop);
-  document.addEventListener('menubutton', $sidebar.toggle);
   navigator.app.overrideButton('menubutton', true);
   system.setIntentHandler(intentHandler, intentHandler.onError);
   system.getCordovaIntent(intentHandler, intentHandler.onError);
@@ -305,13 +293,6 @@ async function loadApp() {
     const activeFile = editorManager.activeFile;
     if (activeFile) editorManager.editor.blur();
   };
-  document.addEventListener('pause', () => {
-    acode.exec('save-state');
-  });
-  document.addEventListener('resume', () => {
-    if (!settings.value.checkFiles) return;
-    checkFiles();
-  });
   sdcard.watchFile(KEYBINDING_FILE, async () => {
     await setKeyBindings(editorManager.editor);
     toast(strings['key bindings updated']);
@@ -494,18 +475,6 @@ function createFileMenu({ top, bottom, toggler }) {
 }
 
 function showTutorials() {
-  tutorial('main-tutorials', (hide) => {
-    const onclick = () => {
-      QuickTools();
-      hide();
-    };
-
-    return <p>
-      Command palette icon has been removed from shortcuts, but you can modify shortcuts.
-      <span className='link' onclick={onclick}>Click here</span> to configure quick tools.
-    </p>;
-  });
-
   if (window.innerWidth > 750) {
     tutorial('quicktools-tutorials', (hide) => {
       const onclick = () => {
@@ -516,6 +485,20 @@ function showTutorials() {
       return <p>
         Quicktools has been <strong>disabled</strong> because it seems like you are on a bigger screen and probably using a keyboard.
         To enable it, <span className='link' onclick={onclick}>click here</span> or press <kbd>Ctrl + Shift + P</kbd> and search for <code>quicktools</code>.
+      </p>;
+    });
+  }
+
+  if (previousVersionCode) {
+    tutorial('main-tutorials', (hide) => {
+      const onclick = () => {
+        QuickTools();
+        hide();
+      };
+
+      return <p>
+        Command palette icon has been removed from shortcuts, but you can modify shortcuts.
+        <span className='link' onclick={onclick}>Click here</span> to configure quick tools.
       </p>;
     });
   }
@@ -551,4 +534,37 @@ function activeElementOnBlur() {
   }
 
   this.removeEventListener('blur', activeElementOnBlur);
+}
+
+function backButtonHandler() {
+  actionStack.pop();
+}
+
+function menuButtonHandler() {
+  acode.exec('toggle-sidebar');
+}
+
+function pauseHandler() {
+  acode.exec('save-state');
+}
+
+function resumeHandler() {
+  if (!settings.value.checkFiles) return;
+  checkFiles();
+}
+
+function resizeHandler() {
+  const bannerIsActive = !!window.ad?.active;
+  const $activeElement = document.activeElement;
+  const isEditable = $activeElement instanceof HTMLInputElement
+    || $activeElement instanceof HTMLTextAreaElement
+    || $activeElement?.isContentEditable;
+
+  if (isEditable && bannerIsActive) {
+    window.ad?.hide();
+  } else if (bannerIsActive) {
+    window.ad?.show();
+  }
+
+  $activeElement.addEventListener('blur', activeElementOnBlur);
 }
