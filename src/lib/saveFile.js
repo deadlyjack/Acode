@@ -1,79 +1,108 @@
-import FileBrowser from '../pages/fileBrowser';
-import dialogs from '../components/dialogs';
-import helpers from '../utils/helpers';
+import Url from 'utils/Url';
+import helpers from 'utils/helpers';
 import constants from './constants';
-import recents from '../lib/recents';
-import fsOperation from '../fileSystem';
-import Url from '../utils/Url';
+import recents from 'lib/recents';
+import fsOperation from 'fileSystem';
 import openFolder from './openFolder';
 import appSettings from './settings';
+import EditorFile from './editorFile';
+import prompt from 'dialogs/prompt';
+import select from 'dialogs/select';
+import FileBrowser from 'pages/fileBrowser';
 
 let saveTimeout;
 
+const SELECT_FOLDER = 'select-folder';
+
 /**
- *
- * @param {File} file
+ * Saves a file to it's location, if file is new, it will ask for location
+ * @param {EditorFile} file
  * @param {boolean} [isSaveAs]
  */
 async function saveFile(file, isSaveAs = false) {
+  // If file is loading, return
   if (file.loading) return;
-  let fs;
-  let url;
+
+  /**
+   * If set, new file needs to be created
+   * @type {string} 
+   */
+  let newUrl;
+  /**
+   * File operation object
+   * @type {fsOperation}
+   */
+  let fileOnDevice;
+  /**
+   * File name, can be changed by user
+   * @type {string}
+   */
   let { filename } = file;
+  /**
+   * If file is new
+   * @type {boolean}
+   */
   let isNewFile = false;
-  let createFile = false;
+
+  /**
+   * Encoding of file
+   * @type {string}
+   */
+  const { encoding } = file;
+  /**
+   * File data
+   * @type {string}
+   */
   const data = file.session.getValue();
+  /**
+   * File tab bar text element, used to show saving status
+   * @type {HTMLElement}
+   */
   const $text = file.tab.querySelector('span.text');
+
   if (!file.uri) {
     isNewFile = true;
   } else {
     isSaveAs = isSaveAs ?? file.readOnly;
   }
 
-  formatFile();
-
   if (isSaveAs || isNewFile) {
     const option = await recents.select(
-      [
-        ['select-folder', strings['select folder'], 'folder']
-      ],
-      'dir',
-      strings['select folder'],
+      [[SELECT_FOLDER, strings['select folder'], 'folder']], // options
+      'dir', // type
+      strings['select folder'], // title
     );
 
-    if (option === 'select-folder') {
-      url = await selectFolder();
+    if (option === SELECT_FOLDER) {
+      newUrl = await selectFolder();
     } else {
-      url = option.val.url;
+      newUrl = option.val.url;
     }
 
     if (isSaveAs) {
-      filename = await getfilename(url, file.filename);
+      filename = await getfilename(newUrl, file.filename);
     } else {
-      filename = await check(url, file.filename);
+      filename = await check(newUrl, file.filename);
     }
 
+    // in case if user cancels the dialog
     if (!filename) return;
   }
 
-  createFile = isSaveAs || url;
-
   if (filename !== file.filename) {
     file.filename = filename;
-    formatFile();
   }
 
   $text.textContent = strings.saving + '...';
   file.isSaving = true;
 
   try {
-    if (createFile) {
-      const fileUri = Url.join(url, file.filename);
-      fs = fsOperation(fileUri);
+    if (isSaveAs || newUrl) { // if save as or new file
+      const fileUri = Url.join(newUrl, file.filename);
+      fileOnDevice = fsOperation(fileUri);
 
-      if (!await fs.exists()) {
-        const fileDir = fsOperation(url);
-        await fileDir.createFile(file.filename);
+      if (!await fileOnDevice.exists()) {
+        await fsOperation(newUrl).createFile(file.filename);
       }
 
       const openedFile = editorManager.getFile(fileUri, 'uri');
@@ -81,12 +110,21 @@ async function saveFile(file, isSaveAs = false) {
       file.uri = fileUri;
       recents.addFile(fileUri);
 
-      const folder = openFolder.find(url);
+      const folder = openFolder.find(newUrl);
       if (folder) folder.reload();
     }
 
-    if (!fs) fs = fsOperation(file.uri);
-    await fs.writeFile(data);
+    if (!fileOnDevice) {
+      fileOnDevice = fsOperation(file.uri);
+    }
+
+    if (appSettings.value.formatOnSave) {
+      editorManager.activeFile.markChanged = false;
+      acode.exec('format', false);
+    }
+
+    await fileOnDevice.writeFile(data, encoding);
+
     if (file.location) {
       recents.addFolder(file.location);
     }
@@ -95,8 +133,7 @@ async function saveFile(file, isSaveAs = false) {
     saveTimeout = setTimeout(() => {
       file.isSaving = false;
       file.isUnsaved = false;
-      // file.onsave();
-      if (url) recents.addFile(file.uri);
+      if (newUrl) recents.addFile(file.uri);
       editorManager.onupdate('save-file');
       editorManager.emit('update', 'save-file');
       editorManager.emit('save-file', file);
@@ -122,7 +159,7 @@ async function saveFile(file, isSaveAs = false) {
   }
 
   async function getfilename(url, name) {
-    let filename = await dialogs.prompt(
+    let filename = await prompt(
       strings['enter file name'],
       name || '',
       strings['new file'],
@@ -143,7 +180,7 @@ async function saveFile(file, isSaveAs = false) {
     const fs = fsOperation(pathname);
     if (!await fs.exists()) return filename;
 
-    const action = await dialogs.select(strings['file already exists'], [
+    const action = await select(strings['file already exists'], [
       ['overwrite', strings.overwrite],
       ['newname', strings['enter file name']],
     ]);
@@ -153,14 +190,6 @@ async function saveFile(file, isSaveAs = false) {
     }
 
     return filename;
-  }
-
-  function formatFile() {
-    const { formatOnSave } = appSettings.value;
-    if (formatOnSave) {
-      editorManager.activeFile.markChanged = false;
-      acode.exec('format', false);
-    }
   }
 }
 

@@ -1,10 +1,10 @@
-import dialogs from 'components/dialogs';
 import fsOperation from 'fileSystem';
 import Url from 'utils/Url';
 import FileBrowser from 'pages/fileBrowser';
 import Uri from 'utils/Uri';
 import settingsPage from 'components/settingsPage';
 import appSettings from 'lib/settings';
+import alert from 'dialogs/alert';
 
 function backupRestore() {
   const title = strings.backup.capitalize() + '/' + strings.restore.capitalize();
@@ -75,7 +75,7 @@ function backupRestore() {
 
       await backupFileFS.writeFile(backupString);
 
-      dialogs.alert(
+      alert(
         strings.success.toUpperCase(),
         `${strings['backup successful']}\n${Uri.getVirtualAddress(
           backupFile,
@@ -106,7 +106,7 @@ backupRestore.restore = async function (url) {
     try {
       backup = JSON.parse(backup);
     } catch (error) {
-      dialogs.alert(
+      alert(
         strings.error.toUpperCase(),
         strings['invalid backup file'],
       );

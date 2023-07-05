@@ -3,6 +3,7 @@ import Path from "utils/Path";
 import Url from "utils/Url";
 import settings from "lib/settings";
 import internalFs from "./internalFs";
+import { encode } from 'utils/encodings';
 
 class FtpClient {
   #MAX_TRY = 3;
@@ -48,7 +49,7 @@ class FtpClient {
       ftp.connect(this.#host, +this.#port, this.#username, this.#password, {
         securityType: this.#security,
         connectionMode: this.#mode,
-        encoding: 'utf8'
+        encoding: settings.value.defaultFileEncoding
       }, (conId) => {
         this.#conId = conId;
         resolve();
@@ -101,6 +102,11 @@ class FtpClient {
     });
   }
 
+  /**
+   * Write file to ftp server
+   * @param {string|ArrayBuffer} content 
+   * @returns 
+   */
   async writeFile(content = '') {
     await this.#connectIfNotConnected();
     const localFile = this.#cacheFile;
@@ -283,7 +289,11 @@ function createFs(ftp) {
       const { data } = await ftp.readFile(encoding);
       return data;
     },
-    writeFile(content) {
+    writeFile(content, encoding) {
+      if (typeof content === 'string' && encoding) {
+        content = encode(content, encoding);
+      }
+
       return ftp.writeFile(content);
     },
     createFile(name, data = '') {

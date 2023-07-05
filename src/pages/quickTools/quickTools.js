@@ -1,10 +1,11 @@
-import dialogs from 'components/dialogs';
 import './style.scss';
 import Page from 'components/page';
 import items, { description } from 'components/quickTools/items';
 import settings from 'lib/settings';
 import helpers from 'utils/helpers';
 import WCPage from 'components/WebComponents/wcPage';
+import select from 'dialogs/select';
+import actionStack from 'lib/actionStack';
 
 export default function QuickTools() {
   const $page = Page(strings['shortcut buttons']);
@@ -81,7 +82,7 @@ async function clickHandler(e) {
     return [i, description(id), icon, true, letters];
   });
 
-  const i = await dialogs.select(strings.select, options);
+  const i = await select(strings.select, options);
   settings.value.quicktoolsItems[index] = i;
   settings.update();
   render(this);

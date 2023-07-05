@@ -1,10 +1,10 @@
-import helpers from '../utils/helpers';
+import helpers from 'utils/helpers';
 
-export default function purchaseListner(onpurchase, onerror) {
+export default function purchaseListener(onpurchase, onerror) {
   return [
     (purchases) => {
       const [purchase] = purchases;
-      if (purchase.purchaseState === iap.PURCAHSE_STATE_PURCHASED) {
+      if (purchase.purchaseState === iap.PURCHASE_STATE_PURCHASED) {
         if (!purchase.isAcknowledged) {
           iap.acknowledgePurchase(purchase.purchaseToken, () => {
             onpurchase();
@@ -17,7 +17,7 @@ export default function purchaseListner(onpurchase, onerror) {
         return;
       }
 
-      const message = purchase.purchaseState === iap.PURCAHSE_STATE_PENDING
+      const message = purchase.purchaseState === iap.PURCHASE_STATE_PENDING
         ? strings['purchase pending']
         : strings.failed;
 

@@ -1,29 +1,53 @@
 import './style.scss';
 import settings from 'lib/settings';
+import Sidebar from 'components/sidebar';
 
 /**@type {HTMLElement} */
 let container;
 
 export default [
-  'documents',
-  'files',
-  strings['files'],
-  (/**@type {HTMLElement} */ el) => {
-    container = el;
-    container.classList.add('files');
-    container.setAttribute('data-msg', strings['open folder']);
-    container.addEventListener('click', clickHandler);
-    editorManager.on(['new-file', 'int-open-file-list', 'remove-file'], (position) => {
-      if (typeof position === 'string' && position !== settings.OPEN_FILE_LIST_POS_SIDEBAR) return;
-      const fileList = container.get(':scope > div.file-list');
-      if (fileList) fixHeight(fileList);
-    });
-    editorManager.on('add-folder', () => {
-      fixHeight();
-    });
-  }
+  'documents',                        // icon
+  'files',                            // id
+  strings['files'],                   // title
+  initApp,                            // init function
+  false,                              // prepend
+  onSelected,                         // onSelected function
 ];
 
+/**
+ * Initialize files app
+ * @param {HTMLElement} el 
+ */
+function initApp(el) {
+  container = el;
+  container.classList.add('files');
+  container.setAttribute('data-msg', strings['open folder']);
+  container.addEventListener('click', clickHandler);
+  editorManager.on(['new-file', 'int-open-file-list', 'remove-file'], (position) => {
+    if (typeof position === 'string' && position !== settings.OPEN_FILE_LIST_POS_SIDEBAR) return;
+    const fileList = container.get(':scope > div.file-list');
+    if (fileList) fixHeight(fileList);
+  });
+  editorManager.on('add-folder', fixHeight);
+  Sidebar.on('show', onSelected);
+}
+
+/**
+ * On selected handler for files app
+ * @param {HTMLElement} el 
+ */
+function onSelected(el) {
+  const $scrollableLists = container.getAll(':scope .scroll[data-scroll-top]');
+  $scrollableLists.forEach(($el) => {
+    $el.scrollTop = $el.dataset.scrollTop;
+  });
+}
+
+/**
+ * Click handler for files app
+ * @param {MouseEvent} e 
+ * @returns 
+ */
 function clickHandler(e) {
   if (!container.children.length) {
     acode.exec('open-folder');

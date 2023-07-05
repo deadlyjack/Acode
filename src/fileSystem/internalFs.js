@@ -1,8 +1,8 @@
 import ajax from '@deadlyjack/ajax';
-import helpers from '../utils/helpers';
-import Url from '../utils/Url';
+import Url from 'utils/Url';
+import { decode, encode } from 'utils/encodings';
 
-export default {
+const internalFs = {
   /**
    *
    * @param {string} url
@@ -37,8 +37,6 @@ export default {
     const name = filename.split('/').pop();
     const dirname = Url.dirname(filename);
 
-    if (data instanceof ArrayBuffer) data = new Blob([data]);
-
     return new Promise((resolve, reject) => {
       reject = setMessage(reject);
       window.resolveLocalFileSystemURL(
@@ -63,7 +61,7 @@ export default {
   },
 
   /**
-   *
+   * Delete a file or directory
    * @param {string} filename
    * @returns {Promise}
    */
@@ -85,12 +83,12 @@ export default {
   },
 
   /**
-   *
+   * Read a file
    * @param {string} filename
    * @param {string} encoding
    * @returns {Promise}
    */
-  readFile(filename, encoding) {
+  readFile(filename) {
     return new Promise((resolve, reject) => {
       reject = setMessage(reject);
       window.resolveLocalFileSystemURL(
@@ -99,14 +97,10 @@ export default {
           (async () => {
             const url = fileEntry.toInternalURL();
             try {
-              let data = await ajax({
+              const data = await ajax({
                 url: url,
                 responseType: 'arraybuffer',
               });
-
-              if (encoding) {
-                data = helpers.decodeText(data, encoding);
-              }
 
               resolve({ data });
             } catch (error) {
@@ -125,7 +119,7 @@ export default {
   },
 
   /**
-   *
+   * Rename a file or directory
    * @param {string} url
    * @param {string} newname
    * @returns {Promise}
@@ -151,7 +145,7 @@ export default {
   },
 
   /**
-   *
+   * Create a directory
    * @param {string} path
    * @param {string} dirname
    * @returns {Promise}
@@ -177,19 +171,32 @@ export default {
     });
   },
 
+  /**
+   * Copy a file or directory to another location
+   * @param {string} src 
+   * @param {string} dest 
+   * @returns {Promise<string>} The new location of the file or directory
+   */
   copy(src, dest) {
     return moveOrCopy('copyTo', src, dest);
   },
 
+  /**
+   * Move a file or directory to another location
+   * @param {string} src 
+   * @param {string} dest 
+   * @returns {Promise<string>} The new location of the file or directory
+   */
   move(src, dest) {
     return moveOrCopy('moveTo', src, dest);
   },
 
   /**
-   *
+   * Move or copy a file or directory to another location
    * @param {"copyTO"|"moveTo"} action
    * @param {string} src
    * @param {string} dest
+   * @returns {Promise<string>} The new location of the file or directory
    */
   moveOrCopy(action, src, dest) {
     return new Promise((resolve, reject) => {
@@ -233,7 +240,7 @@ export default {
   },
 
   /**
-   *
+   * Verify if a file or directory exists
    * @param {string} src
    * @param {string} dest
    * @returns {Promise<{src:Entry, dest:Entry}>}
@@ -275,7 +282,7 @@ export default {
   },
 
   /**
-   *
+   * Check if a file or directory exists
    * @param {Promise<Boolean>} url
    */
   exists(url) {
@@ -293,6 +300,18 @@ export default {
       );
     });
   },
+
+  /**
+   * Test if url supports this file system
+   * @param {string} url 
+   * @returns 
+   */
+  test(url) {
+    return /^file:/.test(url);
+  },
+
+  createFs,
+  getErrorMessage,
 };
 
 function setMessage(reject) {
@@ -310,7 +329,7 @@ function setMessage(reject) {
  * @param {number} code
  * @returns {string}
  */
-export function getErrorMessage(code) {
+function getErrorMessage(code) {
   switch (code) {
     case 1:
       return 'Path not found';
@@ -340,3 +359,80 @@ export function getErrorMessage(code) {
       return 'Uncaught error';
   }
 }
+
+/**
+* Initialize file system
+* @param {string} url
+* @this {object}
+*/
+function createFs(url) {
+  return {
+    async lsDir() {
+      const files = [];
+      const entries = await internalFs.listDir(url);
+
+      entries.map((entry) => {
+        const url = decodeURIComponent(entry.nativeURL);
+        const name = Url.basename(url);
+        files.push({
+          name,
+          url,
+          isDirectory: entry.isDirectory,
+          isFile: entry.isFile,
+        });
+      });
+
+      return files;
+    },
+    async readFile(encoding) {
+      let { data } = await internalFs.readFile(url, encoding);
+
+      if (encoding) {
+        data = await decode(data, encoding);
+      }
+
+      return data;
+    },
+    async writeFile(content, encoding) {
+      if (typeof content === 'string' && encoding) {
+        content = await encode(content, encoding);
+      }
+      return internalFs.writeFile(url, content, false, false);
+    },
+    createFile(name, data) {
+      return internalFs.writeFile(Url.join(url, name), data || '', true, true);
+    },
+    createDirectory(name) {
+      return internalFs.createDir(url, name);
+    },
+    delete() {
+      return internalFs.delete(url);
+    },
+    copyTo(dest) {
+      return internalFs.moveOrCopy('copyTo', url, dest);
+    },
+    moveTo(dest) {
+      return internalFs.moveOrCopy('moveTo', url, dest);
+    },
+    async renameTo(newname) {
+      const name = Url.basename(url).toLowerCase();
+
+      if (name === newname.toLowerCase()) {
+        const uuid = helpers.uuid();
+        let newUrl = await this.renameTo(uuid);
+        newUrl = await fsOperation(newUrl).renameTo(newname);
+        return newUrl;
+      }
+
+      return internalFs.renameFile(url, newname);
+    },
+    exists() {
+      return internalFs.exists(url);
+    },
+    stat() {
+      return internalFs.stats(url);
+    },
+  };
+}
+
+export default internalFs;

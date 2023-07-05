@@ -1,10 +1,11 @@
-import helpers from '../utils/helpers';
-import dialogs from '../components/dialogs';
-import Url from '../utils/Url';
-import Sftp from '../fileSystem/sftp';
-import Ftp from '../fileSystem/ftp';
-import fsOperation from '../fileSystem';
+import helpers from 'utils/helpers';
+import Url from 'utils/Url';
+import Sftp from 'fileSystem/sftp';
+import Ftp from 'fileSystem/ftp';
+import fsOperation from 'fileSystem';
 import URLParse from 'url-parse';
+import loader from 'dialogs/loader';
+import multiPrompt from 'dialogs/multiPrompt';
 
 export default {
   /**
@@ -26,7 +27,7 @@ export default {
     const mode = active ? 'active' : 'passive';
     const ftp = Ftp(hostname, username, password, port, security, mode);
     try {
-      dialogs.loader.create(strings['add ftp'], strings['connecting...'], {
+      loader.create(strings['add ftp'], strings['connecting...'], {
         timeout: 10000,
         callback() {
           stopConnection = true;
@@ -66,7 +67,7 @@ export default {
       if (home !== '/') {
         res.home = home;
       }
-      dialogs.loader.destroy();
+      loader.destroy();
       if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
         window.iad.show();
       }
@@ -77,7 +78,7 @@ export default {
         return;
       }
 
-      dialogs.loader.destroy();
+      loader.destroy();
       await helpers.error(err);
       return await this.addFtp(
         username,
@@ -94,7 +95,7 @@ export default {
       port = port || 21;
       security = security || 'ftp';
       mode = mode || 'passive';
-      return dialogs.multiPrompt(strings['add ftp'], [
+      return multiPrompt(strings['add ftp'], [
         {
           id: 'alias',
           placeholder: strings.name,
@@ -182,7 +183,7 @@ export default {
     } = await prompt(...args);
     const authType = usePassword ? 'password' : 'keyFile';
 
-    dialogs.loader.create(strings['add sftp'], strings['connecting...'], {
+    loader.create(strings['add sftp'], strings['connecting...'], {
       timeout: 10000,
       callback() {
         stopConnection = true;
@@ -208,8 +209,7 @@ export default {
       let localKeyFile = '';
       if (keyFile) {
         let fs = fsOperation(keyFile);
-        const rawData = await fs.readFile();
-        const text = new TextDecoder('utf-8').decode(new Uint8Array(rawData));
+        const text = await fs.readFile('utf8');
 
         //Original key file sometimes gives permission error
         //To solve permission error
@@ -237,7 +237,7 @@ export default {
           passPhrase,
         },
       });
-      dialogs.loader.destroy();
+      loader.destroy();
       if (IS_FREE_VERSION && await window.iad?.isLoaded()) {
         window.iad.show();
       }
@@ -254,7 +254,7 @@ export default {
         return;
       }
 
-      dialogs.loader.destroy();
+      loader.destroy();
       await helpers.error(err);
       return await this.addSftp(
         hostname,
@@ -372,7 +372,7 @@ export default {
         },
       ];
 
-      return dialogs.multiPrompt(strings['add sftp'], inputs);
+      return multiPrompt(strings['add sftp'], inputs);
     }
   },
   edit({ name, storageType, url }) {

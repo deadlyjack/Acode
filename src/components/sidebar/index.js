@@ -1,10 +1,16 @@
 import './style.scss';
 import Ref from 'html-tag-js/ref';
+import actionStack from 'lib/actionStack';
 import constants from 'lib/constants';
 
 let $sidebar;
 /**@type {Array<(el:HTMLElement)=>boolean>} */
 let preventSlideTests = [];
+
+const events = {
+  show: [],
+  hide: [],
+};
 
 /**
  * @typedef {object} SideBar
@@ -109,10 +115,6 @@ function create($container, $toggler) {
     onshow();
   }
 
-  function onshow() {
-    if ($el.onshow) $el.onshow.call($el);
-  }
-
   function hide(hideIfTab = false) {
     localStorage.sidebarShown = 0;
     if (mode === 'phone') {
@@ -135,12 +137,23 @@ function create($container, $toggler) {
       mask.remove();
       $el.remove();
       $container.style.overflow = null;
+      onhide();
     }, 300);
     document.ontouchstart = null;
     resetState();
 
     openedFolders.map(($) => ($.onscroll = null));
     openedFolders = [];
+  }
+
+  function onshow() {
+    if ($el.onshow) $el.onshow.call($el);
+    events.show.forEach((fn) => fn());
+  }
+
+  function onhide() {
+    if ($el.onhide) $el.onhide.call($el);
+    events.hide.forEach((fn) => fn());
   }
 
   /**
@@ -232,7 +245,7 @@ function create($container, $toggler) {
     touch.totalX = touch.endX - touch.startX;
     touch.totalY = touch.endY - touch.startY;
 
-    let width = $el.getwidth();
+    let width = $el.getWidth();
 
     if (
       !$el.activated &&
@@ -259,7 +272,7 @@ function create($container, $toggler) {
     else if (e.target === mask && touch.totalX === 0) return hide();
     e.preventDefault();
 
-    const threshold = $el.getwidth() / 3;
+    const threshold = $el.getWidth() / 3;
 
     if (
       ($el.activated && touch.totalX > -threshold) ||
@@ -332,7 +345,7 @@ function create($container, $toggler) {
   $el.hide = hide;
   $el.toggle = toggle;
   $el.onshow = () => { };
-  $el.getwidth = function () {
+  $el.getWidth = function () {
     const width = innerWidth * 0.7;
     return mode === 'phone' ? (width >= 350 ? 350 : width) : MIN_WIDTH;
   };
@@ -355,6 +368,17 @@ function Sidebar({ container, toggler }) {
 Sidebar.hide = () => $sidebar?.hide();
 Sidebar.show = () => $sidebar?.show();
 Sidebar.toggle = () => $sidebar?.toggle();
+
+Sidebar.on = (/**@type {'hide'|'show'} */ event, /**@type {Function} */ callback) => {
+  if (!events[event]) return;
+  events[event].push(callback);
+};
+
+Sidebar.off = (/**@type {'hide'|'show'} */ event, /**@type {Function} */ callback) => {
+  if (!events[event]) return;
+  events[event] = events[event].filter((cb) => cb !== callback);
+};
+
 /**@type {HTMLElement} */
 Sidebar.el = null;
 

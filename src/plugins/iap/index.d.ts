@@ -2,7 +2,7 @@ interface Iap {
   getProducts(
     skuList: Array<string>,
     onSuccess: (skuList: Array<Object>) => void,
-    onError: (err: String) => error,
+    onError: (err: String) => Error,
   ): void;
   setPurchaseUpdatedListener(
     onSuccess: (purchase: Object) => void,
@@ -26,6 +26,7 @@ interface Iap {
     onSuccess: (purchaseList: Array<Object>) => void,
     onError: (err: string) => void,
   ): void;
+  OK: 0;
   BILLING_UNAVAILABLE: 3;
   DEVELOPER_ERROR: 5;
   ERROR: 6;
@@ -33,14 +34,13 @@ interface Iap {
   ITEM_ALREADY_OWNED: 7;
   ITEM_NOT_OWNED: 8;
   ITEM_UNAVAILABLE: 4;
-  OK: 0;
   SERVICE_DISCONNECTED: -1;
   SERVICE_TIMEOUT: -3;
-  SERVICE_TIMEOUT: 2;
+  SERVICE_UNAVAILABLE: 2;
   USER_CANCELED: 1;
-  PURCAHSE_STATE_PURCHASED: 1;
-  PURCAHSE_STATE_PENDING: 2;
-  PURCAHSE_STATE_UNKNOW: 0;
+  PURCHASE_STATE_PURCHASED: 1;
+  PURCHASE_STATE_PENDING: 2;
+  PURCHASE_STATE_UNKNOWN: 0;
 }
 
 declare var iap: Iap;

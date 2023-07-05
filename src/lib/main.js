@@ -17,10 +17,9 @@ import tile from 'components/tile';
 import Sidebar from 'components/sidebar';
 import contextmenu from 'components/contextmenu';
 import EditorManager from './editorManager';
-import ActionStack from './actionStack';
+import actionStack from './actionStack';
 import helpers from 'utils/helpers';
 import settings from './settings';
-import constants from './constants';
 import intentHandler from 'handlers/intent';
 import openFolder, { addedFolder } from './openFolder';
 import quickToolsInit from 'handlers/quickToolsInit';
@@ -31,7 +30,7 @@ import fsOperation from 'fileSystem';
 import toast from 'components/toast';
 import $_menu from 'views/menu.hbs';
 import $_fileMenu from 'views/file-menu.hbs';
-import openFiles from './openFiles';
+import restoreFiles from './restoreFiles';
 import loadPlugins from './loadPlugins';
 import checkPluginsUpdate from './checkPluginsUpdate';
 import plugins from 'pages/plugins';
@@ -41,14 +40,15 @@ import EditorFile from './editorFile';
 import sidebarApps from 'sidebarApps';
 import checkFiles from './checkFiles';
 import themes from './themes';
-import { createEventInit } from 'utils/keyboardEvent';
-import { resetKeyBindings, setKeyBindings } from 'ace/commands';
 import { initFileList } from './fileList';
+import { getEncoding, initEncodings } from 'utils/encodings';
+import { resetKeyBindings, setKeyBindings } from 'ace/commands';
 import QuickTools from 'pages/quickTools/quickTools';
+import otherSettings from 'settings/appSettings';
 import tutorial from 'components/tutorial';
 import openFile from './openFile';
 import startAd from './startAd';
-import otherSettings from 'settings/appSettings';
+import keyboardHandler, { keydownState } from '../handlers/keyboard';
 
 const previousVersionCode = parseInt(localStorage.versionCode, 10);
 
@@ -69,21 +69,17 @@ async function Main() {
     }
   };
 
-  window.addEventListener('resize', () => {
-    if (window.ad?.shown && (innerHeight * devicePixelRatio) < 600) {
-      ad.hide();
-      return;
-    }
-
-    if (window.ad?.shown) {
-      ad.show();
-    }
-  });
-
+  window.addEventListener('resize', resizeHandler);
+  document.addEventListener('pause', pauseHandler);
+  document.addEventListener('resume', resumeHandler);
+  document.addEventListener('keydown', keyboardHandler);
   document.addEventListener('deviceready', onDeviceReady);
+  document.addEventListener('backbutton', backButtonHandler);
+  document.addEventListener('menubutton', menuButtonHandler);
 }
 
 async function onDeviceReady() {
+  await initEncodings(); // important to load encodings before anything else
 
   const isFreePackage = /(free)$/.test(BuildInfo.packageName);
   const oldResolveURL = window.resolveLocalFileSystemURL;
@@ -222,7 +218,6 @@ async function loadApp() {
   const folders = helpers.parseJSON(localStorage.folders);
   const files = helpers.parseJSON(localStorage.files) || [];
   const editorManager = await EditorManager($header, $main);
-  const actionStack = new ActionStack();
 
   const setMainMenu = () => {
     if ($mainMenu) {
@@ -253,7 +248,7 @@ async function loadApp() {
   };
 
   acode.$headerToggler = $headerToggler;
-  window.actionStack = actionStack;
+  window.actionStack = actionStack.windowCopy();
   window.editorManager = editorManager;
   setMainMenu(settings.value.openFileListPos);
   setFileMenu(settings.value.openFileListPos);
@@ -271,7 +266,6 @@ async function loadApp() {
 
   //#region Add event listeners
   initFileList();
-  createEventInit();
   quickToolsInit();
   sidebarApps.init($sidebar);
   await sidebarApps.loadApps();
@@ -281,8 +275,6 @@ async function loadApp() {
   editorManager.on('rename-file', onFileUpdate);
   editorManager.on('switch-file', onFileUpdate);
   editorManager.on('file-loaded', onFileUpdate);
-  document.addEventListener('backbutton', actionStack.pop);
-  document.addEventListener('menubutton', $sidebar.toggle);
   navigator.app.overrideButton('menubutton', true);
   system.setIntentHandler(intentHandler, intentHandler.onError);
   system.getCordovaIntent(intentHandler, intentHandler.onError);
@@ -301,13 +293,6 @@ async function loadApp() {
     const activeFile = editorManager.activeFile;
     if (activeFile) editorManager.editor.blur();
   };
-  document.addEventListener('pause', () => {
-    acode.exec('save-state');
-  });
-  document.addEventListener('resume', () => {
-    if (!settings.value.checkFiles) return;
-    checkFiles();
-  });
   sdcard.watchFile(KEYBINDING_FILE, async () => {
     await setKeyBindings(editorManager.editor);
     toast(strings['key bindings updated']);
@@ -349,7 +334,7 @@ async function loadApp() {
   }
 
   if (Array.isArray(files) && files.length) {
-    openFiles(files)
+    restoreFiles(files)
       .then(() => {
         onEditorUpdate(undefined, false);
       })
@@ -464,7 +449,7 @@ function createFileMenu({ top, bottom, toggler }) {
     toggler,
     transformOrigin: top ? 'top right' : 'bottom right',
     innerHTML: () => {
-      const file = editorManager.activeFile;
+      const file = window.editorManager.activeFile;
 
       if (file.loading) {
         $menu.classList.add('disabled');
@@ -472,15 +457,16 @@ function createFileMenu({ top, bottom, toggler }) {
         $menu.classList.remove('disabled');
       }
 
+      const { label: encoding } = getEncoding(file.encoding);
+
       return mustache.render($_fileMenu, {
         ...strings,
         file_mode: (file.session.getMode().$id || '').split('/').pop(),
-        file_encoding: file.encoding,
+        file_encoding: encoding,
         file_read_only: !file.editable,
-        file_info: !!file.uri,
+        file_on_disk: !!file.uri,
         file_eol: file.eol,
-        copy_text: !!editorManager.editor.getCopyText(),
-        new_file: file.name === constants.DEFAULT_FILE_NAME && !file.session.getValue(),
+        copy_text: !!window.editorManager.editor.getCopyText(),
       });
     },
   });
@@ -489,18 +475,6 @@ function createFileMenu({ top, bottom, toggler }) {
 }
 
 function showTutorials() {
-  tutorial('main-tutorials', (hide) => {
-    const onclick = () => {
-      QuickTools();
-      hide();
-    };
-
-    return <p>
-      Command palette icon has been removed from shortcuts, but you can modify shortcuts.
-      <span className='link' onclick={onclick}>Click here</span> to configure quick tools.
-    </p>;
-  });
-
   if (window.innerWidth > 750) {
     tutorial('quicktools-tutorials', (hide) => {
       const onclick = () => {
@@ -511,6 +485,20 @@ function showTutorials() {
       return <p>
         Quicktools has been <strong>disabled</strong> because it seems like you are on a bigger screen and probably using a keyboard.
         To enable it, <span className='link' onclick={onclick}>click here</span> or press <kbd>Ctrl + Shift + P</kbd> and search for <code>quicktools</code>.
+      </p>;
+    });
+  }
+
+  if (previousVersionCode) {
+    tutorial('main-tutorials', (hide) => {
+      const onclick = () => {
+        QuickTools();
+        hide();
+      };
+
+      return <p>
+        Command palette icon has been removed from shortcuts, but you can modify shortcuts.
+        <span className='link' onclick={onclick}>Click here</span> to configure quick tools.
       </p>;
     });
   }
@@ -533,4 +521,50 @@ function showTutorials() {
       </p>;
     });
   }
+}
+
+/**
+ * Hide banner ad when focused element is blurred
+ * @this {HTMLElement}
+ */
+function activeElementOnBlur() {
+  const active = !!window.ad?.active;
+  if (active) {
+    window.ad.show();
+  }
+
+  this.removeEventListener('blur', activeElementOnBlur);
+}
+
+function backButtonHandler() {
+  actionStack.pop();
+}
+
+function menuButtonHandler() {
+  acode.exec('toggle-sidebar');
+}
+
+function pauseHandler() {
+  acode.exec('save-state');
+}
+
+function resumeHandler() {
+  if (!settings.value.checkFiles) return;
+  checkFiles();
+}
+
+function resizeHandler() {
+  const bannerIsActive = !!window.ad?.active;
+  const $activeElement = document.activeElement;
+  const isEditable = $activeElement instanceof HTMLInputElement
+    || $activeElement instanceof HTMLTextAreaElement
+    || $activeElement?.isContentEditable;
+
+  if (isEditable && bannerIsActive) {
+    window.ad?.hide();
+  } else if (bannerIsActive) {
+    window.ad?.show();
+  }
+
+  $activeElement.addEventListener('blur', activeElementOnBlur);
 }

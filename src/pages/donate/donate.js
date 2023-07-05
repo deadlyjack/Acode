@@ -1,14 +1,15 @@
 import './donate.scss';
+import mustache from "mustache";
+import ajax from '@deadlyjack/ajax';
 import bodyHBS from "./donate.hbs";
 import productHBS from "./product.hbs";
-import mustache from "mustache";
-import Page from "../../components/page";
-import constants from "../../lib/constants";
-import ajax from '@deadlyjack/ajax';
-import helpers from '../../utils/helpers';
-import dialogs from '../../components/dialogs';
-import tag from 'html-tag-js';
-import loader from 'components/dialogs/loader';
+import Page from "components/page";
+import constants from "lib/constants";
+import helpers from 'utils/helpers';
+import loader from 'dialogs/loader';
+import box from 'dialogs/box';
+import alert from 'dialogs/alert';
+import actionStack from 'lib/actionStack';
 
 //TODO: fix (-1 means, user is not logged in to any google account)
 
@@ -63,11 +64,13 @@ export default function DonateInclude() {
           msg += strings['donation message'];
         }
 
-        dialogs.box(strings.info.toUpperCase(), msg);
+        box(strings.info.toUpperCase(), msg);
       })();
     }
   }, err => {
-    if (err !== iap.USER_CANCELED) dialogs.alert(strings.error.toUpperCase(), err);
+    if (err !== iap.USER_CANCELED) {
+      alert(strings.error.toUpperCase(), err);
+    }
   });
 
   app.onclick = function (e) {
@@ -82,7 +85,9 @@ export default function DonateInclude() {
         iap.purchase(value, () => {
           // ignore
         }, err => {
-          if (err !== iap.USER_CANCELED) dialogs.alert(strings.error, err);
+          if (err !== iap.USER_CANCELED) {
+            alert(strings.error, err);
+          }
         });
         break;
       default:
@@ -95,7 +100,7 @@ export default function DonateInclude() {
   (async function render() {
 
     let products = await new Promise((resolve, reject) => {
-      iap.getProducts(constants.SKULIST, products => {
+      iap.getProducts(constants.SKU_LIST, products => {
         resolve(products);
       }, err => {
         reject(err);

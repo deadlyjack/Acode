@@ -1,8 +1,37 @@
 # Change Log
 
+## [1.8.5] - Build 292
+
+- New
+  - [x] **Smaller app size**
+    - Reduced app size.
+  - [x] **Updated icon pack**
+    - Updated icon pack (mono color).
+  - [x] **Default file encoding**
+    - You can set default file encoding from settings.
+  - [x] **File encoding**
+    - Remember file encoding for each file.
+  - [x] **Sidebar apps**
+    - File list and extension list now remembers scroll position.
+  - [x] **File tab bar**
+    - When repositioning file tab bar, tab container will scroll when current tab is at the edge.
+- Fixes
+  - [x] **Touch handling**
+    - Fixed teardrop and text menu not updated when switching tabs.
+  - [x] **File encoding**
+    - Fixed file encoding not working properly.
+  - [x] **File icon**
+    - Fixed inconsistent file icon.
+  - [x] **JavaScript console**
+    - Fixed JavaScript console not opening.
+  - [x] **Ads**
+    - Fixed ads taking screen when keyboard is open.
+  - [x] **Insert file**
+    - Fixed 'insert file' in opened folder not working properly.
+
 ## [1.8.4] - Build 283
 
-- New Features
+- New
   - [x] **Updated Ace editor**
     - Updated Ace editor to version 1.22.0
   - [x] **Open files position**

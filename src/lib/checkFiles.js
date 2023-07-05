@@ -1,5 +1,6 @@
-import dialogs from '../components/dialogs';
-import fsOperation from '../fileSystem';
+import alert from 'dialogs/alert';
+import fsOperation from 'fileSystem';
+import confirm from 'dialogs/confirm';
 
 let checkFileEnabled = true;
 
@@ -57,7 +58,7 @@ export default async function checkFiles() {
         editorManager.onupdate('file-changed');
         editorManager.emit('update', 'file-changed');
         await new Promise((resolve) => {
-          dialogs.alert(
+          alert(
             strings.info,
             strings['file has been deleted'].replace('{file}', file.filename),
             resolve,
@@ -66,12 +67,12 @@ export default async function checkFiles() {
         return;
       }
 
-      const text = await fs.readFile(file.encoding ?? 'utf-8');
+      const text = await fs.readFile(file.encoding);
       const loadedText = file.session.getValue();
 
       if (text !== loadedText) {
         try {
-          const confirmation = await dialogs.confirm(
+          const confirmation = await confirm(
             strings.warning.toUpperCase(),
             file.filename + strings['file changed'],
           );

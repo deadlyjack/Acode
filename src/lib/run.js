@@ -1,17 +1,18 @@
+import Url from 'utils/Url';
 import mimeType from 'mime-types';
 import { marked } from 'marked';
 import mustache from 'mustache';
 import $_console from 'views/console.hbs';
 import $_markdown from 'views/markdown.hbs';
 import helpers from 'utils/helpers';
-import dialogs from 'components/dialogs';
 import constants from './constants';
 import fsOperation from 'fileSystem';
-import Url from 'utils/Url';
 import openFolder from './openFolder';
 import appSettings from './settings';
 import EditorFile from './editorFile';
 import tutorial from 'components/tutorial';
+import box from 'dialogs/box';
+import alert from 'dialogs/alert';
 
 /**@type {Server} */
 let webServer;
@@ -84,7 +85,7 @@ async function run(
         type: mimeType.lookup(extension),
       });
 
-      dialogs.box(filename, `<img src='${URL.createObjectURL(blob)}'>`);
+      box(filename, `<img src='${URL.createObjectURL(blob)}'>`);
     } catch (err) {
       helpers.error(err);
     }
@@ -118,7 +119,7 @@ async function run(
   next();
 
   function next() {
-    if (extension === 'js' || isConsole) startConsole();
+    if (extension === '.js' || isConsole) startConsole();
     else start();
   }
 
@@ -140,13 +141,17 @@ async function run(
     if (target === 'browser') {
       system.isPowerSaveMode(
         (res) => {
-          if (res)
-            dialogs.alert(strings.info, strings['powersave mode warning']);
-          else startServer();
+          if (res) {
+            alert(strings.info, strings['powersave mode warning']);
+          } else {
+            startServer();
+          }
         },
         startServer,
       );
-    } else startServer();
+    } else {
+      startServer();
+    }
   }
 
   function startServer() {
@@ -170,7 +175,7 @@ async function run(
 
   function handleRequest(req) {
     const reqId = req.requestId;
-    const reqPath = req.path.substr(1) || 'index.html';
+    const reqPath = req.path.endsWith('/') ? req.path + 'index.html' : req.path;
 
     const ext = Url.extname(reqPath);
     let url = null;
@@ -185,12 +190,11 @@ async function run(
         sendFileContent(url, reqId, 'application/javascript');
         break;
 
-      case EXECUTING_SCRIPT:
-        let text;
-        if (extension === 'js') text = activeFile.session.getValue();
-        else text = '';
+      case EXECUTING_SCRIPT: {
+        const text = activeFile?.session.getValue() || '';
         sendText(text, reqId, 'application/javascript');
         break;
+      }
 
       case MARKDOWN_STYLE:
         url = appSettings.value.markdownStyle;
@@ -407,7 +411,7 @@ async function run(
       return;
     }
 
-    let text = await fs.readFile('utf-8');
+    let text = await fs.readFile(appSettings.value.defaultFileEncoding);
     text = processText ? processText(text) : text;
     if (mime === MIMETYPE_HTML) {
       sendHTML(text, id);

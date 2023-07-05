@@ -1,10 +1,9 @@
 import JSZip from 'jszip';
+import Url from "utils/Url";
 import constants from './constants';
-import dialogs from "../components/dialogs";
-import fsOperation from "../fileSystem";
+import fsOperation from "fileSystem";
 import loadPlugin from "./loadPlugin";
-import helpers from "../utils/helpers";
-import Url from "../utils/Url";
+import loader from 'dialogs/loader';
 
 /**
  * Installs a plugin.
@@ -14,7 +13,7 @@ import Url from "../utils/Url";
  */
 export default async function installPlugin(id, name, purchaseToken) {
   const title = name || 'Plugin';
-  const loader = dialogs.loader.create(title, strings.installing);
+  const loaderDialog = loader.create(title, strings.installing);
   let pluginDir;
   let pluginUrl;
 
@@ -38,10 +37,10 @@ export default async function installPlugin(id, name, purchaseToken) {
   }
 
   try {
-    loader.show();
+    loaderDialog.show();
 
     const plugin = await fsOperation(pluginUrl).readFile(undefined, (loaded, total) => {
-      loader.setMessage(`${strings.loading} ${(loaded / total * 100).toFixed(2)}%`);
+      loaderDialog.setMessage(`${strings.loading} ${(loaded / total * 100).toFixed(2)}%`);
     });
 
     if (plugin) {
@@ -97,7 +96,7 @@ export default async function installPlugin(id, name, purchaseToken) {
     }
     throw err;
   } finally {
-    loader.destroy();
+    loaderDialog.destroy();
   }
 }
 
