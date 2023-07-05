@@ -1,4 +1,4 @@
-import dialogs from 'components/dialogs';
+import alert from 'dialogs/alert';
 import openFile from 'lib/openFile';
 import openFolder, { addedFolder } from 'lib/openFolder';
 import helpers from 'utils/helpers';
@@ -49,9 +49,9 @@ FileBrowser.openFileError = (err) => {
   const ERROR = strings.error.toUpperCase();
   const message = `${strings['unable to open file']}. ${helpers.errorMessage(err.code)}`;
   if (err.code) {
-    dialogs.alert(ERROR, message);
+    alert(ERROR, message);
   } else if (err.code !== 0) {
-    dialogs.alert(ERROR, strings['unable to open file']);
+    alert(ERROR, strings['unable to open file']);
   }
 };
 
@@ -78,9 +78,9 @@ FileBrowser.openFolderError = (err) => {
   const ERROR = strings.error.toUpperCase();
   const message = `${strings['unable to open folder']}. ${helpers.errorMessage(err.code)}`;
   if (err.code) {
-    dialogs.alert(ERROR, message);
+    alert(ERROR, message);
   } else if (err.code !== 0) {
-    dialogs.alert(ERROR, strings['unable to open folder']);
+    alert(ERROR, strings['unable to open folder']);
   }
 };
 

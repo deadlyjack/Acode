@@ -17,6 +17,7 @@ export default function defaultFormatter(languageName) {
     return {
       key: name,
       text: caption,
+      icon: `file file_type_default file_type_${name}`,
       value: formatterID,
       valueText: (value) => {
         const formatter = formatters.find(({ id }) => id === value);

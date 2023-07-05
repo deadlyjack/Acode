@@ -101,7 +101,7 @@ async function apply(id, init) {
 
   try {
     let fs = fsOperation(loaderFile);
-    const svg = await fs.readFile('utf-8');
+    const svg = await fs.readFile('utf8');
 
     fs = fsOperation(img);
     if (!(await fs.exists())) {

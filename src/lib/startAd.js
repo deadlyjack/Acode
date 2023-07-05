@@ -30,7 +30,6 @@ export default async function startAd() {
   interstitial.on('dismiss', () => {
     interstitial.load();
   });
-
   window.ad = banner;
   window.iad = interstitial;
 }

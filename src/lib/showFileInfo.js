@@ -1,10 +1,11 @@
 import { filesize } from 'filesize';
 import mustache from 'mustache';
-import $_fileInfo from '../views/file-info.hbs';
-import fsOperation from '../fileSystem';
-import Url from '../utils/Url';
-import dialogs from '../components/dialogs';
-import helpers from '../utils/helpers';
+import $_fileInfo from 'views/file-info.hbs';
+import fsOperation from 'fileSystem';
+import Url from 'utils/Url';
+import helpers from 'utils/helpers';
+import settings from './settings';
+import box from 'dialogs/box';
 
 /**
  * Shows file info
@@ -16,7 +17,7 @@ export default async function showFileInfo(url) {
   try {
     const fs = fsOperation(url);
     const stats = await fs.stat();
-    const value = await fs.readFile('utf-8');
+    const value = await fs.readFile(settings.value.defaultFileEncoding);
 
     let { name, lastModified, length, uri, type } = stats;
     length = filesize(length);
@@ -43,7 +44,7 @@ export default async function showFileInfo(url) {
       await fsOperation(CACHE_STORAGE).createFile(name, value);
     }
 
-    dialogs.box('', mustache.render($_fileInfo, options), true).onclick((e) => {
+    box('', mustache.render($_fileInfo, options), true).onclick((e) => {
       const $target = e.target;
       if ($target instanceof HTMLElement) {
         const action = $target.getAttribute('action');

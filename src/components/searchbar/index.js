@@ -1,12 +1,13 @@
+import actionStack from 'lib/actionStack';
 import './style.scss';
-import helpers from 'utils/helpers';
 
 /**
  *
  * @param {HTMLUListElement|HTMLOListElement} $list
- * @param {(hide:()=>)=>void} setHide
+ * @param {(hide:Function)=>void} setHide
+ * @param {Function} onhide
  */
-function searchBar($list, setHide) {
+function searchBar($list, setHide, onhide) {
   let hideOnBlur = true;
   const $searchInput = tag('input', {
     type: 'search',
@@ -32,11 +33,7 @@ function searchBar($list, setHide) {
 
   if (typeof setHide === 'function') {
     hideOnBlur = false;
-    setHide(() => {
-      $container.remove();
-      actionStack.remove('searchbar');
-      restoreList(); // resotre list items when searchbar is hidden
-    });
+    setHide(hide);
   }
   app.appendChild($container);
   $searchInput.oninput = search;
@@ -57,6 +54,7 @@ function searchBar($list, setHide) {
   function hide() {
     actionStack.remove('searchbar');
     hideSearchBar();
+    if (typeof onhide === 'function') onhide();
   }
 
   function hideSearchBar() {

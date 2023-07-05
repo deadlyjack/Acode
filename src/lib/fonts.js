@@ -1,7 +1,7 @@
-import loader from 'components/dialogs/loader';
-import fsOperation from '../fileSystem';
-import helpers from '../utils/helpers';
-import Url from '../utils/Url';
+import loader from 'dialogs/loader';
+import fsOperation from 'fileSystem';
+import helpers from 'utils/helpers';
+import Url from 'utils/Url';
 
 const fonts = new Map();
 
@@ -112,7 +112,7 @@ async function setFont(name) {
     const $style = tag.get('style#font-style') ?? <style id="font-style"></style>;
     let css = get(name);
 
-    // get all url fron css
+    // get all url font css
     const urls = /url\((.*?)\)/g.exec(css)?.slice(1);
 
     await Promise.all(urls?.map(async url => {

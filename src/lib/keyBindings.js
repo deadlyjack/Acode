@@ -1,4 +1,9 @@
 export default {
+  focusEditor: {
+    description: 'Focus editor',
+    key: 'Ctrl-1',
+    readOnly: false,
+  },
   copy: {
     description: 'Copy',
     key: 'Ctrl-C',

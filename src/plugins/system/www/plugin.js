@@ -11,7 +11,7 @@ module.exports = {
   fileAction: function (fileUri, filename, action, mimeType, onFail) {
     if (typeof action !== 'string') {
       onFail = action || function () { };
-      action = filename
+      action = filename;
       filename = '';
     } else if (typeof mimeType !== 'string') {
       onFail = mimeType || function () { };

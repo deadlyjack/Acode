@@ -7,11 +7,13 @@ import Page from "components/page";
 import helpers from "utils/helpers";
 import fsOperation from "fileSystem";
 import constants from "lib/constants";
-import dialogs from "components/dialogs";
 import TabView from 'components/tabView';
 import searchBar from "components/searchbar";
 import FileBrowser from "pages/fileBrowser";
 import installPlugin from 'lib/installPlugin';
+import select from 'dialogs/select';
+import prompt from 'dialogs/prompt';
+import actionStack from 'lib/actionStack';
 
 /**
  * 
@@ -221,7 +223,7 @@ export default function PluginsInclude(updates) {
 
   async function addSource(value = 'https://', sourceType) {
     if (!sourceType) {
-      sourceType = await dialogs.select('', [
+      sourceType = await select('', [
         ['remote', strings.remote],
         ['local', strings.local],
       ], true);
@@ -230,7 +232,7 @@ export default function PluginsInclude(updates) {
     let source;
 
     if (sourceType === 'remote') {
-      source = await dialogs.prompt('Enter plugin source', value, 'url');
+      source = await prompt('Enter plugin source', value, 'url');
     } else {
       source = (await FileBrowser('file', 'Select plugin source')).url;
     }

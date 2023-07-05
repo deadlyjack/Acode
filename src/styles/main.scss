@@ -102,6 +102,7 @@ a {
   z-index: 5;
 
   li.tile {
+    $width: 120px;
     height: 100%;
     overflow: hidden;
     font-size: 0.8em;
@@ -109,24 +110,21 @@ a {
     margin: 0;
     padding: 0;
     color: inherit;
-    min-width: 100px;
-    max-width: 180px;
+    min-width: $width;
+    min-width: var(--file-tab-width);
+    max-width: $width;
+    max-width: var(--file-tab-width);
 
     .text {
       display: inline-block;
       white-space: nowrap;
-      max-width: 180px;
+      max-width: $width;
+      max-width: var(--file-tab-width);
       overflow: hidden;
       text-overflow: ellipsis;
       margin: 0;
       padding: 0;
       color: inherit;
-    }
-
-    &.select {
-      position: absolute;
-      left: 0;
-      top: 0;
     }
 
     &.notice {

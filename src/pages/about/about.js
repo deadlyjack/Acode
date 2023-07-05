@@ -1,9 +1,10 @@
 import './about.scss';
 import tag from 'html-tag-js';
 import mustache from 'mustache';
-import Page from '../../components/page';
+import Page from 'components/page';
 import _template from './about.hbs';
-import helpers from '../../utils/helpers';
+import helpers from 'utils/helpers';
+import actionStack from 'lib/actionStack';
 
 export default function AboutInclude() {
   const $page = Page(strings.about.capitalize());

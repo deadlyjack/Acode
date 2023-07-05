@@ -1,7 +1,7 @@
 import escapeStringRegexp from 'escape-string-regexp';
-import Url from '../utils/Url';
-import dialogs from '../components/dialogs';
-import helpers from '../utils/helpers';
+import Url from 'utils/Url';
+import helpers from 'utils/helpers';
+import select from 'dialogs/select';
 
 const recents = {
   /**
@@ -129,7 +129,7 @@ const recents = {
       all.push(...extra);
     }
 
-    return dialogs.select(title, all, {
+    return select(title, all, {
       textTransform: false,
     });
   },

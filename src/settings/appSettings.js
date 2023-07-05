@@ -1,16 +1,18 @@
-import dialogs from '../components/dialogs';
-import constants from '../lib/constants';
-import helpers from '../utils/helpers';
-import openFile from '../lib/openFile';
-import fsOperation from '../fileSystem';
 import ajax from '@deadlyjack/ajax';
-import Url from '../utils/Url';
-import settingsPage from '../components/settingsPage';
-import lang from '../lib/lang';
-import appSettings from '../lib/settings';
-import actions from '../handlers/quickTools';
+import Url from 'utils/Url';
+import lang from 'lib/lang';
+import constants from 'lib/constants';
+import helpers from 'utils/helpers';
+import openFile from 'lib/openFile';
+import fsOperation from 'fileSystem';
+import appSettings from 'lib/settings';
+import actions from 'handlers/quickTools';
 import { resetKeyBindings } from 'ace/commands';
 import QuickToolsSettings from 'pages/quickTools';
+import settingsPage from 'components/settingsPage';
+import encodings, { getEncoding } from 'utils/encodings';
+import loader from 'dialogs/loader';
+import actionStack from 'lib/actionStack';
 
 export default function otherSettings() {
   const values = appSettings.value;
@@ -156,6 +158,16 @@ export default function otherSettings() {
           });
         }
       }
+    },
+    {
+      key: 'defaultFileEncoding',
+      text: strings['default file encoding'],
+      value: values.defaultFileEncoding,
+      valueText: (value) => getEncoding(value).label,
+      select: Object.keys(encodings).map((id) => {
+        const encoding = encodings[id];
+        return [id, encoding.label];
+      }),
     }
   ];
 
@@ -171,8 +183,7 @@ export default function otherSettings() {
     switch (key) {
       case 'keybindings': {
         if (value === 'edit') {
-          actionStack.pop();
-          actionStack.pop();
+          actionStack.pop(2);
           openFile(KEYBINDING_FILE);
         } else {
           resetKeyBindings();
@@ -189,7 +200,7 @@ export default function otherSettings() {
           if (value === 'eruda') {
             const fs = fsOperation(Url.join(DATA_STORAGE, 'eruda.js'));
             if (!(await fs.exists())) {
-              dialogs.loader.create(
+              loader.create(
                 strings['downloading file'].replace('{file}', 'eruda.js'),
                 strings['downloading...']
               );
@@ -200,7 +211,7 @@ export default function otherSettings() {
                   contentType: 'application/x-www-form-urlencoded',
                 });
                 await fsOperation(DATA_STORAGE).createFile('eruda.js', erudaScript);
-                dialogs.loader.destroy();
+                loader.destroy();
               } catch (error) {
                 helpers.error(error);
               }

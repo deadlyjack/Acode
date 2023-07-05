@@ -5,6 +5,13 @@ import Url from 'utils/Url';
 
 const commands = [
   {
+    name: 'focusEditor',
+    description: 'Focus editor',
+    exec() {
+      editorManager.editor.focus();
+    }
+  },
+  {
     name: 'findFile',
     description: 'Find file in workspace',
     exec() {

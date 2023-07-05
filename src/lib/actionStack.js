@@ -1,125 +1,147 @@
-import dialogs from '../components/dialogs';
-import appSettings from '../lib/settings';
+import confirm from 'dialogs/confirm';
+import appSettings from 'lib/settings';
 
-function ActionStack() {
-  const stack = [];
-  let mark = null;
-  let oncloseappCallback;
-  let freeze = false;
+const stack = [];
+let mark = null;
+let onCloseAppCallback;
+let freeze = false;
 
-  return {
-    get onCloseApp() {
-      return oncloseappCallback;
-    },
-    set onCloseApp(cb) {
-      oncloseappCallback = cb;
-    },
-    /**
-     * @param {object} fun
-     * @param {string} fun.id
-     * @param {Function} fun.action
-     */
-    push(fun) {
-      stack.push(fun);
-    },
-    pop() {
-      if (freeze) return;
-      const fun = stack.pop();
-      if (fun) {
-        fun.action();
-      } else if (appSettings.value.confirmOnExit) {
-        let closeMessage = acode.exitAppMessage;
+export default {
+  /**
+   * Length of stack
+   * @returns {number}
+   */
+  get length() {
+    return stack.length;
+  },
+  /**
+   * Function to be called when app is closed
+   * @returns {Function}
+   */
+  get onCloseApp() {
+    return onCloseAppCallback;
+  },
+  /**
+   * Function to be called when app is closed
+   * @param {Function} cb
+   */
+  set onCloseApp(cb) {
+    onCloseAppCallback = cb;
+  },
+  /**
+   * Copy of actionStack for window
+   * @deprecated
+   */
+  windowCopy() {
+    const copyStack = { ...this };
+    delete copyStack.windowCopy;
+    copyStack.pop = (repeat) => {
+      console.error('Deprecated: window.actionStack is deprecated, import actionStack instead');
+      this.pop(repeat);
+    };
+    return copyStack;
+  },
+  /**
+   * Push action to stack
+   * @param {object} fun
+   * @param {string} fun.id
+   * @param {Function} fun.action
+   */
+  push(fun) {
+    stack.push(fun);
+  },
+  /**
+   * Pop action from stack
+   * @param {number} repeat pop action multiple times
+   * @returns 
+   */
+  async pop(repeat) {
+    if (freeze) return;
+    let confirmation = true;
 
-        if (closeMessage) {
-          dialogs
-            .confirm(strings.warning.toUpperCase(), closeMessage)
-            .then((confirmation) => {
-              if (confirmation) closeApp();
-            });
-        } else {
-          dialogs
-            .confirm(
-              strings.alert.toUpperCase(),
-              strings['close app'].capitalize(0),
-            )
-            .then((confirmation) => {
-              if (confirmation) closeApp();
-            });
+    if (typeof repeat === 'number' && repeat > 1) {
+      for (let i = 0; i < repeat; ++i) {
+        this.pop();
+      }
+      return;
+    }
+
+    const fun = stack.pop();
+
+    if (fun) {
+      fun.action();
+      return;
+    }
+
+    if (appSettings.value.confirmOnExit) {
+      let closeMessage = acode.exitAppMessage || strings['close app'].capitalize(0);
+      confirmation = await confirm(strings.warning.toUpperCase(), closeMessage);
+    }
+
+    if (confirmation) {
+      const { exitApp } = navigator.app;
+
+      if (typeof onCloseAppCallback === 'function') {
+        const res = onCloseAppCallback();
+        if (res instanceof Promise) {
+          res.finally(exitApp);
+          return;
         }
-      } else {
-        closeApp();
       }
 
-      function closeApp() {
-        const { exitApp } = navigator.app;
-
-        if (typeof oncloseappCallback === 'function') {
-          const res = oncloseappCallback();
-          if (res instanceof Promise) {
-            res.finally(exitApp);
-            return;
-          }
-        }
-
-        if (IS_FREE_VERSION && window.iad?.isLoaded()) {
-          window.iad.show();
-        }
-        exitApp();
-      }
-    },
-    get(id) {
-      return stack.find((act) => act.id === id);
-    },
-    /**
-     *
-     * @param {String} id
-     * @returns {Boolean}
-     */
-    remove(id) {
-      for (let i = 0; i < stack.length; ++i) {
-        let action = stack[i];
-        if (action.id === id) {
-          stack.splice(i, 1);
-          return true;
-        }
+      if (IS_FREE_VERSION && window.iad?.isLoaded()) {
+        window.iad.show();
       }
 
-      return false;
-    },
-    /**
-     *
-     * @param {String} id
-     * @returns {Boolean}
-     */
-    has(id) {
-      for (let act of stack) if (act.id === id) return true;
-      return false;
-    },
-    /**
-     * Sets a mark to recently pushed action
-     */
-    setMark() {
-      mark = stack.length;
-    },
-    /**
-     * Remove all actions that are pushed after marked positions (using `setMark()`)
-     */
-    clearFromMark() {
-      if (mark !== null) {
-        stack.splice(mark);
-        mark = null;
+      exitApp();
+    }
+  },
+  get(id) {
+    return stack.find((act) => act.id === id);
+  },
+  /**
+   * Remove action with given id from stack
+   * @param {String} id
+   * @returns {Boolean}
+   */
+  remove(id) {
+    for (let i = 0; i < stack.length; ++i) {
+      let action = stack[i];
+      if (action.id === id) {
+        stack.splice(i, 1);
+        return true;
       }
-    },
-    freeze() {
-      freeze = true;
-    },
-    unfreeze() {
-      freeze = false;
-    },
-    get length() {
-      return stack.length;
-    },
-  };
-}
+    }
 
-export default ActionStack;
+    return false;
+  },
+  /**
+   * Check if action with given id exists in stack
+   * @param {String} id
+   * @returns {Boolean}
+   */
+  has(id) {
+    for (let act of stack) if (act.id === id) return true;
+    return false;
+  },
+  /**
+   * Sets a mark to recently pushed action
+   */
+  setMark() {
+    mark = stack.length;
+  },
+  /**
+   * Remove all actions that are pushed after marked positions (using `setMark()`)
+   */
+  clearFromMark() {
+    if (mark === null) return;
+    stack.splice(mark);
+    mark = null;
+  },
+  freeze() {
+    freeze = true;
+  },
+  unfreeze() {
+    freeze = false;
+  },
+};

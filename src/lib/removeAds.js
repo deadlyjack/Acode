@@ -1,5 +1,5 @@
-import purchaseListner from '../handlers/purchase';
-import helpers from "../utils/helpers";
+import purchaseListener from 'handlers/purchase';
+import helpers from "utils/helpers";
 
 let callback;
 
@@ -8,7 +8,7 @@ export default function removeAds() {
     iap.getProducts(['acode_pro_new'], (products) => {
       const [product] = products;
 
-      iap.setPurchaseUpdatedListener(...purchaseListner(onpurchase, reject));
+      iap.setPurchaseUpdatedListener(...purchaseListener(onpurchase, reject));
 
       iap.purchase(product.json, (code) => {
         // ignore

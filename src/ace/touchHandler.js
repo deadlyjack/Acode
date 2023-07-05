@@ -513,6 +513,13 @@ export default function addTouchListeners(editor, minimal, onclick) {
     document.removeEventListener('touchend', touchEnd, config);
   }
 
+  function compareRanges(r1, r2) {
+    return r1.start.row === r2.start.row
+      && r1.start.column === r2.start.column
+      && r1.end.row === r2.end.row
+      && r1.end.column === r2.end.column;
+  }
+
   /**
    * Moves cursor to given position
    * @param {number} x 
@@ -524,6 +531,15 @@ export default function addTouchListeners(editor, minimal, onclick) {
 
     if (ctrlKey) {
       const range = new Range(pos.row, pos.column, pos.row, pos.column);
+      const ranges = editor.selection.getAllRanges();
+      const exists = ranges.some((r) => compareRanges(r, range));
+      if (exists) {
+        editor.selection.clearSelection();
+        ranges.splice(ranges.indexOf(exists), 1);
+        ranges.forEach((r) => editor.selection.addRange(r));
+        return;
+      }
+
       editor.selection.addRange(range);
       return;
     }
@@ -550,7 +566,10 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * @returns {void}
    */
   function cursorMode() {
-    if (!teardropSize || !editor.isFocused()) return;
+    if (!teardropSize || !editor.isFocused()) {
+      $cursor.remove();
+      return;
+    }
 
     clearTimeout($cursor.dataset.timeout);
     clearSelectionMode();
@@ -903,8 +922,8 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * Editor container on update
    */
   function onupdate() {
-    clearCursorMode();
     clearSelectionMode();
+    clearCursorMode();
     hideMenu();
   }
 
@@ -912,14 +931,17 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * Editor container on change session
    */
   function onchangesession() {
-    const copyText = editor.session.getTextRange(editor.getSelectionRange());
-    if (!copyText) {
-      menuActive = false;
-      selectionActive = false;
-    } else {
-      selectionActive = true;
-      menuActive = true;
-    }
+    setTimeout(() => {
+      const copyText = editor.session.getTextRange(editor.getSelectionRange());
+      if (copyText) {
+        selectionMode($end);
+        return;
+      }
+
+      clearSelectionMode();
+      cursorMode();
+      hideMenu();
+    }, 0);
   }
 
   /**

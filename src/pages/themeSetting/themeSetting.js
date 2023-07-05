@@ -9,6 +9,7 @@ import themes from 'lib/themes';
 import appSettings from 'lib/settings';
 import ThemeBuilder from 'lib/themeBuilder';
 import TabView from 'components/tabView';
+import actionStack from 'lib/actionStack';
 
 export default function () {
   const $page = Page(strings.theme.capitalize());
