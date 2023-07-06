@@ -367,10 +367,10 @@
   "too many files": "Zu viele Dateien. Nur {count} werden aufgelistet.",
   "too many folders": "Zu viele Ordner. Nur {count} werden aufgelistet.",
   "quicktools:command-palette": "Befehlspalette",
-  "default file encoding": "Default file encoding",
-  "remove entry": "Are you sure you want to remove '{name}' from the saved paths? Please note that removing it will not delete the path itself.",
-  "delete entry": "Confirm deletion: '{name}'. This action cannot be undone. Proceed?",
-  "change encoding": "Reopen '{file}' with '{encoding}' encoding? This action will result in the loss of any unsaved changes made to the file. Do you want to proceed with reopening?",
-  "reopen file": "Are you sure you want to reopen '{file}'? Any unsaved changes will be lost.",
-  "plugin min version": "{name} only available in Acode - {v-code} and above. Click here to update."
-}
+  "default file encoding": "Standard-Dateikodierung",
+  "remove entry": "Sind Sie sicher, das sie '{name}' von den Speicherpfaden entfernen möchten? Bitte beachten Sie, das der Pfad selbst nicht gelöscht wird.",
+  "delete entry": "Löschen bestätigen: '{name}'. Diese Aktion kann nicht zurückgenommen werden. Fortfahren?",
+  "change encoding": "Neuladen von '{file}' mit '{encoding}' Kodierung? Bei dieser Aktion gehen alle ungespeicherten Änderungen an dieser Datei verloren. Wollen Sie mit dem Neuladen fortfahren?",
+  "reopen file": "Sind Sie sicher, das sie '{file}' erneut öffnen wollen? Alle ungespeicherten Änderungen werden verloren gehen.",
+  "plugin min version": "{name} ist nur in Acode - {v-code} und neuer verfügbar. Klicken Sie hier zum Aktualisieren."
+
