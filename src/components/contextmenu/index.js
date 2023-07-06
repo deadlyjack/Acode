@@ -1,4 +1,5 @@
 import './style.scss';
+import actionStack from 'lib/actionStack';
 
 /**
  * @typedef {object} ContextMenuObj

@@ -1,6 +1,6 @@
 import { decode, encode } from 'utils/encodings';
-import dialogs from 'dialogs';
 import helpers from 'utils/helpers';
+import loader from 'dialogs/loader';
 
 const externalFs = {
   async readFile(url) {
@@ -100,7 +100,7 @@ const externalFs = {
   getStorageAccessPermission(uuid, name) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        dialogs.loader.destroy();
+        loader.destroy();
       }, 100);
       sdcard.getStorageAccessPermission(
         uuid,

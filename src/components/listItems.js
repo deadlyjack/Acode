@@ -1,7 +1,10 @@
 import Ref from 'html-tag-js/ref';
 import FileBrowser from 'pages/fileBrowser';
 import Checkbox from './checkbox';
-import dialogs from 'dialogs';
+import alert from 'dialogs/alert';
+import select from 'dialogs/select';
+import prompt from 'dialogs/prompt';
+import color from 'dialogs/color';
 
 /**
  * @typedef {Object} ListItem
@@ -15,7 +18,7 @@ import dialogs from 'dialogs';
  * @property {boolean} [checkbox]
  * @property {string} [prompt]
  * @property {string} [promptType]
- * @property {import('../dialogs/prompt').PromptOptions} [promptOptions]
+ * @property {import('dialogs/prompt').PromptOptions} [promptOptions]
  */
 
 /**
@@ -49,7 +52,7 @@ export default function listItems($list, items, callback, sort = true) {
     if (item.info) {
       $settingName.append(
         <span className='icon info info-button' data-action='info' onclick={() => {
-          dialogs.alert(strings.info, item.info);
+          alert(strings.info, item.info);
         }}></span>
       );
     }
@@ -88,7 +91,15 @@ export default function listItems($list, items, callback, sort = true) {
     const item = items.find((item) => item.key === key);
     if (!item) return;
 
-    const { select, checkbox, prompt, file, folder, color, link } = item;
+    const {
+      select: options,
+      prompt: promptText,
+      color: selectColor,
+      checkbox,
+      file,
+      folder,
+      link,
+    } = item;
     const { text, value, valueText } = item;
     const { promptType, promptOptions } = item;
 
@@ -97,22 +108,22 @@ export default function listItems($list, items, callback, sort = true) {
     let res;
 
     try {
-      if (select) {
-        res = await dialogs.select(text, select, {
+      if (options) {
+        res = await select(text, options, {
           default: value,
         });
       } else if (checkbox !== undefined) {
         $checkbox.toggle();
         res = $checkbox.checked;
-      } else if (prompt) {
-        res = await dialogs.prompt(prompt, value, promptType, promptOptions);
+      } else if (promptText) {
+        res = await prompt(promptText, value, promptType, promptOptions);
         if (res === null) return;
       } else if (file || folder) {
         const mode = file ? 'file' : 'folder';
         const { url } = await FileBrowser(mode);
         res = url;
-      } else if (color) {
-        res = await dialogs.color(value);
+      } else if (selectColor) {
+        res = await color(value);
       } else if (link) {
         system.openInBrowser(link);
         return;

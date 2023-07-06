@@ -1,13 +1,14 @@
-import FileBrowser from 'pages/fileBrowser';
-import dialogs from 'dialogs';
+import Url from 'utils/Url';
 import helpers from 'utils/helpers';
 import constants from './constants';
 import recents from 'lib/recents';
 import fsOperation from 'fileSystem';
-import Url from 'utils/Url';
 import openFolder from './openFolder';
 import appSettings from './settings';
 import EditorFile from './editorFile';
+import prompt from 'dialogs/prompt';
+import select from 'dialogs/select';
+import FileBrowser from 'pages/fileBrowser';
 
 let saveTimeout;
 
@@ -158,7 +159,7 @@ async function saveFile(file, isSaveAs = false) {
   }
 
   async function getfilename(url, name) {
-    let filename = await dialogs.prompt(
+    let filename = await prompt(
       strings['enter file name'],
       name || '',
       strings['new file'],
@@ -179,7 +180,7 @@ async function saveFile(file, isSaveAs = false) {
     const fs = fsOperation(pathname);
     if (!await fs.exists()) return filename;
 
-    const action = await dialogs.select(strings['file already exists'], [
+    const action = await select(strings['file already exists'], [
       ['overwrite', strings.overwrite],
       ['newname', strings['enter file name']],
     ]);

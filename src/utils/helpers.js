@@ -1,10 +1,10 @@
 import ajax from '@deadlyjack/ajax';
 import escapeStringRegexp from 'escape-string-regexp';
 import constants from 'lib/constants';
-import dialogs from 'dialogs';
 import path from './Path';
 import Url from './Url';
 import Uri from './Uri';
+import alert from 'dialogs/alert';
 
 /**
  * Gets programming language name according to filename
@@ -24,10 +24,10 @@ function getFileType(filename) {
     cppheader: /\.(hh|hpp)$/i,
     jsconfig: /^jsconfig.json$/i,
     tsconfig: /^tsconfig.json$/i,
+    android: /\.(apk|aab|slim)$/i,
     jsbeautify: /^\.jsbeautifyrc$/i,
     webpack: /^webpack\.config\.js$/i,
     audio: /\.(mp3|wav|ogg|flac|aac)$/i,
-    android: /\.(apk|aab|slim|smali)$/i,
     git: /(^\.gitignore$)|(^\.gitmodules$)/i,
     video: /\.(mp4|m4a|mov|3gp|wmv|flv|avi)$/i,
     image: /\.(png|jpg|jpeg|gif|bmp|ico|webp)$/i,
@@ -178,7 +178,7 @@ export default {
     };
 
     const msg = this.errorMessage(err, ...args);
-    dialogs.alert(strings.error, msg, onhide);
+    alert(strings.error, msg, onhide);
     return promise;
   },
   /**

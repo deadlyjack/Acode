@@ -15,8 +15,8 @@ export default {
   CUSTOM_THEME: 'body[theme="custom"]',
   FEEDBACK_EMAIL: 'acode@foxdebug.com',
   ERUDA_CDN: 'https://cdn.jsdelivr.net/npm/eruda',
-  PAID_VERSION: 'https://play.google.com/store/apps/details?id=com.foxdebug.acode',
+  get PLAY_STORE_URL() { return `https://play.google.com/store/apps/details?id=${BuildInfo.packageName}`; },
   API_BASE: 'https://acode.foxdebug.com/api',
-  // API_BASE: 'https://192.168.29.46:3001/api', // test api
+  // API_BASE: 'https://192.168.1.74:3001/api', // test api
   SKU_LIST: ["basic", "bronze", "silver", "gold", "platinum"]
 };

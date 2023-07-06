@@ -12,6 +12,7 @@ import settingsPage from 'components/settingsPage';
 import purchaseListener from 'handlers/purchase';
 import alert from 'dialogs/alert';
 import loader from 'dialogs/loader';
+import actionStack from 'lib/actionStack';
 
 export default async function PluginInclude(id, installed, onInstall, onUninstall) {
   installed = typeof installed !== 'boolean' ? installed === 'true' : installed;
@@ -26,6 +27,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
   let product;
   let purchaseToken;
   let $settingsIcon;
+  let minVersionCode = -1;
 
   actionStack.push({
     id: 'plugin',
@@ -78,6 +80,10 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
           if (installed && remotePlugin?.version !== plugin.version) {
             currentVersion = plugin.version;
             update = true;
+          }
+
+          if (remotePlugin.min_version_code) {
+            minVersionCode = remotePlugin.min_version_code;
           }
 
           plugin = Object.assign({}, remotePlugin);
@@ -244,6 +250,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       install,
       uninstall,
       currentVersion,
+      minVersionCode,
     });
 
     if ($settingsIcon) {

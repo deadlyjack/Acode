@@ -1,3 +1,4 @@
+import actionStack from 'lib/actionStack';
 import restoreTheme from 'lib/restoreTheme';
 
 /**

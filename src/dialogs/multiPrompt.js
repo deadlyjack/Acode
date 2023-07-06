@@ -4,6 +4,7 @@ import Checkbox from 'components/checkbox';
 import alert from './alert';
 import appSettings from 'lib/settings';
 import restoreTheme from 'lib/restoreTheme';
+import actionStack from 'lib/actionStack';
 
 /**
  * @typedef {object} Input

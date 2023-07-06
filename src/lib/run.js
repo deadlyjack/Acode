@@ -5,13 +5,14 @@ import mustache from 'mustache';
 import $_console from 'views/console.hbs';
 import $_markdown from 'views/markdown.hbs';
 import helpers from 'utils/helpers';
-import dialogs from 'dialogs';
 import constants from './constants';
 import fsOperation from 'fileSystem';
 import openFolder from './openFolder';
 import appSettings from './settings';
 import EditorFile from './editorFile';
 import tutorial from 'components/tutorial';
+import box from 'dialogs/box';
+import alert from 'dialogs/alert';
 
 /**@type {Server} */
 let webServer;
@@ -84,7 +85,7 @@ async function run(
         type: mimeType.lookup(extension),
       });
 
-      dialogs.box(filename, `<img src='${URL.createObjectURL(blob)}'>`);
+      box(filename, `<img src='${URL.createObjectURL(blob)}'>`);
     } catch (err) {
       helpers.error(err);
     }
@@ -140,13 +141,17 @@ async function run(
     if (target === 'browser') {
       system.isPowerSaveMode(
         (res) => {
-          if (res)
-            dialogs.alert(strings.info, strings['powersave mode warning']);
-          else startServer();
+          if (res) {
+            alert(strings.info, strings['powersave mode warning']);
+          } else {
+            startServer();
+          }
         },
         startServer,
       );
-    } else startServer();
+    } else {
+      startServer();
+    }
   }
 
   function startServer() {
@@ -168,9 +173,19 @@ async function run(
     }
   }
 
+  /**
+   * Requests handler
+   * @param {object} req
+   * @param {string} req.requestId
+   * @param {string} req.path 
+   */
   function handleRequest(req) {
     const reqId = req.requestId;
-    const reqPath = req.path.substr(1) || 'index.html';
+    let reqPath = req.path.substring(1);
+
+    if (!reqPath || reqPath.endsWith('/')) {
+      reqPath += 'index.html';
+    }
 
     const ext = Url.extname(reqPath);
     let url = null;

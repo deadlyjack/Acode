@@ -2,6 +2,7 @@ import appSettings from 'lib/settings';
 import quickTools from 'components/quickTools';
 import KeyboardEvent from 'utils/keyboardEvent';
 import searchSettings from 'settings/searchSettings';
+import actionStack from 'lib/actionStack';
 
 /**@type {HTMLInputElement | HTMLTextAreaElement} */
 let input;
@@ -403,7 +404,7 @@ function resetKeys() {
  * @param {string} [key.key] Key
  * @returns {KeyboardEventInit}
  */
-function getKeys(key = {}) {
+export function getKeys(key = {}) {
   return {
     ...key,
     shiftKey: state.shift,

@@ -1,5 +1,6 @@
 import './style.scss';
 import Ref from 'html-tag-js/ref';
+import actionStack from 'lib/actionStack';
 import constants from 'lib/constants';
 
 let $sidebar;

@@ -1,11 +1,9 @@
 import './fileBrowser.scss';
 
-import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from 'components/page';
 import helpers from 'utils/helpers';
 import contextmenu from 'components/contextmenu';
-import dialogs from 'dialogs';
 import constants from 'lib/constants';
 import filesSettings from 'settings/filesSettings';
 import _template from './fileBrowser.hbs';
@@ -24,6 +22,11 @@ import URLParse from 'url-parse';
 import checkFiles from 'lib/checkFiles';
 import projects from 'lib/projects';
 import appSettings from 'lib/settings';
+import loader from 'dialogs/loader';
+import select from 'dialogs/select';
+import confirm from 'dialogs/confirm';
+import prompt from 'dialogs/prompt';
+import actionStack from 'lib/actionStack';
 
 /**
  * @typedef {{url: String, name: String}} Location
@@ -308,7 +311,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       }
 
       if (!url && action === 'open' && isDir && !idOpenDoc && !isContextMenu) {
-        dialogs.loader.hide();
+        loader.hide();
         util.addPath(name, uuid).then((res) => {
           const storage = allStorages.find((storage) => storage.uuid === uuid);
           storage.url = res.uri;
@@ -394,7 +397,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           options.push(['info', strings.info, 'info']);
         }
 
-        const option = await dialogs.select(strings['select'], options);
+        const option = await select(strings['select'], options);
         switch (option) {
           case 'delete': {
             let deleteFunction = removeFile;
@@ -404,14 +407,14 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
               message = strings['remove entry'].replace('{name}', name);
             }
 
-            const confirmation = await dialogs.confirm(strings.warning, message);
+            const confirmation = await confirm(strings.warning, message);
             if (!confirmation) break;
             deleteFunction();
             break;
           }
 
           case 'rename': {
-            let newname = await dialogs.prompt(strings.rename, name, 'text', {
+            let newname = await prompt(strings.rename, name, 'text', {
               match: constants.FILE_NAME_REGEX,
             });
 
@@ -632,10 +635,10 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
           progress[id] = true;
           const timeout = setTimeout(() => {
-            dialogs.loader.create(name, strings.loading + '...', {
+            loader.create(name, strings.loading + '...', {
               timeout: 10000,
               callback() {
-                dialogs.loader.destroy();
+                loader.destroy();
                 navigate('/', '/');
                 progress[id] = false;
               },
@@ -657,7 +660,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
           delete progress[id];
           clearTimeout(timeout);
-          dialogs.loader.destroy();
+          loader.destroy();
         }
         if (error) return null;
         return {
@@ -751,7 +754,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           val = 'untitled.txt';
         }
 
-        let entryName = await dialogs.prompt(title, val, 'filename', {
+        let entryName = await prompt(title, val, 'filename', {
           match: constants.FILE_NAME_REGEX,
           required: true,
         });
@@ -775,11 +778,11 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           options.push([name, name, icon]);
         });
 
-        project = await dialogs.select(strings['new project'], options);
-        dialogs.loader.create(project, strings.loading + '...');
+        project = await select(strings['new project'], options);
+        loader.create(project, strings.loading + '...');
         projectFiles = await projects.get(project).files();
-        dialogs.loader.destroy();
-        projectName = await dialogs.prompt(
+        loader.destroy();
+        projectName = await prompt(
           strings['project name'],
           project,
           'text',
@@ -790,14 +793,14 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         );
 
         if (!projectName) return;
-        dialogs.loader.create(projectName, strings.loading + '...');
+        loader.create(projectName, strings.loading + '...');
         const fs = fsOperation(url);
         const files = Object.keys(projectFiles); // All project files
 
         newUrl = await fs.createDirectory(projectName);
         projectLocation = Url.join(url, projectName, '/');
         await createProject(files); // Creating project
-        dialogs.loader.destroy();
+        loader.destroy();
         return newUrl;
       }
 

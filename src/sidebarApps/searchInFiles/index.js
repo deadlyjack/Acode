@@ -7,9 +7,10 @@ import fsOperation from 'fileSystem';
 import openFile from 'lib/openFile';
 import addTouchListeners from 'ace/touchHandler';
 import defineMode from './searchResultMode';
-import Sidebar, { preventSlide } from 'components/sidebar';
 import settings from 'lib/settings';
 import helpers from 'utils/helpers';
+import escapeStringRegexp from 'escape-string-regexp';
+import Sidebar, { preventSlide } from 'components/sidebar';
 
 const workers = [];
 const results = [];
@@ -108,6 +109,7 @@ $container.onref = ($el) => {
     showLineNumbers: false,
     fontSize: '14px',
   });
+  searchResult.focus = () => { };
   $container.style.lineHeight = '1.5';
   searchResult.session.setTabSize(1);
   searchResult.renderer.setMargin(0, 0, -20, 0);
@@ -608,7 +610,7 @@ function toRegex(search, options, lookBehind = false) {
   const { caseSensitive = false, wholeWord = false, regExp = false } = options;
 
   let flags = caseSensitive ? 'gm' : 'gim';
-  let regexString = regExp ? search : search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  let regexString = regExp ? search : escapeStringRegexp(search);
 
   if (wholeWord) {
     const wordBoundary = '\\b';
@@ -658,12 +660,13 @@ async function onCursorChange() {
   Sidebar.hide();
   await openFile(url, { render: true });
 
-  if (position) {
-    const { editor } = editorManager;
-    editor.moveCursorTo(position.start.row, position.start.column, false);
-    editor.selection.setRange(position);
-    editor.centerSelection();
-  }
+  if (!position) return;
+
+  const { editor } = editorManager;
+  editor.moveCursorTo(position.start.row, position.start.column, false);
+  editor.selection.setRange(position);
+  editor.centerSelection();
+  editor.focus();
 }
 
 /**

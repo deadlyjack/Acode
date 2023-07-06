@@ -1,3 +1,6 @@
+import './style.scss';
+
+import actionStack from 'lib/actionStack';
 import restoreTheme from 'lib/restoreTheme';
 
 /**
@@ -24,7 +27,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
     onhide,
     then,
     ok,
-    cancle,
+    cancel,
   };
 
   let cancelBtn;
@@ -186,7 +189,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
    * @param {function():void} onCancel Callback function
    * @returns {PromiseLike}
    */
-  function cancle(onCancel) {
+  function cancel(onCancel) {
     _onCancel = onCancel;
     return promiseLike;
   }

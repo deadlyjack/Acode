@@ -1,5 +1,4 @@
 import mimeTypes from 'mime-types';
-import dialogs from "dialogs";
 import run from './run';
 import fsOperation from "fileSystem";
 import helpers from "utils/helpers";
@@ -12,6 +11,7 @@ import appSettings from './settings';
 import tile from "components/tile";
 import Sidebar from 'components/sidebar';
 import startDrag from 'handlers/editorFileTab';
+import confirm from 'dialogs/confirm';
 
 const { Fold } = ace.require('ace/edit_session/fold');
 const { Range } = ace.require('ace/range');
@@ -248,9 +248,6 @@ export default class EditorFile {
 
     this.#onFilePosChange();
     this.#tab.addEventListener('click', tabOnclick.bind(this));
-    this.#tab.addEventListener('touchstart', () => {
-      this.focusedBefore = editorManager.editor.isFocused();
-    });
     appSettings.on('update:openFileListPos', this.#onFilePosChange);
 
     addFile(this);
@@ -586,7 +583,7 @@ export default class EditorFile {
   async remove(force = false) {
     if (this.id === constants.DEFAULT_FILE_SESSION && !editorManager.files.length) return;
     if (!force && this.isUnsaved) {
-      const confirmation = await dialogs.confirm(strings.warning.toUpperCase(), strings['unsaved file']);
+      const confirmation = await confirm(strings.warning.toUpperCase(), strings['unsaved file']);
       if (!confirmation) return;
     }
 
@@ -658,9 +655,14 @@ export default class EditorFile {
    */
   makeActive() {
     const { activeFile, editor, switchFile } = editorManager;
-    if (activeFile?.id === this.id) return;
 
-    activeFile?.removeActive();
+
+    if (activeFile) {
+      if (activeFile.id === this.id) return;
+      activeFile.focusedBefore = activeFile.focused;
+      activeFile.removeActive();
+    }
+
     switchFile(this.id);
 
     if (this.focused) {

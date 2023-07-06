@@ -98,16 +98,19 @@ import loadPolyFill from 'utils/polyfill';
   function assignCustomConsole() {
     window.console = {
       assert(condition, msg, ...substitution) {
+        originalConsole.assert(condition, msg, ...substitution);
         if (!condition) {
           log('error', getStack(new Error()), msg, ...substitution);
         }
       },
       clear() {
+        originalConsole.clear();
         if (isFocused) $input.focus();
         $console.textContent = '';
         $console.appendChild($inputContainer);
       },
       count(hash = 'default') {
+        originalConsole.count(hash);
         if (!counter[hash]) {
           counter[hash] = 1;
         } else {
@@ -116,15 +119,19 @@ import loadPolyFill from 'utils/polyfill';
         log('log', getStack(new Error()), `${hash}: ${counter[hash]}`);
       },
       countReset(hash) {
+        originalConsole.countReset(hash);
         delete counter[hash];
       },
       debug(...args) {
+        originalConsole.debug(...args);
         log('log', getStack(new Error()), ...args);
       },
       dir(...args) {
+        originalConsole.dir(...args);
         log('log', getStack(new Error()), ...args);
       },
       dirxml(...args) {
+        originalConsole.dirxml(...args);
         log('log', getStack(new Error()), ...args);
       },
       error(...args) {
@@ -132,12 +139,15 @@ import loadPolyFill from 'utils/polyfill';
         log('error', getStack(new Error()), ...args);
       },
       group(...args) {
+        originalConsole.group(...args);
         log('log', getStack(new Error()), ...args);
       },
       groupCollapsed(...args) {
+        originalConsole.groupCollapsed(...args);
         log('log', getStack(new Error()), ...args);
       },
       groupEnd(...args) {
+        originalConsole.groupEnd(...args);
         log('log', getStack(new Error()), ...args);
       },
       info(...args) {
@@ -149,15 +159,18 @@ import loadPolyFill from 'utils/polyfill';
         log('log', getStack(new Error()), msg, ...substitution);
       },
       table(...args) {
+        originalConsole.table(...args);
         log('log', getStack(new Error()), ...args);
       },
       time(label = 'default') {
+        originalConsole.time(label);
         if (typeof label !== 'string') {
           throw new TypeError('label must be a string');
         }
         timers[label] = new Date().getTime();
       },
       timeEnd(label = 'default') {
+        originalConsole.timeEnd(label);
         if (typeof label !== 'string') {
           throw new TypeError('label must be a string');
         }
@@ -169,6 +182,7 @@ import loadPolyFill from 'utils/polyfill';
         delete timers[label];
       },
       timeLog(label = 'default') {
+        originalConsole.timeLog(label);
         if (typeof label !== 'string') {
           throw new TypeError('label must be a string');
         }
@@ -179,6 +193,7 @@ import loadPolyFill from 'utils/polyfill';
         log('log', getStack(new Error()), `${label}: ${time}ms`);
       },
       trace(...args) {
+        originalConsole.trace(...args);
         log('trace', getStack(new Error()), ...args);
       },
       warn(msg, ...substitution) {

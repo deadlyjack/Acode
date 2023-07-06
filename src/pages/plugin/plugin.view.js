@@ -1,17 +1,18 @@
+import Url from 'utils/Url';
 import Ref from 'html-tag-js/ref';
-import alert from '../../dialogs/alert';
-import fsOperation from '../../fileSystem';
-import constants from '../../lib/constants';
-import Url from '../../utils/Url';
+import alert from 'dialogs/alert';
+import fsOperation from 'fileSystem';
+import constants from 'lib/constants';
+import actionStack from 'lib/actionStack';
 
 export default (props) => {
   const {
     id,
     name,
-    downloads,
     body,
     icon,
     author,
+    downloads,
     votes_up: votesUp,
     votes_down: votesDown,
     author_github: authorGithub,
@@ -59,7 +60,18 @@ export default (props) => {
   </div>;
 };
 
-function Buttons({ isPaid, installed, update, install, uninstall, purchased, price, buy }) {
+function Buttons({ name, isPaid, installed, update, install, uninstall, purchased, price, buy, minVersionCode }) {
+  if (typeof minVersionCode === 'number' && minVersionCode > BuildInfo.versionCode) {
+    return <div className='error'>
+      <span className='icon info'></span>
+      <a href={constants.PLAY_STORE_URL} className='text'>{
+        strings['plugin min version']
+          .replace('{name}', name)
+          .replace('{v-code}', minVersionCode)
+      }</a>
+    </div>;
+  }
+
   if (installed && update) {
     return <>
       <button onclick={uninstall}>{strings.uninstall}</button>

@@ -119,6 +119,18 @@
       margin: 0 10px;
       border-radius: 4px;
     }
+
+    .error {
+      display: flex;
+      color: rgb(255, 185, 92);
+      color: var(--error-text-color);
+      align-items: center;
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
   }
 
   .body {

@@ -1,6 +1,7 @@
 import autosize from 'autosize';
 import appSettings from 'lib/settings';
 import restoreTheme from 'lib/restoreTheme';
+import actionStack from 'lib/actionStack';
 
 /**
  * @typedef {Object} PromptOptions
