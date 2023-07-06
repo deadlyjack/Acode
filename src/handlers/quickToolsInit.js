@@ -41,7 +41,9 @@ function reset() {
 export default function init() {
   const { $footer, $toggler, $input } = quickTools;
 
-  $toggler.addEventListener('click', () => {
+  $toggler.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     actions('toggle');
   });
 

@@ -42,7 +42,7 @@ export function getEncoding(charset) {
 /**
  * Decodes arrayBuffer to String according given encoding type
  * @param {ArrayBuffer} buffer
- * @param {String} [charset]
+ * @param {string} [charset]
  * @returns {Promise<string>}
  */
 export async function decode(buffer, charset) {
@@ -67,6 +67,12 @@ export async function decode(buffer, charset) {
   return text;
 }
 
+/**
+ * Encodes text to ArrayBuffer according given encoding type
+ * @param {string} text 
+ * @param {string} charset 
+ * @returns {Promise<ArrayBuffer>}
+ */
 export function encode(text, charset) {
   if (!charset) {
     charset = settings.value.defaultFileEncoding;

@@ -109,6 +109,7 @@ $container.onref = ($el) => {
     showLineNumbers: false,
     fontSize: '14px',
   });
+  searchResult.focus = () => { };
   $container.style.lineHeight = '1.5';
   searchResult.session.setTabSize(1);
   searchResult.renderer.setMargin(0, 0, -20, 0);
@@ -659,12 +660,13 @@ async function onCursorChange() {
   Sidebar.hide();
   await openFile(url, { render: true });
 
-  if (position) {
-    const { editor } = editorManager;
-    editor.moveCursorTo(position.start.row, position.start.column, false);
-    editor.selection.setRange(position);
-    editor.centerSelection();
-  }
+  if (!position) return;
+
+  const { editor } = editorManager;
+  editor.moveCursorTo(position.start.row, position.start.column, false);
+  editor.selection.setRange(position);
+  editor.centerSelection();
+  editor.focus();
 }
 
 /**

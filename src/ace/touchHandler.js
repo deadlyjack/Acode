@@ -80,12 +80,12 @@ export default function addTouchListeners(editor, minimal, onclick) {
    */
   const $menu = <menu className='cursor-menu'></menu>;
   const timeToSelectText = 500; // ms
-  const config = { passive: false, }; // event listener config
+  const config = { passive: false }; // event listener config
 
   let scrollTimeout; // timeout to check if scrolling is finished
   let menuActive; // true if menu is active
   let selectionActive; // true if selection is active
-  let animation; // animation frame id
+  let animation; // scroll animation frame id
   let moveY; // touch difference in vertical direction
   let moveX; // touch difference in horizontal direction
   let lastX; // last x
@@ -98,7 +98,8 @@ export default function addTouchListeners(editor, minimal, onclick) {
   let teardropDoesShowMenu = true; // teardrop handler
   let teardropTouchEnded = false; // teardrop handler
   let teardropMoveTimeout; // teardrop handler
-  let $activeTeardrop;
+  let forceCursorMode = false; // force to show cursor
+  let $activeTeardrop; // active teardrop
 
   $el.addEventListener('touchstart', touchStart, config, true);
   scroller.addEventListener('contextmenu', contextmenu, config);
@@ -296,37 +297,35 @@ export default function addTouchListeners(editor, minimal, onclick) {
       }
     }
 
-    if (mode === 'cursor') {
-      e.preventDefault();
-      if (!minimal) {
-        const shiftKey = key.shift || e.shiftKey;
-        const ctrlKey = key.ctrl || e.ctrlKey;
-        if (ctrlKey) {
-          moveCursorTo(clientX, clientY, false, true);
-          return;
-        }
-
-        moveCursorTo(clientX, clientY, shiftKey);
-        if (shiftKey) {
-          selectionMode($end);
-          return;
-        }
-        cursorMode();
-      } else {
-        moveCursorTo(clientX, clientY);
-        if (onclick) onclick();
-      }
-      return;
-    }
-
     if (mode === 'scroll') {
       scrollAnimation(moveX, moveY);
       return;
     }
 
+    cancelAnimationFrame(animation);
+    if (minimal && mode === 'cursor') {
+      moveCursorTo(clientX, clientY);
+      if (onclick) onclick();
+      return;
+    } else if (minimal) {
+      return;
+    }
+
+    if (mode === 'cursor') {
+      e.preventDefault();
+      const shiftKey = key.shift || e.shiftKey;
+      const ctrlKey = key.ctrl || e.ctrlKey;
+      moveCursorTo(clientX, clientY, shiftKey, ctrlKey);
+      if (!ctrlKey && !shiftKey) {
+        forceCursorMode = true;
+        cursorMode();
+      }
+      if (!editor.isFocused()) editor.focus();
+      return;
+    }
+
     if (mode === 'selection') {
       e.preventDefault();
-      if (minimal) return;
       moveCursorTo(clientX, clientY);
       select();
       vibrate();
@@ -335,7 +334,6 @@ export default function addTouchListeners(editor, minimal, onclick) {
 
     if (mode === 'select-line') {
       e.preventDefault();
-      if (minimal) return;
       moveCursorTo(clientX, clientY);
       editor.selection.selectLine();
       selectionMode($end);
@@ -383,11 +381,13 @@ export default function addTouchListeners(editor, minimal, onclick) {
    */
   function contextmenu(e) {
     e.preventDefault();
+    e.stopPropagation();
     if (minimal) return;
     const { clientX, clientY } = e;
     moveCursorTo(clientX, clientY);
     select();
     selectionMode($end);
+    editor.focus();
   }
 
   /**
@@ -398,9 +398,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
     removeListeners();
     const range = editor.selection.getWordRange();
     if (!range || range?.isEmpty()) return;
-    editor.blur();
     editor.selection.setSelectionRange(range);
-    editor.focus();
     selectionMode($end);
   }
 
@@ -529,6 +527,15 @@ export default function addTouchListeners(editor, minimal, onclick) {
   function moveCursorTo(x, y, shiftKey = false, ctrlKey = false) {
     const pos = renderer.screenToTextCoordinates(x, y);
 
+    hideTooltip();
+
+    if (shiftKey) {
+      const anchor = editor.selection.getSelectionAnchor() || editor.getCursorPosition();
+      editor.selection.setRange({ start: anchor, end: pos });
+      selectionMode($end);
+      return;
+    }
+
     if (ctrlKey) {
       const range = new Range(pos.row, pos.column, pos.row, pos.column);
       const ranges = editor.selection.getAllRanges();
@@ -544,21 +551,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
       return;
     }
 
-    editor.blur();
-    if (shiftKey) {
-      let anchor = editor.selection.getSelectionAnchor();
-      if (!anchor) {
-        anchor = editor.getCursorPosition();
-      }
-      editor.selection.setRange({
-        start: anchor,
-        end: pos,
-      });
-    } else {
-      editor.selection.moveToPosition(pos);
-    }
-    editor.focus();
-    hideTooltip();
+    editor.selection.moveToPosition(pos);
   }
 
   /**
@@ -566,11 +559,12 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * @returns {void}
    */
   function cursorMode() {
-    if (!teardropSize || !editor.isFocused()) {
+    if ((!teardropSize || !editor.isFocused()) && !forceCursorMode) {
       $cursor.remove();
       return;
     }
 
+    forceCursorMode = false;
     clearTimeout($cursor.dataset.timeout);
     clearSelectionMode();
 
@@ -850,7 +844,6 @@ export default function addTouchListeners(editor, minimal, onclick) {
     if (clientY < parent.top) dx = -lineHeight;
     if (clientY > parent.bottom) dx = lineHeight;
     if (dx) {
-      console.log('dx', dx);
       teardropMoveTimeout = setTimeout(() => {
         const top = editor.session.getScrollTop();
         editor.session.setScrollTop(top + dx);
@@ -909,6 +902,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * Editor container on scroll end
    */
   function onscrollend() {
+    editor._emit('scroll-end');
     if (selectionActive) {
       selectionMode();
     }

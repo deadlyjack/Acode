@@ -10,6 +10,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.ImageDecoder;
@@ -21,6 +22,7 @@ import android.provider.Settings.Global;
 import android.util.Base64;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import androidx.core.content.FileProvider;
 import androidx.core.content.pm.ShortcutInfoCompat;
@@ -97,6 +99,9 @@ public class System extends CordovaPlugin {
       case "decode":
       case "encode":
         break;
+      case "get-configuration":
+        getConfiguration(callbackContext);
+        return true;
       case "set-input-type":
         setInputType(arg1);
         callbackContext.success();
@@ -220,6 +225,37 @@ public class System extends CordovaPlugin {
       );
 
     return true;
+  }
+
+  private void getConfiguration(CallbackContext callback) {
+    try {
+      JSONObject result = new JSONObject();
+      Configuration config = context.getResources().getConfiguration();
+      InputMethodManager imm = (InputMethodManager) context.getSystemService(
+        Context.INPUT_METHOD_SERVICE
+      );
+      Method method =
+        InputMethodManager.class.getMethod("getInputMethodWindowVisibleHeight");
+
+      result.put("isAcceptingText", imm.isAcceptingText());
+      result.put("keyboardHeight", method.invoke(imm));
+      result.put("locale", config.locale.toString());
+      result.put("fontScale", config.fontScale);
+      result.put("keyboard", config.keyboard);
+      result.put("keyboardHidden", config.keyboardHidden);
+      result.put("hardKeyboardHidden", config.hardKeyboardHidden);
+      result.put("navigationHidden", config.navigationHidden);
+      result.put("navigation", config.navigation);
+      result.put("orientation", config.orientation);
+      callback.success(result);
+    } catch (
+      JSONException
+      | NoSuchMethodException
+      | IllegalAccessException
+      | InvocationTargetException error
+    ) {
+      callback.error(error.toString());
+    }
   }
 
   private void decode(

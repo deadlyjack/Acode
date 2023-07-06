@@ -173,9 +173,19 @@ async function run(
     }
   }
 
+  /**
+   * Requests handler
+   * @param {object} req
+   * @param {string} req.requestId
+   * @param {string} req.path 
+   */
   function handleRequest(req) {
     const reqId = req.requestId;
-    const reqPath = req.path.endsWith('/') ? req.path + 'index.html' : req.path;
+    let reqPath = req.path.substring(1);
+
+    if (!reqPath || reqPath.endsWith('/')) {
+      reqPath += 'index.html';
+    }
 
     const ext = Url.extname(reqPath);
     let url = null;

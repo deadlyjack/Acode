@@ -441,11 +441,13 @@ function execOperation(type, action, url, $target, name) {
     CASE += srcCollapsed ? 1 : 0;
     CASE += $target.collapsed ? 1 : 0;
 
+    startLoading();
     const fs = fsOperation(clipBoard.url);
     let newUrl;
     if (clipBoard.action === 'cut') newUrl = await fs.moveTo(url);
     else newUrl = await fs.copyTo(url);
     const { name: newName } = await fsOperation(newUrl).stat();
+    stopLoading();
     /**
      * CASES:
      * CASE 111: src is file and parent is collapsed where target is also collapsed

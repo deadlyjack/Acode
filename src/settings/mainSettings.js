@@ -3,7 +3,7 @@ import editorSettings from './editorSettings';
 import backupRestore from './backupRestore';
 import themeSetting from 'pages/themeSetting';
 import otherSettings from './appSettings';
-import defaultFormatter from './defaultFormatter';
+import defaultFormatter from './formatter';
 import rateBox from 'dialogs/rateBox';
 import Donate from 'pages/donate';
 import plugins from 'pages/plugins';

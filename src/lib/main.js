@@ -6,49 +6,53 @@ import 'styles/page.scss';
 import 'styles/list.scss';
 import 'styles/overrideAceStyle.scss';
 
-import 'ace/modelist';
-import 'ace/mode-smali';
-import 'components/WebComponents';
 import 'lib/polyfill';
+import 'ace/supportedModes';
+import 'components/WebComponents';
 
-import mustache from 'mustache';
-import ajax from '@deadlyjack/ajax';
-import tile from 'components/tile';
-import Sidebar from 'components/sidebar';
-import contextmenu from 'components/contextmenu';
-import EditorManager from './editorManager';
-import actionStack from './actionStack';
-import helpers from 'utils/helpers';
-import settings from './settings';
-import intentHandler from 'handlers/intent';
-import openFolder, { addedFolder } from './openFolder';
-import quickToolsInit from 'handlers/quickToolsInit';
-import loadPolyFill from 'utils/polyfill';
 import Url from 'utils/Url';
-import applySettings from './applySettings';
+import lang from 'lib/lang';
+import Acode from 'lib/acode';
+import themes from 'lib/themes';
+import mustache from 'mustache';
+import startAd from 'lib/startAd';
+import tile from 'components/tile';
+import ajax from '@deadlyjack/ajax';
+import helpers from 'utils/helpers';
+import settings from 'lib/settings';
+import $_menu from 'views/menu.hbs';
+import openFile from 'lib/openFile';
+import plugins from 'pages/plugins';
 import fsOperation from 'fileSystem';
 import toast from 'components/toast';
-import $_menu from 'views/menu.hbs';
-import $_fileMenu from 'views/file-menu.hbs';
-import restoreFiles from './restoreFiles';
-import loadPlugins from './loadPlugins';
-import checkPluginsUpdate from './checkPluginsUpdate';
-import plugins from 'pages/plugins';
-import Acode from './acode';
-import lang from './lang';
-import EditorFile from './editorFile';
 import sidebarApps from 'sidebarApps';
-import checkFiles from './checkFiles';
-import themes from './themes';
-import { initFileList } from './fileList';
+import EditorFile from 'lib/editorFile';
+import openFolder from 'lib/openFolder';
+import checkFiles from 'lib/checkFiles';
+import Sidebar from 'components/sidebar';
+import actionStack from 'lib/actionStack';
+import loadPolyFill from 'utils/polyfill';
+import loadPlugins from 'lib/loadPlugins';
+import tutorial from 'components/tutorial';
+import intentHandler from 'handlers/intent';
+import restoreFiles from 'lib/restoreFiles';
+import $_fileMenu from 'views/file-menu.hbs';
+import EditorManager from 'lib/editorManager';
+import applySettings from 'lib/applySettings';
+import keyboardHandler from 'handlers/keyboard';
+import contextmenu from 'components/contextmenu';
+import otherSettings from 'settings/appSettings';
+import windowResize from 'handlers/windowResize';
+import quickToolsInit from 'handlers/quickToolsInit';
+import QuickTools from 'pages/quickTools/quickTools';
+import checkPluginsUpdate from 'lib/checkPluginsUpdate';
+
+import { initModes } from 'ace/modelist';
+import { initFileList } from 'lib/fileList';
+import { addedFolder } from 'lib/openFolder';
+import { keydownState } from 'handlers/keyboard';
 import { getEncoding, initEncodings } from 'utils/encodings';
 import { resetKeyBindings, setKeyBindings } from 'ace/commands';
-import QuickTools from 'pages/quickTools/quickTools';
-import otherSettings from 'settings/appSettings';
-import tutorial from 'components/tutorial';
-import openFile from './openFile';
-import startAd from './startAd';
-import keyboardHandler, { keydownState } from '../handlers/keyboard';
 
 const previousVersionCode = parseInt(localStorage.versionCode, 10);
 
@@ -69,7 +73,7 @@ async function Main() {
     }
   };
 
-  window.addEventListener('resize', resizeHandler);
+  window.addEventListener('resize', windowResize);
   document.addEventListener('pause', pauseHandler);
   document.addEventListener('resume', resumeHandler);
   document.addEventListener('keydown', keyboardHandler);
@@ -265,6 +269,7 @@ async function loadApp() {
   //#endregion
 
   //#region Add event listeners
+  initModes();
   initFileList();
   quickToolsInit();
   sidebarApps.init($sidebar);
@@ -523,20 +528,11 @@ function showTutorials() {
   }
 }
 
-/**
- * Hide banner ad when focused element is blurred
- * @this {HTMLElement}
- */
-function activeElementOnBlur() {
-  const active = !!window.ad?.active;
-  if (active) {
-    window.ad.show();
-  }
-
-  this.removeEventListener('blur', activeElementOnBlur);
-}
-
 function backButtonHandler() {
+  if (keydownState.esc) {
+    keydownState.esc = false;
+    return;
+  }
   actionStack.pop();
 }
 
@@ -551,20 +547,4 @@ function pauseHandler() {
 function resumeHandler() {
   if (!settings.value.checkFiles) return;
   checkFiles();
-}
-
-function resizeHandler() {
-  const bannerIsActive = !!window.ad?.active;
-  const $activeElement = document.activeElement;
-  const isEditable = $activeElement instanceof HTMLInputElement
-    || $activeElement instanceof HTMLTextAreaElement
-    || $activeElement?.isContentEditable;
-
-  if (isEditable && bannerIsActive) {
-    window.ad?.hide();
-  } else if (bannerIsActive) {
-    window.ad?.show();
-  }
-
-  $activeElement.addEventListener('blur', activeElementOnBlur);
 }

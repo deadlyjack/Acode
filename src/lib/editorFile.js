@@ -248,9 +248,6 @@ export default class EditorFile {
 
     this.#onFilePosChange();
     this.#tab.addEventListener('click', tabOnclick.bind(this));
-    this.#tab.addEventListener('touchstart', () => {
-      this.focusedBefore = editorManager.editor.isFocused();
-    });
     appSettings.on('update:openFileListPos', this.#onFilePosChange);
 
     addFile(this);
@@ -658,9 +655,14 @@ export default class EditorFile {
    */
   makeActive() {
     const { activeFile, editor, switchFile } = editorManager;
-    if (activeFile?.id === this.id) return;
 
-    activeFile?.removeActive();
+
+    if (activeFile) {
+      if (activeFile.id === this.id) return;
+      activeFile.focusedBefore = activeFile.focused;
+      activeFile.removeActive();
+    }
+
     switchFile(this.id);
 
     if (this.focused) {
