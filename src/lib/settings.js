@@ -139,6 +139,7 @@ class Settings {
       maxDirCount: 100,
       defaultFileEncoding: 'UTF-8',
       inlineAutoCompletion: true,
+      colorPreview: true,
     };
     this.value = structuredClone(this.#defaultSettings);
   }

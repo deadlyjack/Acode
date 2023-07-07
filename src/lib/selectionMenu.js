@@ -18,7 +18,7 @@ export default function selectionMenu() {
     item(() => exec('cut'), <span className="icon cut"></span>, 'selected'),
     item(() => exec('paste'), <span className="icon paste"></span>, 'all'),
     item(() => exec('selectall'), <span className="icon text_format"></span>, 'all', true),
-    item(() => acode.exec('insert-color'), <span className='icon color_lenspalette'></span>, 'all'),
+    item((color) => acode.exec('insert-color', color), <span className='icon color_lenspalette'></span>, 'all'),
     ...items,
   ];
 };
@@ -28,7 +28,7 @@ export default function selectionMenu() {
  * @param {function} onclick function to be called when the item is clicked
  * @param {string | HTMLElement} text content of the item
  * @param {'selected'|'all'} mode mode supported by the item
- * @param {boolean} readOnly wheather to show the item in readOnly mode
+ * @param {boolean} readOnly whether to show the item in readOnly mode
  */
 selectionMenu.add = (onclick, text, mode, readOnly) => {
   items.push(item(onclick, text, mode, readOnly));

@@ -95,14 +95,16 @@ function color(defaultColor, onhide) {
       setTimeout(() => {
         document.body.removeChild(box);
         document.body.removeChild(mask);
+        if (typeof onhide === 'function') onhide();
       }, 300);
     }
 
     function hide() {
       actionStack.remove('box');
+      const height = box.clientHeight;
+      box.style.height = height + 'px';
       picker.destroy();
       hideSelect();
-      if (typeof onhide === 'function') onhide();
     }
 
     function onChange(c) {

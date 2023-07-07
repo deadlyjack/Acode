@@ -82,6 +82,8 @@ export default function addTouchListeners(editor, minimal, onclick) {
   const timeToSelectText = 500; // ms
   const config = { passive: false }; // event listener config
 
+  const ACE_NO_CURSOR = '.ace_gutter,.ace_gutter *,.ace_fold,.ace_inline_button';
+
   let scrollTimeout; // timeout to check if scrolling is finished
   let menuActive; // true if menu is active
   let selectionActive; // true if selection is active
@@ -175,11 +177,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
       return;
     }
 
-    if (
-      $gutter.contains($target)
-      || $target.classList.contains('ace_fold')
-      || $target.classList.contains('ace_inline_button')
-    ) {
+    if ($target.matches(ACE_NO_CURSOR)) {
       moveCursorTo(0, clientY);
       return;
     }

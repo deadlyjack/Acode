@@ -23,6 +23,10 @@ import confirm from 'dialogs/confirm';
 import select from 'dialogs/select';
 import prompt from 'dialogs/prompt';
 import color from 'dialogs/color';
+import { COLOR_REGEX, NAMED_COLORS } from 'utils/color';
+import escapeStringRegexp from 'escape-string-regexp';
+
+const { Range } = ace.require('ace/range');
 
 export default {
   async 'close-all-tabs'() {
@@ -245,24 +249,44 @@ export default {
   'toggle-editmenu'() {
     tag.get('[action=toggle-edit-menu')?.click();
   },
-  'insert-color'() {
+  async 'insert-color'() {
     const { editor } = editorManager;
-    let selectedText = editor.session.getTextRange(editor.getSelectionRange());
+    let defaultColor;
+    let range;
 
-    if (!helpers.isValidColor(selectedText)) {
-      selectedText = undefined;
+    // get range of current word i.e. color
+    const cursorPos = editor.selection.getCursor();
+    /**@type {string} */
+    const line = editor.session.getLine(cursorPos.row);
+
+    // match color in current line and get range
+    const regex = new RegExp(COLOR_REGEX, 'ig');
+    let match;
+
+    while (match = regex.exec(line)) {
+      const start = match.index;
+      const end = match.index + match[0].length;
+
+      if (cursorPos.column >= start && cursorPos.column <= end) {
+        range = new Range(cursorPos.row, start, cursorPos.row, end);
+        defaultColor = match[0];
+        break;
+      }
     }
 
     editor.blur();
-    (async () => {
-      const wasFocused = editorManager.activeFile.focused;
-      const res = await color(selectedText, () => {
-        if (wasFocused) {
-          editor.focus();
-        }
-      });
-      editor.insert(res);
-    })();
+    const wasFocused = editorManager.activeFile.focused;
+    const res = await color(defaultColor, () => {
+      if (wasFocused) {
+        editor.focus();
+      }
+    });
+
+    if (range) {
+      editor.session.replace(range, res);
+      return;
+    }
+    editor.insert(res);
   },
   'copy'() {
     editorManager.editor.execCommand('copy');

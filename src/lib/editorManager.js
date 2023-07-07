@@ -6,7 +6,9 @@ import EditorFile from './editorFile';
 import sidebarApps from 'sidebarApps';
 import quickTools from 'components/quickTools';
 import keyboardHandler from 'handlers/keyboard';
+import initColorView from 'ace/colorView';
 import { keydownState } from 'handlers/keyboard';
+import { deactivateColorView } from 'ace/colorView';
 import { setCommands, setKeyBindings } from 'ace/commands';
 import { HARDKEYBOARDHIDDEN_NO, getSystemConfiguration } from './systemConfiguration';
 
@@ -118,6 +120,8 @@ async function EditorManager($header, $body) {
     }
   };
 
+  // set mode text
+  editor.setSession(ace.createEditSession('', 'ace/mode/text'));
   $body.appendChild($container);
   await setupEditor();
 
@@ -204,6 +208,14 @@ async function EditorManager($header, $body) {
 
   appSettings.on('update:printMargin', function (value) {
     editor.setOption('printMarginColumn', value);
+  });
+
+  appSettings.on('update:colorPreview', function (value) {
+    if (value) {
+      return initColorView(editor);
+    }
+
+    deactivateColorView();
   });
 
   return manager;
@@ -306,6 +318,10 @@ async function EditorManager($header, $body) {
       }
     });
 
+    if (settings.colorPreview) {
+      initColorView(editor);
+    }
+
     touchListeners(editor);
     setCommands(editor);
     await setKeyBindings(editor);
@@ -334,7 +350,7 @@ async function EditorManager($header, $body) {
     editor.setOption('printMarginColumn', settings.printMargin);
     editor.setOption('enableBasicAutocompletion', true);
     editor.setOption('enableLiveAutocompletion', settings.liveAutoCompletion);
-    editor.setOption('enableInlineAutocompletion', settings.inlineAutoCompletion);
+    // editor.setOption('enableInlineAutocompletion', settings.inlineAutoCompletion);
 
     if (!appSettings.value.textWrap) {
       editor.renderer.setScrollMargin(0, 0, 0, settings.leftMargin);
@@ -364,13 +380,9 @@ async function EditorManager($header, $body) {
     const cursorPos = editor.getCursorPosition();
     const contentTop = container.getBoundingClientRect().top;
     const contentBottom = contentTop + container.clientHeight;
-    let cursorTop = editor.renderer.textToScreenCoordinates(cursorPos.row, cursorPos.column).pageY;
-
-    if (cursorTop === contentTop) return true;
-
-    cursorTop -= teardropSize + 10;
-
-    return cursorTop >= contentTop && cursorTop <= contentBottom;
+    const cursorTop = editor.renderer.textToScreenCoordinates(cursorPos.row, cursorPos.column).pageY;
+    const cursorBottom = cursorTop + teardropSize + 10;
+    return cursorTop >= contentTop && cursorBottom <= contentBottom;
   }
 
   /**
@@ -569,7 +581,7 @@ async function EditorManager($header, $body) {
   }
 
   /**
-   *
+   * Gets a file from the file manager
    * @param {string|number} checkFor
    * @param {"id"|"name"|"uri"} [type]
    * @returns {File}

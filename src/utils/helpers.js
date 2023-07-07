@@ -5,6 +5,7 @@ import path from './Path';
 import Url from './Url';
 import Uri from './Uri';
 import alert from 'dialogs/alert';
+import { isValidColor } from './color';
 
 /**
  * Gets programming language name according to filename
@@ -187,11 +188,7 @@ export default {
    * @returns 
    */
   isValidColor(value) {
-    return (
-      /#[0-9a-f]{3,8}/.test(value) ||
-      /rgba?\(\d{1,3},\s?\d{1,3},\s?\d{1,3}(,\s?[0-1])?\)/.test(value) ||
-      /hsla?\(\d{1,3},\s?\d{1,3}%,\s?\d{1,3}%(,\s?[0-1])?\)/.test(value)
-    );
+    return isValidColor(value);
   },
   /**
    * Returns unique ID
@@ -368,4 +365,4 @@ export default {
       timeout = setTimeout(later, wait);
     };
   }
-};
+};;;

@@ -83,7 +83,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
     decTime();
     actionStack.push({
       id: 'box',
-      action: hideSelect,
+      action: hideBox,
     });
 
     document.body.append(box, mask);
@@ -104,7 +104,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
     }
   }
 
-  function hideSelect() {
+  function hideBox() {
     box.classList.add('hide');
     restoreTheme();
     setTimeout(() => {
@@ -122,7 +122,7 @@ function box(titleText, html, hideButtonText, cancelButtonText) {
       }
     }
     actionStack.remove('box');
-    hideSelect();
+    hideBox();
   }
 
   function _hide() {

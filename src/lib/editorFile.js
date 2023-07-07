@@ -747,7 +747,7 @@ export default class EditorFile {
   async #fileAction(action, mimeType) {
     try {
       const uri = await this.#getShareableUri();
-      if (!mimeType) mimeType = mimeTypes.lookup(this.name);
+      if (!mimeType) mimeType = mimeTypes.lookup(this.name) || 'text/plain';
       system.fileAction(uri, this.filename, action, mimeType, this.#showNoAppError);
     } catch (error) {
       toast(strings.error);

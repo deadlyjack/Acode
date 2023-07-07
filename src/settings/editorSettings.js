@@ -152,6 +152,11 @@ export default function editorSettings() {
       index: 0,
       key: 'scroll-settings',
       text: strings['scroll settings'],
+    },
+    {
+      key: 'colorPreview',
+      text: strings['color preview'],
+      checkbox: values.colorPreview,
     }
   ];
 
