@@ -7,7 +7,7 @@ import helpers from 'utils/helpers';
 import { Irid } from 'irid';
 import { HEX, HSL, HSLA, RGB, RGBA } from 'utils/color';
 
-const COLORPICKER_TOKEN_CLASS = '.ace_numeric,.ace_color';
+const COLORPICKER_TOKEN_CLASS = '.ace_color';
 const changedRules = [];
 
 let editor = null;
@@ -15,13 +15,28 @@ let editor = null;
 /**
  * Initialize color view
  * @param {AceAjax.Editor} e Editor instance
+ * @param {boolean} [force=false] Force update color view
  */
-export default function initColorView(e) {
+export default function initColorView(e, force = false) {
   editor = e;
   const { renderer } = editor;
 
   editor.on('changeMode', onChangeMode);
   renderer.on('afterRender', afterRender);
+
+  if (force) {
+    const { files } = editorManager;
+
+    if (Array.isArray(files)) {
+      files.forEach(file => {
+        if (file.session) {
+          file.session._addedColorRule = false;
+        }
+      });
+    }
+
+    onChangeMode();
+  }
 }
 
 export function deactivateColorView() {
@@ -29,7 +44,7 @@ export function deactivateColorView() {
 
   changedRules.forEach((rule) => rule.shift());
   changedRules.length = 0;
-  forceRender();
+  forceTokenizer();
 
   editor.off('changeMode', onChangeMode);
   renderer.off('afterRender', afterRender);
@@ -82,25 +97,43 @@ function onChangeMode() {
 
   if (!forceUpdate) return;
 
-  forceRender();
+  forceTokenizer();
 }
 
 function afterRender() {
   const { session, renderer } = editor;
   const { content } = renderer;
+  let classes = COLORPICKER_TOKEN_CLASS;
 
   // if session is css, scss, less, sass, stylus, or html (with css mode), continue
 
-  if (!sessionSupportsColor(session)) {
+  const mode = sessionSupportsColor(session);
+  if (!mode) {
     return;
   }
 
-  content.getAll(COLORPICKER_TOKEN_CLASS).forEach(( /**@type {HTMLElement} */ el) => {
+  if (mode === 'scss') {
+    classes += ',.ace_function';
+  }
+
+  content.getAll(COLORPICKER_TOKEN_CLASS).forEach(( /**@type {HTMLElement} */ el, i, els) => {
     let content = el.textContent;
+    const previousContent = els[i - 1]?.textContent;
+    const nextContent = els[i + 1]?.textContent;
+    const multiLinePrev = previousContent + content;
+    const multiLineNext = content + nextContent;
 
     if (el.dataset.modified === 'true') return;
 
-    if (!(helpers.isValidColor(content) || el.classList.contains('ace_color'))) return;
+    if (!helpers.isValidColor(content)) {
+      if (helpers.isValidColor(multiLinePrev)) {
+        content = multiLinePrev;
+      } else if (helpers.isValidColor(multiLineNext)) {
+        content = multiLineNext;
+      } else {
+        return;
+      }
+    }
 
     try {
       const brightness = Irid(content).lightness();
@@ -114,7 +147,7 @@ function afterRender() {
   });
 }
 
-function forceRender() {
+function forceTokenizer() {
   const { session } = editor;
   // force recreation of tokenizer
   session.$mode.$tokenizer = null;

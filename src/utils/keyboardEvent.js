@@ -12,7 +12,30 @@
  * @property {boolean} metaKey whether the meta key was pressed or not
  */
 
-const keys = ace.require('ace/lib/keys');
+const keys = {
+  // arrow keys
+  37: "ArrowLeft",
+  38: "ArrowUp",
+  39: "ArrowRight",
+  40: "ArrowDown",
+  // special keys
+  8: "Backspace",
+  9: "Tab",
+  13: "Enter",
+  16: "ShiftLeft",
+  17: "ControlLeft",
+  18: "AltLeft",
+  19: "Pause",
+  20: "CapsLock",
+  27: "Escape",
+  32: " ",
+  33: "PageUp",
+  34: "PageDown",
+  35: "End",
+  36: "Home",
+  45: "Insert",
+  46: "Delete",
+};
 
 
 const initKeyboardEventType = (function (event) {
@@ -92,8 +115,15 @@ export default function KeyboardEvent(type, dict) {
   let propName;
   let localDict = {};
 
-  if (!dict.keyCode && dict.key) {
-    dict.keyCode = keys[dict.key.toLowerCase()] || dict.key.charCodeAt(0);
+  if (!dict.key && (dict.keyCode || dict.which)) {
+    let key = keys[dict.keyCode || dict.which];
+    if (!key) key = String.fromCharCode(dict.keyCode || dict.which);
+    dict.key = key;
+  } else if (dict.key && !dict.which && !dict.keyCode) {
+    let keyCode = Object.keys(keys).find(key => keys[key] === dict.key);
+    if (!keyCode) keyCode = dict.key.charCodeAt(0);
+    dict.keyCode = keyCode;
+    dict.which = keyCode;
   }
 
   for (propName in keyboardEventPropertiesDictionary)

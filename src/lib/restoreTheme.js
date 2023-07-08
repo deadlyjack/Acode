@@ -5,6 +5,12 @@ import { Irid } from 'irid';
 let busy = false;
 let lastCall;
 
+/**
+ * Restores the theme or darkens the status bar and navigation bar
+ * Used when dialogs are opened which has mask that darkens the background
+ * @param {boolean} darken Whether to darken the status bar and navigation bar
+ * @returns 
+ */
 export default function restoreTheme(darken) {
   if (busy) {
     lastCall = darken;

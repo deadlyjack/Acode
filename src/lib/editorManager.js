@@ -212,7 +212,7 @@ async function EditorManager($header, $body) {
 
   appSettings.on('update:colorPreview', function (value) {
     if (value) {
-      return initColorView(editor);
+      return initColorView(editor, true);
     }
 
     deactivateColorView();
@@ -243,7 +243,7 @@ async function EditorManager($header, $body) {
     editor.on('focus', async () => {
       const { activeFile } = manager;
       activeFile.focused = true;
-      keyboardHandler.on('keyBoardShow', scrollCursorIntoView);
+      keyboardHandler.on('keyboardShow', scrollCursorIntoView);
 
       if (isScrolling) return;
 
@@ -362,7 +362,7 @@ async function EditorManager($header, $body) {
   }
 
   function scrollCursorIntoView() {
-    keyboardHandler.off('keyBoardShow', scrollCursorIntoView);
+    keyboardHandler.off('keyboardShow', scrollCursorIntoView);
     if (isCursorVisible()) return;
     const { teardropSize } = appSettings.value;
     editor.renderer.scrollCursorIntoView();

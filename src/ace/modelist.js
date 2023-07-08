@@ -84,7 +84,7 @@ class Mode {
       re = "^.*\\.(" + extensions + ")$";
     }
 
-    this.extRe = new RegExp(re, "gi");
+    this.extRe = new RegExp(re, "i");
   }
 
   supportsFile(filename) {

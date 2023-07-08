@@ -156,10 +156,12 @@ export default {
     readOnly: true,
   },
   fold: {
+    description: 'Fold',
     key: 'Alt-L|Ctrl-F1',
     readOnly: false,
   },
   unfold: {
+    description: 'Unfold',
     key: 'Alt-Shift-L|Ctrl-Shift-F1',
     readOnly: false,
   },

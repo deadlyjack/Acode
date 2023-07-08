@@ -1,8 +1,10 @@
 # Change Log
 
-## [1.8.5] - Build 293
+## [1.8.5] - Build 294
 
 - New
+  - [x] **Touch handling**
+    - Prevent accidental touch when tapping tear drop.
   - [x] **Color Preview**
     - You can now see color preview in css, scss, less, stylus and sass codes.
     - No need to select the whole color.

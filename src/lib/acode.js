@@ -213,15 +213,18 @@ export default class Acode {
     const { getModeForPath } = ace.require('ace/ext/modelist');
     const { name } = getModeForPath(file.filename);
     const formatterId = appSettings.value.formatter[name];
-    let formatter = this.#formatter.find(({ id }) => id === formatterId);
+    const formatter = this.#formatter.find(({ id }) => id === formatterId);
+
+    await formatter?.format();
 
     if (!formatter && selectIfNull) {
-      defaultFormatter(name);
+      return defaultFormatter(name, (id) => {
+        const formatter = this.#formatter.find(({ id: _id }) => _id === id);
+        formatter?.format();
+      });
     } else if (!formatter && !selectIfNull) {
       toast(strings['please select a formatter']);
     }
-
-    if (formatter) await formatter.format();
   }
 
   fsOperation(file) {

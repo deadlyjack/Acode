@@ -66,9 +66,6 @@ export default function inputhints($input, hints, onSelect) {
    * @param {MouseEvent} e Event
    */
   function handleClick(e) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    e.stopPropagation();
     const $el = e.target;
     const action = $el.getAttribute('action');
     if (action !== 'hint') return;
@@ -76,11 +73,8 @@ export default function inputhints($input, hints, onSelect) {
     if (!value) return;
     $input.value = $el.textContent;
     if (onSelect) onSelect(value);
-    else $input.dataset.value = value;
-    const activeHint = $ul.get('.active');
-    if (!activeHint) return;
-    activeHint.classList.remove('active');
-    $el.classList.add('active');
+    preventUpdate = false;
+    onblur();
   }
 
   /**
@@ -88,15 +82,15 @@ export default function inputhints($input, hints, onSelect) {
    * @param {KeyboardEvent} e Event
    */
   function handleKeypress(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      e.stopPropagation();
-      const activeHint = $ul.get('.active');
-      if (!activeHint) return;
-      const value = activeHint.getAttribute('value');
-      if (onSelect) onSelect(value);
-      else $input.value = value;
-    }
+    if (e.key !== 'Enter') return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    const activeHint = $ul.get('.active');
+    if (!activeHint) return;
+    const value = activeHint.getAttribute('value');
+    if (onSelect) onSelect(value);
+    else $input.value = value;
   }
 
   /**
@@ -109,14 +103,14 @@ export default function inputhints($input, hints, onSelect) {
       e.preventDefault();
       e.stopPropagation();
     }
-    moveDown(code);
+    updateHintFocus(code);
   }
 
   /**
    * Moves the active hint up or down
    * @param {"ArrowDown" | "ArrowUp"} key Direction to move
    */
-  function moveDown(key) {
+  function updateHintFocus(key) {
     let nextHint;
     let activeHint = $ul.get('.active');
     if (!activeHint) activeHint = $ul.firstChild;
@@ -168,15 +162,20 @@ export default function inputhints($input, hints, onSelect) {
     position();
   }
 
+  /**
+   * Event listener for blur
+   * @returns 
+   */
   function onblur() {
     if (preventUpdate) return;
 
-    removeUl();
     $input.removeEventListener('keypress', handleKeypress);
     $input.removeEventListener('keydown', handleKeydown);
     $input.removeEventListener('blur', onblur);
     $input.removeEventListener('input', oninput);
     window.removeEventListener('resize', position);
+    ulRemoveEventListeners();
+    $ul.remove();
   }
 
   /**
@@ -248,41 +247,41 @@ export default function inputhints($input, hints, onSelect) {
     };
   }
 
-  function removeUl($el = $ul) {
-    ulRemoveEventListeners($el);
-    $el.remove();
-    $el = null;
+  function ulAddEventListeners() {
+    window.addEventListener('resize', position);
+    $ul.addEventListener('click', handleClick);
+    $ul.addEventListener('mousedown', handleMouseDown);
+    $ul.addEventListener('mouseup', handleMouseUp);
+    $ul.addEventListener('touchstart', handleMouseDown);
+    $ul.addEventListener('touchend', handleMouseUp);
   }
 
-  function ulAddEventListeners($el = $ul) {
-    $el.addEventListener('click', handleClick);
-    $el.addEventListener('mousedown', handleMouseDown);
-    $el.addEventListener('mouseup', handleMouseUp);
-    $el.addEventListener('touchstart', handleMouseDown);
-    $el.addEventListener('touchend', handleMouseUp);
+  function ulRemoveEventListeners() {
+    window.removeEventListener('resize', position);
+    $ul.removeEventListener('click', handleClick);
+    $ul.removeEventListener('mousedown', handleMouseDown);
+    $ul.removeEventListener('mouseup', handleMouseUp);
+    $ul.removeEventListener('touchstart', handleMouseDown);
+    $ul.removeEventListener('touchend', handleMouseUp);
   }
 
-  function ulRemoveEventListeners($el = $ul) {
-    $el.removeEventListener('click', handleClick);
-    $el.removeEventListener('mousedown', handleMouseDown);
-    $el.removeEventListener('mouseup', handleMouseUp);
-    $el.removeEventListener('touchstart', handleMouseDown);
-    $el.removeEventListener('touchend', handleMouseUp);
-  }
-
+  /**
+   * Update the hint list
+   * @param {HTMLUListElement} $newUl 
+   */
   function updateUl($newUl) {
-    let $oldUl = $ul;
+    const $oldList = $ul;
+    ulRemoveEventListeners(); // Remove event listeners from the old list
     $ul = $newUl;
+    ulAddEventListeners(); // Add event listeners to the new list
+    position(); // Update the position of the new list
 
-    removeUl($oldUl);
-    $oldUl = null;
-    $input.blur();
-    $input.focus();
+    $oldList.replaceWith($newUl);
   }
 
   return {
-    getSelected: () => $ul.get('.active'),
-    container: $ul,
+    getSelected() { $ul.get('.active'); },
+    get container() { return $ul; },
   };
 }
 

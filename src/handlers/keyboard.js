@@ -4,19 +4,24 @@ import windowResize from './windowResize';
 
 /**
  * Keyboard event list
- * @typedef {'key'|'keyBoardShow'|'keyboardHide'} KeyboardEventName
+ * @typedef {'key'|'keyboardShow'|'keyboardHide'|'keyboardShowStart'|'keyboardHideStart'} KeyboardEventName
  */
 
+// Asuming that keyboard height is at least 100px
+const MIN_KEYBOARD_HEIGHT = 100;
 const event = {
   key: [],
-  keyBoardShow: [],
+  keyboardShow: [],
   keyboardHide: [],
+  keyboardShowStart: [],
+  keyboardHideStart: [],
 };
 
 let escKey = false;
 let escResetTimeout = null;
-let windowHeight = window.innerHeight;
 let softKeyboardHeight = 0;
+let windowHeight = window.innerHeight;
+let currentWindowHeight = windowHeight;
 
 export const keydownState = {
   /**
@@ -62,24 +67,42 @@ export default function keyboardHandler(e) {
 }
 
 windowResize.on('resizeStart', async () => {
-  const { keyboardHeight } = await getSystemConfiguration();
-  if (windowHeight > window.innerHeight) {
-    softKeyboardHeight = keyboardHeight;
+  const { keyboardHeight, hardKeyboardHidden } = await getSystemConfiguration();
+  const externalKeyboard = hardKeyboardHidden === HARDKEYBOARDHIDDEN_NO;
+
+
+  if (currentWindowHeight > window.innerHeight) { // height decreasing
+    softKeyboardHeight = keyboardHeight > MIN_KEYBOARD_HEIGHT ? keyboardHeight : 0;
+    if (!externalKeyboard && softKeyboardHeight) {
+      emit('keyboardShowStart');
+    }
+  } else if (currentWindowHeight < window.innerHeight) { // height increasing
+    if (!externalKeyboard && softKeyboardHeight) {
+      emit('keyboardHideStart');
+    }
   }
+
+  currentWindowHeight = window.innerHeight;
 });
 
 windowResize.on('resize', async () => {
+  currentWindowHeight = window.innerHeight;
+
+  if (currentWindowHeight > windowHeight) {
+    windowHeight = currentWindowHeight;
+  }
+
   const { hardKeyboardHidden } = await getSystemConfiguration();
   const externalKeyboard = hardKeyboardHidden === HARDKEYBOARDHIDDEN_NO;
 
-  if (externalKeyboard && softKeyboardHeight < 100) return;
+  if (externalKeyboard && !softKeyboardHeight) return;
 
   const keyboardHiddenYes = windowHeight <= window.innerHeight;
 
   if (keyboardHiddenYes) {
     emit('keyboardHide');
   } else {
-    emit('keyBoardShow');
+    emit('keyboardShow');
   }
 
   focusBlurEditor(keyboardHiddenYes);

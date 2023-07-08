@@ -27,7 +27,7 @@ const events = {
  */
 
 quickTools.$input.addEventListener('input', (e) => {
-  const key = e.target.value;
+  const key = e.target.value.toUpperCase();
   quickTools.$input.value = '';
   if (!key || key.length > 1) return;
   const keyCombination = getKeys({ key });
@@ -134,6 +134,7 @@ export default function actions(action, value) {
       return true;
 
     case 'key': {
+      value = parseInt(value, 10);
       const event = KeyboardEvent('keydown', getKeys({ keyCode: value }));
       if (value > 40 && value < 37) {
         resetKeys();

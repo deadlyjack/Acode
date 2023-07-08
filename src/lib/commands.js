@@ -23,10 +23,7 @@ import confirm from 'dialogs/confirm';
 import select from 'dialogs/select';
 import prompt from 'dialogs/prompt';
 import color from 'dialogs/color';
-import { COLOR_REGEX, NAMED_COLORS } from 'utils/color';
-import escapeStringRegexp from 'escape-string-regexp';
-
-const { Range } = ace.require('ace/range');
+import { getColorRange, isValidColor } from 'utils/color';
 
 export default {
   async 'close-all-tabs'() {
@@ -251,28 +248,8 @@ export default {
   },
   async 'insert-color'() {
     const { editor } = editorManager;
-    let defaultColor;
-    let range;
-
-    // get range of current word i.e. color
-    const cursorPos = editor.selection.getCursor();
-    /**@type {string} */
-    const line = editor.session.getLine(cursorPos.row);
-
-    // match color in current line and get range
-    const regex = new RegExp(COLOR_REGEX, 'ig');
-    let match;
-
-    while (match = regex.exec(line)) {
-      const start = match.index;
-      const end = match.index + match[0].length;
-
-      if (cursorPos.column >= start && cursorPos.column <= end) {
-        range = new Range(cursorPos.row, start, cursorPos.row, end);
-        defaultColor = match[0];
-        break;
-      }
-    }
+    const range = getColorRange();
+    let defaultColor = range ? editor.session.getTextRange(range) : '';
 
     editor.blur();
     const wasFocused = editorManager.activeFile.focused;

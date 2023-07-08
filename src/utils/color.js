@@ -161,11 +161,117 @@ export const NAMED_COLORS = {
 
 const namedColors = Object.keys(NAMED_COLORS).join('|');
 
-export const COLOR_REGEX = new RegExp(
-  `(${namedColors}|${RGB}|${RGBA}|${HSL}|${HSLA}|${HEX})`
-);
+export const colorRegex = {
+  /**
+   * Regular expression to match rgb colors
+   * @type {RegExp}
+   */
+  get rgb() {
+    delete this.rgb;
+    this.rgb = new RegExp(`^${RGB}$`);
+    return this.rgb;
+  },
+  /**
+   * Regular expression to match rgba colors
+   * @type {RegExp}
+   */
+  get rgba() {
+    delete this.rgba;
+    this.rgba = new RegExp(`^${RGBA}$`);
+    return this.rgba;
+  },
+  /**
+   * Regular expression to match hsl colors
+   * @type {RegExp}
+   */
+  get hsl() {
+    delete this.hsl;
+    this.hsl = new RegExp(`^${HSL}$`);
+    return this.hsl;
+  },
+  /**
+   * Regular expression to match hsla colors
+   * @type {RegExp}
+   */
+  get hsla() {
+    delete this.hsla;
+    this.hsla = new RegExp(`^${HSLA}$`);
+    return this.hsla;
+  },
+  /**
+   * Regular expression to match hex colors
+   * @type {RegExp}
+   */
+  get hex() {
+    delete this.hex;
+    this.hex = new RegExp(`^${HEX}$`);
+    return this.hex;
+  },
+  /**
+   * Regular expression to match any color
+   * @type {RegExp}
+   */
+  get named() {
+    delete this.named;
+    this.named = new RegExp(`^(${namedColors})$`);
+    return this.named;
+  },
+  /**
+   * Regular expression to match any color
+   * @type {RegExp}
+   */
+  get anyStrict() {
+    delete this.any;
+    this.any = new RegExp(`^(${namedColors}|${RGB}|${RGBA}|${HSL}|${HSLA}|${HEX})$`, 'i');
+    return this.any;
+  },
+  /**
+   * Regular expression to match any color
+   * Always return a new RegExp instance
+   * @type {RegExp}
+   */
+  get anyGlobal() {
+    return new RegExp(`(?<!\w)(${namedColors}|${RGB}|${RGBA}|${HSL}|${HSLA}|${HEX})(?!\w)`, 'gi');
+  }
+};
 
-const COLOR_REGEX_I = new RegExp(RegExp, 'i');
+/**
+ * Select the color at current line and cursor position
+ * @returns {AceAjax.Range}
+ */
+export function getColorRange() {
+  const { editor } = editorManager;
+  const copyText = editor.getCopyText();
+
+  if (copyText) {
+    if (!isValidColor(copyText)) return null;
+    return editor.selection.getRange();
+  }
+
+  const { Range } = ace.require('ace/range');
+  let range;
+
+  const cursorPos = editor.selection.getCursor();
+  /**@type {string} */
+  const line = editor.session.getLine(cursorPos.row);
+
+  // match color in current line and get range
+  const regex = colorRegex.anyGlobal;
+  let match;
+
+  while (match = regex.exec(line)) {
+    const start = match.index;
+    const end = match.index + match[0].length;
+
+    if (cursorPos.column >= start && cursorPos.column <= end) {
+      range = new Range(cursorPos.row, start, cursorPos.row, end);
+      break;
+    }
+  }
+
+  return range;
+}
+
 export function isValidColor(value) {
-  return COLOR_REGEX_I.test(value);
+  return colorRegex.anyStrict.test(value);
 }

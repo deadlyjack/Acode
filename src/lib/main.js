@@ -537,11 +537,13 @@ function backButtonHandler() {
 }
 
 function menuButtonHandler() {
-  acode.exec('toggle-sidebar');
+  const { acode } = window;
+  acode?.exec('toggle-sidebar');
 }
 
 function pauseHandler() {
-  acode.exec('save-state');
+  const { acode } = window;
+  acode?.exec('save-state');
 }
 
 function resumeHandler() {
