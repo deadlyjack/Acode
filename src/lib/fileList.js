@@ -492,7 +492,7 @@ export class Tree {
       name: this.#name,
       url: this.#url,
       path: this.#path,
-      parent: this.#parent.url,
+      parent: this.#parent?.url,
       isDirectory: !!this.#children,
     };
   }

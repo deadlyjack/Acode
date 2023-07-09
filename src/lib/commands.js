@@ -23,7 +23,7 @@ import confirm from 'dialogs/confirm';
 import select from 'dialogs/select';
 import prompt from 'dialogs/prompt';
 import color from 'dialogs/color';
-import { getColorRange, isValidColor } from 'utils/color';
+import { getColorRange } from 'utils/color/regex';
 
 export default {
   async 'close-all-tabs'() {

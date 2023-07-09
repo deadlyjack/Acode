@@ -1,9 +1,9 @@
 import tag from 'html-tag-js';
 import constants from 'lib/constants';
-import selectionMenu from 'lib/selectionMenu';
 import appSettings from 'lib/settings';
 import { key } from 'handlers/quickTools';
-import { getColorRange } from 'utils/color';
+import selectionMenu from 'lib/selectionMenu';
+import { getColorRange } from 'utils/color/regex';
 
 /**
  * Handler for touch events

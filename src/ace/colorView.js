@@ -3,9 +3,8 @@
  * @see https://github.com/easylogic/ace-colorpicker/blob/main/src/extension/ace/colorview.js
  */
 
-import helpers from 'utils/helpers';
-import { Irid } from 'irid';
-import { HEX, HSL, HSLA, RGB, RGBA } from 'utils/color';
+import Color from 'utils/color';
+import { HEX, HSL, HSLA, RGB, RGBA, isValidColor } from 'utils/color/regex';
 
 const COLORPICKER_TOKEN_CLASS = '.ace_color';
 const changedRules = [];
@@ -124,11 +123,12 @@ function afterRender() {
     const multiLineNext = content + nextContent;
 
     if (el.dataset.modified === 'true') return;
+    el.dataset.modified = 'true';
 
-    if (!helpers.isValidColor(content)) {
-      if (helpers.isValidColor(multiLinePrev)) {
+    if (!isValidColor(content)) {
+      if (isValidColor(multiLinePrev)) {
         content = multiLinePrev;
-      } else if (helpers.isValidColor(multiLineNext)) {
+      } else if (isValidColor(multiLineNext)) {
         content = multiLineNext;
       } else {
         return;
@@ -136,11 +136,9 @@ function afterRender() {
     }
 
     try {
-      const brightness = Irid(content).lightness();
-      const fontColorString = brightness > 0.5 ? "#000" : "#fff";
+      const fontColorString = Color(content).luminance > 0.5 ? "#000" : "#fff";
       el.classList.add('ace_color');
       el.style.cssText = `background-color: ${content}; color: ${fontColorString}; pointer-events: all;`;
-      el.dataset.modified = 'true';
     } catch (error) {
       console.log("Invalid color", content);
     }
@@ -151,7 +149,7 @@ function forceTokenizer() {
   const { session } = editor;
   // force recreation of tokenizer
   session.$mode.$tokenizer = null;
-  session.bgTokenizer.setTokenizer(editor.session.$mode.getTokenizer());
+  session.bgTokenizer.setTokenizer(session.$mode.getTokenizer());
   // force re-highlight whole document
   session.bgTokenizer.start(0);
 }

@@ -1,10 +1,10 @@
 import Url from "utils/Url";
 import fonts from 'lib/fonts';
 import box from 'dialogs/box';
+import Color from 'utils/color';
 import themes from 'lib/themes';
 import files from 'lib/fileList';
 import alert from 'dialogs/alert';
-import color from 'dialogs/color';
 import Page from 'components/page';
 import commands from "lib/commands";
 import helpers from "utils/helpers";
@@ -17,6 +17,7 @@ import toast from 'components/toast';
 import sidebarApps from 'sidebarApps';
 import confirm from 'dialogs/confirm';
 import appSettings from "lib/settings";
+import colorPicker from 'dialogs/color';
 import EditorFile from "lib/editorFile";
 import openFolder from 'lib/openFolder';
 import encodings from 'utils/encodings';
@@ -86,6 +87,7 @@ export default class Acode {
 
     this.define('Url', Url);
     this.define('page', Page);
+    this.define('Color', Color);
     this.define('fonts', fonts);
     this.define('toast', toast);
     this.define('alert', alert);
@@ -100,7 +102,7 @@ export default class Acode {
     this.define('palette', palette);
     this.define('projects', projects);
     this.define('tutorial', tutorial);
-    this.define('colorPicker', color);
+    this.define('colorPicker', colorPicker);
     this.define('aceModes', aceModes);
     this.define('themes', themesModule);
     this.define('settings', appSettings);

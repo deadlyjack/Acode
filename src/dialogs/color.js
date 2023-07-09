@@ -4,10 +4,6 @@ import actionStack from 'lib/actionStack';
 
 let lastPicked = localStorage.__picker_last_picked || '#fff';
 
-const HEX_COLOR = /^#([a-f0-9]{3}){1,2}([a-f0-9]{2})?$/i;
-const RGB_COLOR = /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(\s*,\s*\d?(\.\d+)?)?\)$/i;
-const HSL_COLOR = /^hsla?\(([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(\s*,\s*\d?(\.\d+)?)?\)$/i;
-
 /**
  * Choose color
  * @param {string} defaultColor Default color
@@ -138,9 +134,9 @@ function color(defaultColor, onhide) {
  * @returns {'hex'|'rgb'|'hsl'}
  */
 function checkColorType(color) {
-  if (HEX_COLOR.test(color)) return 'hex';
-  if (RGB_COLOR.test(color)) return 'rgb';
-  if (HSL_COLOR.test(color)) return 'hsl';
+  if (color.startsWith('#')) return 'hex';
+  if (color.startsWith('rgb')) return 'rgb';
+  if (color.startsWith('hsl')) return 'hsl';
   return null;
 }
 

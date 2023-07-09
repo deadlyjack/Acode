@@ -8,11 +8,8 @@
     "lang": "node ./utils/lang.js",
     "build": "sh utils/scripts/build.sh",
     "start": "sh utils/scripts/start.sh",
-    "start:debug": "sh utils/scripts/start.sh",
     "clean": "sh utils/scripts/clean.sh android android@10",
     "plugin": "sh utils/scripts/plugin.sh",
-    "test": "jest",
-    "build-ace": "node ./utils/build-ace.js",
     "setup": "sh utils/scripts/setup.sh"
   },
   "keywords": [
@@ -95,7 +92,6 @@
     "esprima": "^4.0.1",
     "filesize": "^10.0.7",
     "html-tag-js": "^1.1.41",
-    "irid": "^4.0.0",
     "js-base64": "^3.7.4",
     "jszip": "^3.10.1",
     "marked": "^5.0.3",

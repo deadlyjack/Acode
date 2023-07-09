@@ -1,4 +1,4 @@
-import Irid from 'irid';
+import Color from 'utils/color';
 
 export default class ThemeBuilder {
   #theme = {
@@ -129,7 +129,7 @@ export default class ThemeBuilder {
 
   set primaryColor(value) {
     if (this.autoDarkened) {
-      this.darkenedPrimaryColor = Irid(value).darken(0.4).toHexString();
+      this.darkenedPrimaryColor = Color(value).darken(0.4).hex.toString();
     }
     this.#theme['--primary-color'] = value;
   }
@@ -258,8 +258,7 @@ export default class ThemeBuilder {
    * This method is used to set a darkened primary color.
    */
   darkenPrimaryColor() {
-    const hex = Irid(this.primaryColor).toHexString();
-    this.darkenedPrimaryColor = Irid(hex).darken(0.4).toHexString();
+    this.darkenedPrimaryColor = Color(this.primaryColor).darken(0.4).hex.toString();
   }
 
   /**

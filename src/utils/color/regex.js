@@ -1,13 +1,16 @@
-export const RGB_MAX_VALUE = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
-export const HUE_VALUE = '(360|3[0-5][0-9]|[0-2][0-9][0-9]|[0-9][0-9]?)';
-export const MAX_PERCENTAGE = '(100|[1-9]?[0-9](\\.\\d+)?)%';
-export const MAX_ALPHA = '(1|0?\.?\\d+)';
-export const RGB_VALUE = `\\s*${RGB_MAX_VALUE}\\s*,\\s*${RGB_MAX_VALUE}\\s*,\\s*${RGB_MAX_VALUE}\\s*`;
-export const RGB = `(rgb\\s*\\(${RGB_VALUE}\\))`;
-export const RGBA = `(rgba\\s*\\(${RGB_VALUE}\\s*,\\s*${MAX_ALPHA}\\s*\\))`;
+export const MAX_16_BASE = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
+export const HUE_VALUE = '(360(\\.0+)?|(3[0-5][0-9]|([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-9][0-9])(\\.\\d+)?)|(\\.\\d+))';
+export const MAX_PERCENTAGE = '((100(\\.0+)?|[1-9]?[0-9](\\.\\d+)?|\\.\\d+)%)';
+export const MAX_ALPHA = `((0(\\.\\d+)?|1(\\.0+)?|\\.\\d+)|${MAX_PERCENTAGE})`;
+export const RGB_VALUE = `(\\s*${MAX_16_BASE}|${MAX_PERCENTAGE}\\s*)`;
+export const RGB_VALUES = `${RGB_VALUE},${RGB_VALUE},${RGB_VALUE}`;
+export const RGB_VALUES_NO_COMMA = `${RGB_VALUE}{3}`;
+export const RGB = `(rgb\\s*\\(${RGB_VALUES}\\)|rgb\\s*\\(${RGB_VALUES_NO_COMMA}\\))`;
+export const RGBA = `(rgba\\s*\\(${RGB_VALUES}\\s*,\\s*${MAX_ALPHA}\\s*\\)|rgba\\s*\\(${RGB_VALUES_NO_COMMA}\\s+${MAX_ALPHA}\\s*\\))`;
 export const HSL_VALUE = `\\s*${HUE_VALUE}\\s*,\\s*${MAX_PERCENTAGE}\\s*,\\s*${MAX_PERCENTAGE}\\s*`;
-export const HSL = `(hsl\\s*\\(${HSL_VALUE}\\))`;
-export const HSLA = `(hsla\\s*\\(${HSL_VALUE}\\s*,\\s*${MAX_ALPHA}\\s*\\))`;
+export const HSL_VALUE_NO_COMMA = `\\s*${HUE_VALUE}\\s+${MAX_PERCENTAGE}\\s+${MAX_PERCENTAGE}\\s*`;
+export const HSL = `(hsl\\s*\\(${HSL_VALUE}\\)|hsl\\s*\\(${HSL_VALUE_NO_COMMA}\\))`;
+export const HSLA = `(hsla\\s*\\(${HSL_VALUE}\\s*,\\s*${MAX_ALPHA}\\s*\\)|hsla\\s*\\(${HSL_VALUE_NO_COMMA}\\s+\/\/\\s+${MAX_ALPHA}\\s*\\)|hsla\\s*\\(${HSL_VALUE_NO_COMMA}\\s+${MAX_ALPHA}\\s*\\))`;
 export const HEX = '(#[0-9a-f]{3,8})';
 export const NAMED_COLORS = {
   'black': 'rgb(0, 0, 0)',
@@ -231,7 +234,8 @@ export const colorRegex = {
    * @type {RegExp}
    */
   get anyGlobal() {
-    return new RegExp(`(?<!\w)(${namedColors}|${RGB}|${RGBA}|${HSL}|${HSLA}|${HEX})(?!\w)`, 'gi');
+    // Negative lookbehind is not supported in older browsers
+    return new RegExp(`(^|\\W)(${namedColors}|${RGB}|${RGBA}|${HSL}|${HSLA}|${HEX})($|\\W)`, 'gi');
   }
 };
 
@@ -260,8 +264,8 @@ export function getColorRange() {
   let match;
 
   while (match = regex.exec(line)) {
-    const start = match.index;
-    const end = match.index + match[0].length;
+    const start = match.index + match[1].length;
+    const end = start + match[2].length;
 
     if (cursorPos.column >= start && cursorPos.column <= end) {
       range = new Range(cursorPos.row, start, cursorPos.row, end);

@@ -92,12 +92,10 @@ function searchInFile({ file, content, search }) {
       start: getLineColumn(content, start),
       end: getLineColumn(content, end)
     };
-    const line = getSurrounding(content, word, start, end);
+    const [line, renderText] = getSurrounding(content, word, start, end);
     text += `\n\t${line.trim()}`;
-    matches.push({ match: word, position });
+    matches.push({ match: word, position, renderText });
   }
-
-  text = text + '\n';
 
   self.postMessage({
     action: 'search-result',
@@ -134,28 +132,24 @@ function replaceInFile({ file, content, search, replace }) {
  * @param {number} end 
  */
 function getSurrounding(content, word, start, end) {
-  const max = 26;
+  const max = 50;
   const remaining = max - (end - start);
+  let result = [];
 
-  if (!remaining || remaining < 0) {
-    return `...${word.substring(start, end + remaining)}`;
+  if (remaining <= 0) {
+    word = word.slice(-max);
+    result = [`...${word}`, word];
+  } else {
+    let left = Math.floor(remaining / 2);
+    let right = left;
+
+    let leftText = content.substring(start - left, start);
+    let rightText = content.substring(end, end + right);
+
+    result = [`${leftText}${word}${rightText}`, word];
   }
 
-  let left = Math.floor(remaining / 2);
-  let right = remaining - left;
-
-  if (start < left) {
-    left = start;
-    right = remaining;
-  }
-
-  let leftText = content.substring(start - left, start);
-  let rightText = content.substring(end, end + right);
-
-  if (/[\r\n]+/.test(leftText)) leftText = '';
-  if (/[\r\n]+/.test(rightText)) rightText = '';
-
-  return `${leftText}${word}${rightText}`;
+  return result.map((text) => text.replace(/[\r\n]+/g, ' ⏎ '));
 }
 
 /**
@@ -241,6 +235,7 @@ function Skip({ exclude, include }) {
    * @returns {boolean} - Returns true if the file should be skipped, false otherwise.
    */
   function test(file) {
+    if (!file.path) return false;
     const match = (pattern) => minimatch(file.path, pattern, { matchBase: true });
     return excludeFiles.some(match) || !includeFiles.some(match);
   }

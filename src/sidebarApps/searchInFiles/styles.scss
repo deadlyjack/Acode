@@ -86,6 +86,26 @@
     .ace_marker-layer {
       display: none !important;
     }
+
+    .ace_highlight {
+      border: solid 1px rgba(122, 122, 122, 0.2);
+      border: solid 1px var(--border-color);
+      border-radius: 2px;
+      background-color: rgb(255, 255, 255);
+      background-color: var(--secondary-color);
+      color: rgb(37, 37, 37);
+      color: var(--secondary-text-color);
+    }
+
+    .ace_file_name {
+      color: rgb(255, 215, 0);
+      color: var(--active-text-color);
+    }
+
+    .ace_gutter-cell:nth-child(odd),
+    .ace_line_group:nth-child(odd) {
+      background-color: rgba(0, 0, 0, 0.2) !important;
+    }
   }
 
   .extras {
@@ -99,16 +119,6 @@
     width: 100%;
     margin-bottom: 10px;
     text-align: right;
-  }
-
-  .highlight {
-    border: solid 1px rgba(122, 122, 122, 0.2);
-    border: solid 1px var(--border-color);
-    border-radius: 2px;
-    background-color: rgb(255, 255, 255);
-    background-color: var(--secondary-color);
-    color: rgb(37, 37, 37);
-    color: var(--secondary-text-color);
   }
 
   button {
@@ -126,9 +136,5 @@
   .search-result {
     position: relative;
     padding-bottom: 5px;
-
-    // &.loading {
-    //   @include linear-loader(30%, 2px);
-    // }
   }
 }

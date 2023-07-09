@@ -49,14 +49,14 @@ export default async function openFile(file, options = {}) {
 
 
       if (text && existingText !== text) {
-        let confirmation = true;
-        if (existingFile.isUnsaved) {
-          const message = strings['reopen file'].replace('{file}', existingFile.filename);
-          confirmation = await confirm(strings.warning, message);
-        }
-        if (confirmation) {
-          existingFile.session.setValue(text);
-        }
+        // let confirmation = true;
+        // if (existingFile.isUnsaved) {
+        //   const message = strings['reopen file'].replace('{file}', existingFile.filename);
+        //   confirmation = await confirm(strings.warning, message);
+        // }
+        // if (confirmation) {
+        // }
+        existingFile.session.setValue(text);
       }
 
       if (cursorPos && existingCursorPos.row !== cursorPos.row && existingCursorPos.column !== cursorPos.column) {

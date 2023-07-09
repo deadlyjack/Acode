@@ -1,6 +1,6 @@
 import themes from './themes';
 import appSettings from './settings';
-import { Irid } from 'irid';
+import Color from 'utils/color';
 
 let busy = false;
 let lastCall;
@@ -33,9 +33,8 @@ export default function restoreTheme(darken) {
     theme.darkenedPrimaryColor === theme.primaryColor) {
     theme.darkenPrimaryColor();
   }
-  const hexColor = Irid(
-    darken ? theme.darkenedPrimaryColor : theme.primaryColor,
-  ).toHexString();
+  const color = darken ? theme.darkenedPrimaryColor : theme.primaryColor;
+  const hexColor = Color(color).hex.toString();
   system.setUiTheme(hexColor, theme.type, () => {
     busy = false;
     if (lastCall !== undefined) {
