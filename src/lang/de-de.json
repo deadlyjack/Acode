@@ -373,5 +373,5 @@
   "change encoding": "Neuladen von '{file}' mit '{encoding}' Kodierung? Bei dieser Aktion gehen alle ungespeicherten Änderungen an dieser Datei verloren. Wollen Sie mit dem Neuladen fortfahren?",
   "reopen file": "Sind Sie sicher, das sie '{file}' erneut öffnen wollen? Alle ungespeicherten Änderungen werden verloren gehen.",
   "plugin min version": "{name} ist nur in Acode - {v-code} und neuer verfügbar. Klicken Sie hier zum Aktualisieren.",
-  "color preview": "Color preview"
+  "color preview": "Farb-Vorschau"
 }
