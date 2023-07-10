@@ -1,8 +1,8 @@
-import fsOperation from '../fileSystem';
-import Url from '../utils/Url';
+import Url from 'utils/Url';
+import color from 'utils/color';
+import fsOperation from 'fileSystem';
 import fonts from './fonts';
 import themes from './preLoadedThemes';
-import restoreTheme from './restoreTheme';
 import settings from './settings';
 import ThemeBuilder from './themeBuilder';
 
@@ -97,7 +97,12 @@ async function apply(id, init) {
   document.body.setAttribute('theme-type', theme.type);
   $style.textContent = theme.css;
   document.head.append($style);
-  restoreTheme();
+
+  // Set status bar and navigation bar color
+  system.setUiTheme(
+    color(theme.primaryColor).hex.toString(),
+    theme.type,
+  );
 
   try {
     let fs = fsOperation(loaderFile);

@@ -69,8 +69,8 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
 
     await (async () => {
       try {
+        loader.showTitleLoader();
         if (await helpers.checkAPIStatus() && (isValidSource(plugin.source))) {
-          loader.showTitleLoader();
           const remotePlugin = await fsOperation(constants.API_BASE, `plugin/${id}`)
             .readFile('json')
             .catch(() => null);
@@ -116,7 +116,6 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
   } catch (err) {
     helpers.error(err);
   } finally {
-    helpers.hideAd();
     loader.removeTitleLoader();
   }
 

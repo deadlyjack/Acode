@@ -493,39 +493,6 @@ function showTutorials() {
       </p>;
     });
   }
-
-  if (previousVersionCode) {
-    tutorial('main-tutorials', (hide) => {
-      const onclick = () => {
-        QuickTools();
-        hide();
-      };
-
-      return <p>
-        Command palette icon has been removed from shortcuts, but you can modify shortcuts.
-        <span className='link' onclick={onclick}>Click here</span> to configure quick tools.
-      </p>;
-    });
-  }
-
-  if (previousVersionCode < 284) {
-    tutorial('keybinding-tutorials', (hide) => {
-      const reset = () => {
-        resetKeyBindings();
-        hide();
-      };
-
-      const edit = () => {
-        openFile(KEYBINDING_FILE);
-        hide();
-      };
-
-      return <p>
-        Keybinding file is misconfigured. Please <span className='link' onclick={edit}>edit</span> or <span className='link' onclick={reset}>reset</span> it.
-        There was a typo in keybinding file. Search 'pallete' and replace it with 'palette'.
-      </p>;
-    });
-  }
 }
 
 function backButtonHandler() {

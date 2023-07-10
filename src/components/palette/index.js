@@ -49,7 +49,7 @@ This shows that using keyboardHideStart event is faster than not using it.
  */
 export default function palette(getList, onsSelectCb, placeholder, onremove) {
   /**@type {HTMLInputElement} */
-  const $input = <input onkeydown={onkeydown} type='search' placeholder={placeholder} onfocusout={remove} enterKeyHint='go' />;
+  const $input = <input onkeydown={onkeydown} type='search' placeholder={placeholder} enterKeyHint='go' />;
   /**@type {HTMLElement} */
   const $mask = <div className='mask' onclick={remove} />;
   /**@type {HTMLDivElement} */
@@ -57,7 +57,7 @@ export default function palette(getList, onsSelectCb, placeholder, onremove) {
 
 
   // Create a palette with input and hints
-  inputhints($input, generateHints, onSelect);
+  inputhints($input, generateHints, onsSelectCb);
 
   // Removes the darkened color from status bar and navigation bar
   restoreTheme(true);
@@ -90,21 +90,11 @@ export default function palette(getList, onsSelectCb, placeholder, onremove) {
   }
 
   /**
-   * Callback to call when a hint is selected
-   * @param {string} value
-   */
-  function onSelect(value) {
-    onsSelectCb(value);
-    remove();
-  }
-
-  /**
    * Generates hint for inputhints
    * @param {HintCallback} setHints Set hints callback
    * @param {HintModification} hintModification Hint modification object
    */
   async function generateHints(setHints, hintModification) {
-    setHints([{ text: strings['loading...'], value: '' }]);
     const list = getList(hintModification);
     let data = list instanceof Promise ? await list : list;
     setHints(data);
@@ -131,5 +121,9 @@ export default function palette(getList, onsSelectCb, placeholder, onremove) {
     if (activeFile.wasFocused) {
       editor.focus();
     }
+
+    remove = () => {
+      console.error('Palette already removed');
+    };
   }
 }

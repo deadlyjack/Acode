@@ -7,8 +7,8 @@ import windowResize from './windowResize';
  * @typedef {'key'|'keyboardShow'|'keyboardHide'|'keyboardShowStart'|'keyboardHideStart'} KeyboardEventName
  */
 
-// Asuming that keyboard height is at least 100px
-const MIN_KEYBOARD_HEIGHT = 100;
+// Asuming that keyboard height is at least 200px
+let MIN_KEYBOARD_HEIGHT = 100;
 const event = {
   key: [],
   keyboardShow: [],
@@ -66,6 +66,11 @@ export default function keyboardHandler(e) {
   editor.dispatchEvent(event);
 }
 
+document.addEventListener('admob.banner.size', async (event) => {
+  const { height } = event.size;
+  MIN_KEYBOARD_HEIGHT = height + 10;
+});
+
 windowResize.on('resizeStart', async () => {
   const { keyboardHeight, hardKeyboardHidden } = await getSystemConfiguration();
   const externalKeyboard = hardKeyboardHidden === HARDKEYBOARDHIDDEN_NO;
@@ -95,7 +100,7 @@ windowResize.on('resize', async () => {
   const { hardKeyboardHidden } = await getSystemConfiguration();
   const externalKeyboard = hardKeyboardHidden === HARDKEYBOARDHIDDEN_NO;
 
-  if (externalKeyboard && !softKeyboardHeight) return;
+  if (externalKeyboard || !softKeyboardHeight) return;
 
   const keyboardHiddenYes = windowHeight <= window.innerHeight;
 

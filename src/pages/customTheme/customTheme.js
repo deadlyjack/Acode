@@ -9,6 +9,7 @@ import themes from 'lib/themes';
 import ThemeBuilder from 'lib/themeBuilder';
 import confirm from 'dialogs/confirm';
 import actionStack from 'lib/actionStack';
+import { isValidColor } from 'utils/color/regex';
 
 export default function CustomThemeInclude() {
   const theme = themes.get('custom');
@@ -78,7 +79,7 @@ export default function CustomThemeInclude() {
     $page.body = <div id='custom-theme' className='main'>
       <div className='list scroll'>{
         Object.keys(customTheme.toJSON())
-          .filter((key) => helpers.isValidColor(customTheme[key]))
+          .filter((key) => isValidColor(customTheme[key]))
           .map(
             (key) => <div
               className='list-item'

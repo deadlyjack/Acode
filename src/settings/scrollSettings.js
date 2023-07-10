@@ -13,6 +13,7 @@ export default function scrollSettings() {
       value: values.scrollSpeed,
       valueText: getScrollSpeedString,
       select: [
+        [constants.SCROLL_SPEED_FAST_X2, `${strings.fast} x2`],
         [constants.SCROLL_SPEED_FAST, strings.fast],
         [constants.SCROLL_SPEED_NORMAL, strings.normal],
         [constants.SCROLL_SPEED_SLOW, strings.slow],
@@ -57,6 +58,8 @@ function getScrollSpeedString(speed) {
       return strings.fast;
     case constants.SCROLL_SPEED_SLOW:
       return strings.slow;
+    case constants.SCROLL_SPEED_FAST_X2:
+      return `${strings.fast} x2`;
     case constants.SCROLL_SPEED_NORMAL:
     default:
       return strings.normal;

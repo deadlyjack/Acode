@@ -3,7 +3,9 @@ import Hsl from './hsl';
 import Rgb from './rgb';
 
 /**@type {CanvasRenderingContext2D} */
-const ctx = (<canvas></canvas>).getContext('2d');
+const ctx = (<canvas></canvas>).getContext('2d', {
+  willReadFrequently: true,
+});
 
 export default (/**@type {string}*/color) => {
   return new Color(color);

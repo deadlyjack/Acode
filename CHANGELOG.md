@@ -1,8 +1,10 @@
 # Change Log
 
-## [1.8.5] - Build 294
+## [1.8.5] - Build 295
 
 - New
+  - [x] **Scroll speed**
+    - New 'Fast x2' scroll speed.
   - [x] **Touch handling**
     - Prevent accidental touch when tapping tear drop.
   - [x] **Color Preview**

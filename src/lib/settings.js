@@ -131,7 +131,7 @@ class Settings {
       rtlText: false,
       hardWrap: false,
       useTextareaForIME: false,
-      touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 5,
+      touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 20,
       quicktoolsItems: [...Array(this.#QUICKTOOLS_SIZE).keys()],
       excludeFolders: this.#excludeFolders,
       maxFilesCount: 500,

@@ -1,11 +1,11 @@
 import ajax from '@deadlyjack/ajax';
 import escapeStringRegexp from 'escape-string-regexp';
-import constants from 'lib/constants';
-import path from './Path';
+
 import Url from './Url';
 import Uri from './Uri';
+import path from './Path';
 import alert from 'dialogs/alert';
-import { isValidColor } from './color';
+import constants from 'lib/constants';
 
 /**
  * Gets programming language name according to filename
@@ -181,14 +181,6 @@ export default {
     const msg = this.errorMessage(err, ...args);
     alert(strings.error, msg, onhide);
     return promise;
-  },
-  /**
-   * Checks if the value is a valid color
-   * @param {string} value 
-   * @returns 
-   */
-  isValidColor(value) {
-    return isValidColor(value);
   },
   /**
    * Returns unique ID

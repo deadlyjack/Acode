@@ -32,18 +32,17 @@ import './style.scss';
 */
 export default function inputhints($input, hints, onSelect) {
   /**@type {HTMLUListElement} */
-  let $ul = <Ul />;
+  const $ul = <Ul />;
+
   let preventUpdate = false;
+  let updateUlTimeout;
 
   $input.addEventListener('focus', onfocus);
 
   if (typeof hints === 'function') {
     const cb = hints;
     hints = [];
-    updateUl(<Ul hints={[{
-      text: strings['loading...'],
-      value: '',
-    }]} />);
+    $ul.content = [<Hint hint={{ value: '', text: strings['loading...'] }} />];
     cb(setHints, hintModification());
   } else {
     setHints(hints);
@@ -146,7 +145,7 @@ export default function inputhints($input, hints, onSelect) {
         matched.push(hint);
       }
     });
-    updateUl(<Ul hints={matched} />);
+    updateUl(matched);
   }
 
   function onfocus() {
@@ -169,6 +168,7 @@ export default function inputhints($input, hints, onSelect) {
   function onblur() {
     if (preventUpdate) return;
 
+    clearTimeout(updateUlTimeout);
     $input.removeEventListener('keypress', handleKeypress);
     $input.removeEventListener('keydown', handleKeydown);
     $input.removeEventListener('blur', onblur);
@@ -217,7 +217,7 @@ export default function inputhints($input, hints, onSelect) {
     } else {
       hints = [];
     }
-    updateUl(<Ul hints={hints} />);
+    updateUl(hints);
     $ul.classList.remove('loading');
   }
 
@@ -266,17 +266,33 @@ export default function inputhints($input, hints, onSelect) {
   }
 
   /**
-   * Update the hint list
-   * @param {HTMLUListElement} $newUl 
+   * First time updates the hint instantly, then debounce
+   * @param {Array<HintObj>} hints 
    */
-  function updateUl($newUl) {
-    const $oldList = $ul;
-    ulRemoveEventListeners(); // Remove event listeners from the old list
-    $ul = $newUl;
-    ulAddEventListeners(); // Add event listeners to the new list
-    position(); // Update the position of the new list
+  function updateUl(hints) {
+    updateUlNow(hints);
+    updateUl = updateUlDebounce;
+  }
 
-    $oldList.replaceWith($newUl);
+  /**
+   * Update the hint list after a delay
+   * @param {Array<HintObj>} hints 
+   */
+  function updateUlDebounce(hints) {
+    clearTimeout(updateUlTimeout);
+    updateUlTimeout = setTimeout(updateUlNow, 300, hints);
+  }
+
+  /**
+   * Update the hint list instantly
+   * @param {Array<HintObj>} hints 
+   */
+  function updateUlNow(hints) {
+    $ul.remove();
+    $ul.innerHTML = '';
+    $ul.content = hints.map((hint) => <Hint hint={hint} />);
+    app.append($ul);
+    position(); // Update the position of the new list
   }
 
   return {
@@ -288,11 +304,21 @@ export default function inputhints($input, hints, onSelect) {
 /**
  * Create a hint item
  * @param {object} param0 Hint item
- * @param {string} param0.value Hint value
- * @param {string} param0.text Hint text
+ * @param {HintObj} param0.hint Hint item
  * @returns {HTMLLIElement}
  */
-function Hint({ value, text }) {
+function Hint({ hint }) {
+  let value = '';
+  let text = '';
+
+  if (typeof hint === 'string') {
+    value = hint;
+    text = hint;
+  } else {
+    value = hint.value;
+    text = hint.text;
+  }
+
   return <li attr-action='hint' attr-value={value} innerHTML={text}></li>;
 }
 
@@ -304,11 +330,6 @@ function Hint({ value, text }) {
  */
 function Ul({ hints = [] }) {
   return <ul id='hints' className='scroll'>
-    {hints.map((hint) => {
-      if (typeof hint === 'string') {
-        return <Hint value={hint} text={hint} />;
-      }
-      return <Hint {...hint} />;
-    })}
+    {hints.map((hint) => <Hint hint={hint} />)}
   </ul>;
 }

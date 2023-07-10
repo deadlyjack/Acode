@@ -1,6 +1,6 @@
 import list from 'components/collapsableList';
 import ScrollBar from 'components/scrollbar';
-import touchListeners from 'ace/touchHandler';
+import touchListeners, { scrollAnimationFrame } from 'ace/touchHandler';
 import appSettings from './settings';
 import EditorFile from './editorFile';
 import sidebarApps from 'sidebarApps';
@@ -397,6 +397,7 @@ async function EditorManager($header, $body) {
 
     session.setScrollTop(scroll);
     editor._emit('scroll', editor);
+    cancelAnimationFrame(scrollAnimationFrame);
   }
 
   function onscrollVend() {
@@ -415,6 +416,7 @@ async function EditorManager($header, $body) {
 
     session.setScrollLeft(scroll);
     editor._emit('scroll', editor);
+    cancelAnimationFrame(scrollAnimationFrame);
   }
 
   function onscrollHEnd() {

@@ -140,7 +140,8 @@ function show() {
 }
 
 /**
- * 
+ * Shows title loader
+ * @param {boolean} [immortal] If true, the loader will not be removed automatically
  */
 function showTitleLoader(immortal = false) {
   if (typeof immortal === 'boolean') {
@@ -153,6 +154,11 @@ function showTitleLoader(immortal = false) {
   }, 0);
 }
 
+/**
+ * Removes title loader
+ * @param {boolean} immortal If not true, the loader will not remove when immortal was true when it was created.
+ * @returns 
+ */
 function removeTitleLoader(immortal = undefined) {
   if (typeof immortal === 'boolean') {
     loaderIsImmortal = immortal;

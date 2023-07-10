@@ -5,6 +5,8 @@ import { key } from 'handlers/quickTools';
 import selectionMenu from 'lib/selectionMenu';
 import { getColorRange } from 'utils/color/regex';
 
+export let scrollAnimationFrame; // scroll animation frame id
+
 /**
  * Handler for touch events
  * @param {AceAjax.Editor} editor Ace editor instance
@@ -87,16 +89,15 @@ export default function addTouchListeners(editor, minimal, onclick) {
 
   let scrollTimeout; // timeout to check if scrolling is finished
   let menuActive; // true if menu is active
-  let selectionActive; // true if selection is active
-  let animation; // scroll animation frame id
+  let mode; // cursor, selection or scroll
   let moveY; // touch difference in vertical direction
   let moveX; // touch difference in horizontal direction
   let lastX; // last x
   let lastY; // last y
   let lockX; // lock x for prevent scrolling in horizontal direction
   let lockY; // lock y for prevent scrolling in vertical direction
-  let mode; // cursor, selection or scroll
   let clickCount = 0; // number of clicks
+  let selectionActive; // true if selection is active
   let lastClickPos = null;
   let teardropDoesShowMenu = true; // teardrop handler
   let teardropTouchEnded = false; // teardrop handler
@@ -155,7 +156,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
    */
   function touchStart(e) {
     const $target = e.target;
-    cancelAnimationFrame(animation);
+    cancelAnimationFrame(scrollAnimationFrame);
     const { clientX, clientY } = e.touches[0];
 
     if (minimal && clientX <= constants.SIDEBAR_SLIDE_START_THRESHOLD_PX) {
@@ -310,7 +311,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
       return;
     }
 
-    cancelAnimationFrame(animation);
+    cancelAnimationFrame(scrollAnimationFrame);
     if (minimal && mode === 'cursor') {
       moveCursorTo(clientX, clientY);
       if (onclick) onclick();
@@ -436,7 +437,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
     }
 
     if (!scrollX && !scrollY) {
-      cancelAnimationFrame(animation);
+      cancelAnimationFrame(scrollAnimationFrame);
       return;
     }
 
@@ -444,7 +445,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
     moveX -= scrollX;
     moveY -= scrollY;
 
-    animation = requestAnimationFrame(
+    scrollAnimationFrame = requestAnimationFrame(
       scrollAnimation.bind(null, moveX, moveY),
     );
   }
@@ -959,6 +960,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * Editor container on change session
    */
   function onchangesession() {
+    cancelAnimationFrame(scrollAnimationFrame);
     setTimeout(() => {
       const copyText = editor.session.getTextRange(editor.getSelectionRange());
       if (copyText) {

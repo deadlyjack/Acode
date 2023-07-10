@@ -41,7 +41,7 @@ export default class ThemeBuilder {
    * @param {'dark'|'light'} [type] type of the theme 
    * @param {'free'|'paid'} [version]  version of the theme
    */
-  constructor(name = '', type = 'dark', version = 'paid') {
+  constructor(name = '', type = 'dark', version = 'free') {
     this.name = name;
     this.type = type;
     this.version = version;
@@ -313,7 +313,7 @@ export default class ThemeBuilder {
   }
 }
 
-export function createBuiltInTHeme(name, type, version = 'paid') {
+export function createBuiltInTheme(name, type, version = 'paid') {
   const theme = new ThemeBuilder(name, type, version);
   theme.autoDarkened = false;
   return theme;
