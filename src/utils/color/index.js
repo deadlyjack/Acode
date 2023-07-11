@@ -41,6 +41,14 @@ class Color {
     return this;
   }
 
+  get isDark() {
+    return this.luminance < 0.5;
+  }
+
+  get isLight() {
+    return this.luminance >= 0.5;
+  }
+
   get lightness() {
     return this.hsl.l;
   }

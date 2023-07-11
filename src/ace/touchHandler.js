@@ -84,8 +84,9 @@ export default function addTouchListeners(editor, minimal, onclick) {
   const $menu = <menu className='cursor-menu'></menu>;
   const timeToSelectText = 500; // ms
   const config = { passive: false }; // event listener config
-
   const ACE_NO_CURSOR = '.ace_gutter,.ace_gutter *,.ace_fold,.ace_inline_button';
+
+  let LOCK_X = appSettings.value.textWrap;
 
   let scrollTimeout; // timeout to check if scrolling is finished
   let menuActive; // true if menu is active
@@ -106,6 +107,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
   let $activeTeardrop; // active teardrop
   let timeTouchStart; // time of touch start
   let touchEnded = true; // true if touch ended
+  let threshold = appSettings.value.touchMoveThreshold;
 
   $el.addEventListener('touchstart', touchStart, config, true);
   scroller.addEventListener('contextmenu', contextmenu, config);
@@ -123,7 +125,9 @@ export default function addTouchListeners(editor, minimal, onclick) {
     editor.on('changeSession', onchangesession);
     editor.on('scroll', onscroll);
     editor.on('fold', onfold);
-    editor.on('select-word', selectionMode.bind({}, $end));
+    editor.on('select-word', () => {
+      selectionMode($end);
+    });
     editor.on('scroll-intoview', () => {
       if (selectionActive) {
         selectionMode($end);
@@ -144,9 +148,15 @@ export default function addTouchListeners(editor, minimal, onclick) {
       $end.dataset.size = value;
       $cursor.dataset.size = value;
     });
-    appSettings.on('update:textWrap', onupdate);
+    appSettings.on('update:textWrap', (value) => {
+      LOCK_X = value;
+      onupdate();
+    });
     appSettings.on('update:scrollSpeed', (value) => {
       scrollSpeed = value;
+    });
+    appSettings.on('update:touchMoveThreshold', (value) => {
+      threshold = value;
     });
   }
 
@@ -191,7 +201,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
     lastY = clientY;
     moveY = 0;
     moveX = 0;
-    lockX = false;
+    lockX = LOCK_X;
     lockY = false;
     mode = 'wait';
 
@@ -219,6 +229,9 @@ export default function addTouchListeners(editor, minimal, onclick) {
     moveX = clientX - lastX;
     moveY = clientY - lastY;
 
+    lastX = clientX;
+    lastY = clientY;
+
     if (!moveX && !moveY) {
       return;
     }
@@ -231,17 +244,11 @@ export default function addTouchListeners(editor, minimal, onclick) {
       }
     }
 
-    lastX = clientX;
-    lastY = clientY;
-
-    const threshold = appSettings.value.touchMoveThreshold;
-    const touchMoved = Math.abs(moveX) < threshold;
-
-    if (appSettings.value.textWrap || touchMoved) {
+    if (lockX || Math.abs(moveX) < threshold) {
       moveX = 0;
     }
 
-    if (Math.abs(moveY) < threshold) {
+    if (lockY || Math.abs(moveY) < threshold) {
       moveY = 0;
     }
 
@@ -816,8 +823,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
       timeTouchStart = null;
 
       // Prevents accidental touchmove
-      const { touchMoveThreshold } = appSettings.value;
-      if (diffX < touchMoveThreshold && diffY < touchMoveThreshold) return;
+      if (diffX < threshold && diffY < threshold) return;
 
       const diffX = Math.abs(lastX - clientX);
       const diffY = Math.abs(lastY - clientY);

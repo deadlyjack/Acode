@@ -366,7 +366,7 @@
   "remove": "移除",
   "too many files": "文件过多。仅列出 {count} 个文件。",
   "too many folders": "文件夹过多。仅列出 {count} 个文件夹",
-  "quicktools:command-palette": "命令面板"
+  "quicktools:command-palette": "命令面板",
   "default file encoding": "默认文本编码",
   "remove entry": "确定要从保存的路径中移除 ‘{name}’ 吗？请注意该移除并不删除路径存在本身。",
   "delete entry": "确认删除：‘{name}’。该操作不可撤销。继续？",

@@ -275,7 +275,9 @@ a.icon {
   }
 
   &.no-icon {
-    max-width: 10px;
+    max-width: 5px;
+    margin-right: 5px;
+    border-radius: 0;
   }
 
   &.letters::before {
