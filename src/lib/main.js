@@ -312,7 +312,7 @@ async function loadApp() {
           plugins(updates);
           $icon.remove();
         }
-      } attr-action='' style={{ fontSize: '1.2rem' }} className='octicon octicon-bell'></span>;
+      } attr-action='' className='icon notifications'></span>;
 
       if ($editMenuToggler.isConnected) {
         $header.insertBefore($icon, $editMenuToggler);
