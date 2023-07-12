@@ -3,7 +3,7 @@ import Path from "utils/Path";
 import Url from "utils/Url";
 import settings from "lib/settings";
 import internalFs from "./internalFs";
-import { encode } from 'utils/encodings';
+import { decode, encode } from 'utils/encodings';
 
 class FtpClient {
   #MAX_TRY = 3;
@@ -89,11 +89,15 @@ class FtpClient {
     });
   }
 
-  async readFile(encoding) {
+  /**
+   * Read file from ftp server
+   * @returns 
+   */
+  async readFile() {
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
       ftp.downloadFile(this.#conId, this.#path, this.#cacheFile, async () => {
-        const data = await internalFs.readFile(this.#cacheFile, encoding);
+        const data = await internalFs.readFile(this.#cacheFile);
         resolve(data);
       }, (error) => {
         reject(error);
@@ -280,18 +284,26 @@ Ftp.fromUrl = (url) => {
 
 Ftp.test = (url) => /^ftp:/.test(url);
 
+/**
+ * Create a fs like interface for the ftp client
+ * @param {FtpClient} ftp 
+ * @returns 
+ */
 function createFs(ftp) {
   return {
     lsDir() {
       return ftp.listDir();
     },
     async readFile(encoding) {
-      const { data } = await ftp.readFile(encoding);
+      const { data } = await ftp.readFile();
+      if (encoding) {
+        return decode(data, encoding);
+      }
       return data;
     },
-    writeFile(content, encoding) {
+    async writeFile(content, encoding) {
       if (typeof content === 'string' && encoding) {
-        content = encode(content, encoding);
+        content = await encode(content, encoding);
       }
 
       return ftp.writeFile(content);

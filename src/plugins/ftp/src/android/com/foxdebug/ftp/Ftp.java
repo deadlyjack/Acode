@@ -79,7 +79,7 @@ public class Ftp extends CordovaPlugin {
             String username = args.optString(2);
             String password = args.optString(3);
             String defaultPath = args.optString(4);
-            String sequirtyType = args.optString(5);
+            String securityType = args.optString(5);
             String connectionMode = args.optString(6);
             String encryption = args.optString(7);
             String encoding = args.optString(8);
@@ -197,7 +197,7 @@ public class Ftp extends CordovaPlugin {
                 "FTP",
                 "FTPClient (" + ftpId + ") Found " + files.length + " files."
               );
-  
+
               JSONArray jsonFiles = new JSONArray();
               if (files.length < 2) {
                 callback.error("Cannot read this directory!");

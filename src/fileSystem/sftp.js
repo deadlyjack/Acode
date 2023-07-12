@@ -3,7 +3,7 @@ import Path from 'utils/Path';
 import Url from 'utils/Url';
 import settings from 'lib/settings';
 import internalFs from './internalFs';
-import { encode } from 'utils/encodings';
+import { decode, encode } from 'utils/encodings';
 
 class SftpClient {
   #MAX_TRY = 3;
@@ -214,7 +214,7 @@ class SftpClient {
   /**
    * Read the file from server
    */
-  readFile(encoding) {
+  readFile() {
     const filename = this.#path;
     const localFilename = this.#getLocalname(filename);
     return new Promise((resolve, reject) => {
@@ -234,7 +234,7 @@ class SftpClient {
             localFilename,
             async () => {
               try {
-                const data = await internalFs.readFile(localFilename, encoding);
+                const data = await internalFs.readFile(localFilename);
                 resolve(data);
               } catch (error) {
                 reject(error);
@@ -672,7 +672,12 @@ function createFs(sftp) {
       return sftp.lsDir();
     },
     async readFile(encoding) {
-      const { data } = await sftp.readFile(encoding);
+      const { data } = await sftp.readFile();
+
+      if (encoding) {
+        return decode(data, encoding);
+      }
+
       return data;
     },
     async writeFile(content, encoding) {
@@ -680,7 +685,7 @@ function createFs(sftp) {
         content = await encode(content, encoding);
       }
 
-      return sftp.writeFile(content, null, encoding);
+      return sftp.writeFile(content, null);
     },
     createFile(name, data) {
       return sftp.createFile(name, data);

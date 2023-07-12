@@ -176,7 +176,7 @@ async function expandList($list) {
       }
     });
   } catch (err) {
-    this.collapse();
+    $list.collapse();
     helpers.error(err);
   } finally {
     stopLoading();

@@ -57,7 +57,7 @@ export default function palette(getList, onsSelectCb, placeholder, onremove) {
 
 
   // Create a palette with input and hints
-  inputhints($input, generateHints, onsSelectCb);
+  inputhints($input, generateHints, onSelect);
 
   // Removes the darkened color from status bar and navigation bar
   restoreTheme(true);
@@ -79,6 +79,15 @@ export default function palette(getList, onsSelectCb, placeholder, onremove) {
     id: 'palette',
     action: remove,
   });
+
+  /**
+   * On select callback for inputhints
+   * @param {string} value 
+   */
+  function onSelect(value) {
+    onsSelectCb(value);
+    remove();
+  }
 
   /**
    * Keydown event handler for input

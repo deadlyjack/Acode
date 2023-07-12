@@ -21,7 +21,6 @@ import ajax from '@deadlyjack/ajax';
 import helpers from 'utils/helpers';
 import settings from 'lib/settings';
 import $_menu from 'views/menu.hbs';
-import openFile from 'lib/openFile';
 import plugins from 'pages/plugins';
 import fsOperation from 'fileSystem';
 import toast from 'components/toast';
@@ -44,7 +43,6 @@ import contextmenu from 'components/contextmenu';
 import otherSettings from 'settings/appSettings';
 import windowResize from 'handlers/windowResize';
 import quickToolsInit from 'handlers/quickToolsInit';
-import QuickTools from 'pages/quickTools/quickTools';
 import checkPluginsUpdate from 'lib/checkPluginsUpdate';
 
 import { initModes } from 'ace/modelist';
@@ -52,7 +50,7 @@ import { initFileList } from 'lib/fileList';
 import { addedFolder } from 'lib/openFolder';
 import { keydownState } from 'handlers/keyboard';
 import { getEncoding, initEncodings } from 'utils/encodings';
-import { resetKeyBindings, setKeyBindings } from 'ace/commands';
+import { setKeyBindings } from 'ace/commands';
 
 const previousVersionCode = parseInt(localStorage.versionCode, 10);
 
