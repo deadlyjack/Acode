@@ -364,14 +364,14 @@
   "info-excludefolders": "Use o padrão **/node_modules/** para ignorar todos os arquivos da pasta node_modules. Isso excluirá os arquivos da lista e também impedirá que sejam incluídos nas pesquisas de arquivos.",
   "missed files": "{count} arquivos verificados após o início da pesquisa e não serão incluídos na pesquisa.",
   "remove": "Remove",
-  "too many files": "Too many files. Only {count} will be listed.",
-  "too many folders": "Too many folders. Only {count} will be listed.",
+  "too many files": "Muitos arquivos, apenas {count} serão listados.",
+  "too many folders": "Muitas pastas, apenas {count} serão listados.",
   "quicktools:command-palette": "Paleta de comandos",
-  "default file encoding": "Default file encoding",
-  "remove entry": "Are you sure you want to remove '{name}' from the saved paths? Please note that removing it will not delete the path itself.",
-  "delete entry": "Confirm deletion: '{name}'. This action cannot be undone. Proceed?",
-  "change encoding": "Reopen '{file}' with '{encoding}' encoding? This action will result in the loss of any unsaved changes made to the file. Do you want to proceed with reopening?",
-  "reopen file": "Are you sure you want to reopen '{file}'? Any unsaved changes will be lost.",
-  "plugin min version": "{name} only available in Acode - {v-code} and above. Click here to update.",
-  "color preview": "Color preview"
+  "default file encoding": "Codificação de arquivo padrão",
+  "remove entry": "Tem certeza de que deseja remover '{name}' dos caminhos salvos? Observe que removê-lo não excluirá o caminho em si.",
+  "delete entry": "Confirme a exclusão: '{name}'. Essa ação não pode ser desfeita. Continuar?",
+  "change encoding": "Reabrir '{file}' com codificação '{encoding}'? Esta ação resultará na perda de alterações não salvas feitas no arquivo. Deseja prosseguir com a reabertura?",
+  "reopen file": "Tem certeza de que deseja reabrir '{file}'? Alterações podem ser perdidas!",
+  "plugin min version": "{name} disponível apenas em Acode - {v-code} e superior. Clique aqui para atualizar.",
+  "color preview": "Visualização de cores"
 }
