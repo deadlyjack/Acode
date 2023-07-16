@@ -4,6 +4,7 @@ import Url from "utils/Url";
 import settings from "lib/settings";
 import internalFs from "./internalFs";
 import { decode, encode } from 'utils/encodings';
+import helpers from 'utils/helpers';
 
 class FtpClient {
   #MAX_TRY = 3;
@@ -130,9 +131,7 @@ class FtpClient {
 
     return new Promise((resolve, reject) => {
       ftp.uploadFile(this.#conId, this.#cacheFile, Path.join(this.#path, name), async () => {
-        const url = Url.join(this.#origin, this.#path, name);
-        const stat = await this.stat(url);
-        resolve(stat.url);
+        resolve(Url.join(this.#origin, this.#path, name));
       }, reject);
     });
   }
@@ -141,9 +140,7 @@ class FtpClient {
     await this.#connectIfNotConnected();
     return new Promise((resolve, reject) => {
       ftp.createDirectory(this.#conId, Path.join(this.#path, name), async () => {
-        const url = Url.join(this.#origin, this.#path, name);
-        const stat = await this.stat(url);
-        resolve(stat.url);
+        resolve(Url.join(this.#origin, this.#path, name));
       }, reject);
     });
   }
@@ -175,9 +172,7 @@ class FtpClient {
     return new Promise((resolve, reject) => {
       ftp.rename(this.#conId, this.#path, newPath, async () => {
         this.#path = newPath;
-        const url = Url.join(this.#origin, newPath);
-        const stat = await this.stat(url);
-        resolve(stat.url);
+        resolve(Url.join(this.#origin, newPath));
       }, reject);
     });
   }
@@ -191,9 +186,7 @@ class FtpClient {
     return new Promise((resolve, reject) => {
       ftp.rename(this.#conId, this.#path, newPath, async () => {
         this.#path = newPath;
-        const url = Url.join(this.#origin, newPath);
-        const stat = await this.stat(url);
-        resolve(stat.url);
+        resolve(Url.join(this.#origin, newPath));
       }, reject);
     });
   }
@@ -203,7 +196,7 @@ class FtpClient {
     return new Promise((resolve, reject) => {
       ftp.exists(this.#conId, this.#path, resolve, (error) => {
         reject(error);
-        console.error('FTP exists: ', error);
+        console.error('FTP error: ', error);
       });
     });
   }
@@ -234,10 +227,17 @@ class FtpClient {
     return new Promise((resolve, reject) => {
       ftp.getStat(this.#conId, url, (stat) => {
         this.#stat = stat;
+        this.#stat.url = Url.join(this.#origin, url);
+        helpers.defineDeprecatedProperty(
+          this.#stat,
+          'uri',
+          function () { return this.url; },
+          function (val) { this.url = val; },
+        );
         if (this.#stat.isFile) {
           this.#stat.type = mimeType.lookup(this.#stat.name);
         }
-        resolve(stat);
+        resolve(this.#stat);
       }, (err) => {
         console.error('Error while getting stat', err);
         reject(err);

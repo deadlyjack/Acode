@@ -761,8 +761,8 @@ export default class EditorFile {
 
     if (/^s?ftp:/.test(this.uri)) return fs.localName;
 
-    const { uri } = await fs.stat();
-    return uri;
+    const { url } = await fs.stat();
+    return url;
   }
 
   /**
@@ -793,6 +793,8 @@ export default class EditorFile {
   }
 
   async #loadText() {
+    let value = '';
+
     const {
       cursorPos,
       scrollLeft,
@@ -801,7 +803,6 @@ export default class EditorFile {
       editable,
     } = this.#loadOptions;
     const { editor } = editorManager;
-    let value;
 
     this.#loadOptions = null;
 
@@ -813,22 +814,27 @@ export default class EditorFile {
 
     try {
       const cacheFs = fsOperation(this.cacheFile);
-      if (await cacheFs.exists()) {
+      const cacheExists = await cacheFs.exists();
+
+      if (cacheExists) {
         value = await cacheFs.readFile(this.encoding);
       }
 
       if (this.uri) {
         const file = fsOperation(this.uri);
-        if (!await file.exists()) {
+        const fileExists = await file.exists();
+        if (!fileExists && cacheExists) {
           this.deletedFile = true;
           this.isUnsaved = true;
-        } else if (value === undefined) {
+        } else if (fileExists) {
           value = await file.readFile(this.encoding);
+        } else {
+          throw new Error('Unable to load file');
         }
       }
 
       this.markChanged = false;
-      this.session.setValue(value || '');
+      this.session.setValue(value);
       this.loaded = true;
       this.loading = false;
 

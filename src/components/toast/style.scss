@@ -19,6 +19,7 @@
   animation: slow-appear 500ms linear 1;
   z-index: 9999;
   border-radius: 4px;
+  pointer-events: none;
 
   &.hide {
     transition: all 1s linear;
@@ -26,14 +27,11 @@
   }
 
   &[clickable='true'] {
-    .message {
-      pointer-events: all;
-    }
+    pointer-events: all;
   }
 
   .message {
     padding: 10px;
-    pointer-events: none;
   }
 
   .icon {

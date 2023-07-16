@@ -356,5 +356,17 @@ export default {
       clearTimeout(timeout);
       timeout = setTimeout(later, wait);
     };
+  },
+  defineDeprecatedProperty(obj, name, getter, setter) {
+    Object.defineProperty(obj, name, {
+      get: function () {
+        console.warn(`Property '${name}' is deprecated.`);
+        return getter.call(this);
+      },
+      set: function (value) {
+        console.warn(`Property '${name}' is deprecated.`);
+        setter.call(this, value);
+      }
+    });
   }
 };;;

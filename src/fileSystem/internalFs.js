@@ -1,6 +1,7 @@
 import ajax from '@deadlyjack/ajax';
 import Url from 'utils/Url';
 import { decode, encode } from 'utils/encodings';
+import helpers from 'utils/helpers';
 
 const internalFs = {
   /**
@@ -208,7 +209,9 @@ const internalFs = {
           src[action](
             dest,
             undefined,
-            (entry) => resolve(entry.nativeURL),
+            (entry) => resolve(
+              decodeURIComponent(entry.nativeURL),
+            ),
             reject,
           );
         })
@@ -225,11 +228,14 @@ const internalFs = {
     return new Promise((resolve, reject) => {
       reject = setMessage(reject);
       window.resolveLocalFileSystemURL(filename, (entry) => {
-        filename = entry.nativeURL;
-        sdcard.stats(
-          filename,
+        sdcard.stats(entry.nativeURL,
           (stats) => {
-            stats.uri = filename;
+            helpers.defineDeprecatedProperty(
+              stats,
+              'uri',
+              function () { return this.url; },
+              function (val) { this.url = val; },
+            );
             stats.url = filename;
             resolve(stats);
           },
