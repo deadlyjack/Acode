@@ -131,17 +131,26 @@ const externalFs = {
     if (Array.isArray(storageList)) {
       const storage = storageList.find(s => s.uri === uri);
       if (storage) {
-        return {
+        const stat = {
+          size: 0,
           name: storage.name,
+          type: 'dir',
           canRead: true,
           canWrite: true,
-          size: 0,
           modifiedDate: new Date(),
           isDirectory: true,
           isFile: false,
           url: uri,
-          uri,
         };
+
+        helpers.defineDeprecatedProperty(
+          stat,
+          'uri',
+          function () { return this.url; },
+          function (val) { this.url = val; },
+        );
+
+        return stat;
       }
     }
 
@@ -150,7 +159,12 @@ const externalFs = {
       sdcard.stats(
         uri,
         (stats) => {
-          stats.uri = uri;
+          helpers.defineDeprecatedProperty(
+            stats,
+            'uri',
+            function () { return this.url; },
+            function (val) { this.url = val; },
+          );
           resolve(stats);
         },
         reject,

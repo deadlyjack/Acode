@@ -4,6 +4,7 @@ import Url from 'utils/Url';
 import settings from 'lib/settings';
 import internalFs from './internalFs';
 import { decode, encode } from 'utils/encodings';
+import helpers from 'utils/helpers';
 
 class SftpClient {
   #MAX_TRY = 3;
@@ -452,7 +453,7 @@ class SftpClient {
     const file = await this.lsDir(filename, true);
     if (!file) return null;
 
-    return {
+    const stat = {
       name: file.name,
       exists: true,
       length: file.size,
@@ -463,9 +464,17 @@ class SftpClient {
       canRead: file.canRead,
       lastModified: file.modifiedDate,
       type: mimeType.lookup(filename),
-      uri: file.url,
       url: file.url,
     };
+
+    helpers.defineDeprecatedProperty(
+      stat,
+      'uri',
+      function () { return this.url; },
+      function (val) { this.url = val; },
+    );
+
+    return stat;
   }
 
   get localName() {

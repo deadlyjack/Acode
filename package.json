@@ -28,10 +28,10 @@
       },
       "cordova-plugin-sftp": {},
       "cordova-plugin-server": {},
-      "cordova-plugin-ftp": {},
       "cordova-plugin-sdcard": {},
       "cordova-plugin-iap": {},
-      "cordova-plugin-system": {}
+      "cordova-plugin-system": {},
+      "cordova-plugin-ftp": {}
     },
     "platforms": [
       "android"

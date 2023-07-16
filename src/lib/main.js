@@ -268,7 +268,6 @@ async function loadApp() {
 
   //#region Add event listeners
   initModes();
-  initFileList();
   quickToolsInit();
   sidebarApps.init($sidebar);
   await sidebarApps.loadApps();
@@ -312,7 +311,7 @@ async function loadApp() {
           plugins(updates);
           $icon.remove();
         }
-      } attr-action='' style={{ fontSize: '1.2rem' }} className='octicon octicon-bell'></span>;
+      } attr-action='' style={{ fontSize: '1.2rem' }} className='icon notifications'></span>;
 
       if ($editMenuToggler.isConnected) {
         $header.insertBefore($icon, $editMenuToggler);
@@ -337,17 +336,17 @@ async function loadApp() {
   }
 
   if (Array.isArray(files) && files.length) {
-    restoreFiles(files)
-      .then(() => {
-        onEditorUpdate(undefined, false);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast('File loading failed!');
-      });
+    try {
+      await restoreFiles(files);
+    } catch (error) {
+      console.error(error);
+      toast('File loading failed!');
+    }
   } else {
     onEditorUpdate(undefined, false);
   }
+
+  initFileList();
 
   /**
    *

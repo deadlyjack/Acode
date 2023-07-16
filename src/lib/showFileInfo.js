@@ -19,11 +19,11 @@ export default async function showFileInfo(url) {
     const stats = await fs.stat();
     const value = await fs.readFile(settings.value.defaultFileEncoding);
 
-    let { name, lastModified, length, uri, type } = stats;
+    let { name, lastModified, length, type } = stats;
     length = filesize(length);
     lastModified = new Date(lastModified).toLocaleString();
 
-    const protocol = Url.getProtocol(uri);
+    const protocol = Url.getProtocol(url);
     const options = {
       name,
       lastModified,

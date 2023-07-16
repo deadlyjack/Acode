@@ -22,9 +22,17 @@ let dirCount = 0;
 let fileCount = 0;
 
 export function initFileList() {
+  if (editorManager?.activeFile.loading) {
+    editorManager.activeFile.on('loadend', initFileList);
+    return;
+  }
   editorManager.on('add-folder', onAddFolder);
   editorManager.on('remove-folder', onRemoveFolder);
   settings.on('update:excludeFolders:after', refresh);
+
+  addedFolder.forEach(({ url, title }) => {
+    onAddFolder({ url, name: title });
+  });
 }
 
 /**
@@ -273,44 +281,62 @@ async function getAllFiles(parent, depth = 0) {
   if (skip()) return;
   if (depth > settings.value.maxDirDepth) return;
 
+  try {
+    const ls = await fsOperation(parent.url).lsDir();
+    await Promise.all(
+      ls.map(async (item) => {
+        if (skip()) return;
+
+        const { name, url, isDirectory } = item;
+        const exists = parent.children.findIndex(({ value }) => value === url);
+        if (exists > -1) {
+          return;
+        }
+
+        const file = await Tree.create(url, name, isDirectory);
+
+        if (skip()) return;
+
+        const existingTree = getTree(Object.values(filesTree), file.url);
+
+        if (existingTree) {
+          file.children = existingTree.children;
+          parent.children.push(file);
+          return;
+        }
+
+        parent.children.push(file);
+        if (isDirectory) {
+          const ignore = !!settings.value.excludeFolders.find(
+            (folder) => minimatch(Url.join(file.path, ''), folder, { matchBase: true }),
+          );
+          if (ignore) return;
+
+          getAllFiles(file, depth + 1);
+          return;
+        }
+
+        incFileCount();
+        emit('push-file', file);
+      })
+    );
+  } catch (error) {
+    // retry after 1s
+    toast(`retrying ftp: ${parent.path}`);
+
+    setTimeout(() => {
+      let root = parent;
+      while (root.parent) {
+        root = root.parent;
+      }
+
+      const isDirOpened = addedFolder.find(({ url }) => url === root.url);
+      if (!isDirOpened) return;
+      getAllFiles(parent, depth);
+    }, 3000);
+  }
+
   incDirCount();
-
-  const ls = await fsOperation(parent.url).lsDir();
-  await Promise.all(ls.map(async (item) => {
-    if (skip()) return;
-
-    const { name, url, isDirectory } = item;
-    const exists = parent.children.findIndex(({ value }) => value === url);
-    if (exists > -1) {
-      return;
-    }
-
-    const file = await Tree.create(url, name, isDirectory);
-
-    if (skip()) return;
-
-    const existingTree = getTree(Object.values(filesTree), file.url);
-
-    if (existingTree) {
-      file.children = existingTree.children;
-      parent.children.push(file);
-      return;
-    }
-
-    parent.children.push(file);
-    if (isDirectory) {
-      const ignore = !!settings.value.excludeFolders.find(
-        (folder) => minimatch(Url.join(file.path, ''), folder, { matchBase: true }),
-      );
-      if (ignore) return;
-
-      getAllFiles(file, depth + 1);
-      return;
-    }
-
-    incFileCount();
-    emit('push-file', file);
-  }));
 }
 
 function skip() {
@@ -465,11 +491,9 @@ export class Tree {
     this.#path = Url.join(this.#parent.path, name);
     if (Array.isArray(this.#children)) {
       const [dirs, files] = countEntries(this.#children);
-      console.log('before', dirs, files);
       dirCount -= dirs;
       fileCount -= files;
       this.#children.length = 0;
-      console.log('after', dirs, files);
     }
     getAllFiles(this);
   }

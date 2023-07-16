@@ -17,7 +17,9 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import org.apache.commons.net.ftp.*;
 import org.apache.commons.net.ftp.parser.ParserInitializationException;
 import org.apache.cordova.CallbackContext;
@@ -68,6 +70,14 @@ public class Ftp extends CordovaPlugin {
   }
 
   public void connect(JSONArray args, CallbackContext callback) {
+    connect(args, callback, false);
+  }
+
+  public void connect(
+    JSONArray args,
+    CallbackContext callback,
+    boolean isRetry
+  ) {
     cordova
       .getThreadPool()
       .execute(
@@ -84,13 +94,15 @@ public class Ftp extends CordovaPlugin {
             String encryption = args.optString(7);
             String encoding = args.optString(8);
             String ftpId = getFtpId(host, port, username);
-            FTPClient ftp;
+            FTPClient ftp = null;
 
             try {
               if (ftpProfiles.containsKey(ftpId)) {
                 ftp = ftpProfiles.get(ftpId);
                 reply = ftp.getReplyCode();
                 if (ftp.isConnected() && FTPReply.isPositiveCompletion(reply)) {
+                  // test if connection is still valid
+                  ftp.sendNoOp();
                   Log.d("FTP", "FTPClient (" + ftpId + ") is connected");
                   callback.success(ftpId);
                   return;
@@ -135,9 +147,28 @@ public class Ftp extends CordovaPlugin {
               callback.success(ftpId);
             } catch (IOException e) {
               Log.e("FTP", "FTPClient (" + ftpId + ")", e);
+              if (ftp != null) {
+                ftpProfiles.remove(ftpId);
+              }
+
+              if (!isRetry) {
+                connect(args, callback, true);
+                return;
+              }
+
               callback.error(e.getMessage());
             } catch (Exception e) {
               Log.e("FTP", "FTPClient (" + ftpId + ")", e);
+
+              if (ftp != null) {
+                ftpProfiles.remove(ftpId);
+              }
+
+              if (!isRetry) {
+                connect(args, callback, true);
+                return;
+              }
+
               callback.error(e.getMessage());
             }
           }
@@ -199,10 +230,6 @@ public class Ftp extends CordovaPlugin {
               );
 
               JSONArray jsonFiles = new JSONArray();
-              if (files.length < 2) {
-                callback.error("Cannot read this directory!");
-                return;
-              }
 
               for (FTPFile file : files) {
                 String filename = file.getName();
@@ -436,12 +463,53 @@ public class Ftp extends CordovaPlugin {
               }
 
               FTPClient ftp = ftpProfiles.get(ftpId);
+
               if (ftp == null) {
                 callback.error("FTP client not found.");
                 return;
               }
 
+              // get list of files in the parent directory
+              String parentPath = getParentPath(oldPath);
+              FTPFile[] ftpFiles = ftp.listFiles(parentPath);
+
+              Log.d("FTP", "Renaming " + oldPath + " to " + newPath);
               ftp.rename(oldPath, newPath);
+
+              // check if file is renamed successfully
+              FTPFile[] newFile = ftp.listFiles(newPath);
+              if (newFile.length > 0) {
+                callback.success(newPath);
+              } else {
+                // get latest list of files in the parent directory
+                FTPFile[] latestFtpFiles = ftp.listFiles(parentPath);
+                // some time src file is renamed and not moved to destination
+                // check if for changed file and rename it original name
+                FTPFile changedFile = null;
+                for (FTPFile file : latestFtpFiles) {
+                  boolean found = false;
+                  for (FTPFile oldFile : ftpFiles) {
+                    if (oldFile.getName().equals(file.getName())) {
+                      found = true;
+                      break;
+                    }
+                  }
+                  if (!found) {
+                    changedFile = file;
+                    break;
+                  }
+                }
+
+                if (changedFile != null) {
+                  String changedFilePath = joinPath(
+                    parentPath,
+                    changedFile.getName()
+                  );
+                  ftp.rename(changedFilePath, oldPath);
+                }
+                callback.error("Failed to rename file");
+              }
+
               callback.success();
             } catch (FTPConnectionClosedException e) {
               callback.error(e.getMessage());

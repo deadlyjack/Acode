@@ -3,6 +3,8 @@ import { addedFolder } from './openFolder';
 import appSettings from './settings';
 
 export default () => {
+  if (!window.editorManager) return;
+
   const filesToSave = [];
   const folders = [];
   const { editor, files, activeFile } = editorManager;
