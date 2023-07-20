@@ -33,6 +33,7 @@ import prompt from 'dialogs/prompt';
  * @property {string} id
  * @property {string} url
  * @property {string} title
+ * @property {boolean} listFiles Weather to list all files recursively
  * @property {boolean} saveState
  * @property {Collapsible} $node
  * @property {ClipBoard} clipBoard
@@ -53,7 +54,7 @@ export const addedFolder = [];
  * @param {boolean} [opts.saveState]
  * @param {Map<string, boolean>} [opts.listState]
  */
-function openFolder(_path, opts = {}) {
+async function openFolder(_path, opts = {}) {
   if (addedFolder.find((folder) => folder.url === _path)) {
     return;
   }
@@ -61,6 +62,7 @@ function openFolder(_path, opts = {}) {
   const saveState = opts.saveState ?? true;
   const listState = opts.listState || {};
   const title = opts.name;
+  const listFiles = await confirm(strings.confirm, strings['list files']);
 
   if (!title) {
     throw new Error('Folder name is required');
@@ -98,6 +100,7 @@ function openFolder(_path, opts = {}) {
   addedFolder.push({
     title,
     remove,
+    listFiles,
     saveState,
     listState,
     url: _path,
@@ -113,6 +116,10 @@ function openFolder(_path, opts = {}) {
   editorManager.emit('update', 'add-folder');
   editorManager.onupdate('add-folder', event);
   editorManager.emit('add-folder', event);
+
+  if (listFiles) {
+    FileList.listFolder({ url: _path, name: title });
+  }
 
   if (listState[_path]) {
     $root.expand();
@@ -135,7 +142,7 @@ function openFolder(_path, opts = {}) {
     editorManager.onupdate('remove-folder', event);
     editorManager.emit('remove-folder', event);
   }
-}
+};
 
 /**
  * Expand the list

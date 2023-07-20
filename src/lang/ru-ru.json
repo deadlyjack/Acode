@@ -365,8 +365,6 @@
   "info-excludefolders": "Используйте шаблон **/node_modules/**, чтобы игнорировать все файлы из папки node_modules. Это исключит файлы из списка, а также предотвратит их включение в поиске файлов.",
   "missed files": "Найдено {count} файлов, они не будут учитываться.",
   "remove": "Удалить",
-  "too many files": "Слишком много файлов, показаны в списке только {count}.",
-  "too many folders": "Слишком много папок, показаны в списке только {count}.",
   "quicktools:command-palette": "Палитра команд",
   "default file encoding": "Кодировка по умолчанию",
   "remove entry": "Вы уверены, что хотите убрать '{name}' из сохранённых путей? Сама папка удалена не будет.",
@@ -374,5 +372,7 @@
   "change encoding": "Переоткрыть '{file}' с кодировкой '{encoding}'? Вы потеряете все несохранённые изменения.",
   "reopen file": "Переоткрыть '{file}'? Вы потеряете все несохранённые изменения.",
   "plugin min version": "{name} доступен только для Acode - {v-code} и выше. Нажмите для обновления.",
-  "color preview": "Предпросмотр цвета"
+  "color preview": "Предпросмотр цвета",
+  "confirm": "Confirm",
+  "list files": "Do you want to list all files in this directory? Please note that if this directory is located on a remote server (e.g., FTP, SFTP), listing all files may consume more data and take some time. However, if there are only a few files in the directory, it should be fine"
 }

@@ -33,9 +33,12 @@ import './style.scss';
 export default function inputhints($input, hints, onSelect) {
   /**@type {HTMLUListElement} */
   const $ul = <Ul />;
+  const LIMIT = 100;
 
   let preventUpdate = false;
   let updateUlTimeout;
+  let pages = 0;
+  let currentHints = [];
 
   $input.addEventListener('focus', onfocus);
 
@@ -254,6 +257,7 @@ export default function inputhints($input, hints, onSelect) {
     $ul.addEventListener('mouseup', handleMouseUp);
     $ul.addEventListener('touchstart', handleMouseDown);
     $ul.addEventListener('touchend', handleMouseUp);
+    $ul.addEventListener('scroll', updatePage);
   }
 
   function ulRemoveEventListeners() {
@@ -263,6 +267,15 @@ export default function inputhints($input, hints, onSelect) {
     $ul.removeEventListener('mouseup', handleMouseUp);
     $ul.removeEventListener('touchstart', handleMouseDown);
     $ul.removeEventListener('touchend', handleMouseUp);
+    $ul.removeEventListener('scroll', updatePage);
+  }
+
+  function updatePage() {
+    // if the scroll is at the bottom
+    if ($ul.scrollTop + $ul.clientHeight >= $ul.scrollHeight) {
+      pages++;
+      updateUlNow(currentHints, pages);
+    }
   }
 
   /**
@@ -286,12 +299,26 @@ export default function inputhints($input, hints, onSelect) {
   /**
    * Update the hint list instantly
    * @param {Array<HintObj>} hints 
+   * @param {number} page
    */
-  function updateUlNow(hints) {
+  function updateUlNow(hints, page = 0) {
+    // render only first 500 hints
+    currentHints = hints;
+    const offset = page * LIMIT;
+    const end = offset + LIMIT;
+    const list = hints.slice(offset, end);
+    let scrollTop = $ul.scrollTop;
+    if (!list.length) return;
+
     $ul.remove();
-    $ul.innerHTML = '';
-    $ul.content = hints.map((hint) => <Hint hint={hint} />);
+    if (!page) {
+      scrollTop = 0;
+      $ul.content = list.map((hint) => <Hint hint={hint} />);
+    } else {
+      $ul.append(...list.map((hint) => <Hint hint={hint} />));
+    }
     app.append($ul);
+    $ul.scrollTop = scrollTop;
     position(); // Update the position of the new list
   }
 

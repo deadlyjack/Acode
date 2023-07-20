@@ -364,8 +364,6 @@
   "info-excludefolders": "node_modules ഫോൾഡറിൽ നിന്നുള്ള എല്ലാ ഫയലുകളും അവഗണിക്കാൻ **/node_modules/** പാറ്റേൺ ഉപയോഗിക്കുക. ഇത് ഫയലുകളെ ലിസ്റ്റുചെയ്യുന്നതിൽ നിന്ന് ഒഴിവാക്കുകയും ഫയൽ തിരയലിൽ ഉൾപ്പെടുത്തുന്നതിൽ നിന്ന് തടയുകയും ചെയ്യും.",
   "missed files": "തിരയൽ ആരംഭിച്ചതിന് ശേഷം സ്‌കാൻ ചെയ്‌ത {count} ഫയലുകൾ തിരയലിൽ ഉൾപ്പെടുത്തില്ല.",
   "remove": "നീക്കം ചെയ്യുക",
-  "too many files": "നിറയെ അധികം ഫയൽസ് . Only {count} ഇണമേ ലിസ്റ്റ് ചെയ്യുകയുള്ളൂ",
-  "too many folders": "നിറയെ അധികം ഫോയിഫെറ്സ് . {count} എണ്ണമേ ലിസ്റ്റ് ചെയപെടു.",
   "quicktools:command-palette": "കമാൻഡ് പല്ലെറ്റ്",
   "default file encoding": "Default file encoding",
   "remove entry": "Are you sure you want to remove '{name}' from the saved paths? Please note that removing it will not delete the path itself.",
@@ -373,5 +371,7 @@
   "change encoding": "Reopen '{file}' with '{encoding}' encoding? This action will result in the loss of any unsaved changes made to the file. Do you want to proceed with reopening?",
   "reopen file": "Are you sure you want to reopen '{file}'? Any unsaved changes will be lost.",
   "plugin min version": "{name} only available in Acode - {v-code} and above. Click here to update.",
-  "color preview": "Color preview"
+  "color preview": "Color preview",
+  "confirm": "Confirm",
+  "list files": "Do you want to list all files in this directory? Please note that if this directory is located on a remote server (e.g., FTP, SFTP), listing all files may consume more data and take some time. However, if there are only a few files in the directory, it should be fine"
 }

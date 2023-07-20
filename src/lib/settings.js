@@ -134,12 +134,11 @@ class Settings {
       touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 20,
       quicktoolsItems: [...Array(this.#QUICKTOOLS_SIZE).keys()],
       excludeFolders: this.#excludeFolders,
-      maxFilesCount: 500,
-      maxDirDepth: 10,
-      maxDirCount: 100,
       defaultFileEncoding: 'UTF-8',
       inlineAutoCompletion: true,
       colorPreview: true,
+      maxRetryCount: 3,
+      showRetryToast: false,
     };
     this.value = structuredClone(this.#defaultSettings);
   }

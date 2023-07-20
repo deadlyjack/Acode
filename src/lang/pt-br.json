@@ -231,7 +231,7 @@
   "browser": "Navegador",
   "diagonal scrolling": "Rolagem diagonal",
   "reverse scrolling": "Rolagem reversa",
-    "formatter": "Formatador",
+  "formatter": "Formatador",
   "format on save": "Format on save",
   "remove ads": "Remover propagandas",
   "fast": "Rápido",
@@ -364,8 +364,6 @@
   "info-excludefolders": "Use o padrão **/node_modules/** para ignorar todos os arquivos da pasta node_modules. Isso excluirá os arquivos da lista e também impedirá que sejam incluídos nas pesquisas de arquivos.",
   "missed files": "{count} arquivos verificados após o início da pesquisa e não serão incluídos na pesquisa.",
   "remove": "Remover",
-  "too many files": "Muitos arquivos. Apenas {count} serão listados.",
-  "too many folders": "Muitas pastas. Apenas {count} serão listadas.",
   "quicktools:command-palette": "Paleta de comandos",
   "default file encoding": "Codificação de arquivo padrão",
   "remove entry": "Tem certeza de que deseja remover '{name}' dos caminhos salvos? Observe que removê-lo não excluirá o caminho em si.",
@@ -373,5 +371,7 @@
   "change encoding": "Reabrir '{file}' com codificação '{encoding}'? Esta ação resultará na perda de quaisquer alterações não salvas feitas no arquivo. Deseja prosseguir com a reabertura?",
   "reopen file": "Tem certeza de que deseja reabrir '{file}'? Quaisquer alterações não salvas serão perdidas.",
   "plugin min version": "{name} disponível apenas no Acode - {v-code} e superior. Clique aqui para atualizar.",
-  "color preview": "Pré-vizualização de cores"
+  "color preview": "Pré-vizualização de cores",
+  "confirm": "Confirm",
+  "list files": "Do you want to list all files in this directory? Please note that if this directory is located on a remote server (e.g., FTP, SFTP), listing all files may consume more data and take some time. However, if there are only a few files in the directory, it should be fine"
 }

@@ -364,8 +364,6 @@
   "info-excludefolders": "使用表达式 **/node_modules/** 以忽略所有 node_modules 文件夹下的文件。这将排除文件列表中列出的文件并阻止在这些文件中搜索。",
   "missed files": "自搜索开始后扫描了 {count} 个文件并将不会被包含在搜索中。",
   "remove": "移除",
-  "too many files": "文件过多。仅列出 {count} 个文件。",
-  "too many folders": "文件夹过多。仅列出 {count} 个文件夹",
   "quicktools:command-palette": "命令面板",
   "default file encoding": "默认文本编码",
   "remove entry": "确定要从保存的路径中移除 ‘{name}’ 吗？请注意该移除并不删除路径存在本身。",
@@ -373,5 +371,7 @@
   "change encoding": "确定要重新打开 ‘{file}’ 以使用 ‘{encoding}’ 编码编辑？该操作将丢失该文件所有未保存的修改。继续重新打开？",
   "reopen file": "确定要重新打开 ‘{file}’？所有未保存的修改将会丢失。",
   "plugin min version": "{name} 仅在 Acode - {v-code} 及以上版本有效。点击以更新。",
-  "color preview": "颜色预览"
+  "color preview": "颜色预览",
+  "confirm": "Confirm",
+  "list files": "Do you want to list all files in this directory? Please note that if this directory is located on a remote server (e.g., FTP, SFTP), listing all files may consume more data and take some time. However, if there are only a few files in the directory, it should be fine"
 }

@@ -364,8 +364,6 @@
   "info-excludefolders": "Use the pattern **/node_modules/** to ignore all files from the node_modules folder. This will exclude the files from being listed and will also prevent them from being included in file searches.",
   "missed files": "Scanned {count} files after search started and will not be included in search.",
   "remove": "Remove",
-  "too many files": "Too many files. Only {count} will be listed.",
-  "too many folders": "Too many folders. Only {count} will be listed.",
   "quicktools:command-palette": "Command palette",
   "default file encoding": "Default file encoding",
   "remove entry": "Are you sure you want to remove '{name}' from the saved paths? Please note that removing it will not delete the path itself.",
@@ -373,5 +371,7 @@
   "change encoding": "Reopen '{file}' with '{encoding}' encoding? This action will result in the loss of any unsaved changes made to the file. Do you want to proceed with reopening?",
   "reopen file": "Are you sure you want to reopen '{file}'? Any unsaved changes will be lost.",
   "plugin min version": "{name} only available in Acode - {v-code} and above. Click here to update.",
-  "color preview": "Color preview"
+  "color preview": "Color preview",
+  "confirm": "Confirm",
+  "list files": "Do you want to list all files in this directory? Please note that if this directory is located on a remote server (e.g., FTP, SFTP), listing all files may consume more data and take some time. However, if there are only a few files in the directory, it should be fine"
 }

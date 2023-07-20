@@ -364,8 +364,6 @@
   "info-excludefolders": "Benutzen Sie das Muster **/node_modules/** um Dateien im node_modules-Ordner auszuschließen. Dies schließt sie aus der Auflistung aus und verhindert das sie in den Datei-Suchen mit einbezogen wird.",
   "missed files": "Nach dem Start der Suche wurden {count} Dateien gescannt und werden nicht mit in die Suche einbezogen.",
   "remove": "Entfernen",
-  "too many files": "Zu viele Dateien. Nur {count} werden aufgelistet.",
-  "too many folders": "Zu viele Ordner. Nur {count} werden aufgelistet.",
   "quicktools:command-palette": "Befehlspalette",
   "default file encoding": "Standard-Dateikodierung",
   "remove entry": "Sind Sie sicher, das sie '{name}' von den Speicherpfaden entfernen möchten? Bitte beachten Sie, das der Pfad selbst nicht gelöscht wird.",
@@ -373,5 +371,7 @@
   "change encoding": "Neuladen von '{file}' mit '{encoding}' Kodierung? Bei dieser Aktion gehen alle ungespeicherten Änderungen an dieser Datei verloren. Wollen Sie mit dem Neuladen fortfahren?",
   "reopen file": "Sind Sie sicher, das sie '{file}' erneut öffnen wollen? Alle ungespeicherten Änderungen werden verloren gehen.",
   "plugin min version": "{name} ist nur in Acode - {v-code} und neuer verfügbar. Klicken Sie hier zum Aktualisieren.",
-  "color preview": "Farb-Vorschau"
+  "color preview": "Farb-Vorschau",
+  "confirm": "Confirm",
+  "list files": "Do you want to list all files in this directory? Please note that if this directory is located on a remote server (e.g., FTP, SFTP), listing all files may consume more data and take some time. However, if there are only a few files in the directory, it should be fine"
 }
