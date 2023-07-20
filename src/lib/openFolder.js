@@ -54,7 +54,7 @@ export const addedFolder = [];
  * @param {boolean} [opts.saveState]
  * @param {Map<string, boolean>} [opts.listState]
  */
-async function openFolder(_path, opts = {}) {
+function openFolder(_path, opts = {}) {
   if (addedFolder.find((folder) => folder.url === _path)) {
     return;
   }
@@ -62,7 +62,7 @@ async function openFolder(_path, opts = {}) {
   const saveState = opts.saveState ?? true;
   const listState = opts.listState || {};
   const title = opts.name;
-  const listFiles = await confirm(strings.confirm, strings['list files']);
+  let listFiles = false;
 
   if (!title) {
     throw new Error('Folder name is required');
@@ -97,7 +97,7 @@ async function openFolder(_path, opts = {}) {
     name: title,
   };
 
-  addedFolder.push({
+  const folder = {
     title,
     remove,
     listFiles,
@@ -111,15 +111,27 @@ async function openFolder(_path, opts = {}) {
       $root.collapse();
       $root.expand();
     },
-  });
+  };
+  addedFolder.push(folder);
 
   editorManager.emit('update', 'add-folder');
   editorManager.onupdate('add-folder', event);
   editorManager.emit('add-folder', event);
 
-  if (listFiles) {
-    FileList.listFolder({ url: _path, name: title });
-  }
+  (async () => {
+    const protocol = Url.getProtocol(_path).slice(0, -1);
+    const type = /^(content|file)$/.test(protocol) ? '' : ` (${protocol})`;
+    const message = strings['list files'].replace(
+      '{name}',
+      `${title}${type}`
+    );
+    listFiles = await confirm(strings.confirm, message, true);
+    if (listFiles) {
+      FileList.addRoot({ url: _path, name: title });
+    }
+
+    folder.listFiles = listFiles;
+  })();
 
   if (listState[_path]) {
     $root.expand();
@@ -359,8 +371,8 @@ function execOperation(type, action, url, $target, name) {
       editorManager.emit('update', 'delete-folder');
     }
 
-    FileList.remove(url);
     toast(strings.success);
+    FileList.remove(url);
   }
 
   async function renameFile() {

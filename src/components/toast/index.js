@@ -10,7 +10,7 @@ const toastQueue = [];
  */
 export default function toast(message, duration = 0, bgColor, color) {
   const $oldToast = tag.get('#toast');
-  const $toast = <div id='toast' attr-clickable={message instanceof HTMLElement} style={{ backgroundColor: bgColor, color }}>
+  const $toast = <div id='toast' attr-clickable={typeof duration !== 'number'} style={{ backgroundColor: bgColor, color }}>
     <span className='message'>{message}</span>
     {
       duration === false

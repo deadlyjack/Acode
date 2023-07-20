@@ -373,5 +373,5 @@
   "plugin min version": "{name} disponível apenas no Acode - {v-code} e superior. Clique aqui para atualizar.",
   "color preview": "Pré-vizualização de cores",
   "confirm": "Confirm",
-  "list files": "Do you want to list all files in this directory? Please note that if this directory is located on a remote server (e.g., FTP, SFTP), listing all files may consume more data and take some time. However, if there are only a few files in the directory, it should be fine"
+  "list files": "Do you want to list all files in <strong>{name}</strong>? Please note that if this directory is located on a remote server (e.g., FTP, SFTP), listing all files may consume more data and take some time. However, if there are only a few files in the directory, it should be fine"
 }

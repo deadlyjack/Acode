@@ -26,11 +26,6 @@ export function initFileList() {
   // editorManager.on('add-folder', onAddFolder);
   editorManager.on('remove-folder', onRemoveFolder);
   settings.on('update:excludeFolders:after', refresh);
-
-  addedFolder.forEach(({ url, title, listFiles }) => {
-    if (!listFiles) return;
-    listFolder({ url, name: title });
-  });
 }
 
 /**
@@ -213,11 +208,8 @@ function flattenTree(tree, transform, listedDirs) {
  * Called when a folder is added
  * @param {{url: string, name: string}} folder - Folder path
  */
-export async function listFolder({ url, name }) {
+export async function addRoot({ url, name }) {
   try {
-    const fs = Url.getProtocol(url);
-    if (settings.value.excludeFs.includes(fs)) return;
-
     const tree = await Tree.createRoot(url, name);
     filesTree[url] = tree;
     getAllFiles(tree);
@@ -245,10 +237,8 @@ function onRemoveFolder({ url }) {
  * @param {Tree} [root] - Root path
  */
 async function getAllFiles(parent, root) {
-  // async function getAllFiles(parent, depth = 0) {
   root = root || parent.root;
   if (!parent.children || !root.isConnected) return;
-  // if (depth > settings.value.maxDirDepth) return;
 
   try {
     const entries = await fsOperation(parent.url).lsDir();
@@ -271,7 +261,6 @@ async function getAllFiles(parent, root) {
     setTimeout(() => {
       // why not outside? because parent may be removed
       if (!root.isConnected) return;
-      // getAllFiles(parent, depth);
       parent.children.length = 0;
       getAllFiles(parent);
     }, 3000);
@@ -297,7 +286,6 @@ function emit(event, ...args) {
  */
 async function createChildTree(parent, item, root) {
   if (!root.isConnected) return;
-  // if (skip()) return;
   const { name, url, isDirectory } = item;
   const exists = parent.children.findIndex(({ value }) => value === url);
   if (exists > -1) {
@@ -306,7 +294,6 @@ async function createChildTree(parent, item, root) {
 
   const file = await Tree.create(url, name, isDirectory);
   if (!root.isConnected) return;
-  // if (skip()) return;
 
   const existingTree = getTree(Object.values(filesTree), file.url);
 
@@ -323,31 +310,12 @@ async function createChildTree(parent, item, root) {
     );
     if (ignore) return;
 
-    // getAllFiles(file, depth + 1);
     getAllFiles(file, root);
     return;
   }
 
-  // incFileCount();
   emit('push-file', file);
 }
-
-// /**
-//  * Count number of directories
-//  * @param {Tree} tree
-//  * @returns {[number, number]} [directories, files]
-//  */
-// function countEntries(tree, dirs = 0, files = 0) {
-//   if (!tree.children) return [dirs, files];
-//   dirs += tree.children.filter(({ children }) => children).length;
-//   files += tree.children.length - dirs;
-//   tree.children.forEach((item) => {
-//     const [i, j] = countEntries(item);
-//     dirs += i;
-//     files += j;
-//   });
-//   return [dirs, files];
-// }
 
 export class Tree {
   /**@type {string}*/

@@ -5,9 +5,10 @@ import restoreTheme from 'lib/restoreTheme';
  * Confirm dialog box
  * @param {string} titleText Title text
  * @param {string} message Alert message
+ * @param {boolean} isHTML Whether the message is HTML
  * @returns {Promise<boolean>}
  */
-function confirm(titleText, message) {
+function confirm(titleText, message, isHTML) {
   return new Promise((resolve) => {
     if (!message && titleText) {
       message = titleText;
@@ -20,7 +21,8 @@ function confirm(titleText, message) {
     });
     const messageSpan = tag('span', {
       className: 'message scroll',
-      textContent: message,
+      innerHTML: isHTML ? message : undefined,
+      textContent: isHTML ? undefined : message,
     });
     const okBtn = tag('button', {
       textContent: strings.ok,
