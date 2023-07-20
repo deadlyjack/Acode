@@ -372,6 +372,6 @@
   "reopen file": "Sind Sie sicher, das sie '{file}' erneut öffnen wollen? Alle ungespeicherten Änderungen werden verloren gehen.",
   "plugin min version": "{name} ist nur in Acode - {v-code} und neuer verfügbar. Klicken Sie hier zum Aktualisieren.",
   "color preview": "Farb-Vorschau",
-  "confirm": "Confirm",
-  "list files": "Do you want to list all files in this directory? Please note that if this directory is located on a remote server (e.g., FTP, SFTP), listing all files may consume more data and take some time. However, if there are only a few files in the directory, it should be fine"
+  "confirm": "Bestätigen",
+  "list files": "Wollen Sie alle Dateien dieses Ordners auflisten? Bitte bedenken Sie, wenn sich dieser Ordner auf einem entfernten Server befindet (z.B. FTP, SFTP), kann das Auflisten mehr Daten nutzen und etwas Zeit in Anspruch nehmen. Befinden sich hingegen nur wenige Dateien in dem Ordner, sollte dies kein Problem darstellen."
 }
