@@ -375,5 +375,5 @@
   "plugin min version": "{name} only available in Acode - {v-code} and above. Click here to update.",
   "color preview": "Color preview",
   "confirm": "Confirm",
-  "list files": "Do you want to list all files in <strong>{name}</strong>? Please note that if this directory is located on a remote server (e.g., FTP, SFTP), listing all files may consume more data and take some time. However, if there are only a few files in the directory, it should be fine"
+  "list files": "Do you want to list all files in <strong>{name}</strong>?<br><br><strong>FTP/SFTP</strong> folders may not work properly if it has too many files."
 }

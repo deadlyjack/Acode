@@ -210,6 +210,12 @@ function flattenTree(tree, transform, listedDirs) {
  */
 export async function addRoot({ url, name }) {
   try {
+
+    const TERMUX_STORAGE = "content://com.termux.documents/tree/%2Fdata%2Fdata%2Fcom.termux%2Ffiles%2Fhome::/data/data/com.termux/files/home/storage";
+    const TERMUX_SHARED = "content://com.termux.documents/tree/%2Fdata%2Fdata%2Fcom.termux%2Ffiles%2Fhome::/data/data/com.termux/files/home/storage/shared";
+    if (url === TERMUX_STORAGE) return;
+    if (url === TERMUX_SHARED) return;
+
     const tree = await Tree.createRoot(url, name);
     filesTree[url] = tree;
     getAllFiles(tree);
