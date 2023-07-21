@@ -73,7 +73,7 @@
   "save": "Salvar",
   "saving": "Salvando",
   "save as": "Salvar como",
-  "save file to run": "Favor slavar este arquivo para executar no navegador",
+  "save file to run": "Favor salvar este arquivo para executar no navegador",
   "search": "Pesquisar",
   "see logs and errors": "Ver logs e erros",
   "select folder": "Selecionar a pasta",
@@ -232,7 +232,7 @@
   "diagonal scrolling": "Rolagem diagonal",
   "reverse scrolling": "Rolagem reversa",
   "formatter": "Formatador",
-  "format on save": "Format on save",
+  "format on save": "Formatar ao salvar",
   "remove ads": "Remover propagandas",
   "fast": "Rápido",
   "slow": "Lento",
@@ -372,6 +372,6 @@
   "reopen file": "Tem certeza de que deseja reabrir '{file}'? Quaisquer alterações não salvas serão perdidas.",
   "plugin min version": "{name} disponível apenas no Acode - {v-code} e superior. Clique aqui para atualizar.",
   "color preview": "Pré-vizualização de cores",
-  "confirm": "Confirm",
-  "list files": "Do you want to list all files in <strong>{name}</strong>?<br><br><strong>FTP/SFTP</strong> folders may not work properly if it has too many files."
+  "confirm": "Confirmar",
+  "list files": "Você quer listar todos os arquivos em <strong>{name}</strong>?<br><br>Pastas<strong>FTP/SFTP</strong> podem não funcionar corretamente se tiverem muitos arquivos."
 }
