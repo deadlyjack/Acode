@@ -59,6 +59,13 @@ export default {
       file.remove(true);
     });
   },
+  async 'save-all-changes'() {
+      const doSave = await confirm(strings['warning'], strings['save all changes warning']);
+      if (!doSave) return;
+      editorManager.files.forEach(async (file) => {
+          file.save();
+      });
+  },
   'close-current-tab'() {
     editorManager.activeFile.remove();
   },

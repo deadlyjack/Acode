@@ -327,6 +327,7 @@
   "close all": "Close all",
   "unsaved files warning": "Some files are not saved. Click 'ok' select what to do or press 'cancel' to go back.",
   "save all warning": "Are you sure you want to save all files and close? This action cannot be reversed.",
+  "save all changes warning": "Are you sure you want to save all files?",
   "close all warning": "Are you sure you want to close all files? You will lose the unsaved changes and this action cannot be reversed.",
   "refresh": "Refresh",
   "shortcut buttons": "Shortcut buttons",

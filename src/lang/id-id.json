@@ -328,6 +328,7 @@
   "close all": "Tutup semua",
   "unsaved files warning": "Beberapa berkas belum disimpan. Klik 'Oke' untuk melanjutkan atau 'Batal' untuk kembali.",
   "save all warning": "Yakin ingin menyimpan semua berkas dan menutupnya? Tindakan ini tidak dapat dibatalkan.",
+  "save all changes warning": "Are you sure you want to save all files?",
   "close all warning": "Apakah Anda yakin ingin menutup semua berkas? Anda akan kehilangan perubahan yang belum disimpan dan tindakan ini tidak dapat dibatalkan.",
   "refresh": "Segarkan",
   "shortcut buttons": "Tombol pintasan",

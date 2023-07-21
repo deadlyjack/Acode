@@ -326,6 +326,7 @@
   "close all": "Fechar todos",
   "unsaved files warning": "Os arquivos não foram salvos, clique 'ok' para salvar ou 'cancel' para cancelar",
   "save all warning": "Tem certeza de que deseja salvar todos os arquivos e fechar? Esta ação não pode ser revertida.",
+  "save all changes warning": "Are you sure you want to save all files?",
   "close all warning": "Tem certeza de que deseja fechar todos os arquivos? Você perderá as alterações não salvas e esta ação não pode ser revertida.",
   "refresh": "Recarregar",
   "shortcut buttons": "Botões de atalho",
