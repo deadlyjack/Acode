@@ -73,6 +73,14 @@ const commands = [
     readOnly: true,
   },
   {
+    name: 'saveAllChanges',
+    description: 'Save all changes',
+    exec() {
+      acode.exec('save-all-changes');
+    },
+    readOnly: true,
+  },
+  {
     name: 'nextFile',
     description: 'Open next file tab',
     exec() {

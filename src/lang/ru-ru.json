@@ -327,6 +327,7 @@
   "close all": "Закрыть всё",
   "unsaved files warning": "Некоторые файлы не сохранены. Нажмите 'OK' чтобы продолжить или 'Отмена' для возвращения.",
   "save all warning": "Вы действительно хотите сохранить и закрыть всё?",
+  "save all changes warning": "Are you sure you want to save all files?",
   "close all warning": "Вы действительно хотите закрыть всё? Все ваши несохранённые файлы или изменения не сохранятся",
   "refresh": "Обновить",
   "shortcut buttons": "Иконки",

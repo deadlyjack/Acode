@@ -326,6 +326,7 @@
   "close all": "關閉所有",
   "unsaved files warning": "存在未被保存的文件。點擊『確認』選擇下一步或者點擊『取消』返回。",
   "save all warning": "確定要保存所有文件並關閉？該操作不可撤銷。",
+  "save all changes warning": "Are you sure you want to save all files?",
   "close all warning": "確定要關閉所有文件？該操作將不保存文件更改並且不可撤銷。",
   "refresh": "刷新",
   "shortcut buttons": "快捷鍵按鈕",
