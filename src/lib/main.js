@@ -332,7 +332,10 @@ async function loadApp() {
 
   acode.setLoadingMessage('Loading folders...');
   if (Array.isArray(folders)) {
-    folders.forEach((folder) => openFolder(folder.url, folder.opts));
+    folders.forEach((folder) => {
+      folder.opts.listFiles = !!folder.opts.listFiles;
+      openFolder(folder.url, folder.opts);
+    });
   }
 
   if (Array.isArray(files) && files.length) {

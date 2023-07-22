@@ -52,6 +52,7 @@ export const addedFolder = [];
  * @param {string} opts.name
  * @param {string} [opts.id]
  * @param {boolean} [opts.saveState]
+ * @param {boolean} [opts.listFiles]
  * @param {Map<string, boolean>} [opts.listState]
  */
 function openFolder(_path, opts = {}) {
@@ -62,7 +63,7 @@ function openFolder(_path, opts = {}) {
   const saveState = opts.saveState ?? true;
   const listState = opts.listState || {};
   const title = opts.name;
-  let listFiles = false;
+  let listFiles = opts.listFiles;
 
   if (!title) {
     throw new Error('Folder name is required');
@@ -119,13 +120,16 @@ function openFolder(_path, opts = {}) {
   editorManager.emit('add-folder', event);
 
   (async () => {
-    const protocol = Url.getProtocol(_path).slice(0, -1);
-    const type = /^(content|file)$/.test(protocol) ? '' : ` (${protocol})`;
-    const message = strings['list files'].replace(
-      '{name}',
-      `${title}${type}`
-    );
-    listFiles = await confirm(strings.confirm, message, true);
+    if (typeof listFiles !== 'boolean') {
+      const protocol = Url.getProtocol(_path).slice(0, -1);
+      const type = /^(content|file)$/.test(protocol) ? '' : ` (${protocol})`;
+      const message = strings['list files'].replace(
+        '{name}',
+        `${title}${type}`
+      );
+      listFiles = await confirm(strings.confirm, message, true);
+    }
+
     if (listFiles) {
       FileList.addRoot({ url: _path, name: title });
     }

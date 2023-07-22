@@ -36,13 +36,14 @@ export default () => {
 
   if (settings.rememberFolders) {
     addedFolder.forEach((folder) => {
-      const { url, saveState, title, listState } = folder;
+      const { url, saveState, title, listState, listFiles } = folder;
       folders.push({
         url,
         opts: {
           saveState,
           name: title,
           listState,
+          listFiles,
         },
       });
     });
