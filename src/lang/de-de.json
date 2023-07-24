@@ -326,7 +326,7 @@
   "close all": "Alle schließen",
   "unsaved files warning": "Einige Dateien sind nicht gespeichert. Drücken Sie 'Ok' um eine Aktion zu wählen oder 'Abbruch' um zurückzugehen.",
   "save all warning": "Wollen Sie wirklich alle Dateien speichern und schließen? Dies Aktion kann nicht zurückgenommen werden.",
-  "save all changes warning": "Are you sure you want to save all files?",
+  "save all changes warning": "Sind Sie sicher, das Sie alle Dateien speichern wollen?",
   "close all warning": "Wollen Sie wirklich alle Dateien schließen? Sie verlieren ungespeicherte Änderungen und diese Aktion kann nicht zurückgenommen werden.",
   "refresh": "Aktualisieren",
   "shortcut buttons": "Schnellwahl-Schaltflächen",
