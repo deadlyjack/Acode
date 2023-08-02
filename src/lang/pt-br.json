@@ -326,7 +326,7 @@
   "close all": "Fechar tudo",
   "unsaved files warning": "Alguns arquivos não são estão salvos. Clique em 'ok' e selecione o que fazer ou pressione 'cancelar' para voltar.",
   "save all warning": "Tem certeza de que deseja salvar todos os arquivos e fechar? Esta ação não pode ser revertida.",
-  "save all changes warning": "Are you sure you want to save all files?",
+  "save all changes warning": "Tem certeza de que deseja salvar todos os arquivos?",
   "close all warning": "Tem certeza de que deseja fechar todos os arquivos? Você perderá as alterações não salvas e esta ação não pode ser revertida.",
   "refresh": "Atualizar",
   "shortcut buttons": "Botões de atalho",
@@ -374,5 +374,5 @@
   "plugin min version": "{name} disponível apenas no Acode - {v-code} e superior. Clique aqui para atualizar.",
   "color preview": "Pré-vizualização de cores",
   "confirm": "Confirmar",
-  "list files": "Você quer listar todos os arquivos em <strong>{name}</strong>?<br><br>Pastas<strong>FTP/SFTP</strong> podem não funcionar corretamente se tiverem muitos arquivos."
+  "list files": "Você quer listar todos os arquivos em <strong>{name}</strong>?<br><br>Pastas <strong>FTP/SFTP</strong> podem não funcionar corretamente se tiverem muitos arquivos."
 }
