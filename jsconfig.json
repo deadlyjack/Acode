@@ -16,5 +16,8 @@
   },
   "include": [
     "src/**/*"
-  ]
+  ],
+  "typeAcquisition": {
+    "enable": true
+  }
 }

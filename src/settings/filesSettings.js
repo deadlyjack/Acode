@@ -19,11 +19,10 @@ export default function filesSettings() {
     },
   ];
 
+  return settingsPage(title, items, callback);
 
   function callback(key, value) {
     appSettings.value.fileBrowser[key] = value;
     appSettings.update();
   }
-
-  settingsPage(title, items, callback);
 }

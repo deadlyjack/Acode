@@ -15,5 +15,6 @@ export default function help() {
     },
   ];
 
-  settingsPage(title, items, () => { });
+  const page = settingsPage(title, items, () => { }, 'separate');
+  page.show();
 }

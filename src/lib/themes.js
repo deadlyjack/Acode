@@ -68,6 +68,10 @@ function add(theme) {
  * @param {boolean} init Whether or not this is the first time the theme is being applied
  */
 async function apply(id, init) {
+  if (!DOES_SUPPORT_THEME) {
+    id = 'default';
+  }
+
   themeApplied = true;
   const loaderFile = Url.join(ASSETS_DIRECTORY, 'res/tail-spin.svg');
   const svgName = '__tail-spin__.svg';

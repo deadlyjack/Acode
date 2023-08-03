@@ -1,7 +1,7 @@
 import settingsPage from 'components/settingsPage';
 import appSettings from 'lib/settings';
 
-export default function defaultFormatter(languageName) {
+export default function formatterSettings(languageName) {
   const title = strings.formatter;
   const values = appSettings.value;
   const { formatters } = acode;
@@ -30,17 +30,11 @@ export default function defaultFormatter(languageName) {
     };
   });
 
+  const page = settingsPage(title, items, callback, 'separate');
+  page.show(languageName);
+
   function callback(key, value) {
     values.formatter[key] = value;
     appSettings.update();
   }
-
-  const { $list } = settingsPage(title, items, callback);
-  if (!languageName) return;
-
-  const $item = $list.get(`[data-key="${languageName}"]`);
-  if (!$item) return;
-
-  $item.scrollIntoView();
-  $item.click();
 }

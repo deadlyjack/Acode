@@ -3,7 +3,7 @@ import editorSettings from './editorSettings';
 import backupRestore from './backupRestore';
 import themeSetting from 'pages/themeSetting';
 import otherSettings from './appSettings';
-import defaultFormatter from './formatter';
+import formatterSettings from './formatterSettings';
 import rateBox from 'dialogs/rateBox';
 import Donate from 'pages/donate';
 import plugins from 'pages/plugins';
@@ -16,11 +16,12 @@ import openFile from 'lib/openFile';
 import settings from 'lib/settings';
 import confirm from 'dialogs/confirm';
 import actionStack from 'lib/actionStack';
+import filesSettings from './filesSettings';
+import scrollSettings from './scrollSettings';
+import searchSettings from './searchSettings';
 
-export default function settingsMain() {
+export default function mainSettings() {
   const title = strings.settings.capitalize();
-  let $list;
-
   const items = [
     {
       key: 'about',
@@ -80,7 +81,7 @@ export default function settingsMain() {
       index: 5,
     },
     {
-      key: 'preview',
+      key: 'preview-settings',
       text: strings['preview settings'],
       icon: 'play_arrow',
       index: 4,
@@ -100,14 +101,18 @@ export default function settingsMain() {
     });
   }
 
-  removeAds.callback = () => {
-    $list.get('[data-key="removeads"]').remove();
-  };
-
+  /**
+   * Callback for settings page for handling click event
+   * @this {HTMLElement}
+   * @param {string} key 
+   */
   async function callback(key) {
     switch (key) {
+      case 'app-settings':
+      case 'backup-restore':
       case 'editor-settings':
-        editorSettings();
+      case 'preview-settings':
+        appSettings.uiSettings[key].show();
         break;
 
       case 'theme':
@@ -116,14 +121,6 @@ export default function settingsMain() {
 
       case 'about':
         About();
-        break;
-
-      case 'app-settings':
-        otherSettings();
-        break;
-
-      case 'backup-restore':
-        backupRestore();
         break;
 
       case 'donate':
@@ -139,11 +136,7 @@ export default function settingsMain() {
         break;
 
       case 'formatter':
-        defaultFormatter();
-        break;
-
-      case 'preview':
-        previewSettings();
+        formatterSettings();
         break;
 
       case 'editSettings': {
@@ -161,10 +154,12 @@ export default function settingsMain() {
         break;
 
       case 'removeads':
-        removeAds()
-          .then((error) => {
-            helpers.error(error);
-          });
+        try {
+          await removeAds();
+          this.remove();
+        } catch (error) {
+          helpers.error(error);
+        }
         break;
 
       default:
@@ -172,5 +167,15 @@ export default function settingsMain() {
     }
   }
 
-  ({ $list } = settingsPage(title, items, callback));
+  const page = settingsPage(title, items, callback);
+  page.show();
+  
+  appSettings.uiSettings['main-settings'] = page;
+  appSettings.uiSettings['app-settings'] = otherSettings();
+  appSettings.uiSettings['file-settings'] = filesSettings();
+  appSettings.uiSettings['backup-restore'] = backupRestore();
+  appSettings.uiSettings['editor-settings'] = editorSettings();
+  appSettings.uiSettings['scroll-settings'] = scrollSettings();
+  appSettings.uiSettings['search-settings'] = searchSettings();
+  appSettings.uiSettings['preview-settings'] = previewSettings();
 }

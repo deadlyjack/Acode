@@ -9,19 +9,32 @@ import prompt from 'dialogs/prompt';
 import colorPicker from 'dialogs/color';
 import actionStack from 'lib/actionStack';
 import FileBrowser from 'pages/fileBrowser';
+import appSettings from "lib/settings";
 import { isValidColor } from 'utils/color/regex';
 
 /**
- * 
- * @param {string} title 
- * @param {Array<object>} settings 
- * @param {(key, value) => void} callback  called when setting is changed
+ * @typedef {object} SettingsPage
+ * @property {(goTo:string)=>void} show show settings page
+ * @property {()=>void} hide hide settings page
+ * @property {(key:string)=>HTMLElement[]} search search for a setting
+ * @property {(title:string)=>void} setTitle set title of settings page
+ * @property {()=>void} restoreList restore list to original state
  */
 
-export default function settingsPage(title, settings, callback) {
+/**
+ *  Creates a settings page
+ * @param {string} title 
+ * @param {ListItem[]} settings 
+ * @param {(key, value) => void} callback  called when setting is changed
+ * @param {'united'|'separate'} [type='united']
+ * @returns {SettingsPage}
+ */
+export default function settingsPage(title, settings, callback, type = 'united') {
   let hideSearchBar = () => { };
   const $page = Page(title);
-  const $list = <div className='main list'></div>;
+  /**@type {HTMLDivElement} */
+  const $list = <div tabIndex={0} className='main list'></div>;
+  /**@type {ListItem} */
   let note;
 
   settings = settings.filter((setting) => {
@@ -29,34 +42,54 @@ export default function settingsPage(title, settings, callback) {
       note = setting.note;
       return false;
     }
+
+    if (!setting.info) {
+      Object.defineProperty(setting, 'info', {
+        get() {
+          return strings[`info-${this.key.toLocaleLowerCase()}`];
+        }
+      });
+    }
+
     return true;
   });
 
-  if (settings.length > 5) {
+  if (type === 'united' || (type === 'separate' && settings.length > 5)) {
     const $search = <span className='icon search' attr-action='search'></span>;
-    $search.onclick = () => {
-      searchBar($list, (hide) => {
+    $search.onclick = () => searchBar(
+      $list,
+      (hide) => {
         hideSearchBar = hide;
-      });
-    };
+      },
+      type === 'united' ? () => {
+        Object.values(appSettings.uiSettings).forEach((page) => {
+          page.restoreList();
+        });
+      } : null,
+      type === 'united' ? (key) => {
+        const $items = [];
+        Object.values(appSettings.uiSettings).forEach((page) => {
+          $items.push(...page.search(key));
+        });
+        return $items;
+      } : null,
+    );
 
     $page.header.append($search);
   }
 
-  actionStack.push({
-    id: title,
-    action: $page.hide,
-  });
-
+  /** DISCLAIMER: do not assign hideSearchBar directly because it can change  */
   $page.ondisconnect = () => hideSearchBar();
-  $page.onhide = function () {
+  $page.onhide = () => {
     helpers.hideAd();
     actionStack.remove(title);
   };
 
   listItems($list, settings, callback);
-
   $page.body = $list;
+
+  /**@type {HTMLElement[]} */
+  const children = [...$list.children];
 
   if (note) {
     $page.append(
@@ -72,10 +105,58 @@ export default function settingsPage(title, settings, callback) {
 
   $page.append(<div style={{ height: '50vh' }}></div>);
 
-  app.append($page);
-  helpers.showAd();
+  return {
+    /**
+     * Show settings page
+     * @param {string} goTo Key of setting to scroll to and select
+     * @returns {void}
+     */
+    show(goTo) {
+      actionStack.push({
+        id: title,
+        action: $page.hide,
+      });
+      app.append($page);
+      helpers.showAd();
 
-  return { $page, $list };
+      if (goTo) {
+        const $item = $list.get(`[data-key="${goTo}"]`);
+        if (!$item) return;
+
+        $item.scrollIntoView();
+        $item.click();
+        return;
+      }
+
+      $list.focus();
+    },
+    hide() {
+      $page.hide();
+    },
+    /**
+     * Search for a setting
+     * @param {string} key 
+     */
+    search(key) {
+      return children.filter((child) => {
+        const text = child.textContent.toLowerCase();
+        return text.match(key, 'i');
+      });
+    },
+    /**
+     * Restore list to original state
+     */
+    restoreList() {
+      $list.content = children;
+    },
+    /**
+     * Set title of settings page
+     * @param {string} title 
+     */
+    setTitle(title) {
+      $page.settitle(title);
+    }
+  };
 }
 
 /**
@@ -94,7 +175,7 @@ export default function settingsPage(title, settings, callback) {
  */
 
 /**
- * 
+ * Creates a list of settings
  * @param {HTMLUListElement} $list 
  * @param {Array<ListItem>} items 
  * @param {()=>void} callback called when setting is changed
@@ -107,7 +188,8 @@ function listItems($list, items, callback) {
   items.forEach((item) => {
     const $setting = new Ref();
     const $settingName = new Ref();
-    const $item = <div className={`list-item ${item.sake ? 'sake' : ''}`} data-key={item.key} data-action='list-item'>
+    /**@type {HTMLDivElement} */
+    const $item = <div tabIndex={1} className={`list-item ${item.sake ? 'sake' : ''}`} data-key={item.key} data-action='list-item'>
       <span className={`icon ${item.icon || 'no-icon'}`} style={{ color: item.iconColor }}></span>
       <div ref={$setting} className="container">
         <div ref={$settingName} className="text">{item.text.capitalize(0)}</div>
@@ -140,11 +222,11 @@ function listItems($list, items, callback) {
     } else {
       $items.push($item);
     }
+
+    $item.addEventListener('click', onclick);
   });
 
-  $list.innerHTML = '';
-  $list.append(...$items);
-  $list.addEventListener('click', onclick);
+  $list.content = $items;
 
   /**
    * Click handler for $list
@@ -153,8 +235,7 @@ function listItems($list, items, callback) {
    */
   async function onclick(e) {
     const $target = e.target;
-    const { action, key } = e.target.dataset;
-    if (action !== 'list-item') return;
+    const { key } = e.target.dataset;
 
     const item = items.find((item) => item.key === key);
     if (!item) return;
@@ -203,7 +284,7 @@ function listItems($list, items, callback) {
     item.value = res;
     setValueText($valueText, res, valueText?.bind(item));
     setColor($target, res);
-    callback(key, item.value);
+    callback.call($target, key, item.value);
   }
 }
 

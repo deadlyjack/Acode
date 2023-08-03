@@ -8,11 +8,11 @@ import helpers from 'utils/helpers';
 import fsOperation from 'fileSystem';
 import constants from 'lib/constants';
 import installPlugin from 'lib/installPlugin';
-import settingsPage from 'components/settingsPage';
 import purchaseListener from 'handlers/purchase';
 import alert from 'dialogs/alert';
 import loader from 'dialogs/loader';
 import actionStack from 'lib/actionStack';
+import settings from 'lib/settings';
 
 export default async function PluginInclude(id, installed, onInstall, onUninstall) {
   installed = typeof installed !== 'boolean' ? installed === 'true' : installed;
@@ -235,7 +235,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
   }
 
   async function render() {
-    const settings = acode.getPluginSettings(id);
+    const pluginSettings = settings.uiSettings[`plugin-${plugin.id}`];
     $page.body = view({
       ...plugin,
       body: marked(plugin.description),
@@ -257,11 +257,12 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       $settingsIcon = null;
     }
 
-    if (settings) {
+    if (pluginSettings) {
+      pluginSettings.setTitle(plugin.name);
       $settingsIcon = <span
         attr-action='settings'
         className='icon settings'
-        onclick={() => settingsPage(plugin.name, settings.list, settings.cb)}
+        onclick={() => pluginSettings.show()}
       ></span>;
       if (!$page.header.contains($settingsIcon)) {
         $page.header.append($settingsIcon);

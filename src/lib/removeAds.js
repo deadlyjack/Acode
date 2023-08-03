@@ -1,8 +1,10 @@
 import purchaseListener from 'handlers/purchase';
 import helpers from "utils/helpers";
 
-let callback;
-
+/**
+ * Remove ads after purchase
+ * @returns {Promise<void>}
+ */
 export default function removeAds() {
   return new Promise((resolve, reject) => {
     iap.getProducts(['acode_pro_new'], (products) => {
@@ -18,18 +20,11 @@ export default function removeAds() {
     });
 
     function onpurchase() {
-      resolve();
+      resolve(null);
       helpers.hideAd(true);
       localStorage.setItem('acode_pro', 'true');
       window.IS_FREE_VERSION = false;
       toast(strings['thank you :)']);
-      if (typeof callback === 'function') callback();
     }
   });
 }
-
-Object.defineProperty(removeAds, 'callback', {
-  set: (value) => {
-    callback = value;
-  }
-});

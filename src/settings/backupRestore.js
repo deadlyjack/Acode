@@ -8,7 +8,6 @@ import alert from 'dialogs/alert';
 
 function backupRestore() {
   const title = strings.backup.capitalize() + '/' + strings.restore.capitalize();
-
   const items = [
     {
       key: 'backup',
@@ -25,6 +24,9 @@ function backupRestore() {
     }
   ];
 
+
+  return settingsPage(title, items, callback);
+
   function callback(key) {
     switch (key) {
       case 'backup':
@@ -39,8 +41,6 @@ function backupRestore() {
         break;
     }
   }
-
-  settingsPage(title, items, callback);
 
   async function backup() {
     try {

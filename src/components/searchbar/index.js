@@ -1,34 +1,25 @@
-import actionStack from 'lib/actionStack';
 import './style.scss';
+import Ref from 'html-tag-js/ref';
+import actionStack from 'lib/actionStack';
 
 /**
- *
+ * Create and activate search bar
  * @param {HTMLUListElement|HTMLOListElement} $list
  * @param {(hide:Function)=>void} setHide
- * @param {Function} onhide
+ * @param {()=>void} onhideCb callback to be called when search bar is hidden
+ * @param {(value:string)=>HTMLElement[]} searchFunction
  */
-function searchBar($list, setHide, onhide) {
+function searchBar($list, setHide, onhideCb, searchFunction) {
   let hideOnBlur = true;
-  const $searchInput = tag('input', {
-    type: 'search',
-    placeholder: strings.search,
-    enterKeyHint: 'go',
-  });
-  const $container = tag('div', {
-    id: 'search-bar',
-    children: [
-      $searchInput,
-      tag('span', {
-        className: 'icon clearclose',
-        onclick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          e.stopImmediatePropagation();
-          hide();
-        },
-      }),
-    ],
-  });
+  let timeout = null;
+  const $searchInput = new Ref();
+  /**@type {HTMLDivElement} */
+  const $container = <div id="search-bar">
+    <input ref={$searchInput} type="search" placeholder={strings.search} enterKeyHint="go" />
+    <span className="icon clearclose" onclick={hide}></span>
+  </div>;
+
+  /**@type {HTMLElement[]} */
   const children = [...$list.children];
 
   if (typeof setHide === 'function') {
@@ -36,59 +27,58 @@ function searchBar($list, setHide, onhide) {
     setHide(hide);
   }
   app.appendChild($container);
-  $searchInput.oninput = search;
-  $searchInput.focus();
-  $searchInput.onblur = () => {
-    if (hideOnBlur) {
-      setTimeout(() => {
-        hide();
-      }, 0);
-    }
+
+  $searchInput.el.oninput = search;
+  $searchInput.el.focus();
+  $searchInput.el.onblur = () => {
+    if (!hideOnBlur) return;
+    setTimeout(hide, 0);
   };
 
   actionStack.push({
     id: 'searchbar',
-    action: hideSearchBar,
+    action: hide,
   });
 
   function hide() {
     actionStack.remove('searchbar');
-    hideSearchBar();
-    if (typeof onhide === 'function') onhide();
-  }
 
-  function hideSearchBar() {
-    onhide();
+    if (!$list.parentElement) return;
+    if (typeof onhideCb === 'function') onhideCb();
+
+    $list.content = children;
     $container.classList.add('hide');
     setTimeout(() => {
       $container.remove();
     }, 300);
   }
 
+  function search() {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(searchNow.bind(this), 500);
+  }
+
   /**
    * @this {HTMLInputElement}
    */
-  function search() {
-    const val = this.value.toLowerCase();
-    const result = [];
-
-    children.map((child) => {
-      const text = child.textContent.toLowerCase();
-      if (text.match(val, 'i')) result.push(child);
-    });
+  function searchNow() {
+    const val = $searchInput.value.toLowerCase();
+    const result = searchFunction ? searchFunction(val) : filterList(val);
 
     $list.textContent = '';
     $list.append(...result);
   }
 
-  function onhide() {
-    if (!$list.parentElement) return;
-    restoreList();
-  }
-
-  function restoreList() {
-    $list.textContent = '';
-    $list.append(...children);
+  /**
+   * Search list items
+   * @param {string} val 
+   * @returns 
+   */
+  function filterList(val) {
+    return children.filter((child) => {
+      const text = child.textContent.toLowerCase();
+      return text.match(val, 'i');
+    });
   }
 }
 

@@ -3,7 +3,7 @@ import openFile from './openFile';
 import openFolder from './openFolder';
 import helpers from 'utils/helpers';
 import constants from './constants';
-import help from 'settings/help';
+import help from 'settings/helpSettings';
 import recents from 'lib/recents';
 import fsOperation from 'fileSystem';
 import actions from 'handlers/quickTools';
@@ -15,7 +15,7 @@ import EditorFile from './editorFile';
 import findFile from 'palettes/findFile';
 import appSettings from './settings';
 import Sidebar from 'components/sidebar';
-import settingsMain from 'settings/mainSettings';
+import mainSettings from 'settings/mainSettings';
 import commandPalette from 'palettes/commandPalette';
 import changeEncoding from 'palettes/changeEncoding';
 import changeMode from 'palettes/changeMode';
@@ -60,11 +60,9 @@ export default {
     });
   },
   async 'save-all-changes'() {
-      const doSave = await confirm(strings['warning'], strings['save all changes warning']);
-      if (!doSave) return;
-      editorManager.files.forEach(async (file) => {
-          file.save();
-      });
+    const doSave = await confirm(strings['warning'], strings['save all changes warning']);
+    if (!doSave) return;
+    editorManager.files.forEach(file.save);
   },
   'close-current-tab'() {
     editorManager.activeFile.remove();
@@ -151,7 +149,7 @@ export default {
     editorManager.files[fileIndex].makeActive();
   },
   'open'(page) {
-    if (page === 'settings') settingsMain();
+    if (page === 'settings') mainSettings();
     if (page === 'help') help();
     editorManager.editor.blur();
   },

@@ -22,10 +22,10 @@ export default function searchSettings() {
     },
   ];
 
+  return settingsPage(title, items, callback);
+
   function callback(key, value) {
     values[key] = value;
     appSettings.update();
   }
-
-  settingsPage(title, items, callback);
 }

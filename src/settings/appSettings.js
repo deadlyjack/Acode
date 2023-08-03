@@ -17,7 +17,6 @@ import actionStack from 'lib/actionStack';
 export default function otherSettings() {
   const values = appSettings.value;
   const title = strings['app settings'].capitalize();
-
   const items = [
     {
       key: 'retryRemoteFsAfterFail',
@@ -75,7 +74,9 @@ export default function otherSettings() {
       key: 'keyboardMode',
       text: strings['keyboard mode'],
       value: values.keyboardMode,
-      valueText: getModeString,
+      valueText(mode) {
+        return strings[mode.replace(/_/g, ' ').toLocaleLowerCase()];
+      },
       select: [
         [appSettings.KEYBOARD_MODE_NORMAL, strings.normal],
         [appSettings.KEYBOARD_MODE_NO_SUGGESTIONS, strings['no suggestions']],
@@ -171,15 +172,9 @@ export default function otherSettings() {
     }
   ];
 
-  items.forEach((item) => {
-    Object.defineProperty(item, 'info', {
-      get() {
-        return strings[`info-${this.key.toLocaleLowerCase()}`];
-      }
-    });
-  });
+  return settingsPage(title, items, callback);
 
-  function callback(key, value) {
+  async function callback(key, value) {
     switch (key) {
       case 'keybindings': {
         if (value === 'edit') {
@@ -195,30 +190,32 @@ export default function otherSettings() {
         QuickToolsSettings();
         return;
 
-      case 'console':
-        (async () => {
-          if (value === 'eruda') {
-            const fs = fsOperation(Url.join(DATA_STORAGE, 'eruda.js'));
-            if (!(await fs.exists())) {
-              loader.create(
-                strings['downloading file'].replace('{file}', 'eruda.js'),
-                strings['downloading...']
-              );
-              try {
-                const erudaScript = await ajax({
-                  url: constants.ERUDA_CDN,
-                  responseType: 'text',
-                  contentType: 'application/x-www-form-urlencoded',
-                });
-                await fsOperation(DATA_STORAGE).createFile('eruda.js', erudaScript);
-                loader.destroy();
-              } catch (error) {
-                helpers.error(error);
-              }
-            }
-          }
-        })();
-        break;
+      case 'console': {
+        if (value !== 'eruda') {
+          break;
+        }
+
+        const fs = fsOperation(Url.join(DATA_STORAGE, 'eruda.js'));
+        if (!await fs.exists()) {
+          break;
+        }
+
+        loader.create(
+          strings['downloading file'].replace('{file}', 'eruda.js'),
+          strings['downloading...']
+        );
+        try {
+          const erudaScript = await ajax({
+            url: constants.ERUDA_CDN,
+            responseType: 'text',
+            contentType: 'application/x-www-form-urlencoded',
+          });
+          await fsOperation(DATA_STORAGE).createFile('eruda.js', erudaScript);
+          loader.destroy();
+        } catch (error) {
+          helpers.error(error);
+        }
+      }
 
       case 'rememberFiles':
         if (!value) {
@@ -267,10 +264,4 @@ export default function otherSettings() {
       [key]: value,
     });
   }
-
-  function getModeString(mode) {
-    return strings[mode.replace(/_/g, ' ').toLocaleLowerCase()];
-  }
-
-  settingsPage(title, items, callback);
 }

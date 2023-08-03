@@ -71,11 +71,11 @@ export default function previewSettings() {
     }
   ];
 
+  return settingsPage(title, items, callback);
+
   function callback(key, value) {
     appSettings.update({
       [key]: value,
     });
   }
-
-  settingsPage(title, items, callback);
 }

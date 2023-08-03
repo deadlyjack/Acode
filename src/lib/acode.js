@@ -33,17 +33,17 @@ import KeyboardEvent from 'utils/keyboardEvent';
 import keyboardHandler from 'handlers/keyboard';
 import windowResize from 'handlers/windowResize';
 import contextmenu from 'components/contextmenu';
-import defaultFormatter from "settings/formatter";
+import formatterSettings from "settings/formatterSettings";
 
 import { addedFolder } from 'lib/openFolder';
 import { decode, encode } from 'utils/encodings';
 import { addMode, removeMode } from 'ace/modelist';
+import settingsPage from 'components/settingsPage';
 
 export default class Acode {
   #modules = {};
   #pluginsInit = {};
   #pluginUnmount = {};
-  #pluginSettings = {};
   #formatter = [{
     id: 'default',
     name: 'Default',
@@ -102,13 +102,13 @@ export default class Acode {
     this.define('palette', palette);
     this.define('projects', projects);
     this.define('tutorial', tutorial);
-    this.define('colorPicker', colorPicker);
     this.define('aceModes', aceModes);
     this.define('themes', themesModule);
     this.define('settings', appSettings);
     this.define('EditorFile', EditorFile);
     this.define('inputhints', inputhints);
     this.define('openfolder', openFolder);
+    this.define('colorPicker', colorPicker);
     this.define('actionStack', actionStack);
     this.define('multiPrompt', multiPrompt);
     this.define('addedfolder', addedFolder);
@@ -157,13 +157,17 @@ export default class Acode {
     document.body.setAttribute('data-small-msg', message);
   }
 
+  /**
+   * Sets plugin init function
+   * @param {string} id 
+   * @param {() => void} initFunction 
+   * @param {{list: import('components/settingsPage').ListItem[], cb: (key: string, value: string)=>void}} settings 
+   */
   setPluginInit(id, initFunction, settings) {
     this.#pluginsInit[id] = initFunction;
-    this.#pluginSettings[id] = settings;
-  }
 
-  getPluginSettings(id) {
-    return this.#pluginSettings[id];
+    if (!settings) return;
+    appSettings.uiSettings[`plugin-${id}`] = settingsPage(id, settings.list, settings.cb);
   }
 
   setPluginUnmount(id, unmountFunction) {
@@ -188,7 +192,7 @@ export default class Acode {
       fsOperation(Url.join(CACHE_STORAGE, id)).delete();
     }
 
-    delete this.#pluginSettings[id];
+    delete appSettings.uiSettings[`plugin-${id}`];
   }
 
   registerFormatter(id, extensions, format) {
@@ -220,12 +224,22 @@ export default class Acode {
     await formatter?.format();
 
     if (!formatter && selectIfNull) {
-      return defaultFormatter(name, (id) => {
-        const formatter = this.#formatter.find(({ id: _id }) => _id === id);
-        formatter?.format();
-      });
+      formatterSettings(name);
+      this.#afterSelectFormatter(name);
+      return;
     } else if (!formatter && !selectIfNull) {
       toast(strings['please select a formatter']);
+    }
+  }
+
+  #afterSelectFormatter(name) {
+    appSettings.on('update:formatter', format);
+
+    function format() {
+      appSettings.off('update:formatter', format);
+      const id = appSettings.value.formatter[name];
+      const formatter = this.#formatter.find(({ id: _id }) => _id === id);
+      formatter?.format();
     }
   }
 

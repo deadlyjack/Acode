@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.8.6] - Build 305
+
+- New
+  - [x] **Search in settings**
+    - You can now search for any settings in settings page.
+- Updates
+  - [x] **Language**
+    - Updated language pack for Russian, Spanish, Portuguese and Deutsche.
+
 ## [1.8.5] - Build 295
 
 - New

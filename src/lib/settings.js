@@ -74,6 +74,9 @@ class Settings {
   PREVIEW_MODE_INAPP = 'inapp';
   PREVIEW_MODE_BROWSER = 'browser';
 
+  /**@type {{[key: string]: import('components/settingsPage').SettingsPage}} */
+  uiSettings = {};
+
   constructor() {
     this.#defaultSettings = {
       animation: 'system',

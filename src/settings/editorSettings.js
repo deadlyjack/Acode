@@ -160,18 +160,17 @@ export default function editorSettings() {
     }
   ];
 
-  items.forEach((item) => {
-    Object.defineProperty(item, 'info', {
-      get() {
-        return strings[`info-${this.key.toLocaleLowerCase()}`];
-      }
-    });
-  });
+  return settingsPage(title, items, callback);
 
+  /**
+   * Callback for settings page when an item is clicked
+   * @param {string} key 
+   * @param {string} value 
+   */
   function callback(key, value) {
     switch (key) {
       case 'scroll-settings':
-        scrollSettings();
+        appSettings.uiSettings[key].show();
         break;
 
       case 'editorFont':
@@ -184,6 +183,4 @@ export default function editorSettings() {
         break;
     }
   }
-
-  settingsPage(title, items, callback);
 }
