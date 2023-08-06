@@ -374,5 +374,5 @@
   "plugin min version": "{name} sólo disponible en Acode - {v-code} y superior. Haga clic aquí para actualizar.",
   "color preview": "Vista previa del color",
   "confirm": "Confirmar",
-  "list files": "Deseas listar todos los archivos en <strong>{name}</strong>?<br><br> Las carpetas <strong>FTP/SFTP</strong> pueden no funcionar correctamente si tiene demasiados archivos."
+  "list files": "List all files in <strong>{name}</strong>? Too many files may crash the app."
 }

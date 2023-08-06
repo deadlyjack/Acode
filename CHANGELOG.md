@@ -8,6 +8,9 @@
 - Updates
   - [x] **Language**
     - Updated language pack for Russian, Spanish, Portuguese and Deutsche.
+- Fixes
+  - [x] **Not Loading**
+    - Fixed app not loading on older devices.
 
 ## [1.8.5] - Build 295
 

@@ -374,5 +374,5 @@
   "plugin min version": "{name} 僅在 Acode - {v-code} 及以上版本有效。點擊以更新。",
   "color preview": "顏色預覽",
   "confirm": "Confirm",
-  "list files": "Do you want to list all files in <strong>{name}</strong>?<br><br><strong>FTP/SFTP</strong> folders may not work properly if it has too many files."
+  "list files": "List all files in <strong>{name}</strong>? Too many files may crash the app."
 }
