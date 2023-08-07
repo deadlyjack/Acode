@@ -374,5 +374,5 @@
   "plugin min version": "{name} ist nur in Acode - {v-code} und neuer verfügbar. Klicken Sie hier zum Aktualisieren.",
   "color preview": "Farb-Vorschau",
   "confirm": "Bestätigen",
-  "list files": "List all files in <strong>{name}</strong>? Too many files may crash the app."
+  "list files": "Alle Dateien in <strong>{name}</strong> auflisten? Bei zu viele Dateien könnte die App abstürzen."
 }
