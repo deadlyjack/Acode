@@ -19,7 +19,7 @@ Welcome to Acode Editor - a powerful and versatile code editing tool designed sp
 
 You can get Acode Editor from popular platforms:
 
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="80">](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree) [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80"/>](https://www.f-droid.org/packages/com.foxdebug.acode/)
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="60">](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree) [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="60"/>](https://www.f-droid.org/packages/com.foxdebug.acode/)
 
 ## • Project Structure
 
@@ -66,4 +66,4 @@ For comprehensive documentation on creating plugins for Acode Editor, visit the 
 
 For plugin development information, refer to: [Acode Plugin Documentation](https://acode.foxdebug.com/plugin-docs)
 
-Empower your coding journey with the dynamic and efficient Acode Editor. Happy coding on-the-go!
+> 💙 Empower your coding journey with the dynamic and efficient Acode Editor. Happy coding on-the-go!
