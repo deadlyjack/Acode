@@ -1,38 +1,41 @@
-# Acode editor (Code editor for android)
+# Acode Editor - Code Editor for Android
 
-<p style='text-align:center;'>
-     <img src='res/logo_1.png' width='250'>
+<p align="center">
+  <img src='res/logo_1.png' width='250'>
 </p>
 
-Acode is a lightweight but powerful code editor for Android phones. You can use this editor for editing HTML, CSS, JavaScript, text files, etc.
+## • Overview
 
-You can create a website, run the website in the browser and see errors or logs in the console.
-Also edit any kind of source file like Python, CSS, HTML, Java, JavaScript, Dart, etc.
+Welcome to Acode Editor - a powerful and versatile code editing tool designed specifically for Android devices. Whether you're working on HTML, CSS, JavaScript, or other programming languages, Acode empowers you to code on-the-go with confidence.
 
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree)
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-alt="Get it on F-Droid"
-height="80" />](https://www.f-droid.org/packages/com.foxdebug.acode/)
+## • Features
 
-## Project structure
+- Edit and create websites, and instantly preview them in a browser.
+- Seamlessly modify source files for various languages like Python, Java, JavaScript, and more.
+- Access the console to quickly identify errors and logs.
+- Enjoy multi-language editing support with easy management tools.
+
+## • Installation
+
+You can get Acode Editor from popular platforms:
+
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="60">](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree) [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="60"/>](https://www.f-droid.org/packages/com.foxdebug.acode/)
+
+## • Project Structure
 
 <pre>
 Acode/
 |
-|- src/   - contains all the raw code, and language files
+|- src/   - Core code and language files
 |
-|- www/   - contains public documents, built JavaScript and CSS files, and HTML files
+|- www/   - Public documents, compiled files, and HTML templates
 |
-|- utils/ - contains the CLI tools for building the package, manipulating/adding strings to all languages, etc.
+|- utils/ - CLI tools for building, string manipulation, and more
 </pre>
 
-## Multi-language support
+## • Multi-language Support
 
-To add a new language, create a new file with the language code for Android (e.g. en-us for English) in the [`src/lang/`](https://github.com/deadlyjack/Acode/tree/main/src/lang) directory. After adding your new language, also add it to [`src/lib/lang.js`](https://github.com/deadlyjack/Acode/blob/main/src/lib/lang.js).
-
-Here are a few utility tools to add, remove or search a string in all added languages.
+Enhance Acode's capabilities by adding new languages easily. Just create a file with the language code (e.g., en-us for English) in [`src/lang/`](https://github.com/deadlyjack/Acode/tree/main/src/lang) and include it in [`src/lib/lang.js`](https://github.com/deadlyjack/Acode/blob/main/src/lib/lang.js). Manage strings across languages effortlessly using utility commands:
 
 ```shell
 yarn lang add
@@ -41,22 +44,26 @@ yarn lang search
 yarn lang update
 ```
 
-## How to build
+## • Building the Application
 
-To build the APK you need Nodejs, NPM, and Apache Cordova installed on your device. Use Cordova CLI to build the application.
+To build the APK, ensure you have Node.js, NPM, and Apache Cordova installed on your device. Use Cordova CLI to build the application.
 
-Run this command to do the initial setup of the project. It's required just once.
+1. Initial setup (required only once):
 
 ```shell
 yarn setup
 ```
 
-Build the project:
+2. Build the project:
 
 ```shell
 yarn build <platform (android)> <free|paid> <p|prod|d|dev>
 ```
 
-## Develop a plugin for Acode
+## • Developing a Plugin for Acode
 
-Please see this [repository](https://github.com/deadlyjack/acode-plugin) for documentation.
+For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/deadlyjack/acode-plugin).
+
+For plugin development information, refer to: [Acode Plugin Documentation](https://acode.foxdebug.com/plugin-docs)
+
+> 💙 Empower your coding journey with the dynamic and efficient Acode Editor. Happy coding on-the-go!
