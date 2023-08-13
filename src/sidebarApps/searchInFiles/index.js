@@ -227,14 +227,14 @@ async function onWorkerMessage(e) {
         position: null,
       });
 
-      fileNames.push(file.name);
+      fileNames.push(escapeStringRegexp(file.name));
       forceTokenizer();
       for (let i = 0; i < matches.length; i++) {
         const result = matches[i];
         result.file = index;
         results.push(result);
         if (!words.includes(result.renderText)) {
-          words.push(result.renderText);
+          words.push(escapeStringRegexp(result.renderText));
           forceTokenizer();
         }
       }
