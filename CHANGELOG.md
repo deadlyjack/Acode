@@ -9,6 +9,8 @@
   - [x] **Language**
     - Updated language pack for Russian, Spanish, Portuguese and Deutsche.
 - Fixes
+  - [x] **Sidebar search**
+    - Fixed sidebar search not rendering words with special characters.
   - [x] **Not Loading**
     - Fixed app not loading on older devices.
 
