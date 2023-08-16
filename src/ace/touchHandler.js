@@ -247,7 +247,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
         captureLastX = null;
         lastXForScroll = clientX;
         lastYForScroll = clientY;
-      }, 50);
+      }, 10);
     }
 
     if (!moveX && !moveY) {
