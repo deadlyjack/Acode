@@ -108,6 +108,11 @@ export default function addTouchListeners(editor, minimal, onclick) {
   let timeTouchStart; // time of touch start
   let touchEnded = true; // true if touch ended
   let threshold = appSettings.value.touchMoveThreshold;
+  let captureLastX; // last x for capturing touchmove
+  let lastXForScroll; // last x for scroll
+  let lastYForScroll; // last y for scroll
+  let scrollX = 0; // scroll x
+  let scrollY = 0; // scroll y
 
   $el.addEventListener('touchstart', touchStart, config, true);
   scroller.addEventListener('contextmenu', contextmenu, config);
@@ -199,6 +204,10 @@ export default function addTouchListeners(editor, minimal, onclick) {
     touchEnded = false;
     lastX = clientX;
     lastY = clientY;
+    lastXForScroll = clientX;
+    lastYForScroll = clientY;
+    scrollX = 0;
+    scrollY = 0;
     moveY = 0;
     moveX = 0;
     lockX = LOCK_X;
@@ -228,9 +237,18 @@ export default function addTouchListeners(editor, minimal, onclick) {
 
     moveX = clientX - lastX;
     moveY = clientY - lastY;
-
+    scrollX = clientX - lastXForScroll;
+    scrollY = clientY - lastYForScroll;
     lastX = clientX;
     lastY = clientY;
+
+    if (!captureLastX) {
+      captureLastX = setTimeout(() => {
+        captureLastX = null;
+        lastXForScroll = clientX;
+        lastYForScroll = clientY;
+      }, 50);
+    }
 
     if (!moveX && !moveY) {
       return;
@@ -314,7 +332,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
         return;
       }
 
-      scrollAnimation(moveX, moveY);
+      scrollAnimation(scrollX, scrollY);
       return;
     }
 
