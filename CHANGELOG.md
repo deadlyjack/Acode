@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.8.6] - Build 305
+## [1.8.6] - Build 310
 
 - New
   - [x] **Search in settings**
