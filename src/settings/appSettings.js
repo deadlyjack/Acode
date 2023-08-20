@@ -196,7 +196,7 @@ export default function otherSettings() {
         }
 
         const fs = fsOperation(Url.join(DATA_STORAGE, 'eruda.js'));
-        if (!await fs.exists()) {
+        if (await fs.exists()) {
           break;
         }
 

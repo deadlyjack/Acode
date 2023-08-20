@@ -13,6 +13,10 @@
     - Fixed sidebar search not rendering words with special characters.
   - [x] **Not Loading**
     - Fixed app not loading on older devices.
+  - [x] **Scrolling**
+    - Fixed scrolling not working properly on some devices.
+  - [x] **Eruda console**
+    - Fixed eruda console not working properly.
 
 ## [1.8.5] - Build 295
 
