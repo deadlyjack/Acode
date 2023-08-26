@@ -120,7 +120,7 @@ class Settings {
       checkFiles: true,
       desktopMode: false,
       console: this.CONSOLE_LEGACY,
-      keyboardMode: this.KEYBOARD_MODE_NORMAL,
+      keyboardMode: this.KEYBOARD_MODE_NO_SUGGESTIONS_AGGRESSIVE,
       rememberFiles: true,
       rememberFolders: true,
       diagonalScrolling: false,

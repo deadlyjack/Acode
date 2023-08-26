@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.8.6] - Build 310
+## [1.8.6] - Build 312
 
 - New
   - [x] **Search in settings**
@@ -8,6 +8,8 @@
 - Updates
   - [x] **Language**
     - Updated language pack for Russian, Spanish, Portuguese and Deutsche.
+  - [x] **Updated Ace editor**
+    - Updated Ace editor to version 1.5.0
 - Fixes
   - [x] **Sidebar search**
     - Fixed sidebar search not rendering words with special characters.
@@ -17,6 +19,8 @@
     - Fixed scrolling not working properly on some devices.
   - [x] **Eruda console**
     - Fixed eruda console not working properly.
+  - [x] **Scrollbar**
+    - Fixed scrollbar not working properly.
 
 ## [1.8.5] - Build 295
 

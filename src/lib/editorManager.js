@@ -1,6 +1,6 @@
 import list from 'components/collapsableList';
 import ScrollBar from 'components/scrollbar';
-import touchListeners, { scrollAnimationFrame } from 'ace/touchHandler';
+import touchListeners from 'ace/touchHandler';
 import appSettings from './settings';
 import EditorFile from './editorFile';
 import sidebarApps from 'sidebarApps';
@@ -9,6 +9,7 @@ import keyboardHandler from 'handlers/keyboard';
 import initColorView from 'ace/colorView';
 import { keydownState } from 'handlers/keyboard';
 import { deactivateColorView } from 'ace/colorView';
+import { scrollAnimationFrame } from 'ace/touchHandler';
 import { setCommands, setKeyBindings } from 'ace/commands';
 import { HARDKEYBOARDHIDDEN_NO, getSystemConfiguration } from './systemConfiguration';
 
@@ -425,9 +426,8 @@ async function EditorManager($header, $body) {
 
   /**
    * Callback function called on scroll vertically
-   * @param {Boolean} render
    */
-  function onscrollleft(render = true) {
+  function setHScrollValue() {
     if (appSettings.value.textWrap || preventScrollbarH) return;
     const session = editor.getSession();
     const scrollLeft = session.getScrollLeft();
@@ -439,15 +439,18 @@ async function EditorManager($header, $body) {
 
     lastScrollLeft = scrollLeft;
     $hScrollbar.value = factor;
-    if (render) $hScrollbar.render();
     editor._emit('scroll', 'horizontal');
+  }
+
+  function onscrollleft() {
+    setHScrollValue();
+    $hScrollbar.render();
   }
 
   /**
    * Callback function called on scroll vertically
-   * @param {Boolean} render
    */
-  function onscrolltop(render = true) {
+  function setVScrollValue() {
     if (preventScrollbarV) return;
     const session = editor.getSession();
     const scrollTop = session.getScrollTop();
@@ -459,8 +462,12 @@ async function EditorManager($header, $body) {
 
     lastScrollTop = scrollTop;
     $vScrollbar.value = factor;
-    if (render) $vScrollbar.render();
     editor._emit('scroll', 'vertical');
+  }
+
+  function onscrolltop() {
+    setVScrollValue();
+    $vScrollbar.render();
   }
 
   function updateFloatingButton(show = false) {
@@ -514,8 +521,12 @@ async function EditorManager($header, $body) {
 
     $hScrollbar.remove();
     $vScrollbar.remove();
-    onscrolltop(false);
-    if (!appSettings.value.textWrap) onscrollleft(false);
+
+    setVScrollValue();
+    if (!appSettings.value.textWrap) {
+      setHScrollValue();
+    }
+
     editor.setReadOnly(!file.editable || !!file.loading);
 
     manager.onupdate('switch-file');

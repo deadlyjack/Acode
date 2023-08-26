@@ -171,7 +171,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       $fbMenu.hide();
       const action = e.target.getAttribute('action');
       if (action === 'settings') {
-        filesSettings();
+        filesSettings().show();
         const onshow = () => {
           $page.off('show', onshow);
           reload();

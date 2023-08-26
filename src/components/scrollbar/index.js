@@ -55,6 +55,7 @@ export default function ScrollBar(options) {
   let scrollbarTimeoutRemove;
   let onshow;
   let onhide;
+  let touchStarted = false;
 
   if (options.width) scrollbarSize = options.width;
 
@@ -84,6 +85,7 @@ export default function ScrollBar(options) {
    */
   function touchStart(e) {
     e.preventDefault();
+    touchStarted = true;
     if (!rect) resize();
     const touch = e.type === 'touchstart' ? e.touches[0] : e;
     touchStartValue.x = touch.clientX;
@@ -143,6 +145,7 @@ export default function ScrollBar(options) {
    */
   function touchEnd(e) {
     e.preventDefault();
+    touchStarted = false;
     $scrollbar.classList.remove('active');
     document.removeEventListener('touchmove', touchMove, config);
     document.removeEventListener('mousemove', touchMove, config);
@@ -184,11 +187,15 @@ export default function ScrollBar(options) {
 
   function render() {
     show();
+    clearTimeout(scrollbarTimeoutHide);
     scrollbarTimeoutHide = setTimeout(hide, TIMEOUT);
   }
 
   function show() {
-    $scrollbar.dataset.state = false;
+    if ($scrollbar.dataset.hidden === 'false') {
+      return;
+    }
+    $scrollbar.dataset.hidden = false;
     clearTimeout(scrollbarTimeoutHide);
     clearTimeout(scrollbarTimeoutRemove);
     $scrollbar.classList.remove('hide');
@@ -199,6 +206,7 @@ export default function ScrollBar(options) {
   }
 
   function hide() {
+    if (touchStarted) return;
     $scrollbar.dataset.hidden = true;
     $scrollbar.classList.add('hide');
     scrollbarTimeoutRemove = setTimeout(() => $scrollbar.remove(), 300);
