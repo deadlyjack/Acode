@@ -373,6 +373,6 @@
   "reopen file": "确定要重新打开 ‘{file}’？所有未保存的修改将会丢失。",
   "plugin min version": "{name} 仅在 Acode - {v-code} 及以上版本有效。点击以更新。",
   "color preview": "颜色预览",
-  "confirm": "Confirm",
-  "list files": "List all files in <strong>{name}</strong>? Too many files may crash the app."
+  "confirm": "确定",
+  "list files": "列出 <strong>{name}</strong> 下的所有文件吗？过多的文件可能会导致应用崩溃。"
 }
