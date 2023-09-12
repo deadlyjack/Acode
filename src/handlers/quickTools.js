@@ -317,8 +317,8 @@ function find(skip, backward) {
   const { $searchInput } = quickTools;
   editorManager.editor.find($searchInput.value, {
     skipCurrent: skip,
-    backwards: backward,
     ...appSettings.value.search,
+    backwards: backward,
   });
 
   updateSearchState();
