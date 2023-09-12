@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.8.6] - Build 312
+## [1.8.6] - Build 313
 
 - New
   - [x] **Search in settings**
@@ -21,6 +21,8 @@
     - Fixed eruda console not working properly.
   - [x] **Scrollbar**
     - Fixed scrollbar not working properly.
+  - [x] **Custom theme**
+    - Fixed custom theme not working properly.
 
 ## [1.8.5] - Build 295
 

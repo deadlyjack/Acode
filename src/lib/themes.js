@@ -56,6 +56,7 @@ function get(name) {
  */
 function add(theme) {
   if (!(theme instanceof ThemeBuilder)) return;
+  if (appThemes.has(theme.id)) return;
   appThemes.set(theme.id, theme);
   if (settings.value.appTheme === theme.id) {
     apply(theme.id);
@@ -130,9 +131,12 @@ async function apply(id, init) {
  */
 function update(theme) {
   if (!(theme instanceof ThemeBuilder)) return;
+  const oldTheme = get(theme.id);
+  if (!oldTheme) {
+    add(theme);
+    return;
+  }
   const json = theme.toJSON();
-  const oldTheme = get(theme.name);
-  if (!oldTheme) return;
   Object.keys(json).forEach((key) => {
     oldTheme[key] = json[key];
   });

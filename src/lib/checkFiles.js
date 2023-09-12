@@ -14,6 +14,7 @@ Object.defineProperty(checkFiles, 'check', {
 });
 
 export default async function checkFiles() {
+  if (!editorManager) return;
   if (checkFileEnabled === false) {
     checkFileEnabled = true;
     return;
