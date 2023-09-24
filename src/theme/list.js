@@ -1,10 +1,10 @@
 import Url from 'utils/Url';
 import color from 'utils/color';
 import fsOperation from 'fileSystem';
-import fonts from './fonts';
-import themes from './preLoadedThemes';
-import settings from './settings';
-import ThemeBuilder from './themeBuilder';
+import fonts from '../lib/fonts';
+import themes from './preInstalled';
+import settings from '../lib/settings';
+import ThemeBuilder from './builder';
 
 /** @type {Map<string, ThemeBuilder>} */
 const appThemes = new Map();

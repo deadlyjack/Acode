@@ -375,5 +375,7 @@
   "plugin min version": "{name} доступен только для Acode версии {v-code} и выше. Нажмите для обновления.",
   "color preview": "Предпросмотр цвета",
   "confirm": "Подтверждение",
-  "list files": "Список всех файлов <strong>{name}</strong>. Обширное количество файлов может привести к крашу самого приложения."
+  "list files": "Список всех файлов <strong>{name}</strong>. Обширное количество файлов может привести к крашу самого приложения.",
+  "problems": "Problems",
+  "show side buttons": "Show side buttons"
 }

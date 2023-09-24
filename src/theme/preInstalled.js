@@ -1,4 +1,4 @@
-import { createBuiltInTheme } from './themeBuilder';
+import { createBuiltInTheme } from './builder';
 
 const WHITE = 'rgb(255, 255, 255)';
 const BLACK = 'rgb(0, 0, 0)';

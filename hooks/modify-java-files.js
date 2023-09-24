@@ -5,7 +5,7 @@ const prettier = require('prettier');
 
 main();
 
-function main() {
+async function main() {
   const flagFile = path.resolve(__dirname, '../platforms/android/.flag_done');
   if (fs.existsSync(flagFile)) {
     return;
@@ -52,7 +52,7 @@ function main() {
         'android.view.inputmethod.InputConnection',
         'android.view.inputmethod.EditorInfo',
       ],
-      'feilds': [
+      'fields': [
         {
           type: 'int',
           name: 'type',
@@ -128,7 +128,7 @@ function main() {
         }
       ]
     }
-  }
+  };
 
   const fileContent = {};
 
@@ -139,10 +139,8 @@ function main() {
   for (let file in contentToAdd) {
     const content = fileContent[file];
     const contentToAddTo = contentToAdd[file];
-    let newContent = prettier.format(removeComments(content), {
-      parser: 'java',
-      printWidth: Infinity
-    });
+    const text = removeComments(content);
+    let newContent = await format(text);
     if (contentToAddTo.import) {
       const imports = contentToAddTo.import.map(importStr => {
         return `import ${importStr};`;
@@ -153,13 +151,13 @@ function main() {
         `$1${imports}\n$2`
       );
     }
-    if (contentToAddTo.feilds) {
-      const feilds = contentToAddTo.feilds.map(feild => {
-        return getFeildString(feild);
+    if (contentToAddTo.fields) {
+      const fields = contentToAddTo.fields.map(field => {
+        return getFieldString(field);
       }).join('\n');
       newContent = newContent.replace(
         /^(\s*)(\w+\s+\w+\s*;)/m,
-        `$1${feilds}\n$2`
+        `$1${fields}\n$2`
       );
     }
     if (contentToAddTo.methods) {
@@ -190,11 +188,7 @@ function main() {
       }
     }
 
-    newContent = prettier.format(newContent, {
-      parser: 'java',
-      tabWidth: 2,
-      printWidth: Infinity,
-    });
+    newContent = await format(newContent);
     fs.writeFile(files[file], newContent, err => {
       if (err) {
         console.log(err);
@@ -214,6 +208,15 @@ function main() {
     console.log(`${flagFile} updated`);
   });
 
+  async function format(content) {
+    return prettier.format(content, {
+      plugins: ['prettier-plugin-java'],
+      parser: 'java',
+      tabWidth: 2,
+      printWidth: Infinity
+    });
+  }
+
   function getMethodString(method) {
     const params = method.params.map(param => {
       return `${param.type} ${param.name}`;
@@ -229,8 +232,8 @@ function main() {
     return str + ';';
   }
 
-  function getFeildString(feild) {
-    return `${feild.modifier} ${feild.type} ${feild.name}${feild.value ? ` = ${feild.value}` : ''};`;
+  function getFieldString(field) {
+    return `${field.modifier} ${field.type} ${field.name}${field.value ? ` = ${field.value}` : ''};`;
   }
 
   function isInterface(filename, content) {

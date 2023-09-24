@@ -2,7 +2,6 @@
   position: absolute;
   background-color: transparent;
   padding: 10px;
-  z-index: 999;
   opacity: 0.5;
   z-index: 9999;
   animation: scrollbar-show 300ms ease 1;
@@ -62,6 +61,7 @@
   &.right {
     left: auto;
     right: 0;
+    padding: 10px 17px 10px 10px;
   }
 
   &.left {

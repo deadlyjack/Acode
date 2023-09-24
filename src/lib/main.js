@@ -13,7 +13,7 @@ import 'components/WebComponents';
 import Url from 'utils/Url';
 import lang from 'lib/lang';
 import Acode from 'lib/acode';
-import themes from 'lib/themes';
+import themes from 'theme/list';
 import mustache from 'mustache';
 import startAd from 'lib/startAd';
 import tile from 'components/tile';
@@ -39,7 +39,7 @@ import $_fileMenu from 'views/file-menu.hbs';
 import EditorManager from 'lib/editorManager';
 import applySettings from 'lib/applySettings';
 import keyboardHandler from 'handlers/keyboard';
-import contextmenu from 'components/contextmenu';
+import Contextmenu from 'components/contextmenu';
 import otherSettings from 'settings/appSettings';
 import windowResize from 'handlers/windowResize';
 import quickToolsInit from 'handlers/quickToolsInit';
@@ -435,7 +435,7 @@ function mainPageOnShow() {
 }
 
 function createMainMenu({ top, bottom, toggler }) {
-  return contextmenu({
+  return Contextmenu({
     right: '6px',
     top,
     bottom,
@@ -448,7 +448,7 @@ function createMainMenu({ top, bottom, toggler }) {
 }
 
 function createFileMenu({ top, bottom, toggler }) {
-  const $menu = contextmenu({
+  const $menu = Contextmenu({
     top,
     bottom,
     toggler,

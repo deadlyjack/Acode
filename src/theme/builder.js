@@ -23,6 +23,8 @@ export default class ThemeBuilder {
     "--popup-background-color": "rgb(255, 255, 255)",
     "--popup-text-color": "rgb(37, 37, 37)",
     "--popup-active-color": "rgb(169, 0, 0)",
+    "--danger-color": "rgb(160, 51, 0)",
+    "--danger-text-color": "rgb(255, 255, 255)",
     "--file-tab-width": "120px",
   };
 
@@ -212,6 +214,14 @@ export default class ThemeBuilder {
 
   set popupActiveColor(value) {
     this.#theme['--popup-active-color'] = value;
+  }
+
+  get dangerColor() {
+    return this.#theme['--danger-color'];
+  }
+
+  set dangerColor(value) {
+    this.#theme['--danger-color'] = value;
   }
 
   get fileTabWidth() {

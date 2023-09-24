@@ -10,7 +10,7 @@ import actionStack from 'lib/actionStack';
  */
 
 /**
- * @typedef {object} contextMenuOptions
+ * @typedef {object} ContextMenuOptions
  * @property {number} left
  * @property {number} top
  * @property {number} bottom
@@ -19,16 +19,19 @@ import actionStack from 'lib/actionStack';
  * @property {HTMLElement} toggler
  * @property {function} onshow
  * @property {function} onhide
- * @property {function(this:HTMLElement):string} innerHTML
+ * @property {Array<[string, string]>} items Array of [text, action] pairs
+ * @property {(this:HTMLElement, event:MouseEvent)=>void} onclick Called when an item is clicked
+ * @property {(item:string) => void} onselect Called when an item is selected
+ * @property {(this:HTMLElement) => string} innerHTML Called when the menu is shown
  */
 
 /**
  * Create a context menu
- * @param {string|contextMenuOptions} content Context menu content or options
- * @param {contextMenuOptions} [options] Options
+ * @param {string|ContextMenuOptions} content Context menu content or options
+ * @param {ContextMenuOptions} [options] Options
  * @returns {ContextMenuObj}
  */
-export default function contextmenu(content, options) {
+export default function Contextmenu(content, options) {
   if (!options && typeof content === 'object') {
     options = content;
     content = null;
@@ -39,6 +42,16 @@ export default function contextmenu(content, options) {
   const $el = tag('ul', {
     className: 'context-menu scroll',
     innerHTML: content || '',
+    onclick(e) {
+      if (options.onclick) options.onclick.call(this, e);
+      if (options.onselect) {
+        const $target = e.target;
+        const { action } = $target.dataset;
+        if (!action) return;
+        hide();
+        options.onselect.call(this, action);
+      }
+    },
     style: {
       top: options.top || 'auto',
       left: options.left || 'auto',
@@ -52,6 +65,14 @@ export default function contextmenu(content, options) {
     ontouchstart: hide,
     onmousedown: hide,
   });
+
+  if (Array.isArray(options.items)) {
+    options.items.forEach(([text, action]) => {
+      $el.append(
+        <li data-action={action}>{text}</li>
+      );
+    });
+  }
 
   if (!options.innerHTML) addTabindex();
 

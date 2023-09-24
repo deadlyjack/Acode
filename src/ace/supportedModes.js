@@ -126,6 +126,7 @@ const modeList = {
   Protobuf: "proto",
   Puppet: "epp|pp",
   Python: "py",
+  PRQL: "prql",
   QML: "qml",
   R: "r",
   Raku: "raku|rakumod|rakutest|p6|pl6|pm6",

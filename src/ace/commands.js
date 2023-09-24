@@ -215,6 +215,13 @@ const commands = [
     scrollIntoView: 'cursor',
   },
   {
+    name: 'problems',
+    description: 'Show errors and warnings',
+    exec() {
+      acode.exec('open', 'problems');
+    },
+  },
+  {
     name: 'replace',
     description: 'Replace',
     exec() {

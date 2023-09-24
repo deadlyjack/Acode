@@ -74,17 +74,17 @@ function Buttons({ name, isPaid, installed, update, install, uninstall, purchase
 
   if (installed && update) {
     return <>
-      <button onclick={uninstall}>{strings.uninstall}</button>
-      <button onclick={install}>{strings.update}</button>
+      <button data-type='uninstall' onclick={uninstall}>{strings.uninstall}</button>
+      <button data-type='update' onclick={install}>{strings.update}</button>
     </>;
   }
 
   if (installed) {
-    return <button onclick={uninstall}>{strings.uninstall}</button>;
+    return <button data-type='uninstall' onclick={uninstall}>{strings.uninstall}</button>;
   }
 
   if (isPaid && !purchased && price) {
-    return <button onclick={buy}>{price}</button>;
+    return <button data-type='buy' onclick={buy}>{price}</button>;
   }
 
   if (isPaid && !purchased && !price) {
@@ -94,7 +94,7 @@ function Buttons({ name, isPaid, installed, update, install, uninstall, purchase
     </div>;
   }
 
-  return <button onclick={install}>{strings.install}</button>;
+  return <button data-type='install' onclick={install}>{strings.install}</button>;
 }
 
 function Version({ currentVersion, version }) {

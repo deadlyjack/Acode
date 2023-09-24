@@ -1,10 +1,10 @@
-import constants from './constants';
-import fsOperation from 'fileSystem';
-import helpers from 'utils/helpers';
-import Url from 'utils/Url';
 import lang from './lang';
-import ThemeBuilder from './themeBuilder';
-import themes from './themes';
+import Url from 'utils/Url';
+import themes from 'theme/list';
+import constants from './constants';
+import helpers from 'utils/helpers';
+import fsOperation from 'fileSystem';
+import ThemeBuilder from 'theme/builder';
 
 /**
  * @typedef {object} fileBrowserSettings
@@ -142,6 +142,8 @@ class Settings {
       colorPreview: true,
       maxRetryCount: 3,
       showRetryToast: false,
+      showSideButtons: true,
+      showAnnotations: false,
     };
     this.value = structuredClone(this.#defaultSettings);
   }

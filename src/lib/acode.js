@@ -2,7 +2,7 @@ import Url from "utils/Url";
 import fonts from 'lib/fonts';
 import box from 'dialogs/box';
 import Color from 'utils/color';
-import themes from 'lib/themes';
+import themes from 'theme/list';
 import files from 'lib/fileList';
 import alert from 'dialogs/alert';
 import Page from 'components/page';
@@ -25,20 +25,21 @@ import palette from 'components/palette';
 import actionStack from 'lib/actionStack';
 import tutorial from 'components/tutorial';
 import FileBrowser from "pages/fileBrowser";
-import ThemeBuilder from 'lib/themeBuilder';
+import ThemeBuilder from 'theme/builder';
 import selectionMenu from "lib/selectionMenu";
 import multiPrompt from 'dialogs/multiPrompt';
 import inputhints from 'components/inputhints';
 import KeyboardEvent from 'utils/keyboardEvent';
 import keyboardHandler from 'handlers/keyboard';
 import windowResize from 'handlers/windowResize';
-import contextmenu from 'components/contextmenu';
+import Contextmenu from 'components/contextmenu';
 import formatterSettings from "settings/formatterSettings";
+import settingsPage from 'components/settingsPage';
+import SideButton from 'components/sideButton';
 
 import { addedFolder } from 'lib/openFolder';
 import { decode, encode } from 'utils/encodings';
 import { addMode, removeMode } from 'ace/modelist';
-import settingsPage from 'components/settingsPage';
 
 export default class Acode {
   #modules = {};
@@ -112,7 +113,7 @@ export default class Acode {
     this.define('actionStack', actionStack);
     this.define('multiPrompt', multiPrompt);
     this.define('addedfolder', addedFolder);
-    this.define('contextMenu', contextmenu);
+    this.define('contextMenu', Contextmenu);
     this.define('fileBrowser', FileBrowser);
     this.define('fsOperation', fsOperation);
     this.define('keyboard', keyboardHandler);
@@ -121,6 +122,7 @@ export default class Acode {
     this.define('themeBuilder', ThemeBuilder);
     this.define('selectionMenu', selectionMenu);
     this.define('sidebarApps', sidebarAppsModule);
+    this.define('sideButton', SideButton);
     this.define('createKeyboardEvent', KeyboardEvent);
     this.define('toInternalUrl', helpers.toInternalUri);
   }

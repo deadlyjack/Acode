@@ -1,15 +1,15 @@
 import './themeSetting.scss';
+import themes from 'theme/list';
 import Ref from 'html-tag-js/ref';
 import Page from 'components/page';
-import searchBar from 'components/searchbar';
-import CustomTheme from 'pages/customTheme';
 import helpers from 'utils/helpers';
 import removeAds from 'lib/removeAds';
-import themes from 'lib/themes';
 import appSettings from 'lib/settings';
-import ThemeBuilder from 'lib/themeBuilder';
+import ThemeBuilder from 'theme/builder';
 import TabView from 'components/tabView';
 import actionStack from 'lib/actionStack';
+import CustomTheme from 'pages/customTheme';
+import searchBar from 'components/searchbar';
 
 export default function () {
   const $page = Page(strings.theme.capitalize());

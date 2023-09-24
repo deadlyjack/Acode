@@ -2,6 +2,8 @@
 
 #plugin {
   overflow: auto;
+  max-width: 800px;
+  margin: auto;
 
   .header {
     display: flex;
@@ -118,6 +120,20 @@
     button {
       margin: 0 10px;
       border-radius: 4px;
+      max-width: 300px;
+
+      @media (max-width: 800px) {
+        &:only-child {
+          margin: 0 auto;
+        }
+      }
+
+      &[data-type='uninstall'] {
+        background-color: rgb(160, 51, 0) !important;
+        background-color: var(--danger-color) !important;
+        color: rgb(255, 255, 255) !important;
+        color: var(--danger-text-color) !important;
+      }
     }
 
     .error {

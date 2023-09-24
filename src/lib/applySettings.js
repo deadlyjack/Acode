@@ -2,7 +2,7 @@ import actions from '../handlers/quickTools';
 import constants from './constants';
 import appSettings from '../lib/settings';
 import fonts from './fonts';
-import themes from './themes';
+import themes from '../theme/list';
 
 export default {
   beforeRender() {

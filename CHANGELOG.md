@@ -1,5 +1,25 @@
 # Change Log
 
+## [1.8.7] - Build 314
+
+- New
+  - [x] **Updated Ace editor**
+    - Updated Ace editor to version 1.28.0
+  - [x] **New problems page**
+    - You can now see all the problems in one place.
+    - You can also see the problems in opened file.
+  - [x] **New settings**
+    - New settings to toggle side buttons.
+  - [x] **New Plugin API**
+    - `SideButton` is a new component that can be used to add side buttons.
+  - [x] **New theme color**
+    - New `danger-color` and `danger-text-color` theme color.
+  - [x] **New key binding**
+    - Use `Ctrl+Shift+M` key binding to open problems page.
+- Fixes
+  - [x] **Plugin page**
+    - Improved plugin page UI.
+
 ## [1.8.6] - Build 313
 
 - New

@@ -11,9 +11,9 @@ import TabView from 'components/tabView';
 import searchBar from "components/searchbar";
 import FileBrowser from "pages/fileBrowser";
 import installPlugin from 'lib/installPlugin';
-import select from 'dialogs/select';
 import prompt from 'dialogs/prompt';
 import actionStack from 'lib/actionStack';
+import Contextmenu from 'components/contextmenu';
 
 /**
  * 
@@ -22,7 +22,7 @@ import actionStack from 'lib/actionStack';
 export default function PluginsInclude(updates) {
   const $page = Page(strings['plugins']);
   const $search = <span className="icon search" data-action='search'></span>;
-  const $add = <span className="icon add" data-action='add-source' onclick={() => addSource()}></span>;
+  const $add = <span className="icon add" data-action='add-source'></span>;
   const List = () => <div id='plugin-list' className='list scroll' empty-msg={strings['loading...']}></div>;
   const $list = {
     all: <List />,
@@ -36,6 +36,19 @@ export default function PluginsInclude(updates) {
   };
   let $currList = $list.installed;
   let currSection = 'installed';
+
+  Contextmenu({
+    toggler: $add,
+    top: '8px',
+    right: '8px',
+    items: [
+      [strings.remote, 'remote'],
+      [strings.local, 'local'],
+    ],
+    onselect(item) {
+      addSource(item);
+    },
+  });
 
   $page.body = <TabView id='plugins'>
     <div className='options'>
@@ -221,15 +234,14 @@ export default function PluginsInclude(updates) {
     return Url.join(PLUGIN_DIR, id, name);
   }
 
-  async function addSource(value = 'https://', sourceType) {
-    if (!sourceType) {
-      sourceType = await select('', [
-        ['remote', strings.remote],
-        ['local', strings.local],
-      ], true);
-    }
-
+  async function addSource(sourceType, value = 'https://') {
     let source;
+
+    const clipboardData = await getClipboardData();
+
+    if (clipboardData && clipboardData.startsWith('https')) {
+      value = clipboardData;
+    }
 
     if (sourceType === 'remote') {
       source = await prompt('Enter plugin source', value, 'url');
@@ -244,7 +256,14 @@ export default function PluginsInclude(updates) {
       await getInstalledPlugins();
     } catch (error) {
       window.toast(helpers.errorMessage(error));
-      addSource(source, sourceType);
+      addSource(sourceType, source);
     }
+  }
+
+  async function getClipboardData() {
+    return new Promise((resolve) => {
+      const { clipboard } = cordova.plugins;
+      clipboard.paste(resolve);
+    });
   }
 }

@@ -343,6 +343,11 @@ export default {
     key: null,
     readOnly: false,
   },
+  problems: {
+    description: 'Show problems',
+    key: 'Ctrl-Shift-M',
+    readOnly: true,
+  },
   gotopageup: {
     description: 'Go to page up',
     key: 'PageUp',

@@ -1,13 +1,13 @@
 import './customTheme.scss';
 
-import Page from 'components/page';
+import themes from 'theme/list';
 import color from 'dialogs/color';
+import Page from 'components/page';
 import helpers from 'utils/helpers';
 import select from 'dialogs/select';
 import settings from 'lib/settings';
-import themes from 'lib/themes';
-import ThemeBuilder from 'lib/themeBuilder';
 import confirm from 'dialogs/confirm';
+import ThemeBuilder from 'theme/builder';
 import actionStack from 'lib/actionStack';
 import { isValidColor } from 'utils/color/regex';
 

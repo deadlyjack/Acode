@@ -374,5 +374,7 @@
   "plugin min version": "{name} 仅在 Acode - {v-code} 及以上版本有效。点击以更新。",
   "color preview": "颜色预览",
   "confirm": "确定",
-  "list files": "列出 <strong>{name}</strong> 下的所有文件吗？过多的文件可能会导致应用崩溃。"
+  "list files": "列出 <strong>{name}</strong> 下的所有文件吗？过多的文件可能会导致应用崩溃。",
+  "problems": "Problems",
+  "show side buttons": "Show side buttons"
 }

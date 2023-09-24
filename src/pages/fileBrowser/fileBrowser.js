@@ -3,7 +3,7 @@ import './fileBrowser.scss';
 import mustache from 'mustache';
 import Page from 'components/page';
 import helpers from 'utils/helpers';
-import contextmenu from 'components/contextmenu';
+import Contextmenu from 'components/contextmenu';
 import constants from 'lib/constants';
 import filesSettings from 'settings/filesSettings';
 import _template from './fileBrowser.hbs';
@@ -90,7 +90,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       toggler: $menuToggler,
       transformOrigin: 'top right',
     };
-    const $fbMenu = contextmenu({
+    const $fbMenu = Contextmenu({
       innerHTML: () => {
         return `
         <li action="settings">${strings.settings.capitalize(0)}</li>
@@ -100,7 +100,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       },
       ...menuOption,
     });
-    const $addMenu = contextmenu({
+    const $addMenu = Contextmenu({
       innerHTML: () => {
         if (currentDir.url === '/') {
           return mustache.render(_addMenuHome, {

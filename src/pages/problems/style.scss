@@ -1,0 +1,51 @@
+#problems {
+  height: 100%;
+  width: 100%;
+
+  .single-file {
+    padding: 10px;
+    box-sizing: border-box;
+
+    summary {
+      height: 40px;
+      width: 100%;
+      font-weight: bold;
+      line-height: 40px;
+    }
+
+    .problem {
+      display: flex;
+      padding: 5px;
+      border-bottom: solid 1px var(--border-color);
+
+      * {
+        pointer-events: none;
+      }
+
+      .icon {
+        margin: 0 5px;
+        font-size: 0.9rem;
+        color: var(--primary-text-color) !important;
+      }
+
+      .problem-line {
+        display: flex;
+        align-items: center;
+        margin-left: 10px;
+        font-size: 0.9rem;
+      }
+
+      .problem-message {
+        flex: 1;
+
+        &[data-type='error'] {
+          color: var(--danger-color);
+        }
+
+        &[data-type='warning'] {
+          color: var(--error-text-color);
+        }
+      }
+    }
+  }
+}

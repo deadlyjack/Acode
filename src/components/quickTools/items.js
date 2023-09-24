@@ -33,7 +33,7 @@ export default [
   item('exclamation', 'letters', 'insert', '!', '!'),
   item('command-palette', 'keyboard_control', 'command', 'openCommandPalette'),
   item('alt-key', 'letters', 'alt', undefined, 'alt', false),
-  item('meta-key', 'letters', 'meta', undefined, 'meta', false)
+  item('meta-key', 'letters', 'meta', undefined, 'meta', false),
 ];
 
 /**

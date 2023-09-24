@@ -167,6 +167,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * @param {TouchEvent} e Touch event
    */
   function touchStart(e) {
+    /**@type {HTMLElement} */
     const $target = e.target;
     cancelAnimationFrame(scrollAnimationFrame);
     const { clientX, clientY } = e.touches[0];

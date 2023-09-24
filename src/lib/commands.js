@@ -24,6 +24,7 @@ import select from 'dialogs/select';
 import prompt from 'dialogs/prompt';
 import color from 'dialogs/color';
 import { getColorRange } from 'utils/color/regex';
+import Problems from 'pages/problems/problems';
 
 export default {
   async 'close-all-tabs'() {
@@ -149,8 +150,22 @@ export default {
     editorManager.files[fileIndex].makeActive();
   },
   'open'(page) {
-    if (page === 'settings') mainSettings();
-    if (page === 'help') help();
+    switch (page) {
+      case 'settings':
+        mainSettings();
+        break;
+
+      case 'help':
+        help();
+        break;
+
+      case 'problems':
+        Problems();
+        break;
+
+      default:
+        return;
+    }
     editorManager.editor.blur();
   },
   'open-with'() {

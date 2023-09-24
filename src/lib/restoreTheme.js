@@ -1,6 +1,6 @@
-import themes from './themes';
-import appSettings from './settings';
+import themes from 'theme/list';
 import Color from 'utils/color';
+import appSettings from './settings';
 
 let count = 0;
 

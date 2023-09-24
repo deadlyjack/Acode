@@ -2,7 +2,20 @@ import './style.scss';
 import tag from 'html-tag-js';
 
 /**
- *
+ * @typedef {HTMLElement} Scrollbar
+ * @property {function():void} destroy
+ * @property {function():void} render
+ * @property {function():void} show
+ * @property {function():void} hide
+ * @property {function():void} resize
+ * @property {function():void} onshow
+ * @property {number} value
+ * @property {number} size
+ * @property {boolean} visible
+ */
+
+/**
+ * Create a scrollbar
  * @param {Object} options
  * @param {HTMLElement} [options.parent]
  * @param {"top"|"left"|"right"|"bottom"} [options.placement = "right"]
@@ -17,7 +30,6 @@ export default function ScrollBar(options) {
   }
 
   const { placement = 'right' } = options;
-
   const $cursor = tag('span', {
     className: 'scroll-cursor',
     style: {

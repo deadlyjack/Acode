@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'file-icons';
-  src: url('file-icons.ttf?5brck3') format('truetype');
+  src: url('file-icons.ttf?mz5lfn') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -9,6 +9,7 @@
 .file {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'file-icons' !important;
+  speak: never;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -622,6 +623,11 @@
   color: #e10098;
 }
 
+.file_type_prql:before {
+  content: "\e9a3";
+  color: #dfb13c;
+}
+
 .file_type_groovy:before {
   content: "\e92d";
 }
@@ -838,6 +844,11 @@
 .file_type_license:before {
   content: "\e943";
   color: #aa79c1;
+}
+
+.file_type_odin:before {
+  content: "\e9a2";
+  color: #00f3ff;
 }
 
 .file_type_liquid:before {
