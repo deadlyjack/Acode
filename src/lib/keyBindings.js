@@ -195,7 +195,7 @@ export default {
   },
   findprevious: {
     description: 'Find previous',
-    key: 'Ctrl-Shift-K',
+    key: 'Ctrl-Shift-X',
     readOnly: false,
   },
   selectOrFindNext: {
@@ -345,7 +345,7 @@ export default {
   },
   problems: {
     description: 'Show problems',
-    key: 'Ctrl-Shift-M',
+    key: 'Ctrl-Shift-K',
     readOnly: true,
   },
   gotopageup: {

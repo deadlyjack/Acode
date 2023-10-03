@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.8.7] - Build 314
+## [1.8.7] - Build 315
 
 - New
   - [x] **Updated Ace editor**
@@ -15,10 +15,11 @@
   - [x] **New theme color**
     - New `danger-color` and `danger-text-color` theme color.
   - [x] **New key binding**
-    - Use `Ctrl+Shift+M` key binding to open problems page.
+    - Use `Ctrl+Shift+X` key binding to open problems page.
 - Fixes
   - [x] **Plugin page**
     - Improved plugin page UI.
+    - Shows plugin quickly when opened and loads new information in background.
 
 ## [1.8.6] - Build 313
 

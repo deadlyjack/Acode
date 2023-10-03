@@ -65,6 +65,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
       };
 
       isPaid = installedPlugin.price > 0;
+      render();
     }
 
     await (async () => {
