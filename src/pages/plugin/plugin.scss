@@ -211,7 +211,8 @@
   background-color: rgb(255, 255, 255);
   background-color: var(--secondary-color);
   z-index: 999;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 20px var(--box-shadow-color);
   border-radius: 40px 40px 0 0;
   overflow: hidden;
   animation: slide-up 0.3s ease-in-out;
