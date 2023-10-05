@@ -826,9 +826,9 @@ export default class EditorFile {
         if (!fileExists && cacheExists) {
           this.deletedFile = true;
           this.isUnsaved = true;
-        } else if (fileExists) {
+        } else if (!cacheExists && fileExists) {
           value = await file.readFile(this.encoding);
-        } else {
+        } else if (!cacheExists && !fileExists) {
           throw new Error('Unable to load file');
         }
       }

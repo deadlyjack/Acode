@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.8.7] - Build 315
+## [1.8.7] - Build 318
 
 - New
   - [x] **Updated Ace editor**
@@ -20,6 +20,8 @@
   - [x] **Plugin page**
     - Improved plugin page UI.
     - Shows plugin quickly when opened and loads new information in background.
+  - [x] **Unsaved changes**
+    - Fixed unsaved changes not showing up in file when app restarted.
 
 ## [1.8.6] - Build 313
 
