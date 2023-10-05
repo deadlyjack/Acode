@@ -375,6 +375,6 @@
   "color preview": "Farb-Vorschau",
   "confirm": "Bestätigen",
   "list files": "Alle Dateien in <strong>{name}</strong> auflisten? Bei zu viele Dateien könnte die App abstürzen.",
-  "problems": "Problems",
-  "show side buttons": "Show side buttons"
+  "problems": "Probleme",
+  "show side buttons": "Zeige Seitenknöpfe"
 }
