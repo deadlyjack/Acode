@@ -374,7 +374,7 @@
   "plugin min version": "{name} disponível apenas no Acode - {v-code} e superior. Clique aqui para atualizar.",
   "color preview": "Pré-vizualização de cores",
   "confirm": "Confirmar",
-  "list files": "List all files in <strong>{name}</strong>? Too many files may crash the app.",
-  "problems": "Problems",
-  "show side buttons": "Show side buttons"
+  "list files": "Listar todos os arquivos em <strong>{name}</strong>? Muitos arquivos podem travar o aplicativo.",
+  "problems": "Problemas",
+  "show side buttons": "Mostras botões laterais"
 }
