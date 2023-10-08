@@ -15,7 +15,7 @@ export default async function checkPluginsUpdate() {
         ).readFile('json');
 
         const res = await ajax({
-          url: `https://acode.foxdebug.com/api/plugin/check-update/${plugin.id}/${plugin.version}`,
+          url: `https://acode.app/api/plugin/check-update/${plugin.id}/${plugin.version}`,
         });
 
         if (res.update) {

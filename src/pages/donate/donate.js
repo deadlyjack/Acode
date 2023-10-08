@@ -14,7 +14,7 @@ import actionStack from 'lib/actionStack';
 //TODO: fix (-1 means, user is not logged in to any google account)
 
 export default function DonateInclude() {
-  const BASE_URL = "https://acode.foxdebug.com/res/";
+  const BASE_URL = "https://acode.app/res/";
   const $page = Page(strings.support);
   let adShown = false;
 

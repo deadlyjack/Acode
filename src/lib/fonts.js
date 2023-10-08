@@ -24,47 +24,47 @@ add('Roboto Mono', `@font-face {
 
 add('Source Code', `@font-face {
   font-family: 'Source Code';
-  src: url(https://acode.foxdebug.com/SourceCodePro.ttf) format('truetype');
+  src: url(https://acode.app/SourceCodePro.ttf) format('truetype');
   font-weight: 300 700;
   font-style: normal;
 }`);
 
 add('Victor Mono Italic', `@font-face {
   font-family: 'Victor Mono Italic';
-  src: url(https://acode.foxdebug.com/VictorMono-Italic.otf) format('truetype');
+  src: url(https://acode.app/VictorMono-Italic.otf) format('truetype');
   font-style: normal;
 }`);
 
 add('Victor Mono Medium', `@font-face {
   font-family: 'Victor Mono Medium';
-  src: url(https://acode.foxdebug.com/VictorMono-Medium.otf) format('truetype');
+  src: url(https://acode.app/VictorMono-Medium.otf) format('truetype');
   font-weight: medium;
   font-style: normal;
 }`);
 
 add('Cascadia Code', `@font-face {
   font-family: 'Cascadia Code';
-  src: url(https://acode.foxdebug.com/CascadiaCode.ttf) format('truetype');
+  src: url(https://acode.app/CascadiaCode.ttf) format('truetype');
   font-weight: 300 700;
   font-style: normal;
 }`);
 
 add('Proggy Clean', `@font-face {
   font-family: 'Proggy Clean';
-  src: url(https://acode.foxdebug.com/ProggyClean.ttf) format('truetype');
+  src: url(https://acode.app/ProggyClean.ttf) format('truetype');
   font-weight: 300 700;
   font-style: normal;
 }`);
 
 add('JetBrains Mono Bold', `@font-face {
   font-family: 'JetBrains Mono Bold';
-  src: url(https://acode.foxdebug.com/JetBrainsMono-Bold.ttf) format('truetype');
+  src: url(https://acode.app/JetBrainsMono-Bold.ttf) format('truetype');
   font-weight: bold;
 }`);
 
 add('JetBrains Mono Regular', `@font-face {
   font-family: 'JetBrains Mono Regular';
-  src: url(https://acode.foxdebug.com/JetBrainsMono-Regular.ttf) format('truetype');
+  src: url(https://acode.app/JetBrainsMono-Regular.ttf) format('truetype');
   font-weight: 300 700;
   font-style: normal;
 }`);
@@ -74,7 +74,7 @@ add('Poppins', `@font-face {
   font-family: Poppins;
   font-style: normal;
   font-weight: 400;
-  src: url(https://acode.foxdebug.com/Poppins-Regular.woff2) format('woff2');
+  src: url(https://acode.app/Poppins-Regular.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }`);
 
@@ -82,13 +82,13 @@ add('Righteous', `@font-face {
   font-family: Righteous;
   font-style: normal;
   font-weight: 400;
-  src: url(https://acode.foxdebug.com/righteous-latin-regular.woff) format('woff');
+  src: url(https://acode.app/righteous-latin-regular.woff) format('woff');
 }`);
 
 add('Noto Mono', `@font-face {
   font-display: swap;
   font-family: 'Noto Mono';
-  src: url(https://acode.foxdebug.com/NotoMono-Regular.woff) format("woff");
+  src: url(https://acode.app/NotoMono-Regular.woff) format("woff");
   font-weight: 400;
   font-style: normal;
   unicode-range: U+0590-06FF;
