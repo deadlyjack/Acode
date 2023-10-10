@@ -56,7 +56,7 @@ export default {
         required: true,
         value: name ?? '',
       },
-    ], 'https://acode.foxdebug.com/faqs/224761680');
+    ], 'https://acode.app/faqs/224761680');
 
     if (!res) return;
 

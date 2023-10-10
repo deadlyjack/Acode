@@ -11,7 +11,7 @@ export default function help() {
     {
       key: 'faqs',
       text: strings.faqs,
-      link: 'https://acode.foxdebug.com/faqs',
+      link: 'https://acode.app/faqs',
     },
   ];
 

@@ -14,6 +14,7 @@ let isClickMode;
 let contextmenu;
 let contextmenuTimeout;
 let active = false; // is button already active
+let slide = 0;
 
 /**@type {HTMLElement} */
 let $row;
@@ -145,6 +146,7 @@ function touchstart(e) {
   } else {
     $el.classList.add('active');
   }
+
   document.addEventListener('touchmove', touchmove);
   document.addEventListener('keyup', touchcancel);
   document.addEventListener('touchend', touchend);
@@ -158,8 +160,8 @@ function touchstart(e) {
 function touchmove(e) {
   if (contextmenu || touchMoved === false) return;
 
-  const { $row1, $row2 } = quickTools;
   const $el = e.target;
+  const { $row1, $row2 } = quickTools;
   const { clientX } = e.touches[0];
 
   if (moveX === 0) {
@@ -191,6 +193,8 @@ function touchmove(e) {
     } else if ($row2?.contains($el)) {
       $row = $row2;
     }
+
+    slide = parseInt($row.scrollLeft / $row.clientWidth, 10);
   }
 
   if ($row) {
@@ -212,9 +216,8 @@ function touchend(e) {
 
   if (touchMoved && $row) {
     $row.style.scrollBehavior = 'smooth';
-    const slide = parseInt($row.scrollLeft / $row.clientWidth, 10);
     let scroll = 0;
-    if (movedX < 0 && movedX > -MOVE_X_THRESHOLD) {
+    if (movedX < 0 && movedX < -MOVE_X_THRESHOLD) {
       scroll = (slide - 1) * $row.clientWidth;
     } else if (movedX > 0 && movedX > MOVE_X_THRESHOLD) {
       scroll = (slide + 1) * $row.clientWidth;

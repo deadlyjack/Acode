@@ -64,6 +64,6 @@ yarn build <platform (android)> <free|paid> <p|prod|d|dev>
 
 For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/deadlyjack/acode-plugin).
 
-For plugin development information, refer to: [Acode Plugin Documentation](https://acode.foxdebug.com/plugin-docs)
+For plugin development information, refer to: [Acode Plugin Documentation](https://acode.app/plugin-docs)
 
 > 💙 Empower your coding journey with the dynamic and efficient Acode Editor. Happy coding on-the-go!

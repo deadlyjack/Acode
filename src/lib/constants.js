@@ -17,7 +17,7 @@ export default {
   FEEDBACK_EMAIL: 'acode@foxdebug.com',
   ERUDA_CDN: 'https://cdn.jsdelivr.net/npm/eruda',
   get PLAY_STORE_URL() { return `https://play.google.com/store/apps/details?id=${BuildInfo.packageName}`; },
-  API_BASE: 'https://acode.foxdebug.com/api',
+  API_BASE: 'https://acode.app/api',
   // API_BASE: 'https://192.168.1.74:3001/api', // test api
   SKU_LIST: ["basic", "bronze", "silver", "gold", "platinum"]
 };
