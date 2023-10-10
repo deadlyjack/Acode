@@ -1,27 +1,32 @@
 # Change Log
 
-## [1.8.7] - Build 318
+## [1.8.7]
 
 - New
-  - [x] **Updated Ace editor**
+  - [x] **Updated Ace editor** | 318
     - Updated Ace editor to version 1.28.0
-  - [x] **New problems page**
+  - [x] **New problems page** | 318
     - You can now see all the problems in one place.
     - You can also see the problems in opened file.
-  - [x] **New settings**
+  - [x] **New settings** | 318
     - New settings to toggle side buttons.
-  - [x] **New Plugin API**
+  - [x] **New Plugin API** | 318
     - `SideButton` is a new component that can be used to add side buttons.
-  - [x] **New theme color**
+  - [x] **New theme color** | 318
     - New `danger-color` and `danger-text-color` theme color.
-  - [x] **New key binding**
+  - [x] **New key binding** | 318
     - Use `Ctrl+Shift+X` key binding to open problems page.
+  - [x] **Plugin** | 319
+    - Install plugin directly from browser.
 - Fixes
-  - [x] **Plugin page**
+  - [x] **Plugin page** | 318
     - Improved plugin page UI.
     - Shows plugin quickly when opened and loads new information in background.
-  - [x] **Unsaved changes**
+  - [x] **Unsaved changes** | 318
     - Fixed unsaved changes not showing up in file when app restarted.
+  - [x] **Quicktools** | 319
+    - Fixed quicktools slides back when touch moved slightly.
+
 
 ## [1.8.6] - Build 313
 
