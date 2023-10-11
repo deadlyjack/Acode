@@ -16,7 +16,7 @@
     - New `danger-color` and `danger-text-color` theme color.
   - [x] **New key binding** | 318
     - Use `Ctrl+Shift+X` key binding to open problems page.
-  - [x] **Plugin** | 319
+  - [x] **Plugin** | 320
     - Install plugin directly from browser.
 - Fixes
   - [x] **Plugin page** | 318

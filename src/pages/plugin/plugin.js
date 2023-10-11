@@ -132,7 +132,8 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
     render();
 
     if (installOnRender && !installed) {
-      install();
+      const $button = $page.get('[data-type="install"], [data-type="buy"]');
+      $button?.click();
     }
 
   } catch (err) {
