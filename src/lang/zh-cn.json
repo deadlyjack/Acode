@@ -375,6 +375,6 @@
   "color preview": "颜色预览",
   "confirm": "确定",
   "list files": "列出 <strong>{name}</strong> 下的所有文件吗？过多的文件可能会导致应用崩溃。",
-  "problems": "Problems",
-  "show side buttons": "Show side buttons"
+  "problems": "有问题",
+  "show side buttons": "显示侧边按钮"
 }
