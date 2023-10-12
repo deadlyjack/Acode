@@ -33,7 +33,7 @@ const exec = promisify(require('child_process').exec);
     let babelrcText = fs.readFileSync(babelrcpath, 'utf-8');
     let config = fs.readFileSync(configpath, 'utf-8');
     let html = fs.readFileSync(htmlpath, 'utf-8');
-    let platforms = fs.readdirSync(platformsDir);
+    let platforms = fs.readdirSync(platformsDir).filter((file) => !file.startsWith('.'));
     let logo, id, currentId;
 
     currentId = /id="([a-z.]+)"/.exec(config)[1];
