@@ -26,6 +26,8 @@
     - Fixed unsaved changes not showing up in file when app restarted.
   - [x] **Quicktools** | 319
     - Fixed quicktools slides back when touch moved slightly.
+  - [x] **Settings** | 321
+    - Fixed settings not saving properly.
 
 
 ## [1.8.6] - Build 313

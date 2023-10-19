@@ -368,7 +368,7 @@ function areEqual(obj1, obj2) {
     if (!obj2.hasOwnProperty(key)) return false;
     if (obj1[key] === obj2[key]) continue;
     if (typeof obj1[key] !== 'object') return false;
-    if (!this.isObjectEqual(obj1[key], obj2[key])) return false;
+    if (!areEqual(obj1[key], obj2[key])) return false;
   }
 
   return true;
