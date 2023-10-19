@@ -212,14 +212,14 @@ interface System {
   inAppBrowser(url: string, title: string, showButtons: boolean): void;
   /**
    * Sets the color of status bar and navigation bar
-   * @param theme Color of status bar and navigation bar
-   * @param type Type of theme foe e.g. light or dark
+   * @param systemBarColor Color of status bar and navigation bar
+   * @param theme Theme as object
    * @param onSuccess Callback on success
    * @param onFail Callback on fail
    */
   setUiTheme(
-    theme: string,
-    type: string,
+    systemBarColor: string,
+    theme: object,
     onSuccess: OnSuccessBool,
     onFail: OnFail,
   ): void;

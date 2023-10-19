@@ -34,5 +34,5 @@ export default function restoreTheme(darken = false) {
   }
   const color = darken ? theme.darkenedPrimaryColor : theme.primaryColor;
   const hexColor = Color(color).hex.toString();
-  system.setUiTheme(hexColor, theme.type);
+  system.setUiTheme(hexColor, theme.toJSON('hex'));
 }

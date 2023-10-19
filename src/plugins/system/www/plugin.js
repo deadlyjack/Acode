@@ -89,8 +89,8 @@ module.exports = {
     }, 'System', 'in-app-browser', [url, title, !!showButtons, disableCache]);
     return myInAppBrowser;
   },
-  setUiTheme: function (theme, type, onSuccess, onFail) {
-    cordova.exec(onSuccess, onFail, 'System', 'set-ui-theme', [theme, type]);
+  setUiTheme: function (systemBarColor, theme, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'System', 'set-ui-theme', [systemBarColor, theme]);
   },
   setIntentHandler: function (handler, onerror) {
     cordova.exec(handler, onerror, 'System', 'set-intent-handler', []);

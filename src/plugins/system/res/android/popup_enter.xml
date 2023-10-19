@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Scale from small to normal size -->
+  <scale android:duration="100" android:fromXScale="0" android:fromYScale="0.5" android:pivotX="100%" android:pivotY="0%" android:toXScale="1.0" android:toYScale="1.0" />
+
+  <!-- Fade in from 0% opacity to 100% -->
+  <alpha android:duration="100" android:fromAlpha="0.0" android:toAlpha="1.0" />
+</set>

@@ -7,7 +7,6 @@ const resPath = path.resolve(
 );
 
 const splashScreens = [
-  'drawable',
   'mipmap-ldpi',
   'mipmap-hdpi-v26',
   'mipmap-ldpi-v26',

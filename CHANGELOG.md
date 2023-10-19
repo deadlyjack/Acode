@@ -27,7 +27,6 @@
   - [x] **Quicktools** | 319
     - Fixed quicktools slides back when touch moved slightly.
 
-
 ## [1.8.6] - Build 313
 
 - New

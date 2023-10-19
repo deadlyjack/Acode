@@ -248,14 +248,24 @@ export default class ThemeBuilder {
     return `:root {${css}}`;
   }
 
-  toJSON() {
+  /**
+   * Gets the theme as an object
+   * @param {'rgba'|'hex' | 'none'} colorType 
+   * @returns {Object<string, string>}
+   */
+  toJSON(colorType = 'none') {
     const res = {
       name: this.name,
       type: this.type,
       version: this.version,
     };
     Object.keys(this.#theme).forEach((key) => {
-      res[ThemeBuilder.#toPascal(key)] = this.#theme[key];
+      const color = colorType === 'hex'
+        ? Color(this.#theme[key]).hex.toString()
+        : colorType === 'rgba'
+          ? Color(this.#theme[key]).rgba.toString()
+          : this.#theme[key];
+      res[ThemeBuilder.#toPascal(key)] = color;
     });
     return res;
   }

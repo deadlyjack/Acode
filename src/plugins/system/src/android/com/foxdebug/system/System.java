@@ -29,6 +29,7 @@ import androidx.core.content.pm.ShortcutInfoCompat;
 import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.core.graphics.drawable.IconCompat;
 import com.foxdebug.system.BrowserDialog;
+import com.foxdebug.system.Ui.Theme;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -56,8 +57,8 @@ public class System extends CordovaPlugin {
   private Context context;
   private int REQ_PERMISSIONS = 1;
   private int REQ_PERMISSION = 2;
-  private int themeColor = 0xFF000000;
-  private String themeType = "dark";
+  private int systemBarColor = 0xFF000000;
+  private Theme theme;
   private CallbackContext intentHandler;
   private CordovaWebView webView;
 
@@ -117,7 +118,7 @@ public class System extends CordovaPlugin {
           .runOnUiThread(
             new Runnable() {
               public void run() {
-                setUiTheme(arg1, arg2, callbackContext);
+                setUiTheme(arg1, args.optJSONObject(1), callbackContext);
               }
             }
           );
@@ -582,8 +583,8 @@ public class System extends CordovaPlugin {
   ) {
     BrowserDialog browserDialog = new BrowserDialog(
       this,
-      themeColor,
-      themeType,
+      theme,
+      systemBarColor,
       showButtons,
       disableCache,
       callback
@@ -706,15 +707,15 @@ public class System extends CordovaPlugin {
   }
 
   private void setUiTheme(
-    final String color,
-    final String type,
+    final String systemBarColor,
+    final JSONObject theme,
     final CallbackContext callback
   ) {
+    this.systemBarColor = Color.parseColor(systemBarColor);
+    this.theme = new Theme(theme);
+
     if (Build.VERSION.SDK_INT >= 21) {
-      final int bgColor = Color.parseColor(color);
       final Window window = activity.getWindow();
-      themeColor = bgColor;
-      themeType = type.toLowerCase();
       // Method and constants not available on all SDKs but we want to be able to compile this code with any SDK
       window.clearFlags(0x04000000); // SDK 19: WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
       window.addFlags(0x80000000); // SDK 21: WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -724,12 +725,12 @@ public class System extends CordovaPlugin {
         window
           .getClass()
           .getMethod("setNavigationBarColor", int.class)
-          .invoke(window, themeColor);
+          .invoke(window, this.systemBarColor);
 
         window
           .getClass()
           .getMethod("setStatusBarColor", int.class)
-          .invoke(window, themeColor);
+          .invoke(window, this.systemBarColor);
 
         setStatusBarStyle(window);
         setNavigationBarStyle(window);
@@ -746,6 +747,7 @@ public class System extends CordovaPlugin {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       View decorView = window.getDecorView();
       int uiOptions = decorView.getSystemUiVisibility();
+      String themeType = theme.getType();
 
       if (themeType.equals("light")) {
         decorView.setSystemUiVisibility(
@@ -763,6 +765,7 @@ public class System extends CordovaPlugin {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       View decorView = window.getDecorView();
       int uiOptions = decorView.getSystemUiVisibility();
+      String themeType = theme.getType();
 
       // 0x80000000 FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
       // 0x00000010 SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR

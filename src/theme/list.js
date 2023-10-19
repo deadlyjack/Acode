@@ -106,7 +106,7 @@ async function apply(id, init) {
   // Set status bar and navigation bar color
   system.setUiTheme(
     color(theme.primaryColor).hex.toString(),
-    theme.type,
+    theme.toJSON('hex'),
   );
 
   try {

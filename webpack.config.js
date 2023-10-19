@@ -12,7 +12,15 @@ module.exports = (env, options) => {
       use: ['raw-loader'],
     },
     {
-      test: /\.(sa|sc|c)ss$/,
+      test: /\.module.(sa|sc|c)ss$/,
+      use: [
+        'raw-loader',
+        'postcss-loader',
+        'sass-loader',
+      ],
+    },
+    {
+      test: /(?<!\.module)\.(sa|sc|c)ss$/,
       use: [
         {
           loader: MiniCssExtractPlugin.loader,
@@ -35,10 +43,6 @@ module.exports = (env, options) => {
   // if (mode === 'production') {
   rules.push({
     test: /\.m?js$/,
-    // exclude: {
-    //   and: [/node_modules/],
-    //   not: [/(minimatch|marked|filesize)/]
-    // },
     use: [
       'html-tag-js/jsx/tag-loader.js',
       {
