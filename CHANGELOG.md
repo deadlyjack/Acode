@@ -28,6 +28,8 @@
     - Fixed quicktools slides back when touch moved slightly.
   - [x] **Settings** | 321
     - Fixed settings not saving properly.
+  - [x] **Internal storage** | 322
+    - Fixed renaming file.
 
 
 ## [1.8.6] - Build 313
