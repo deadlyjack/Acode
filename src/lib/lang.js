@@ -17,6 +17,12 @@ const langMap = {
       return await import('../lang/fr-fr.json');
     },
   },
+  'tl-ph': {
+    name: 'Tagalog',
+    async strings() {
+      return await import('../lang/tl-ph.json');
+    },
+  },
   'de-de': {
     name: 'Deutsch',
     async strings() {
