@@ -28,7 +28,6 @@ import androidx.core.content.FileProvider;
 import androidx.core.content.pm.ShortcutInfoCompat;
 import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.core.graphics.drawable.IconCompat;
-import com.foxdebug.system.BrowserDialog;
 import com.foxdebug.system.Ui.Theme;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -50,8 +49,6 @@ import org.json.JSONObject;
 
 public class System extends CordovaPlugin {
 
-  // private WebviewActivity webviewActivity;
-  private BrowserDialog browserDialog;
   private CallbackContext requestPermissionCallback;
   private Activity activity;
   private Context context;
@@ -119,22 +116,6 @@ public class System extends CordovaPlugin {
             new Runnable() {
               public void run() {
                 setUiTheme(arg1, args.optJSONObject(1), callbackContext);
-              }
-            }
-          );
-        return true;
-      case "in-app-browser":
-        this.cordova.getActivity()
-          .runOnUiThread(
-            new Runnable() {
-              public void run() {
-                inAppBrowser(
-                  arg1,
-                  arg2,
-                  args.optBoolean(2),
-                  args.optBoolean(3),
-                  callbackContext
-                );
               }
             }
           );
@@ -572,52 +553,6 @@ public class System extends CordovaPlugin {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     context.startActivity(intent);
     callback.success("Launched " + appId);
-  }
-
-  private void inAppBrowser(
-    String url,
-    String title,
-    boolean showButtons,
-    Boolean disableCache,
-    CallbackContext callback
-  ) {
-    BrowserDialog browserDialog = new BrowserDialog(
-      this,
-      theme,
-      systemBarColor,
-      showButtons,
-      disableCache,
-      callback
-    );
-    browserDialog.show(url, title);
-    this.browserDialog = browserDialog;
-  }
-
-  public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-    if (
-      requestCode != browserDialog.FILE_SELECT_CODE ||
-      browserDialog.webViewFilePathCallback == null
-    ) {
-      super.onActivityResult(requestCode, resultCode, intent);
-      return;
-    }
-    ArrayList<Uri> uris = new ArrayList<Uri>();
-    ClipData clipData = intent.getClipData();
-    if (clipData != null) {
-      for (int i = 0; i < clipData.getItemCount(); i++) {
-        ClipData.Item item = clipData.getItemAt(i);
-        Uri uri = item.getUri();
-        uris.add(uri);
-      }
-    } else {
-      Uri uri = intent.getData();
-      uris.add(uri);
-    }
-
-    browserDialog.webViewFilePathCallback.onReceiveValue(
-      uris.toArray(new Uri[uris.size()])
-    );
-    browserDialog.webViewFilePathCallback = null;
   }
 
   private void addShortcut(

@@ -37,7 +37,7 @@ module.exports = (env, options) => {
         'postcss-loader',
         'sass-loader',
       ],
-    }
+    },
   ];
 
   // if (mode === 'production') {

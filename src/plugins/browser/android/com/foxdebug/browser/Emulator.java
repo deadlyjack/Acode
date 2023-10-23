@@ -1,17 +1,16 @@
-package com.foxdebug.system;
+package com.foxdebug.browser;
 
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import com.foxdebug.system.Ui;
-import com.foxdebug.system.Ui.Icons;
-import com.foxdebug.system.Ui.Theme;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,33 +18,28 @@ import java.util.HashMap;
 
 public class Emulator extends LinearLayout {
 
-  private Theme theme;
+  private Ui.Theme theme;
   private View reference;
   private Context context;
   private Callback listener;
+  private boolean initialized = false;
   private Device defaultDevice;
   private LinearLayout seekBarsLayout;
-  private boolean wasDesktopMode = false;
   private DeviceListView deviceListView;
   private boolean preventChangeDevice = false;
-  private boolean changeBackDesktopMode = false;
   private HashMap<String, SeekBar> seekBars = new HashMap<String, SeekBar>();
 
   public abstract static class Callback {
 
     public abstract void onChange(int width, int height);
-
-    public abstract void setDesktopMode(boolean enabled);
-
-    public abstract boolean getDesktopMode();
   }
 
-  public Emulator(Context context, Theme theme) {
+  public Emulator(Context context, Ui.Theme theme) {
     super(context);
     this.context = context;
     this.theme = theme;
 
-    defaultDevice = new Device("Custom", 0, 0, Icons.TUNE, false);
+    defaultDevice = new Device("Custom", 0, 0, Ui.Icons.TUNE, false);
     deviceListView = new DeviceListView(context, theme);
     deviceListView.setLayoutParams(
       new LinearLayout.LayoutParams(
@@ -65,23 +59,23 @@ public class Emulator extends LinearLayout {
 
     deviceListView.add(
       defaultDevice,
-      new Device("iPhone SE", 320, 568, Icons.PHONE_APPLE),
-      new Device("iPhone 8", 375, 667, Icons.PHONE_APPLE),
-      new Device("iPhone 8+", 414, 736, Icons.PHONE_APPLE),
-      new Device("iPhone X", 375, 812, Icons.PHONE_APPLE),
-      new Device("iPad", 768, 1024, Icons.TABLET_APPLE),
-      new Device("iPad Pro", 1024, 1366, Icons.TABLET_APPLE),
-      new Device("Galaxy S5", 360, 640, Icons.PHONE_ANDROID),
-      new Device("Pixel 2", 411, 731, Icons.PHONE_ANDROID),
-      new Device("Pixel 2 XL", 411, 823, Icons.PHONE_ANDROID),
-      new Device("Nexus 5X", 411, 731, Icons.PHONE_ANDROID),
-      new Device("Nexus 6P", 411, 731, Icons.PHONE_ANDROID),
-      new Device("Nexus 7", 600, 960, Icons.TABLET_ANDROID),
-      new Device("Nexus 10", 800, 1280, Icons.TABLET_ANDROID),
-      new Device("Laptop", 1280, 800, Icons.LAPTOP),
-      new Device("Laptop L", 1440, 900, Icons.LAPTOP),
-      new Device("Laptop XL", 1680, 1050, Icons.LAPTOP),
-      new Device("UHD 4k", 3840, 2160, Icons.TV)
+      new Device("iPhone SE", 320, 568, Ui.Icons.PHONE_APPLE),
+      new Device("iPhone 8", 375, 667, Ui.Icons.PHONE_APPLE),
+      new Device("iPhone 8+", 414, 736, Ui.Icons.PHONE_APPLE),
+      new Device("iPhone X", 375, 812, Ui.Icons.PHONE_APPLE),
+      new Device("iPad", 768, 1024, Ui.Icons.TABLET_APPLE),
+      new Device("iPad Pro", 1024, 1366, Ui.Icons.TABLET_APPLE),
+      new Device("Galaxy S5", 360, 640, Ui.Icons.PHONE_ANDROID),
+      new Device("Pixel 2", 411, 731, Ui.Icons.PHONE_ANDROID),
+      new Device("Pixel 2 XL", 411, 823, Ui.Icons.PHONE_ANDROID),
+      new Device("Nexus 5X", 411, 731, Ui.Icons.PHONE_ANDROID),
+      new Device("Nexus 6P", 411, 731, Ui.Icons.PHONE_ANDROID),
+      new Device("Nexus 7", 600, 960, Ui.Icons.TABLET_ANDROID),
+      new Device("Nexus 10", 800, 1280, Ui.Icons.TABLET_ANDROID),
+      new Device("Laptop", 1280, 800, Ui.Icons.LAPTOP),
+      new Device("Laptop L", 1440, 900, Ui.Icons.LAPTOP),
+      new Device("Laptop XL", 1680, 1050, Ui.Icons.LAPTOP),
+      new Device("UHD 4k", 3840, 2160, Ui.Icons.TV)
     );
 
     deviceListView.select(defaultDevice);
@@ -99,8 +93,6 @@ public class Emulator extends LinearLayout {
 
     addControl("width", 50, "Width");
     addControl("height", 50, "Height");
-
-    setElevation(10f);
     setOrientation(LinearLayout.HORIZONTAL);
     setBackgroundColor(theme.get("primaryColor"));
     setLayoutParams(
@@ -123,13 +115,35 @@ public class Emulator extends LinearLayout {
     SeekBar heightSeekBar = seekBars.get("height");
     int maxWidth = view.getMeasuredWidth();
     int maxHeight = view.getMeasuredHeight();
+    int width = widthSeekBar.getProgress();
+    int height = heightSeekBar.getProgress();
+    int minWidth = widthSeekBar.getMin();
+    int minHeight = heightSeekBar.getMin();
 
-    preventChangeDevice = true;
-    widthSeekBar.setMax(maxWidth);
-    heightSeekBar.setMax(maxHeight);
-    heightSeekBar.setProgress(maxHeight);
-    widthSeekBar.setProgress(maxWidth);
-    preventChangeDevice = false;
+    getViewTreeObserver()
+      .addOnGlobalLayoutListener(
+        new ViewTreeObserver.OnGlobalLayoutListener() {
+          @Override
+          public void onGlobalLayout() {
+            Log.d("Emulator", "onGlobalLayout");
+            getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            int correctedHeight = maxHeight - getHeight();
+
+            widthSeekBar.setMax(maxWidth);
+            heightSeekBar.setMax(correctedHeight);
+
+            preventChangeDevice = true;
+            if (width > maxWidth || !initialized) {
+              heightSeekBar.setProgress(maxHeight);
+            }
+
+            if (height > correctedHeight || !initialized) {
+              widthSeekBar.setProgress(maxWidth);
+            }
+            preventChangeDevice = false;
+          }
+        }
+      );
   }
 
   public int getWidthProgress() {
@@ -183,10 +197,6 @@ public class Emulator extends LinearLayout {
           }
           if (!preventChangeDevice) {
             selectDevice(defaultDevice);
-            if (changeBackDesktopMode) {
-              listener.setDesktopMode(wasDesktopMode);
-              changeBackDesktopMode = false;
-            }
           }
         }
 
@@ -200,27 +210,14 @@ public class Emulator extends LinearLayout {
   }
 
   private void selectDevice(Device device) {
+    if (device.id == defaultDevice.id) {
+      return;
+    }
+
     SeekBar widthSeekBar = seekBars.get("width");
     SeekBar heightSeekBar = seekBars.get("height");
     int maxWidth = widthSeekBar.getMax();
     int maxHeight = heightSeekBar.getMax();
-
-    if (device.id == defaultDevice.id) {
-      if (changeBackDesktopMode) {
-        listener.setDesktopMode(wasDesktopMode);
-      }
-      return;
-    }
-
-    if (device.isDesktop && !listener.getDesktopMode()) {
-      wasDesktopMode = false;
-      changeBackDesktopMode = true;
-      listener.setDesktopMode(true);
-    } else if (!device.isDesktop && listener.getDesktopMode()) {
-      wasDesktopMode = true;
-      changeBackDesktopMode = true;
-      listener.setDesktopMode(false);
-    }
 
     int width = device.width;
     int height = device.height;
@@ -241,10 +238,6 @@ public class Emulator extends LinearLayout {
     widthSeekBar.setProgress(width);
     heightSeekBar.setProgress(height);
     preventChangeDevice = false;
-
-    if (listener != null) {
-      listener.onChange(getWidthProgress(), getHeightProgress());
-    }
   }
 }
 
@@ -277,7 +270,7 @@ class Device {
   }
 
   public Device(String name, int width, int height) {
-    this(name, width, height, Icons.TUNE, true);
+    this(name, width, height, Ui.Icons.TUNE, true);
   }
 }
 
@@ -287,14 +280,14 @@ class DeviceListView extends ScrollView {
   LinearLayout deviceListLayout;
   Callback callback;
   Context context;
-  Theme theme;
+  Ui.Theme theme;
 
   public abstract static class Callback {
 
     public abstract void onSelect(Device device);
   }
 
-  public DeviceListView(Context context, Theme theme) {
+  public DeviceListView(Context context, Ui.Theme theme) {
     super(context);
     this.context = context;
     this.theme = theme;
@@ -350,7 +343,7 @@ class DeviceListView extends ScrollView {
 
 class DeviceView extends LinearLayout {
 
-  Theme theme;
+  Ui.Theme theme;
   Device device;
   TextView label;
   ImageView icon;
@@ -362,7 +355,7 @@ class DeviceView extends LinearLayout {
     public abstract void onSelect(DeviceView device);
   }
 
-  public DeviceView(Context context, Device device, Theme theme) {
+  public DeviceView(Context context, Device device, Ui.Theme theme) {
     super(context);
     int primaryTextColor = theme.get("primaryTextColor");
     this.theme = theme;
@@ -375,7 +368,7 @@ class DeviceView extends LinearLayout {
     setOrientation(LinearLayout.HORIZONTAL);
 
     icon = new ImageView(context);
-    icon.setImageBitmap(Icons.get(context, device.icon, primaryTextColor));
+    icon.setImageBitmap(Ui.Icons.get(context, device.icon, primaryTextColor));
     icon.setPadding(0, 0, 5, 0);
     icon.setLayoutParams(
       new LinearLayout.LayoutParams(
@@ -407,7 +400,7 @@ class DeviceView extends LinearLayout {
 
   public void deselect() {
     int primaryTextColor = theme.get("primaryTextColor");
-    icon.setImageBitmap(Icons.get(context, device.icon, primaryTextColor));
+    icon.setImageBitmap(Ui.Icons.get(context, device.icon, primaryTextColor));
     label.setTextColor(primaryTextColor);
     label.setTypeface(null, Typeface.NORMAL);
     isSelected = false;
@@ -415,7 +408,7 @@ class DeviceView extends LinearLayout {
 
   public void select() {
     int activeTextColor = theme.get("activeTextColor");
-    icon.setImageBitmap(Icons.get(context, device.icon, activeTextColor));
+    icon.setImageBitmap(Ui.Icons.get(context, device.icon, activeTextColor));
     label.setTextColor(activeTextColor);
     label.setTypeface(null, Typeface.BOLD);
     isSelected = true;

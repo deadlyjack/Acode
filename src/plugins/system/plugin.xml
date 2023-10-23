@@ -35,15 +35,9 @@
 
     <resource-file src="res/android/file_provider.xml" target="res/xml/file_provider.xml" />
     <resource-file src="res/android/icon.ttf" target="assets/font/icon.ttf" />
-    <resource-file src="res/android/popup_enter.xml" target="res/anim/popup_enter.xml" />
-    <resource-file src="res/android/popup_exit.xml" target="res/anim/popup_exit.xml" />
-    <resource-file src="res/android/styles.xml" target="res/values/styles.xml" />
-    <source-file src="src/android/com/foxdebug/system/Ui.java" target-dir="src/com/foxdebug/system"/>
-    <source-file src="src/android/com/foxdebug/system/BrowserDialog.java" target-dir="src/com/foxdebug/system"/>
-    <source-file src="src/android//com/foxdebug/system/Emulator.java" target-dir="src/com/foxdebug/system"/>
-    <source-file src="src/android/com/foxdebug/system/System.java" target-dir="src/com/foxdebug/system"/>
+    <source-file src="android/com/foxdebug/system/Ui.java" target-dir="src/com/foxdebug/system"/>
+    <source-file src="android/com/foxdebug/system/System.java" target-dir="src/com/foxdebug/system"/>
 
-    <framework src="commons-io:commons-io:2.11.0" />
     <framework src="androidx.core:core:1.6.0" />
     <framework src="androidx.core:core-google-shortcuts:1.0.0" />
   </platform>

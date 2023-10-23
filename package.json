@@ -28,10 +28,11 @@
       },
       "cordova-plugin-sftp": {},
       "cordova-plugin-server": {},
-      "cordova-plugin-sdcard": {},
       "cordova-plugin-iap": {},
       "cordova-plugin-ftp": {},
-      "cordova-plugin-system": {}
+      "cordova-plugin-system": {},
+      "cordova-plugin-sdcard": {},
+      "cordova-plugin-browser": {}
     },
     "platforms": [
       "android"
@@ -58,6 +59,7 @@
     "babel-loader": "^9.1.2",
     "cordova-android": "^10.1.2",
     "cordova-clipboard": "^1.3.0",
+    "cordova-plugin-browser": "file:src/plugins/browser",
     "cordova-plugin-buildinfo": "^4.0.0",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^7.0.0",
@@ -95,6 +97,7 @@
     "js-base64": "^3.7.4",
     "jszip": "^3.10.1",
     "marked": "5.0.5",
+    "marked-mangle": "^1.1.4",
     "mime-types": "^2.1.35",
     "minimatch": "^9.0.3",
     "mustache": "^4.2.0",

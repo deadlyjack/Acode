@@ -14,29 +14,28 @@ public class Ui {
 
   public static class Icons {
 
-    static final String LOGO = "\uE922";
-    static final String TUNE = "\uE927";
-    static final String EXIT = "\uE902";
-    static final String REFRESH = "\uE91B";
-    static final String TERMINAL = "\uE923";
-    static final String NO_CACHE = "\uE901";
-    static final String MORE_VERT = "\uE91A";
-    static final String OPEN_IN_BROWSER = "\uE91f";
+    public static final String LOGO = "\uE922";
+    public static final String TUNE = "\uE927";
+    public static final String EXIT = "\uE902";
+    public static final String REFRESH = "\uE91B";
+    public static final String TERMINAL = "\uE923";
+    public static final String NO_CACHE = "\uE901";
+    public static final String MORE_VERT = "\uE91A";
+    public static final String OPEN_IN_BROWSER = "\uE91f";
 
-    static final String PHONE_APPLE = "\uE90D";
-    static final String PHONE_ANDROID = "\uE90E";
-    static final String TABLET_ANDROID = "\uE90F";
-    static final String TABLET_APPLE = "\uE92A";
-    static final String DESKTOP = "\uE90A";
-    static final String DEVICES = "\uE907";
-    static final String LAPTOP = "\uE90D";
-    static final String TV = "\uE929";
+    public static final String PHONE_APPLE = "\uE90D";
+    public static final String PHONE_ANDROID = "\uE90E";
+    public static final String TABLET_ANDROID = "\uE90F";
+    public static final String TABLET_APPLE = "\uE92A";
+    public static final String DESKTOP = "\uE90A";
+    public static final String DEVICES = "\uE907";
+    public static final String LAPTOP = "\uE90D";
+    public static final String TV = "\uE929";
 
-    private static final String FONT_PATH = "font/icon.ttf";
-
-    private static int size = 24;
-    private static int color = Color.parseColor("#000000");
     private static Paint paint;
+    private static int size = 24;
+    private static int color = Color.parseColor("#FFFFFF");
+    private static final String FONT_PATH = "font/icon.ttf";
 
     public static Bitmap get(
       Context context,
@@ -84,13 +83,13 @@ public class Ui {
       return get(context, code, size, color);
     }
 
-    public static Bitmap get(Context context, String code, int size) {
-      return get(context, code, size, color);
-    }
-
     public static Bitmap get(Context context, String code, String color) {
       int intColor = Color.parseColor(color);
       return get(context, code, size, intColor);
+    }
+
+    public static Bitmap get(Context context, String code, int color) {
+      return get(context, code, size, color);
     }
 
     public static void setSize(int size) {

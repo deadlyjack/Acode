@@ -132,11 +132,12 @@ const internalFs = {
         url,
         (fs) => {
           fs.getParent((parent) => {
-            const parentUrl = parent.nativeURL;
-            let newUrl = Url.join(parentUrl, newname);
-            fs.moveTo(parent, newname, async () => {
-              const stats = await this.stats(newUrl);
-              resolve(stats.url);
+            fs.moveTo(parent, newname, async (entry) => {
+              const newUrl = Url.join(
+                Url.dirname(url),
+                entry.name,
+              );
+              resolve(newUrl);
             }, reject);
           }, reject);
         },
@@ -323,8 +324,9 @@ const internalFs = {
 function setMessage(reject) {
   return function (err) {
     if (err.code) {
-      const error = new Error(getErrorMessage(err.code));
-      return reject(error);
+      const message = getErrorMessage(err.code);
+      err.message = message;
+      return reject(err);
     }
     reject(err);
   };

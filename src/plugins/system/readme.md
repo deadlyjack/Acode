@@ -1,8 +1,8 @@
-# Utitly plugin for cordova apps.
+# Util plugin for cordova apps
 
 Using this plugin, cordova apps can:
 
-- Enable/disable fullscreen
+- Enable/disable full screen
 - Share file
 - Get webview information
 - Send email

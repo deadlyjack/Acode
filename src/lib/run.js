@@ -13,6 +13,7 @@ import EditorFile from './editorFile';
 import tutorial from 'components/tutorial';
 import box from 'dialogs/box';
 import alert from 'dialogs/alert';
+import browser from 'plugins/browser';
 
 /**@type {Server} */
 let webServer;
@@ -263,7 +264,7 @@ async function run(
       switch (ext) {
         case '.htm':
         case '.html':
-          if (file) {
+          if (file && file.loaded && file.isUnsaved) {
             sendHTML(file.session.getValue(), reqId);
           } else {
             sendFileContent(url, reqId, MIMETYPE_HTML);
@@ -283,7 +284,7 @@ async function run(
           break;
 
         default:
-          if (file && file.isUnsaved) {
+          if (file && file.loaded && file.isUnsaved) {
             sendText(
               file.session.getValue(),
               reqId,
@@ -447,10 +448,7 @@ async function run(
       return;
     }
 
-    const browser = system.inAppBrowser(src, filename, !isConsole, appSettings.value.disableCache);
-    browser.onOpenExternalBrowser = () => {
-      target = "browser";
-    };
+    browser.open(src);
   }
 }
 
