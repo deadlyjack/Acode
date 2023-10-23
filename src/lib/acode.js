@@ -40,6 +40,7 @@ import SideButton from 'components/sideButton';
 import { addedFolder } from 'lib/openFolder';
 import { decode, encode } from 'utils/encodings';
 import { addMode, removeMode } from 'ace/modelist';
+import { addIntentHandler, removeIntentHandler } from 'handlers/intent';
 
 export default class Acode {
   #modules = {};
@@ -86,6 +87,11 @@ export default class Acode {
       removeMode,
     };
 
+    const intent = {
+      addHandler: addIntentHandler,
+      removeHandler: removeIntentHandler,
+    };
+
     this.define('Url', Url);
     this.define('page', Page);
     this.define('Color', Color);
@@ -96,6 +102,7 @@ export default class Acode {
     this.define('loader', loader);
     this.define('dialogBox', box);
     this.define('prompt', prompt);
+    this.define('intent', intent);
     this.define('fileList', files);
     this.define('fs', fsOperation);
     this.define('confirm', confirm);
@@ -106,6 +113,7 @@ export default class Acode {
     this.define('aceModes', aceModes);
     this.define('themes', themesModule);
     this.define('settings', appSettings);
+    this.define('sideButton', SideButton);
     this.define('EditorFile', EditorFile);
     this.define('inputhints', inputhints);
     this.define('openfolder', openFolder);
@@ -122,7 +130,6 @@ export default class Acode {
     this.define('themeBuilder', ThemeBuilder);
     this.define('selectionMenu', selectionMenu);
     this.define('sidebarApps', sidebarAppsModule);
-    this.define('sideButton', SideButton);
     this.define('createKeyboardEvent', KeyboardEvent);
     this.define('toInternalUrl', helpers.toInternalUri);
   }

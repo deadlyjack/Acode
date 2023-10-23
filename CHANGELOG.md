@@ -18,6 +18,8 @@
     - Use `Ctrl+Shift+X` key binding to open problems page.
   - [x] **Plugin** | 320
     - Install plugin directly from browser.
+  - [x] **Intent** | 323
+    - Plugin has now API to handle intent with uri acode://module/action/value.
 - Fixes
   - [x] **Plugin page** | 318
     - Improved plugin page UI.
@@ -30,7 +32,8 @@
     - Fixed settings not saving properly.
   - [x] **Internal storage** | 322
     - Fixed renaming file.
-
+  - [x] **Side buttons** | 323
+    - Fixed side buttons not shown properly.
 
 ## [1.8.6] - Build 313
 

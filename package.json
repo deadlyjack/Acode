@@ -95,6 +95,7 @@
     "js-base64": "^3.7.4",
     "jszip": "^3.10.1",
     "marked": "5.0.5",
+    "marked-mangle": "^1.1.4",
     "mime-types": "^2.1.35",
     "minimatch": "^9.0.3",
     "mustache": "^4.2.0",

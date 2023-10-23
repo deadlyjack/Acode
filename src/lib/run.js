@@ -263,7 +263,7 @@ async function run(
       switch (ext) {
         case '.htm':
         case '.html':
-          if (file) {
+          if (file && file.loaded && file.isUnsaved) {
             sendHTML(file.session.getValue(), reqId);
           } else {
             sendFileContent(url, reqId, MIMETYPE_HTML);
@@ -283,7 +283,7 @@ async function run(
           break;
 
         default:
-          if (file && file.isUnsaved) {
+          if (file && file.loaded && file.isUnsaved) {
             sendText(
               file.session.getValue(),
               reqId,
