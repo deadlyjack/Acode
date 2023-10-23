@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.9.0]
+
+- New
+  - [x] **New in app browser** | 324
+    - New in app browser with new UI.
+    - You can emulate multiple devices.
+
 ## [1.8.7]
 
 - New

@@ -15,20 +15,11 @@
 
 
     <config-file parent="./application" target="AndroidManifest.xml">
-      <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode" android:exported="true" android:name="com.foxdebug.browser.BrowserActivity" android:theme="@style/Theme.AppCompat.NoActionBar" android:windowSoftInputMode="adjustResize">
-        <intent-filter android:label="Acode browser">
-          <action android:name="android.intent.action.MAIN" />
-          <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-        <intent-filter android:autoVerify="true">
-          <action android:name="android.intent.action.VIEW" />
-          <category android:name="android.intent.category.DEFAULT" />
-          <category android:name="android.intent.category.BROWSABLE" />
-          <data android:scheme="http" />
-          <data android:scheme="https" />
-        </intent-filter>
+      <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode" android:name="com.foxdebug.browser.BrowserActivity" android:theme="@style/Theme.AppCompat.NoActionBar" android:windowSoftInputMode="adjustResize">
       </activity>
     </config-file>
+
+    <hook type="after_prepare" src="utils/updatePackage.js" />
 
     <resource-file src="res/android/menu_enter.xml" target="res/anim/menu_enter.xml" />
     <resource-file src="res/android/menu_exit.xml" target="res/anim/menu_exit.xml" />
