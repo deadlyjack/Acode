@@ -588,6 +588,9 @@ import loadPolyFill from 'utils/polyfill';
    * @returns 
    */
   function getStack(error, skip = false) {
+    if (error === null) {
+      error = new Error();
+    }
     let stack = error.stack.split('\n');
     if (!skip) stack.splice(1, 1);
     let regExecRes = /<(.*)>:(\d+):(\d+)/.exec(stack[1]) || [];

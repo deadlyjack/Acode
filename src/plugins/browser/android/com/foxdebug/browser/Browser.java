@@ -15,6 +15,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.ConsoleMessage;
@@ -134,8 +135,8 @@ public class Browser extends LinearLayout {
     webView = new WebView(context);
     webView.setFocusable(true);
     webView.setFocusableInTouchMode(true);
-    webView.setBackgroundColor(theme.get("primaryColor"));
-    fitWebViewToScreen();
+    webView.setBackgroundColor(0xFFFFFFFF);
+    fitWebViewTo(0, 0, 1);
 
     webView.setWebChromeClient(new BrowserChromeClient(this));
     webView.setWebViewClient(new BrowserWebViewClient(this));
@@ -145,6 +146,7 @@ public class Browser extends LinearLayout {
     settings.setDomStorageEnabled(true);
     settings.setAllowContentAccess(true);
     settings.setDisplayZoomControls(false);
+    settings.setDomStorageEnabled(true);
 
     webViewContainer = new LinearLayout(context);
     webViewContainer.setGravity(Gravity.CENTER);
@@ -187,21 +189,36 @@ public class Browser extends LinearLayout {
               }
 
               emulator = checked;
-              setDesktopMode(checked);
               if (checked) {
+                setDesktopMode(true);
                 setConsoleVisible(false);
                 menu.setChecked("Console", false);
                 menu.setVisible("Console", false);
                 addView(deviceEmulator);
                 fitWebViewTo(
                   deviceEmulator.getWidthProgress(),
-                  deviceEmulator.getHeightProgress()
+                  deviceEmulator.getHeightProgress(),
+                  deviceEmulator.getScaleProgress()
                 );
               } else {
                 menu.setVisible("Console", true);
                 removeView(deviceEmulator);
-                fitWebViewToScreen();
+                fitWebViewTo(0, 0, 1);
+                webView
+                  .getViewTreeObserver()
+                  .addOnGlobalLayoutListener(
+                    new ViewTreeObserver.OnGlobalLayoutListener() {
+                      @Override
+                      public void onGlobalLayout() {
+                        webView
+                          .getViewTreeObserver()
+                          .removeOnGlobalLayoutListener(this);
+                        setDesktopMode(false);
+                      }
+                    }
+                  );
               }
+
               break;
             case "Console":
               setConsoleVisible(checked);
@@ -237,8 +254,8 @@ public class Browser extends LinearLayout {
     deviceEmulator.setChangeListener(
       new Emulator.Callback() {
         @Override
-        public void onChange(int width, int height) {
-          fitWebViewTo(width, height);
+        public void onChange(int width, int height, float scale) {
+          fitWebViewTo(width, height, scale);
         }
       }
     );
@@ -277,7 +294,6 @@ public class Browser extends LinearLayout {
       height = webView.getMeasuredHeight();
     }
 
-    updateViewportDimension(width, height);
     webSettings.setLoadWithOverviewMode(enabled);
     webSettings.setUseWideViewPort(enabled);
     webSettings.setLoadWithOverviewMode(enabled);
@@ -323,13 +339,13 @@ public class Browser extends LinearLayout {
 
   private void updateViewportDimension(int width, int height) {
     String script =
-      "!function(){var e=document.head;if(e){var t=document.querySelector('meta[name=viewport]');t&&e.removeChild(t),(t=document.createElement('meta')).name='viewport',t.content='width=%s, height=%s, initial-scale=%s',e.appendChild(t)}}();";
+      "!function(){var e=document.head;if(e){e.querySelectorAll(\"meta[name=viewport]\").forEach(function(e){e.remove()});var t=document.createElement(\"meta\");t.name=\"viewport\",t.content=\"width=%s, height=%s, initial-scale=%s\",e.append(t)}}();";
     String w = "device-width";
     String h = "device-height";
     String r = "1";
     if (width > 0) {
       w = String.valueOf(width);
-      r = "document.documentElement.clientWidth/" + w;
+      r = "0.1";
       h = "";
     }
 
@@ -340,18 +356,18 @@ public class Browser extends LinearLayout {
     webView.evaluateJavascript(String.format(script, w, h, r), null);
   }
 
-  private void fitWebViewToScreen() {
+  private void fitWebViewTo(int width, int height, float scale) {
+    webView.setScaleX(scale);
+    webView.setScaleY(scale);
     webView.setLayoutParams(
       new LinearLayout.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.MATCH_PARENT
+        width == 0 ? ViewGroup.LayoutParams.MATCH_PARENT : width,
+        height == 0 ? ViewGroup.LayoutParams.MATCH_PARENT : height
       )
     );
-  }
-
-  private void fitWebViewTo(int width, int height) {
-    webView.setLayoutParams(new LinearLayout.LayoutParams(width, height));
-    updateViewportDimension(width, height);
+    if (width > 0 && height > 0) {
+      updateViewportDimension(width, height);
+    }
   }
 
   private void styleIcon(ImageView view) {
@@ -557,6 +573,8 @@ class BrowserChromeClient extends WebChromeClient {
         WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
       );
     String mimeType = fileChooserParams.getAcceptTypes()[0];
+
+    mimeType = mimeType == null ? "*/*" : mimeType;
 
     selectDocument.addCategory(Intent.CATEGORY_OPENABLE);
     selectDocument.setType(mimeType);

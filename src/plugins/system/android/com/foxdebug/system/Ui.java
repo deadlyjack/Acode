@@ -23,7 +23,7 @@ public class Ui {
     public static final String MORE_VERT = "\uE91A";
     public static final String OPEN_IN_BROWSER = "\uE91f";
 
-    public static final String PHONE_APPLE = "\uE90D";
+    public static final String PHONE_APPLE = "\uE928";
     public static final String PHONE_ANDROID = "\uE90E";
     public static final String TABLET_ANDROID = "\uE90F";
     public static final String TABLET_APPLE = "\uE92A";

@@ -22,24 +22,27 @@ public class Emulator extends LinearLayout {
   private View reference;
   private Context context;
   private Callback listener;
+  private Device customDevice;
+  private Device selectedDevice;
   private boolean initialized = false;
-  private Device defaultDevice;
   private LinearLayout seekBarsLayout;
   private DeviceListView deviceListView;
-  private boolean preventChangeDevice = false;
   private HashMap<String, SeekBar> seekBars = new HashMap<String, SeekBar>();
 
   public abstract static class Callback {
 
-    public abstract void onChange(int width, int height);
+    public abstract void onChange(int width, int height, float scale);
   }
 
   public Emulator(Context context, Ui.Theme theme) {
     super(context);
+    View border;
+    LinearLayout main;
+
     this.context = context;
     this.theme = theme;
 
-    defaultDevice = new Device("Custom", 0, 0, Ui.Icons.TUNE, false);
+    customDevice = new Device("Custom", 0, 0, Ui.Icons.TUNE, false);
     deviceListView = new DeviceListView(context, theme);
     deviceListView.setLayoutParams(
       new LinearLayout.LayoutParams(
@@ -58,7 +61,7 @@ public class Emulator extends LinearLayout {
     );
 
     deviceListView.add(
-      defaultDevice,
+      customDevice,
       new Device("iPhone SE", 320, 568, Ui.Icons.PHONE_APPLE),
       new Device("iPhone 8", 375, 667, Ui.Icons.PHONE_APPLE),
       new Device("iPhone 8+", 414, 736, Ui.Icons.PHONE_APPLE),
@@ -78,7 +81,7 @@ public class Emulator extends LinearLayout {
       new Device("UHD 4k", 3840, 2160, Ui.Icons.TV)
     );
 
-    deviceListView.select(defaultDevice);
+    deviceListView.select(customDevice);
 
     seekBarsLayout = new LinearLayout(context);
     seekBarsLayout.setPadding(0, 10, 0, 0);
@@ -91,19 +94,30 @@ public class Emulator extends LinearLayout {
       )
     );
 
-    addControl("width", 50, "Width");
-    addControl("height", 50, "Height");
-    setOrientation(LinearLayout.HORIZONTAL);
-    setBackgroundColor(theme.get("primaryColor"));
-    setLayoutParams(
+    border = new View(context);
+    border.setBackgroundColor(theme.get("borderColor"));
+    border.setLayoutParams(
+      new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
+    );
+
+    main = new LinearLayout(context);
+    main.setOrientation(LinearLayout.HORIZONTAL);
+    main.setBackgroundColor(theme.get("primaryColor"));
+    main.addView(seekBarsLayout);
+    main.addView(deviceListView);
+    main.setLayoutParams(
       new LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
         LinearLayout.LayoutParams.WRAP_CONTENT
       )
     );
 
-    addView(seekBarsLayout);
-    addView(deviceListView);
+    addControl("width", 50, "Width");
+    addControl("height", 50, "Height");
+    addControl("scale", 50, "Scale");
+    addView(border);
+    addView(main);
+    setOrientation(LinearLayout.VERTICAL);
   }
 
   public void setChangeListener(Callback listener) {
@@ -113,6 +127,7 @@ public class Emulator extends LinearLayout {
   public void setReference(View view) {
     SeekBar widthSeekBar = seekBars.get("width");
     SeekBar heightSeekBar = seekBars.get("height");
+    SeekBar scaleSeekBar = seekBars.get("scale");
     int maxWidth = view.getMeasuredWidth();
     int maxHeight = view.getMeasuredHeight();
     int width = widthSeekBar.getProgress();
@@ -125,22 +140,29 @@ public class Emulator extends LinearLayout {
         new ViewTreeObserver.OnGlobalLayoutListener() {
           @Override
           public void onGlobalLayout() {
-            Log.d("Emulator", "onGlobalLayout");
             getViewTreeObserver().removeOnGlobalLayoutListener(this);
             int correctedHeight = maxHeight - getHeight();
+            int iHeight = height;
+            int iWidth = width;
 
             widthSeekBar.setMax(maxWidth);
             heightSeekBar.setMax(correctedHeight);
-
-            preventChangeDevice = true;
             if (width > maxWidth || !initialized) {
               heightSeekBar.setProgress(maxHeight);
+              iHeight = maxHeight;
             }
 
             if (height > correctedHeight || !initialized) {
               widthSeekBar.setProgress(maxWidth);
+              iWidth = maxWidth;
             }
-            preventChangeDevice = false;
+
+            setMaxScale(iWidth, iHeight);
+            scaleSeekBar.setMin(100);
+            scaleSeekBar.setProgress(100);
+            if (listener != null) {
+              listener.onChange(iWidth, correctedHeight, 1);
+            }
           }
         }
       );
@@ -152,6 +174,10 @@ public class Emulator extends LinearLayout {
 
   public int getHeightProgress() {
     return seekBars.get("height").getProgress();
+  }
+
+  public float getScaleProgress() {
+    return seekBars.get("scale").getProgress() / 100f;
   }
 
   private void addControl(String id, int height, String label) {
@@ -192,12 +218,35 @@ public class Emulator extends LinearLayout {
           int progress,
           boolean fromUser
         ) {
-          if (listener != null) {
-            listener.onChange(getWidthProgress(), getHeightProgress());
+          if (!fromUser || listener == null) {
+            return;
           }
-          if (!preventChangeDevice) {
-            selectDevice(defaultDevice);
+
+          String seekBarName = seekBar == seekBars.get("width")
+            ? "width" //
+            : seekBar == seekBars.get("height") //
+              ? "height" //
+              : "scale"; //
+
+          Log.d("Emulator", seekBarName);
+
+          int height = getHeightProgress();
+          int width = getWidthProgress();
+          float scale = getScaleProgress();
+
+          if (seekBarName != "scale") {
+            SeekBar scaleSeekBar = seekBars.get("scale");
+            setMaxScale(width, height);
+            scale = 1;
           }
+
+          listener.onChange(width, height, scale);
+
+          if (selectedDevice == null || selectedDevice.id == customDevice.id) {
+            return;
+          }
+
+          selectDevice(customDevice);
         }
 
         @Override
@@ -210,14 +259,21 @@ public class Emulator extends LinearLayout {
   }
 
   private void selectDevice(Device device) {
-    if (device.id == defaultDevice.id) {
+    if (selectedDevice != null) selectedDevice.deselect();
+    device.select();
+
+    selectedDevice = device;
+    if (device.id == customDevice.id) {
       return;
     }
 
     SeekBar widthSeekBar = seekBars.get("width");
     SeekBar heightSeekBar = seekBars.get("height");
+    SeekBar scaleSeekBar = seekBars.get("scale");
+
     int maxWidth = widthSeekBar.getMax();
     int maxHeight = heightSeekBar.getMax();
+    int maxScale;
 
     int width = device.width;
     int height = device.height;
@@ -234,10 +290,27 @@ public class Emulator extends LinearLayout {
       width = (int) (width - (width * ratio));
     }
 
-    preventChangeDevice = true;
     widthSeekBar.setProgress(width);
     heightSeekBar.setProgress(height);
-    preventChangeDevice = false;
+    setMaxScale(width, height);
+    maxScale = scaleSeekBar.getMax();
+    scaleSeekBar.setProgress(maxScale);
+    listener.onChange(width, height, maxScale / 100f);
+  }
+
+  private void setMaxScale(int width, int height) {
+    SeekBar scaleSeekBar = seekBars.get("scale");
+    SeekBar widthSeekBar = seekBars.get("width");
+    SeekBar heightSeekBar = seekBars.get("height");
+    int maxWidth = widthSeekBar.getMax();
+    int maxHeight = heightSeekBar.getMax();
+
+    float scaleX = maxWidth / (float) width;
+    float scaleY = maxHeight / (float) height;
+    int scale = (int) (Math.min(scaleX, scaleY) * 100);
+
+    scaleSeekBar.setMax(scale);
+    scaleSeekBar.setProgress(100);
   }
 }
 
@@ -248,6 +321,7 @@ class Device {
   public int height;
   public String name;
   public String icon;
+  public DeviceView view;
   public boolean isDesktop;
 
   public Device(
@@ -271,6 +345,18 @@ class Device {
 
   public Device(String name, int width, int height) {
     this(name, width, height, Ui.Icons.TUNE, true);
+  }
+
+  public void select() {
+    if (view != null) {
+      view.select();
+    }
+  }
+
+  public void deselect() {
+    if (view != null) {
+      view.deselect();
+    }
   }
 }
 
@@ -361,6 +447,7 @@ class DeviceView extends LinearLayout {
     this.theme = theme;
     this.device = device;
     this.context = context;
+    this.device.view = this;
 
     setId(device.id);
     setClickable(true);
