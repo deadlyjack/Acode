@@ -12,6 +12,7 @@ let movedX; // total moved x
 let touchMoved;
 let isClickMode;
 let contextmenu;
+let startTime;
 let contextmenuTimeout;
 let active = false; // is button already active
 let slide = 0;
@@ -129,6 +130,7 @@ function touchstart(e) {
     return;
   }
 
+  startTime = performance.now();
   $touchstart = $el;
   e.preventDefault();
   e.stopPropagation();
@@ -233,6 +235,10 @@ function touchend(e) {
 
     $row.scrollLeft = scroll;
     touchcancel(e);
+
+    if ($el === $touchstart && performance.now() - startTime < 100) {
+      click($el);
+    }
     return;
   }
 
@@ -298,6 +304,11 @@ function oncontextmenu(e) {
  * @param {HTMLElement} $el 
  */
 function click($el) {
+  $el.classList.add('click');
+  clearTimeout($el.dataset.timeout);
+  $el.dataset.timeout = setTimeout(() => {
+    $el.classList.remove('click');
+  }, 300);
   const { action } = $el.dataset;
   if (!action) return;
 

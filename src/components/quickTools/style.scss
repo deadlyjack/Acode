@@ -1,6 +1,12 @@
 @import '../../styles/mixins.scss';
 
 #quick-tools {
+  .icon.click {
+    @include active-icon;
+    transition: all 0.3s ease-in-out;
+    transform: scale(1.2);
+  }
+
   &[data-alt="true"] {
     [data-id="alt-key"] {
       @include active-icon;

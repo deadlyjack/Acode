@@ -96,6 +96,8 @@ export default function addTouchListeners(editor, minimal, onclick) {
   let moveX; // touch difference in horizontal direction
   let lastX; // last x
   let lastY; // last y
+  let lastXForCapture; // last x for capturing touchmove
+  let lastYForCapture; // last y for capturing touchmove
   let lockX; // lock x for prevent scrolling in horizontal direction
   let lockY; // lock y for prevent scrolling in vertical direction
   let clickCount = 0; // number of clicks
@@ -202,6 +204,8 @@ export default function addTouchListeners(editor, minimal, onclick) {
     touchEnded = false;
     lastX = clientX;
     lastY = clientY;
+    lastXForCapture = clientX;
+    lastYForCapture = clientY;
     moveY = 0;
     moveX = 0;
     lockX = LOCK_X;
@@ -236,16 +240,11 @@ export default function addTouchListeners(editor, minimal, onclick) {
     lastX = clientX;
     lastY = clientY;
 
-    if (!captureLastPos) {
-      captureLastPos = setTimeout(() => {
-        captureLastPos = null;
-        if (touchEnded && mode === 'scroll') {
-          const scrollX = lockX ? 0 : lastX - clientX;
-          const scrollY = lockY ? 0 : lastY - clientY;
-          scrollAnimation(scrollX, scrollY);
-        }
-      }, SCROLL_CAPTURE_TIME);
-    }
+
+    captureLastPos = setTimeout(() => {
+      lastXForCapture = clientX;
+      lastYForCapture = clientY;
+    }, SCROLL_CAPTURE_TIME);
 
     if (!moveX && !moveY) {
       return;
@@ -280,6 +279,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * @param {TouchEvent} e Event
    */
   function touchEnd(e) {
+    const { clientX, clientY } = e.changedTouches[0];
     // why I was using e.preventDefault() ? 🤔
     // because select word and select line misbehave without
     // preventDefault
@@ -287,10 +287,12 @@ export default function addTouchListeners(editor, minimal, onclick) {
     touchEnded = true;
 
     if (mode === 'scroll') {
+      const scrollX = lockX ? 0 : clientX - lastXForCapture;
+      const scrollY = lockY ? 0 : clientY - lastYForCapture;
+      scrollAnimation(scrollX, scrollY);
       return;
     }
 
-    const { clientX, clientY } = e.changedTouches[0];
 
     if (mode === 'wait') {
       if (lastClickPos) {
