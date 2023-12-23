@@ -1,6 +1,7 @@
 import { decode, encode } from 'utils/encodings';
 import helpers from 'utils/helpers';
 import loader from 'dialogs/loader';
+import Url from 'utils/Url';
 
 const externalFs = {
   async readFile(url) {

@@ -41,6 +41,12 @@
     - Fixed renaming file.
   - [x] **Side buttons** | 323
     - Fixed side buttons not shown properly.
+  - [x] **Open folders** | 330
+    - Fixed move file/folder not working properly.
+  - [x] **Editor** | 330
+    - Improved scrolling.
+  - [x] **Quicktools** | 330
+    - Improved quicktools.
 
 ## [1.8.6] - Build 313
 
