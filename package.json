@@ -87,7 +87,7 @@
     "autosize": "^6.0.1",
     "cordova": "12.0.0",
     "core-js": "^3.32.2",
-    "crypto-js": "^4.1.1",
+    "crypto-js": "^4.2.0",
     "escape-string-regexp": "^5.0.0",
     "esprima": "^4.0.1",
     "filesize": "^10.0.12",
