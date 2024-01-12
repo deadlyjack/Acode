@@ -242,7 +242,11 @@ public class Emulator extends LinearLayout {
 
           listener.onChange(width, height, scale);
 
-          if (selectedDevice == null || selectedDevice.id == customDevice.id) {
+          if (
+            seekBarName == "scale" ||
+            selectedDevice == null ||
+            selectedDevice.id == customDevice.id
+          ) {
             return;
           }
 

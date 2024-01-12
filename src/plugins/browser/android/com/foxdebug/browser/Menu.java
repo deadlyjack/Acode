@@ -1,6 +1,7 @@
 package com.foxdebug.browser;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
@@ -146,6 +147,7 @@ class MenuItem extends LinearLayout {
   public Boolean checked;
   public CheckBox checkBox;
   public String action;
+  private int textColor;
   private int itemHeight;
   private int imageSize;
   private int padding;
@@ -197,7 +199,8 @@ class MenuItem extends LinearLayout {
     addView(imageView, 0);
   }
 
-  public void setText(String text, int textColor) {
+  public void setText(String text, int color) {
+    textColor = color;
     TextView textView = new TextView(context);
     LinearLayout.LayoutParams textViewParams = new LinearLayout.LayoutParams(
       ViewGroup.LayoutParams.FILL_PARENT,
@@ -222,6 +225,15 @@ class MenuItem extends LinearLayout {
     checkBox.setChecked(checked);
     checkBox.setEnabled(false);
     checkBox.setClickable(false);
+    checkBox.setButtonTintList(
+      new ColorStateList(
+        new int[][] {
+          new int[] { android.R.attr.state_checked },
+          new int[] { -android.R.attr.state_checked },
+        },
+        new int[] { textColor, textColor }
+      )
+    );
 
     FrameLayout container = new FrameLayout(context);
     FrameLayout.LayoutParams containerParams = new FrameLayout.LayoutParams(
