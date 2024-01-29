@@ -1,1 +1,16 @@
-{"plugins":["cordova-plugin-iap","cordova-plugin-server","cordova-plugin-sftp","cordova-plugin-ftp","cordova-plugin-file","cordova-plugin-device","cordova-plugin-buildinfo","cordova-clipboard","cordova-plugin-vibration","cordova-plugin-sdcard","cordova-plugin-system","cordova-plugin-browser"]}
+{
+  "plugins": [
+    "cordova-plugin-iap",
+    "cordova-plugin-server",
+    "cordova-plugin-sftp",
+    "cordova-plugin-ftp",
+    "cordova-plugin-file",
+    "cordova-plugin-device",
+    "cordova-plugin-buildinfo",
+    "cordova-clipboard",
+    "cordova-plugin-vibration",
+    "cordova-plugin-sdcard",
+    "cordova-plugin-system",
+    "cordova-plugin-browser"
+  ]
+}

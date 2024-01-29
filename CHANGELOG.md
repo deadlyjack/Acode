@@ -6,6 +6,21 @@
   - [x] **New in app browser** | 324
     - New in app browser with new UI.
     - You can emulate multiple devices.
+- Fixes
+  - [x] **File** | 931
+    - Fixed not able share, edit or open with other apps.
+
+
+## [1.8.8]
+
+- New
+  - [x] **Natural Scrolling** | 331
+    - Acode now uses natural scrolling.
+- Fixes
+  - [x] **Selecting text** | 331
+    - Fixed an issue where selecting text using long press and adding text to selection behaves unexpectedly.
+  - [x] **Open folders** | 331
+    - Fixed an issue where removing folder from sidebar doesn't remove the selected folder.
 
 ## [1.8.7]
 

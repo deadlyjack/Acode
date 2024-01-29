@@ -418,11 +418,7 @@ function execOperation(type, action, url, $target, name) {
       ? strings['enter file name']
       : strings['enter folder name'];
 
-    const defaultValue = action === 'new file'
-      ? constants.DEFAULT_FILE_NAME
-      : strings['new folder'];
-
-    let newName = await prompt(msg, defaultValue, 'text', {
+    let newName = await prompt(msg, '', 'text', {
       match: constants.FILE_NAME_REGEX,
       required: true,
     });
@@ -779,6 +775,8 @@ openFolder.removeFolders = (url) => {
  * @returns {Folder}
  */
 openFolder.find = (url) => {
+  const found = addedFolder.find((folder) => folder.url === url);
+  if (found) return found;
   return addedFolder.find((folder) => {
     const { url: furl } = Url.parse(folder.url);
     const regex = new RegExp('^' + escapeStringRegexp(furl));

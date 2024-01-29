@@ -125,7 +125,7 @@ export default {
   async 'new-file'() {
     let filename = await prompt(
       strings['enter file name'],
-      constants.DEFAULT_FILE_NAME,
+      '',
       'filename',
       {
         match: constants.FILE_NAME_REGEX,

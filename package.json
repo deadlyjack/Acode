@@ -10,7 +10,7 @@
     "start": "sh utils/scripts/start.sh",
     "clean": "sh utils/scripts/clean.sh android android@10",
     "plugin": "sh utils/scripts/plugin.sh",
-    "setup": "sh utils/scripts/setup.sh"
+    "setup": "node ./utils/setup.js"
   },
   "keywords": [
     "ecosystem:cordova"
@@ -30,9 +30,9 @@
       "cordova-plugin-server": {},
       "cordova-plugin-iap": {},
       "cordova-plugin-ftp": {},
-      "cordova-plugin-sdcard": {},
       "cordova-plugin-system": {},
-      "cordova-plugin-browser": {}
+      "cordova-plugin-browser": {},
+      "cordova-plugin-sdcard": {}
     },
     "platforms": [
       "android"
@@ -89,6 +89,7 @@
     "autosize": "^6.0.1",
     "cordova": "12.0.0",
     "core-js": "^3.34.0",
+    "crypto-js": "^4.2.0",
     "escape-string-regexp": "^5.0.0",
     "esprima": "^4.0.1",
     "filesize": "^10.1.0",

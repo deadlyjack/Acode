@@ -852,6 +852,7 @@ public class SDcard extends CordovaPlugin {
               result.put("isDirectory", file.isDirectory());
               result.put("isVirtual", file.isVirtual());
               result.put("lastModified", file.lastModified());
+              result.put("url", file.getUri().toString());
 
               callback.success(result);
             } catch (Exception e) {
