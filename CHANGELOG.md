@@ -10,7 +10,6 @@
   - [x] **File** | 931
     - Fixed not able share, edit or open with other apps.
 
-
 ## [1.8.8]
 
 - New
