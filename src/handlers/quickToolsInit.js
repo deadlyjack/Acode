@@ -92,7 +92,7 @@ export default function init() {
   if (appSettings.value.quickToolsTriggerMode === appSettings.QUICKTOOLS_TRIGGER_MODE_CLICK) {
     isClickMode = true;
     $footer.addEventListener('click', onclick);
-    $footer.addEventListener('contextmenu', oncontextmenu);
+    $footer.addEventListener('contextmenu', oncontextmenu, true);
   } else {
     $footer.addEventListener('touchstart', touchstart);
     $footer.addEventListener('keydown', touchstart);
@@ -102,10 +102,10 @@ export default function init() {
     if (value === appSettings.QUICKTOOLS_TRIGGER_MODE_CLICK) {
       $footer.removeEventListener('touchstart', touchstart);
       $footer.removeEventListener('keydown', touchstart);
-      $footer.addEventListener('contextmenu', onclick);
+      $footer.addEventListener('contextmenu', onclick, true);
       $footer.addEventListener('click', onclick);
     } else {
-      $footer.removeEventListener('contextmenu', onclick);
+      $footer.removeEventListener('contextmenu', onclick, true);
       $footer.removeEventListener('click', onclick);
       $footer.addEventListener('keydown', touchstart);
       $footer.addEventListener('touchstart', touchstart);

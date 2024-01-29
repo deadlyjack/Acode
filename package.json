@@ -10,7 +10,7 @@
     "start": "sh utils/scripts/start.sh",
     "clean": "sh utils/scripts/clean.sh android android@10",
     "plugin": "sh utils/scripts/plugin.sh",
-    "setup": "sh utils/scripts/setup.sh"
+    "setup": "node ./utils/setup.js"
   },
   "keywords": [
     "ecosystem:cordova"

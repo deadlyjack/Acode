@@ -129,7 +129,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
     actionStack.setMark();
     $lead.onclick = close;
     $content.addEventListener('click', handleClick);
-    $content.addEventListener('contextmenu', handleContextMenu);
+    $content.addEventListener('contextmenu', handleContextMenu, true);
     $page.body = $content;
     $page.header.append($search, $addMenuToggler, $menuToggler);
 

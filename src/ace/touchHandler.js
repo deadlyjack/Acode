@@ -7,16 +7,21 @@ import { getColorRange } from 'utils/color/regex';
 
 export let scrollAnimationFrame; // scroll animation frame id
 
+const SCROLL_SPEED = {
+  FAST_X2: 0.99,
+  FAST: 0.97,
+  NORMAL: 0.95,
+  SLOW: 0.9,
+};
+
 /**
  * Handler for touch events
  * @param {AceAjax.Editor} editor Ace editor instance
  * @param {boolean} minimal if true, disable selection, menu and cursor
 */
 export default function addTouchListeners(editor, minimal, onclick) {
-  const SCROLL_CAPTURE_TIME = 30; // ms
   const { renderer, container: $el } = editor;
-  const { scroller, $gutter } = renderer;
-
+  const { $gutter } = renderer;
   const { Range } = ace.require('ace/range');
 
   let {
@@ -83,7 +88,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * Text menu for touch devices
    */
   const $menu = <menu className='cursor-menu'></menu>;
-  const timeToSelectText = 500; // ms
+  const RESET_CLICK_COUNT_TIME = 500; // ms
   const config = { passive: false }; // event listener config
   const ACE_NO_CURSOR = '.ace_gutter,.ace_gutter *,.ace_fold,.ace_inline_button';
 
@@ -96,8 +101,12 @@ export default function addTouchListeners(editor, minimal, onclick) {
   let moveX; // touch difference in horizontal direction
   let lastX; // last x
   let lastY; // last y
-  let lastXForCapture; // last x for capturing touchmove
-  let lastYForCapture; // last y for capturing touchmove
+  let directionX; // direction in x
+  let directionY; // direction in y
+  let initialX; // initial x
+  let initialY; // initial y
+  let initialTimeX; // initial time
+  let initialTimeY; // initial time
   let lockX; // lock x for prevent scrolling in horizontal direction
   let lockY; // lock y for prevent scrolling in vertical direction
   let clickCount = 0; // number of clicks
@@ -111,10 +120,9 @@ export default function addTouchListeners(editor, minimal, onclick) {
   let timeTouchStart; // time of touch start
   let touchEnded = true; // true if touch ended
   let threshold = appSettings.value.touchMoveThreshold;
-  let captureLastPos; // last x for capturing touchmove
 
   $el.addEventListener('touchstart', touchStart, config, true);
-  scroller.addEventListener('contextmenu', contextmenu, config);
+  $el.addEventListener('contextmenu', contextmenu, config, true);
 
   editor.setSelection = (value) => {
     selectionActive = value;
@@ -171,6 +179,8 @@ export default function addTouchListeners(editor, minimal, onclick) {
   function touchStart(e) {
     /**@type {HTMLElement} */
     const $target = e.target;
+
+    editor.textInput.onContextMenu = null;
     cancelAnimationFrame(scrollAnimationFrame);
     const { clientX, clientY } = e.touches[0];
 
@@ -204,8 +214,10 @@ export default function addTouchListeners(editor, minimal, onclick) {
     touchEnded = false;
     lastX = clientX;
     lastY = clientY;
-    lastXForCapture = clientX;
-    lastYForCapture = clientY;
+    initialX = clientX;
+    initialY = clientY;
+    initialTimeX = e.timeStamp;
+    initialTimeY = e.timeStamp;
     moveY = 0;
     moveX = 0;
     lockX = LOCK_X;
@@ -215,7 +227,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
     setTimeout(() => {
       clickCount = 0;
       lastClickPos = null;
-    }, timeToSelectText);
+    }, RESET_CLICK_COUNT_TIME);
 
     document.addEventListener('touchmove', touchMove, config);
     document.addEventListener('touchend', touchEnd, config);
@@ -231,20 +243,29 @@ export default function addTouchListeners(editor, minimal, onclick) {
       return;
     }
 
-    let { clientX, clientY } = e.touches[0];
-    clientX = Math.round(clientX * 100) / 100;
-    clientY = Math.round(clientY * 100) / 100;
+    let currentDirectionX; // direction in x
+    let currentDirectionY; // direction in y
+    const { clientX, clientY } = e.touches[0];
 
     moveX = clientX - lastX;
     moveY = clientY - lastY;
+    currentDirectionX = moveX > 0 ? 1 : -1;
+    currentDirectionY = moveY > 0 ? 1 : -1;
+
+    if (directionX !== currentDirectionX) {
+      initialX = clientX;
+      initialTimeX = e.timeStamp;
+    }
+
+    if (directionY !== currentDirectionY) {
+      initialY = clientY;
+      initialTimeY = e.timeStamp;
+    }
+
+    directionX = currentDirectionX;
+    directionY = currentDirectionY;
     lastX = clientX;
     lastY = clientY;
-
-
-    captureLastPos = setTimeout(() => {
-      lastXForCapture = clientX;
-      lastYForCapture = clientY;
-    }, SCROLL_CAPTURE_TIME);
 
     if (!moveX && !moveY) {
       return;
@@ -287,9 +308,13 @@ export default function addTouchListeners(editor, minimal, onclick) {
     touchEnded = true;
 
     if (mode === 'scroll') {
-      const scrollX = lockX ? 0 : clientX - lastXForCapture;
-      const scrollY = lockY ? 0 : clientY - lastYForCapture;
-      scrollAnimation(scrollX, scrollY);
+      const deltaTimeX = e.timeStamp - initialTimeX;
+      const deltaTimeY = e.timeStamp - initialTimeY;
+      const deltaX = clientX - initialX;
+      const deltaY = clientY - initialY;
+      const velocityX = lockX ? 0 : Math.round(deltaX / deltaTimeX); // in px/ms
+      const velocityY = lockY ? 0 : Math.round(deltaY / deltaTimeY); // in px/ms
+      scrollAnimation(velocityX, velocityY);
       return;
     }
 
@@ -412,7 +437,6 @@ export default function addTouchListeners(editor, minimal, onclick) {
     const { clientX, clientY } = e;
     moveCursorTo(clientX, clientY);
     select();
-    selectionMode($end);
     editor.focus();
   }
 
@@ -430,26 +454,38 @@ export default function addTouchListeners(editor, minimal, onclick) {
 
   /**
    * Scrolls the editor with smooth animation
-   * @param {number} moveX 
-   * @param {number} moveY 
+   * @param {number} velocityX velocity in x direction
+   * @param {number} velocityY velocity in y direction
+   * @param {number} [timeThen]
    * @returns {void}
    */
-  function scrollAnimation(moveX, moveY) {
-    const nextX = moveX * scrollSpeed;
-    const nextY = moveY * scrollSpeed;
+  function scrollAnimation(velocityX, velocityY, timeThen = 0) {
+    const timeNow = Date.now();
+
+    if (!timeThen) {
+      scrollAnimationFrame = requestAnimationFrame(
+        scrollAnimation.bind(null, velocityX, velocityY, timeNow),
+      );
+      return;
+    }
+
+    const timeElapsed = timeNow - timeThen;
+    const FRICTION = SCROLL_SPEED[scrollSpeed];
+    const nextX = velocityX * timeElapsed;
+    const nextY = velocityY * timeElapsed;
 
     let scrollX = parseInt(nextX * 100) / 100;
     let scrollY = parseInt(nextY * 100) / 100;
 
-    const [canScrollX, canScrollY] = testScroll(moveX, moveY);
+    const [canScrollX, canScrollY] = testScroll(scrollX, scrollY);
 
     if (!canScrollX) {
-      moveX = 0;
+      velocityX = 0;
       scrollX = 0;
     }
 
     if (!canScrollY) {
-      moveY = 0;
+      velocityY = 0;
       scrollY = 0;
     }
 
@@ -458,12 +494,13 @@ export default function addTouchListeners(editor, minimal, onclick) {
       return;
     }
 
-    scroll(moveX, moveY);
-    moveX -= scrollX;
-    moveY -= scrollY;
+    scroll(scrollX, scrollY);
+
+    velocityX *= FRICTION;
+    velocityY *= FRICTION;
 
     scrollAnimationFrame = requestAnimationFrame(
-      scrollAnimation.bind(null, moveX, moveY),
+      scrollAnimation.bind(null, velocityX, velocityY, timeNow),
     );
   }
 

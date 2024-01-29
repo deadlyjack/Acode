@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.8.8]
+
+- New
+  - [x] **Natural Scrolling** | 331
+    - Acode now uses natural scrolling.
+- Fixes
+  - [x] **Selecting text** | 331
+    - Fixed an issue where selecting text using long press and adding text to selection behaves unexpectedly.
+  - [x] **Open folders** | 331
+    - Fixed an issue where removing folder from sidebar doesn't remove the selected folder.
+
 ## [1.8.7]
 
 - New
