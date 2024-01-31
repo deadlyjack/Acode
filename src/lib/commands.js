@@ -69,7 +69,7 @@ export default {
     editorManager.activeFile.remove();
   },
   'console'() {
-    run(true, 'in app');
+    run(true, 'inapp');
   },
   'check-files'() {
     if (!appSettings.value.checkFiles) return;

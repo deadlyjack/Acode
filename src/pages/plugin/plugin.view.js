@@ -4,6 +4,7 @@ import alert from 'dialogs/alert';
 import fsOperation from 'fileSystem';
 import constants from 'lib/constants';
 import actionStack from 'lib/actionStack';
+import toast from 'components/toast';
 
 export default (props) => {
   const {
@@ -15,6 +16,7 @@ export default (props) => {
     downloads,
     votes_up: votesUp,
     votes_down: votesDown,
+    author_verified: authorVerified,
     author_github: authorGithub,
     comment_count: commentCount,
   } = props;
@@ -37,7 +39,16 @@ export default (props) => {
         <div className="desc">
           <span className="name">{name}</span>
           <div className='version'><Version {...props} /></div>
-          <a className="author" href={`https://github.com/${authorGithub}`}>{author}</a>
+          <div className='author'>
+            <a href={`https://github.com/${authorGithub}`}>{author}</a>
+            {
+              authorVerified ?
+                <span on:click={() => {
+                  toast(strings['verified publisher']);
+                }} className='icon verified'></span> :
+                ''
+            }
+          </div>
         </div>
       </div>
       <div style={moreInfoStyle} className='more-info'>

@@ -33,7 +33,7 @@ public class BrowserActivity extends Activity {
       theme = new Ui.Theme(new JSONObject());
     }
 
-    browser = new Browser(this, theme);
+    browser = new Browser(this, theme, onlyConsole);
     browser.setUrl(url);
     setContentView(browser);
     setSystemTheme(theme.get("primaryColor"));

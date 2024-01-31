@@ -62,14 +62,16 @@ public class Browser extends LinearLayout {
   private int imageSize;
   private int titleHeight;
   private int titleTextHeight;
+  private boolean onlyConsole;
 
   ValueCallback<Uri[]> filePathCallback;
   final int REQUEST_SELECT_FILE = 1;
 
-  public Browser(Context context, Ui.Theme theme) {
+  public Browser(Context context, Ui.Theme theme, Boolean onlyConsole) {
     super(context);
     this.theme = theme;
     this.context = context;
+    this.onlyConsole = onlyConsole;
     this.padding = Ui.dpToPixels(context, 5);
     this.fontSize = Ui.dpToPixels(context, 5);
     this.imageSize = Ui.dpToPixels(context, 35);
@@ -126,11 +128,15 @@ public class Browser extends LinearLayout {
     faviconFrame.addView(loading);
 
     titleLayout = createTile();
-    titleText = createEditText(title);
     titleLayout.addView(faviconFrame);
+    if (!onlyConsole) {
+      titleText = createEditText(title);
+      titleLayout.addView(refreshIcon);
+      titleLayout.addView(menuIcon);
+    } else {
+      titleText = createTextView(title);
+    }
     titleLayout.addView(titleText);
-    titleLayout.addView(refreshIcon);
-    titleLayout.addView(menuIcon);
 
     webView = new WebView(context);
     webView.setFocusable(true);

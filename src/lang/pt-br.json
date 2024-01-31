@@ -376,5 +376,6 @@
   "confirm": "Confirmar",
   "list files": "Listar todos os arquivos em <strong>{name}</strong>? Muitos arquivos podem travar o aplicativo.",
   "problems": "Problemas",
-  "show side buttons": "Mostrar botões laterais"
+  "show side buttons": "Mostrar botões laterais",
+  "verified publisher": "Verified publisher"
 }

@@ -377,5 +377,6 @@
   "confirm": "Confirm",
   "list files": "List all files in <strong>{name}</strong>? Too many files may crash the app.",
   "problems": "Problems",
-  "show side buttons": "Show side buttons"
+  "show side buttons": "Show side buttons",
+  "verified publisher": "Verified publisher"
 }

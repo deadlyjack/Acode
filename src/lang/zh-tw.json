@@ -376,5 +376,6 @@
   "confirm": "確認",
   "list files": "列出在 <strong>{name}</strong> 中的所有檔案嗎？太多檔案也許會導致此應用程式崩潰。",
   "problems": "有問題",
-  "show side buttons": "顯示側邊按鈕"
+  "show side buttons": "顯示側邊按鈕",
+  "verified publisher": "Verified publisher"
 }

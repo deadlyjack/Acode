@@ -377,5 +377,6 @@
   "confirm": "Подтверждение",
   "list files": "Список всех файлов <strong>{name}</strong>. Обширное количество файлов может привести к крашу самого приложения.",
   "problems": "Problems",
-  "show side buttons": "Show side buttons"
+  "show side buttons": "Show side buttons",
+  "verified publisher": "Verified publisher"
 }

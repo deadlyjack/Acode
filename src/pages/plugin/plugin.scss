@@ -9,6 +9,19 @@
     display: flex;
     flex-direction: column;
 
+    .author {
+      display: flex;
+      padding: 10px 0;
+      gap: 2px;
+
+      .verified {
+        height: 12px;
+        width: 12px;
+        background-size: contain;
+        background-position: center;
+      }
+    }
+
     .tag {
       display: flex;
       align-items: center;

@@ -304,6 +304,10 @@ async function run(
     }
   }
 
+  /**
+   * Sends 404 error
+   * @param {string} id 
+   */
   function error(id) {
     webServer?.send(id, {
       status: 404,
@@ -311,13 +315,18 @@ async function run(
     });
   }
 
+  /**
+   * Sends favicon
+   * @param {string} assets 
+   * @param {string} reqId 
+   */
   function sendIco(assets, reqId) {
     const ico = Url.join(assets, 'res/logo/favicon.ico');
     sendFile(ico, reqId);
   }
 
   /**
-   *
+   * Sends HTML file
    * @param {string} text
    * @param {string} id
    */
@@ -359,6 +368,12 @@ async function run(
     sendText(text, id);
   }
 
+  /**
+   * Sends file
+   * @param {string} path 
+   * @param {string} id 
+   * @returns 
+   */
   async function sendFile(path, id) {
     if (isLoading) {
       queue.push(() => {
@@ -414,6 +429,14 @@ async function run(
     if (typeof action === 'function') action();
   }
 
+  /**
+   * Sends file content
+   * @param {string} url 
+   * @param {string} id 
+   * @param {string} mime 
+   * @param {(txt: string) => string} processText 
+   * @returns 
+   */
   async function sendFileContent(url, id, mime, processText) {
     const fs = fsOperation(url);
 
@@ -431,6 +454,13 @@ async function run(
     }
   }
 
+  /**
+   * Sends text
+   * @param {string} text 
+   * @param {string} id 
+   * @param {string} mimeType 
+   * @param {(txt: string) => string} processText 
+   */
   function sendText(text, id, mimeType, processText) {
     webServer?.send(id, {
       status: 200,
@@ -441,6 +471,9 @@ async function run(
     });
   }
 
+  /**
+   * Opens the preview in browser
+   */
   function openBrowser() {
     const src = `http://localhost:${port}/${filename}`;
     if (target === 'browser') {
@@ -448,7 +481,7 @@ async function run(
       return;
     }
 
-    browser.open(src);
+    browser.open(src, isConsole);
   }
 }
 

@@ -285,6 +285,10 @@ a.icon {
     font-size: 0.6em;
     font-weight: bolder;
   }
+
+  &.verified {
+    background-image: url(https://localhost/__cdvfile_assets__/www/res/verified.svg);
+  }
 }
 
 .mask {

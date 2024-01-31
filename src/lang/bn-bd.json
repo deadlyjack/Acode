@@ -376,5 +376,6 @@
   "confirm": "নিশ্চিত",
   "list files": "<strong>{name}</strong>- এর ভেতরের সকল ফাইল তালিকাভুক্ত করুন? অতিরিক্ত ফাইল অ্যাপটি ক্র্যাশ করতে পারে।",
   "problems": "সমস্যাগুলো",
-  "show side buttons": "সাইড বাটনগুলো দেখান"
+  "show side buttons": "সাইড বাটনগুলো দেখান",
+  "verified publisher": "Verified publisher"
 }
