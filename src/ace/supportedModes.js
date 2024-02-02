@@ -1,4 +1,4 @@
-const { addMode } = require('./modelist');
+import { addMode } from "./modelist";
 
 const modeList = {
   ABAP: "abap",
@@ -12,6 +12,7 @@ const modeList = {
   AsciiDoc: "asciidoc|adoc",
   ASL: "dsl|asl|asl.json",
   Assembly_x86: "asm|a",
+  Astro: "astro",
   AutoHotKey: "ahk",
   BatchFile: "bat|cmd",
   BibTeX: "bib",
@@ -29,6 +30,7 @@ const modeList = {
   Csound_Score: "sco",
   CSS: "css",
   Curly: "curly",
+  Cuttlefish: "conf",
   D: "d|di",
   Dart: "dart",
   Diff: "diff|patch",
@@ -46,6 +48,7 @@ const modeList = {
   FSharp: "fsi|fs|ml|mli|fsx|fsscript",
   FSL: "fsl",
   FTL: "ftl",
+  Flix: "flix",
   Gcode: "gcode",
   Gherkin: "feature",
   Gitignore: "^.gitignore",
@@ -103,6 +106,7 @@ const modeList = {
   MIXAL: "mixal",
   MUSHCode: "mc|mush",
   MySQL: "mysql",
+  Nasal: "nas",
   Nginx: "nginx|conf",
   Nim: "nim",
   Nix: "nix",
@@ -110,6 +114,7 @@ const modeList = {
   Nunjucks: "nunjucks|nunjs|nj|njk",
   ObjectiveC: "m|mm",
   OCaml: "ml|mli",
+  Odin: "odin",
   PartiQL: "partiql|pql",
   Pascal: "pas|p",
   Perl: "pl|pm",
@@ -180,7 +185,8 @@ const modeList = {
   XQuery: "xq",
   YAML: "yaml|yml",
   Zeek: "zeek|bro",
-  Django: "html"
+  Zig: "zig",
+  Django: "html",
 };
 
 const languageNames = {
@@ -197,7 +203,7 @@ const languageNames = {
   FTL: "FreeMarker",
   PHP_Laravel_blade: "PHP (Blade Template)",
   Perl6: "Perl 6",
-  AutoHotKey: "AutoHotkey/AutoIt"
+  AutoHotKey: "AutoHotkey/AutoIt",
 };
 
 Object.keys(modeList).forEach((key) => {

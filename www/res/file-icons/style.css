@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'file-icons';
-  src: url('file-icons.ttf?mz5lfn') format('truetype');
+  src: url('file-icons.ttf?ujkkfk') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -44,6 +44,11 @@
 .file_type_video:before {
   content: "\e991";
   color: #e75749;
+}
+
+.file_type_astro:before {
+  content: "\e9a4";
+  color: #fff;
 }
 
 .file_type_music:before {
@@ -1457,6 +1462,11 @@
   color: #0f80cc;
 }
 
+.file_type_sqlite3:before {
+  content: "\e97a";
+  color: #0f80cc;
+}
+
 .file_type_stylus:before {
   content: "\e97b";
 }
@@ -1551,6 +1561,11 @@
 }
 
 .file_type_typescript:before {
+  content: "\e98a";
+  color: #007acc;
+}
+
+.file_type_ts:before {
   content: "\e98a";
   color: #007acc;
 }
@@ -1748,4 +1763,9 @@
 .file_type_adb:before {
   content: "\e99d";
   color: #0f23c3;
+}
+
+.file_type_zig:before {
+  content: "\e9a5";
+  color: #f7a41d;
 }
