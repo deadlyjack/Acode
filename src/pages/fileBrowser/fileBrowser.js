@@ -748,13 +748,11 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
       if (arg === 'file' || arg === 'folder') {
         let title = strings['enter folder name'];
-        let val = strings['new folder'];
         if (arg === 'file') {
           title = strings['enter file name'];
-          val = 'untitled.txt';
         }
 
-        let entryName = await prompt(title, val, 'filename', {
+        let entryName = await prompt(title, '', 'filename', {
           match: constants.FILE_NAME_REGEX,
           required: true,
         });

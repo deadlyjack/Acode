@@ -31,8 +31,8 @@
       "cordova-plugin-iap": {},
       "cordova-plugin-ftp": {},
       "cordova-plugin-sdcard": {},
-      "cordova-plugin-browser": {},
-      "cordova-plugin-system": {}
+      "cordova-plugin-system": {},
+      "cordova-plugin-browser": {}
     },
     "platforms": [
       "android"

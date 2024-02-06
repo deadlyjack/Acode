@@ -129,14 +129,12 @@ public class Browser extends LinearLayout {
 
     titleLayout = createTile();
     titleLayout.addView(faviconFrame);
+    titleText = onlyConsole ? createTextView(title) : createEditText(title);
+    titleLayout.addView(titleText);
     if (!onlyConsole) {
-      titleText = createEditText(title);
       titleLayout.addView(refreshIcon);
       titleLayout.addView(menuIcon);
-    } else {
-      titleText = createTextView(title);
     }
-    titleLayout.addView(titleText);
 
     webView = new WebView(context);
     webView.setFocusable(true);

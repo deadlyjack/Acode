@@ -229,6 +229,12 @@ export default function multiPrompt(message, inputs, help) {
           hidden,
         });
 
+        if (value) {
+          setTimeout(() => {
+            $input.scrollLeft = $input.scrollWidth;
+          }, 0);
+        }
+
         if (disabled) $input.disabled = true;
         if (hints) inputhints($input, hints);
 
