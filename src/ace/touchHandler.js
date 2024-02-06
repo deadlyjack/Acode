@@ -460,6 +460,11 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * @returns {void}
    */
   function scrollAnimation(velocityX, velocityY, timeThen = 0) {
+    if (!velocityX && !velocityY) {
+      onscrollend();
+      return;
+    }
+
     const timeNow = Date.now();
 
     if (!timeThen) {
