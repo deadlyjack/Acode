@@ -110,6 +110,7 @@ async function run(
         }
 
         next();
+        return;
       } catch (err) {
         helpers.error(err);
         return;
@@ -475,6 +476,7 @@ async function run(
    * Opens the preview in browser
    */
   function openBrowser() {
+    console.count('openBrowser');
     const src = `http://localhost:${port}/${filename}`;
     if (target === 'browser') {
       system.openInBrowser(src);

@@ -554,8 +554,13 @@ public class SDcard extends CordovaPlugin {
 
             try {
               DocumentFile file = DocumentFile.fromTreeUri(context, fileUri);
+              // If only case change, OS adds '(<number>)' as suffix, to avoid that we need to rename to a temporary name first
+              if (newFile.equalsIgnoreCase(file.getName())) {
+                file.renameTo(newFile + "_temp");
+              }
 
               if (file.renameTo(newFile)) {
+                String name = file.getName();
                 docId = DocumentsContract.getDocumentId(file.getUri());
                 callback.success(srcUri + SEPARATOR + docId);
               } else {

@@ -12,6 +12,9 @@
 - Fixes
   - [x] **File** | 931
     - Fixed not able share, edit or open with other apps.
+    - Fixed file rename not working properly. | 934
+  - [x] **Preview** | 934
+    - Fixed preview where it opens browser two times.
 
 ## [1.8.8]
 
