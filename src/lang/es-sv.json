@@ -150,7 +150,7 @@
   "show console": "Mostrar consola",
   "image": "Imagen",
   "insert file": "Insertar archivo",
-  "insert color": "Insert color",
+  "insert color": "Insertar color",
   "powersave mode warning": "Desactive el modo de ahorro de energía para obtener una vista previa en un navegador externo",
   "exit": "Salir",
   "custom": "personalizado",
@@ -375,7 +375,7 @@
   "color preview": "Vista previa del color",
   "confirm": "Confirmar",
   "list files": "List all files in <strong>{name}</strong>? Too many files may crash the app.",
-  "problems": "Problems",
-  "show side buttons": "Show side buttons",
-  "verified publisher": "Verified publisher"
+  "problems": "Problemas",
+  "show side buttons": "Mostrar botones laterales",
+  "verified publisher": "Publicador verificado"
 }
