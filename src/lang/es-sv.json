@@ -150,7 +150,7 @@
   "show console": "Mostrar consola",
   "image": "Imagen",
   "insert file": "Insertar archivo",
-  "insert color": "Insert color",
+  "insert color": "Insertar color",
   "powersave mode warning": "Desactive el modo de ahorro de energía para obtener una vista previa en un navegador externo",
   "exit": "Salir",
   "custom": "personalizado",
@@ -374,8 +374,8 @@
   "plugin min version": "{name} sólo disponible en Acode - {v-code} y superior. Haga clic aquí para actualizar.",
   "color preview": "Vista previa del color",
   "confirm": "Confirmar",
-  "list files": "List all files in <strong>{name}</strong>? Too many files may crash the app.",
-  "problems": "Problems",
-  "show side buttons": "Show side buttons",
-  "verified publisher": "Verified publisher"
+  "list files": "¿Listar todos los archivos en <strong>{name}</strong>? Demasiados archivos pueden bloquear la aplicación.",
+  "problems": "Problemas",
+  "show side buttons": "Mostrar botones laterales",
+  "verified publisher": "Publicador verificado"
 }
