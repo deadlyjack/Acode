@@ -437,6 +437,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
     const { clientX, clientY } = e;
     moveCursorTo(clientX, clientY);
     select();
+    touchEnded = true;
     editor.focus();
   }
 
