@@ -12,11 +12,11 @@ const fs = require('fs');
 const path = require('path');
 const PLATFORM_FILES = ['.DS_Store'];
 
-execSync('npm install', { stdio: 'inherit' });
-execSync('cordova platform add android@10', { stdio: 'inherit' });
-execSync('cordova plugin add cordova-plugin-buildinfo', { stdio: 'inherit' });
-execSync('cordova plugin add cordova-plugin-device', { stdio: 'inherit' });
-execSync('cordova plugin add cordova-plugin-file', { stdio: 'inherit' });
+// execSync('npm install', { stdio: 'inherit' });
+// execSync('cordova platform add android@10', { stdio: 'inherit' });
+// execSync('cordova plugin add cordova-plugin-buildinfo', { stdio: 'inherit' });
+// execSync('cordova plugin add cordova-plugin-device', { stdio: 'inherit' });
+// execSync('cordova plugin add cordova-plugin-file', { stdio: 'inherit' });
 
 const plugins = fs.readdirSync(path.join(__dirname, '../src/plugins'));
 plugins.forEach(plugin => {

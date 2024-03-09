@@ -37,6 +37,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -58,12 +59,19 @@ public class System extends CordovaPlugin {
   private Theme theme;
   private CallbackContext intentHandler;
   private CordovaWebView webView;
+  private HashMap<Integer, CallbackContext> callbacks;
 
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
     this.context = cordova.getContext();
     this.activity = cordova.getActivity();
     this.webView = webView;
+    
+    this.callbacks = new HashMap<Integer, CallbackContext>();
+    
+    PluginResultService.setCallback(result -> {
+      setCommandResult(result);
+    });
   }
 
   public boolean execute(
@@ -126,6 +134,32 @@ public class System extends CordovaPlugin {
             new Runnable() {
               public void run() {
                 clearCache(callbackContext);
+              }
+            }
+          );
+        return true;
+      case "pty-execute":
+        this.cordova.getActivity()
+          .runOnUiThread(
+            new Runnable() {
+              public void run() {
+                ptyExecute(
+                  arg1, arg3, args.optJSONArray(1),
+                  args.optBoolean(3), callbackContext
+                );
+              }
+            }
+          );
+        return true;
+      case "pty-run":
+        this.cordova.getActivity()
+          .runOnUiThread(
+            new Runnable() {
+              public void run() {
+                ptyRunCommand(
+                  arg1, arg3, args.optJSONArray(1),
+                  args.optBoolean(3), callbackContext
+                );
               }
             }
           );
@@ -207,6 +241,129 @@ public class System extends CordovaPlugin {
       );
 
     return true;
+  }
+
+  private void setCommandResult(JSONObject result) {
+    Integer executionId = result.optInt("id");
+
+    try {
+      CallbackContext callback = callbacks.get(executionId);
+      if (callback == null) { return; }
+
+      // PluginResult newResult = new PluginResult(
+      //   PluginResult.Status.OK, result
+      // );
+      // newResult.setKeepCallback(true);
+      // callback.sendPluginResult(newResult);
+
+      callback.success(result);
+      callbacks.remove(executionId);
+    } catch (Exception err) {}
+  }
+  
+  private String[] convertJSONArray(JSONArray arr) {
+    List<String> list = new ArrayList<String>();
+    for (int i = 0; i < arr.length(); i++) {
+      try {
+        String item = arr.getString(i);
+        list.add(item);
+      } catch (JSONException e) {}
+    }
+
+    String[] res = new String[list.size()];
+    return list.toArray(res);
+  }
+
+  private void ptyExecute(
+    String command, String homeDir,
+    JSONArray args, Boolean background,
+    CallbackContext callback
+  ) {
+    try {
+      if (homeDir.equals("")) {
+        homeDir = "/data/data/com.termux/files/home";
+      }
+
+      Intent intent = new Intent();
+
+      intent.setAction("com.termux.RUN_COMMAND");
+      intent.setClassName("com.termux", "com.termux.app.RunCommandService");
+
+      intent.putExtra("com.termux.RUN_COMMAND_PATH", command);
+      intent.putExtra(
+        "com.termux.RUN_COMMAND_ARGUMENTS",
+        convertJSONArray(args)
+      );
+
+      intent.putExtra("com.termux.RUN_COMMAND_WORKDIR", homeDir);
+      intent.putExtra("com.termux.RUN_COMMAND_BACKGROUND", background);
+      intent.putExtra("com.termux.RUN_COMMAND_SESSION_ACTION", "3");
+
+      context.startService(intent);
+
+      callback.success("Running command.");
+    } catch (Exception error) {
+      callback.error(error.toString());
+    }
+  }
+
+  private void ptyRunCommand(
+    String command, String homeDir,
+    JSONArray commandArgs, Boolean background,
+    CallbackContext callback
+  ) {
+    try {
+      if (homeDir.equals("")) {
+        homeDir = "/data/data/com.termux/files/home";
+      }
+
+      Intent intent = new Intent();
+
+      intent.setClassName("com.termux", "com.termux.app.RunCommandService");
+      intent.setAction("com.termux.RUN_COMMAND");
+
+      intent.putExtra("com.termux.RUN_COMMAND_PATH", command);
+      intent.putExtra(
+        "com.termux.RUN_COMMAND_ARGUMENTS",
+        convertJSONArray(commandArgs)
+      );
+
+      intent.putExtra("com.termux.RUN_COMMAND_WORKDIR", homeDir);
+      intent.putExtra("com.termux.RUN_COMMAND_BACKGROUND", background);
+      intent.putExtra("com.termux.RUN_COMMAND_SESSION_ACTION", "3");
+
+      // Create the intent for the IntentService class that should be sent the result by TermuxService
+      Intent resultIntent = new Intent(
+        context, PluginResultService.class
+      );
+
+      // Generate a unique execution id for this execution command
+      int executionId = PluginResultService.getNextExecutionId();
+
+      resultIntent.putExtra(
+        PluginResultService.EXTRA_EXECUTION_ID, executionId
+      );
+
+      PendingIntent pendingIntent = PendingIntent.getService(
+        context, executionId,
+        resultIntent, PendingIntent.FLAG_MUTABLE
+      );
+      intent.putExtra(
+        "com.termux.RUN_COMMAND_PENDING_INTENT", pendingIntent
+      );
+
+      try {
+        callbacks.put(executionId, callback);
+        context.startService(intent);
+      } catch (Exception e) {
+        callbacks.remove(executionId);
+        callback.error(
+          "Failed to start command: " + e.getMessage()
+        );
+      }
+    } catch (Exception error) {
+      callback.error(error.toString());
+    }
   }
 
   private void getConfiguration(CallbackContext callback) {

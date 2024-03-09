@@ -8,6 +8,8 @@
 
   <domain-config cleartextTrafficPermitted="true">
     <domain includeSubdomains="true">localhost</domain>
+    <domain includeSubdomains="true">10.9.56.64</domain>
+    <domain includeSubdomains="true">192.168.43.250</domain>
   </domain-config>
 </network-security-config>
 

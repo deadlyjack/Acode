@@ -16,6 +16,7 @@ import fsOperation from "fileSystem";
 import toast from 'components/toast';
 import sidebarApps from 'sidebarApps';
 import confirm from 'dialogs/confirm';
+import browser from 'plugins/browser';
 import appSettings from "lib/settings";
 import colorPicker from 'dialogs/color';
 import EditorFile from "lib/editorFile";
@@ -36,6 +37,8 @@ import Contextmenu from 'components/contextmenu';
 import formatterSettings from "settings/formatterSettings";
 import settingsPage from 'components/settingsPage';
 import SideButton from 'components/sideButton';
+
+import ptyModule, { setup } from "lib/pty";
 
 import { addedFolder } from 'lib/openFolder';
 import { decode, encode } from 'utils/encodings';
@@ -104,6 +107,7 @@ export default class Acode {
     this.define('prompt', prompt);
     this.define('intent', intent);
     this.define('fileList', files);
+    this.define('browser', browser);
     this.define('fs', fsOperation);
     this.define('confirm', confirm);
     this.define('helpers', helpers);
@@ -132,6 +136,13 @@ export default class Acode {
     this.define('sidebarApps', sidebarAppsModule);
     this.define('createKeyboardEvent', KeyboardEvent);
     this.define('toInternalUrl', helpers.toInternalUri);
+    
+    this.define("pty", ptyModule);
+  }
+  
+  async initialize() {
+    setup();
+    await ptyModule.host.initializeServer();
   }
 
   /**
