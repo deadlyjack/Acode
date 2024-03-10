@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import './mixins.scss';
 @import './keyframes.scss';
 @import './fileInfo.scss';
