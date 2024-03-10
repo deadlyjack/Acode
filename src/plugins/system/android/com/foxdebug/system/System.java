@@ -22,6 +22,7 @@ import android.provider.Settings.Global;
 import android.util.Base64;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsetsController;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import androidx.core.content.FileProvider;
@@ -643,74 +644,82 @@ public class System extends CordovaPlugin {
 
   private void setUiTheme(
     final String systemBarColor,
-    final JSONObject theme,
+    final JSONObject schema,
     final CallbackContext callback
   ) {
     this.systemBarColor = Color.parseColor(systemBarColor);
-    this.theme = new Theme(theme);
+    this.theme = new Theme(schema);
 
-    if (Build.VERSION.SDK_INT >= 21) {
-      final Window window = activity.getWindow();
-      // Method and constants not available on all SDKs but we want to be able to compile this code with any SDK
-      window.clearFlags(0x04000000); // SDK 19: WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-      window.addFlags(0x80000000); // SDK 21: WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-      try {
-        // Using reflection makes sure any 5.0+ device will work without having to compile with SDK level 21
+    final Window window = activity.getWindow();
+    // Method and constants not available on all SDKs but we want to be able to compile this code with any SDK
+    window.clearFlags(0x04000000); // SDK 19: WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    window.addFlags(0x80000000); // SDK 21: WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+    try {
+      // Using reflection makes sure any 5.0+ device will work without having to compile with SDK level 21
 
-        window
-          .getClass()
-          .getMethod("setNavigationBarColor", int.class)
-          .invoke(window, this.systemBarColor);
+      window
+        .getClass()
+        .getMethod("setNavigationBarColor", int.class)
+        .invoke(window, this.systemBarColor);
 
-        window
-          .getClass()
-          .getMethod("setStatusBarColor", int.class)
-          .invoke(window, this.systemBarColor);
+      window
+        .getClass()
+        .getMethod("setStatusBarColor", int.class)
+        .invoke(window, this.systemBarColor);
 
+      if (Build.VERSION.SDK_INT < 30) {
         setStatusBarStyle(window);
         setNavigationBarStyle(window);
-        callback.success("OK");
-      } catch (IllegalArgumentException error) {
-        callback.error(error.toString());
-      } catch (Exception error) {
-        callback.error(error.toString());
+      } else {
+        String themeType = theme.getType();
+        WindowInsetsController controller = window.getInsetsController();
+        int appearance =
+          WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS |
+          WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+
+        if (themeType.equals("light")) {
+          controller.setSystemBarsAppearance(appearance, appearance);
+        } else {
+          controller.setSystemBarsAppearance(0, appearance);
+        }
       }
+      callback.success("OK");
+    } catch (IllegalArgumentException error) {
+      callback.error(error.toString());
+    } catch (Exception error) {
+      callback.error(error.toString());
     }
   }
 
   private void setStatusBarStyle(final Window window) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      View decorView = window.getDecorView();
-      int uiOptions = decorView.getSystemUiVisibility();
-      String themeType = theme.getType();
+    View decorView = window.getDecorView();
+    int uiOptions = decorView.getSystemUiVisibility();
+    String themeType = theme.getType();
 
-      if (themeType.equals("light")) {
-        decorView.setSystemUiVisibility(
-          uiOptions | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        );
-        return;
-      }
+    if (themeType.equals("light")) {
       decorView.setSystemUiVisibility(
-        uiOptions & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        uiOptions | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
       );
+      return;
     }
+    decorView.setSystemUiVisibility(
+      uiOptions & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+    );
   }
 
   private void setNavigationBarStyle(final Window window) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      View decorView = window.getDecorView();
-      int uiOptions = decorView.getSystemUiVisibility();
-      String themeType = theme.getType();
+    View decorView = window.getDecorView();
+    int uiOptions = decorView.getSystemUiVisibility();
+    String themeType = theme.getType();
 
-      // 0x80000000 FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
-      // 0x00000010 SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+    // 0x80000000 FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
+    // 0x00000010 SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
-      if (themeType.equals("light")) {
-        decorView.setSystemUiVisibility(uiOptions | 0x80000000 | 0x00000010);
-        return;
-      }
-      decorView.setSystemUiVisibility(uiOptions | 0x80000000 & ~0x00000010);
+    if (themeType.equals("light")) {
+      decorView.setSystemUiVisibility(uiOptions | 0x80000000 | 0x00000010);
+      return;
     }
+    decorView.setSystemUiVisibility(uiOptions | 0x80000000 & ~0x00000010);
   }
 
   private void getCordovaIntent(CallbackContext callback) {

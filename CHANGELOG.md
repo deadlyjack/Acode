@@ -5,6 +5,9 @@
 - New
   - [x] **Ace editor** | 937
     - Updated Ace editor to version 1.32.7
+- Fixes
+  - [x] **UI** | 942
+    - Fixed status and navigation text color not visible in light theme.
 
 - Fixes
   - [x] **Text selection** | 937

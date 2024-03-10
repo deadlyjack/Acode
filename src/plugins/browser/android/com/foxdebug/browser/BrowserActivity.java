@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsetsController;
 import android.webkit.WebChromeClient;
 import com.foxdebug.system.Ui;
 import org.json.JSONObject;
@@ -51,56 +52,64 @@ public class BrowserActivity extends Activity {
   private void setSystemTheme(int systemBarColor) {
     try {
       Ui.Icons.setSize(Ui.dpToPixels(this, 18));
-      if (Build.VERSION.SDK_INT >= 21) {
-        final Window window = getWindow();
-        // Method and constants not available on all SDKs but we want to be able to compile this code with any SDK
-        window.clearFlags(0x04000000); // SDK 19: WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(0x80000000); // SDK 21: WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        try {
-          // Using reflection makes sure any 5.0+ device will work without having to compile with SDK level 21
+      final Window window = getWindow();
+      // Method and constants not available on all SDKs but we want to be able to compile this code with any SDK
+      window.clearFlags(0x04000000); // SDK 19: WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+      window.addFlags(0x80000000); // SDK 21: WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+      try {
+        // Using reflection makes sure any 5.0+ device will work without having to compile with SDK level 21
 
-          window
-            .getClass()
-            .getMethod("setNavigationBarColor", int.class)
-            .invoke(window, systemBarColor);
+        window
+          .getClass()
+          .getMethod("setNavigationBarColor", int.class)
+          .invoke(window, systemBarColor);
 
-          window
-            .getClass()
-            .getMethod("setStatusBarColor", int.class)
-            .invoke(window, systemBarColor);
+        window
+          .getClass()
+          .getMethod("setStatusBarColor", int.class)
+          .invoke(window, systemBarColor);
 
+        if (Build.VERSION.SDK_INT < 30) {
           setStatusBarStyle(window);
           setNavigationBarStyle(window);
-        } catch (IllegalArgumentException ignore) {} catch (Exception ignore) {}
-      }
+        } else {
+          String themeType = theme.getType();
+          WindowInsetsController controller = window.getInsetsController();
+          int appearance =
+            WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS |
+            WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+
+          if (themeType.equals("light")) {
+            controller.setSystemBarsAppearance(appearance, appearance);
+          } else {
+            controller.setSystemBarsAppearance(0, appearance);
+          }
+        }
+      } catch (IllegalArgumentException ignore) {} catch (Exception ignore) {}
     } catch (Exception e) {}
   }
 
   private void setStatusBarStyle(final Window window) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      View decorView = window.getDecorView();
-      int uiOptions = decorView.getSystemUiVisibility();
-      String themeType = theme.getType();
+    View decorView = window.getDecorView();
+    int uiOptions = decorView.getSystemUiVisibility();
+    String themeType = theme.getType();
 
-      if (themeType.equals("light")) {
-        decorView.setSystemUiVisibility(
-          uiOptions | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        );
-        return;
-      }
+    if (themeType.equals("light")) {
+      decorView.setSystemUiVisibility(
+        uiOptions | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+      );
+      return;
     }
   }
 
   private void setNavigationBarStyle(final Window window) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      View decorView = window.getDecorView();
-      int uiOptions = decorView.getSystemUiVisibility();
-      String themeType = theme.getType();
+    View decorView = window.getDecorView();
+    int uiOptions = decorView.getSystemUiVisibility();
+    String themeType = theme.getType();
 
-      if (themeType.equals("light")) {
-        decorView.setSystemUiVisibility(uiOptions | 0x80000000 | 0x00000010);
-        return;
-      }
+    if (themeType.equals("light")) {
+      decorView.setSystemUiVisibility(uiOptions | 0x80000000 | 0x00000010);
+      return;
     }
   }
 
