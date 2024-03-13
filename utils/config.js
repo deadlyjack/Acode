@@ -9,6 +9,7 @@ const exec = promisify(require('child_process').exec);
   const HTML_ID = /<title>[a-z.]+<\/title>/;
   const ID_PAID = 'com.foxdebug.acode';
   const ID_FREE = 'com.foxdebug.acodefree';
+  const ID_NODE = 'com.foxdebug.acodenode';
   const arg = process.argv[2];
   const arg2 = process.argv[3];
   const platformsDir = path.resolve(__dirname, '../platforms/');
@@ -48,6 +49,9 @@ const exec = promisify(require('child_process').exec);
     if (arg2 === 'free') {
       logo = logoTextFree;
       id = ID_FREE;
+    } else if (arg2 === "node") {
+      logo = logoTextFree;
+      id = ID_NODE;
     } else {
       logo = logoTextPaid;
       id = ID_PAID;
@@ -72,27 +76,28 @@ const exec = promisify(require('child_process').exec);
 
         promises.push(
           (async () => {
+            if (id === ID_NODE) return;
             console.log(
               `|--- Reinstalling platform ${platform.toUpperCase()} ---|`,
             );
 
             if (id === ID_FREE) {
-              await exec(`cordova plugin add cordova-plugin-consent@2.4.0 --save`);
-              await exec(`cordova plugin add admob-plus-cordova@1.28.0 --save --variable APP_ID_ANDROID="${AD_APP_ID}"`);
-              await exec(`cordova clean`);
-              await exec(`cordova prepare`);
+              // await exec(`cordova plugin add cordova-plugin-consent@2.4.0 --save`);
+              // await exec(`cordova plugin add admob-plus-cordova@1.28.0 --save --variable APP_ID_ANDROID="${AD_APP_ID}"`);
+              // await exec(`cordova clean`);
+              // await exec(`cordova prepare`);
               console.log('DONE! Installing admob-plus-cordova');
             } else {
-              await exec(`cordova plugin remove cordova-plugin-consent --save`);
-              await exec(`cordova plugin remove admob-plus-cordova --save`);
-              await exec(`cordova clean`);
-              await exec(`cordova prepare`);
+              // await exec(`cordova plugin remove cordova-plugin-consent --save`);
+              // await exec(`cordova plugin remove admob-plus-cordova --save`);
+              // await exec(`cordova clean`);
+              // await exec(`cordova prepare`);
               console.log('DONE! Removing admob-plus-cordova');
             }
 
-            const { stderr } = await exec(`yarn clean`);
-            if (stderr) console.error(stderr);
-            else console.log('DONE! Reinstalling platform');
+            // const { stderr } = await exec(`yarn clean`);
+            // if (stderr) console.error(stderr);
+            // else console.log('DONE! Reinstalling platform');
 
           })(),
         );

@@ -33,7 +33,7 @@ NC=''
 script1="node ./utils/config.js $mode $app"
 script2="webpack --progress --mode $webpackmode "
 script3="node ./utils/loadStyles.js"
-script4="cordova build $platform $cordovamode"
+script4="cordova build $platform $cordovamode -- --jvmargs='-Xmx1536M --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED'"
 eval "
 echo \"${RED}$script1${NC}\";
 $script1;
