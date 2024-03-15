@@ -130,7 +130,7 @@ export default function DonateInclude() {
       col2.push(html);
     });
 
-    $page.body = tag.parse(mustache.render(bodyHBS, {
+    $page.body = helpers.parseHTML(mustache.render(bodyHBS, {
       col1: col1.join(''),
       col2: col2.join(''),
     }));

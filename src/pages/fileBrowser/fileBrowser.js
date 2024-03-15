@@ -77,7 +77,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
     const $page = Page(strings['file browser'].capitalize(), {
       lead: $lead,
     });
-    const $content = tag.parse(
+    const $content = helpers.parseHTML(
       mustache.render(_template, {
         type: mode,
         info,
@@ -937,7 +937,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
     function render(dir) {
       const { list, scroll } = dir;
-      const $list = tag.parse(
+      const $list = helpers.parseHTML(
         mustache.render(_list, {
           msg: strings['empty folder message'],
           list,

@@ -23,10 +23,12 @@ const exec = promisify(require('child_process').exec);
   const logoTextPaid = `<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#3a3e54</color>
+    <color name="ic_splash_background">#3a3e54</color>
 </resources>`;
   const logoTextFree = `<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#ffffff</color>
+    <color name="ic_splash_background">#313131</color>
 </resources>`;
 
   try {
@@ -73,23 +75,22 @@ const exec = promisify(require('child_process').exec);
         promises.push(
           (async () => {
             console.log(
-              `|--- Reinstalling platform ${platform.toUpperCase()} ---|`,
+              `|--- Preparing platform ${platform.toUpperCase()} ---|`,
             );
 
             if (id === ID_FREE) {
+              console.log(`|--- Installing Admob ---|`);
               await exec(`cordova plugin add cordova-plugin-consent@2.4.0 --save`);
               await exec(`cordova plugin add admob-plus-cordova@1.28.0 --save --variable APP_ID_ANDROID="${AD_APP_ID}"`);
-              await exec(`cordova clean`);
-              await exec(`cordova prepare`);
               console.log('DONE! Installing admob-plus-cordova');
             } else {
+              console.log(`|--- Removing Admob ---|`);
               await exec(`cordova plugin remove cordova-plugin-consent --save`);
               await exec(`cordova plugin remove admob-plus-cordova --save`);
-              await exec(`cordova clean`);
-              await exec(`cordova prepare`);
               console.log('DONE! Removing admob-plus-cordova');
             }
 
+            console.log(`|--- Reinstalling platform ---|`);
             const { stderr } = await exec(`yarn clean`);
             if (stderr) console.error(stderr);
             else console.log('DONE! Reinstalling platform');

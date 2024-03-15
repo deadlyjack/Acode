@@ -1,5 +1,20 @@
 # Change Log
 
+## [1.10.0]
+
+- New
+  - [x] **Ace editor** | 937
+    - Updated Ace editor to version 1.32.7
+- Fixes
+  - [x] **UI** | 944
+    - Fixed status and navigation text color not visible in light theme.
+  - [x] **Plugin** | 944
+    - Fixed updates for plugin not showing up.
+
+- Fixes
+  - [x] **Text selection** | 937
+    - Fixed context menu not showing up when selecting all text from context menu after click and hold.
+
 ## [1.9.0]
 
 - New

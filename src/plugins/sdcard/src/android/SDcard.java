@@ -313,6 +313,12 @@ public class SDcard extends CordovaPlugin {
     if (requestCode == PICK_FROM_GALLERY) {
       if (resultCode == Activity.RESULT_OK) {
         Uri uri = data.getData();
+        if (uri == null) {
+          activityResultCallback.error("No file selected");
+        } else {
+          takePermission(uri);
+          activityResultCallback.success(uri.toString());
+        }
         activityResultCallback.success(uri.toString());
       }
       return;
@@ -322,6 +328,12 @@ public class SDcard extends CordovaPlugin {
       if (resultCode == Activity.RESULT_OK) {
         try {
           Uri uri = data.getData();
+
+          if (uri == null) {
+            activityResultCallback.error("No file selected");
+            return;
+          }
+
           takePermission(uri);
           DocumentFile file = DocumentFile.fromSingleUri(context, uri);
           JSONObject res = new JSONObject();
@@ -352,16 +364,17 @@ public class SDcard extends CordovaPlugin {
         Uri uri = data.getData();
         if (uri == null) {
           activityResultCallback.error("Empty uri");
+          return;
+        }
+
+        takePermission(uri);
+        DocumentFile file = DocumentFile.fromTreeUri(context, uri);
+        if (file != null && file.canWrite()) {
+          activityResultCallback.success(uri.toString());
         } else {
-          takePermission(uri);
-          DocumentFile file = DocumentFile.fromTreeUri(context, uri);
-          if (file != null && file.canWrite()) {
-            activityResultCallback.success(uri.toString());
-          } else {
-            activityResultCallback.error(
-              "No write permission: " + uri.toString()
-            );
-          }
+          activityResultCallback.error(
+            "No write permission: " + uri.toString()
+          );
         }
       } catch (Exception error) {
         activityResultCallback.error(error.toString());
@@ -563,12 +576,12 @@ public class SDcard extends CordovaPlugin {
                 String name = file.getName();
                 docId = DocumentsContract.getDocumentId(file.getUri());
                 callback.success(srcUri + SEPARATOR + docId);
-              } else {
-                callback.error("Unable to rename: " + filename);
+                return;
               }
+
+              callback.error("Unable to rename: " + filename);
             } catch (Exception e) {
-              Log.e("RENAME_DOCUMENT_FILE", "Unable to rename file", e);
-              callback.error(e.toString());
+              callback.error(e.getMessage());
             }
           }
         }
