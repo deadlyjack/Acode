@@ -62,9 +62,15 @@ export default {
   },
   saveFileAs: {
     description: 'Save as current file',
-    key: 'Ctrl-Shift-S',
+    key: 'Alt-S',
     readOnly: true,
     action: 'save-as',
+  },
+  saveAllChanges: {
+    description: 'Save all changes of opened file',
+    key: 'Ctrl-Shift-S',
+    readOnly: true,
+    action: 'save-all-changes',
   },
   nextFile: {
     description: 'Open next file tab',
