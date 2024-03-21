@@ -274,7 +274,7 @@ async function run(
 
         case '.md':
           if (file) {
-            const html = markdownIt().render(file.session.getValue());
+            const html = markdownIt({ html: true }).render(file.session.getValue());
             const doc = mustache.render($_markdown, {
               html,
               filename,

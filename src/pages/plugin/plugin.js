@@ -261,7 +261,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
     const pluginSettings = settings.uiSettings[`plugin-${plugin.id}`];
     $page.body = view({
       ...plugin,
-      body: markdownIt().render(plugin.description),
+      body: markdownIt({ html: true, xhtmlOut: true }).render(plugin.description),
       purchased,
       installed,
       update,

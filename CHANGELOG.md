@@ -10,6 +10,8 @@
     - Fixed status and navigation text color not visible in light theme.
   - [x] **Plugin** | 944
     - Fixed updates for plugin not showing up.
+  - [x] **Markdown** | 945
+    - Fixed markdown preview not working properly.
 
 - Fixes
   - [x] **Text selection** | 937
