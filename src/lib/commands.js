@@ -63,7 +63,9 @@ export default {
   async 'save-all-changes'() {
     const doSave = await confirm(strings['warning'], strings['save all changes warning']);
     if (!doSave) return;
-    editorManager.files.forEach(file.save);
+    for (const file of editorManager.files) {
+      await file.save();
+    }
   },
   'close-current-tab'() {
     editorManager.activeFile.remove();
