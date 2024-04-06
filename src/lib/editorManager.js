@@ -14,12 +14,11 @@ import { setCommands, setKeyBindings } from 'ace/commands';
 import { HARDKEYBOARDHIDDEN_NO, getSystemConfiguration } from './systemConfiguration';
 import SideButton, { sideButtonContainer } from 'components/sideButton';
 
-//TODO: Add option to work multiple files at same time in large display.
-
 /**
- *
- * @param {HTMLElement} $header
- * @param {HTMLElement} $body
+ * Represents an editor manager that handles multiple files and provides various editor configurations and event listeners.
+ * @param {HTMLElement} $header - The header element.
+ * @param {HTMLElement} $body - The body element.
+ * @returns {Promise<Object>} A promise that resolves to the editor manager object.
  */
 async function EditorManager($header, $body) {
   /**
@@ -231,8 +230,8 @@ async function EditorManager($header, $body) {
   return manager;
 
   /**
-   * 
-   * @param {EditorFile} file 
+   * Adds a file to the manager's file list and updates the UI.
+   * @param {File} file - The file to be added.
    */
   function addFile(file) {
     if (manager.files.includes(file)) return;
@@ -241,6 +240,10 @@ async function EditorManager($header, $body) {
     $header.text = file.name;
   }
 
+  /**
+   * Sets up the editor with various configurations and event listeners.
+   * @returns {Promise<void>} A promise that resolves once the editor is set up.
+   */
   async function setupEditor() {
     const Emmet = ace.require('ace/ext/emmet');
     const textInput = editor.textInput.getElement();
@@ -386,6 +389,9 @@ async function EditorManager($header, $body) {
     );
   }
 
+  /**
+   * Scrolls the cursor into view if it is not currently visible.
+   */
   function scrollCursorIntoView() {
     keyboardHandler.off('keyboardShow', scrollCursorIntoView);
     if (isCursorVisible()) return;
@@ -411,7 +417,7 @@ async function EditorManager($header, $body) {
   }
 
   /**
-   * Callback function
+   * Sets the vertical scroll value of the editor. This is called when the editor is scrolled horizontally using the scrollbar.
    * @param {Number} value
    */
   function onscrollV(value) {
@@ -425,13 +431,17 @@ async function EditorManager($header, $body) {
     cancelAnimationFrame(scrollAnimationFrame);
   }
 
+  /**
+   * Handles the onscroll event for the vend element.
+   */
   function onscrollVend() {
     preventScrollbarV = false;
   }
 
+
   /**
-   * Callback function
-   * @param {Number} value
+   * Sets the horizontal scroll value of the editor. This is called when the editor is scrolled vertically using the scrollbar.
+   * @param {number} value - The scroll value.
    */
   function onscrollH(value) {
     preventScrollbarH = true;
@@ -444,12 +454,15 @@ async function EditorManager($header, $body) {
     cancelAnimationFrame(scrollAnimationFrame);
   }
 
+  /**
+   * Handles the event when the horizontal scrollbar reaches the end.
+   */
   function onscrollHEnd() {
     preventScrollbarH = false;
   }
 
   /**
-   * Callback function called on scroll vertically
+   * Sets scrollbars value based on the editor's scroll position.
    */
   function setHScrollValue() {
     if (appSettings.value.textWrap || preventScrollbarH) return;
@@ -466,13 +479,17 @@ async function EditorManager($header, $body) {
     editor._emit('scroll', 'horizontal');
   }
 
+  /**
+   * Handles the scroll left event.
+   * Updates the horizontal scroll value and renders the horizontal scrollbar.
+   */
   function onscrollleft() {
     setHScrollValue();
     $hScrollbar.render();
   }
 
   /**
-   * Callback function called on scroll vertically
+   * Sets scrollbars value based on the editor's scroll position.
    */
   function setVScrollValue() {
     if (preventScrollbarV) return;
@@ -489,11 +506,19 @@ async function EditorManager($header, $body) {
     editor._emit('scroll', 'vertical');
   }
 
+  /**
+   * Handles the scroll top event.
+   * Updates the vertical scroll value and renders the vertical scrollbar.
+   */
   function onscrolltop() {
     setVScrollValue();
     $vScrollbar.render();
   }
 
+  /**
+   * Updates the floating button visibility based on the provided show parameter.
+   * @param {boolean} [show=false] - Indicates whether to show the floating button.
+   */
   function updateFloatingButton(show = false) {
     const { $headerToggler } = acode;
     const { $toggler } = quickTools;
@@ -513,25 +538,30 @@ async function EditorManager($header, $body) {
         $headerToggler.classList.remove('hide');
         root.appendOuter($headerToggler);
       }
-    } else {
-      if (!scrollBarVisibilityCount) {
-        if ($toggler.isConnected) {
-          $toggler.classList.add('hide');
-          timeoutQuicktoolsToggler = setTimeout(
-            () => $toggler.remove(),
-            300,
-          );
-        }
-        if ($headerToggler.isConnected) {
-          $headerToggler.classList.add('hide');
-          timeoutHeaderToggler = setTimeout(() => $headerToggler.remove(), 300);
-        }
-      }
 
-      ++scrollBarVisibilityCount;
+      return;
     }
+
+    if (!scrollBarVisibilityCount) {
+      if ($toggler.isConnected) {
+        $toggler.classList.add('hide');
+        timeoutQuicktoolsToggler = setTimeout(
+          () => $toggler.remove(),
+          300,
+        );
+      }
+      if ($headerToggler.isConnected) {
+        $headerToggler.classList.add('hide');
+        timeoutHeaderToggler = setTimeout(() => $headerToggler.remove(), 300);
+      }
+    }
+
+    ++scrollBarVisibilityCount;
   }
 
+  /**
+   * Toggles the visibility of the problem button based on the presence of annotations in the files.
+   */
   function toggleProblemButton() {
     const fileWithProblems = manager.files.find((file) => {
       const annotations = file.session.getAnnotations();
@@ -545,6 +575,11 @@ async function EditorManager($header, $body) {
     }
   }
 
+  /**
+   * Updates the side button container based on the value of `showSideButtons` in `appSettings`.
+   * If `showSideButtons` is `false`, the side button container is removed from the DOM.
+   * If `showSideButtons` is `true`, the side button container is appended to the body element.
+   */
   function updateSideButtonContainer() {
     const { showSideButtons } = appSettings.value;
     if (!showSideButtons) {
@@ -555,6 +590,10 @@ async function EditorManager($header, $body) {
     $body.append(sideButtonContainer);
   }
 
+  /**
+   * Updates the margin of the editor and optionally updates the gutter settings.
+   * @param {boolean} [updateGutter=false] - Whether to update the gutter settings.
+   */
   function updateMargin(updateGutter = false) {
     const { showSideButtons, linenumbers, showAnnotations } = appSettings.value;
     const top = 0;
@@ -576,6 +615,10 @@ async function EditorManager($header, $body) {
     });
   }
 
+  /**
+   * Switches the active file in the editor.
+   * @param {string} id - The ID of the file to switch to.
+   */
   function switchFile(id) {
     const { id: activeFileId } = manager.activeFile || {};
     if (activeFileId === id) return;
@@ -587,8 +630,8 @@ async function EditorManager($header, $body) {
     editor.setSession(file.session);
     $header.text = file.filename;
 
-    $hScrollbar.remove();
-    $vScrollbar.remove();
+    $hScrollbar.hideImmediately();
+    $vScrollbar.hideImmediately();
 
     setVScrollValue();
     if (!appSettings.value.textWrap) {
@@ -601,6 +644,9 @@ async function EditorManager($header, $body) {
     events.emit('switch-file', file);
   }
 
+  /**
+   * Initializes the file tab container.
+   */
   function initFileTabContainer() {
     let $list;
 
@@ -656,6 +702,10 @@ async function EditorManager($header, $body) {
     manager.emit('int-open-file-list', openFileListPos);
   }
 
+  /**
+   * Checks if there are any unsaved files in the manager.
+   * @returns {number} The number of unsaved files.
+   */
   function hasUnsavedFiles() {
     const unsavedFiles = manager.files.filter((file) => file.isUnsaved);
     return unsavedFiles.length;

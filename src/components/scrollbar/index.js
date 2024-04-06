@@ -2,13 +2,15 @@ import './style.scss';
 import tag from 'html-tag-js';
 
 /**
- * @typedef {HTMLElement} Scrollbar
+ * @typedef {object} Scrollbar
  * @property {function():void} destroy
  * @property {function():void} render
  * @property {function():void} show
  * @property {function():void} hide
  * @property {function():void} resize
  * @property {function():void} onshow
+ * @property {function():void} onhide
+ * @property {function():void} hideImmediately
  * @property {number} value
  * @property {number} size
  * @property {boolean} visible
@@ -22,7 +24,7 @@ import tag from 'html-tag-js';
  * @param {Number} [options.width]
  * @param {function():void} [options.onscroll]
  * @param {function():void} [options.onscrollend]
- * @returns {Scrollbar}
+ * @returns {Scrollbar & HTMLElement}
  */
 export default function ScrollBar(options) {
   if (!options || !options.parent) {
@@ -225,6 +227,13 @@ export default function ScrollBar(options) {
     if (typeof onhide === 'function') onhide();
   }
 
+  function hideImmediately() {
+    $scrollbar.dataset.hidden = true;
+    $scrollbar.classList.add('hide');
+    $scrollbar.remove();
+    if (typeof onhide === 'function') onhide();
+  }
+
   Object.defineProperty($scrollbar, 'size', {
     get: () => scrollbarSize,
     set: setWidth,
@@ -277,6 +286,10 @@ export default function ScrollBar(options) {
     get() {
       return onhide;
     },
+  });
+
+  Object.defineProperty($scrollbar, 'hideImmediately', {
+    value: hideImmediately,
   });
 
   return $scrollbar;

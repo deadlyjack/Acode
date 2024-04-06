@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.10.1]
+
+- New
+  - [x] **Updated Ace editor** | 946
+    - Updated Ace editor to version 1.32.9
+- Fixes
+  - [x] **Scrolling** | 946
+    - Fixed scrollbars not showing up properly.
+
 ## [1.10.0]
 
 - New
@@ -12,8 +21,6 @@
     - Fixed updates for plugin not showing up.
   - [x] **Markdown** | 945
     - Fixed markdown preview not working properly.
-
-- Fixes
   - [x] **Text selection** | 937
     - Fixed context menu not showing up when selecting all text from context menu after click and hold.
 
