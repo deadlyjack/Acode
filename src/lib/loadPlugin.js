@@ -28,11 +28,15 @@ export default async function loadPlugin(pluginId, justInstalled = false) {
       if (!await fsOperation(cacheFile).exists()) {
         await fsOperation(CACHE_STORAGE).createFile(pluginId);
       }
-      await acode.initPlugin(pluginId, baseUrl, $page, {
-        cacheFileUrl: await helpers.toInternalUri(cacheFile),
-        cacheFile: fsOperation(cacheFile),
-        firstInit: justInstalled,
-      });
+      try {
+        await acode.initPlugin(pluginId, baseUrl, $page, {
+          cacheFileUrl: await helpers.toInternalUri(cacheFile),
+          cacheFile: fsOperation(cacheFile),
+          firstInit: justInstalled,
+        });
+      } catch (error) {
+        toast(`Error loading plugin ${pluginId}: ${error.message}`);
+      }
       resolve();
     };
   });

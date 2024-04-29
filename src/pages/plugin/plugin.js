@@ -1,6 +1,6 @@
 import './plugin.scss';
 import Url from 'utils/Url';
-import { marked } from 'marked';
+import markdownIt from 'markdown-it';
 import ajax from '@deadlyjack/ajax';
 import view from './plugin.view.js';
 import Page from "components/page";
@@ -261,7 +261,7 @@ export default async function PluginInclude(id, installed, onInstall, onUninstal
     const pluginSettings = settings.uiSettings[`plugin-${plugin.id}`];
     $page.body = view({
       ...plugin,
-      body: marked(plugin.description),
+      body: markdownIt({ html: true, xhtmlOut: true }).render(plugin.description),
       purchased,
       installed,
       update,

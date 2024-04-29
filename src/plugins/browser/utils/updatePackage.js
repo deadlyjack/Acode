@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const androidManifest = path.resolve(__dirname, "../../../platforms/android/app/src/main/AndroidManifest.xml");
+const configXML = path.resolve(__dirname, "../../../config.xml");
 const menuJava = path.resolve(__dirname, "../../../platforms/android/app/src/main/java/com/foxdebug/browser/Menu.java");
 const repeatChar = (char, times) => {
   let res = "";
@@ -10,9 +10,9 @@ const repeatChar = (char, times) => {
 };
 
 try {
-  const manifest = fs.readFileSync(androidManifest, "utf8");
+  const config = fs.readFileSync(configXML, "utf8");
   const fileData = fs.readFileSync(menuJava, "utf8");
-  const appName = /package="([0-9a-zA-Z\.\-_]*)"/.exec(manifest)[1].split(".").pop();
+  const appName = /widget id="([0-9a-zA-Z\.\-_]*)"/.exec(config)[1].split(".").pop();
   const newFileData = fileData.replace(/(import com\.foxdebug\.)(acode|acodefree)(.R;)/, `$1${appName}$3`);
   fs.writeFileSync(menuJava, newFileData);
 

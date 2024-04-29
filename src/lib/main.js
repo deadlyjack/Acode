@@ -151,6 +151,7 @@ async function onDeviceReady() {
   })();
   window.acode = new Acode();
 
+  system.requestPermission('android.permission.READ_EXTERNAL_STORAGE');
   system.requestPermission('android.permission.WRITE_EXTERNAL_STORAGE');
 
   const { versionCode } = BuildInfo;

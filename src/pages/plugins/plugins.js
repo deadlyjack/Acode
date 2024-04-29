@@ -87,7 +87,9 @@ export default function PluginsInclude(updates) {
     $page.get('.options').style.display = 'none';
     $page.settitle(strings.update);
     getInstalledPlugins(updates)
-      .then(render);
+      .then(() => {
+        render('installed');
+      });
     return;
   }
 

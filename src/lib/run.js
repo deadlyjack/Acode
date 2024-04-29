@@ -1,6 +1,6 @@
 import Url from 'utils/Url';
 import mimeType from 'mime-types';
-import { marked } from 'marked';
+import markdownIt from 'markdown-it';
 import mustache from 'mustache';
 import $_console from 'views/console.hbs';
 import $_markdown from 'views/markdown.hbs';
@@ -274,7 +274,7 @@ async function run(
 
         case '.md':
           if (file) {
-            const html = marked.parse(file.session.getValue());
+            const html = markdownIt({ html: true }).render(file.session.getValue());
             const doc = mustache.render($_markdown, {
               html,
               filename,

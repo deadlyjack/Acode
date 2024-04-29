@@ -368,5 +368,14 @@ export default {
         setter.call(this, value);
       }
     });
+  },
+  parseHTML(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const children = doc.body.children;
+    if (children.length === 1) {
+      return children[0];
+    }
+    return Array.from(children);
   }
-};;;
+};

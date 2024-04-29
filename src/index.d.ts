@@ -8,6 +8,7 @@ declare const KEYBINDING_FILE: string;
 declare const IS_FREE_VERSION: string;
 declare const ANDROID_SDK_INT: number;
 declare const DOES_SUPPORT_THEME: boolean;
+declare const acode: object;
 
 interface Window {
   ASSETS_DIRECTORY: string;
@@ -18,6 +19,7 @@ interface Window {
   IS_FREE_VERSION: string;
   ANDROID_SDK_INT: number;
   DOES_SUPPORT_THEME: boolean;
+  acode: object;
 }
 
 interface String{

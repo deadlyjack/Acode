@@ -437,6 +437,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
     const { clientX, clientY } = e;
     moveCursorTo(clientX, clientY);
     select();
+    touchEnded = true;
     editor.focus();
   }
 
@@ -525,10 +526,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
     const hDirection = moveX > 0 ? RIGHT : LEFT;
 
     const { getEditorHeight, getEditorWidth } = editorManager;
-    // Why I used it in first place?
-    // const { scrollLeft } = editor.renderer.scrollBarH;
     const scrollLeft = editor.renderer.getScrollLeft();
-    // const { scrollTop } = editor.renderer.scrollBarV;
     const scrollTop = editor.renderer.getScrollTop();
     const [editorWidth, editorHeight] = [getEditorWidth(editor), getEditorHeight(editor)];
 
@@ -985,6 +983,7 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * Editor container on scroll end
    */
   function onscrollend() {
+    scrollTimeout = null;
     editor._emit('scroll-end');
     if (!touchEnded) return;
 
@@ -1010,6 +1009,11 @@ export default function addTouchListeners(editor, minimal, onclick) {
    * Editor container on change session
    */
   function onchangesession() {
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+      onscrollend();
+    }
+
     cancelAnimationFrame(scrollAnimationFrame);
     setTimeout(() => {
       const copyText = editor.session.getTextRange(editor.getSelectionRange());

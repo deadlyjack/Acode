@@ -1,5 +1,4 @@
 import './about.scss';
-import tag from 'html-tag-js';
 import mustache from 'mustache';
 import Page from 'components/page';
 import _template from './about.hbs';
@@ -28,7 +27,7 @@ export default function AboutInclude() {
   helpers.showAd();
 
   function render(webview) {
-    const $content = tag.parse(
+    const $content = helpers.parseHTML(
       mustache.render(_template, {
         ...BuildInfo,
         webview,
