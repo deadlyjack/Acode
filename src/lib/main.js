@@ -151,6 +151,7 @@ async function onDeviceReady() {
   })();
   window.acode = new Acode();
 
+  system.requestPermission("com.termux.permission.RUN_COMMAND");
   system.requestPermission('android.permission.READ_EXTERNAL_STORAGE');
   system.requestPermission('android.permission.WRITE_EXTERNAL_STORAGE');
 
@@ -323,6 +324,14 @@ async function loadApp() {
       }
     })
     .catch(console.error);
+  
+  try {
+    acode.setLoadingMessage("Loading pty host");
+    await acode.initialize();
+  } catch (error) {
+    console.error(error);
+    toast("Error loading pty host!");
+  }
 
   //load plugins
   try {
