@@ -38,6 +38,9 @@
             <application android:hardwareAccelerated="true" />
             <application android:requestLegacyExternalStorage="true" />
             <application android:largeHeap="true" />
+            <application>
+                <service android:name="com.foxdebug.system.PluginResultService" />
+            </application>
         </edit-config>
 
         <config-file parent="./application/activity" target="AndroidManifest.xml">
@@ -68,11 +71,15 @@
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
+            <queries>
+                <package android:name="com.termux" />
+            </queries>
+
             <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
             <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
             <uses-permission android:name="android.permission.VIBRATE" />
-            <!-- <uses-permission android:name="com.termux.permission.RUN_COMMAND" /> -->
+            <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
         </config-file>
 
         <hook type="before_prepare" src="hooks/modify-java-files.js" />

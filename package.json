@@ -21,14 +21,17 @@
       "cordova-clipboard": {},
       "cordova-plugin-buildinfo": {},
       "cordova-plugin-device": {},
-      "cordova-plugin-file": {},
+      "cordova-plugin-file": {
+        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+      },
       "cordova-plugin-sftp": {},
       "cordova-plugin-server": {},
       "cordova-plugin-ftp": {},
       "cordova-plugin-sdcard": {},
       "cordova-plugin-browser": {},
+      "cordova-plugin-iap": {},
       "cordova-plugin-system": {},
-      "cordova-plugin-iap": {}
+      "@parrino/cordova-plugin-local-notifications": {}
     },
     "platforms": [
       "android"
@@ -49,12 +52,14 @@
     "@babel/preset-env": "^7.24.6",
     "@babel/runtime": "^7.24.6",
     "@babel/runtime-corejs3": "^7.24.6",
+    "@parrino/cordova-plugin-local-notifications": "^1.0.2",
     "@types/ace": "^0.0.52",
     "@types/url-parse": "^1.4.11",
     "autoprefixer": "^10.4.19",
     "babel-loader": "^9.1.3",
     "cordova-android": "^13.0.0",
     "cordova-clipboard": "^1.3.0",
+    "cordova-plugin-badge": "^0.8.9",
     "cordova-plugin-browser": "file:src/plugins/browser",
     "cordova-plugin-buildinfo": "^4.0.0",
     "cordova-plugin-device": "^2.0.3",

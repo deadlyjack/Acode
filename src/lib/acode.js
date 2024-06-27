@@ -37,6 +37,8 @@ import formatterSettings from "settings/formatterSettings";
 import settingsPage from 'components/settingsPage';
 import SideButton from 'components/sideButton';
 
+import ptyModule, { setup } from "lib/pty";
+
 import { addedFolder } from 'lib/openFolder';
 import { decode, encode } from 'utils/encodings';
 import { addMode, removeMode } from 'ace/modelist';
@@ -99,6 +101,7 @@ export default class Acode {
     this.define('toast', toast);
     this.define('alert', alert);
     this.define('select', select);
+    this.define("pty", ptyModule);
     this.define('loader', loader);
     this.define('dialogBox', box);
     this.define('prompt', prompt);
@@ -132,6 +135,10 @@ export default class Acode {
     this.define('sidebarApps', sidebarAppsModule);
     this.define('createKeyboardEvent', KeyboardEvent);
     this.define('toInternalUrl', helpers.toInternalUri);
+  }
+
+  initialize() {
+    setup();
   }
 
   /**

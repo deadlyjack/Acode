@@ -103,5 +103,37 @@ module.exports = {
   },
   getGlobalSetting: function (key, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'get-global-setting', [key]);
+  },
+  execute: function ({
+    command, homeDir,
+    background = true,
+    args, sessionAction,
+    extras
+  } = {}) {
+    return new Promise((resolve, reject) => {
+      cordova.exec(resolve, reject, "System", "pty-execute", [
+        command, args || [],
+        homeDir || "/data/data/com.termux/files/home",
+        background,
+        String(sessionAction === undefined ? 3 : sessionAction),
+        extras || {}
+      ]);
+    });
+  },
+  run: function ({
+    command, homeDir,
+    background = true,
+    args, sessionAction,
+    extras
+  } = {}) {
+    return new Promise((resolve, reject) => {
+      cordova.exec(resolve, reject, "System", "pty-run", [
+        command, args || [],
+        homeDir || "/data/data/com.termux/files/home",
+        background,
+        String(sessionAction === undefined ? 3 : sessionAction),
+        extras || {}
+      ]);
+    });
   }
 };
