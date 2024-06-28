@@ -91,7 +91,7 @@ public class Iap extends CordovaPlugin {
                 getPurchases(callbackContext);
                 break;
               case "acknowledgePurchase":
-                aknowledgePurchase(arg1, callbackContext);
+                acknowledgePurchase(arg1, callbackContext);
                 break;
             }
           }
@@ -165,25 +165,29 @@ public class Iap extends CordovaPlugin {
   }
 
   private void startConnection(CallbackContext callbackContext) {
-    if (billingClient == null) {
-      billingClient = getBillingClient();
-    }
-    billingClient.startConnection(
-      new BillingClientStateListener() {
-        public void onBillingSetupFinished(BillingResult billingResult) {
-          int responseCode = billingResult.getResponseCode();
-          if (responseCode == BillingResponseCode.OK) {
-            callbackContext.success(responseCode);
-          } else {
-            callbackContext.error(responseCode);
+    try {
+      if (billingClient == null) {
+        billingClient = getBillingClient();
+      }
+      billingClient.startConnection(
+        new BillingClientStateListener() {
+          public void onBillingSetupFinished(BillingResult billingResult) {
+            int responseCode = billingResult.getResponseCode();
+            if (responseCode == BillingResponseCode.OK) {
+              callbackContext.success(responseCode);
+            } else {
+              callbackContext.error(responseCode);
+            }
+          }
+
+          public void onBillingServiceDisconnected() {
+            callbackContext.error("Billing service disconnected");
           }
         }
-
-        public void onBillingServiceDisconnected() {
-          callbackContext.error("Billing service disconnected");
-        }
-      }
-    );
+      );
+    } catch (SecurityException e) {
+      callbackContext.error(e.getMessage());
+    }
   }
 
   private void getProducts(
@@ -295,7 +299,7 @@ public class Iap extends CordovaPlugin {
     );
   }
 
-  private void aknowledgePurchase(
+  private void acknowledgePurchase(
     String purchaseToken,
     CallbackContext callbackContext
   ) {

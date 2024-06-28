@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.10.2]
+
+- New
+  - [x] **Updated Ace editor** | 947
+    - Updated Ace editor to version 1.33.1.
+
 ## [1.10.1]
 
 - New
