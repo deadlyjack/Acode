@@ -459,4 +459,19 @@ export default {
     }
     return { uri: currentUri, type: tileType };
   },
+  formatDownloadCount(downloadCount) {
+    const units = ["", "K", "M", "B", "T"];
+    let index = 0;
+
+    while (downloadCount >= 1000 && index < units.length - 1) {
+      downloadCount /= 1000;
+      index++;
+    }
+
+    const countStr =
+      downloadCount < 10 ? downloadCount.toFixed(2) : downloadCount.toFixed(1);
+    const trimmedCountStr = countStr.replace(/\.?0+$/, "");
+
+    return `${trimmedCountStr}${units[index]}`;
+  },
 };
