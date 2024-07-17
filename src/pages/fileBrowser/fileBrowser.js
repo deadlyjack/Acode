@@ -1,32 +1,32 @@
-import './fileBrowser.scss';
+import "./fileBrowser.scss";
 
-import mustache from 'mustache';
-import Page from 'components/page';
-import helpers from 'utils/helpers';
-import Contextmenu from 'components/contextmenu';
-import constants from 'lib/constants';
-import filesSettings from 'settings/filesSettings';
-import _template from './fileBrowser.hbs';
-import _list from './list.hbs';
-import _addMenu from './add-menu.hbs';
-import _addMenuHome from './add-menu-home.hbs';
-import externalFs from 'fileSystem/externalFs';
-import fsOperation from 'fileSystem';
-import searchBar from 'components/searchbar';
-import Url from 'utils/Url';
-import util from './util';
-import openFolder from 'lib/openFolder';
-import recents from 'lib/recents';
-import remoteStorage from 'lib/remoteStorage';
-import URLParse from 'url-parse';
-import checkFiles from 'lib/checkFiles';
-import projects from 'lib/projects';
-import appSettings from 'lib/settings';
-import loader from 'dialogs/loader';
-import select from 'dialogs/select';
-import confirm from 'dialogs/confirm';
-import prompt from 'dialogs/prompt';
-import actionStack from 'lib/actionStack';
+import mustache from "mustache";
+import Page from "components/page";
+import helpers from "utils/helpers";
+import Contextmenu from "components/contextmenu";
+import constants from "lib/constants";
+import filesSettings from "settings/filesSettings";
+import _template from "./fileBrowser.hbs";
+import _list from "./list.hbs";
+import _addMenu from "./add-menu.hbs";
+import _addMenuHome from "./add-menu-home.hbs";
+import externalFs from "fileSystem/externalFs";
+import fsOperation from "fileSystem";
+import searchBar from "components/searchbar";
+import Url from "utils/Url";
+import util from "./util";
+import openFolder from "lib/openFolder";
+import recents from "lib/recents";
+import remoteStorage from "lib/remoteStorage";
+import URLParse from "url-parse";
+import checkFiles from "lib/checkFiles";
+import projects from "lib/projects";
+import appSettings from "lib/settings";
+import loader from "dialogs/loader";
+import select from "dialogs/select";
+import confirm from "dialogs/confirm";
+import prompt from "dialogs/prompt";
+import actionStack from "lib/actionStack";
 
 /**
  * @typedef {{url: String, name: String}} Location
@@ -49,32 +49,36 @@ import actionStack from 'lib/actionStack';
  * @returns {Promise<import('.').SelectedFile>}
  */
 function FileBrowserInclude(mode, info, doesOpenLast = true) {
-  mode = mode || 'file';
+  mode = mode || "file";
 
-  const IS_FOLDER_MODE = ['folder', 'both'].includes(mode);
-  const IS_FILE_MODE = ['file', 'both'].includes(mode);
+  const IS_FOLDER_MODE = ["folder", "both"].includes(mode);
+  const IS_FILE_MODE = ["file", "both"].includes(mode);
   const storedState = helpers.parseJSON(localStorage.fileBrowserState) || [];
   /**@type {Array<Location>} */
   const state = [];
   /**@type {Array<Storage>} */
   const allStorages = [];
-  let storageList = JSON.parse(localStorage.storageList || '[]');
+  let storageList = JSON.parse(localStorage.storageList || "[]");
 
   if (!info) {
-    if (mode !== 'both') {
-      info = IS_FOLDER_MODE ? strings['open folder'] : strings['open file'];
+    if (mode !== "both") {
+      info = IS_FOLDER_MODE ? strings["open folder"] : strings["open file"];
     } else {
-      info = strings['file browser'];
+      info = strings["file browser"];
     }
   }
 
   return new Promise((resolve, reject) => {
     //#region Declaration
-    const $menuToggler = <span className="icon more_vert" data-action='toggle-menu'></span>;
-    const $addMenuToggler = <span className="icon add" data-action='toggle-add-menu'></span>;
-    const $search = <span className="icon search" data-action='search'></span>;
-    const $lead = <span className="icon clearclose" data-action='close'></span>;
-    const $page = Page(strings['file browser'].capitalize(), {
+    const $menuToggler = (
+      <span className="icon more_vert" data-action="toggle-menu"></span>
+    );
+    const $addMenuToggler = (
+      <span className="icon add" data-action="toggle-add-menu"></span>
+    );
+    const $search = <span className="icon search" data-action="search"></span>;
+    const $lead = <span className="icon clearclose" data-action="close"></span>;
+    const $page = Page(strings["file browser"].capitalize(), {
       lead: $lead,
     });
     const $content = helpers.parseHTML(
@@ -83,18 +87,18 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         info,
       }),
     );
-    const $navigation = $content.get('.navigation');
+    const $navigation = $content.get(".navigation");
     const menuOption = {
-      top: '8px',
-      right: '8px',
+      top: "8px",
+      right: "8px",
       toggler: $menuToggler,
-      transformOrigin: 'top right',
+      transformOrigin: "top right",
     };
     const $fbMenu = Contextmenu({
       innerHTML: () => {
         return `
         <li action="settings">${strings.settings.capitalize(0)}</li>
-        ${currentDir.url === '/' ? `<li action="refresh">${strings['reset connections'].capitalize(0)}</li>` : ''}
+        ${currentDir.url === "/" ? `<li action="refresh">${strings["reset connections"].capitalize(0)}</li>` : ""}
         <li action="reload">${strings.reload.capitalize(0)}</li>
         `;
       },
@@ -102,7 +106,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
     });
     const $addMenu = Contextmenu({
       innerHTML: () => {
-        if (currentDir.url === '/') {
+        if (currentDir.url === "/") {
           return mustache.render(_addMenuHome, {
             ...strings,
           });
@@ -128,18 +132,17 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
     actionStack.setMark();
     $lead.onclick = close;
-    $content.addEventListener('click', handleClick);
-    $content.addEventListener('contextmenu', handleContextMenu, true);
+    $content.addEventListener("click", handleClick);
+    $content.addEventListener("contextmenu", handleContextMenu, true);
     $page.body = $content;
     $page.header.append($search, $addMenuToggler, $menuToggler);
 
-
     if (IS_FOLDER_MODE) {
-      $openFolder = tag('button', {
-        className: 'floating icon check',
+      $openFolder = tag("button", {
+        className: "floating icon check",
         style: {
-          bottom: '10px',
-          top: 'auto',
+          bottom: "10px",
+          top: "auto",
         },
         disabled: true,
         onclick() {
@@ -150,7 +153,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           }
 
           resolve({
-            type: 'folder',
+            type: "folder",
             ...currentDir,
           });
         },
@@ -163,38 +166,38 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
     helpers.showAd();
 
     actionStack.push({
-      id: 'filebrowser',
+      id: "filebrowser",
       action: close,
     });
 
     $fbMenu.onclick = function (e) {
       $fbMenu.hide();
-      const action = e.target.getAttribute('action');
-      if (action === 'settings') {
+      const action = e.target.getAttribute("action");
+      if (action === "settings") {
         filesSettings().show();
         const onshow = () => {
-          $page.off('show', onshow);
+          $page.off("show", onshow);
           reload();
         };
-        $page.on('show', onshow);
+        $page.on("show", onshow);
         return;
       }
 
-      if (action === 'reload') {
+      if (action === "reload") {
         const { url } = currentDir;
         if (url in cachedDir) delete cachedDir[url];
         reload();
         return;
       }
 
-      if (action === 'refresh') {
+      if (action === "refresh") {
         ftp.disconnect(
-          () => { },
-          () => { },
+          () => {},
+          () => {},
         );
         sftp.close(
-          () => { },
-          () => { },
+          () => {},
+          () => {},
         );
         toast(strings.success);
         return;
@@ -204,17 +207,17 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
     $addMenu.onclick = async (e) => {
       $addMenu.hide();
       const $target = e.target;
-      const action = $target.getAttribute('action');
-      const value = $target.getAttribute('value');
+      const action = $target.getAttribute("action");
+      const value = $target.getAttribute("value");
       if (!action) return;
 
       switch (action) {
-        case 'create': {
+        case "create": {
           try {
             const newUrl = await create(value);
             if (!newUrl) break;
 
-            const type = value === 'file' ? 'file' : 'folder';
+            const type = value === "file" ? "file" : "folder";
             openFolder.add(newUrl, type);
             reload();
           } catch (error) {
@@ -224,12 +227,12 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           break;
         }
 
-        case 'add-path':
+        case "add-path":
           addStorage();
           break;
 
-        case 'addFtp':
-        case 'addSftp': {
+        case "addFtp":
+        case "addSftp": {
           const storage = await remoteStorage[action]();
           updateStorage(storage);
           break;
@@ -241,28 +244,28 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
     };
 
     $search.onclick = function () {
-      const $list = $content.get('#list');
+      const $list = $content.get("#list");
       if ($list) searchBar($list);
     };
 
     $page.onhide = function () {
       helpers.hideAd();
       actionStack.clearFromMark();
-      actionStack.remove('filebrowser');
-      $content.removeEventListener('click', handleClick);
-      $content.removeEventListener('contextmenu', handleContextMenu);
-      document.removeEventListener('resume', reload);
+      actionStack.remove("filebrowser");
+      $content.removeEventListener("click", handleClick);
+      $content.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("resume", reload);
     };
 
     if (doesOpenLast && storedState.length) {
       loadStates(storedState);
       return;
     }
-    navigate('/', '/');
+    navigate("/", "/");
 
     function close() {
-      const err = new Error('User cancelled');
-      Object.defineProperty(err, 'code', {
+      const err = new Error("User cancelled");
+      Object.defineProperty(err, "code", {
         value: 0,
       });
       reject(err);
@@ -279,28 +282,28 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
        * @type {HTMLElement}
        */
       const $el = e.target;
-      let action = $el.getAttribute('action') || $el.dataset.action;
+      let action = $el.getAttribute("action") || $el.dataset.action;
       if (!action) return;
 
       let url = $el.dataset.url;
-      let name = $el.dataset.name || $el.getAttribute('name');
-      const idOpenDoc = $el.hasAttribute('open-doc');
-      const uuid = $el.getAttribute('uuid');
-      const type = $el.getAttribute('type');
-      const storageType = $el.getAttribute('storageType');
-      const home = $el.getAttribute('home');
-      const isDir = ['dir', 'directory', 'folder'].includes(type);
+      let name = $el.dataset.name || $el.getAttribute("name");
+      const idOpenDoc = $el.hasAttribute("open-doc");
+      const uuid = $el.getAttribute("uuid");
+      const type = $el.getAttribute("type");
+      const storageType = $el.getAttribute("storageType");
+      const home = $el.getAttribute("home");
+      const isDir = ["dir", "directory", "folder"].includes(type);
 
       if (!url) {
-        const $url = $el.get('data-url');
+        const $url = $el.get("data-url");
         if ($url) {
           url = $url.textContent;
         }
       }
 
-      if (storageType === 'notification') {
+      if (storageType === "notification") {
         switch (uuid) {
-          case 'addstorage':
+          case "addstorage":
             addStorage();
             break;
 
@@ -310,7 +313,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         return;
       }
 
-      if (!url && action === 'open' && isDir && !idOpenDoc && !isContextMenu) {
+      if (!url && action === "open" && isDir && !idOpenDoc && !isContextMenu) {
         loader.hide();
         util.addPath(name, uuid).then((res) => {
           const storage = allStorages.find((storage) => storage.uuid === uuid);
@@ -324,21 +327,21 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         return;
       }
 
-      if (isContextMenu) action = 'contextmenu';
-      else if (idOpenDoc) action = 'open-doc';
+      if (isContextMenu) action = "contextmenu";
+      else if (idOpenDoc) action = "open-doc";
 
       switch (action) {
-        case 'navigation':
+        case "navigation":
           folder();
           break;
-        case 'contextmenu':
+        case "contextmenu":
           contextMenuHandler();
           break;
-        case 'open':
+        case "open":
           if (isDir) folder();
-          else if (!$el.hasAttribute('disabled')) file();
+          else if (!$el.hasAttribute("disabled")) file();
           break;
-        case 'open-doc':
+        case "open-doc":
           openDoc();
           break;
       }
@@ -353,14 +356,14 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
       function navigateToHome() {
         const navigationArray = [];
-        const dirs = home.split('/');
+        const dirs = home.split("/");
         const { url: parsedUrl, query } = Url.parse(url);
-        let path = '';
+        let path = "";
 
         for (let dir of dirs) {
           path = Url.join(path, dir);
           navigationArray.push({
-            url: `${Url.join(parsedUrl, path, '')}${query}`,
+            url: `${Url.join(parsedUrl, path, "")}${query}`,
             name: dir || name,
           });
         }
@@ -371,7 +374,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       function file() {
         $page.hide();
         resolve({
-          type: 'file',
+          type: "file",
           url,
           name,
         });
@@ -381,30 +384,31 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         if (appSettings.value.vibrateOnTap) {
           navigator.vibrate(constants.VIBRATION_TIME);
         }
-        if ($el.getAttribute('open-doc') === 'true') return;
+        if ($el.getAttribute("open-doc") === "true") return;
 
-        const deleteText = currentDir.url === '/' ? strings.remove : strings.delete;
+        const deleteText =
+          currentDir.url === "/" ? strings.remove : strings.delete;
         const options = [
-          ['delete', deleteText, 'delete'],
-          ['rename', strings.rename, 'text_format'],
+          ["delete", deleteText, "delete"],
+          ["rename", strings.rename, "text_format"],
         ];
 
         if (/s?ftp/.test(storageType)) {
-          options.push(['edit', strings.edit, 'edit']);
+          options.push(["edit", strings.edit, "edit"]);
         }
 
         if (helpers.isFile(type)) {
-          options.push(['info', strings.info, 'info']);
+          options.push(["info", strings.info, "info"]);
         }
 
-        const option = await select(strings['select'], options);
+        const option = await select(strings["select"], options);
         switch (option) {
-          case 'delete': {
+          case "delete": {
             let deleteFunction = removeFile;
-            let message = strings['delete entry'].replace('{name}', name);
+            let message = strings["delete entry"].replace("{name}", name);
             if (uuid) {
               deleteFunction = removeStorage;
-              message = strings['remove entry'].replace('{name}', name);
+              message = strings["remove entry"].replace("{name}", name);
             }
 
             const confirmation = await confirm(strings.warning, message);
@@ -413,8 +417,8 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
             break;
           }
 
-          case 'rename': {
-            let newname = await prompt(strings.rename, name, 'text', {
+          case "rename": {
+            let newname = await prompt(strings.rename, name, "text", {
               match: constants.FILE_NAME_REGEX,
             });
 
@@ -426,16 +430,18 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
             break;
           }
 
-          case 'edit': {
-            const storage = await remoteStorage.edit(storageList.find((storage) => storage.uuid === uuid));
+          case "edit": {
+            const storage = await remoteStorage.edit(
+              storageList.find((storage) => storage.uuid === uuid),
+            );
             if (!storage) break;
             storage.uuid = uuid;
             updateStorage(storage);
             break;
           }
 
-          case 'info':
-            acode.exec('file-info', url);
+          case "info":
+            acode.exec("file-info", url);
             break;
         }
       }
@@ -446,7 +452,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           const newUrl = await fs.renameTo(newname);
           recents.removeFile(url);
           recents.addFile(newUrl);
-          const file = editorManager.getFile(url, 'uri');
+          const file = editorManager.getFile(url, "uri");
           if (file) {
             file.uri = newUrl;
             file.filename = newname;
@@ -470,7 +476,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
             helpers.updateUriOfAllActiveFiles(url);
             recents.removeFolder(url);
           } else {
-            const openedFile = editorManager.getFile(url, 'uri');
+            const openedFile = editorManager.getFile(url, "uri");
             if (openedFile) openedFile.uri = null;
           }
           toast(strings.success);
@@ -494,7 +500,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           if (storage.url) {
             const parsedUrl = URLParse(storage.url, true);
             const keyFile = decodeURIComponent(
-              parsedUrl.query['keyFile'] || '',
+              parsedUrl.query["keyFile"] || "",
             );
             if (keyFile) {
               fsOperation(keyFile).delete();
@@ -521,10 +527,10 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           (res) => {
             res.url = res.uri;
             resolve({
-              type: 'file',
+              type: "file",
               ...res,
               name: res.filename,
-              mode: 'single',
+              mode: "single",
             });
             $page.hide();
           },
@@ -545,12 +551,12 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
       if (ANDROID_SDK_INT == 29) {
         const rootDirName = cordova.file.externalRootDirectory;
-        const testDirName = 'Acode_Test_file' + helpers.uuid();
+        const testDirName = "Acode_Test_file" + helpers.uuid();
         const testDirFs = fsOperation(Url.join(rootDirName, testDirName));
 
         try {
           await fsOperation(rootDirName).createDirectory(testDirName);
-          await testDirFs.createFile('test' + helpers.uuid());
+          await testDirFs.createFile("test" + helpers.uuid());
 
           hasInternalStorage = !!(await testDirFs.lsDir()).length;
         } catch (error) {
@@ -565,10 +571,10 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       if (hasInternalStorage) {
         util.pushFolder(
           allStorages,
-          'Internal storage',
+          "Internal storage",
           cordova.file.externalRootDirectory,
           {
-            uuid: 'internal-storage',
+            uuid: "internal-storage",
           },
         );
       }
@@ -579,17 +585,17 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           if (storageList.find((s) => s.uuid === storage.uuid)) return;
           let path;
           if (storage.path && isStorageManager) {
-            path = 'file://' + storage.path;
+            path = "file://" + storage.path;
           }
-          util.pushFolder(allStorages, storage.name, path || '', {
+          util.pushFolder(allStorages, storage.name, path || "", {
             ...storage,
-            storageType: 'sd',
+            storageType: "sd",
           });
         });
-      } catch (err) { }
+      } catch (err) {}
 
       storageList.forEach((storage) => {
-        let url = storage.url || /**@deprecated */ storage['uri'];
+        let url = storage.url || /**@deprecated */ storage["uri"];
 
         util.pushFolder(allStorages, storage.name, url, {
           storageType: storage.storageType,
@@ -599,15 +605,15 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       });
 
       if (!allStorages.length) {
-        util.pushFolder(allStorages, strings['add a storage'], '', {
-          storageType: 'notification',
-          uuid: 'addstorage',
+        util.pushFolder(allStorages, strings["add a storage"], "", {
+          storageType: "notification",
+          uuid: "addstorage",
         });
       }
 
       if (IS_FILE_MODE) {
-        util.pushFolder(allStorages, 'Select document', null, {
-          'open-doc': true,
+        util.pushFolder(allStorages, "Select document", null, {
+          "open-doc": true,
         });
       }
 
@@ -628,18 +634,18 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       if (url in cachedDir) {
         return cachedDir[url];
       } else {
-        if (url === '/') {
+        if (url === "/") {
           list = await listAllStorages();
         } else {
           const id = helpers.uuid();
 
           progress[id] = true;
           const timeout = setTimeout(() => {
-            loader.create(name, strings.loading + '...', {
+            loader.create(name, strings.loading + "...", {
               timeout: 10000,
               callback() {
                 loader.destroy();
-                navigate('/', '/');
+                navigate("/", "/");
                 progress[id] = false;
               },
             });
@@ -686,7 +692,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         throw new Error('navigate(url, name): "name" is required.');
       }
 
-      if (url === '/') {
+      if (url === "/") {
         if (IS_FOLDER_MODE) $openFolder.disabled = true;
       } else {
         if (IS_FOLDER_MODE) $openFolder.disabled = false;
@@ -739,20 +745,20 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       const { url } = currentDir;
       const alreadyCreated = [];
       const options = [];
-      let ctUrl = '';
+      let ctUrl = "";
       let projectLocation = null;
-      let projectFiles = '';
-      let projectName = '';
-      let project = '';
+      let projectFiles = "";
+      let projectName = "";
+      let project = "";
       let newUrl;
 
-      if (arg === 'file' || arg === 'folder') {
-        let title = strings['enter folder name'];
-        if (arg === 'file') {
-          title = strings['enter file name'];
+      if (arg === "file" || arg === "folder") {
+        let title = strings["enter folder name"];
+        if (arg === "file") {
+          title = strings["enter file name"];
         }
 
-        let entryName = await prompt(title, '', 'filename', {
+        let entryName = await prompt(title, "", "filename", {
           match: constants.FILE_NAME_REGEX,
           required: true,
         });
@@ -760,43 +766,37 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
         if (!entryName) return;
         entryName = helpers.fixFilename(entryName);
 
-        const fs = fsOperation(url);
-        if (arg === 'folder') {
-          newUrl = await fs.createDirectory(entryName);
+        if (arg === "folder") {
+          newUrl = await helpers.createFileStructure(url, entryName, false);
         }
-        if (arg === 'file') {
-          newUrl = await fs.createFile(entryName);
+        if (arg === "file") {
+          newUrl = await helpers.createFileStructure(url, entryName);
         }
-        return newUrl;
+        return newUrl.uri;
       }
 
-      if (arg === 'project') {
+      if (arg === "project") {
         projects.list().map((project) => {
           const { name, icon } = project;
           options.push([name, name, icon]);
         });
 
-        project = await select(strings['new project'], options);
-        loader.create(project, strings.loading + '...');
+        project = await select(strings["new project"], options);
+        loader.create(project, strings.loading + "...");
         projectFiles = await projects.get(project).files();
         loader.destroy();
-        projectName = await prompt(
-          strings['project name'],
-          project,
-          'text',
-          {
-            required: true,
-            match: constants.FILE_NAME_REGEX,
-          },
-        );
+        projectName = await prompt(strings["project name"], project, "text", {
+          required: true,
+          match: constants.FILE_NAME_REGEX,
+        });
 
         if (!projectName) return;
-        loader.create(projectName, strings.loading + '...');
+        loader.create(projectName, strings.loading + "...");
         const fs = fsOperation(url);
         const files = Object.keys(projectFiles); // All project files
 
         newUrl = await fs.createDirectory(projectName);
-        projectLocation = Url.join(url, projectName, '/');
+        projectLocation = Url.join(url, projectName, "/");
         await createProject(files); // Creating project
         loader.destroy();
         return newUrl;
@@ -808,14 +808,14 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           reload();
           return;
         }
-        ctUrl = '';
+        ctUrl = "";
         const file = files.pop();
         await createFile(file);
         return await createProject(files);
       }
 
       function createFile(fileUrl) {
-        const paths = fileUrl.split('/');
+        const paths = fileUrl.split("/");
         const filename = paths.pop();
         return createDir(projectFiles, fileUrl, filename, paths);
       }
@@ -836,7 +836,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
           await fs.createDirectory(name);
           alreadyCreated.push(toCreate);
         }
-        ctUrl += name + '/';
+        ctUrl += name + "/";
         return await createDir(project, fileUrl, filename, paths);
       }
     }
@@ -851,13 +851,13 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       $navigation.append(
         <span
           id={getNavId(url)}
-          className='nav'
+          className="nav"
           data-url={url}
           data-name={name}
-          attr-action='navigation'
+          attr-action="navigation"
           attr-text={name}
           tabIndex={-1}
-        ></span>
+        ></span>,
       );
       $navigation.scrollLeft = $navigation.scrollWidth;
 
@@ -923,7 +923,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       }
 
       if (!storage.type) {
-        storage.type = 'dir';
+        storage.type = "dir";
       }
 
       if (!storage.storageType) {
@@ -939,12 +939,12 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
       const { list, scroll } = dir;
       const $list = helpers.parseHTML(
         mustache.render(_list, {
-          msg: strings['empty folder message'],
+          msg: strings["empty folder message"],
           list,
         }),
       );
 
-      const $oldList = $content.get('#list');
+      const $oldList = $content.get("#list");
       if ($oldList) {
         const { url } = currentDir;
         if (url && cachedDir[url]) {
