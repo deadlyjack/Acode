@@ -71,8 +71,8 @@ function openFolder(_path, opts = {}) {
 
   const $root = collapsableList(title, "folder", {
     tail: <Tail target={() => $root.$title} />,
-    allCaps: true,
-    ontoggle: () => expandList($root),
+                                allCaps: true,
+                                ontoggle: () => expandList($root),
   });
   const $text = $root.$title.get(":scope>span.text");
 
@@ -85,10 +85,10 @@ function openFolder(_path, opts = {}) {
   $root.$title.dataset.name = title;
 
   $root.$ul.onclick =
-    $root.$ul.oncontextmenu =
-    $root.$title.onclick =
-    $root.$title.oncontextmenu =
-      handleItems;
+  $root.$ul.oncontextmenu =
+  $root.$title.onclick =
+  $root.$title.oncontextmenu =
+  handleItems;
 
   recents.addFolder(_path, opts);
   sidebarApps.get("files").append($root);
@@ -182,24 +182,24 @@ async function expandList($list) {
     startLoading();
     const entries = await fsOperation(url).lsDir();
     helpers
-      .sortDir(entries, {
-        sortByName: true,
-        showHiddenFiles: true,
-      })
-      .map((entry) => {
-        const name = entry.name || Path.basename(entry.url);
-        if (entry.isDirectory) {
-          const $list = createFolderTile(name, entry.url);
-          $ul.appendChild($list);
+    .sortDir(entries, {
+      sortByName: true,
+      showHiddenFiles: true,
+    })
+    .map((entry) => {
+      const name = entry.name || Path.basename(entry.url);
+      if (entry.isDirectory) {
+        const $list = createFolderTile(name, entry.url);
+        $ul.appendChild($list);
 
-          if (listState[entry.url]) {
-            $list.expand();
-          }
-        } else {
-          const $item = createFileTile(name, entry.url);
-          $ul.append($item);
+        if (listState[entry.url]) {
+          $list.expand();
         }
-      });
+      } else {
+        const $item = createFileTile(name, entry.url);
+        $ul.append($item);
+      }
+    });
   } catch (err) {
     $list.collapse();
     helpers.error(err);
@@ -388,7 +388,7 @@ function execOperation(type, action, url, $target, name) {
     $target.dataset.name = newName;
     if (helpers.isFile(type)) {
       $target.querySelector(":scope>span").className =
-        helpers.getIconForFile(newName);
+      helpers.getIconForFile(newName);
       let file = editorManager.getFile(url, "uri");
       if (file) {
         file.uri = newUrl;
@@ -406,9 +406,9 @@ function execOperation(type, action, url, $target, name) {
 
   async function createNew() {
     const msg =
-      action === "new file"
-        ? strings["enter file name"]
-        : strings["enter folder name"];
+    action === "new file"
+    ? strings["enter file name"]
+    : strings["enter folder name"];
 
     let newName = await prompt(msg, "", "text", {
       match: constants.FILE_NAME_REGEX,
@@ -425,11 +425,12 @@ function execOperation(type, action, url, $target, name) {
     } else {
       newUrl = await helpers.createFileStructure(url, newName, false);
     }
+    if (!newUrl) return;
     newName = Url.basename(newUrl.uri);
     if ($target.unclasped) {
       if (newUrl.type == "file") {
         appendTile($target, createFileTile(newName, newUrl.uri));
-      } else {
+      } else if (newUrl.type == "folder") {
         appendList($target, createFolderTile(newName, newUrl.uri));
       }
     }
@@ -635,7 +636,7 @@ function appendList($target, $list) {
 function createFolderTile(name, url) {
   const $list = collapsableList(name, "folder", {
     tail: <Tail target={() => $list.$title} />,
-    ontoggle: () => expandList($list),
+                                ontoggle: () => expandList($list),
   });
   const { $title } = $list;
   $title.dataset.url = url;
@@ -654,8 +655,8 @@ function createFolderTile(name, url) {
 function createFileTile(name, url) {
   const $tile = tile({
     lead: <span className={helpers.getIconForFile(name)}></span>,
-    text: name,
-    tail: <Tail target={() => $tile} />,
+                     text: name,
+                     tail: <Tail target={() => $tile} />,
   });
   $tile.dataset.url = url;
   $tile.dataset.name = name;
@@ -673,16 +674,16 @@ function createFileTile(name, url) {
 function Tail({ target }) {
   return (
     <span
-      className="icon more_vert"
-      attr-action="close"
-      onclick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        handleItems({
-          target: target(),
-          type: "contextmenu",
-        });
-      }}
+    className="icon more_vert"
+    attr-action="close"
+    onclick={(e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      handleItems({
+        target: target(),
+                  type: "contextmenu",
+      });
+    }}
     ></span>
   );
 }
@@ -725,7 +726,7 @@ openFolder.renameItem = (oldFile, newFile, newFilename) => {
       }, 0);
     } else {
       $el.querySelector(":scope>span").className =
-        helpers.getIconForFile(newFilename);
+      helpers.getIconForFile(newFilename);
     }
 
     $el.dataset.url = newFile;
