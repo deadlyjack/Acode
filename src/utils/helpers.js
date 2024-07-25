@@ -1,11 +1,12 @@
-import ajax from '@deadlyjack/ajax';
-import escapeStringRegexp from 'escape-string-regexp';
+import ajax from "@deadlyjack/ajax";
+import escapeStringRegexp from "escape-string-regexp";
+import fsOperation from "fileSystem";
 
-import Url from './Url';
-import Uri from './Uri';
-import path from './Path';
-import alert from 'dialogs/alert';
-import constants from 'lib/constants';
+import Url from "./Url";
+import Uri from "./Uri";
+import path from "./Path";
+import alert from "dialogs/alert";
+import constants from "lib/constants";
 
 /**
  * Gets programming language name according to filename
@@ -34,12 +35,17 @@ function getFileType(filename) {
     image: /\.(png|jpg|jpeg|gif|bmp|ico|webp)$/i,
     npm: /(^package\.json$)|(^package\-lock\.json$)/i,
     compressed: /\.(zip|rar|7z|tar|gz|gzip|dmg|iso)$/i,
-    eslint: /(^\.eslintrc(\.(json5?|ya?ml|toml))?$|eslint\.config\.(c?js|json)$)/i,
-    postcssconfig: /(^\.postcssrc(\.(json5?|ya?ml|toml))?$|postcss\.config\.(c?js|json)$)/i,
-    prettier: /(^\.prettierrc(\.(json5?|ya?ml|toml))?$|prettier\.config\.(c?js|json)$)/i,
+    eslint:
+    /(^\.eslintrc(\.(json5?|ya?ml|toml))?$|eslint\.config\.(c?js|json)$)/i,
+    postcssconfig:
+    /(^\.postcssrc(\.(json5?|ya?ml|toml))?$|postcss\.config\.(c?js|json)$)/i,
+    prettier:
+    /(^\.prettierrc(\.(json5?|ya?ml|toml))?$|prettier\.config\.(c?js|json)$)/i,
   };
 
-  const fileType = Object.keys(regex).find((type) => regex[type].test(filename));
+  const fileType = Object.keys(regex).find((type) =>
+  regex[type].test(filename),
+  );
   if (fileType) return fileType;
 
   return Url.extname(filename).substring(1);
@@ -52,10 +58,9 @@ export default {
    * @param {ArrayBuffer} arrayBuffer
    * @param {String} [encoding='utf-8']
    */
-  decodeText(arrayBuffer, encoding = 'utf-8') {
-
-    const isJson = encoding === 'json';
-    if (isJson) encoding = 'utf-8';
+  decodeText(arrayBuffer, encoding = "utf-8") {
+    const isJson = encoding === "json";
+    if (isJson) encoding = "utf-8";
 
     const uint8Array = new Uint8Array(arrayBuffer);
     const result = new TextDecoder(encoding).decode(uint8Array);
@@ -69,7 +74,7 @@ export default {
    * @param {string} filename
    */
   getIconForFile(filename) {
-    const { getModeForPath } = ace.require('ace/ext/modelist');
+    const { getModeForPath } = ace.require("ace/ext/modelist");
     const type = getFileType(filename);
     const { name } = getModeForPath(filename);
 
@@ -84,7 +89,7 @@ export default {
    * @param {object} fileBrowser settings
    * @param {'both'|'file'|'folder'}
    */
-  sortDir(list, fileBrowser, mode = 'both') {
+  sortDir(list, fileBrowser, mode = "both") {
     const dir = [];
     const file = [];
     const sortByName = fileBrowser.sortByName;
@@ -93,13 +98,13 @@ export default {
     list.forEach((item) => {
       let hidden;
 
-      item.name = item.name || path.basename(item.url || '');
-      hidden = item.name[0] === '.';
+      item.name = item.name || path.basename(item.url || "");
+      hidden = item.name[0] === ".";
 
-      if (typeof item.isDirectory !== 'boolean') {
+      if (typeof item.isDirectory !== "boolean") {
         if (this.isDir(item.type)) item.isDirectory = true;
       }
-      if (!item.type) item.type = item.isDirectory ? 'dir' : 'file';
+      if (!item.type) item.type = item.isDirectory ? "dir" : "file";
       if (!item.url) item.url = item.url || item.uri;
       if ((hidden && showHiddenFile) || !hidden) {
         if (item.isDirectory) {
@@ -109,9 +114,9 @@ export default {
         }
       }
       if (item.isDirectory) {
-        item.icon = 'folder';
+        item.icon = "folder";
       } else {
-        if (mode === 'folder') {
+        if (mode === "folder") {
           item.disabled = true;
         }
         item.icon = this.getIconForFile(item.name);
@@ -141,18 +146,18 @@ export default {
       }
     });
 
-    const extra = args.join('<br>');
+    const extra = args.join("<br>");
     let msg;
 
-    if (typeof err === 'string' && err) {
+    if (typeof err === "string" && err) {
       msg = err;
     } else if (err instanceof Error) {
       msg = err.message;
     } else {
-      msg = strings['an error occurred'];
+      msg = strings["an error occurred"];
     }
 
-    return msg + (extra ? '<br>' + extra : '');
+    return msg + (extra ? "<br>" + extra : "");
   },
   /**
    *
@@ -170,17 +175,17 @@ export default {
     const onhide = () => {
       if (hide) hide();
     };
-    const promise = {
-      then(fun) {
-        if (typeof fun === 'function') {
-          hide = fun;
-        }
-      },
-    };
+      const promise = {
+        then(fun) {
+          if (typeof fun === "function") {
+            hide = fun;
+          }
+        },
+      };
 
-    const msg = this.errorMessage(err, ...args);
-    alert(strings.error, msg, onhide);
-    return promise;
+      const msg = this.errorMessage(err, ...args);
+      alert(strings.error, msg, onhide);
+      return promise;
   },
   /**
    * Returns unique ID
@@ -235,17 +240,17 @@ export default {
     }
 
     /**@type {string[]} */
-    const storageList = JSON.parse(localStorage.storageList || '[]');
+    const storageList = JSON.parse(localStorage.storageList || "[]");
     const storageListLen = storageList.length;
 
     for (let i = 0; i < storageListLen; ++i) {
       const uuid = storageList[i];
-      let storageUrl = Url.parse(uuid.uri || uuid.url || '').url;
+      let storageUrl = Url.parse(uuid.uri || uuid.url || "").url;
       if (!storageUrl) continue;
-      if (storageUrl.endsWith('/')) {
+      if (storageUrl.endsWith("/")) {
         storageUrl = storageUrl.slice(0, -1);
       }
-      const regex = new RegExp('^' + escapeStringRegexp(storageUrl));
+      const regex = new RegExp("^" + escapeStringRegexp(storageUrl));
       if (regex.test(url)) {
         url = url.replace(regex, uuid.name);
         break;
@@ -267,7 +272,7 @@ export default {
     for (let file of files) {
       if (!file.uri) continue;
       const fileUrl = Url.parse(file.uri).url;
-      if (new RegExp('^' + escapeStringRegexp(url)).test(fileUrl)) {
+      if (new RegExp("^" + escapeStringRegexp(url)).test(fileUrl)) {
         if (newUrl) {
           file.uri = Url.join(newUrl, file.filename);
         } else {
@@ -276,19 +281,16 @@ export default {
       }
     }
 
-    editorManager.onupdate('file-delete');
-    editorManager.emit('update', 'file-delete');
+    editorManager.onupdate("file-delete");
+    editorManager.emit("update", "file-delete");
   },
   /**
    * Displays ad on the current page
    */
   showAd() {
     const { ad } = window;
-    if (
-      IS_FREE_VERSION
-      && (innerHeight * devicePixelRatio) > 600 && ad
-    ) {
-      const $page = tag.getAll('wc-page:not(#root)').pop();
+    if (IS_FREE_VERSION && innerHeight * devicePixelRatio > 600 && ad) {
+      const $page = tag.getAll("wc-page:not(#root)").pop();
       if ($page) {
         ad.active = true;
         ad.show();
@@ -302,7 +304,7 @@ export default {
   hideAd(force = false) {
     const { ad } = window;
     if (IS_FREE_VERSION && ad?.active) {
-      const $pages = tag.getAll('.page-replacement');
+      const $pages = tag.getAll(".page-replacement");
       const hide = $pages.length === 1;
 
       if (force || hide) {
@@ -313,9 +315,13 @@ export default {
   },
   async toInternalUri(uri) {
     return new Promise((resolve, reject) => {
-      window.resolveLocalFileSystemURL(uri, (entry) => {
-        resolve(entry.toInternalURL());
-      }, reject);
+      window.resolveLocalFileSystemURL(
+        uri,
+        (entry) => {
+          resolve(entry.toInternalURL());
+        },
+        reject,
+      );
     });
   },
   promisify(func, ...args) {
@@ -325,19 +331,19 @@ export default {
   },
   async checkAPIStatus() {
     try {
-      const { status } = await ajax.get(Url.join(constants.API_BASE, 'status'));
-      return status === 'ok';
+      const { status } = await ajax.get(Url.join(constants.API_BASE, "status"));
+      return status === "ok";
     } catch (error) {
       return false;
     }
   },
   fixFilename(name) {
     if (!name) return name;
-    return name.replace(/(\r\n)+|\r+|\n+|\t+/g, '').trim();
+    return name.replace(/(\r\n)+|\r+|\n+|\t+/g, "").trim();
   },
   /**
-   * Creates a debounced function that delays invoking the input function until after 'wait' milliseconds have elapsed 
-   * since the last time the debounced function was invoked. Useful for implementing behavior that should only happen 
+   * Creates a debounced function that delays invoking the input function until after 'wait' milliseconds have elapsed
+   * since the last time the debounced function was invoked. Useful for implementing behavior that should only happen
    * after the input is complete.
    *
    * @param {Function} func - The function to debounce.
@@ -366,16 +372,110 @@ export default {
       set: function (value) {
         console.warn(`Property '${name}' is deprecated.`);
         setter.call(this, value);
-      }
+      },
     });
   },
   parseHTML(html) {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
+    const doc = parser.parseFromString(html, "text/html");
     const children = doc.body.children;
     if (children.length === 1) {
       return children[0];
     }
     return Array.from(children);
-  }
-};
+  },
+  async createFileStructure(uri, pathString, isFile = true) {
+    const parts = pathString.split("/").filter(Boolean);
+    let currentUri = uri;
+
+    // Determine if it's a special case URI
+    const isSpecialCase = currentUri.includes("::");
+    let baseFolder;
+
+    if (currentUri.includes("com.android.externalstorage.documents")) {
+      baseFolder = decodeURIComponent(currentUri.split("%3A")[1].split("/")[0]);
+    } else if (
+      !(
+        currentUri.includes("com.android.externalstorage.documents") ||
+        currentUri.includes("com.termux.documents")
+      )
+    ) {
+      if (isFile) {
+        await fsOperation(uri).createFile(pathString);
+      } else {
+        await fsOperation(uri).createDirectory(pathString);
+      }
+      return { uri: uri, type: isFile ? "file" : "folder" };
+    }
+
+    for (let i = 0; i < parts.length; i++) {
+      const isLastElement = i === parts.length - 1;
+      const name = parts[i];
+      let fullUri = currentUri;
+
+      // Adjust URI for special cases
+      if (currentUri.includes("com.android.externalstorage.documents")) {
+        if (!isSpecialCase && i === 0) {
+          fullUri += `::primary:${baseFolder}/${name}`;
+        } else {
+          fullUri += `/${name}`;
+        }
+      } else if (currentUri.includes("com.termux.documents")) {
+        if (!isSpecialCase && i === 0) {
+          fullUri += `::/data/data/com.termux/files/home/${name}`;
+        } else {
+          fullUri += `/${name}`;
+        }
+      }
+
+      if (isLastElement && isFile) {
+        // Create file if it's the last element and isFile is true
+        if (!(await fsOperation(fullUri).exists())) {
+          await fsOperation(currentUri).createFile(name);
+        } else {
+          return;
+        }
+      } else {
+        // Create directory
+        if (!(await fsOperation(fullUri).exists())) {
+          await fsOperation(currentUri).createDirectory(name);
+        } else {
+          return;
+        }
+      }
+      currentUri = fullUri;
+    }
+    let tileType;
+    if (isFile && parts.length === 1) {
+      tileType = "file";
+    } else {
+      const urlParts = currentUri.split("/");
+      const pathParts = pathString.split("/");
+      const pathStartIndex = urlParts.findIndex(
+        (part) => part === pathParts[0],
+      );
+      if (pathStartIndex !== -1) {
+        const pathEndIndex = pathStartIndex + pathParts.length;
+        urlParts.splice(pathStartIndex + 1, pathEndIndex - pathStartIndex - 1);
+      }
+      currentUri = urlParts.join("/");
+      tileType = "folder";
+    }
+    return { uri: currentUri, type: tileType };
+  },
+  formatDownloadCount(downloadCount) {
+    const units = ["", "K", "M", "B", "T"];
+    let index = 0;
+
+    while (downloadCount >= 1000 && index < units.length - 1) {
+      downloadCount /= 1000;
+      index++;
+    }
+
+    const countStr =
+    downloadCount < 10 ? downloadCount.toFixed(2) : downloadCount.toFixed(1);
+    const trimmedCountStr = countStr.replace(/\.?0+$/, "");
+
+    return `${trimmedCountStr}${units[index]}`;
+  },
+   };

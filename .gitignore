@@ -9,3 +9,4 @@
 /platforms/android/release-signing.properties
 **/*/.DS_Store
 .DS_Store
+pnpm-lock.yaml
