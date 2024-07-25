@@ -70,6 +70,10 @@
             </intent-filter>
         </config-file>
 
+        <config-file target="AndroidManifest.xml" parent="./application">
+            <service android:name="com.foxdebug.system.PluginResultService" />
+        </config-file>
+
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <queries>
                 <package android:name="com.termux" />
