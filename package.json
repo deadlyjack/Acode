@@ -30,8 +30,8 @@
       "cordova-plugin-sdcard": {},
       "cordova-plugin-browser": {},
       "cordova-plugin-iap": {},
-      "cordova-plugin-system": {},
-      "@parrino/cordova-plugin-local-notifications": {}
+      "@parrino/cordova-plugin-local-notifications": {},
+      "cordova-plugin-system": {}
     },
     "platforms": [
       "android"

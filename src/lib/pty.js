@@ -10,7 +10,7 @@ let socketToNotify = new Map();
 let NOTIFICATIONS_ID = 1000;
 let notifyCount = 0;
 
-export function setup() {
+export async function setup() {
   let { notification } = cordova.plugins;
 
   // Ensure Notifications Permission
@@ -28,6 +28,8 @@ export function setup() {
     let socket = socketToNotify.get(notification.id);
     socket?.close();
   });
+
+  await host.initializeServer()
 }
 
 export class PtyError extends Error {
@@ -510,3 +512,8 @@ export async function execute(command, args, config) {
 export const host = new PtyHost();
 
 export default { run: runCommand, host };
+
+system.run({
+  command: "l/data/data/com.termux/files/usr/bin/ls",
+  args: ["-a"], background: true, sessionAction: 3
+}).then(console.log)

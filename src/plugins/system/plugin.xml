@@ -21,13 +21,22 @@
       <provider android:name="androidx.core.content.FileProvider" android:authorities="com.foxdebug.provider" android:exported="false" android:grantUriPermissions="true">
         <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_provider"/>
       </provider>
+      <service android:name="com.foxdebug.system.PluginResultService" />
     </config-file>
 
 
     <config-file parent="./application/activity" target="AndroidManifest.xml">
       <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
+        <action android:name="android.intent.action.MAIN" />
       </intent-filter>
+    </config-file>
+
+    <config-file parent="." target="AndroidManifest.xml">
+      <queries>
+        <package android:name="com.termux" />
+      </queries>
+
+      <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
     </config-file>
 
     <hook type="before_prepare" src="utils/resetProvider.js" />
