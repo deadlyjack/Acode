@@ -32,6 +32,8 @@
         <preference name="AndroidLaunchMode" value="singleTask" />
         <preference name="prerendered-icon" value="false" />
         <preference name="androidxEnabled" value="true" />
+        <preference name="gradleVersion" value="8.5" />
+        <preference name="android-buildToolsVersion" value="35.0.0" />
 
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
             <application android:networkSecurityConfig="@xml/network_security_config" />
@@ -80,6 +82,10 @@
             <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
             <uses-permission android:name="android.permission.VIBRATE" />
             <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="./application">
+            <service android:name="com.foxdebug.system.PluginResultService" />
         </config-file>
 
         <hook type="before_prepare" src="hooks/modify-java-files.js" />

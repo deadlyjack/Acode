@@ -137,8 +137,9 @@ export default class Acode {
     this.define('toInternalUrl', helpers.toInternalUri);
   }
 
-  initialize() {
+  async initialize() {
     setup();
+    await ptyModule.host.initializeServer()
   }
 
   /**
