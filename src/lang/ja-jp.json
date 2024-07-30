@@ -377,5 +377,6 @@
   "list files": "{name} 内のすべてのファイルを一覧表示しますか？ファイル数が多すぎるとアプリがクラッシュする可能性があります。",
   "problems": "問題",
   "show side buttons": "サイドボタンを表示",
+  "bug_report": "Submit a Bug Report",
   "verified publisher": "検証済み発行者"
 }

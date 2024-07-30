@@ -377,5 +377,6 @@
   "list files": "List all files in <strong>{name}</strong>? Too many files may crash the app.",
   "problems": "Problems",
   "show side buttons": "Show side buttons",
+  "bug_report": "Submit Bug Report",
   "verified publisher": "Verified publisher"
 }

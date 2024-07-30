@@ -16,6 +16,7 @@ Welcome to Acode Editor - a powerful and versatile code editing tool designed sp
 - Seamlessly modify source files for various languages like Python, Java, JavaScript, and more.
 - Access the console to quickly identify errors and logs.
 - Enjoy multi-language editing support with easy management tools.
+- Enjoy a large collections of community plugins to enhance your coding experience.
 
 ## • Installation
 
