@@ -1,6 +1,6 @@
-import './style.scss';
-import Ref from 'html-tag-js/ref';
-import actionStack from 'lib/actionStack';
+import "./style.scss";
+import Ref from "html-tag-js/ref";
+import actionStack from "lib/actionStack";
 
 /**
  * Create and activate search bar
@@ -14,15 +14,22 @@ function searchBar($list, setHide, onhideCb, searchFunction) {
   let timeout = null;
   const $searchInput = new Ref();
   /**@type {HTMLDivElement} */
-  const $container = <div id="search-bar">
-    <input ref={$searchInput} type="search" placeholder={strings.search} enterKeyHint="go" />
+  const $container = (
+    <div id="search-bar">
+    <input
+    ref={$searchInput}
+    type="search"
+    placeholder={strings.search}
+    enterKeyHint="go"
+    />
     <span className="icon clearclose" onclick={hide}></span>
-  </div>;
+    </div>
+  );
 
   /**@type {HTMLElement[]} */
   const children = [...$list.children];
 
-  if (typeof setHide === 'function') {
+  if (typeof setHide === "function") {
     hideOnBlur = false;
     setHide(hide);
   }
@@ -36,18 +43,18 @@ function searchBar($list, setHide, onhideCb, searchFunction) {
   };
 
   actionStack.push({
-    id: 'searchbar',
+    id: "searchbar",
     action: hide,
   });
 
   function hide() {
-    actionStack.remove('searchbar');
+    actionStack.remove("searchbar");
 
     if (!$list.parentElement) return;
-    if (typeof onhideCb === 'function') onhideCb();
+    if (typeof onhideCb === "function") onhideCb();
 
     $list.content = children;
-    $container.classList.add('hide');
+    $container.classList.add("hide");
     setTimeout(() => {
       $container.remove();
     }, 300);
@@ -61,23 +68,38 @@ function searchBar($list, setHide, onhideCb, searchFunction) {
   /**
    * @this {HTMLInputElement}
    */
-  function searchNow() {
+  async function searchNow() {
     const val = $searchInput.value.toLowerCase();
-    const result = searchFunction ? searchFunction(val) : filterList(val);
+    let result;
 
-    $list.textContent = '';
+    if (searchFunction) {
+      result = searchFunction(val);
+
+      if (result instanceof Promise) {
+        try {
+          result = await result;
+        } catch (error) {
+          console.error("Search function failed:", error);
+          result = [];
+        }
+      }
+    } else {
+      result = filterList(val);
+    }
+
+    $list.textContent = "";
     $list.append(...result);
   }
 
   /**
    * Search list items
-   * @param {string} val 
-   * @returns 
+   * @param {string} val
+   * @returns
    */
   function filterList(val) {
     return children.filter((child) => {
       const text = child.textContent.toLowerCase();
-      return text.match(val, 'i');
+      return text.match(val, "i");
     });
   }
 }

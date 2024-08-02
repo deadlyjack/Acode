@@ -377,5 +377,6 @@
   "list files": "¿Listar todos los archivos en <strong>{name}</strong>? Demasiados archivos pueden bloquear la aplicación.",
   "problems": "Problemas",
   "show side buttons": "Mostrar botones laterales",
+  "bug_report": "Submit a Bug Report",
   "verified publisher": "Publicador verificado"
 }

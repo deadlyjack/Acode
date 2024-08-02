@@ -36,15 +36,15 @@ function getFileType(filename) {
     npm: /(^package\.json$)|(^package\-lock\.json$)/i,
     compressed: /\.(zip|rar|7z|tar|gz|gzip|dmg|iso)$/i,
     eslint:
-      /(^\.eslintrc(\.(json5?|ya?ml|toml))?$|eslint\.config\.(c?js|json)$)/i,
+    /(^\.eslintrc(\.(json5?|ya?ml|toml))?$|eslint\.config\.(c?js|json)$)/i,
     postcssconfig:
-      /(^\.postcssrc(\.(json5?|ya?ml|toml))?$|postcss\.config\.(c?js|json)$)/i,
+    /(^\.postcssrc(\.(json5?|ya?ml|toml))?$|postcss\.config\.(c?js|json)$)/i,
     prettier:
-      /(^\.prettierrc(\.(json5?|ya?ml|toml))?$|prettier\.config\.(c?js|json)$)/i,
+    /(^\.prettierrc(\.(json5?|ya?ml|toml))?$|prettier\.config\.(c?js|json)$)/i,
   };
 
   const fileType = Object.keys(regex).find((type) =>
-    regex[type].test(filename),
+  regex[type].test(filename),
   );
   if (fileType) return fileType;
 
@@ -175,17 +175,17 @@ export default {
     const onhide = () => {
       if (hide) hide();
     };
-    const promise = {
-      then(fun) {
-        if (typeof fun === "function") {
-          hide = fun;
-        }
-      },
-    };
+      const promise = {
+        then(fun) {
+          if (typeof fun === "function") {
+            hide = fun;
+          }
+        },
+      };
 
-    const msg = this.errorMessage(err, ...args);
-    alert(strings.error, msg, onhide);
-    return promise;
+      const msg = this.errorMessage(err, ...args);
+      alert(strings.error, msg, onhide);
+      return promise;
   },
   /**
    * Returns unique ID
@@ -432,11 +432,15 @@ export default {
         // Create file if it's the last element and isFile is true
         if (!(await fsOperation(fullUri).exists())) {
           await fsOperation(currentUri).createFile(name);
+        } else {
+          return;
         }
       } else {
         // Create directory
         if (!(await fsOperation(fullUri).exists())) {
           await fsOperation(currentUri).createDirectory(name);
+        } else {
+          return;
         }
       }
       currentUri = fullUri;
@@ -469,9 +473,9 @@ export default {
     }
 
     const countStr =
-      downloadCount < 10 ? downloadCount.toFixed(2) : downloadCount.toFixed(1);
+    downloadCount < 10 ? downloadCount.toFixed(2) : downloadCount.toFixed(1);
     const trimmedCountStr = countStr.replace(/\.?0+$/, "");
 
     return `${trimmedCountStr}${units[index]}`;
   },
-};
+   };

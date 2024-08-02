@@ -378,5 +378,6 @@
   "list files": "Список всех файлов <strong>{name}</strong>. Обширное количество файлов может привести к крашу самого приложения.",
   "problems": "Проблемы",
   "show side buttons": "Показать кнопки на стороне",
+  "bug_report": "Submit a Bug Report",
   "verified publisher": "Проверенный издатель"
 }

@@ -1,17 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <link rel="stylesheet" href="./res/icons/style.css" />
     <link rel="stylesheet" href="./res/file-icons/style.css" />
 
     <script>
       (function () {
-        var __testEl = document.createElement('div');
-        var __testChildEl = document.createElement('div');
+        var __testEl = document.createElement("div");
+        var __testChildEl = document.createElement("div");
         if (__testEl.append) {
           __testEl.append(__testChildEl);
           if (__testEl.children.length === 1) {
@@ -46,14 +47,14 @@
         type,
         listener,
         useCapture,
-        allowed
+        allowed,
       ) {
-        if (typeof useCapture === 'boolean') {
+        if (typeof useCapture === "boolean") {
           allowed = useCapture;
           useCapture = undefined;
         }
 
-        if(type === 'contextmenu' && !allowed) {
+        if (type === "contextmenu" && !allowed) {
           return;
         }
 
@@ -63,8 +64,8 @@
         }
 
         if (
-          this.classList.contains('editor-container') &&
-          startsWith(type, 'touch')
+          this.classList.contains("editor-container") &&
+          startsWith(type, "touch")
         ) {
           if (!this.eventListeners) {
             this.eventListeners = {};
@@ -102,14 +103,14 @@
     <script src="./js/ace/ext-static_highlight.js"></script>
 
     <script>
-      var color = localStorage.getItem('__primary_color');
-      var __bg_color = '#20202c';
+      var color = localStorage.getItem("__primary_color");
+      var __bg_color = "#20202c";
       if (color) {
         __bg_color = color;
       }
 
-      document.querySelector(':root').style.cssText =
-        '--bg-color: ' + __bg_color;
+      document.querySelector(":root").style.cssText =
+        "--bg-color: " + __bg_color;
     </script>
 
     <style>
@@ -123,7 +124,7 @@
 
       body.loading.splash::before {
         content: attr(data-version);
-        background-image: url('./res/logo/logo.svg');
+        background-image: url("./res/logo/logo.svg");
         background-position: center;
         background-repeat: no-repeat;
         background-size: 180px;
@@ -161,21 +162,21 @@
 
     <script src="./js/build/main.build.js"></script>
 
-        <title>Acode</title>
-<!--styles-->
-<link rel="stylesheet" href="./css/build/32.css">
-<link rel="stylesheet" href="./css/build/383.css">
-<link rel="stylesheet" href="./css/build/53.css">
-<link rel="stylesheet" href="./css/build/609.css">
-<link rel="stylesheet" href="./css/build/about.css">
-<link rel="stylesheet" href="./css/build/customTheme.css">
-<link rel="stylesheet" href="./css/build/donate.css">
-<link rel="stylesheet" href="./css/build/fileBrowser.css">
-<link rel="stylesheet" href="./css/build/main.css">
-<link rel="stylesheet" href="./css/build/plugins.css">
-<link rel="stylesheet" href="./css/build/themeSetting.css">
-<!--styles_end-->
-</head>
+    <title>Acode</title>
+    <!--styles-->
+    <link rel="stylesheet" href="./css/build/32.css" />
+    <link rel="stylesheet" href="./css/build/383.css" />
+    <link rel="stylesheet" href="./css/build/53.css" />
+    <link rel="stylesheet" href="./css/build/609.css" />
+    <link rel="stylesheet" href="./css/build/about.css" />
+    <link rel="stylesheet" href="./css/build/customTheme.css" />
+    <link rel="stylesheet" href="./css/build/donate.css" />
+    <link rel="stylesheet" href="./css/build/fileBrowser.css" />
+    <link rel="stylesheet" href="./css/build/main.css" />
+    <link rel="stylesheet" href="./css/build/plugins.css" />
+    <link rel="stylesheet" href="./css/build/themeSetting.css" />
+    <!--styles_end-->
+  </head>
 
   <body class="loading splash" data-version="">
     <wc-page id="root" class="primary"></wc-page>
