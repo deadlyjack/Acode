@@ -62,7 +62,7 @@ function initApp(el) {
   container.content = $header;
 
   if (!$searchResult) {
-    $searchResult = <ul className="list search-result"></ul>;
+    $searchResult = <ul className="list search-result scroll"></ul>;
     container.append($searchResult);
   }
 
