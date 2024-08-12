@@ -21,7 +21,7 @@
  rm -rf *.apks  toc.pb 
  
  echo "🔎 Logging Tree(File Structure) & finding .aab"
- tree
+ tree -I "node_modules|plugins|src|res"
  find /**/*.aab
 
 
