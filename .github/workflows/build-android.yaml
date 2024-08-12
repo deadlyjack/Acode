@@ -1,5 +1,5 @@
 name: Build Android 
-on: workflow_dispatch
+on: push
 jobs: 
    build: 
      name: Build APK 
