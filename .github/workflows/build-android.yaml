@@ -1,9 +1,19 @@
 name: Build Android 
-on: push
+on: 
+  push: 
+  
+  workflow_dispatch:
+      inputs:
+        forceRun:
+          description: 'ForceRun - Forcefully runs the workflow regardless of whether its running in a fork or not'
+          required: false
+          default: false
+          type: boolean
 jobs: 
    build: 
      name: Build APK 
      runs-on: ubuntu-latest 
+     if: github.repository == 'deadlyjack/Acode' && !contains(github.event.head_commit.message, 'skip ci') || inputs.forceRun == true
      steps: 
        - name: Checkout source 
          uses: actions/checkout@v4
