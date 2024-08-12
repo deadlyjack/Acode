@@ -51,11 +51,11 @@ jobs:
        - name: Upload dev APK 
          uses: actions/upload-artifact@v4
          with: 
-           name: app-dev 
+           name: app-development-prod-included
            path: ./*.apk 
   
        - name: Upload release bundle 
          uses: actions/upload-artifact@v4
          with: 
-           name: app-release 
+           name: app-release-aab
            path: ./*.aab
