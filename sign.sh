@@ -22,7 +22,7 @@
  
  echo "🔎 Logging Tree(File Structure) & finding .aab"
  tree -I "node_modules|plugins|src|res"
- find /**/*.aab
+ find . -name "*.aab"
 
 
  # convert to apk 
