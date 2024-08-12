@@ -219,7 +219,8 @@ export default {
     editorManager.editor.resize(true);
   },
   'run'() {
-    editorManager.activeFile[appSettings.value.useCurrentFileForPreview ? runFile : run]?.();
+    console.log("[RUN]", `useCurrentFileForPreview: ${appSettings.value.useCurrentFileForPreview}`, editorManager.activeFile[appSettings.value.useCurrentFileForPreview ? "runFile" : "run"])
+    editorManager.activeFile[appSettings.value.useCurrentFileForPreview ? "runFile" : "run"]?.();
   },
   'run-file'() {
     editorManager.activeFile.runFile?.();

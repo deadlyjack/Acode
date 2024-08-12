@@ -64,7 +64,7 @@ export default function previewSettings() {
     },
     {
       key: 'useCurrentAsPreview',
-      text: 'Should use Current File For preview instead of default (index.html)',
+      text: strings['Should use Current File For preview instead of default (index.html)'],
       checkbox: values.useCurrentFileForPreview,
     },
     {
