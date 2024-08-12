@@ -219,7 +219,7 @@ export default {
     editorManager.editor.resize(true);
   },
   'run'() {
-    editorManager.activeFile.run();
+    editorManager.activeFile[appSettings.value.useCurrentFileForPreview ? runFile : run]?.();
   },
   'run-file'() {
     editorManager.activeFile.runFile?.();
