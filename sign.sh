@@ -18,7 +18,10 @@
   
  # cleanup if needed 
  rm -rf *.apks  toc.pb 
-  
+ 
+ find **/**/*.aab
+
+
  # convert to apk 
  for aab in *.aab; do 
  java -jar "bundletool-all-1.13.1.jar" build-apks --bundle=$aab --mode=universal --output="${aab%.*}.apks" --ks=acode.keystore --ks-pass=pass:password --ks-key-alias=acode --key-pass=pass:password  
