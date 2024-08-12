@@ -63,7 +63,7 @@ export default function previewSettings() {
       checkbox: values.disableCache,
     },
     {
-      key: 'useCurrentAsPreview',
+      key: 'useCurrentFileForPreview',
       text: strings['Should use Current File For preview instead of default (index.html)'],
       checkbox: !!values.useCurrentFileForPreview,
     },
