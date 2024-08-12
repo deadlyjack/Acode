@@ -1,6 +1,5 @@
 ## convert aab bundle to APK 
   pwd
-  tree
  # grab tool for conversion 
  if [  ! -f bundletool-all-1.13.1.jar ]; then 
    wget https://github.com/google/bundletool/releases/download/1.13.1/bundletool-all-1.13.1.jar 
