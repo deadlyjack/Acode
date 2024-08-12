@@ -25,10 +25,10 @@
 
 
  # convert to apk 
- for aab in *.aab; do 
- java -jar "bundletool-all-1.13.1.jar" build-apks --bundle=$aab --mode=universal --output="${aab%.*}.apks" --ks=acode.keystore --ks-pass=pass:password --ks-key-alias=acode --key-pass=pass:password  
+ for aab in $(find . -name "*.aab"); do 
+  java -jar "bundletool-all-1.13.1.jar" build-apks --bundle="$aab" --mode=universal --output="${aab%.*}.apks" --ks=acode.keystore --ks-pass=pass:password --ks-key-alias=acode --key-pass=pass:password
   
- # extract apk 
- unzip ${aab%.*}.apks 
- mv -v universal.apk ${aab%.*}.apk 
- done
+  # extract apk
+  unzip "${aab%.*}.apks"
+  mv -v universal.apk "${aab%.*}.apk"
+done
