@@ -12,7 +12,7 @@ jobs:
          uses: actions/setup-java@v3 
          with: 
            distribution: 'zulu' # See 'Supported distributions' for available options 
-           java-version: '11' # only 11 works for this project  
+           java-version: '17' # only 11 works for this project  
   
        - name: Setup Node.js 
          uses: actions/setup-node@v1 
