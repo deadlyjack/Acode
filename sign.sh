@@ -30,5 +30,10 @@
   
   # extract apk
   unzip "${aab%.*}.apks"
+
+   # Extract just the file name from the path
+  filename=$(basename "$aab")
+
+  #  Move and rename the universal APK
   mv -v universal.apk "${aab%.*}.apk"
 done
