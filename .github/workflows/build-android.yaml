@@ -41,9 +41,12 @@ jobs:
   
        - name: Build Android prod aab 
          run: yarn build android paid prod 
+         id: android-aab-build
   
        - name: Sign 
          run: | 
+               pwd
+               echo "${{steps.android-aab-build.outputs}}"
                sudo chmod 777 ./sign.sh 
                ./sign.sh 
   
