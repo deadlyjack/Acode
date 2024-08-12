@@ -19,8 +19,7 @@
  # cleanup if needed 
  rm -rf *.apks  toc.pb 
  
- echo "🔎 Logging Tree(File Structure) & finding .aab"
- tree -I "node_modules|plugins|src|res"
+ echo "🔎 finding .aab files"
  find . -name "*.aab"
 
 
@@ -30,5 +29,10 @@
   
   # extract apk
   unzip "${aab%.*}.apks"
-  mv -v universal.apk "${aab%.*}.apk"
+
+   # Extract just the file name from the path
+  filename=$(basename "$aab")
+
+  #  Move and rename the universal APK
+  mv -v universal.apk "${filename%.*}.apk"
 done
