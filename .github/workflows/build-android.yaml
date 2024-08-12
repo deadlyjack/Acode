@@ -1,8 +1,6 @@
 name: Build Android 
-  
- on: [workflow_dispatch] 
-  
- jobs: 
+on: [push, workflow_dispatch] 
+jobs: 
    build: 
      name: Build APK 
      runs-on: ubuntu-latest 
