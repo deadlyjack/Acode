@@ -616,7 +616,7 @@ public class System extends CordovaPlugin {
         context,
         0,
         pinnedShortcutCallbackIntent,
-        0
+        PendingIntent.FLAG_IMMUTABLE
       );
 
       shortcutManager.requestPinShortcut(
