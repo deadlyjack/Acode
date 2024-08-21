@@ -1,51 +1,62 @@
-import run from './run';
-import openFile from './openFile';
-import openFolder from './openFolder';
-import helpers from 'utils/helpers';
-import constants from './constants';
-import help from 'settings/helpSettings';
-import recents from 'lib/recents';
-import fsOperation from 'fileSystem';
-import actions from 'handlers/quickTools';
-import FileBrowser from 'pages/fileBrowser';
-import showFileInfo from './showFileInfo';
-import checkFiles from './checkFiles';
-import saveState from './saveState';
-import EditorFile from './editorFile';
-import findFile from 'palettes/findFile';
-import appSettings from './settings';
-import Sidebar from 'components/sidebar';
-import mainSettings from 'settings/mainSettings';
-import commandPalette from 'palettes/commandPalette';
-import changeEncoding from 'palettes/changeEncoding';
-import changeMode from 'palettes/changeMode';
-import confirm from 'dialogs/confirm';
-import select from 'dialogs/select';
-import prompt from 'dialogs/prompt';
-import color from 'dialogs/color';
-import { getColorRange } from 'utils/color/regex';
-import Problems from 'pages/problems/problems';
+import run from "./run";
+import openFile from "./openFile";
+import openFolder from "./openFolder";
+import helpers from "utils/helpers";
+import constants from "./constants";
+import help from "settings/helpSettings";
+import recents from "lib/recents";
+import fsOperation from "fileSystem";
+import actions from "handlers/quickTools";
+import FileBrowser from "pages/fileBrowser";
+import showFileInfo from "./showFileInfo";
+import checkFiles from "./checkFiles";
+import saveState from "./saveState";
+import EditorFile from "./editorFile";
+import findFile from "palettes/findFile";
+import appSettings from "./settings";
+import Sidebar from "components/sidebar";
+import mainSettings from "settings/mainSettings";
+import commandPalette from "palettes/commandPalette";
+import changeEncoding from "palettes/changeEncoding";
+import changeMode from "palettes/changeMode";
+import confirm from "dialogs/confirm";
+import select from "dialogs/select";
+import prompt from "dialogs/prompt";
+import color from "dialogs/color";
+import { getColorRange } from "utils/color/regex";
+import Problems from "pages/problems/problems";
 
 export default {
-  async 'close-all-tabs'() {
+  async "close-all-tabs"() {
     let save = false;
-    const unsavedFiles = editorManager.files.filter((file) => file.isUnsaved).length;
+    const unsavedFiles = editorManager.files.filter(
+      (file) => file.isUnsaved,
+    ).length;
     if (unsavedFiles) {
-      const confirmation = await confirm(strings['warning'], strings['unsaved files warning']);
+      const confirmation = await confirm(
+        strings["warning"],
+        strings["unsaved files warning"],
+      );
       if (!confirmation) return;
-      const option = await select(strings['select'], [
-        ['save', strings['save all']],
-        ['close', strings['close all']],
-        ['cancel', strings['cancel']],
+      const option = await select(strings["select"], [
+        ["save", strings["save all"]],
+        ["close", strings["close all"]],
+        ["cancel", strings["cancel"]],
       ]);
-      if (option === 'cancel') return;
+      if (option === "cancel") return;
 
-      if (option === 'save') {
-        const doSave = await confirm(strings['warning'], strings['save all warning']);
+      if (option === "save") {
+        const doSave = await confirm(
+          strings["warning"],
+          strings["save all warning"],
+        );
         if (!doSave) return;
         save = true;
       } else {
-        const doClose = await confirm(strings['warning'], strings['close all warning']);
+        const doClose = await confirm(
+          strings["warning"],
+          strings["close all warning"],
+        );
         if (!doClose) return;
       }
     }
@@ -60,78 +71,79 @@ export default {
       file.remove(true);
     });
   },
-  async 'save-all-changes'() {
-    const doSave = await confirm(strings['warning'], strings['save all changes warning']);
+  async "save-all-changes"() {
+    const doSave = await confirm(
+      strings["warning"],
+      strings["save all changes warning"],
+    );
     if (!doSave) return;
-    editorManager.files.forEach(file.save);
+    editorManager.files.forEach((file) => {
+      file.save();
+      file.isUnsaved = false;
+    });
   },
-  'close-current-tab'() {
+  "close-current-tab"() {
     editorManager.activeFile.remove();
   },
-  'console'() {
-    run(true, 'inapp');
+  console() {
+    run(true, "inapp");
   },
-  'check-files'() {
+  "check-files"() {
     if (!appSettings.value.checkFiles) return;
     checkFiles();
   },
-  'command-palette'() {
+  "command-palette"() {
     commandPalette();
   },
-  'disable-fullscreen'() {
-    app.classList.remove('fullscreen-mode');
-    this['resize-editor']();
+  "disable-fullscreen"() {
+    app.classList.remove("fullscreen-mode");
+    this["resize-editor"]();
   },
-  'enable-fullscreen'() {
-    app.classList.add('fullscreen-mode');
-    this['resize-editor']();
+  "enable-fullscreen"() {
+    app.classList.add("fullscreen-mode");
+    this["resize-editor"]();
   },
-  'encoding'() {
+  encoding() {
     changeEncoding();
   },
-  'exit'() {
+  exit() {
     navigator.app.exitApp();
   },
-  'edit-with'() {
+  "edit-with"() {
     editorManager.activeFile.editWith();
   },
-  'find-file'() {
+  "find-file"() {
     findFile();
   },
-  'files'() {
-    FileBrowser('both', strings['file browser'])
+  files() {
+    FileBrowser("both", strings["file browser"])
       .then(FileBrowser.open)
       .catch(FileBrowser.openError);
   },
-  'find'() {
-    actions('search');
+  find() {
+    actions("search");
   },
-  'file-info'(url) {
+  "file-info"(url) {
     showFileInfo(url);
   },
-  async 'goto'() {
-    const res = await prompt(strings['enter line number'], '', 'number', {
-      placeholder: 'line.column',
+  async goto() {
+    const res = await prompt(strings["enter line number"], "", "number", {
+      placeholder: "line.column",
     });
 
     if (!res) return;
 
-    const [line, col] = `${res}`.split('.');
+    const [line, col] = `${res}`.split(".");
     const editor = editorManager.editor;
 
     editor.focus();
     editor.gotoLine(line, col, true);
   },
-  async 'new-file'() {
-    let filename = await prompt(
-      strings['enter file name'],
-      '',
-      'filename',
-      {
-        match: constants.FILE_NAME_REGEX,
-        required: true,
-      },
-    );
+  async "new-file"() {
+    let filename = await prompt(strings["enter file name"], "", "filename", {
+      match: constants.FILE_NAME_REGEX,
+      required: true,
+    });
 
     filename = helpers.fixFilename(filename);
     if (!filename) return;
@@ -140,7 +152,7 @@ export default {
       isUnsaved: false,
     });
   },
-  'next-file'() {
+  "next-file"() {
     const len = editorManager.files.length;
     let fileIndex = editorManager.files.indexOf(editorManager.activeFile);
 
@@ -149,17 +161,17 @@ export default {
 
     editorManager.files[fileIndex].makeActive();
   },
-  'open'(page) {
+  open(page) {
     switch (page) {
-      case 'settings':
+      case "settings":
         mainSettings();
         break;
 
-      case 'help':
+      case "help":
         help();
         break;
 
-      case 'problems':
+      case "problems":
         Problems();
         break;
 
@@ -168,22 +180,22 @@ export default {
     }
     editorManager.editor.blur();
   },
-  'open-with'() {
+  "open-with"() {
     editorManager.activeFile.openWith();
   },
-  'open-file'() {
+  "open-file"() {
     editorManager.editor.blur();
-    FileBrowser('file')
+    FileBrowser("file")
       .then(FileBrowser.openFile)
       .catch(FileBrowser.openFileError);
   },
-  'open-folder'() {
+  "open-folder"() {
     editorManager.editor.blur();
-    FileBrowser('folder')
+    FileBrowser("folder")
       .then(FileBrowser.openFolder)
       .catch(FileBrowser.openFolderError);
   },
-  'prev-file'() {
+  "prev-file"() {
     const len = editorManager.files.length;
     let fileIndex = editorManager.files.indexOf(editorManager.activeFile);
 
@@ -192,11 +204,11 @@ export default {
 
     editorManager.files[fileIndex].makeActive();
   },
-  'read-only'() {
+  "read-only"() {
     const file = editorManager.activeFile;
     file.editable = !file.editable;
   },
-  'recent'() {
+  recent() {
     recents.select().then((res) => {
       const { type } = res;
       if (helpers.isFile(type)) {
@@ -207,69 +219,69 @@ export default {
         });
       } else if (helpers.isDir(type)) {
         openFolder(res.val.url, res.val.opts);
-      } else if (res === 'clear') {
+      } else if (res === "clear") {
         recents.clear();
       }
     });
   },
-  'replace'() {
+  replace() {
     this.find();
   },
-  'resize-editor'() {
+  "resize-editor"() {
     editorManager.editor.resize(true);
   },
-  'run'() {
+  run() {
     editorManager.activeFile.run();
   },
-  'run-file'() {
+  "run-file"() {
     editorManager.activeFile.runFile?.();
   },
-  async 'save'(showToast) {
+  async save(showToast) {
     try {
       await editorManager.activeFile.save();
       if (showToast) {
-        toast(strings['file saved']);
+        toast(strings["file saved"]);
       }
     } catch (error) {
       helpers.error(error);
     }
   },
-  async 'save-as'(showToast) {
+  async "save-as"(showToast) {
     try {
       await editorManager.activeFile.saveAs();
       if (showToast) {
-        toast(strings['file saved']);
+        toast(strings["file saved"]);
       }
     } catch (error) {
       helpers.error(error);
     }
   },
-  'save-state'() {
+  "save-state"() {
     saveState();
   },
-  'share'() {
+  share() {
     editorManager.activeFile.share();
   },
-  'syntax'() {
+  syntax() {
     changeMode();
   },
-  'toggle-fullscreen'() {
-    app.classList.toggle('fullscreen-mode');
-    this['resize-editor']();
+  "toggle-fullscreen"() {
+    app.classList.toggle("fullscreen-mode");
+    this["resize-editor"]();
   },
-  'toggle-sidebar'() {
+  "toggle-sidebar"() {
     Sidebar.toggle();
   },
-  'toggle-menu'() {
-    tag.get('[action=toggle-menu]')?.click();
+  "toggle-menu"() {
+    tag.get("[action=toggle-menu]")?.click();
   },
-  'toggle-editmenu'() {
-    tag.get('[action=toggle-edit-menu')?.click();
+  "toggle-editmenu"() {
+    tag.get("[action=toggle-edit-menu")?.click();
   },
-  async 'insert-color'() {
+  async "insert-color"() {
     const { editor } = editorManager;
     const range = getColorRange();
-    let defaultColor = range ? editor.session.getTextRange(range) : '';
+    let defaultColor = range ? editor.session.getTextRange(range) : "";
 
     editor.blur();
     const wasFocused = editorManager.activeFile.focused;
@@ -285,36 +297,31 @@ export default {
     }
     editor.insert(res);
   },
-  'copy'() {
-    editorManager.editor.execCommand('copy');
+  copy() {
+    editorManager.editor.execCommand("copy");
   },
-  'cut'() {
-    editorManager.editor.execCommand('cut');
+  cut() {
+    editorManager.editor.execCommand("cut");
   },
-  'paste'() {
-    editorManager.editor.execCommand('paste');
+  paste() {
+    editorManager.editor.execCommand("paste");
   },
-  'select-all'() {
+  "select-all"() {
     const { editor } = editorManager;
-    editor.execCommand('selectall');
+    editor.execCommand("selectall");
     editor.scrollToRow(Infinity);
   },
-  async 'rename'(file) {
+  async rename(file) {
     file = file || editorManager.activeFile;
 
-    if (file.mode === 'single') {
-      alert(strings.info.toUpperCase(), strings['unable to rename']);
+    if (file.mode === "single") {
+      alert(strings.info.toUpperCase(), strings["unable to rename"]);
       return;
     }
 
-    let newname = await prompt(
-      strings.rename,
-      file.filename,
-      'filename',
-      {
-        match: constants.FILE_NAME_REGEX,
-      },
-    );
+    let newname = await prompt(strings.rename, file.filename, "filename", {
+      match: constants.FILE_NAME_REGEX,
+    });
 
     newname = helpers.fixFilename(newname);
     if (!newname || newname === file.filename) return;
@@ -331,7 +338,7 @@ export default {
         file.filename = newname;
 
         openFolder.renameItem(uri, newUri, newname);
-        toast(strings['file renamed']);
+        toast(strings["file renamed"]);
       } catch (err) {
         helpers.error(err);
       }
@@ -339,21 +346,17 @@ export default {
       file.filename = newname;
     }
   },
-  async 'format'(selectIfNull) {
+  async format(selectIfNull) {
     const { editor } = editorManager;
     const pos = editor.getCursorPosition();
 
     await acode.format(selectIfNull);
     editor.selection.moveCursorToPosition(pos);
   },
-  async 'eol'() {
-    const eol = await select(
-      strings['new line mode'],
-      ['unix', 'windows'],
-      {
-        default: editorManager.activeFile.eol,
-      },
-    );
+  async eol() {
+    const eol = await select(strings["new line mode"], ["unix", "windows"], {
+      default: editorManager.activeFile.eol,
+    });
     editorManager.activeFile.eol = eol;
   },
 };
