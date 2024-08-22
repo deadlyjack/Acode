@@ -378,5 +378,8 @@
   "problems": "問題",
   "show side buttons": "サイドボタンを表示",
   "bug_report": "Submit a Bug Report",
-  "verified publisher": "検証済み発行者"
+  "verified publisher": "検証済み発行者",
+  "most_downloaded": "Most Downloaded",
+  "newly_added": "Newly Added",
+  "top_rated": "Top Rated"
 }

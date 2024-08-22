@@ -378,5 +378,8 @@
   "problems": "問題",
   "show side buttons": "顯示側邊按鈕",
   "bug_report": "提交錯誤回報",
-  "verified publisher": "已驗證的發行者"
+  "verified publisher": "已驗證的發行者",
+  "most_downloaded": "Most Downloaded",
+  "newly_added": "Newly Added",
+  "top_rated": "Top Rated"
 }
