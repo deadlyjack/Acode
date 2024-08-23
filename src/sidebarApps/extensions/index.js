@@ -7,6 +7,7 @@ import fsOperation from "fileSystem";
 import constants from "lib/constants";
 import collapsableList from "components/collapsableList";
 import Sidebar from "components/sidebar";
+import select from "dialogs/select";
 
 /** @type {HTMLElement} */
 let $installed = null;
@@ -19,7 +20,12 @@ let $searchResult = null;
 
 const $header = (
   <div className="header">
-    <span className="title">{strings["plugins"]}</span>
+    <span className="title">
+      {strings["plugins"]}
+      <button className="icon-button" onclick={filterPlugins}>
+        <span className="icon tune"></span>
+      </button>
+    </span>
     <input
       oninput={searchPlugin}
       type="search"
@@ -114,6 +120,53 @@ async function searchPlugin() {
   }, 500);
 }
 
+async function filterPlugins() {
+  const filterOptions = {
+    [strings.top_rated]: "top_rated",
+    [strings.newly_added]: "newest",
+    [strings.most_downloaded]: "downloads",
+  };
+
+  const filterName = await select("Filter", Object.keys(filterOptions));
+  if (!filterName) return;
+
+  $searchResult.content = "";
+  const filterParam = filterOptions[filterName];
+
+  try {
+    $searchResult.classList.add("loading");
+    const plugins = await getFilteredPlugins(filterParam);
+    const filterMessage = (
+      <div className="filter-message">
+        <span>
+          Filter for <strong>{filterName}</strong>
+        </span>
+        <span
+          className="icon clearclose close-button"
+          data-action="clear-filter"
+          onclick={() => clearFilter()}
+        ></span>
+      </div>
+    );
+    $searchResult.content = [filterMessage, ...plugins.map(ListItem)];
+    updateHeight($searchResult);
+
+    function clearFilter() {
+      $searchResult.content = "";
+      updateHeight($searchResult);
+    }
+  } catch (error) {
+    console.error("Error filtering plugins:", error);
+    $searchResult.content = <span className="error">{strings["error"]}</span>;
+  } finally {
+    $searchResult.classList.remove("loading");
+  }
+}
+
+async function clearFilter() {
+  $searchResult.content = "";
+}
+
 async function loadInstalled() {
   if (this.collapsed) return;
 
@@ -165,6 +218,22 @@ async function listInstalledPlugins() {
     }),
   );
   return plugins;
+}
+
+async function getFilteredPlugins(filterName) {
+  try {
+    let response;
+    if (filterName === "top_rated") {
+      response = await fetch(`${constants.API_BASE}/plugins?explore=random`);
+    } else {
+      response = await fetch(
+        `${constants.API_BASE}/plugin?orderBy=${filterName}`,
+      );
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function startLoading($list) {

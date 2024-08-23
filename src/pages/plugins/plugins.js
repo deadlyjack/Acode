@@ -252,7 +252,9 @@ export default function PluginsInclude(updates) {
       }
       return await response.json();
     } catch (error) {
+      $list.all.setAttribute("empty-msg", strings["error"]);
       console.error(error);
+      return [];
     }
   }
 
