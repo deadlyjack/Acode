@@ -34,7 +34,6 @@ script1="node ./utils/config.js $mode $app"
 script2="webpack --progress --mode $webpackmode "
 script3="node ./utils/loadStyles.js"
 script4="cordova build $platform $cordovamode"
-script5="node ./utils/rename.js $mode $app"
 eval "
 echo \"${RED}$script1${NC}\";
 $script1;
@@ -44,6 +43,4 @@ echo \"${RED}$script3${NC}\";
 $script3;
 echo \"${RED}$script4${NC}\";
 $script4;
-echo \"${RED}$script5${NC}\";
-$script5
 "
