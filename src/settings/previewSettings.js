@@ -1,3 +1,4 @@
+import Checkbox from 'components/checkbox';
 import settingsPage from 'components/settingsPage';
 import appSettings from 'lib/settings';
 
@@ -60,6 +61,11 @@ export default function previewSettings() {
       key: 'disableCache',
       text: strings['disable in-app-browser caching'],
       checkbox: values.disableCache,
+    },
+    {
+      key: 'useCurrentFileForPreview',
+      text: strings['Should use Current File For preview instead of default (index.html)'],
+      checkbox: !!values.useCurrentFileForPreview,
     },
     {
       key: 'showConsoleToggler',

@@ -90,6 +90,7 @@ class Settings {
       showConsoleToggler: true,
       previewMode: this.PREVIEW_MODE_INAPP,
       disableCache: false,
+      useCurrentFileForPreview: false,
       host: 'localhost',
       search: this.#searchSettings,
       lang: 'en-us',

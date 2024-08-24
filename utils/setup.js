@@ -18,6 +18,13 @@ try {
 } catch (error) {
   // ignore
 }
+
+try {
+ execSync('mkdir -p www/css/build www/js/build', { stdio: 'inherit' }) 
+} catch (error) {
+  console.log("Failed to create www/css/build & www/js/build directories (You may Try after reading The Error)", error)
+}
+
 execSync('cordova plugin add cordova-plugin-buildinfo', { stdio: 'inherit' });
 execSync('cordova plugin add cordova-plugin-device', { stdio: 'inherit' });
 execSync('cordova plugin add cordova-plugin-file', { stdio: 'inherit' });
