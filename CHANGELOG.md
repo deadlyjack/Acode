@@ -1,13 +1,13 @@
 # Change Log
 
-## [1.10.4] (951)
+## [1.10.4] (952)
 
 - New
   - Nested Files/Folder Creation
   - Updated ace to latest version
   - Improved displaying of Download count on Plugins page as well as on Sidebar
   - Enhanced search functionality to allow searching across all available plugins from the "all" section of the plugin page.
-  - Added a new option on Help page for submiting bug reports.
+  - Added a new option on Help page for submitting bug reports.
 - Fixes
   - Fixed issue with the search bar on the plugin page
   - Fixed issue with the search bar closing accidentally when clicking elsewhere on the screen
