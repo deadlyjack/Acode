@@ -23,11 +23,12 @@ export default function PluginsInclude(updates) {
   const $page = Page(strings["plugins"]);
   const $search = <span className="icon search" data-action="search"></span>;
   const $add = <span className="icon add" data-action="add-source"></span>;
+  const $filter = <span className="icon tune" data-action="filter"></span>;
   const List = () => (
     <div
-    id="plugin-list"
-    className="list scroll"
-    empty-msg={strings["loading..."]}
+      id="plugin-list"
+      className="list scroll"
+      empty-msg={strings["loading..."]}
     ></div>
   );
   const $list = {
@@ -57,28 +58,67 @@ export default function PluginsInclude(updates) {
     },
   });
 
+  Contextmenu({
+    toggler: $filter,
+    top: "8px",
+    right: "16px",
+    items: [
+      [strings.top_rated, "top_rated"],
+      [strings.newly_added, "newest"],
+      [strings.most_downloaded, "downloads"],
+    ],
+    onselect(item) {
+      const filterNames = {
+        top_rated: strings.top_rated,
+        newest: strings.newly_added,
+        downloads: strings.most_downloaded,
+      };
+      const filterName = filterNames[item];
+      render("all");
+      getFilteredPlugins(item).then((plugins) => {
+        $list.all.replaceChildren();
+        $list.all.append(
+          <div className="filter-message">
+            Filter for <strong>{filterName}</strong>
+            <span
+              className="icon clearclose"
+              data-action="clear-filter"
+              onclick={() => {
+                $list.all.replaceChildren();
+                getAllPlugins();
+              }}
+            ></span>
+          </div>,
+        );
+        plugins.forEach((plugin) => {
+          $list.all.append(<Item {...plugin} />);
+        });
+      });
+    },
+  });
+
   $page.body = (
     <TabView id="plugins">
-    <div className="options">
-    <span
-    id="installed_plugins"
-    onclick={renderInstalled}
-    tabindex="0"
-    className="active"
-    >
-    {strings.installed}
-    </span>
-    <span id="all_plugins" onclick={renderAll} tabindex="0">
-    {strings.all}
-    </span>
-    <span id="owned_plugins" onclick={renderOwned} tabindex="0">
-    {strings.owned}
-    </span>
-    </div>
-    {$list.installed}
+      <div className="options">
+        <span
+          id="installed_plugins"
+          onclick={renderInstalled}
+          tabindex="0"
+          className="active"
+        >
+          {strings.installed}
+        </span>
+        <span id="all_plugins" onclick={renderAll} tabindex="0">
+          {strings.all}
+        </span>
+        <span id="owned_plugins" onclick={renderOwned} tabindex="0">
+          {strings.owned}
+        </span>
+      </div>
+      {$list.installed}
     </TabView>
   );
-  $page.header.append($search, $add);
+  $page.header.append($search, $filter, $add);
 
   actionStack.push({
     id: "plugins",
@@ -135,8 +175,8 @@ export default function PluginsInclude(updates) {
         searchBar(
           $currList,
           (hide) => (hideSearchBar = hide),
-                  undefined,
-                  searchRemotely,
+          undefined,
+          searchRemotely,
         );
         return;
       } else {
@@ -197,6 +237,24 @@ export default function PluginsInclude(updates) {
       $list.all.setAttribute("empty-msg", strings["error"]);
       console.error(error);
       return []; // Return an empty array on error
+    }
+  }
+
+  async function getFilteredPlugins(filterName) {
+    try {
+      let response;
+      if (filterName === "top_rated") {
+        response = await fetch(`${constants.API_BASE}/plugins?explore=random`);
+      } else {
+        response = await fetch(
+          `${constants.API_BASE}/plugin?orderBy=${filterName}`,
+        );
+      }
+      return await response.json();
+    } catch (error) {
+      $list.all.setAttribute("empty-msg", strings["error"]);
+      console.error(error);
+      return [];
     }
   }
 

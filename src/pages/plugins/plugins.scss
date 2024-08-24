@@ -2,6 +2,30 @@
   display: flex;
   flex-direction: column;
 
+  .filter-message {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--popup-text-color);
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 0 10px var(--box-shadow-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    strong {
+      color: var(--link-text-color);
+      margin-left: 5px;
+    }
+    span {
+      margin-left: auto;
+      padding: 5px;
+      &:hover {
+        cursor: pointer;
+        background-color: var(--error-text-color);
+      }
+    }
+  }
+
   .list:empty::after {
     content: attr(empty-msg);
   }
