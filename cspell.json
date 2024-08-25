@@ -9,7 +9,10 @@
     "fastlane",
     "hooks",
     "res",
-    "*.gradle"
+    "*.gradle",
+    "src/plugins/**/*",
+    "plugins",
+    "platforms"
   ],
   "files": [
     "**/*.html",
