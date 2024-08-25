@@ -133,9 +133,9 @@ export default class WCPage extends HTMLElement {
   set body($el) {
     if (this.body) this.replaceChild($el, this.body);
 
-    const headerAdjecent = this.header.nextElementSibling;
-    if (headerAdjecent) {
-      this.insertBefore($el, headerAdjecent);
+    const headerAdjacent = this.header.nextElementSibling;
+    if (headerAdjacent) {
+      this.insertBefore($el, headerAdjacent);
       return;
     }
 

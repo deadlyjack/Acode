@@ -7,7 +7,7 @@ import windowResize from './windowResize';
  * @typedef {'key'|'keyboardShow'|'keyboardHide'|'keyboardShowStart'|'keyboardHideStart'} KeyboardEventName
  */
 
-// Asuming that keyboard height is at least 200px
+// Assuming that keyboard height is at least 200px
 let MIN_KEYBOARD_HEIGHT = 100;
 const event = {
   key: [],

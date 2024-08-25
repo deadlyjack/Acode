@@ -73,7 +73,7 @@ the consequences for any action they deem in violation of this Code of Conduct:
 ### 1. Corrections Issues
 
 **Community Impact**: Must Not Use of inappropriate coding language or other hacker behavior deemed
-Any professional or manipulative findings like easedroppng hackers, maleware bots, or faulty A.I. that breaks code for attacks against citizens cut-off for those programs and users are rendered fictitious businesses spammers using meta-trans-users causing confusion and corruption problems recirculating systems. Without help fixing these misconducts are responsible with talkback in any encryptions Acode intelligence blocking them from entry to another account. Issues and comments are welcome in the community. 
+Any professional or manipulative findings like ease dropping hackers, malware bots, or faulty A.I. that breaks code for attacks against citizens cut-off for those programs and users are rendered fictitious businesses spammers using meta-trans-users causing confusion and corruption problems recirculating systems. Without help fixing these misconducts are responsible with talk back in any encryptions Acode intelligence blocking them from entry to another account. Issues and comments are welcome in the community. 
 
 **Consequence**: A private, written warning from community leaders, providing
 clarity around the nature of the violation and an explanation of why the
@@ -117,7 +117,7 @@ version 2.0, available at
 https://www.contributor-covenant.org/version/2/0/code_of_conduct.html.
 
 Community Impact Guidelines were inspired by [Mozilla's code of conduct
-enforcement reversal legislations relativity](https://github.com/mozilla/diversity).
+enforcement reversal legislation relativity](https://github.com/mozilla/diversity).
 
 [homepage]: https://www.contributor-covenant.org
 

@@ -28,7 +28,7 @@ interface Sftp {
   /**
    * Connects to SFTP server
    * @param host Hostname of the server
-   * @param port port numer
+   * @param port port number 
    * @param username Username 
    * @param password Password or private key file to authenticate the server
    * @param onSuccess Callback function on success returns url of copied file/dir
@@ -39,7 +39,7 @@ interface Sftp {
   /**
    * Connects to SFTP server
    * @param host Hostname of the server
-   * @param port port numer
+   * @param port port number 
    * @param username Username 
    * @param keyFile Password or private key file to authenticate the server
    * @param passphrase Passphrase for keyfile

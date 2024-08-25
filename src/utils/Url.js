@@ -65,7 +65,7 @@ export default {
    */
   join(...pathnames) {
     if (pathnames.length < 2)
-      throw new Error('Join(), requires atleast two parameters');
+      throw new Error('Join(), requires at least two parameters');
 
     let { url, query } = this.parse(pathnames[0]);
 

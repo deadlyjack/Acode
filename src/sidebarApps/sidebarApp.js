@@ -3,7 +3,7 @@ let $apps;
 /**@type {HTMLElement} */
 let $sidebar;
 /**@type {HTMLElement} */
-let $contaienr;
+let $containers;
 
 export default class SidebarApp {
   /**@type {HTMLSpanElement} */
@@ -90,7 +90,7 @@ export default class SidebarApp {
     this.#icon.classList.toggle('active', this.#active);
     if (this.#active) {
       const child = getContainer(this.#container);
-      $sidebar.replaceChild($contaienr, child);
+      $sidebar.replaceChild($containers, child);
       this.#onselect(this.#container);
     }
   }
@@ -141,10 +141,10 @@ function Icon({ icon, id, title }) {
  * @returns {HTMLElement}
  */
 function getContainer($el) {
-  const res = $contaienr;
+  const res = $containers;
 
   if ($el) {
-    $contaienr = $el;
+    $containers = $el;
   }
 
   return res || $sidebar.get('.container');

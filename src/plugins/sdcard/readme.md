@@ -56,7 +56,7 @@ interface SDcard {
    * Gets actual url for relative path to src
    * e.g. getPath(src, "../path/to/file.txt") => actual url
    * @param src Directory url
-   * @param path Relative file/direcotry path
+   * @param path Relative file/directory path
    * @param onSuccess Callback function on success returns actual url
    * @param onFail Callback function on error returns error object
    */

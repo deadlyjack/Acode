@@ -17,7 +17,7 @@ let arg = "";
 let val = "";
 
 if (args._.length > 3) {
-  console.error("Invalid argments", args._);
+  console.error("Invalid arguments", args._);
   process.exit(0);
 } else {
   command = args._[0];

@@ -217,8 +217,8 @@
     - Now it will ask what to do with unsaved files.
   - [x] **File changed alert**
     - Fixed file changed alert showing up even when file is not changed.
-  - [x] **X-Plore**
-    - Fixed file not opening when opened from X-Plore.
+  - [x] **Explore**
+    - Fixed file not opening when opened from Explore.
   - [x] **Extensions app in sidebar**
     - Fixed extensions app's explore not rendering properly.
   - [x] **Minor bugs**
