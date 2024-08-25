@@ -11,11 +11,18 @@
     "res",
     "*.gradle"
   ],
-  "files": ["**/*.html", "**/*.scss", "**/*.js", "**/*.css", "**/*.md", "**/*.hbs", "**/*.sh", "**/*.d.ts"],
-  "dictionaryDefinitions": [],
-  "dictionaries": [
-    "en"
+  "files": [
+    "**/*.html",
+    "**/*.scss",
+    "**/*.js",
+    "**/*.css",
+    "**/*.md",
+    "**/*.hbs",
+    "**/*.sh",
+    "**/*.d.ts"
   ],
+  "dictionaryDefinitions": [],
+  "dictionaries": ["en"],
   "ignoreWords": [
     "ABAP",
     "abap",
@@ -416,7 +423,8 @@
     "customise",
     "Roboto",
     "Cascadia",
-    "Invisibles"
+    "Invisibles",
+    "Biomejs"
   ],
   "allowCompoundWords": false
 }
