@@ -2,11 +2,7 @@ name: CI
 
 on:
   push:
-    branches:
-      - '*'
   pull_request:
-    branches:
-      - '*'
 
 jobs:
   spell-check:
@@ -15,15 +11,31 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install cspell
         run: npm install -g cspell
 
       - name: Run spell check
         run: cspell
+
+  quality:
+    name: Linting and formatting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+
+      - name: Run Biome
+        run: biome ci .
