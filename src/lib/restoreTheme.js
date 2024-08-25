@@ -1,6 +1,6 @@
-import themes from 'theme/list';
-import Color from 'utils/color';
-import appSettings from './settings';
+import themes from "theme/list";
+import Color from "utils/color";
+import appSettings from "./settings";
 
 let count = 0;
 
@@ -8,31 +8,31 @@ let count = 0;
  * Restores the theme or darkens the status bar and navigation bar
  * Used when dialogs are opened which has mask that darkens the background
  * @param {boolean} darken Whether to darken the status bar and navigation bar
- * @returns 
+ * @returns
  */
 export default function restoreTheme(darken = false) {
-  if (!count && !darken) return;
-  count += darken ? 1 : -1;
-  if (darken !== !!count) return;
-  if (darken && document.body.classList.contains('loading')) return;
+	if (!count && !darken) return;
+	count += darken ? 1 : -1;
+	if (darken !== !!count) return;
+	if (darken && document.body.classList.contains("loading")) return;
 
-  let themeName = DOES_SUPPORT_THEME ? appSettings.value.appTheme : 'default';
-  let theme = themes.get(themeName);
+	let themeName = DOES_SUPPORT_THEME ? appSettings.value.appTheme : "default";
+	let theme = themes.get(themeName);
 
-  if (theme?.version !== 'free' && IS_FREE_VERSION) {
-    themeName = 'default';
-    theme = themes.get(themeName);
-    appSettings.value.appTheme = themeName;
-    appSettings.update();
-  }
+	if (theme?.version !== "free" && IS_FREE_VERSION) {
+		themeName = "default";
+		theme = themes.get(themeName);
+		appSettings.value.appTheme = themeName;
+		appSettings.update();
+	}
 
-  if (
-    !theme.darkenedPrimaryColor
-    || theme.darkenedPrimaryColor === theme.primaryColor
-  ) {
-    theme.darkenPrimaryColor();
-  }
-  const color = darken ? theme.darkenedPrimaryColor : theme.primaryColor;
-  const hexColor = Color(color).hex.toString();
-  system.setUiTheme(hexColor, theme.toJSON('hex'));
+	if (
+		!theme.darkenedPrimaryColor ||
+		theme.darkenedPrimaryColor === theme.primaryColor
+	) {
+		theme.darkenPrimaryColor();
+	}
+	const color = darken ? theme.darkenedPrimaryColor : theme.primaryColor;
+	const hexColor = Color(color).hex.toString();
+	system.setUiTheme(hexColor, theme.toJSON("hex"));
 }

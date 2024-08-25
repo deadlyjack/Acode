@@ -1,6 +1,6 @@
-import Ref from 'html-tag-js/ref';
-import actionStack from 'lib/actionStack';
-import restoreTheme from 'lib/restoreTheme';
+import Ref from "html-tag-js/ref";
+import actionStack from "lib/actionStack";
+import restoreTheme from "lib/restoreTheme";
 
 let loaderIsImmortal = false;
 let onCancelCallback = null;
@@ -29,114 +29,123 @@ let $currentMask = null;
  * @param {LoaderOptions} [options] Loader options
  * @returns {Loader}
  */
-function create(titleText, message = '', options = {}) {
-  if (!message && titleText) {
-    message = titleText;
-    titleText = '';
-  }
+function create(titleText, message = "", options = {}) {
+	if (!message && titleText) {
+		message = titleText;
+		titleText = "";
+	}
 
-  const $oldLoader = tag.get('#__loader');
-  const $oldMask = tag.get('#__loader-mask');
+	const $oldLoader = tag.get("#__loader");
+	const $oldMask = tag.get("#__loader-mask");
 
-  if ($oldLoader) $oldLoader.remove();
+	if ($oldLoader) $oldLoader.remove();
 
-  const $message = new Ref();
-  const $titleSpan = new Ref();
+	const $message = new Ref();
+	const $titleSpan = new Ref();
 
-  const $mask = $oldMask || <span className='mask' id='__loader-mask'></span>;
-  const $dialog = $oldLoader || <div className='prompt alert' id='__loader'>
-    <strong ref={$titleSpan} className='title'>{titleText}</strong>
-    <span className='message loader'>
-      <span className='loader'></span>
-      <div ref={$message} className='message' innerHTML={message} style={{ whiteSpace: 'pre-wrap' }}></div>
-    </span>
-  </div>;
+	const $mask = $oldMask || <span className="mask" id="__loader-mask"></span>;
+	const $dialog = $oldLoader || (
+		<div className="prompt alert" id="__loader">
+			<strong ref={$titleSpan} className="title">
+				{titleText}
+			</strong>
+			<span className="message loader">
+				<span className="loader"></span>
+				<div
+					ref={$message}
+					className="message"
+					innerHTML={message}
+					style={{ whiteSpace: "pre-wrap" }}
+				></div>
+			</span>
+		</div>
+	);
 
-  const { timeout, oncancel } = options;
-  if (typeof oncancel === 'function') {
-    onCancelCallback = oncancel;
-  }
+	const { timeout, oncancel } = options;
+	if (typeof oncancel === "function") {
+		onCancelCallback = oncancel;
+	}
 
-  if (typeof timeout === 'number') {
-    setTimeout(() => {
-      $dialog.append(
-        <div className='button-container'>
-          <button onclick={destroy} >{strings.cancel}</button>
-        </div>
-      );
-    }, timeout);
-  }
+	if (typeof timeout === "number") {
+		setTimeout(() => {
+			$dialog.append(
+				<div className="button-container">
+					<button onclick={destroy}>{strings.cancel}</button>
+				</div>,
+			);
+		}, timeout);
+	}
 
-  if (!$oldLoader) {
-    actionStack.freeze();
-    document.body.append($dialog, $mask);
-    restoreTheme(true);
-  }
+	if (!$oldLoader) {
+		actionStack.freeze();
+		document.body.append($dialog, $mask);
+		restoreTheme(true);
+	}
 
-  return {
-    setTitle(title) {
-      $titleSpan.textContent = title;
-    },
-    setMessage(message) {
-      $message.innerHTML = message;
-    },
-    hide,
-    show,
-    destroy,
-  };
+	return {
+		setTitle(title) {
+			$titleSpan.textContent = title;
+		},
+		setMessage(message) {
+			$message.innerHTML = message;
+		},
+		hide,
+		show,
+		destroy,
+	};
 }
 
 /**
  * Removes the loader from DOM permanently
  */
 function destroy() {
-  const loaderDiv = tag.get('#__loader');
-  const mask = tag.get('#__loader-mask');
-  restoreTheme();
+	const loaderDiv = tag.get("#__loader");
+	const mask = tag.get("#__loader-mask");
+	restoreTheme();
 
-  if (!loaderDiv && !mask) {
-    actionStack.unfreeze();
-    return;
-  }
+	if (!loaderDiv && !mask) {
+		actionStack.unfreeze();
+		return;
+	}
 
-  loaderDiv?.classList.add('hide');
-  setTimeout(() => {
-    actionStack.unfreeze();
-    if (loaderDiv?.isConnected) loaderDiv.remove();
-    if (mask?.isConnected) mask.remove();
-    onCancelCallback?.();
-  }, 300);
+	loaderDiv?.classList.add("hide");
+	setTimeout(() => {
+		actionStack.unfreeze();
+		if (loaderDiv?.isConnected) loaderDiv.remove();
+		if (mask?.isConnected) mask.remove();
+		onCancelCallback?.();
+	}, 300);
 }
 
 /**
  * Hides the loading dialog box temporarily and can be restored using show method
  */
 function hide() {
-  const loaderDiv = tag.get('#__loader');
-  const mask = tag.get('#__loader-mask');
+	const loaderDiv = tag.get("#__loader");
+	const mask = tag.get("#__loader-mask");
 
-  if (loaderDiv) {
-    $currentDialog = loaderDiv;
-    loaderDiv.remove();
-  }
-  if (mask) {
-    $currentMask = mask;
-    mask.remove();
-  }
+	if (loaderDiv) {
+		$currentDialog = loaderDiv;
+		loaderDiv.remove();
+	}
+	if (mask) {
+		$currentMask = mask;
+		mask.remove();
+	}
 }
 
 /**
  * Shows previously hidden dialog box.
  */
 function show() {
-  if ($currentDialog) {
-    app.append($currentDialog);
-    $currentDialog = null;
-  }
-  if ($currentMask) {
-    app.append($currentMask);
-    $currentMask = null;
-  }
+	if ($currentDialog) {
+		app.append($currentDialog);
+		$currentDialog = null;
+	}
+	if ($currentMask) {
+		app.append($currentMask);
+		$currentMask = null;
+	}
 }
 
 /**
@@ -144,38 +153,37 @@ function show() {
  * @param {boolean} [immortal] If true, the loader will not be removed automatically
  */
 function showTitleLoader(immortal = false) {
-  if (typeof immortal === 'boolean') {
-    loaderIsImmortal = immortal;
-  }
+	if (typeof immortal === "boolean") {
+		loaderIsImmortal = immortal;
+	}
 
-  setTimeout(() => {
-    app.classList.remove('title-loading-hide');
-    app.classList.add('title-loading');
-  }, 0);
+	setTimeout(() => {
+		app.classList.remove("title-loading-hide");
+		app.classList.add("title-loading");
+	}, 0);
 }
 
 /**
  * Removes title loader
  * @param {boolean} immortal If not true, the loader will not remove when immortal was true when it was created.
- * @returns 
+ * @returns
  */
 function removeTitleLoader(immortal = undefined) {
-  if (typeof immortal === 'boolean') {
-    loaderIsImmortal = immortal;
-  }
+	if (typeof immortal === "boolean") {
+		loaderIsImmortal = immortal;
+	}
 
-  if (loaderIsImmortal) return;
-  setTimeout(() => {
-    app.classList.add('title-loading-hide');
-  }, 0);
+	if (loaderIsImmortal) return;
+	setTimeout(() => {
+		app.classList.add("title-loading-hide");
+	}, 0);
 }
 
-
 export default {
-  create,
-  destroy,
-  hide,
-  show,
-  showTitleLoader,
-  removeTitleLoader,
+	create,
+	destroy,
+	hide,
+	show,
+	showTitleLoader,
+	removeTitleLoader,
 };
