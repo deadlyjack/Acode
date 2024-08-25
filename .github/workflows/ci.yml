@@ -1,4 +1,4 @@
-name: Spell Check
+name: CI
 
 on:
   push:
@@ -10,6 +10,7 @@ on:
 
 jobs:
   spell-check:
+    name: Check spelling
     runs-on: ubuntu-latest
 
     steps:
