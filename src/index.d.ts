@@ -11,24 +11,24 @@ declare const DOES_SUPPORT_THEME: boolean;
 declare const acode: object;
 
 interface Window {
-  ASSETS_DIRECTORY: string;
-  DATA_STORAGE: string;
-  CACHE_STORAGE: string;
-  PLUGIN_DIR: string;
-  KEYBINDING_FILE: string;
-  IS_FREE_VERSION: string;
-  ANDROID_SDK_INT: number;
-  DOES_SUPPORT_THEME: boolean;
-  acode: object;
+	ASSETS_DIRECTORY: string;
+	DATA_STORAGE: string;
+	CACHE_STORAGE: string;
+	PLUGIN_DIR: string;
+	KEYBINDING_FILE: string;
+	IS_FREE_VERSION: string;
+	ANDROID_SDK_INT: number;
+	DOES_SUPPORT_THEME: boolean;
+	acode: object;
 }
 
-interface String{
-  /**
-   * Capitalize the first letter of a string
-   */
-  capitalize(): string;
-  /**
-   * Generate a hash from a string
-   */
-  hash(): string;
+interface String {
+	/**
+	 * Capitalize the first letter of a string
+	 */
+	capitalize(): string;
+	/**
+	 * Generate a hash from a string
+	 */
+	hash(): string;
 }

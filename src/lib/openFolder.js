@@ -1,21 +1,21 @@
-import escapeStringRegexp from "escape-string-regexp";
-import fsOperation from "fileSystem";
 import collapsableList from "components/collapsableList";
-import tile from "components/tile";
 import Sidebar from "components/sidebar";
-import helpers from "utils/helpers";
-import Path from "utils/Path";
-import Url from "utils/Url";
-import FileBrowser from "pages/fileBrowser";
-import sidebarApps from "sidebarApps";
-import recents from "./recents";
-import constants from "./constants";
-import openFile from "./openFile";
-import appSettings from "./settings";
-import * as FileList from "./fileList";
-import select from "dialogs/select";
+import tile from "components/tile";
 import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
+import select from "dialogs/select";
+import escapeStringRegexp from "escape-string-regexp";
+import fsOperation from "fileSystem";
+import FileBrowser from "pages/fileBrowser";
+import sidebarApps from "sidebarApps";
+import Path from "utils/Path";
+import Url from "utils/Url";
+import helpers from "utils/helpers";
+import constants from "./constants";
+import * as FileList from "./fileList";
+import openFile from "./openFile";
+import recents from "./recents";
+import appSettings from "./settings";
 
 /**
  * @typedef {import('../components/collapsableList').Collapsible} Collapsible
@@ -56,108 +56,108 @@ export const addedFolder = [];
  * @param {Map<string, boolean>} [opts.listState]
  */
 function openFolder(_path, opts = {}) {
-  if (addedFolder.find((folder) => folder.url === _path)) {
-    return;
-  }
+	if (addedFolder.find((folder) => folder.url === _path)) {
+		return;
+	}
 
-  const saveState = opts.saveState ?? true;
-  const listState = opts.listState || {};
-  const title = opts.name;
-  let listFiles = opts.listFiles;
+	const saveState = opts.saveState ?? true;
+	const listState = opts.listState || {};
+	const title = opts.name;
+	let listFiles = opts.listFiles;
 
-  if (!title) {
-    throw new Error("Folder name is required");
-  }
+	if (!title) {
+		throw new Error("Folder name is required");
+	}
 
-  const $root = collapsableList(title, "folder", {
-    tail: <Tail target={() => $root.$title} />,
-                                allCaps: true,
-                                ontoggle: () => expandList($root),
-  });
-  const $text = $root.$title.get(":scope>span.text");
+	const $root = collapsableList(title, "folder", {
+		tail: <Tail target={() => $root.$title} />,
+		allCaps: true,
+		ontoggle: () => expandList($root),
+	});
+	const $text = $root.$title.get(":scope>span.text");
 
-  $root.id = "r" + _path.hashCode();
-  $text.style.overflow = "hidden";
-  $text.style.whiteSpace = "nowrap";
-  $text.style.textOverflow = "ellipsis";
-  $root.$title.dataset.type = "root";
-  $root.$title.dataset.url = _path;
-  $root.$title.dataset.name = title;
+	$root.id = "r" + _path.hashCode();
+	$text.style.overflow = "hidden";
+	$text.style.whiteSpace = "nowrap";
+	$text.style.textOverflow = "ellipsis";
+	$root.$title.dataset.type = "root";
+	$root.$title.dataset.url = _path;
+	$root.$title.dataset.name = title;
 
-  $root.$ul.onclick =
-  $root.$ul.oncontextmenu =
-  $root.$title.onclick =
-  $root.$title.oncontextmenu =
-  handleItems;
+	$root.$ul.onclick =
+		$root.$ul.oncontextmenu =
+		$root.$title.onclick =
+		$root.$title.oncontextmenu =
+			handleItems;
 
-  recents.addFolder(_path, opts);
-  sidebarApps.get("files").append($root);
+	recents.addFolder(_path, opts);
+	sidebarApps.get("files").append($root);
 
-  const event = {
-    url: _path,
-    name: title,
-  };
+	const event = {
+		url: _path,
+		name: title,
+	};
 
-  const folder = {
-    title,
-    remove,
-    listFiles,
-    saveState,
-    listState,
-    url: _path,
-    $node: $root,
-    id: opts.id,
-    clipBoard: {},
-    reload() {
-      $root.collapse();
-      $root.expand();
-    },
-  };
-  addedFolder.push(folder);
+	const folder = {
+		title,
+		remove,
+		listFiles,
+		saveState,
+		listState,
+		url: _path,
+		$node: $root,
+		id: opts.id,
+		clipBoard: {},
+		reload() {
+			$root.collapse();
+			$root.expand();
+		},
+	};
+	addedFolder.push(folder);
 
-  editorManager.emit("update", "add-folder");
-  editorManager.onupdate("add-folder", event);
-  editorManager.emit("add-folder", event);
+	editorManager.emit("update", "add-folder");
+	editorManager.onupdate("add-folder", event);
+	editorManager.emit("add-folder", event);
 
-  (async () => {
-    if (typeof listFiles !== "boolean") {
-      const protocol = Url.getProtocol(_path).slice(0, -1);
-      const type = /^(content|file)$/.test(protocol) ? "" : ` (${protocol})`;
-      const message = strings["list files"].replace(
-        "{name}",
-        `${title}${type}`,
-      );
-      listFiles = await confirm(strings.confirm, message, true);
-    }
+	(async () => {
+		if (typeof listFiles !== "boolean") {
+			const protocol = Url.getProtocol(_path).slice(0, -1);
+			const type = /^(content|file)$/.test(protocol) ? "" : ` (${protocol})`;
+			const message = strings["list files"].replace(
+				"{name}",
+				`${title}${type}`,
+			);
+			listFiles = await confirm(strings.confirm, message, true);
+		}
 
-    if (listFiles) {
-      FileList.addRoot({ url: _path, name: title });
-    }
+		if (listFiles) {
+			FileList.addRoot({ url: _path, name: title });
+		}
 
-    folder.listFiles = listFiles;
-  })();
+		folder.listFiles = listFiles;
+	})();
 
-  if (listState[_path]) {
-    $root.expand();
-  }
+	if (listState[_path]) {
+		$root.expand();
+	}
 
-  function remove(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-    }
+	function remove(e) {
+		if (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			e.stopImmediatePropagation();
+		}
 
-    if ($root.parentElement) {
-      $root.remove();
-    }
+		if ($root.parentElement) {
+			$root.remove();
+		}
 
-    const index = addedFolder.findIndex((folder) => folder.url === _path);
-    if (index !== -1) addedFolder.splice(index, 1);
-    editorManager.emit("update", "remove-folder");
-    editorManager.onupdate("remove-folder", event);
-    editorManager.emit("remove-folder", event);
-  }
+		const index = addedFolder.findIndex((folder) => folder.url === _path);
+		if (index !== -1) addedFolder.splice(index, 1);
+		editorManager.emit("update", "remove-folder");
+		editorManager.onupdate("remove-folder", event);
+		editorManager.emit("remove-folder", event);
+	}
 }
 
 /**
@@ -165,47 +165,47 @@ function openFolder(_path, opts = {}) {
  * @param {Collapsible} $list
  */
 async function expandList($list) {
-  const { $ul, $title } = $list;
-  const { url } = $title.dataset;
+	const { $ul, $title } = $list;
+	const { url } = $title.dataset;
 
-  const { saveState, listState, $node } = openFolder.find(url);
-  const startLoading = () => $node.$title.classList.add("loading");
-  const stopLoading = () => $node.$title.classList.remove("loading");
+	const { saveState, listState, $node } = openFolder.find(url);
+	const startLoading = () => $node.$title.classList.add("loading");
+	const stopLoading = () => $node.$title.classList.remove("loading");
 
-  if (!$ul) return;
+	if (!$ul) return;
 
-  $ul.textContent = null;
-  if (saveState) listState[url] = $list.unclasped;
-  if (!$list.unclasped) return;
+	$ul.textContent = null;
+	if (saveState) listState[url] = $list.unclasped;
+	if (!$list.unclasped) return;
 
-  try {
-    startLoading();
-    const entries = await fsOperation(url).lsDir();
-    helpers
-    .sortDir(entries, {
-      sortByName: true,
-      showHiddenFiles: true,
-    })
-    .map((entry) => {
-      const name = entry.name || Path.basename(entry.url);
-      if (entry.isDirectory) {
-        const $list = createFolderTile(name, entry.url);
-        $ul.appendChild($list);
+	try {
+		startLoading();
+		const entries = await fsOperation(url).lsDir();
+		helpers
+			.sortDir(entries, {
+				sortByName: true,
+				showHiddenFiles: true,
+			})
+			.map((entry) => {
+				const name = entry.name || Path.basename(entry.url);
+				if (entry.isDirectory) {
+					const $list = createFolderTile(name, entry.url);
+					$ul.appendChild($list);
 
-        if (listState[entry.url]) {
-          $list.expand();
-        }
-      } else {
-        const $item = createFileTile(name, entry.url);
-        $ul.append($item);
-      }
-    });
-  } catch (err) {
-    $list.collapse();
-    helpers.error(err);
-  } finally {
-    stopLoading();
-  }
+					if (listState[entry.url]) {
+						$list.expand();
+					}
+				} else {
+					const $item = createFileTile(name, entry.url);
+					$ul.append($item);
+				}
+			});
+	} catch (err) {
+		$list.collapse();
+		helpers.error(err);
+	} finally {
+		stopLoading();
+	}
 }
 
 /**
@@ -215,13 +215,13 @@ async function expandList($list) {
  * @returns
  */
 function collapsed($el, isFile) {
-  if (!$el.isConnected) return true;
-  $el = $el.parentElement;
-  if (!isFile) {
-    $el = $el.parentElement;
-  }
+	if (!$el.isConnected) return true;
+	$el = $el.parentElement;
+	if (!isFile) {
+		$el = $el.parentElement;
+	}
 
-  return $el.previousElementSibling.collapsed;
+	return $el.previousElementSibling.collapsed;
 }
 
 /**
@@ -229,19 +229,19 @@ function collapsed($el, isFile) {
  * @param {Event} e
  */
 function handleItems(e) {
-  const mode = e.type;
-  const $target = e.target;
-  if (!($target instanceof HTMLElement)) return;
-  const type = $target.dataset.type;
-  if (!type) return;
-  const url = $target.dataset.url;
-  const name = $target.dataset.name;
+	const mode = e.type;
+	const $target = e.target;
+	if (!($target instanceof HTMLElement)) return;
+	const type = $target.dataset.type;
+	if (!type) return;
+	const url = $target.dataset.url;
+	const name = $target.dataset.name;
 
-  if (mode === "click") {
-    handleClick(type, url, name, $target);
-  } else if (mode === "contextmenu") {
-    handleContextmenu(type, url, name, $target);
-  }
+	if (mode === "click") {
+		handleClick(type, url, name, $target);
+	} else if (mode === "contextmenu") {
+		handleContextmenu(type, url, name, $target);
+	}
 }
 
 /**
@@ -252,54 +252,54 @@ function handleItems(e) {
  * @param {HTMLElement} $target
  */
 async function handleContextmenu(type, url, name, $target) {
-  if (appSettings.value.vibrateOnTap) {
-    navigator.vibrate(constants.VIBRATION_TIME);
-  }
-  const { clipBoard, $node } = openFolder.find(url);
-  const cancel = `${strings.cancel}${clipBoard ? ` (${strings[clipBoard.action]})` : ""}`;
-  const COPY = ["copy", strings.copy, "copy"];
-  const CUT = ["cut", strings.cut, "cut"];
-  const REMOVE = ["delete", strings.delete, "delete"];
-  const RENAME = ["rename", strings.rename, "edit"];
-  const PASTE = ["paste", strings.paste, "paste", !!clipBoard];
-  const NEW_FILE = ["new file", strings["new file"], "document-add"];
-  const NEW_FOLDER = ["new folder", strings["new folder"], "folder-add"];
-  const CANCEL = ["cancel", cancel, "clearclose"];
-  const OPEN_FOLDER = ["open-folder", strings["open folder"], "folder"];
-  const INSERT_FILE = ["insert-file", strings["insert file"], "file_copy"];
-  const CLOSE_FOLDER = ["close", strings["close"], "folder-remove"];
+	if (appSettings.value.vibrateOnTap) {
+		navigator.vibrate(constants.VIBRATION_TIME);
+	}
+	const { clipBoard, $node } = openFolder.find(url);
+	const cancel = `${strings.cancel}${clipBoard ? ` (${strings[clipBoard.action]})` : ""}`;
+	const COPY = ["copy", strings.copy, "copy"];
+	const CUT = ["cut", strings.cut, "cut"];
+	const REMOVE = ["delete", strings.delete, "delete"];
+	const RENAME = ["rename", strings.rename, "edit"];
+	const PASTE = ["paste", strings.paste, "paste", !!clipBoard];
+	const NEW_FILE = ["new file", strings["new file"], "document-add"];
+	const NEW_FOLDER = ["new folder", strings["new folder"], "folder-add"];
+	const CANCEL = ["cancel", cancel, "clearclose"];
+	const OPEN_FOLDER = ["open-folder", strings["open folder"], "folder"];
+	const INSERT_FILE = ["insert-file", strings["insert file"], "file_copy"];
+	const CLOSE_FOLDER = ["close", strings["close"], "folder-remove"];
 
-  let options;
+	let options;
 
-  if (helpers.isFile(type)) {
-    options = [COPY, CUT, RENAME, REMOVE];
-  } else if (helpers.isDir(type)) {
-    options = [
-      COPY,
-      CUT,
-      REMOVE,
-      RENAME,
-      PASTE,
-      NEW_FILE,
-      NEW_FOLDER,
-      OPEN_FOLDER,
-      INSERT_FILE,
-    ];
-  } else if (type === "root") {
-    options = [PASTE, NEW_FILE, NEW_FOLDER, INSERT_FILE, CLOSE_FOLDER];
-  }
+	if (helpers.isFile(type)) {
+		options = [COPY, CUT, RENAME, REMOVE];
+	} else if (helpers.isDir(type)) {
+		options = [
+			COPY,
+			CUT,
+			REMOVE,
+			RENAME,
+			PASTE,
+			NEW_FILE,
+			NEW_FOLDER,
+			OPEN_FOLDER,
+			INSERT_FILE,
+		];
+	} else if (type === "root") {
+		options = [PASTE, NEW_FILE, NEW_FOLDER, INSERT_FILE, CLOSE_FOLDER];
+	}
 
-  if (clipBoard.action) options.push(CANCEL);
+	if (clipBoard.action) options.push(CANCEL);
 
-  try {
-    const option = await select(name, options);
-    await execOperation(type, option, url, $target, name);
-  } catch (error) {
-    console.error(error);
-    helpers.error(error);
-  } finally {
-    $node.$title.classList.remove("loading");
-  }
+	try {
+		const option = await select(name, options);
+		await execOperation(type, option, url, $target, name);
+	} catch (error) {
+		console.error(error);
+		helpers.error(error);
+	} finally {
+		$node.$title.classList.remove("loading");
+	}
 }
 
 /**
@@ -310,286 +310,286 @@ async function handleContextmenu(type, url, name, $target) {
  * @param {string} name Name of file or folder
  */
 function execOperation(type, action, url, $target, name) {
-  const { clipBoard, $node, remove } = openFolder.find(url);
-  const startLoading = () => $node.$title.classList.add("loading");
-  const stopLoading = () => $node.$title.classList.remove("loading");
+	const { clipBoard, $node, remove } = openFolder.find(url);
+	const startLoading = () => $node.$title.classList.add("loading");
+	const stopLoading = () => $node.$title.classList.remove("loading");
 
-  switch (action) {
-    case "copy":
-    case "cut":
-      return clipBoardAction();
+	switch (action) {
+		case "copy":
+		case "cut":
+			return clipBoardAction();
 
-    case "delete":
-      return deleteFile();
+		case "delete":
+			return deleteFile();
 
-    case "rename":
-      return renameFile();
+		case "rename":
+			return renameFile();
 
-    case "paste":
-      return paste();
+		case "paste":
+			return paste();
 
-    case "new file":
-    case "new folder":
-      return createNew();
+		case "new file":
+		case "new folder":
+			return createNew();
 
-    case "cancel":
-      return cancelAction();
+		case "cancel":
+			return cancelAction();
 
-    case "open-folder":
-      return open();
+		case "open-folder":
+			return open();
 
-    case "insert-file":
-      return insertFile();
+		case "insert-file":
+			return insertFile();
 
-    case "close":
-      return remove();
-  }
+		case "close":
+			return remove();
+	}
 
-  async function deleteFile() {
-    const msg = strings["delete entry"].replace("{name}", name);
-    const confirmation = await confirm(strings.warning, msg);
-    if (!confirmation) return;
-    startLoading();
-    await fsOperation(url).delete();
-    recents.removeFile(url);
-    if (helpers.isFile(type)) {
-      $target.remove();
-      const file = editorManager.getFile(url, "uri");
-      if (file) file.uri = null;
-      editorManager.onupdate("delete-file");
-      editorManager.emit("update", "delete-file");
-    } else {
-      recents.removeFolder(url);
-      helpers.updateUriOfAllActiveFiles(url, null);
-      $target.parentElement.remove();
-      editorManager.onupdate("delete-folder");
-      editorManager.emit("update", "delete-folder");
-    }
+	async function deleteFile() {
+		const msg = strings["delete entry"].replace("{name}", name);
+		const confirmation = await confirm(strings.warning, msg);
+		if (!confirmation) return;
+		startLoading();
+		await fsOperation(url).delete();
+		recents.removeFile(url);
+		if (helpers.isFile(type)) {
+			$target.remove();
+			const file = editorManager.getFile(url, "uri");
+			if (file) file.uri = null;
+			editorManager.onupdate("delete-file");
+			editorManager.emit("update", "delete-file");
+		} else {
+			recents.removeFolder(url);
+			helpers.updateUriOfAllActiveFiles(url, null);
+			$target.parentElement.remove();
+			editorManager.onupdate("delete-folder");
+			editorManager.emit("update", "delete-folder");
+		}
 
-    toast(strings.success);
-    FileList.remove(url);
-  }
+		toast(strings.success);
+		FileList.remove(url);
+	}
 
-  async function renameFile() {
-    let newName = await prompt(strings.rename, name, "text", {
-      match: constants.FILE_NAME_REGEX,
-      required: true,
-    });
+	async function renameFile() {
+		let newName = await prompt(strings.rename, name, "text", {
+			match: constants.FILE_NAME_REGEX,
+			required: true,
+		});
 
-    newName = helpers.fixFilename(newName);
-    if (!newName || newName === name) return;
+		newName = helpers.fixFilename(newName);
+		if (!newName || newName === name) return;
 
-    startLoading();
-    const fs = fsOperation(url);
-    const newUrl = await fs.renameTo(newName);
-    newName = Url.basename(newUrl);
-    $target.querySelector(":scope>.text").textContent = newName;
-    $target.dataset.url = newUrl;
-    $target.dataset.name = newName;
-    if (helpers.isFile(type)) {
-      $target.querySelector(":scope>span").className =
-      helpers.getIconForFile(newName);
-      let file = editorManager.getFile(url, "uri");
-      if (file) {
-        file.uri = newUrl;
-        file.filename = newName;
-      }
-    } else {
-      helpers.updateUriOfAllActiveFiles(url, newUrl);
-      //Reloading the folder by collapsing and expanding the folder
-      $target.click(); //collapse
-      $target.click(); //expand
-    }
-    toast(strings.success);
-    FileList.rename(url, newUrl);
-  }
+		startLoading();
+		const fs = fsOperation(url);
+		const newUrl = await fs.renameTo(newName);
+		newName = Url.basename(newUrl);
+		$target.querySelector(":scope>.text").textContent = newName;
+		$target.dataset.url = newUrl;
+		$target.dataset.name = newName;
+		if (helpers.isFile(type)) {
+			$target.querySelector(":scope>span").className =
+				helpers.getIconForFile(newName);
+			let file = editorManager.getFile(url, "uri");
+			if (file) {
+				file.uri = newUrl;
+				file.filename = newName;
+			}
+		} else {
+			helpers.updateUriOfAllActiveFiles(url, newUrl);
+			//Reloading the folder by collapsing and expanding the folder
+			$target.click(); //collapse
+			$target.click(); //expand
+		}
+		toast(strings.success);
+		FileList.rename(url, newUrl);
+	}
 
-  async function createNew() {
-    const msg =
-    action === "new file"
-    ? strings["enter file name"]
-    : strings["enter folder name"];
+	async function createNew() {
+		const msg =
+			action === "new file"
+				? strings["enter file name"]
+				: strings["enter folder name"];
 
-    let newName = await prompt(msg, "", "text", {
-      match: constants.FILE_NAME_REGEX,
-      required: true,
-    });
+		let newName = await prompt(msg, "", "text", {
+			match: constants.FILE_NAME_REGEX,
+			required: true,
+		});
 
-    newName = helpers.fixFilename(newName);
-    if (!newName) return;
-    startLoading();
-    let newUrl;
+		newName = helpers.fixFilename(newName);
+		if (!newName) return;
+		startLoading();
+		let newUrl;
 
-    if (action === "new file") {
-      newUrl = await helpers.createFileStructure(url, newName);
-    } else {
-      newUrl = await helpers.createFileStructure(url, newName, false);
-    }
-    if (!newUrl) return;
-    newName = Url.basename(newUrl.uri);
-    if ($target.unclasped) {
-      if (newUrl.type == "file") {
-        appendTile($target, createFileTile(newName, newUrl.uri));
-      } else if (newUrl.type == "folder") {
-        appendList($target, createFolderTile(newName, newUrl.uri));
-      }
-    }
+		if (action === "new file") {
+			newUrl = await helpers.createFileStructure(url, newName);
+		} else {
+			newUrl = await helpers.createFileStructure(url, newName, false);
+		}
+		if (!newUrl) return;
+		newName = Url.basename(newUrl.uri);
+		if ($target.unclasped) {
+			if (newUrl.type === "file") {
+				appendTile($target, createFileTile(newName, newUrl.uri));
+			} else if (newUrl.type === "folder") {
+				appendList($target, createFolderTile(newName, newUrl.uri));
+			}
+		}
 
-    FileList.append(url, newUrl.uri);
-    toast(strings.success);
-  }
+		FileList.append(url, newUrl.uri);
+		toast(strings.success);
+	}
 
-  async function paste() {
-    let CASE = "";
-    const $src = clipBoard.$el;
-    const srcType = $src.dataset.type;
-    const IS_FILE = helpers.isFile(srcType);
-    const IS_DIR = helpers.isDir(srcType);
-    const srcCollapsed = collapsed($src, IS_FILE);
+	async function paste() {
+		let CASE = "";
+		const $src = clipBoard.$el;
+		const srcType = $src.dataset.type;
+		const IS_FILE = helpers.isFile(srcType);
+		const IS_DIR = helpers.isDir(srcType);
+		const srcCollapsed = collapsed($src, IS_FILE);
 
-    CASE += IS_FILE ? 1 : 0;
-    CASE += srcCollapsed ? 1 : 0;
-    CASE += $target.collapsed ? 1 : 0;
+		CASE += IS_FILE ? 1 : 0;
+		CASE += srcCollapsed ? 1 : 0;
+		CASE += $target.collapsed ? 1 : 0;
 
-    startLoading();
-    const fs = fsOperation(clipBoard.url);
-    let newUrl;
-    if (clipBoard.action === "cut") newUrl = await fs.moveTo(url);
-    else newUrl = await fs.copyTo(url);
-    const { name: newName } = await fsOperation(newUrl).stat();
-    stopLoading();
-    /**
-     * CASES:
-     * CASE 111: src is file and parent is collapsed where target is also collapsed
-     * CASE 110: src is file and parent is collapsed where target is unclasped
-     * CASE 101: src is file and parent is unclasped where target is collapsed
-     * CASE 100: src is file and parent is unclasped where target is also unclasped
-     * CASE 011: src is directory and parent is collapsed where target is also collapsed
-     * CASE 001: src is directory and parent is unclasped where target is also collapsed
-     * CASE 010: src is directory and parent is collapsed where target is also unclasped
-     * CASE 000: src is directory and parent is unclasped where target is also unclasped
-     */
+		startLoading();
+		const fs = fsOperation(clipBoard.url);
+		let newUrl;
+		if (clipBoard.action === "cut") newUrl = await fs.moveTo(url);
+		else newUrl = await fs.copyTo(url);
+		const { name: newName } = await fsOperation(newUrl).stat();
+		stopLoading();
+		/**
+		 * CASES:
+		 * CASE 111: src is file and parent is collapsed where target is also collapsed
+		 * CASE 110: src is file and parent is collapsed where target is unclasped
+		 * CASE 101: src is file and parent is unclasped where target is collapsed
+		 * CASE 100: src is file and parent is unclasped where target is also unclasped
+		 * CASE 011: src is directory and parent is collapsed where target is also collapsed
+		 * CASE 001: src is directory and parent is unclasped where target is also collapsed
+		 * CASE 010: src is directory and parent is collapsed where target is also unclasped
+		 * CASE 000: src is directory and parent is unclasped where target is also unclasped
+		 */
 
-    if (clipBoard.action === "cut") {
-      //move
+		if (clipBoard.action === "cut") {
+			//move
 
-      if (IS_FILE) {
-        const file = editorManager.getFile(clipBoard.url, "uri");
-        if (file) file.uri = newUrl;
-      } else if (IS_DIR) {
-        helpers.updateUriOfAllActiveFiles(clipBoard.url, newUrl);
-      }
+			if (IS_FILE) {
+				const file = editorManager.getFile(clipBoard.url, "uri");
+				if (file) file.uri = newUrl;
+			} else if (IS_DIR) {
+				helpers.updateUriOfAllActiveFiles(clipBoard.url, newUrl);
+			}
 
-      switch (CASE) {
-        case "111":
-        case "011":
-          break;
+			switch (CASE) {
+				case "111":
+				case "011":
+					break;
 
-        case "110":
-          appendTile($target, createFileTile(newName, newUrl));
-          break;
+				case "110":
+					appendTile($target, createFileTile(newName, newUrl));
+					break;
 
-        case "101":
-          $src.remove();
-          break;
+				case "101":
+					$src.remove();
+					break;
 
-        case "100":
-          appendTile($target, createFileTile(newName, newUrl));
-          $src.remove();
-          break;
+				case "100":
+					appendTile($target, createFileTile(newName, newUrl));
+					$src.remove();
+					break;
 
-        case "001":
-          $src.parentElement.remove();
-          break;
+				case "001":
+					$src.parentElement.remove();
+					break;
 
-        case "010":
-          appendList($target, createFolderTile(newName, newUrl));
-          break;
+				case "010":
+					appendList($target, createFolderTile(newName, newUrl));
+					break;
 
-        case "000":
-          appendList($target, createFolderTile(newName, newUrl));
-          $src.parentElement.remove();
-          break;
+				case "000":
+					appendList($target, createFolderTile(newName, newUrl));
+					$src.parentElement.remove();
+					break;
 
-        default:
-          break;
-      }
-      FileList.remove(clipBoard.url);
-    } else {
-      //copy
+				default:
+					break;
+			}
+			FileList.remove(clipBoard.url);
+		} else {
+			//copy
 
-      switch (CASE) {
-        case "111":
-        case "101":
-        case "011":
-        case "001":
-          break;
+			switch (CASE) {
+				case "111":
+				case "101":
+				case "011":
+				case "001":
+					break;
 
-        case "110":
-        case "100":
-          appendTile($target, createFileTile(newName, newUrl));
-          break;
+				case "110":
+				case "100":
+					appendTile($target, createFileTile(newName, newUrl));
+					break;
 
-        case "010":
-        case "000":
-          appendList($target, createFolderTile(newName, newUrl));
-          break;
+				case "010":
+				case "000":
+					appendList($target, createFolderTile(newName, newUrl));
+					break;
 
-        default:
-          break;
-      }
-    }
+				default:
+					break;
+			}
+		}
 
-    FileList.append(url, newUrl);
-    toast(strings.success);
-    clearClipboard();
-  }
+		FileList.append(url, newUrl);
+		toast(strings.success);
+		clearClipboard();
+	}
 
-  async function insertFile() {
-    startLoading();
-    try {
-      const file = await FileBrowser("file", strings["insert file"]);
-      const sourceFs = fsOperation(file.url);
-      const data = await sourceFs.readFile();
-      const sourceStats = await sourceFs.stat();
-      const insertedFile = await fsOperation(url).createFile(
-        sourceStats.name,
-        data,
-      );
-      appendTile($target, createFileTile(sourceStats.name, insertedFile));
-      FileList.append(url, insertedFile);
-    } catch (error) {
-    } finally {
-      stopLoading();
-    }
-  }
+	async function insertFile() {
+		startLoading();
+		try {
+			const file = await FileBrowser("file", strings["insert file"]);
+			const sourceFs = fsOperation(file.url);
+			const data = await sourceFs.readFile();
+			const sourceStats = await sourceFs.stat();
+			const insertedFile = await fsOperation(url).createFile(
+				sourceStats.name,
+				data,
+			);
+			appendTile($target, createFileTile(sourceStats.name, insertedFile));
+			FileList.append(url, insertedFile);
+		} catch (error) {
+		} finally {
+			stopLoading();
+		}
+	}
 
-  async function clipBoardAction() {
-    clipBoard.url = url;
-    clipBoard.action = action;
-    clipBoard.$el = $target;
+	async function clipBoardAction() {
+		clipBoard.url = url;
+		clipBoard.action = action;
+		clipBoard.$el = $target;
 
-    if (action === "cut") $target.classList.add("cut");
-    else $target.classList.remove("cut");
-  }
+		if (action === "cut") $target.classList.add("cut");
+		else $target.classList.remove("cut");
+	}
 
-  async function open() {
-    FileBrowser.openFolder({
-      url,
-      name,
-    });
-  }
+	async function open() {
+		FileBrowser.openFolder({
+			url,
+			name,
+		});
+	}
 
-  function cancelAction() {
-    clipBoard.$el.classList.remove("cut");
-    clearClipboard();
-  }
+	function cancelAction() {
+		clipBoard.$el.classList.remove("cut");
+		clearClipboard();
+	}
 
-  function clearClipboard() {
-    clipBoard.$el = null;
-    clipBoard.url = null;
-    clipBoard.action = null;
-  }
+	function clearClipboard() {
+		clipBoard.$el = null;
+		clipBoard.url = null;
+		clipBoard.action = null;
+	}
 }
 
 /**
@@ -598,9 +598,9 @@ function execOperation(type, action, url, $target, name) {
  * @param {string} url
  */
 function handleClick(type, uri) {
-  if (!helpers.isFile(type)) return;
-  openFile(uri, { render: true });
-  Sidebar.hide();
+	if (!helpers.isFile(type)) return;
+	openFile(uri, { render: true });
+	Sidebar.hide();
 }
 
 /**
@@ -609,10 +609,10 @@ function handleClick(type, uri) {
  * @param {HTMLElement} $tile
  */
 function appendTile($target, $tile) {
-  $target = $target.nextElementSibling;
-  const $firstTile = $target.get(":scope>[type=file]");
-  if ($firstTile) $target.insertBefore($tile, $firstTile);
-  else $target.append($tile);
+	$target = $target.nextElementSibling;
+	const $firstTile = $target.get(":scope>[type=file]");
+	if ($firstTile) $target.insertBefore($tile, $firstTile);
+	else $target.append($tile);
 }
 
 /**
@@ -621,10 +621,10 @@ function appendTile($target, $tile) {
  * @param {HTMLElement} $list The tile to be inserted
  */
 function appendList($target, $list) {
-  $target = $target.nextElementSibling;
-  const $firstList = $target.firstElementChild;
-  if ($firstList) $target.insertBefore($list, $firstList);
-  else $target.append($list);
+	$target = $target.nextElementSibling;
+	const $firstList = $target.firstElementChild;
+	if ($firstList) $target.insertBefore($list, $firstList);
+	else $target.append($list);
 }
 
 /**
@@ -634,16 +634,16 @@ function appendList($target, $list) {
  * @returns {HTMLElement}
  */
 function createFolderTile(name, url) {
-  const $list = collapsableList(name, "folder", {
-    tail: <Tail target={() => $list.$title} />,
-                                ontoggle: () => expandList($list),
-  });
-  const { $title } = $list;
-  $title.dataset.url = url;
-  $title.dataset.name = name;
-  $title.dataset.type = "dir";
+	const $list = collapsableList(name, "folder", {
+		tail: <Tail target={() => $list.$title} />,
+		ontoggle: () => expandList($list),
+	});
+	const { $title } = $list;
+	$title.dataset.url = url;
+	$title.dataset.name = name;
+	$title.dataset.type = "dir";
 
-  return $list;
+	return $list;
 }
 
 /**
@@ -653,16 +653,16 @@ function createFolderTile(name, url) {
  * @returns {HTMLElement}
  */
 function createFileTile(name, url) {
-  const $tile = tile({
-    lead: <span className={helpers.getIconForFile(name)}></span>,
-                     text: name,
-                     tail: <Tail target={() => $tile} />,
-  });
-  $tile.dataset.url = url;
-  $tile.dataset.name = name;
-  $tile.dataset.type = "file";
+	const $tile = tile({
+		lead: <span className={helpers.getIconForFile(name)}></span>,
+		text: name,
+		tail: <Tail target={() => $tile} />,
+	});
+	$tile.dataset.url = url;
+	$tile.dataset.name = name;
+	$tile.dataset.type = "file";
 
-  return $tile;
+	return $tile;
 }
 
 /**
@@ -672,20 +672,20 @@ function createFileTile(name, url) {
  * @returns {HTMLElement}
  */
 function Tail({ target }) {
-  return (
-    <span
-    className="icon more_vert"
-    attr-action="close"
-    onclick={(e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      handleItems({
-        target: target(),
-                  type: "contextmenu",
-      });
-    }}
-    ></span>
-  );
+	return (
+		<span
+			className="icon more_vert"
+			attr-action="close"
+			onclick={(e) => {
+				e.stopPropagation();
+				e.preventDefault();
+				handleItems({
+					target: target(),
+					type: "contextmenu",
+				});
+			}}
+		></span>
+	);
 }
 
 /**
@@ -694,76 +694,76 @@ function Tail({ target }) {
  * @param {'file'|'folder'} type is file or folder
  */
 openFolder.add = async (url, type) => {
-  const { url: parent } = await fsOperation(Url.dirname(url)).stat();
-  FileList.append(parent, url);
+	const { url: parent } = await fsOperation(Url.dirname(url)).stat();
+	FileList.append(parent, url);
 
-  const filesApp = sidebarApps.get("files");
-  const $els = filesApp.getAll(`[data-url="${parent}"]`);
-  Array.from($els).forEach(($el) => {
-    if ($el.dataset.type !== "dir") return;
+	const filesApp = sidebarApps.get("files");
+	const $els = filesApp.getAll(`[data-url="${parent}"]`);
+	Array.from($els).forEach(($el) => {
+		if ($el.dataset.type !== "dir") return;
 
-    if (type === "file") {
-      appendTile($el, createFileTile(Url.basename(url), url));
-    } else {
-      appendList($el, createFolderTile(Url.basename(url), url));
-    }
-  });
+		if (type === "file") {
+			appendTile($el, createFileTile(Url.basename(url), url));
+		} else {
+			appendList($el, createFolderTile(Url.basename(url), url));
+		}
+	});
 };
 
 openFolder.renameItem = (oldFile, newFile, newFilename) => {
-  FileList.rename(oldFile, newFile);
+	FileList.rename(oldFile, newFile);
 
-  helpers.updateUriOfAllActiveFiles(oldFile, newFile);
+	helpers.updateUriOfAllActiveFiles(oldFile, newFile);
 
-  const filesApp = sidebarApps.get("files");
-  const $els = filesApp.getAll(`[data-url="${oldFile}"]`);
-  Array.from($els).forEach(($el) => {
-    if ($el.dataset.type === "dir") {
-      $el = $el.$title;
-      setTimeout(() => {
-        $el.collapse();
-        $el.expand();
-      }, 0);
-    } else {
-      $el.querySelector(":scope>span").className =
-      helpers.getIconForFile(newFilename);
-    }
+	const filesApp = sidebarApps.get("files");
+	const $els = filesApp.getAll(`[data-url="${oldFile}"]`);
+	Array.from($els).forEach(($el) => {
+		if ($el.dataset.type === "dir") {
+			$el = $el.$title;
+			setTimeout(() => {
+				$el.collapse();
+				$el.expand();
+			}, 0);
+		} else {
+			$el.querySelector(":scope>span").className =
+				helpers.getIconForFile(newFilename);
+		}
 
-    $el.dataset.url = newFile;
-    $el.dataset.name = newFilename;
-    $el.querySelector(":scope>.text").textContent = newFilename;
-  });
+		$el.dataset.url = newFile;
+		$el.dataset.name = newFilename;
+		$el.querySelector(":scope>.text").textContent = newFilename;
+	});
 };
 
 openFolder.removeItem = (url) => {
-  FileList.remove(url);
-  const folder = addedFolder.find(({ url: fUrl }) => url === fUrl);
+	FileList.remove(url);
+	const folder = addedFolder.find(({ url: fUrl }) => url === fUrl);
 
-  if (folder) {
-    folder.remove();
-    return;
-  }
+	if (folder) {
+		folder.remove();
+		return;
+	}
 
-  const filesApp = sidebarApps.get("files");
-  const $el = filesApp.getAll(`[data-url="${url}"]`);
-  Array.from($el).forEach(($el) => {
-    const type = $el.dataset.type;
-    if (helpers.isFile(type)) {
-      $el.remove();
-    } else {
-      $el.parentElement.remove();
-    }
-  });
+	const filesApp = sidebarApps.get("files");
+	const $el = filesApp.getAll(`[data-url="${url}"]`);
+	Array.from($el).forEach(($el) => {
+		const type = $el.dataset.type;
+		if (helpers.isFile(type)) {
+			$el.remove();
+		} else {
+			$el.parentElement.remove();
+		}
+	});
 };
 
 openFolder.removeFolders = (url) => {
-  ({ url } = Url.parse(url));
-  const regex = new RegExp("^" + escapeStringRegexp(url));
-  addedFolder.forEach((folder) => {
-    if (regex.test(folder.url)) {
-      folder.remove();
-    }
-  });
+	({ url } = Url.parse(url));
+	const regex = new RegExp("^" + escapeStringRegexp(url));
+	addedFolder.forEach((folder) => {
+		if (regex.test(folder.url)) {
+			folder.remove();
+		}
+	});
 };
 
 /**
@@ -772,13 +772,13 @@ openFolder.removeFolders = (url) => {
  * @returns {Folder}
  */
 openFolder.find = (url) => {
-  const found = addedFolder.find((folder) => folder.url === url);
-  if (found) return found;
-  return addedFolder.find((folder) => {
-    const { url: furl } = Url.parse(folder.url);
-    const regex = new RegExp("^" + escapeStringRegexp(furl));
-    return regex.test(url);
-  });
+	const found = addedFolder.find((folder) => folder.url === url);
+	if (found) return found;
+	return addedFolder.find((folder) => {
+		const { url: furl } = Url.parse(folder.url);
+		const regex = new RegExp("^" + escapeStringRegexp(furl));
+		return regex.test(url);
+	});
 };
 
 export default openFolder;

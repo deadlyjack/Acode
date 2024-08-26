@@ -1,5 +1,5 @@
-import './styles.scss';
-import Ref from 'html-tag-js/ref';
+import "./styles.scss";
+import Ref from "html-tag-js/ref";
 
 /**
  * @typedef {Object} Checkbox
@@ -19,66 +19,73 @@ import Ref from 'html-tag-js/ref';
  * @param {string} [name] Name of checkbox
  * @param {string} [id] Id of checkbox
  * @param {"checkbox"|"radio"} [type] Type of checkbox
- * @param {Ref} [ref] A refence to the input element
+ * @param {Ref} [ref] A reference to the input element
  * @param {string} [size] Size of checkbox
  * @returns {Checkbox}
  */
 function Checkbox(text, checked, name, id, type, ref, size) {
-  if (typeof text === 'object') {
-    ({ text, checked, name, id, type, ref, size } = text);
-  }
+	if (typeof text === "object") {
+		({ text, checked, name, id, type, ref, size } = text);
+	}
 
-  size = size || '1rem';
+	size = size || "1rem";
 
-  const $input = ref || new Ref();
-  const $checkbox = <label className="input-checkbox">
-    <input ref={$input} checked={checked} type={type || 'checkbox'} name={name} id={id} />
-    <span style={{ height: size, width: size }} className="box"></span>
-    <span>{text}</span>
-  </label>;
+	const $input = ref || new Ref();
+	const $checkbox = (
+		<label className="input-checkbox">
+			<input
+				ref={$input}
+				checked={checked}
+				type={type || "checkbox"}
+				name={name}
+				id={id}
+			/>
+			<span style={{ height: size, width: size }} className="box"></span>
+			<span>{text}</span>
+		</label>
+	);
 
+	Object.defineProperties($checkbox, {
+		checked: {
+			get() {
+				return !!$input.el.checked;
+			},
+			set(value) {
+				$input.el.checked = value;
+			},
+		},
+		onclick: {
+			get() {
+				return $input.el.onclick;
+			},
+			set(onclick) {
+				$input.el.onclick = onclick;
+			},
+		},
+		onchange: {
+			get() {
+				return $input.el.onchange;
+			},
+			set(onchange) {
+				$input.el.onchange = onchange;
+			},
+		},
+		value: {
+			get() {
+				return this.checked;
+			},
+			set(value) {
+				this.checked = value;
+			},
+		},
+		toggle: {
+			value() {
+				this.checked = !this.checked;
+			},
+		},
+	});
 
-  Object.defineProperties($checkbox, {
-    checked: {
-      get() {
-        return !!$input.el.checked;
-      },
-      set(value) {
-        $input.el.checked = value;
-      },
-    },
-    onclick: {
-      get() {
-        return $input.el.onclick;
-      },
-      set(onclick) {
-        $input.el.onclick = onclick;
-      },
-    },
-    onchange: {
-      get() {
-        return $input.el.onchange;
-      },
-      set(onchange) {
-        $input.el.onchange = onchange;
-      },
-    },
-    value: {
-      get() {
-        return this.checked;
-      },
-      set(value) {
-        this.checked = value;
-      },
-    },
-    toggle: {
-      value() {
-        this.checked = !this.checked;
-      }
-    }
-  });
-
-  return $checkbox;
+	return $checkbox;
 }
 
 export default Checkbox;
