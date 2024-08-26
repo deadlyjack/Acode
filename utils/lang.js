@@ -17,7 +17,7 @@ let arg = "";
 let val = "";
 
 if (args._.length > 3) {
-  console.error("Invalid argments", args._);
+  console.error("Invalid arguments", args._);
   process.exit(0);
 } else {
   command = args._[0];
@@ -36,9 +36,9 @@ switch (command) {
     break;
   default:
     console.error(`Missing/Invalid arguments.
-use 'add' to add a new string 
-use 'remove' to remove a string 
-use 'search' to search a string 
+use 'add' to add a new string
+use 'remove' to remove a string
+use 'search' to search a string
 use 'update' to update a string
 use 'update-key' to update a key
 use 'check' to check a string`);

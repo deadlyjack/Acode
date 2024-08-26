@@ -88,9 +88,9 @@ export default class WCPage extends HTMLElement {
   }
 
   /**
-   * Adds event listener to the page 
-   * @param {'hide' | 'show'} event 
-   * @param {function(this: WCPage):void} cb 
+   * Adds event listener to the page
+   * @param {'hide' | 'show'} event
+   * @param {function(this: WCPage):void} cb
    */
   on(event, cb) {
     if (event in this.#on) {
@@ -111,7 +111,7 @@ export default class WCPage extends HTMLElement {
 
   /**
    * Sets the title of the page
-   * @param {string} title 
+   * @param {string} title
    */
   settitle(title) {
     this.header.text = title;
@@ -133,9 +133,9 @@ export default class WCPage extends HTMLElement {
   set body($el) {
     if (this.body) this.replaceChild($el, this.body);
 
-    const headerAdjecent = this.header.nextElementSibling;
-    if (headerAdjecent) {
-      this.insertBefore($el, headerAdjecent);
+    const headerAdjacent = this.header.nextElementSibling;
+    if (headerAdjacent) {
+      this.insertBefore($el, headerAdjacent);
       return;
     }
 
@@ -202,8 +202,8 @@ class PageHandler {
   onReplace;
 
   /**
-   * 
-   * @param {HTMLElement} $el 
+   *
+   * @param {HTMLElement} $el
    */
   constructor($el) {
     this.$el = $el;

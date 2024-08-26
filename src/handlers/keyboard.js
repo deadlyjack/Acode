@@ -7,7 +7,7 @@ import windowResize from './windowResize';
  * @typedef {'key'|'keyboardShow'|'keyboardHide'|'keyboardShowStart'|'keyboardHideStart'} KeyboardEventName
  */
 
-// Asuming that keyboard height is at least 200px
+// Assuming that keyboard height is at least 200px
 let MIN_KEYBOARD_HEIGHT = 100;
 const event = {
   key: [],
@@ -47,7 +47,7 @@ export const keydownState = {
 
 /**
  * Handles keyboard events
- * @param {KeyboardEvent} e 
+ * @param {KeyboardEvent} e
  */
 export default function keyboardHandler(e) {
   const $target = e.target;
@@ -116,9 +116,9 @@ windowResize.on('resize', async () => {
 
 /**
  * Add event listener for keyboard event.
- * @param {KeyboardEventName} eventName 
- * @param {Function} callback 
- * @returns 
+ * @param {KeyboardEventName} eventName
+ * @param {Function} callback
+ * @returns
  */
 keyboardHandler.on = (eventName, callback) => {
   if (!event[eventName]) return;
@@ -127,9 +127,9 @@ keyboardHandler.on = (eventName, callback) => {
 
 /**
  * Remove event listener for keyboard event.
- * @param {KeyboardEventName} eventName 
- * @param {Function} callback 
- * @returns 
+ * @param {KeyboardEventName} eventName
+ * @param {Function} callback
+ * @returns
  */
 keyboardHandler.off = (eventName, callback) => {
   if (!event[eventName]) return;
@@ -138,8 +138,8 @@ keyboardHandler.off = (eventName, callback) => {
 
 /**
   * Emit keyboard event.
- * @param {KeyboardEventName} eventName 
- * @returns 
+ * @param {KeyboardEventName} eventName
+ * @returns
  */
 function emit(eventName) {
   if (!event[eventName]) return;
@@ -148,8 +148,8 @@ function emit(eventName) {
 
 /**
  * Focus the editor if keyboard is visible, blur it otherwise.
- * @param {boolean} keyboardHidden 
- * @returns 
+ * @param {boolean} keyboardHidden
+ * @returns
  */
 function focusBlurEditor(keyboardHidden) {
   if (keyboardHidden) {
@@ -159,7 +159,7 @@ function focusBlurEditor(keyboardHidden) {
 
 /**
  * Show ad if keyboard is hidden and ad is active, hide ad otherwise.
- * @param {boolean} keyboardHidden 
+ * @param {boolean} keyboardHidden
  */
 function showHideAd(keyboardHidden) {
   const bannerIsActive = !!window.ad?.active;
