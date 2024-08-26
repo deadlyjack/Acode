@@ -63,27 +63,6 @@ yarn setup
 yarn build <platform (android)> <free|paid> <p|prod|d|dev>
 ```
 
-## • Contributing
-
-Acode Editor is an open-source project, and we welcome contributions from the community. To contribute, follow these steps:
-
-1. Fork the repository.
-2. Make your changes and commit them.
-3. Push your changes to your fork.
-4. Create a pull request and Wait for review.
-
-Please ensure that your code is clean, well-formatted, and follows the project's coding standards. Acode uses [Biomejs](https://biomejs.dev/) for formatting and linting. You can use following commands to lints/format your code locally:
-```shell
-yarn lint # for linting
-yarn format # for formatting
-yarn spellcheck # for spellchecking
-```
-Also, ensure that your code is well-documented and includes comments where necessary.
-
-> [!Note]
-> You can use any package manager like npm or yarn or pnpm or bun.
-> You can use your editor specific Biomejs plugin for auto-formatting and linting based on Acode's configs.
-
 ## • Developing a Plugin for Acode
 
 For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/deadlyjack/acode-plugin).

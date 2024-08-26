@@ -1,8 +1,8 @@
-import "./style.scss";
-import inputhints from "components/inputhints";
-import keyboardHandler from "handlers/keyboard";
-import actionStack from "lib/actionStack";
-import restoreTheme from "lib/restoreTheme";
+import './style.scss';
+import restoreTheme from 'lib/restoreTheme';
+import inputhints from 'components/inputhints';
+import actionStack from 'lib/actionStack';
+import keyboardHandler from 'handlers/keyboard';
 
 /**
  * @typedef {import('./inputhints').HintCallback} HintCallback
@@ -48,97 +48,91 @@ This shows that using keyboardHideStart event is faster than not using it.
  * @returns {void}
  */
 export default function palette(getList, onsSelectCb, placeholder, onremove) {
-	/**@type {HTMLInputElement} */
-	const $input = (
-		<input
-			onkeydown={onkeydown}
-			type="search"
-			placeholder={placeholder}
-			enterKeyHint="go"
-		/>
-	);
-	/**@type {HTMLElement} */
-	const $mask = <div className="mask" onclick={remove} />;
-	/**@type {HTMLDivElement} */
-	const $palette = <div id="palette">{$input}</div>;
+  /**@type {HTMLInputElement} */
+  const $input = <input onkeydown={onkeydown} type='search' placeholder={placeholder} enterKeyHint='go' />;
+  /**@type {HTMLElement} */
+  const $mask = <div className='mask' onclick={remove} />;
+  /**@type {HTMLDivElement} */
+  const $palette = <div id="palette">{$input}</div>;
 
-	// Create a palette with input and hints
-	inputhints($input, generateHints, onSelect);
 
-	// Removes the darkened color from status bar and navigation bar
-	restoreTheme(true);
+  // Create a palette with input and hints
+  inputhints($input, generateHints, onSelect);
 
-	// Remove palette when input is blurred
-	$input.addEventListener("blur", remove);
-	// Don't wait for input to blur when keyboard hides, remove is
-	// as soon as keyboard starts to hide
-	keyboardHandler.on("keyboardHideStart", remove);
+  // Removes the darkened color from status bar and navigation bar
+  restoreTheme(true);
 
-	// Add to DOM
-	app.append($palette, $mask);
+  // Remove palette when input is blurred
+  $input.addEventListener('blur', remove);
+  // Don't wait for input to blur when keyboard hides, remove is
+  // as soon as keyboard starts to hide
+  keyboardHandler.on('keyboardHideStart', remove);
 
-	// Focus input to show options
-	$input.focus();
+  // Add to DOM
+  app.append($palette, $mask);
 
-	// Add to action stack to remove on back button
-	actionStack.push({
-		id: "palette",
-		action: remove,
-	});
+  // Focus input to show options
+  $input.focus();
 
-	/**
-	 * On select callback for inputhints
-	 * @param {string} value
-	 */
-	function onSelect(value) {
-		onsSelectCb(value);
-		remove();
-	}
+  // Add to action stack to remove on back button
+  actionStack.push({
+    id: 'palette',
+    action: remove,
+  });
 
-	/**
-	 * Keydown event handler for input
-	 * @param {KeyboardEvent} e
-	 */
-	function onkeydown(e) {
-		if (e.key !== "Escape") return;
-		remove();
-	}
+  /**
+   * On select callback for inputhints
+   * @param {string} value 
+   */
+  function onSelect(value) {
+    onsSelectCb(value);
+    remove();
+  }
 
-	/**
-	 * Generates hint for inputhints
-	 * @param {HintCallback} setHints Set hints callback
-	 * @param {HintModification} hintModification Hint modification object
-	 */
-	async function generateHints(setHints, hintModification) {
-		const list = getList(hintModification);
-		let data = list instanceof Promise ? await list : list;
-		setHints(data);
-	}
+  /**
+   * Keydown event handler for input
+   * @param {KeyboardEvent} e 
+   */
+  function onkeydown(e) {
+    if (e.key !== 'Escape') return;
+    remove();
+  }
 
-	/**
-	 * Removes the palette
-	 */
-	function remove() {
-		actionStack.remove("palette");
-		keyboardHandler.off("keyboardHideStart", remove);
-		$input.removeEventListener("blur", remove);
+  /**
+   * Generates hint for inputhints
+   * @param {HintCallback} setHints Set hints callback
+   * @param {HintModification} hintModification Hint modification object
+   */
+  async function generateHints(setHints, hintModification) {
+    const list = getList(hintModification);
+    let data = list instanceof Promise ? await list : list;
+    setHints(data);
+  }
 
-		restoreTheme();
-		$palette.remove();
-		$mask.remove();
+  /**
+   * Removes the palette
+   */
+  function remove() {
+    actionStack.remove('palette');
+    keyboardHandler.off('keyboardHideStart', remove);
+    $input.removeEventListener('blur', remove);
 
-		if (typeof onremove === "function") {
-			onremove();
-			return;
-		}
+    restoreTheme();
+    $palette.remove();
+    $mask.remove();
 
-		const { activeFile, editor } = editorManager;
-		if (activeFile.wasFocused) {
-			editor.focus();
-		}
+    if (typeof onremove === 'function') {
+      onremove();
+      return;
+    }
 
-		remove = () => {
-			console.error("Palette already removed");
-		};
-	}
+    const { activeFile, editor } = editorManager;
+    if (activeFile.wasFocused) {
+      editor.focus();
+    }
+
+    remove = () => {
+      console.error('Palette already removed');
+    };
+  }
 }
