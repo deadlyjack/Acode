@@ -30,7 +30,6 @@ export const TOUCHSCREEN_NOTOUCH = 1;
 export const TOUCHSCREEN_STYLUS = 2;
 export const TOUCHSCREEN_UNDEFINED = 0;
 
-
 /**
  * @typedef {Object} SystemConfiguration
  * @property {number} hardKeyboardHidden
@@ -44,13 +43,12 @@ export const TOUCHSCREEN_UNDEFINED = 0;
  * @property {string} locale
  */
 
-
 /**
  * Get the system configuration
  * @returns {Promise<SystemConfiguration>}
  */
 export function getSystemConfiguration() {
-  return new Promise((resolve, reject) => {
-    cordova.exec(resolve, reject, 'System', 'get-configuration', []);
-  });
+	return new Promise((resolve, reject) => {
+		cordova.exec(resolve, reject, "System", "get-configuration", []);
+	});
 }

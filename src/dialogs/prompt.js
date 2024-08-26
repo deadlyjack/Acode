@@ -1,7 +1,7 @@
-import autosize from 'autosize';
-import appSettings from 'lib/settings';
-import restoreTheme from 'lib/restoreTheme';
-import actionStack from 'lib/actionStack';
+import autosize from "autosize";
+import actionStack from "lib/actionStack";
+import restoreTheme from "lib/restoreTheme";
+import appSettings from "lib/settings";
 
 /**
  * @typedef {Object} PromptOptions
@@ -11,7 +11,6 @@ import actionStack from 'lib/actionStack';
  * @property {(any)=>boolean} [test]
  */
 
-
 /**
  * Opens a prompt dialog
  * @param {string} message
@@ -20,136 +19,141 @@ import actionStack from 'lib/actionStack';
  * @param {PromptOptions} options
  * @returns {Promise<string|number|null>} Returns null if cancelled
  */
-export default function prompt(message, defaultValue, type = 'text', options = {}) {
-  return new Promise((resolve) => {
-    const inputType = type === 'textarea' ? 'textarea' : 'input';
-    type = type === 'filename' ? 'text' : type;
+export default function prompt(
+	message,
+	defaultValue,
+	type = "text",
+	options = {},
+) {
+	return new Promise((resolve) => {
+		const inputType = type === "textarea" ? "textarea" : "input";
+		type = type === "filename" ? "text" : type;
 
-    const messageSpan = tag('span', {
-      textContent: message,
-      className: 'message scroll',
-    });
-    const input = tag(inputType, {
-      value: defaultValue,
-      className: 'input',
-      placeholder: options.placeholder,
-    });
-    const okBtn = tag('button', {
-      type: 'submit',
-      textContent: strings.ok,
-      disabled: !defaultValue,
-      onclick: function () {
-        if (options.required && !input.value) {
-          errorMessage.textContent = strings.required;
-          return;
-        }
-        hide();
-        let { value } = input;
-        if (type === 'number') value = +value;
-        resolve(value);
-      },
-    });
-    const cancelBtn = tag('button', {
-      textContent: strings.cancel,
-      type: 'button',
-      onclick: function () {
-        hide();
-        resolve(null);
-      },
-    });
-    const errorMessage = tag('span', {
-      className: 'error-msg',
-    });
-    const promptDiv = tag('form', {
-      action: '#',
-      className: 'prompt',
-      onsubmit: (e) => {
-        e.preventDefault();
-        if (!okBtn.disabled) {
-          resolve(input.value);
-        }
-      },
-      children: [
-        messageSpan,
-        input,
-        errorMessage,
-        tag('div', {
-          className: 'button-container',
-          children: [cancelBtn, okBtn],
-        }),
-      ],
-    });
-    const mask = tag('span', {
-      className: 'mask',
-    });
+		const messageSpan = tag("span", {
+			textContent: message,
+			className: "message scroll",
+		});
+		const input = tag(inputType, {
+			value: defaultValue,
+			className: "input",
+			placeholder: options.placeholder,
+		});
+		const okBtn = tag("button", {
+			type: "submit",
+			textContent: strings.ok,
+			disabled: !defaultValue,
+			onclick: function () {
+				if (options.required && !input.value) {
+					errorMessage.textContent = strings.required;
+					return;
+				}
+				hide();
+				let { value } = input;
+				if (type === "number") value = +value;
+				resolve(value);
+			},
+		});
+		const cancelBtn = tag("button", {
+			textContent: strings.cancel,
+			type: "button",
+			onclick: function () {
+				hide();
+				resolve(null);
+			},
+		});
+		const errorMessage = tag("span", {
+			className: "error-msg",
+		});
+		const promptDiv = tag("form", {
+			action: "#",
+			className: "prompt",
+			onsubmit: (e) => {
+				e.preventDefault();
+				if (!okBtn.disabled) {
+					resolve(input.value);
+				}
+			},
+			children: [
+				messageSpan,
+				input,
+				errorMessage,
+				tag("div", {
+					className: "button-container",
+					children: [cancelBtn, okBtn],
+				}),
+			],
+		});
+		const mask = tag("span", {
+			className: "mask",
+		});
 
-    if (inputType === 'textarea') {
-      input.rows = 1;
-      input.inputMode = type;
-    } else {
-      input.type = type;
-      if (type === 'number') {
-        input.step = 'any';
-      }
-    }
+		if (inputType === "textarea") {
+			input.rows = 1;
+			input.inputMode = type;
+		} else {
+			input.type = type;
+			if (type === "number") {
+				input.step = "any";
+			}
+		}
 
-    input.oninput = function () {
-      const { match, test } = options;
-      let isValid = true;
+		input.oninput = function () {
+			const { match, test } = options;
+			let isValid = true;
 
-      if (match) {
-        isValid = match.test(input.value);
-      }
+			if (match) {
+				isValid = match.test(input.value);
+			}
 
-      if (test) {
-        isValid = test(input.value);
-      }
+			if (test) {
+				isValid = test(input.value);
+			}
 
-      if (!isValid) {
-        okBtn.disabled = true;
-        errorMessage.textContent = strings['invalid value'];
-      } else {
-        okBtn.disabled = false;
-        errorMessage.textContent = '';
-      }
-    };
+			if (!isValid) {
+				okBtn.disabled = true;
+				errorMessage.textContent = strings["invalid value"];
+			} else {
+				okBtn.disabled = false;
+				errorMessage.textContent = "";
+			}
+		};
 
-    input.onfocus = function () {
-      this.select();
-    };
+		input.onfocus = function () {
+			this.select();
+		};
 
-    actionStack.push({
-      id: 'prompt',
-      action: hidePrompt,
-    });
+		actionStack.push({
+			id: "prompt",
+			action: hidePrompt,
+		});
 
-    system.setInputType("NORMAL");
-    restoreTheme(true);
-    app.append(promptDiv, mask);
-    input.focus();
-    if (input.value) {
-      try {
-        const col = input.value.length;
-        input.setSelectionRange(col, col);
-      } catch (error) {
-        // ignore
-      }
-    }
-    if (inputType === 'textarea') autosize(input);
+		system.setInputType("NORMAL");
+		restoreTheme(true);
+		app.append(promptDiv, mask);
+		input.focus();
+		if (input.value) {
+			try {
+				const col = input.value.length;
+				input.setSelectionRange(col, col);
+			} catch (error) {
+				// ignore
+			}
+		}
+		if (inputType === "textarea") autosize(input);
 
-    function hidePrompt() {
-      promptDiv.classList.add('hide');
-      restoreTheme();
-      setTimeout(() => {
-        if (promptDiv.isConnected) promptDiv.remove();
-        if (mask.isConnected) mask.remove();
-      }, 300);
-    }
+		function hidePrompt() {
+			promptDiv.classList.add("hide");
+			restoreTheme();
+			setTimeout(() => {
+				if (promptDiv.isConnected) promptDiv.remove();
+				if (mask.isConnected) mask.remove();
+			}, 300);
+		}
 
-    function hide() {
-      actionStack.remove('prompt');
-      system.setInputType(appSettings.value.keyboardMode);
-      hidePrompt();
-    }
-  });
+		function hide() {
+			actionStack.remove("prompt");
+			system.setInputType(appSettings.value.keyboardMode);
+			hidePrompt();
+		}
+	});
 }

@@ -10,7 +10,10 @@
     "clean": "sh utils/scripts/clean.sh android android",
     "plugin": "sh utils/scripts/plugin.sh",
     "setup": "node ./utils/setup.js",
-    "spellcheck": "npx cspell"
+    "spellcheck": "npx cspell",
+    "lint": "biome lint --write",
+    "format": "biome format --write",
+    "check": "biome check --write"
   },
   "keywords": [
     "ecosystem:cordova"
@@ -50,6 +53,7 @@
     "@babel/preset-env": "^7.24.6",
     "@babel/runtime": "^7.24.6",
     "@babel/runtime-corejs3": "^7.24.6",
+    "@biomejs/biome": "1.8.3",
     "@types/ace": "^0.0.52",
     "@types/url-parse": "^1.4.11",
     "autoprefixer": "^10.4.19",
