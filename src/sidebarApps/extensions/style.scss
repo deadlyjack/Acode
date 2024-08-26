@@ -55,6 +55,10 @@
   }
 
   .tile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
     .text {
       &.sub-text {
         font-size: 0.8rem;
@@ -62,6 +66,16 @@
         &::after {
           font-size: 0.7rem;
         }
+      }
+    }
+    .more_vert {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: var(--active-icon-color);
       }
     }
   }

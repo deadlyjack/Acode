@@ -5,6 +5,7 @@ import Sidebar from "components/sidebar";
 import select from "dialogs/select";
 import fsOperation from "fileSystem";
 import constants from "lib/constants";
+import settings from "lib/settings";
 import plugin from "pages/plugin";
 import Url from "utils/Url";
 import helpers from "utils/helpers";
@@ -295,10 +296,26 @@ function ListItem({ icon, name, id, version, downloads, installed }) {
 			>
 				{name}
 			</span>
+			{installed ? (
+				<span
+					className="icon more_vert"
+					data-action="more-plugin-action"
+				></span>
+			) : (
+				""
+			)}
 		</div>
 	);
 
-	$el.onclick = () => {
+	$el.onclick = (event) => {
+		const morePluginActionButton = event.target.closest(
+			'[data-action="more-plugin-action"]',
+		);
+		if (morePluginActionButton) {
+			more_plugin_action(id, name);
+			return;
+		}
+
 		plugin(
 			{ id, installed },
 			() => {
@@ -325,4 +342,52 @@ function ListItem({ icon, name, id, version, downloads, installed }) {
 	};
 
 	return $el;
+}
+
+async function loadAd(el) {
+	if (!IS_FREE_VERSION) return;
+	try {
+		if (!(await window.iad?.isLoaded())) {
+			const oldText = el.textContent;
+			el.textContent = strings["loading..."];
+			await window.iad.load();
+			el.textContent = oldText;
+		}
+	} catch (error) {}
+}
+
+async function uninstall(id) {
+	try {
+		const pluginDir = Url.join(PLUGIN_DIR, id);
+		await Promise.all([loadAd(this), fsOperation(pluginDir).delete()]);
+		acode.unmountPlugin(id);
+		if (!IS_FREE_VERSION && (await window.iad?.isLoaded())) {
+			window.iad.show();
+		}
+	} catch (err) {
+		helpers.error(err);
+	}
+}
+
+async function more_plugin_action(id, pluginName) {
+	let actions;
+	let pluginSettings = settings.uiSettings[`plugin-${id}`];
+	if (pluginSettings) {
+		actions = [strings.settings, strings.uninstall];
+	} else {
+		actions = [strings.uninstall];
+	}
+	let action = await select("Action", actions);
+	if (!action) return;
+	switch (action) {
+		case strings.settings:
+			pluginSettings.setTitle(pluginName);
+			pluginSettings.show();
+			break;
+		case strings.uninstall:
+			await uninstall(id);
+			const $plugin = $installed.querySelector(`[data-plugin-id="${id}"]`);
+			$plugin.remove();
+			break;
+	}
 }
