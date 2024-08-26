@@ -19,7 +19,7 @@ import Ref from 'html-tag-js/ref';
  * @param {string} [name] Name of checkbox
  * @param {string} [id] Id of checkbox
  * @param {"checkbox"|"radio"} [type] Type of checkbox
- * @param {Ref} [ref] A refence to the input element
+ * @param {Ref} [ref] A reference to the input element
  * @param {string} [size] Size of checkbox
  * @returns {Checkbox}
  */

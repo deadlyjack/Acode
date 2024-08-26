@@ -31,7 +31,7 @@ export default {
 
   /**
    * Checks if given urls are same or not
-   * @param  {...String} urls 
+   * @param  {...String} urls
    * @returns {Boolean}
    */
   areSame(...urls) {
@@ -65,7 +65,7 @@ export default {
    */
   join(...pathnames) {
     if (pathnames.length < 2)
-      throw new Error('Join(), requires atleast two parameters');
+      throw new Error('Join(), requires at least two parameters');
 
     let { url, query } = this.parse(pathnames[0]);
 
@@ -262,7 +262,7 @@ export default {
   },
   /**
    * Decodes url and returns username, password, hostname, pathname, port and query
-   * @param {string} url 
+   * @param {string} url
    * @returns {URLObject}
    */
   decodeUrl(url) {
@@ -308,8 +308,8 @@ export default {
   },
   /**
    * Removes trailing slash from url
-   * @param {string} url 
-   * @returns 
+   * @param {string} url
+   * @returns
    */
   trimSlash(url) {
     const parsed = this.parse(url);
