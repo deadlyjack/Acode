@@ -23,3 +23,17 @@ jobs:
 
       - name: Run spell check
         run: cspell
+
+  quality:
+    name: Linting and formatting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+
+      - name: Run Biome
+        run: biome ci .

@@ -1,4 +1,4 @@
-import purchaseListener from 'handlers/purchase';
+import purchaseListener from "handlers/purchase";
 import helpers from "utils/helpers";
 
 /**
@@ -6,25 +6,29 @@ import helpers from "utils/helpers";
  * @returns {Promise<void>}
  */
 export default function removeAds() {
-  return new Promise((resolve, reject) => {
-    iap.getProducts(['acode_pro_new'], (products) => {
-      const [product] = products;
+	return new Promise((resolve, reject) => {
+		iap.getProducts(["acode_pro_new"], (products) => {
+			const [product] = products;
 
-      iap.setPurchaseUpdatedListener(...purchaseListener(onpurchase, reject));
+			iap.setPurchaseUpdatedListener(...purchaseListener(onpurchase, reject));
 
-      iap.purchase(product.json, (code) => {
-        // ignore
-      }, (err) => {
-        alert(strings.error, err);
-      });
-    });
+			iap.purchase(
+				product.json,
+				(code) => {
+					// ignore
+				},
+				(err) => {
+					alert(strings.error, err);
+				},
+			);
+		});
 
-    function onpurchase() {
-      resolve(null);
-      helpers.hideAd(true);
-      localStorage.setItem('acode_pro', 'true');
-      window.IS_FREE_VERSION = false;
-      toast(strings['thank you :)']);
-    }
-  });
+		function onpurchase() {
+			resolve(null);
+			helpers.hideAd(true);
+			localStorage.setItem("acode_pro", "true");
+			window.IS_FREE_VERSION = false;
+			toast(strings["thank you :)"]);
+		}
+	});
 }

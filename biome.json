@@ -1,0 +1,41 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+	"organizeImports": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": false,
+			"complexity": {
+				"noStaticOnlyClass": "error",
+				"noUselessSwitchCase": "error",
+				"useFlatMap": "error"
+			},
+			"style": {
+				"noNegationElse": "off",
+				"useForOf": "error",
+				"useNodejsImportProtocol": "error",
+				"useNumberNamespace": "error"
+			},
+			"suspicious": {
+				"noDoubleEquals": "error",
+				"noThenProperty": "error",
+				"useIsArray": "error"
+			}
+		}
+	},
+	"files": {
+		"include": ["src/**/*", "utils/**/*.js", "www/**/*.js", "www/res/**/*.css"],
+		"ignore": [
+			"www/js/**/*.js",
+			"www/css/**/*.css",
+			"src/plugins/**/*",
+			"plugins/**/*",
+			"hooks/**/*",
+			"fastlane/**/*",
+			"res/**/*",
+			"platforms/**/*"
+		]
+	}
+}
