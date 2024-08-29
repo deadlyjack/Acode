@@ -137,9 +137,7 @@ export default class Acode {
     this.define('toInternalUrl', helpers.toInternalUri);
   }
 
-  initialize() {
-    setup();
-  }
+  async initialize() { setup() }
 
   /**
    * Define a module

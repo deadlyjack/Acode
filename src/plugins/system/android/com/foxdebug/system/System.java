@@ -225,6 +225,9 @@ public class System extends CordovaPlugin {
               case "launch-app":
                 launchApp(arg1, arg2, arg3, callbackContext);
                 break;
+              case "is-app-installed":
+                isAppInstalled(arg1, callbackContext);
+                break;
               case "get-global-setting":
                 getGlobalSetting(arg1, callbackContext);
                 break;
@@ -760,6 +763,20 @@ public class System extends CordovaPlugin {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     context.startActivity(intent);
     callback.success("Launched " + appId);
+  }
+
+  private void isAppInstalled(
+    String appId,
+    CallbackContext callback
+  ) {
+    Intent intent = context
+      .getPackageManager()
+      .getLaunchIntentForPackage(appId);
+    if (intent == null) {
+      callback.error("App not found");
+      return;
+    }
+    callback.success(appId);
   }
 
   private void addShortcut(

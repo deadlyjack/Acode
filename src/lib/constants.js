@@ -19,5 +19,8 @@ export default {
   get PLAY_STORE_URL() { return `https://play.google.com/store/apps/details?id=${BuildInfo.packageName}`; },
   API_BASE: 'https://acode.app/api',
   // API_BASE: 'https://192.168.0.102:3001/api', // test api
-  SKU_LIST: ["basic", "bronze", "silver", "gold", "platinum"]
+  SKU_LIST: ["basic", "bronze", "silver", "gold", "platinum"],
+
+  // PTY Executor
+  EXECUTOR_PACKAGE_NAME: "com.termux"
 };

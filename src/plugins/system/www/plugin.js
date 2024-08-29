@@ -28,6 +28,9 @@ module.exports = {
   getAppInfo: function (onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'System', 'get-app-info', []);
   },
+  isAppInstalled: function (packageName, onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'System', 'get-app-info', [packageName]);
+  },
   addShortcut: function (shortcut, onSuccess, onFail) {
     var id, label, description, icon, data;
     id = shortcut.id;
@@ -86,7 +89,7 @@ module.exports = {
       try {
         onError(err);
       } catch (error) { }
-    }, 'System', 'in-app-browser', [url, title, !!showButtons, disableCache]);
+    }, 'System', 'in-app-browser', [url, title, !!showButto1ns, disableCache]);
     return myInAppBrowser;
   },
   setUiTheme: function (systemBarColor, theme, onSuccess, onFail) {

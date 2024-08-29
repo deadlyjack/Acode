@@ -30,7 +30,7 @@
       "cordova-plugin-sdcard": {},
       "cordova-plugin-browser": {},
       "cordova-plugin-iap": {},
-      "@parrino/cordova-plugin-local-notifications": {},
+      "@spoonconsulting/cordova-plugin-local-notification": {},
       "cordova-plugin-system": {}
     },
     "platforms": [
@@ -52,7 +52,7 @@
     "@babel/preset-env": "^7.24.6",
     "@babel/runtime": "^7.24.6",
     "@babel/runtime-corejs3": "^7.24.6",
-    "@parrino/cordova-plugin-local-notifications": "^1.0.2",
+    "@spoonconsulting/cordova-plugin-local-notification": "^1.0.6",
     "@types/ace": "^0.0.52",
     "@types/url-parse": "^1.4.11",
     "autoprefixer": "^10.4.19",
@@ -66,6 +66,7 @@
     "cordova-plugin-file": "^8.0.1",
     "cordova-plugin-ftp": "file:src/plugins/ftp",
     "cordova-plugin-iap": "file:src/plugins/iap",
+    "cordova-plugin-local-notifications": "^1.0.0",
     "cordova-plugin-sdcard": "file:src/plugins/sdcard",
     "cordova-plugin-server": "file:src/plugins/server",
     "cordova-plugin-sftp": "file:src/plugins/sftp",

@@ -1,16 +1,18 @@
+const origAlert = window.alert;
+
 import alert from "dialogs/alert";
-// import helpers from "utils/helpers";
 import loader from "dialogs/loader";
 import toast from "components/toast";
 import confirm from "dialogs/confirm";
-
 import { ReconnectingWebSocket } from "utils/pty";
+
+import constants from "./constants";
 
 let socketToNotify = new Map();
 let NOTIFICATIONS_ID = 1000;
 let notifyCount = 0;
 
-export async function setup() {
+function setupNotifications() {
   let { notification } = cordova.plugins;
 
   // Ensure Notifications Permission
@@ -28,8 +30,140 @@ export async function setup() {
     let socket = socketToNotify.get(notification.id);
     socket?.close();
   });
+}
 
-  await host.initializeServer()
+function ensureExecutor() {
+  return new Promise((resolve, reject) => {
+    system.isAppInstalled("com.texmux", async () => {
+      try {
+        const response = await runCommand("whoami", []);
+        if (response.stdoutLength) { resolve(true); }
+
+        setTimeout(() => {
+          reject("Termux took too long to respond");
+        });
+      } catch (err) {
+        origAlert(String(err))
+        alert(
+          "Configure Termux For Acode",
+          `Edit the file at '~/.termux/termux.properties' and uncomment 'allow-external-apps'`
+        );
+
+        reject("Termux not configured");
+      }
+    }, () => {
+      reject("Termux not installed");
+      alert(
+        "Termux not installed",
+        "Termux is required to use Acode pty, please install and restart Acode"
+      );
+    });
+  });
+}
+
+async function ensureNodeJS() {
+  let response = await runCommand(
+    "whereis", ["node", "npm"]
+  );
+  let nodejsPath = response.stdout
+    .split("\n").find(s => s.includes("node"))
+    .substring(("node: ").length);
+
+  let npmPath = response.stdout
+    .split("\n").find(s => s.includes("npm"))
+    .substring(("npm: ").length);
+
+  if (!(nodejsPath || npmPath)) {
+    const confirmation = await confirm("Install nodejs?");
+    if (confirmation) {
+      const update = await runCommand(
+        "pkg", ["update"],
+        { background: false, sessionAction: 0 }
+      );
+      if (update.exitCode) {
+        origAlert("Error updating termux pkg", update.stderr);
+        throw new Error(update.stderr)
+      }
+
+      const install = await runCommand(
+        "pkg", ["install", "nodejs"],
+        { background: false, sessionAction: 0 }
+      );
+      if (install.exitCode) {
+        origAlert("Error installing nodejs", install.stderr);
+        throw new Error(install.stderr)
+      }
+    }
+  }
+}
+
+async function ensurePtyServer() {
+  const ptyResponse = await runCommand(
+    "whereis", ["acode-pty"]
+  );
+  const ptyPath = ptyResponse.stdout
+    .split("\n").find(s => s.includes("acode-pty"))
+    .substring(("acode-pty: ").length);
+
+  const pythonResponse = await runCommand(
+    "whereis", ["python"]
+  )
+  const pythonPath = pythonResponse.stdout
+    .split("\n").find(s => s.includes("python"))
+    .substring(("python: ").length);
+
+  if (!ptyPath) {
+    const confirmation = await confirm(
+      "Install acode-pty?",
+      "Required to run commands in termux"
+    );
+    if (confirmation) {
+      if (!pythonPath) {
+        const confirmInstall = await confirm(
+          "Install python?",
+          "Required to install acode-pty"
+        );
+        if (confirmInstall) {
+          const install = await runCommand(
+            "pkg", ["install", "python"],
+            { background: false, sessionAction: 0 }
+          );
+          if (install.exitCode) {
+            origAlert("Error installing python", install.stderr);
+            throw new Error(install.stderr)
+          }
+        }
+      }
+
+      const status = await runCommand(
+        "bash", ["-c", "export GYP_DEFINES=\"android_ndk_path=''\"; npm install -g acode-pty"],
+        { background: false, sessionAction: 0 }
+      );
+      const ptyResponse = await runCommand(
+        "whereis", ["acode-pty"]
+      );
+      const ptyPath = ptyResponse.stdout
+        .split("\n").find(s => s.includes("acode-pty"))
+        .substring(("acode-pty: ").length);
+
+      if (!ptyPath) {
+        origAlert(
+          "Error installing acode-pty",
+          "Retry running `npm i -g acode-pty` in Termux"
+        );
+        throw new Error("Error installing acode-pty");
+      }
+    }
+  }
+}
+
+export async function setup() {
+  setupNotifications();
+
+  await ensureExecutor();
+  await ensureNodeJS();
+  await ensurePtyServer();
+  await host.initializeServer();
 }
 
 export class PtyError extends Error {
@@ -145,7 +279,7 @@ class PtyConnection extends EventTarget {
   exit() {
     return new Promise((resolve, reject) => {
       let output = "";
-      this.addEventListener("message", ({data}) => {
+      this.addEventListener("message", ({ data }) => {
         output = output + data;
       });
       this.addEventListener("close", () => {
@@ -223,23 +357,21 @@ export class PtyHost {
       .split("\n")
       .find(s => s.includes(this.#serverLibrary[1]))
       .substring((this.#serverLibrary[1] + ": ").length);
+
     if (serverPath?.length) {
       this.#serverLibraryPath = serverPath;
       await this.#startServer();
       this.#initialized = true;
       toast("PtyHost: Server started");
     } else {
-      toast("PtyHost: Server not found");
+      origAlert("PtyHost: Server not found");
 
       if (!installServerIfUnavalable) {
         return false;
       }
 
-      let installServer = await confirm("Install pty-host server now?");
-      if (installServer) {
-        await this.#installServer();
-        await this.initializeServer(false);
-      }
+      this.installServer();
+      return;
     }
 
     // Kill server on app exit
@@ -276,6 +408,14 @@ export class PtyHost {
     }
   }
 
+  async installServer() {
+    let installServer = await confirm("Install pty-host server now?");
+    if (installServer) {
+      await this.#installServer();
+      await this.initializeServer(false);
+    }
+  }
+
   async #installServer() {
     let installLoader = loader.create(
       "Installing pty-host server",
@@ -307,7 +447,7 @@ export class PtyHost {
       // console.error(err);
     }
 
-    if (response && response.status == 200) {
+    if (response && response.ok) {
       // Server already active
       return;
     }
@@ -335,7 +475,7 @@ export class PtyHost {
           timeout && clearTimeout(timeout);
 
           resolve(true);
-        } catch (err) {}
+        } catch (err) { }
       }, 1000);
 
       // Auto Reject after 5 seconds
@@ -512,8 +652,3 @@ export async function execute(command, args, config) {
 export const host = new PtyHost();
 
 export default { run: runCommand, host };
-
-system.run({
-  command: "l/data/data/com.termux/files/usr/bin/ls",
-  args: ["-a"], background: true, sessionAction: 3
-}).then(console.log)
