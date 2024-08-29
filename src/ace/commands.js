@@ -259,6 +259,13 @@ const commands = [
 			editor._emit("select-word");
 		},
 	},
+	{
+		name: "openLogFile",
+		description: "Open Log File",
+		exec() {
+			acode.exec("open-log-file");
+		},
+	},
 ];
 
 export function setCommands(editor) {

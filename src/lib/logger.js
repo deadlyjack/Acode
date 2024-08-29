@@ -1,4 +1,6 @@
 import fsOperation from "fileSystem";
+import Url from "utils/Url";
+import constants from "./constants";
 
 /*
 /**
@@ -25,7 +27,7 @@ class Logger {
 		this.#logBuffer = new Map();
 		this.#maxBufferSize = maxBufferSize;
 		this.#logLevel = logLevel;
-		this.#logFileName = "Acode.log";
+		this.#logFileName = constants.LOG_FILE_NAME;
 		this.#flushInterval = flushInterval;
 		this.#startAutoFlush(); // Automatically flush logs at intervals
 		this.#setupAppLifecycleHandlers(); // Handle app lifecycle events for safe log saving
@@ -68,20 +70,22 @@ class Logger {
 	#writeLogToFile = async (logContent) => {
 		try {
 			if (
-				!(await fsOperation(window.DATA_STORAGE + this.#logFileName).exists())
+				!(await fsOperation(
+					Url.join(DATA_STORAGE, constants.LOG_FILE_NAME),
+				).exists())
 			) {
 				await fsOperation(window.DATA_STORAGE).createFile(
-					this.#logFileName,
+					constants.LOG_FILE_NAME,
 					logContent,
 				);
 			} else {
 				let existingData = await fsOperation(
-					window.DATA_STORAGE + this.#logFileName,
+					Url.join(DATA_STORAGE, constants.LOG_FILE_NAME),
 				).readFile("utf8");
 				let newData = existingData + "\n" + logContent;
-				await fsOperation(window.DATA_STORAGE + this.#logFileName).writeFile(
-					newData,
-				);
+				await fsOperation(
+					Url.join(DATA_STORAGE, constants.LOG_FILE_NAME),
+				).writeFile(newData);
 			}
 		} catch (error) {
 			console.error("Error in handling fs operation on log file. Error:", err);

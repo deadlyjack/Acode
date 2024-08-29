@@ -14,6 +14,7 @@ import commandPalette from "palettes/commandPalette";
 import findFile from "palettes/findFile";
 import help from "settings/helpSettings";
 import mainSettings from "settings/mainSettings";
+import Url from "utils/Url";
 import { getColorRange } from "utils/color/regex";
 import helpers from "utils/helpers";
 import checkFiles from "./checkFiles";
@@ -361,5 +362,8 @@ export default {
 			default: editorManager.activeFile.eol,
 		});
 		editorManager.activeFile.eol = eol;
+	},
+	"open-log-file"() {
+		openFile(Url.join(DATA_STORAGE, constants.LOG_FILE_NAME));
 	},
 };
