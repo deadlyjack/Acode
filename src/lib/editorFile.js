@@ -477,7 +477,8 @@ export default class EditorFile {
 
 			await fs.writeFile(text);
 		} catch (error) {
-			console.error(error);
+			window.log("error", "Writing to cache failed:");
+			window.log("error", error);
 		}
 	}
 
@@ -519,7 +520,7 @@ export default class EditorFile {
 			if (oldText.length !== text.length) return true;
 			return oldText !== text;
 		} catch (error) {
-			console.log(error);
+			window.log("error", error);
 			return false;
 		}
 	}
@@ -789,7 +790,8 @@ export default class EditorFile {
 			if (!(await fs.exists())) return;
 			fs.renameTo(newId);
 		} catch (error) {
-			console.error("renameCacheFile", error);
+			window.log("error", "renameCacheFile");
+			window.log("error", error);
 		}
 	}
 
@@ -802,7 +804,7 @@ export default class EditorFile {
 			if (!(await fs.exists())) return;
 			await fs.delete();
 		} catch (error) {
-			console.error(error);
+			window.log("error", error);
 		}
 	}
 
@@ -838,6 +840,7 @@ export default class EditorFile {
 				} else if (!cacheExists && fileExists) {
 					value = await file.readFile(this.encoding);
 				} else if (!cacheExists && !fileExists) {
+					window.log("error", "unable to load file");
 					throw new Error("Unable to load file");
 				}
 			}
@@ -870,7 +873,8 @@ export default class EditorFile {
 			this.#emit("loaderror", createFileEvent(this));
 			this.remove();
 			toast(`Unable to load: ${this.filename}`);
-			console.log(error);
+			window.log("error", "Unable to load: " + this.filename);
+			window.log("error", error);
 		} finally {
 			this.#emit("loadend", createFileEvent(this));
 		}

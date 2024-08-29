@@ -138,7 +138,7 @@ export default function palette(getList, onsSelectCb, placeholder, onremove) {
 		}
 
 		remove = () => {
-			console.error("Palette already removed");
+			window.log("warn", "Palette already removed.");
 		};
 	}
 }

@@ -140,7 +140,7 @@ export default async function PluginInclude(
 					}
 				}
 			} catch (error) {
-				console.error(error);
+				window.log("error", error);
 			} finally {
 				loader.removeTitleLoader();
 			}
@@ -154,6 +154,7 @@ export default async function PluginInclude(
 			$button?.click();
 		}
 	} catch (err) {
+		window.log("error", err);
 		helpers.error(err);
 	} finally {
 		loader.removeTitleLoader();
@@ -173,6 +174,7 @@ export default async function PluginInclude(
 			}
 			render();
 		} catch (err) {
+			window.log("error", err);
 			helpers.error(err);
 		}
 	}
@@ -190,6 +192,7 @@ export default async function PluginInclude(
 			}
 			render();
 		} catch (err) {
+			window.log("error", err);
 			helpers.error(err);
 		}
 	}
@@ -231,6 +234,8 @@ export default async function PluginInclude(
 				$button.textContent = oldText;
 			}
 		} catch (error) {
+			window.log("error", "Failed to buy:");
+			window.log("error", error);
 			helpers.error(error);
 			$button.textContent = oldText;
 		}
@@ -266,6 +271,7 @@ export default async function PluginInclude(
 
 			toast(error || strings.error);
 		} catch (error) {
+			window.log("error", error);
 			helpers.error(error);
 		} finally {
 			$button.textContent = oldText;

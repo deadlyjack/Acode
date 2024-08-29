@@ -121,7 +121,7 @@ async function apply(id, init) {
 		}
 		await fs.writeFile(svg.replace(/#fff/g, theme.primaryColor));
 	} catch (error) {
-		console.error(error);
+		window.log("error", error);
 	}
 }
 

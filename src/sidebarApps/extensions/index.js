@@ -157,7 +157,8 @@ async function filterPlugins() {
 			updateHeight($searchResult);
 		}
 	} catch (error) {
-		console.error("Error filtering plugins:", error);
+		window.log("error", "Error filtering plugins:");
+		window.log("error", error);
 		$searchResult.content = <span className="error">{strings["error"]}</span>;
 	} finally {
 		$searchResult.classList.remove("loading");
@@ -233,7 +234,7 @@ async function getFilteredPlugins(filterName) {
 		}
 		return await response.json();
 	} catch (error) {
-		console.error(error);
+		window.log("error", error);
 	}
 }
 

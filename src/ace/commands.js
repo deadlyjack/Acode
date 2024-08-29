@@ -314,6 +314,7 @@ export async function resetKeyBindings() {
 		}
 		await fs.writeFile(content);
 	} catch (error) {
-		console.error(error);
+		window.log("error", "Reset Keybinding failed!");
+		window.log("error", error);
 	}
 }

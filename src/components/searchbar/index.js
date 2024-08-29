@@ -79,7 +79,8 @@ function searchBar($list, setHide, onhideCb, searchFunction) {
 				try {
 					result = await result;
 				} catch (error) {
-					console.error("Search function failed:", error);
+					window.log("error", "Search function failed:");
+					window.log("error", error);
 					result = [];
 				}
 			}
