@@ -81,7 +81,7 @@
     "sass": "^1.77.2",
     "sass-loader": "^14.2.1",
     "style-loader": "^4.0.0",
-    "webpack": "^5.91.0",
+    "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
