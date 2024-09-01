@@ -355,13 +355,6 @@ export default function PluginsInclude(updates) {
 
   async function addSource(sourceType, value = "https://") {
     let source;
-
-    const clipboardData = await getClipboardData();
-
-    if (clipboardData && clipboardData.startsWith("https")) {
-      value = clipboardData;
-    }
-
     if (sourceType === "remote") {
       source = await prompt("Enter plugin source", value, "url");
     } else {
@@ -377,12 +370,5 @@ export default function PluginsInclude(updates) {
       window.toast(helpers.errorMessage(error));
       addSource(sourceType, source);
     }
-  }
-
-  async function getClipboardData() {
-    return new Promise((resolve) => {
-      const { clipboard } = cordova.plugins;
-      clipboard.paste(resolve);
-    });
   }
 }
