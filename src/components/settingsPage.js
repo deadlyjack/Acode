@@ -304,7 +304,7 @@ function listItems($list, items, callback) {
 				return;
 			}
 		} catch (error) {
-			console.log(error);
+			window.log("error", error);
 		}
 
 		item.value = res;

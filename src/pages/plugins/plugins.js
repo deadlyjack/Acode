@@ -235,7 +235,8 @@ export default function PluginsInclude(updates) {
       return plugins.map((plugin) => <Item {...plugin} />);
     } catch (error) {
       $list.all.setAttribute("empty-msg", strings["error"]);
-      console.error(error);
+      window.log("error", "Failed to search remotely:");
+      window.log("error", error);
       return []; // Return an empty array on error
     }
   }
@@ -253,7 +254,8 @@ export default function PluginsInclude(updates) {
       return await response.json();
     } catch (error) {
       $list.all.setAttribute("empty-msg", strings["error"]);
-      console.error(error);
+      window.log("error", "Failed to filter plugins:");
+      window.log("error", error);
       return [];
     }
   }
@@ -281,7 +283,7 @@ export default function PluginsInclude(updates) {
 
       $list.all.setAttribute("empty-msg", strings["no plugins found"]);
     } catch (error) {
-      console.error(error);
+      window.log("error", error);
     }
   }
 

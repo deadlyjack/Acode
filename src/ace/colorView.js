@@ -141,7 +141,8 @@ function afterRender() {
 				el.classList.add("ace_color");
 				el.style.cssText = `background-color: ${content}; color: ${fontColorString}; pointer-events: all;`;
 			} catch (error) {
-				console.log("Invalid color", content);
+				window.log("error", `Invalid color: ${content}`);
+				window.log("error", error);
 			}
 		});
 }

@@ -36,8 +36,9 @@ export default {
 		const copyStack = { ...this };
 		delete copyStack.windowCopy;
 		copyStack.pop = (repeat) => {
-			console.error(
-				"Deprecated: window.actionStack is deprecated, import actionStack instead",
+			window.log(
+				"error",
+				"Deprecated: `window.actionStack` is deprecated, import `actionStack` instead",
 			);
 			this.pop(repeat);
 		};

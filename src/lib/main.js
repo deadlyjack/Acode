@@ -30,6 +30,7 @@ import EditorFile from "lib/editorFile";
 import EditorManager from "lib/editorManager";
 import lang from "lib/lang";
 import loadPlugins from "lib/loadPlugins";
+import Logger from "lib/logger";
 import openFolder from "lib/openFolder";
 import restoreFiles from "lib/restoreFiles";
 import settings from "lib/settings";
@@ -55,6 +56,7 @@ import { getEncoding, initEncodings } from "utils/encodings";
 const previousVersionCode = Number.parseInt(localStorage.versionCode, 10);
 
 window.onload = Main;
+const logger = new Logger();
 
 async function Main() {
 	const oldPreventDefault = TouchEvent.prototype.preventDefault;
@@ -103,12 +105,14 @@ async function onDeviceReady() {
 	window.PLUGIN_DIR = Url.join(DATA_STORAGE, "plugins");
 	window.KEYBINDING_FILE = Url.join(DATA_STORAGE, ".key-bindings.json");
 	window.IS_FREE_VERSION = isFreePackage;
+	window.log = logger.log.bind(logger);
 
 	startAd();
 
 	try {
 		await helpers.promisify(iap.startConnection).catch((e) => {
-			console.error("connection error:", e);
+			window.log("error", "connection error");
+			window.log("error", e);
 		});
 
 		if (localStorage.acode_pro === "true") {
@@ -127,7 +131,8 @@ async function onDeviceReady() {
 			}
 		}
 	} catch (error) {
-		console.error("Purchase error:", error);
+		window.log("error", "Purchase error");
+		window.log("error", error);
 	}
 
 	try {
@@ -182,23 +187,26 @@ async function onDeviceReady() {
 
 	setTimeout(() => {
 		if (document.body.classList.contains("loading"))
-			document.body.setAttribute(
-				"data-small-msg",
-				"This is taking unexpectedly long time!",
-			);
+			window.log("warn", "App is taking unexpectedly long time!");
+		document.body.setAttribute(
+			"data-small-msg",
+			"This is taking unexpectedly long time!",
+		);
 	}, 1000 * 10);
 
 	acode.setLoadingMessage("Loading settings...");
+	window.log("info", "Loading Settings...");
 	await settings.init();
 	themes.init();
 
 	acode.setLoadingMessage("Loading language...");
+	window.log("info", "Loading language...");
 	await lang.set(settings.value.lang);
 
 	try {
 		await loadApp();
 	} catch (error) {
-		console.error(error);
+		window.log("error", error);
 		toast(`Error: ${error.message}`);
 	} finally {
 		setTimeout(() => {
@@ -338,6 +346,8 @@ async function loadApp() {
 	});
 	//#endregion
 
+	window.log("info", "App started!");
+
 	new EditorFile();
 
 	checkPluginsUpdate()
@@ -369,6 +379,8 @@ async function loadApp() {
 	try {
 		await loadPlugins();
 	} catch (error) {
+		window.log("error", "Plugins loading failed!");
+		window.log("error", error);
 		toast("Plugins loading failed!");
 	}
 
@@ -384,7 +396,8 @@ async function loadApp() {
 		try {
 			await restoreFiles(files);
 		} catch (error) {
-			console.error(error);
+			window.log("error", "File loading failed!");
+			window.log("error", error);
 			toast("File loading failed!");
 		}
 	} else {

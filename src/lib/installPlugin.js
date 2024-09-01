@@ -22,7 +22,7 @@ export default async function installPlugin(id, name, purchaseToken) {
 			await fsOperation(DATA_STORAGE).createDirectory("plugins");
 		}
 	} catch (error) {
-		console.error(error);
+		window.log("error", error);
 	}
 
 	if (!/^(https?|file|content):/.test(id)) {

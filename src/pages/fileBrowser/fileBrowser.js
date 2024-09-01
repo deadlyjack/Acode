@@ -221,7 +221,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 						openFolder.add(newUrl, type);
 						reload();
 					} catch (error) {
-						console.error(error);
+						window.log("error", error);
 						helpers.error(error);
 					}
 					break;
@@ -461,6 +461,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 					toast(strings.success);
 					reload();
 				} catch (err) {
+					window.log("error", err);
 					helpers.error(err);
 				}
 			}
@@ -483,6 +484,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 					delete cachedDir[url];
 					reload();
 				} catch (err) {
+					window.log("error", err);
 					helpers.error(err);
 				}
 			}

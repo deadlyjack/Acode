@@ -227,6 +227,7 @@ export default [
 async function onWorkerMessage(e) {
 	const { action, error, data, id } = e.data;
 	if (error) {
+		window.log("error", error);
 		console.error(error);
 		return;
 	}

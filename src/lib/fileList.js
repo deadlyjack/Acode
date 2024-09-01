@@ -222,7 +222,7 @@ export async function addRoot({ url, name }) {
 		emit("add-folder", tree);
 	} catch (error) {
 		// ignore
-		console.error(error);
+		window.log("error", error);
 	}
 }
 
