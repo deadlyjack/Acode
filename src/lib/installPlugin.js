@@ -4,14 +4,17 @@ import JSZip from "jszip";
 import Url from "utils/Url";
 import constants from "./constants";
 import loadPlugin from "./loadPlugin";
+import helpers from "utils/helpers";
+import purchaseListener from "handlers/purchase";
 
 /**
  * Installs a plugin.
  * @param {string} id
  * @param {string} name
  * @param {string} purchaseToken
+ * @param {(message: any) => void} setMessage
  */
-export default async function installPlugin(id, name, purchaseToken) {
+export default async function installPlugin(id, name, purchaseToken, setMessage) {
 	const title = name || "Plugin";
 	const loaderDialog = loader.create(title, strings.installing);
 	let pluginDir;
@@ -41,7 +44,7 @@ export default async function installPlugin(id, name, purchaseToken) {
 	}
 
 	try {
-		loaderDialog.show();
+		if (!setMessage) loaderDialog.show();
 
 		const plugin = await fsOperation(pluginUrl).readFile(
 			undefined,
@@ -63,6 +66,14 @@ export default async function installPlugin(id, name, purchaseToken) {
 			const pluginJson = JSON.parse(
 				await zip.files["plugin.json"].async("text"),
 			);
+
+			if (pluginJson.dependencies) {
+				for (const dependency of pluginJson.dependencies) {
+					const _setMessage = setMessage? setMessage: loaderDialog.setMessage;
+					const hasError = await resolveDependency(dependency, _setMessage);
+					if (hasError) throw new Error(strings.failed);
+				}
+			}
 
 			if (!pluginDir) {
 				pluginJson.source = pluginUrl;
@@ -107,7 +118,7 @@ export default async function installPlugin(id, name, purchaseToken) {
 		}
 		throw err;
 	} finally {
-		loaderDialog.destroy();
+		if (!setMessage) loaderDialog.destroy();
 	}
 }
 
@@ -137,5 +148,98 @@ async function createFileRecursive(parent, dir) {
 	}
 	if (dir.length) {
 		await createFileRecursive(newParent, dir);
+	}
+}
+
+/** Resolve dependency
+ * @param {string} id
+ * @param {(message: any) => void} setMessage
+ * @returns {Promise<boolean>} has error
+ */
+async function resolveDependency(id, setMessage) {
+	let purchaseToken;
+	let product;
+	let isPaid = false;
+
+	try {
+		const remoteDependency = await fsOperation(
+			constants.API_BASE,
+			`plugin/${id}`,
+		)
+			.readFile("json")
+			.catch(() => null);
+
+		if (!remoteDependency) return true;
+
+		const version = await isInstalled(id);
+		if (remoteDependency?.version === version) return false;
+
+		plugin = Object.assign({}, remoteDependency);
+
+		if (!Number.parseFloat(remoteDependency.price)) return true;
+
+		isPaid = remoteDependency.price > 0;
+		[product] = await helpers.promisify(iap.getProducts, [
+			remoteDependency.sku,
+		]);
+		if (product) {
+			const purchase = await getPurchase(product.productId);
+			purchaseToken = purchase?.purchaseToken;
+		}
+
+		if (isPaid && !purchaseToken) {
+			if (!product) throw new Error("Product not found");
+			const apiStatus = await helpers.checkAPIStatus();
+
+			if (!apiStatus) {
+				alert(strings.error, strings.api_error);
+				return true;
+			}
+
+			iap.setPurchaseUpdatedListener(...purchaseListener(onpurchase, onerror));
+			setMessage(strings["loading..."]);
+			await helpers.promisify(iap.purchase, product.json);
+
+			async function onpurchase(e) {
+				const purchase = await getPurchase(product.productId);
+				await ajax.post(Url.join(constants.API_BASE, "plugin/order"), {
+					data: {
+						id: id,
+						token: purchase?.purchaseToken,
+						package: BuildInfo.packageName,
+					},
+				});
+				purchaseToken = purchase?.purchaseToken;
+			}
+
+			async function onerror(error) {
+				helpers.error(error);
+				return true;
+			}
+		}
+
+		setMessage(`${strings.installing.replace("...", "")} ${remoteDependency.name}...`);
+		await installPlugin(dependency, undefined, purchaseToken, setMessage);
+
+	} catch (error) {
+		helpers.error(error);
+	}
+
+	async function getPurchase(sku) {
+		const purchases = await helpers.promisify(iap.getPurchases);
+		const purchase = purchases.find((p) => p.productIds.includes(sku));
+		return purchase;
+	}
+
+	/**
+	 *
+	 * @param {string} id
+	 * @returns {Promise<string>} plugin version
+	 */
+	async function isInstalled(id) {
+		if (await fsOperation(PLUGIN_DIR, id).exists()) {
+			const plugin = await fsOperation(PLUGIN_DIR, id, "plugin.json").readFile("json");
+			return plugin.version
+		}
 	}
 }
