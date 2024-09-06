@@ -1,11 +1,11 @@
 import loader from "dialogs/loader";
 import fsOperation from "fileSystem";
+import purchaseListener from "handlers/purchase";
 import JSZip from "jszip";
 import Url from "utils/Url";
+import helpers from "utils/helpers";
 import constants from "./constants";
 import loadPlugin from "./loadPlugin";
-import helpers from "utils/helpers";
-import purchaseListener from "handlers/purchase";
 
 /**
  * Installs a plugin.
@@ -14,7 +14,12 @@ import purchaseListener from "handlers/purchase";
  * @param {string} purchaseToken
  * @param {(message: any) => void} setMessage
  */
-export default async function installPlugin(id, name, purchaseToken, setMessage) {
+export default async function installPlugin(
+	id,
+	name,
+	purchaseToken,
+	setMessage,
+) {
 	const title = name || "Plugin";
 	const loaderDialog = loader.create(title, strings.installing);
 	let pluginDir;
@@ -69,7 +74,7 @@ export default async function installPlugin(id, name, purchaseToken, setMessage)
 
 			if (pluginJson.dependencies) {
 				for (const dependency of pluginJson.dependencies) {
-					const _setMessage = setMessage? setMessage: loaderDialog.setMessage;
+					const _setMessage = setMessage ? setMessage : loaderDialog.setMessage;
 					const hasError = await resolveDependency(dependency, _setMessage);
 					if (hasError) throw new Error(strings.failed);
 				}
@@ -218,9 +223,10 @@ async function resolveDependency(id, setMessage) {
 			}
 		}
 
-		setMessage(`${strings.installing.replace("...", "")} ${remoteDependency.name}...`);
+		setMessage(
+			`${strings.installing.replace("...", "")} ${remoteDependency.name}...`,
+		);
 		await installPlugin(dependency, undefined, purchaseToken, setMessage);
-
 	} catch (error) {
 		helpers.error(error);
 	}
@@ -238,8 +244,10 @@ async function resolveDependency(id, setMessage) {
 	 */
 	async function isInstalled(id) {
 		if (await fsOperation(PLUGIN_DIR, id).exists()) {
-			const plugin = await fsOperation(PLUGIN_DIR, id, "plugin.json").readFile("json");
-			return plugin.version
+			const plugin = await fsOperation(PLUGIN_DIR, id, "plugin.json").readFile(
+				"json",
+			);
+			return plugin.version;
 		}
 	}
 }
