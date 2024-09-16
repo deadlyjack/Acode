@@ -377,9 +377,9 @@
 	"list files": "列出 <strong>{name}</strong> 下的所有文件吗？过多的文件可能会导致应用崩溃。",
 	"problems": "有问题",
 	"show side buttons": "显示侧边按钮",
-	"bug_report": "Submit a Bug Report",
+	"bug_report": "提交缺陷报告",
 	"verified publisher": "已认证发布者",
-	"most_downloaded": "Most Downloaded",
-	"newly_added": "Newly Added",
-	"top_rated": "Top Rated"
+	"most_downloaded": "最多下载",
+	"newly_added": "最近上架",
+	"top_rated": "最多好评"
 }
