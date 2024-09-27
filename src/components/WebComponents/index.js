@@ -1,4 +1,4 @@
-import '@ungap/custom-elements';
-import WcPage from './wcPage';
+import "@ungap/custom-elements";
+import WcPage from "./wcPage";
 
-customElements.define('wc-page', WcPage);
+customElements.define("wc-page", WcPage);

@@ -1,8 +1,8 @@
-import alert from 'dialogs/alert';
-import openFile from 'lib/openFile';
-import openFolder, { addedFolder } from 'lib/openFolder';
-import helpers from 'utils/helpers';
-import Url from 'utils/Url';
+import alert from "dialogs/alert";
+import openFile from "lib/openFile";
+import openFolder, { addedFolder } from "lib/openFolder";
+import Url from "utils/Url";
+import helpers from "utils/helpers";
 
 /**
  * @typedef {"file"|"folder"|"both"} BrowseMode
@@ -18,83 +18,83 @@ import Url from 'utils/Url';
  * @returns {Promise<SelectedFile>}
  */
 function FileBrowser(mode, info, doesOpenLast, ...args) {
-  return new Promise((resolve, reject) => {
-    import(/* webpackChunkName: "fileBrowser" */ './fileBrowser').then(
-      (res) => {
-        const FileBrowser = res.default;
-        FileBrowser(mode, info, doesOpenLast, ...args)
-          .then(resolve)
-          .catch(reject);
-      },
-    );
-  });
+	return new Promise((resolve, reject) => {
+		import(/* webpackChunkName: "fileBrowser" */ "./fileBrowser").then(
+			(res) => {
+				const FileBrowser = res.default;
+				FileBrowser(mode, info, doesOpenLast, ...args)
+					.then(resolve)
+					.catch(reject);
+			},
+		);
+	});
 }
 
 FileBrowser.openFile = (res) => {
-  const { url, name, mode } = res;
-  const createOption = {
-    uri: url,
-    name,
-    render: true,
-  };
+	const { url, name, mode } = res;
+	const createOption = {
+		uri: url,
+		name,
+		render: true,
+	};
 
-  if (mode) {
-    createOption.mode = mode;
-  }
+	if (mode) {
+		createOption.mode = mode;
+	}
 
-  openFile(url, createOption);
+	openFile(url, createOption);
 };
 
 FileBrowser.openFileError = (err) => {
-  const ERROR = strings.error.toUpperCase();
-  const message = `${strings['unable to open file']}. ${helpers.errorMessage(err.code)}`;
-  if (err.code) {
-    alert(ERROR, message);
-  } else if (err.code !== 0) {
-    alert(ERROR, strings['unable to open file']);
-  }
+	const ERROR = strings.error.toUpperCase();
+	const message = `${strings["unable to open file"]}. ${helpers.errorMessage(err.code)}`;
+	if (err.code) {
+		alert(ERROR, message);
+	} else if (err.code !== 0) {
+		alert(ERROR, strings["unable to open file"]);
+	}
 };
 
 FileBrowser.openFolder = async (res) => {
-  const { url, name } = res;
-  const protocol = Url.getProtocol(url);
+	const { url, name } = res;
+	const protocol = Url.getProtocol(url);
 
-  if (protocol === 'ftp:') {
-    openFolder(url, {
-      name: name,
-      saveState: false,
-    });
-  } else {
-    openFolder(url, {
-      name: name,
-    });
-  }
+	if (protocol === "ftp:") {
+		openFolder(url, {
+			name: name,
+			saveState: false,
+		});
+	} else {
+		openFolder(url, {
+			name: name,
+		});
+	}
 
-  const folder = addedFolder.find((folder) => folder.url === url);
-  folder?.$node?.$title?.click();
+	const folder = addedFolder.find((folder) => folder.url === url);
+	folder?.$node?.$title?.click();
 };
 
 FileBrowser.openFolderError = (err) => {
-  const ERROR = strings.error.toUpperCase();
-  const message = `${strings['unable to open folder']}. ${helpers.errorMessage(err.code)}`;
-  if (err.code) {
-    alert(ERROR, message);
-  } else if (err.code !== 0) {
-    alert(ERROR, strings['unable to open folder']);
-  }
+	const ERROR = strings.error.toUpperCase();
+	const message = `${strings["unable to open folder"]}. ${helpers.errorMessage(err.code)}`;
+	if (err.code) {
+		alert(ERROR, message);
+	} else if (err.code !== 0) {
+		alert(ERROR, strings["unable to open folder"]);
+	}
 };
 
 FileBrowser.open = (res) => {
-  if (res.type === 'folder') {
-    FileBrowser.openFolder(res);
-    return;
-  }
+	if (res.type === "folder") {
+		FileBrowser.openFolder(res);
+		return;
+	}
 
-  FileBrowser.openFile(res);
+	FileBrowser.openFile(res);
 };
 
 FileBrowser.openError = (err) => {
-  FileBrowser.openFileError(err);
+	FileBrowser.openFileError(err);
 };
 
 export default FileBrowser;

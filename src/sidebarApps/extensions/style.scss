@@ -1,15 +1,64 @@
-@import '../../styles/mixins.scss';
+@import "../../styles/mixins.scss";
 
 .container.extensions {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      .icon-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--primary-text-color);
+        padding: 5px;
+        margin-left: 15px;
+        border-radius: 50%;
+        transition: background-color 0.3s ease;
+        &:hover {
+          background-color: var(--active-icon-color);
+        }
+      }
+    }
+  }
+
   .list.search-result {
     min-height: 0;
 
     &.loading {
       @include loader(20px);
     }
+    .filter-message {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--primary-color);
+      padding: 5px;
+      border-bottom: 1px solid var(--border-color);
+      strong {
+        color: var(--link-text-color);
+      }
+      .close-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: color 0.3s;
+        &:hover {
+          background-color: var(--error-text-color);
+        }
+      }
+    }
   }
 
   .tile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
     .text {
       &.sub-text {
         font-size: 0.8rem;
@@ -17,6 +66,16 @@
         &::after {
           font-size: 0.7rem;
         }
+      }
+    }
+    .more_vert {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: var(--active-icon-color);
       }
     }
   }

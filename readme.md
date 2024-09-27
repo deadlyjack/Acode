@@ -1,4 +1,4 @@
-# Acode Editor - Code Editor for Android
+# Acode - Code Editor for Android
 
 <p align="center">
   <img src='res/logo_1.png' width='250'>
@@ -14,8 +14,9 @@ Welcome to Acode Editor - a powerful and versatile code editing tool designed sp
 
 - Edit and create websites, and instantly preview them in a browser.
 - Seamlessly modify source files for various languages like Python, Java, JavaScript, and more.
-- Access the console to quickly identify errors and logs.
+- Built-in javascript console
 - Enjoy multi-language editing support with easy management tools.
+- Enjoy a large collections of community plugins to enhance your coding experience.
 
 ## • Installation
 
@@ -62,10 +63,41 @@ yarn setup
 yarn build <platform (android)> <free|paid> <p|prod|d|dev>
 ```
 
+## • Contributing
+
+Acode Editor is an open-source project, and we welcome contributions from the community. To contribute, follow these steps:
+
+1. Fork the repository.
+2. Make your changes and commit them.
+3. Push your changes to your fork.
+4. Create a pull request and Wait for review.
+
+Please ensure that your code is clean, well-formatted, and follows the project's coding standards. Acode uses [Biomejs](https://biomejs.dev/) for formatting and linting. You can use following commands to lints/format your code locally:
+```shell
+yarn lint # for linting
+yarn format # for formatting
+yarn spellcheck # for spellchecking
+```
+Also, ensure that your code is well-documented and includes comments where necessary.
+
+> [!Note]
+> You can use any package manager like npm or yarn or pnpm or bun.
+> You can use your editor specific Biomejs plugin for auto-formatting and linting based on Acode's configs.
+
 ## • Developing a Plugin for Acode
 
 For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/deadlyjack/acode-plugin).
 
 For plugin development information, refer to: [Acode Plugin Documentation](https://acode.app/plugin-docs)
 
-> 💙 Empower your coding journey with the dynamic and efficient Acode Editor. Happy coding on-the-go!
+> 💙 Happy coding!
+
+## Star History
+
+<a href="https://star-history.com/#deadlyjack/Acode&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=deadlyjack/Acode&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=deadlyjack/Acode&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=deadlyjack/Acode&type=Date" />
+ </picture>
+</a>

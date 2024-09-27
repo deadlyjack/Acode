@@ -1,5 +1,23 @@
 # Change Log
 
+## [1.10.4] (952)
+
+- New
+  - Nested Files/Folder Creation
+  - Updated ace to latest version
+  - Improved displaying of Download count on Plugins page as well as on Sidebar
+  - Enhanced search functionality to allow searching across all available plugins from the "all" section of the plugin page.
+  - Added a new option on Help page for submitting bug reports.
+- Fixes
+  - Fixed issue with the search bar on the plugin page
+  - Fixed issue with the search bar closing accidentally when clicking elsewhere on the screen
+
+## [1.10.2]
+
+- New
+  - [x] **Updated Ace editor** | 947
+    - Updated Ace editor to version 1.33.1.
+
 ## [1.10.1]
 
 - New
@@ -199,8 +217,8 @@
     - Now it will ask what to do with unsaved files.
   - [x] **File changed alert**
     - Fixed file changed alert showing up even when file is not changed.
-  - [x] **X-Plore**
-    - Fixed file not opening when opened from X-Plore.
+  - [x] **Explore**
+    - Fixed file not opening when opened from Explore.
   - [x] **Extensions app in sidebar**
     - Fixed extensions app's explore not rendering properly.
   - [x] **Minor bugs**

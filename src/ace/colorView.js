@@ -3,10 +3,10 @@
  * @see https://github.com/easylogic/ace-colorpicker/blob/main/src/extension/ace/colorview.js
  */
 
-import Color from 'utils/color';
-import { HEX, HSL, HSLA, RGB, RGBA, isValidColor } from 'utils/color/regex';
+import Color from "utils/color";
+import { HEX, HSL, HSLA, RGB, RGBA, isValidColor } from "utils/color/regex";
 
-const COLORPICKER_TOKEN_CLASS = '.ace_color';
+const COLORPICKER_TOKEN_CLASS = ".ace_color";
 const changedRules = [];
 
 let editor = null;
@@ -17,139 +17,141 @@ let editor = null;
  * @param {boolean} [force=false] Force update color view
  */
 export default function initColorView(e, force = false) {
-  editor = e;
-  const { renderer } = editor;
+	editor = e;
+	const { renderer } = editor;
 
-  editor.on('changeMode', onChangeMode);
-  renderer.on('afterRender', afterRender);
+	editor.on("changeMode", onChangeMode);
+	renderer.on("afterRender", afterRender);
 
-  if (force) {
-    const { files } = editorManager;
+	if (force) {
+		const { files } = editorManager;
 
-    if (Array.isArray(files)) {
-      files.forEach(file => {
-        if (file.session) {
-          file.session._addedColorRule = false;
-        }
-      });
-    }
+		if (Array.isArray(files)) {
+			files.forEach((file) => {
+				if (file.session) {
+					file.session._addedColorRule = false;
+				}
+			});
+		}
 
-    onChangeMode();
-  }
+		onChangeMode();
+	}
 }
 
 export function deactivateColorView() {
-  const { renderer } = editor;
+	const { renderer } = editor;
 
-  changedRules.forEach((rule) => rule.shift());
-  changedRules.length = 0;
-  forceTokenizer();
+	changedRules.forEach((rule) => rule.shift());
+	changedRules.length = 0;
+	forceTokenizer();
 
-  editor.off('changeMode', onChangeMode);
-  renderer.off('afterRender', afterRender);
+	editor.off("changeMode", onChangeMode);
+	renderer.off("afterRender", afterRender);
 }
 
 /**
  * Checks if the session supports color
- * @param {AceAjax.IEditSession} session 
- * @returns 
+ * @param {AceAjax.IEditSession} session
+ * @returns
  */
 function sessionSupportsColor(session) {
-  const mode = session.getMode().$id.split('/').pop();
-  return /css|less|scss|sass|stylus|html|dart/.test(mode)
-    ? mode
-    : false;
+	const mode = session.getMode().$id.split("/").pop();
+	return /css|less|scss|sass|stylus|html|dart/.test(mode) ? mode : false;
 }
 
 function onChangeMode() {
-  const session = editor.session;
-  let forceUpdate = false;
+	const session = editor.session;
+	let forceUpdate = false;
 
-  // if mode is not css, scss, sass, less, stylus, or html, return
-  const mode = sessionSupportsColor(session);
-  if (session._addedColorRule || !mode) {
-    return;
-  }
+	// if mode is not css, scss, sass, less, stylus, or html, return
+	const mode = sessionSupportsColor(session);
+	if (session._addedColorRule || !mode) {
+		return;
+	}
 
-  let rules = session.$mode.$highlightRules.getRules();
+	let rules = session.$mode.$highlightRules.getRules();
 
-  if (mode === 'css') {
-    rules = { 'ruleset': rules['ruleset'] };
-  } else if (mode === 'html') {
-    rules = { 'css-ruleset': rules['css-ruleset'] };
-  }
+	if (mode === "css") {
+		rules = { ruleset: rules["ruleset"] };
+	} else if (mode === "html") {
+		rules = { "css-ruleset": rules["css-ruleset"] };
+	}
 
-  Object.keys(rules).forEach((key) => {
-    const rule = rules[key];
-    if (rule instanceof Array) {
-      const ruleExists = rule.some((r) => r.token === 'color');
-      if (ruleExists) return;
-      forceUpdate = true;
-      rule.unshift({
-        token: "color",
-        regex: `${HEX}|${RGB}|${RGBA}|${HSL}|${HSLA}`,
-      });
-      changedRules.push(rule);
-      return;
-    }
-  });
+	Object.keys(rules).forEach((key) => {
+		const rule = rules[key];
+		if (Array.isArray(rule)) {
+			const ruleExists = rule.some((r) => r.token === "color");
+			if (ruleExists) return;
+			forceUpdate = true;
+			rule.unshift({
+				token: "color",
+				regex: `${HEX}|${RGB}|${RGBA}|${HSL}|${HSLA}`,
+			});
+			changedRules.push(rule);
+			return;
+		}
+	});
 
-  if (!forceUpdate) return;
+	if (!forceUpdate) return;
 
-  forceTokenizer();
+	forceTokenizer();
 }
 
 function afterRender() {
-  const { session, renderer } = editor;
-  const { content } = renderer;
-  let classes = COLORPICKER_TOKEN_CLASS;
+	const { session, renderer } = editor;
+	const { content } = renderer;
+	let classes = COLORPICKER_TOKEN_CLASS;
 
-  // if session is css, scss, less, sass, stylus, or html (with css mode), continue
+	// if session is css, scss, less, sass, stylus, or html (with css mode), continue
 
-  const mode = sessionSupportsColor(session);
-  if (!mode) {
-    return;
-  }
+	const mode = sessionSupportsColor(session);
+	if (!mode) {
+		return;
+	}
 
-  if (mode === 'scss') {
-    classes += ',.ace_function';
-  }
+	if (mode === "scss") {
+		classes += ",.ace_function";
+	}
 
-  content.getAll(COLORPICKER_TOKEN_CLASS).forEach(( /**@type {HTMLElement} */ el, i, els) => {
-    let content = el.textContent;
-    const previousContent = els[i - 1]?.textContent;
-    const nextContent = els[i + 1]?.textContent;
-    const multiLinePrev = previousContent + content;
-    const multiLineNext = content + nextContent;
+	content
+		.getAll(COLORPICKER_TOKEN_CLASS)
+		.forEach((/**@type {HTMLElement} */ el, i, els) => {
+			let content = el.textContent;
+			const previousContent = els[i - 1]?.textContent;
+			const nextContent = els[i + 1]?.textContent;
+			const multiLinePrev = previousContent + content;
+			const multiLineNext = content + nextContent;
 
-    if (el.dataset.modified === 'true') return;
-    el.dataset.modified = 'true';
+			if (el.dataset.modified === "true") return;
+			el.dataset.modified = "true";
 
-    if (!isValidColor(content)) {
-      if (isValidColor(multiLinePrev)) {
-        content = multiLinePrev;
-      } else if (isValidColor(multiLineNext)) {
-        content = multiLineNext;
-      } else {
-        return;
-      }
-    }
+			if (!isValidColor(content)) {
+				if (isValidColor(multiLinePrev)) {
+					content = multiLinePrev;
+				} else if (isValidColor(multiLineNext)) {
+					content = multiLineNext;
+				} else {
+					return;
+				}
+			}
 
-    try {
-      const fontColorString = Color(content).luminance > 0.5 ? "#000" : "#fff";
-      el.classList.add('ace_color');
-      el.style.cssText = `background-color: ${content}; color: ${fontColorString}; pointer-events: all;`;
-    } catch (error) {
-      console.log("Invalid color", content);
-    }
-  });
+			try {
+				const fontColorString =
+					Color(content).luminance > 0.5 ? "#000" : "#fff";
+				el.classList.add("ace_color");
+				el.style.cssText = `background-color: ${content}; color: ${fontColorString}; pointer-events: all;`;
+			} catch (error) {
+				window.log("error", `Invalid color: ${content}`);
+				window.log("error", error);
+			}
+		});
 }
 
 function forceTokenizer() {
-  const { session } = editor;
-  // force recreation of tokenizer
-  session.$mode.$tokenizer = null;
-  session.bgTokenizer.setTokenizer(session.$mode.getTokenizer());
-  // force re-highlight whole document
-  session.bgTokenizer.start(0);
+	const { session } = editor;
+	// force recreation of tokenizer
+	session.$mode.$tokenizer = null;
+	session.bgTokenizer.setTokenizer(session.$mode.getTokenizer());
+	// force re-highlight whole document
+	session.bgTokenizer.start(0);
 }
