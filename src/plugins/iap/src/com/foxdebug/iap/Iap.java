@@ -23,6 +23,7 @@ import com.android.billingclient.api.SkuDetailsResponseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.lang.ref.WeakReference;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -35,14 +36,14 @@ import org.json.JSONObject;
 public class Iap extends CordovaPlugin {
 
   private BillingClient billingClient;
-  private Context context;
-  private Activity activity;
+  private WeakReference<Context> contextRef;
+  private WeakReference<Activity> activityRef;
   private CallbackContext purchaseUpdated;
 
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
-    context = cordova.getContext();
-    activity = cordova.getActivity();
+    contextRef = new WeakReference<>(cordova.getContext());
+    activityRef = new WeakReference<>(cordova.getActivity());
     billingClient = getBillingClient();
   }
 
@@ -103,7 +104,7 @@ public class Iap extends CordovaPlugin {
 
   private BillingClient getBillingClient() {
     return BillingClient
-      .newBuilder(this.context)
+      .newBuilder(this.contextRef.get())
       .enablePendingPurchases()
       .setListener(
         new PurchasesUpdatedListener() {
@@ -248,7 +249,7 @@ public class Iap extends CordovaPlugin {
     try {
       SkuDetails skuDetails = new SkuDetails(json);
       BillingResult result = billingClient.launchBillingFlow(
-        activity,
+        activityRef.get(),
         BillingFlowParams.newBuilder().setSkuDetails(skuDetails).build()
       );
       int responseCode = result.getResponseCode();
