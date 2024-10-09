@@ -267,7 +267,7 @@
 	"restore default settings": "Przywróć ustawienia domyślne",
 	"server port": "Port serwera",
 	"preview settings": "Ustawienia podglądu",
-	"preview settings note": "Jeśli port podglądu i port serwera są różne, aplikacja nie uruchomi serwera i zamiast tego otworzy https://<host>:<port podglądu> w przeglądarce lub przeglądarce w aplikacji. Jest to przydatne, gdy serwer jest uruchomiony w innej lokalizacji",
+	"preview settings note": "Jeśli port podglądu i port serwera są różne, aplikacja nie uruchomi serwera i zamiast tego otworzy https://<host>:<port podglądu> w przeglądarce lub w przeglądarce w aplikacji. Jest to przydatne, gdy serwer jest uruchomiony w innej lokalizacji",
 	"backup/restore note": "Tworzy kopię zapasową tylko ustawień, niestandardowego motywu i przypisanych klawiszy. Nie tworzy kopii zapasowej FPT/SFTP.",
 	"host": "Host",
 	"retry ftp/sftp when fail": "Ponów ftp/sftp w przypadku niepowodzenia",
