@@ -1,5 +1,29 @@
 # Change Log
 
+## [1.10.5] (953)
+
+- New
+  - Plugin Filtering System in #1011
+  - feat: Add more action menu in sidebar plugin in #1017
+  - Implement Logger system in #1020
+  - Feat: Use Current File for preview (Toggle option) in #1006
+  - updated ace editor to v1.36.2 in #1025
+
+- Fixes
+  - Update de-de.json in #1039
+  - fixed sidebar plugin search list scrolling in #1002
+  - Improve zh-TW traditional Chinese translation in #1004
+  - fix: Fixed save all changes option in #1010
+  - chore(i18n): vi-vn in #1016
+  - removed auto paste of url on plugin page in #1023
+  - fixed weird spacing issue on header #925 in #1024
+  - Update zh-cn.json and zh-hant.json in #1031
+  - Refactor Iap.java: Use WeakReference for Context and Activity to prevent memory leaks in #1040
+  - Updated Polish translation in #1043
+  - ru-ru improved in #1041
+  - Update pl-pl.json in #1044 & #1045
+  - fix: termux related fs operations failure in #1046
+
 ## [1.10.4] (952)
 
 - New
