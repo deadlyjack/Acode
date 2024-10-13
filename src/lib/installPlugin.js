@@ -1,3 +1,4 @@
+import ajax from "@deadlyjack/ajax";
 import loader from "dialogs/loader";
 import fsOperation from "fileSystem";
 import purchaseListener from "handlers/purchase";
@@ -166,70 +167,56 @@ async function resolveDependency(id, setMessage) {
 	let product;
 	let isPaid = false;
 
-	try {
-		const remoteDependency = await fsOperation(
-			constants.API_BASE,
-			`plugin/${id}`,
-		)
-			.readFile("json")
-			.catch(() => null);
+	const remoteDependency = await fsOperation(constants.API_BASE, `plugin/${id}`)
+		.readFile("json")
+		.catch(() => null);
 
-		if (!remoteDependency) return true;
+	if (!remoteDependency) throw new Error("Invalid plugin dependency");
 
-		const version = await isInstalled(id);
-		if (remoteDependency?.version === version) return false;
+	const version = await getInstalledPluginVersion(id);
+	if (remoteDependency?.version === version) return false;
 
-		plugin = Object.assign({}, remoteDependency);
+	isPaid = remoteDependency.price > 0;
+	[product] = await helpers.promisify(iap.getProducts, [remoteDependency.sku]);
+	if (product) {
+		const purchase = await getPurchase(product.productId);
+		purchaseToken = purchase?.purchaseToken;
+	}
 
-		if (!Number.parseFloat(remoteDependency.price)) return true;
+	if (isPaid && !purchaseToken) {
+		if (!product) throw new Error("Product not found");
+		const apiStatus = await helpers.checkAPIStatus();
 
-		isPaid = remoteDependency.price > 0;
-		[product] = await helpers.promisify(iap.getProducts, [
-			remoteDependency.sku,
-		]);
-		if (product) {
+		if (!apiStatus) {
+			alert(strings.error, strings.api_error);
+			return true;
+		}
+
+		iap.setPurchaseUpdatedListener(...purchaseListener(onpurchase, onerror));
+		setMessage(strings["loading..."]);
+		await helpers.promisify(iap.purchase, product.json);
+
+		async function onpurchase(e) {
 			const purchase = await getPurchase(product.productId);
+			await ajax.post(Url.join(constants.API_BASE, "plugin/order"), {
+				data: {
+					id: id,
+					token: purchase?.purchaseToken,
+					package: BuildInfo.packageName,
+				},
+			});
 			purchaseToken = purchase?.purchaseToken;
 		}
 
-		if (isPaid && !purchaseToken) {
-			if (!product) throw new Error("Product not found");
-			const apiStatus = await helpers.checkAPIStatus();
-
-			if (!apiStatus) {
-				alert(strings.error, strings.api_error);
-				return true;
-			}
-
-			iap.setPurchaseUpdatedListener(...purchaseListener(onpurchase, onerror));
-			setMessage(strings["loading..."]);
-			await helpers.promisify(iap.purchase, product.json);
-
-			async function onpurchase(e) {
-				const purchase = await getPurchase(product.productId);
-				await ajax.post(Url.join(constants.API_BASE, "plugin/order"), {
-					data: {
-						id: id,
-						token: purchase?.purchaseToken,
-						package: BuildInfo.packageName,
-					},
-				});
-				purchaseToken = purchase?.purchaseToken;
-			}
-
-			async function onerror(error) {
-				helpers.error(error);
-				return true;
-			}
+		async function onerror(error) {
+			throw error;
 		}
-
-		setMessage(
-			`${strings.installing.replace("...", "")} ${remoteDependency.name}...`,
-		);
-		await installPlugin(dependency, undefined, purchaseToken, setMessage);
-	} catch (error) {
-		helpers.error(error);
 	}
+
+	setMessage(
+		`${strings.installing.replace("...", "")} ${remoteDependency.name}...`,
+	);
+	await installPlugin(id, undefined, purchaseToken, setMessage);
 
 	async function getPurchase(sku) {
 		const purchases = await helpers.promisify(iap.getPurchases);
@@ -242,7 +229,7 @@ async function resolveDependency(id, setMessage) {
 	 * @param {string} id
 	 * @returns {Promise<string>} plugin version
 	 */
-	async function isInstalled(id) {
+	async function getInstalledPluginVersion(id) {
 		if (await fsOperation(PLUGIN_DIR, id).exists()) {
 			const plugin = await fsOperation(PLUGIN_DIR, id, "plugin.json").readFile(
 				"json",
