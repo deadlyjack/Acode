@@ -381,5 +381,6 @@
 	"verified publisher": "已認證發布者",
 	"most_downloaded": "最多下載",
 	"newly_added": "最近上架",
-	"top_rated": "最多好評"
+	"top_rated": "最多好評",
+	"rename not supported": "Rename on termux dir isn't supported"
 }

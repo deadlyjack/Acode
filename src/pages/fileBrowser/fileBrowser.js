@@ -3,6 +3,7 @@ import "./fileBrowser.scss";
 import Contextmenu from "components/contextmenu";
 import Page from "components/page";
 import searchBar from "components/searchbar";
+import alert from "dialogs/alert";
 import confirm from "dialogs/confirm";
 import loader from "dialogs/loader";
 import prompt from "dialogs/prompt";
@@ -447,6 +448,10 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			}
 
 			async function renameFile(newname) {
+				if (url.startsWith("content://com.termux.documents/tree/")) {
+					alert(strings.warning, strings["rename not supported"]);
+					return;
+				}
 				const fs = fsOperation(url);
 				try {
 					const newUrl = await fs.renameTo(newname);
@@ -468,18 +473,40 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
 			async function removeFile() {
 				try {
-					const fs = fsOperation(url);
-					await fs.delete();
-					recents.removeFile(url);
-					openFolder.removeItem(url);
-
 					if (helpers.isDir(type)) {
+						if (url.startsWith("content://com.termux.documents/tree/")) {
+							const fs = fsOperation(url);
+							const entries = await fs.lsDir();
+							if (entries.length === 0) {
+								await fs.delete();
+							} else {
+								const deleteRecursively = async (currentUrl) => {
+									const currentFs = fsOperation(currentUrl);
+									const currentEntries = await currentFs.lsDir();
+									for (const entry of currentEntries) {
+										if (entry.isDirectory) {
+											await deleteRecursively(entry.url);
+										} else {
+											await fsOperation(entry.url).delete();
+										}
+									}
+									await currentFs.delete();
+								};
+								await deleteRecursively(url);
+							}
+						} else {
+							await fsOperation(url).delete();
+						}
 						helpers.updateUriOfAllActiveFiles(url);
 						recents.removeFolder(url);
 					} else {
+						const fs = fsOperation(url);
+						await fs.delete();
 						const openedFile = editorManager.getFile(url, "uri");
 						if (openedFile) openedFile.uri = null;
 					}
+					recents.removeFile(url);
+					openFolder.removeItem(url);
 					toast(strings.success);
 					delete cachedDir[url];
 					reload();

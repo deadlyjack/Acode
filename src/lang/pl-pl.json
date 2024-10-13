@@ -381,5 +381,6 @@
 	"verified publisher": "Zweryfikowany wydawca",
 	"most_downloaded": "Najczęściej pobierane",
 	"newly_added": "Ostatnio dodane",
-	"top_rated": "Najwyżej oceniane"
+	"top_rated": "Najwyżej oceniane",
+	"rename not supported": "Rename on termux dir isn't supported"
 }

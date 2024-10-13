@@ -382,5 +382,6 @@
 	"verified publisher": "Проверенный издатель",
 	"most_downloaded": "Популярные",
 	"newly_added": "Новые",
-	"top_rated": "С высокой оценкой"
+	"top_rated": "С высокой оценкой",
+	"rename not supported": "Rename on termux dir isn't supported"
 }

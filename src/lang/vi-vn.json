@@ -382,5 +382,6 @@
 	"verified publisher": "Nhà phát hành đã xác minh",
 	"most_downloaded": "Tải xuống nhiều nhất",
 	"newly_added": "Mới được thêm vào",
-	"top_rated": "Đánh giá cao nhất"
+	"top_rated": "Đánh giá cao nhất",
+	"rename not supported": "Rename on termux dir isn't supported"
 }

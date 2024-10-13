@@ -383,5 +383,6 @@
 	"verified publisher": "Verified publisher",
 	"most_downloaded": "Most Downloaded",
 	"newly_added": "Newly Added",
-	"top_rated": "Top Rated"
+	"top_rated": "Top Rated",
+	"rename not supported": "Rename on termux dir isn't supported"
 }
