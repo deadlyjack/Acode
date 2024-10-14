@@ -293,7 +293,7 @@
 	"print margin": "Margines wydruku",
 	"touch move threshold": "Próg przesunięcia dotykowego",
 	"info-retryremotefsafterfail": "Ponów połączenie FTP/SFTP w przypadku niepowodzenia",
-	"info-fullscreen": "Ukryj pasek tytułu na ekranie głównym.",
+	"info-fullscreen": "Ukrywanie paska tytułu na ekranie głównym.",
 	"info-checkfiles": "Sprawdza zmiany w plikach, gdy aplikacja działa w tle.",
 	"info-console": "Wybierz konsolę JavaScript. Legacy to domyślna konsola, eruda to konsola innej firmy.",
 	"info-keyboardmode": "Tryb klawiatury do wprowadzania tekstu, brak sugestii ukryje sugestie i automatyczną korektę. Jeśli brak sugestii nie działa, spróbuj zmienić wartość na brak sugestii agresywnych.",
