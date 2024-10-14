@@ -291,7 +291,7 @@
 	"plugin": "Wtyczka",
 	"quicktools trigger mode": "Tryb wyzwalania szybkich narzędzi",
 	"print margin": "Margines wydruku",
-	"touch move threshold": "Próg przesunięcia dotykowego",
+	"touch move threshold": "Próg reakcji na dotyk",
 	"info-retryremotefsafterfail": "Ponów połączenie FTP/SFTP w przypadku niepowodzenia",
 	"info-fullscreen": "Ukrywanie paska tytułu na ekranie głównym.",
 	"info-checkfiles": "Sprawdza zmiany w plikach, gdy aplikacja działa w tle.",
