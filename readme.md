@@ -68,15 +68,22 @@ yarn build <platform (android)> <free|paid> <p|prod|d|dev>
 Acode Editor is an open-source project, and we welcome contributions from the community. To contribute, follow these steps:
 
 1. Fork the repository.
-2. Make your changes and commit them.
+2. Make your changes and commit them.(make branch for each feature or bug fix)
 3. Push your changes to your fork.
-4. Create a pull request and Wait for review.
+4. Create a pull request from your branch to main branch of this repository with proper description and Wait for review.
 
-Please ensure that your code is clean, well-formatted, and follows the project's coding standards. Acode uses [Biomejs](https://biomejs.dev/) for formatting and linting. You can use following commands to lints/format your code locally:
+> [!Note]
+> Ensure your pull request includes:
+> - A clear description of the changes made or problem or feature.
+> - A reference to the issue being addressed (if applicable).
+> - A clear explanation of the solution or implementation.
+> - Screenshots or GIFs (if applicable).
+
+Please ensure that your code is clean, well-formatted, and follows the project's coding standards. Acode uses [Biomejs](https://biomejs.dev/) for formatting and linting and [typos](https://github.com/crate-ci/typos) for low false positives source code spell checking. You can use following commands to lints/format your code locally:
 ```shell
 yarn lint # for linting
 yarn format # for formatting
-yarn spellcheck # for spellchecking
+yarn check # it runs both lint and format
 ```
 Also, ensure that your code is well-documented and includes comments where necessary.
 

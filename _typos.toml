@@ -1,0 +1,53 @@
+[default]
+check-filename = true
+
+[files]
+extend-exclude = [
+    "node_modules",
+    "www",
+    "*.yaml",
+    ".vscode",
+    "fastlane",
+    "hooks",
+    "res",
+    "*.gradle",
+    "plugins",
+    "platforms",
+    "src/lang/ar-ye.json",
+    "src/lang/be-by.json",
+    "src/lang/bn-bd.json",
+    "src/lang/cs-cz.json",
+    "src/lang/de-de.json",
+    "src/lang/es-sv.json",
+    "src/lang/fr-fr.json",
+    "src/lang/hi-in.json",
+    "src/lang/hu-hu.json",
+    "src/lang/id-id.json",
+    "src/lang/ir-fa.json",
+    "src/lang/it-it.json",
+    "src/lang/ja-jp.json",
+    "src/lang/ko-kr.json",
+    "src/lang/ml-in.json",
+    "src/lang/mm-unicode.json",
+    "src/lang/mm-zawgyi.json",
+    "src/lang/pl-pl.json",
+    "src/lang/pt-br.json",
+    "src/lang/pu-in.json",
+    "src/lang/ru-ru.json",
+    "src/lang/tl-ph.json",
+    "src/lang/tr-tr.json",
+    "src/lang/uk-ua.json",
+    "src/lang/uz-uz.json",
+    "src/lang/vi-vn.json",
+    "src/lang/zh-cn.json",
+    "src/lang/zh-hant.json",
+    "src/lang/zh-tw.json",
+]
+
+[default.extend-words]
+# temporary thing to staisfy the linter
+strech = "strech"
+contaienr = "contaienr"
+formate = "formate"
+collapsable = "collapsable"
+styl = "styl"
