@@ -7,6 +7,7 @@ import fsOperation from "fileSystem";
 import actions from "handlers/quickTools";
 import recents from "lib/recents";
 import FileBrowser from "pages/fileBrowser";
+import plugins from "pages/plugins";
 import Problems from "pages/problems/problems";
 import changeEncoding from "palettes/changeEncoding";
 import changeMode from "palettes/changeMode";
@@ -174,6 +175,10 @@ export default {
 
 			case "problems":
 				Problems();
+				break;
+
+			case "plugins":
+				plugins();
 				break;
 
 			default:

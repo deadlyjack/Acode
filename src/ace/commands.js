@@ -287,6 +287,14 @@ const commands = [
 			settings.update(false);
 		},
 	},
+	{
+		name: "openPluginsPage",
+		description: "Open Plugins Page",
+		exec() {
+			acode.exec("open", "plugins");
+		},
+		readOnly: true,
+	},
 ];
 
 export function setCommands(editor) {
