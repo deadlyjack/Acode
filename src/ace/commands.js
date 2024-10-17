@@ -295,6 +295,14 @@ const commands = [
 		},
 		readOnly: true,
 	},
+	{
+		name: "copyDeviceInfo",
+		description: "Copy Device info",
+		exec() {
+			acode.exec("copy-device-info");
+		},
+		readOnly: true,
+	},
 ];
 
 export function setCommands(editor) {
