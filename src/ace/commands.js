@@ -1,6 +1,7 @@
 import fsOperation from "fileSystem";
 import actions from "handlers/quickTools";
 import keyBindings from "lib/keyBindings";
+import settings from "lib/settings";
 import Url from "utils/Url";
 
 const commands = [
@@ -264,6 +265,26 @@ const commands = [
 		description: "Open Log File",
 		exec() {
 			acode.exec("open-log-file");
+		},
+	},
+	{
+		name: "increaseFontSize",
+		description: "Increase font size",
+		exec(editor) {
+			let size = Number.parseInt(editor.getFontSize(), 10) || 12;
+			editor.setFontSize(size + 1);
+			settings.value.fontSize = size + 1 + "px";
+			settings.update(false);
+		},
+	},
+	{
+		name: "decreaseFontSize",
+		description: "Decrease font size",
+		exec(editor) {
+			let size = Number.parseInt(editor.getFontSize(), 10) || 12;
+			editor.setFontSize(Math.max(size - 1 || 1));
+			settings.value.fontSize = Math.max(size - 1 || 1) + "px";
+			settings.update(false);
 		},
 	},
 ];
