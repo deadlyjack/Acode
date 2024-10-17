@@ -397,7 +397,10 @@ function execOperation(type, action, url, $target, name) {
 	}
 
 	async function renameFile() {
-		if (url.startsWith("content://com.termux.documents/tree/")) {
+		if (
+			url.startsWith("content://com.termux.documents/tree/") &&
+			!helpers.isFile(type)
+		) {
 			alert(strings.warning, strings["rename not supported"]);
 			return;
 		}
@@ -411,7 +414,22 @@ function execOperation(type, action, url, $target, name) {
 
 		startLoading();
 		const fs = fsOperation(url);
-		const newUrl = await fs.renameTo(newName);
+		let newUrl;
+
+		if (
+			url.startsWith("content://com.termux.documents/tree/") &&
+			helpers.isFile(type)
+		) {
+			// Special handling for Termux content files
+			const newFilePath = Url.join(Url.dirname(url), newName);
+			const content = await fs.readFile();
+			await fsOperation(Url.dirname(url)).createFile(newName, content);
+			await fs.delete();
+			newUrl = newFilePath;
+		} else {
+			newUrl = await fs.renameTo(newName);
+		}
+
 		newName = Url.basename(newUrl);
 		$target.querySelector(":scope>.text").textContent = newName;
 		$target.dataset.url = newUrl;
