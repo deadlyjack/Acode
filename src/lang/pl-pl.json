@@ -280,7 +280,7 @@
 	"show console toggler": "Pokaż przełącznik konsoli",
 	"binary file": "Ten plik zawiera dane binarne, czy chcesz go otworzyć?",
 	"relative line numbers": "Relatywne numery linii",
-	"elastic tabstops": "Elastyczne zakładki",
+	"elastic tabstops": "Elastyczne tabulatory",
 	"line based rtl switching": "Przełącznik RTL oparty na linii",
 	"hard wrap": "Twarde zawijanie",
 	"spellcheck": "Sprawdzanie pisowni",
@@ -309,7 +309,7 @@
 	"api_error": "Serwer API nie działa, spróbuj za jakiś czas.",
 	"installed": "Zainstalowane",
 	"all": "Wszystko",
-	"medium": "Średnia",
+	"medium": "Średni",
 	"refund": "Zwrot",
 	"product not available": "Produkt niedostępny",
 	"no-product-info": "Ten produkt nie jest obecnie dostępny w Twoim kraju, spróbuj ponownie w późniejszym terminie.",
@@ -382,5 +382,5 @@
 	"most_downloaded": "Najczęściej pobierane",
 	"newly_added": "Ostatnio dodane",
 	"top_rated": "Najwyżej oceniane",
-	"rename not supported": "Rename on termux dir isn't supported"
+	"rename not supported": "Zmiana nazwy katalogu w termux nie jest obsługiwana"
 }
