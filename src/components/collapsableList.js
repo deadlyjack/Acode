@@ -17,7 +17,7 @@ import tile from "./tile";
  */
 
 /**
- * Create a collapsable list
+ * Create a collapsible list
  * @param {string} titleText Title of the list
  * @param {boolean} hidden If true, the list will be hidden
  * @param {"indicator"|"folder"} type Type of the list toggle indicator

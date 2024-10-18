@@ -24,7 +24,7 @@ const { Range } = ace.require("ace/range");
  * @typedef {object}  FileOptions new file options
  * @property {boolean} [isUnsaved] weather file needs to saved
  * @property {render} [render] make file active
- * @property {string} [id] ID fo the file
+ * @property {string} [id] ID for the file
  * @property {string} [uri] uri of the file
  * @property {string} [text] session text
  * @property {boolean} [editable] enable file to edit or not

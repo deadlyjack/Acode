@@ -6,25 +6,21 @@ on:
 
 jobs:
   spell-check:
+    timeout-minutes: 5
     name: Check spelling
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Actions Repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Check spelling
+        uses: crate-ci/typos@master
         with:
-          node-version: "20"
-
-      - name: Install cspell
-        run: npm install -g cspell
-
-      - name: Run spell check
-        run: cspell
+          config: ./_typos.toml
 
   quality:
+    timeout-minutes: 5
     name: Linting and formatting
     runs-on: ubuntu-latest
 

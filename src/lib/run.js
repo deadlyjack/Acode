@@ -39,7 +39,8 @@ async function run(
 				return;
 			}
 
-			system.inAppBrowser(src, "", false, disableCache);
+			browser.open(src);
+			return;
 		}
 	}
 
@@ -338,7 +339,7 @@ async function run(
 						? "eruda._shadowRoot.querySelector('.eruda-entry-btn').style.display = 'none';"
 						: ""
 				}
-        
+
         sessionStorage.setItem('__console_available', true);
         document.addEventListener('showconsole', function () {eruda.show()});
         document.addEventListener('hideconsole', function () {eruda.hide()});

@@ -52,6 +52,7 @@ import { keydownState } from "handlers/keyboard";
 import { initFileList } from "lib/fileList";
 import { addedFolder } from "lib/openFolder";
 import { getEncoding, initEncodings } from "utils/encodings";
+import constants from "./constants";
 
 const previousVersionCode = Number.parseInt(localStorage.versionCode, 10);
 
@@ -106,6 +107,19 @@ async function onDeviceReady() {
 	window.KEYBINDING_FILE = Url.join(DATA_STORAGE, ".key-bindings.json");
 	window.IS_FREE_VERSION = isFreePackage;
 	window.log = logger.log.bind(logger);
+
+	// Capture synchronous errors
+	window.addEventListener("error", function (event) {
+		const errorMsg = `Error: ${event.message}, Source: ${event.filename}, Line: ${event.lineno}, Column: ${event.colno}, Stack: ${event.error?.stack || "N/A"}`;
+		window.log("error", errorMsg);
+	});
+	// Capture unhandled promise rejections
+	window.addEventListener("unhandledrejection", function (event) {
+		window.log(
+			"error",
+			`Unhandled rejection: ${event.reason ? event.reason.message : "Unknown reason"}\nStack: ${event.reason ? event.reason.stack : "No stack available"}`,
+		);
+	});
 
 	startAd();
 
@@ -185,22 +199,31 @@ async function onDeviceReady() {
 		oldResolveURL.call(this, Url.safe(url), ...args);
 	};
 
-	setTimeout(() => {
-		if (document.body.classList.contains("loading"))
+	setTimeout(async () => {
+		if (document.body.classList.contains("loading")) {
 			window.log("warn", "App is taking unexpectedly long time!");
-		document.body.setAttribute(
-			"data-small-msg",
-			"This is taking unexpectedly long time!",
-		);
+			document.body.setAttribute(
+				"data-small-msg",
+				"This is taking unexpectedly long time!",
+			);
+			// share the log file (but currently doesn't work)
+			// system.fileAction(
+			//   Url.join(DATA_STORAGE, constants.LOG_FILE_NAME),
+			//   constants.LOG_FILE_NAME,
+			//   "SEND",
+			//   "text/plain",
+			//   () => {
+			//     toast(strings["no app found to handle this file"]);
+			//   },
+			// );
+		}
 	}, 1000 * 10);
 
 	acode.setLoadingMessage("Loading settings...");
-	window.log("info", "Loading Settings...");
 	await settings.init();
 	themes.init();
 
 	acode.setLoadingMessage("Loading language...");
-	window.log("info", "Loading language...");
 	await lang.set(settings.value.lang);
 
 	try {
@@ -346,7 +369,7 @@ async function loadApp() {
 	});
 	//#endregion
 
-	window.log("info", "App started!");
+	window.log("info", "Started app and services...");
 
 	new EditorFile();
 

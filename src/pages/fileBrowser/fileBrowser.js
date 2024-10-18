@@ -449,8 +449,35 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
 			async function renameFile(newname) {
 				if (url.startsWith("content://com.termux.documents/tree/")) {
-					alert(strings.warning, strings["rename not supported"]);
-					return;
+					if (helpers.isDir(type)) {
+						alert(strings.warning, strings["rename not supported"]);
+						return;
+					} else {
+						// Special handling for Termux content files
+						const fs = fsOperation(url);
+						try {
+							const content = await fs.readFile();
+							const newUrl = Url.join(Url.dirname(url), newname);
+							await fsOperation(Url.dirname(url)).createFile(newname, content);
+							await fs.delete();
+
+							recents.removeFile(url);
+							recents.addFile(newUrl);
+							const file = editorManager.getFile(url, "uri");
+							if (file) {
+								file.uri = newUrl;
+								file.filename = newname;
+							}
+							openFolder.renameItem(url, newUrl, newname);
+							toast(strings.success);
+							reload();
+							return;
+						} catch (err) {
+							window.log("error", err);
+							helpers.error(err);
+							return;
+						}
+					}
 				}
 				const fs = fsOperation(url);
 				try {
