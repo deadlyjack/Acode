@@ -10,6 +10,7 @@ import constants from "lib/constants";
 import installPlugin from "lib/installPlugin";
 import settings from "lib/settings";
 import markdownIt from "markdown-it";
+import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
 import Url from "utils/Url";
 import helpers from "utils/helpers";
 import view from "./plugin.view.js";
@@ -282,9 +283,9 @@ export default async function PluginInclude(
 		const pluginSettings = settings.uiSettings[`plugin-${plugin.id}`];
 		$page.body = view({
 			...plugin,
-			body: markdownIt({ html: true, xhtmlOut: true }).render(
-				plugin.description,
-			),
+			body: markdownIt({ html: true, xhtmlOut: true })
+				.use(MarkdownItGitHubAlerts)
+				.render(plugin.description),
 			purchased,
 			installed,
 			update,
