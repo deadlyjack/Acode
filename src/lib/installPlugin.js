@@ -3,6 +3,7 @@ import fsOperation from "fileSystem";
 import JSZip from "jszip";
 import Url from "utils/Url";
 import constants from "./constants";
+import InstallState from "./installState";
 import loadPlugin from "./loadPlugin";
 
 /**
@@ -70,6 +71,8 @@ export default async function installPlugin(id, name, purchaseToken) {
 				pluginDir = Url.join(PLUGIN_DIR, id);
 			}
 
+			const state = await InstallState.new(id);
+
 			if (!(await fsOperation(pluginDir).exists())) {
 				await fsOperation(PLUGIN_DIR).createDirectory(id);
 			}
@@ -81,7 +84,7 @@ export default async function installPlugin(id, name, purchaseToken) {
 				}
 
 				const fileUrl = Url.join(pluginDir, correctFile);
-				if (!(await fsOperation(fileUrl).exists())) {
+				if (!state.exists(correctFile)) {
 					await createFileRecursive(pluginDir, correctFile);
 				}
 
@@ -93,11 +96,18 @@ export default async function installPlugin(id, name, purchaseToken) {
 					data = JSON.stringify(pluginJson);
 				}
 
+				if (!(await state.isUpdated(correctFile, data))) {
+					return;
+				}
+
 				await fsOperation(fileUrl).writeFile(data);
+				return;
 			});
 
 			await Promise.all(promises);
 			await loadPlugin(id, true);
+			await state.save();
+			deleteRedundantFiles(pluginDir, state);
 		}
 	} catch (err) {
 		try {
@@ -137,5 +147,36 @@ async function createFileRecursive(parent, dir) {
 	}
 	if (dir.length) {
 		await createFileRecursive(newParent, dir);
+	}
+}
+/**
+ *
+ * @param {string} dir
+ * @param {Array<string>} files
+ */
+async function listFileRecursive(dir, files) {
+	for (const child of await fsOperation(dir).lsDir()) {
+		const fileUrl = Url.join(dir, child.name);
+		if (child.isDirectory) {
+			await listFileRecursive(fileUrl, files);
+		} else {
+			files.push(fileUrl);
+		}
+	}
+}
+
+/**
+ *
+ * @param {Record<string, boolean>} files
+ */
+async function deleteRedundantFiles(pluginDir, state) {
+	/** @type string[] */
+	let files = [];
+	await listFileRecursive(pluginDir, files);
+
+	for (const file of files) {
+		if (!state.exists(file.replace(`${pluginDir}/`, ""))) {
+			fsOperation(file).delete();
+		}
 	}
 }
