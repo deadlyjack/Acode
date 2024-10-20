@@ -3,6 +3,7 @@ import alert from "dialogs/alert";
 import box from "dialogs/box";
 import fsOperation from "fileSystem";
 import markdownIt from "markdown-it";
+import anchor from "markdown-it-anchor";
 import mimeType from "mime-types";
 import mustache from "mustache";
 import browser from "plugins/browser";
@@ -266,9 +267,15 @@ async function run(
 
 				case ".md":
 					if (file) {
-						const html = markdownIt({ html: true }).render(
-							file.session.getValue(),
-						);
+						const html = markdownIt({ html: true })
+							.use(anchor, {
+								slugify: (s) =>
+									s
+										.trim()
+										.toLowerCase()
+										.replace(/[^a-z0-9]+/g, "-"),
+							})
+							.render(file.session.getValue());
 						const doc = mustache.render($_markdown, {
 							html,
 							filename,

@@ -96,6 +96,7 @@
     "js-base64": "^3.7.7",
     "jszip": "^3.10.1",
     "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.2.0",
     "mime-types": "^2.1.35",
     "minimatch": "^9.0.4",
     "mustache": "^4.2.0",
