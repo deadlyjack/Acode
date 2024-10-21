@@ -82,6 +82,7 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 		const $page = Page(strings["file browser"].capitalize(), {
 			lead: $lead,
 		});
+		let hideSearchBar = () => {};
 		const $content = helpers.parseHTML(
 			mustache.render(_template, {
 				type: mode,
@@ -246,10 +247,11 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
 		$search.onclick = function () {
 			const $list = $content.get("#list");
-			if ($list) searchBar($list);
+			if ($list) searchBar($list, (hide) => (hideSearchBar = hide));
 		};
 
 		$page.onhide = function () {
+			hideSearchBar();
 			helpers.hideAd();
 			actionStack.clearFromMark();
 			actionStack.remove("filebrowser");
@@ -740,6 +742,9 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 		 * @param {String} name
 		 */
 		async function navigate(url, name, assignBackButton = true) {
+			if (document.getElementById("search-bar")) {
+				hideSearchBar();
+			}
 			if (!url) {
 				throw new Error('navigate(url, name): "url" is required.');
 			}
@@ -1000,6 +1005,10 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 					list,
 				}),
 			);
+
+			if (document.getElementById("search-bar")) {
+				hideSearchBar();
+			}
 
 			const $oldList = $content.get("#list");
 			if ($oldList) {
