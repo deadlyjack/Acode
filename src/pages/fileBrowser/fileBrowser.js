@@ -1,5 +1,6 @@
 import "./fileBrowser.scss";
 
+import Checkbox from "components/checkbox";
 import Contextmenu from "components/contextmenu";
 import Page from "components/page";
 import searchBar from "components/searchbar";
@@ -61,6 +62,9 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 	const allStorages = [];
 	let storageList = JSON.parse(localStorage.storageList || "[]");
 
+	let isSelectionMode = false;
+	let selectedItems = new Set();
+
 	if (!info) {
 		if (mode !== "both") {
 			info = IS_FOLDER_MODE ? strings["open folder"] : strings["open file"];
@@ -74,9 +78,22 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 		const $menuToggler = (
 			<span className="icon more_vert" data-action="toggle-menu"></span>
 		);
+		const $selectionMenuToggler = (
+			<span
+				className="icon more_vert"
+				data-action="toggle-selection-menu"
+			></span>
+		);
 		const $addMenuToggler = (
 			<span className="icon add" data-action="toggle-add-menu"></span>
 		);
+		const $selectionModeToggler = (
+			<span
+				className="icon text_format"
+				data-action="toggle-selection-mode"
+			></span>
+		);
+
 		const $search = <span className="icon search" data-action="search"></span>;
 		const $lead = <span className="icon clearclose" data-action="close"></span>;
 		const $page = Page(strings["file browser"].capitalize(), {
@@ -106,6 +123,16 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			},
 			...menuOption,
 		});
+		const $selectionMenu = Contextmenu({
+			innerHTML: () => {
+				return `
+        <li action="compress">${strings.compress.capitalize(0)}</li>
+        <li action="copy">${strings.copy.capitalize(0)}</li>
+        <li action="delete">${strings.delete.capitalize(0)}</li>
+        `;
+			},
+			...((menuOption.toggler = $selectionMenuToggler) && menuOption),
+		});
 		const $addMenu = Contextmenu({
 			innerHTML: () => {
 				if (currentDir.url === "/") {
@@ -118,6 +145,8 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			},
 			...((menuOption.toggler = $addMenuToggler) && menuOption),
 		});
+
+		$selectionMenuToggler.style.display = "none";
 		const progress = {};
 		let cachedDir = {};
 		let currentDir = {
@@ -137,7 +166,13 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 		$content.addEventListener("click", handleClick);
 		$content.addEventListener("contextmenu", handleContextMenu, true);
 		$page.body = $content;
-		$page.header.append($search, $addMenuToggler, $menuToggler);
+		$page.header.append(
+			$search,
+			$selectionModeToggler,
+			$addMenuToggler,
+			$menuToggler,
+			$selectionMenuToggler,
+		);
 
 		if (IS_FOLDER_MODE) {
 			$openFolder = tag("button", {
@@ -171,6 +206,11 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			id: "filebrowser",
 			action: close,
 		});
+
+		$selectionModeToggler.onclick = function () {
+			isSelectionMode = !isSelectionMode;
+			toggleSelectionMode(isSelectionMode);
+		};
 
 		$fbMenu.onclick = function (e) {
 			$fbMenu.hide();
@@ -275,6 +315,90 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			$page.hide();
 		}
 
+		function updateSelectionCount($count) {
+			if ($count) {
+				$count.textContent = `${selectedItems.size} items selected`;
+			}
+		}
+
+		function toggleSelectionMode(active) {
+			const $list = $content.get("#list");
+			if (active) {
+				$list.classList.add("selection-mode");
+				const $header = tag("div", {
+					className: "selection-header",
+				});
+
+				const selectAllCheckbox = Checkbox("", false);
+				const $count = tag("span", {
+					className: "text selection-count",
+					textContent: "0 items selected",
+				});
+
+				// Handle select all functionality
+				selectAllCheckbox.onclick = () => {
+					const checked = selectAllCheckbox.checked;
+					const items = $list.querySelectorAll(".tile:not(.selection-header)");
+					items.forEach((item) => {
+						const checkbox = item.querySelector(".input-checkbox");
+						if (checkbox) {
+							checkbox.checked = checked;
+							const url = item.querySelector("data-url").textContent;
+							if (checked) {
+								selectedItems.add(url);
+							} else {
+								selectedItems.delete(url);
+							}
+						}
+					});
+					updateSelectionCount($count);
+				};
+
+				$header.append(selectAllCheckbox, $count);
+				$list.insertBefore($header, $list.firstChild);
+
+				// Add checkboxes to list items
+				$list
+					.querySelectorAll(".tile:not(.selection-header)")
+					.forEach((item) => {
+						const checkbox = Checkbox("", false);
+						checkbox.onclick = () => {
+							const url = item.querySelector("data-url").textContent;
+							if (checkbox.checked) {
+								selectedItems.add(url);
+							} else {
+								selectedItems.delete(url);
+							}
+							updateSelectionCount($count);
+						};
+						item.prepend(checkbox);
+					});
+
+				$addMenuToggler.style.display = "none";
+				$menuToggler.style.display = "none";
+				$selectionMenuToggler.style.display = "";
+
+				// Disable floating button in selection mode
+				if ($openFolder) {
+					$openFolder.disabled = true;
+				}
+			} else {
+				$list.classList.remove("selection-mode");
+				$list.querySelector(".selection-header")?.remove();
+				$list.querySelectorAll(".input-checkbox").forEach((cb) => cb.remove());
+				selectedItems.clear();
+
+				$addMenuToggler.style.display = "";
+				$menuToggler.style.display = "";
+				$selectionMenuToggler.style.display = "none";
+
+				// Re-enable floating button when exiting selection mode
+				if ($openFolder) {
+					$openFolder.disabled = false;
+				}
+			}
+		}
+
 		/**
 		 * Called when any file folder is clicked
 		 * @param {MouseEvent} e
@@ -285,6 +409,25 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			 * @type {HTMLElement}
 			 */
 			const $el = e.target;
+
+			if (isSelectionMode) {
+				const checkbox = $el.closest(".tile")?.querySelector(".input-checkbox");
+				if (checkbox && !$el.closest(".selection-header")) {
+					checkbox.checked = !checkbox.checked;
+					const url = $el
+						.closest(".tile")
+						.querySelector("data-url").textContent;
+					if (checkbox.checked) {
+						selectedItems.add(url);
+					} else {
+						selectedItems.delete(url);
+					}
+					const $count = $content.querySelector(".selection-count");
+					updateSelectionCount($count);
+				}
+				return;
+			}
+
 			let action = $el.getAttribute("action") || $el.dataset.action;
 			if (!action) return;
 

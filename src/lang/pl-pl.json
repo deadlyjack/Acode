@@ -382,5 +382,6 @@
 	"most_downloaded": "Najczęściej pobierane",
 	"newly_added": "Ostatnio dodane",
 	"top_rated": "Najwyżej oceniane",
-	"rename not supported": "Zmiana nazwy katalogu w termux nie jest obsługiwana"
+	"rename not supported": "Zmiana nazwy katalogu w termux nie jest obsługiwana",
+	"compress": "Compress"
 }

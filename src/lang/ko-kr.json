@@ -382,5 +382,6 @@
 	"most_downloaded": "대부분의 다운로드",
 	"newly_added": "새로 추가되었습니다",
 	"top_rated": "최고 평점",
-	"rename not supported": "Rename on termux dir isn't supported"
+	"rename not supported": "Rename on termux dir isn't supported",
+	"compress": "Compress"
 }

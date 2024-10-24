@@ -86,4 +86,20 @@
       }
     }
   }
+  .selection-header {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background: var(--primary-color);
+    color: var(--primary-text-color);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    gap: 10px;
+
+    .selection-count {
+      font-size: 0.9em;
+    }
+
+  }
 }

@@ -382,5 +382,6 @@
 	"most_downloaded": "最多下載",
 	"newly_added": "最近上架",
 	"top_rated": "最多好評",
-	"rename not supported": "不支持修改 Termux 內的文件夾名"
+	"rename not supported": "不支持修改 Termux 內的文件夾名",
+	"compress": "Compress"
 }

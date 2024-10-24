@@ -383,5 +383,6 @@
 	"most_downloaded": "Tải xuống nhiều nhất",
 	"newly_added": "Mới được thêm vào",
 	"top_rated": "Đánh giá cao nhất",
-	"rename not supported": "Đổi tên trên thư mục Termux không được hỗ trợ"
+	"rename not supported": "Đổi tên trên thư mục Termux không được hỗ trợ",
+	"compress": "Compress"
 }

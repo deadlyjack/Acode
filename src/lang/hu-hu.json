@@ -382,5 +382,6 @@
 	"most_downloaded": "Legtöbbször letöltött",
 	"newly_added": "Újonnan hozzáadott",
 	"top_rated": "Legjobbra értékelt",
-	"rename not supported": "A Termux könyvtár átnevezése nem támogatott "
+	"rename not supported": "A Termux könyvtár átnevezése nem támogatott ",
+	"compress": "Compress"
 }

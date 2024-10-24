@@ -384,5 +384,6 @@
 	"most_downloaded": "Most Downloaded",
 	"newly_added": "Newly Added",
 	"top_rated": "Top Rated",
-	"rename not supported": "Rename on termux dir isn't supported"
+	"rename not supported": "Rename on termux dir isn't supported",
+	"compress": "Compress"
 }
