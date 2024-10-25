@@ -384,5 +384,7 @@
 	"top_rated": "Najwyżej oceniane",
 	"rename not supported": "Zmiana nazwy katalogu w termux nie jest obsługiwana",
 	"compress": "Compress",
-	"copy uri": "Copy Uri"
+	"copy uri": "Copy Uri",
+	"delete entries": "Are you sure you want to delete {count} items?",
+	"deleting items": "Deleting {count} items..."
 }

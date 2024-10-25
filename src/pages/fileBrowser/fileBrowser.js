@@ -11,6 +11,7 @@ import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import fsOperation from "fileSystem";
 import externalFs from "fileSystem/externalFs";
+import JSZip from "jszip";
 import actionStack from "lib/actionStack";
 import checkFiles from "lib/checkFiles";
 import constants from "lib/constants";
@@ -277,6 +278,165 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 				case "addSftp": {
 					const storage = await remoteStorage[action]();
 					updateStorage(storage);
+					break;
+				}
+
+				default:
+					break;
+			}
+		};
+
+		$selectionMenu.onclick = async (e) => {
+			$selectionMenu.hide();
+			const $target = e.target;
+			const action = $target.getAttribute("action");
+			if (!action) return;
+
+			switch (action) {
+				case "compress":
+					if (currentDir.url === "/") {
+						break;
+					}
+
+					const zip = new JSZip();
+					let loadingLoader = loader.create(
+						strings["loading"],
+						"Compressing files",
+						{
+							timeout: 3000,
+						},
+					);
+					try {
+						for (const url of selectedItems) {
+							const fs = fsOperation(url);
+							const stats = await fs.stat();
+							const isDir = stats.isDirectory;
+
+							if (isDir) {
+								const addDirToZip = async (dirUrl, zipFolder) => {
+									const entries = await fsOperation(dirUrl).lsDir();
+									for (const entry of entries) {
+										const percent = (
+											((entries.length - entries.indexOf(entry)) /
+												entries.length) *
+											100
+										).toFixed(0);
+										loadingLoader.setMessage(
+											`Compressing ${entry.name.length > 20 ? entry.name.substring(0, 20) + "..." : entry.name} (${percent}%)`,
+										);
+										if (entry.isDirectory) {
+											const newZipFolder = zipFolder.folder(entry.name);
+											await addDirToZip(entry.url, newZipFolder);
+										} else {
+											const content = await fsOperation(entry.url).readFile();
+											zipFolder.file(entry.name, content, { binary: true });
+										}
+									}
+								};
+								await addDirToZip(url, zip.folder(Url.basename(url)));
+							} else {
+								const content = await fs.readFile();
+								zip.file(Url.basename(url), content);
+							}
+						}
+
+						const zipContent = await zip.generateAsync({
+							type: "arraybuffer",
+						});
+						const zipName = "archive_" + Date.now() + ".zip";
+						const zipPath = Url.join(currentDir.url, zipName);
+						const shortPath =
+							currentDir.url.length > 40
+								? currentDir.url.substring(0, 37) + "..."
+								: currentDir.url;
+						loadingLoader.setMessage(`Saving ${zipName} to ${shortPath}`);
+						await fsOperation(currentDir.url).createFile(zipName, zipContent);
+						loadingLoader.destroy();
+						toast(strings.success);
+						isSelectionMode = !isSelectionMode;
+						toggleSelectionMode(isSelectionMode);
+						reload();
+					} catch (err) {
+						loadingLoader.destroy();
+						toast(strings.error);
+						console.error(err);
+					}
+					break;
+
+				case "delete": {
+					if (currentDir.url === "/") {
+						break;
+					}
+
+					// Show confirmation dialog
+					const confirmMessage =
+						selectedItems.size === 1
+							? strings["delete entry"].replace(
+									"{name}",
+									Array.from(selectedItems)[0].split("/").pop(),
+								)
+							: strings["delete entries"].replace(
+									"{count}",
+									selectedItems.size,
+								);
+
+					const confirmation = await confirm(strings.warning, confirmMessage);
+					if (!confirmation) break;
+
+					const loadingDialog = loader.create(
+						strings.loading,
+						strings["deleting items"].replace("{count}", selectedItems.size),
+						{ timeout: 3000 },
+					);
+
+					try {
+						for (const url of selectedItems) {
+							if ((await fsOperation(url).stat()).isDirectory) {
+								if (url.startsWith("content://com.termux.documents/tree/")) {
+									const fs = fsOperation(url);
+									const entries = await fs.lsDir();
+									if (entries.length === 0) {
+										await fs.delete();
+									} else {
+										const deleteRecursively = async (currentUrl) => {
+											const currentFs = fsOperation(currentUrl);
+											const currentEntries = await currentFs.lsDir();
+											for (const entry of currentEntries) {
+												if (entry.isDirectory) {
+													await deleteRecursively(entry.url);
+												} else {
+													await fsOperation(entry.url).delete();
+												}
+											}
+											await currentFs.delete();
+										};
+										await deleteRecursively(url);
+									}
+								} else {
+									await fsOperation(url).delete();
+								}
+								helpers.updateUriOfAllActiveFiles(url);
+								recents.removeFolder(url);
+							} else {
+								const fs = fsOperation(url);
+								await fs.delete();
+								const openedFile = editorManager.getFile(url, "uri");
+								if (openedFile) openedFile.uri = null;
+							}
+							recents.removeFile(url);
+							openFolder.removeItem(url);
+							delete cachedDir[url];
+						}
+						toast(strings.success);
+						reload();
+						isSelectionMode = false;
+						toggleSelectionMode(false);
+					} catch (err) {
+						loadingDialog.destroy();
+						helpers.error(err);
+					} finally {
+						loadingDialog.destroy();
+					}
 					break;
 				}
 

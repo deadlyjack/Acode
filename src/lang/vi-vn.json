@@ -385,5 +385,7 @@
 	"top_rated": "Đánh giá cao nhất",
 	"rename not supported": "Đổi tên trên thư mục Termux không được hỗ trợ",
 	"compress": "Compress",
-	"copy uri": "Copy Uri"
+	"copy uri": "Copy Uri",
+	"delete entries": "Are you sure you want to delete {count} items?",
+	"deleting items": "Deleting {count} items..."
 }
