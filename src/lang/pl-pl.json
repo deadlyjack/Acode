@@ -383,5 +383,6 @@
 	"newly_added": "Ostatnio dodane",
 	"top_rated": "Najwyżej oceniane",
 	"rename not supported": "Zmiana nazwy katalogu w termux nie jest obsługiwana",
-	"compress": "Compress"
+	"compress": "Compress",
+	"copy uri": "Copy Uri"
 }

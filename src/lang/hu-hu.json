@@ -383,5 +383,6 @@
 	"newly_added": "Újonnan hozzáadott",
 	"top_rated": "Legjobbra értékelt",
 	"rename not supported": "A Termux könyvtár átnevezése nem támogatott ",
-	"compress": "Compress"
+	"compress": "Compress",
+	"copy uri": "Copy Uri"
 }

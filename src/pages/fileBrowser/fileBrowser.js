@@ -547,6 +547,10 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 					options.push(["info", strings.info, "info"]);
 				}
 
+				if (currentDir.url !== "/" && url) {
+					options.push(["copyuri", strings["copy uri"], "copy"]);
+				}
+
 				const option = await select(strings["select"], options);
 				switch (option) {
 					case "delete": {
@@ -588,6 +592,11 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
 					case "info":
 						acode.exec("file-info", url);
+						break;
+
+					case "copyuri":
+						navigator.clipboard.writeText(url);
+						alert(strings.success, strings["copied to clipboard"]);
 						break;
 				}
 			}

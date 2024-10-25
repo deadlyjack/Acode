@@ -383,5 +383,6 @@
 	"newly_added": "Neu Hinzugefügte",
 	"top_rated": "Am besten Bewertete",
 	"rename not supported": "Rename on termux dir isn't supported",
-	"compress": "Compress"
+	"compress": "Compress",
+	"copy uri": "Copy Uri"
 }
