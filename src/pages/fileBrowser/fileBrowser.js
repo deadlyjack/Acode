@@ -128,7 +128,6 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			innerHTML: () => {
 				return `
         <li action="compress">${strings.compress.capitalize(0)}</li>
-        <li action="copy">${strings.copy.capitalize(0)}</li>
         <li action="delete">${strings.delete.capitalize(0)}</li>
         `;
 			},
