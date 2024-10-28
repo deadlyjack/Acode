@@ -382,5 +382,9 @@
 	"most_downloaded": "最多下载",
 	"newly_added": "最近上架",
 	"top_rated": "最多好评",
-	"rename not supported": "不支持修改 Termux 内的文件夹名"
+	"rename not supported": "不支持修改 Termux 内的文件夹名",
+	"compress": "Compress",
+	"copy uri": "Copy Uri",
+	"delete entries": "Are you sure you want to delete {count} items?",
+	"deleting items": "Deleting {count} items..."
 }

@@ -382,5 +382,9 @@
 	"most_downloaded": "Legtöbbször letöltött",
 	"newly_added": "Újonnan hozzáadott",
 	"top_rated": "Legjobbra értékelt",
-	"rename not supported": "A Termux könyvtár átnevezése nem támogatott "
+	"rename not supported": "A Termux könyvtár átnevezése nem támogatott ",
+	"compress": "Compress",
+	"copy uri": "Copy Uri",
+	"delete entries": "Are you sure you want to delete {count} items?",
+	"deleting items": "Deleting {count} items..."
 }

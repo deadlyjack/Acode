@@ -383,5 +383,9 @@
 	"most_downloaded": "Популярные",
 	"newly_added": "Новые",
 	"top_rated": "С высокой оценкой",
-	"rename not supported": "Rename on termux dir isn't supported"
+	"rename not supported": "Rename on termux dir isn't supported",
+	"compress": "Compress",
+	"copy uri": "Copy Uri",
+	"delete entries": "Are you sure you want to delete {count} items?",
+	"deleting items": "Deleting {count} items..."
 }
