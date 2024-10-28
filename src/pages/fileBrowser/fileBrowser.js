@@ -269,6 +269,68 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 					break;
 				}
 
+				case "import-project-zip": {
+					let zipFile = await new Promise((resolve, reject) => {
+						sdcard.openDocumentFile(
+							(res) => {
+								resolve(res.uri);
+							},
+							(err) => {
+								reject(err);
+							},
+							"application/zip",
+						);
+					});
+
+					if (!zipFile) break;
+
+					const loadingLoader = loader.create(
+						strings["loading"],
+						"Importing zip file...",
+						{ timeout: 10000 },
+					);
+
+					try {
+						const zipContent = await fsOperation(zipFile).readFile();
+						const zip = await JSZip.loadAsync(zipContent);
+						const targetDir = currentDir.url;
+						const targetFs = fsOperation(targetDir);
+
+						// Create folder with zip name
+						const zipName = Url.basename(zipFile).replace(/\.zip$/, "");
+						const extractDir = Url.join(targetDir, zipName);
+						await targetFs.createDirectory(zipName);
+
+						const files = Object.keys(zip.files);
+						const total = files.length;
+						let current = 0;
+
+						for (const filePath of files) {
+							const file = zip.files[filePath];
+							current++;
+
+							loadingLoader.setMessage(
+								`Extracting ${filePath} (${Math.round((current / total) * 100)}%)`,
+							);
+
+							if (file.dir) {
+								await fsOperation(extractDir).createDirectory(filePath);
+							} else {
+								const content = await file.async("arraybuffer");
+								await fsOperation(extractDir).createFile(filePath, content);
+							}
+						}
+
+						loadingLoader.destroy();
+						toast(strings.success);
+						reload();
+					} catch (err) {
+						loadingLoader.destroy();
+						helpers.error(err);
+					}
+					break;
+				}
+
 				case "add-path":
 					addStorage();
 					break;
