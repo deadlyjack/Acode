@@ -383,9 +383,9 @@
 	"newly_added": "Újonnan hozzáadott",
 	"top_rated": "Legjobbra értékelt",
 	"rename not supported": "A Termux könyvtár átnevezése nem támogatott ",
-	"compress": "Compress",
-	"copy uri": "Copy Uri",
-	"delete entries": "Are you sure you want to delete {count} items?",
-	"deleting items": "Deleting {count} items...",
-	"import project zip": "Import Project(zip)"
+	"compress": "Tömörítés",
+	"copy uri": "Uri másolása",
+	"delete entries": "Biztosan töröl {count} elemet?",
+	"deleting items": "{count} elem törlése…",
+	"import project zip": "Project(zip) importálása"
 }
