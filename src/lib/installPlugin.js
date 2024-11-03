@@ -78,33 +78,37 @@ export default async function installPlugin(id, name, purchaseToken) {
 			}
 
 			const promises = Object.keys(zip.files).map(async (file) => {
-				let correctFile = file;
-				if (/\\/.test(correctFile)) {
-					correctFile = correctFile.replace(/\\/g, "/");
-				}
+				try {
+					let correctFile = file;
+					if (/\\/.test(correctFile)) {
+						correctFile = correctFile.replace(/\\/g, "/");
+					}
 
-				const fileUrl = Url.join(pluginDir, correctFile);
-				if (!state.exists(correctFile)) {
-					await createFileRecursive(pluginDir, correctFile);
-				}
+					const fileUrl = Url.join(pluginDir, correctFile);
 
-				if (correctFile.endsWith("/")) return;
+					if (!state.exists(correctFile)) {
+						await createFileRecursive(pluginDir, correctFile);
+					}
 
-				let data = await zip.files[file].async("ArrayBuffer");
+					// Skip directories
+					if (correctFile.endsWith("/")) return;
 
-				if (file === "plugin.json") {
-					data = JSON.stringify(pluginJson);
-				}
+					let data = await zip.files[file].async("ArrayBuffer");
 
-				if (!(await state.isUpdated(correctFile, data))) {
+					if (file === "plugin.json") {
+						data = JSON.stringify(pluginJson);
+					}
+
+					if (!(await state.isUpdated(correctFile, data))) return;
+					await fsOperation(fileUrl).writeFile(data);
 					return;
+				} catch (error) {
+					console.error(`Error processing file ${file}:`, error);
 				}
-
-				await fsOperation(fileUrl).writeFile(data);
-				return;
 			});
 
-			await Promise.all(promises);
+			// Wait for all files to be processed
+			await Promise.allSettled(promises);
 			await loadPlugin(id, true);
 			await state.save();
 			deleteRedundantFiles(pluginDir, state);

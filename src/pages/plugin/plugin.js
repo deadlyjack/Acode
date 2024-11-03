@@ -8,6 +8,7 @@ import purchaseListener from "handlers/purchase";
 import actionStack from "lib/actionStack";
 import constants from "lib/constants";
 import installPlugin from "lib/installPlugin";
+import InstallState from "lib/installState";
 import settings from "lib/settings";
 import markdownIt from "markdown-it";
 import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
@@ -183,7 +184,12 @@ export default async function PluginInclude(
 	async function uninstall() {
 		try {
 			const pluginDir = Url.join(PLUGIN_DIR, plugin.id);
-			await Promise.all([loadAd(this), fsOperation(pluginDir).delete()]);
+			const state = await InstallState.new(plugin.id);
+			await Promise.all([
+				loadAd(this),
+				fsOperation(pluginDir).delete(),
+				state.delete(state.storeUrl),
+			]);
 			acode.unmountPlugin(plugin.id);
 			if (onUninstall) onUninstall(plugin.id);
 			installed = false;

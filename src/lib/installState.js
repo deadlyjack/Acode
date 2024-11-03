@@ -15,25 +15,29 @@ export default class InstallState {
 	 * @returns
 	 */
 	static async new(id) {
-		const state = new InstallState();
-		state.id = await checksumText(id);
-		state.updatedStore = {};
+		try {
+			const state = new InstallState();
+			state.id = await checksumText(id);
+			state.updatedStore = {};
 
-		if (!(await fsOperation(INSTALL_STATE_STORAGE).exists())) {
-			await fsOperation(DATA_STORAGE).createDirectory(".install-state");
+			if (!(await fsOperation(INSTALL_STATE_STORAGE).exists())) {
+				await fsOperation(DATA_STORAGE).createDirectory(".install-state");
+			}
+
+			state.storeUrl = Url.join(INSTALL_STATE_STORAGE, state.id);
+			if (await fsOperation(state.storeUrl).exists()) {
+				state.store = JSON.parse(
+					await fsOperation(state.storeUrl).readFile("utf-8"),
+				);
+			} else {
+				state.store = {};
+				await fsOperation(INSTALL_STATE_STORAGE).createFile(state.id);
+			}
+
+			return state;
+		} catch (e) {
+			console.error(e);
 		}
-
-		state.storeUrl = Url.join(INSTALL_STATE_STORAGE, state.id);
-		if (await fsOperation(state.storeUrl).exists()) {
-			state.store = JSON.parse(
-				await fsOperation(state.storeUrl).readFile("utf-8"),
-			);
-		} else {
-			state.store = {};
-			await fsOperation(INSTALL_STATE_STORAGE).createFile(state.id);
-		}
-
-		return state;
 	}
 
 	/**
@@ -71,6 +75,12 @@ export default class InstallState {
 		await fsOperation(this.storeUrl).writeFile(
 			JSON.stringify(this.updatedStore),
 		);
+	}
+
+	async delete(url) {
+		if (await fsOperation(url).exists()) {
+			await fsOperation(url).delete();
+		}
 	}
 }
 
