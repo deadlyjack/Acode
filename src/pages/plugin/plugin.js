@@ -11,6 +11,7 @@ import installPlugin from "lib/installPlugin";
 import InstallState from "lib/installState";
 import settings from "lib/settings";
 import markdownIt from "markdown-it";
+import anchor from "markdown-it-anchor";
 import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
 import Url from "utils/Url";
 import helpers from "utils/helpers";
@@ -291,6 +292,13 @@ export default async function PluginInclude(
 			...plugin,
 			body: markdownIt({ html: true, xhtmlOut: true })
 				.use(MarkdownItGitHubAlerts)
+				.use(anchor, {
+					slugify: (s) =>
+						s
+							.trim()
+							.toLowerCase()
+							.replace(/[^a-z0-9]+/g, "-"),
+				})
 				.render(plugin.description),
 			purchased,
 			installed,
@@ -303,6 +311,47 @@ export default async function PluginInclude(
 			uninstall,
 			currentVersion,
 			minVersionCode,
+		});
+
+		// Handle anchor links
+		$page.body.querySelectorAll("a[href^='#']").forEach((link) => {
+			const originalHref = link.getAttribute("href");
+			link.setAttribute("data-href", originalHref);
+			link.style.cursor = "pointer";
+			// Remove default click behavior
+			link.removeAttribute("href");
+
+			// Add custom click handler
+			link.addEventListener(
+				"click",
+				(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+
+					const hash = link.getAttribute("data-href") || link.textContent;
+					const targetId = hash.startsWith("#") ? hash.slice(1) : hash;
+
+					// Look for either the anchor link or a heading with matching id
+					const targetElement =
+						$page.body.querySelector(`[name="${targetId}"]`) ||
+						$page.body.querySelector(`#${targetId}`);
+
+					if (targetElement) {
+						const headerOffset =
+							document.querySelector("header")?.offsetHeight || 0;
+						const elementPosition = targetElement.getBoundingClientRect().top;
+						const offsetPosition = elementPosition - headerOffset;
+
+						$page.body.scrollBy({
+							top: offsetPosition,
+							behavior: "smooth",
+						});
+					}
+
+					return false;
+				},
+				{ capture: true },
+			);
 		});
 
 		if ($settingsIcon) {
