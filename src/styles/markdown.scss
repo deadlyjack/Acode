@@ -389,4 +389,17 @@
   .markdown-alert.markdown-alert-caution .markdown-alert-title {
     color: var(--color-caution);
   }
+  .task-list-item {
+    list-style-type: none;
+    label {
+        font-weight: 400;
+    }
+    &+.task-list-item {
+        margin-top: 0.25rem;
+    }
+  }
+  ul:dir(rtl) .task-list-item-checkbox,
+  ol:dir(rtl) .task-list-item-checkbox {
+    margin: 0 -1.6em 0.25em 0.2em;
+  }
 }

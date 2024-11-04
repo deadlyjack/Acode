@@ -13,6 +13,7 @@ import settings from "lib/settings";
 import markdownIt from "markdown-it";
 import anchor from "markdown-it-anchor";
 import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
+import markdownItTaskLists from "markdown-it-task-lists";
 import Url from "utils/Url";
 import helpers from "utils/helpers";
 import view from "./plugin.view.js";
@@ -299,6 +300,7 @@ export default async function PluginInclude(
 							.toLowerCase()
 							.replace(/[^a-z0-9]+/g, "-"),
 				})
+				.use(markdownItTaskLists)
 				.render(plugin.description),
 			purchased,
 			installed,

@@ -98,6 +98,7 @@
     "markdown-it": "^14.1.0",
     "markdown-it-anchor": "^9.2.0",
     "markdown-it-github-alerts": "^0.3.0",
+    "markdown-it-task-lists": "^2.1.1",
     "mime-types": "^2.1.35",
     "minimatch": "^9.0.4",
     "mustache": "^4.2.0",
