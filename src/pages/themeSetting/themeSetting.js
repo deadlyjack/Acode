@@ -100,7 +100,13 @@ export default function () {
 	}
 
 	function renderEditorThemes() {
-		editor.setTheme(appSettings.value.editorTheme);
+		const currentTheme = appSettings.value.editorTheme;
+		const themePrefix = "ace/theme/";
+		const fullThemePath = currentTheme.startsWith(themePrefix)
+			? currentTheme
+			: themePrefix + currentTheme;
+
+		editor.setTheme(fullThemePath);
 		if (innerHeight * 0.3 >= 120) {
 			$page.body.append($themePreview);
 			editor.resize();
@@ -109,10 +115,9 @@ export default function () {
 		}
 
 		const themeList = ace.require("ace/ext/themelist");
-		const currentTheme = appSettings.value.editorTheme;
 		let $currentItem;
 		list.el.content = themeList.themes.map((theme) => {
-			const isCurrent = theme.theme === currentTheme;
+			const isCurrent = theme.theme === fullThemePath;
 			const $item = (
 				<Item
 					name={theme.caption}

@@ -8,8 +8,12 @@ import purchaseListener from "handlers/purchase";
 import actionStack from "lib/actionStack";
 import constants from "lib/constants";
 import installPlugin from "lib/installPlugin";
+import InstallState from "lib/installState";
 import settings from "lib/settings";
 import markdownIt from "markdown-it";
+import anchor from "markdown-it-anchor";
+import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
+import markdownItTaskLists from "markdown-it-task-lists";
 import Url from "utils/Url";
 import helpers from "utils/helpers";
 import view from "./plugin.view.js";
@@ -182,7 +186,12 @@ export default async function PluginInclude(
 	async function uninstall() {
 		try {
 			const pluginDir = Url.join(PLUGIN_DIR, plugin.id);
-			await Promise.all([loadAd(this), fsOperation(pluginDir).delete()]);
+			const state = await InstallState.new(plugin.id);
+			await Promise.all([
+				loadAd(this),
+				fsOperation(pluginDir).delete(),
+				state.delete(state.storeUrl),
+			]);
 			acode.unmountPlugin(plugin.id);
 			if (onUninstall) onUninstall(plugin.id);
 			installed = false;
@@ -282,9 +291,17 @@ export default async function PluginInclude(
 		const pluginSettings = settings.uiSettings[`plugin-${plugin.id}`];
 		$page.body = view({
 			...plugin,
-			body: markdownIt({ html: true, xhtmlOut: true }).render(
-				plugin.description,
-			),
+			body: markdownIt({ html: true, xhtmlOut: true })
+				.use(MarkdownItGitHubAlerts)
+				.use(anchor, {
+					slugify: (s) =>
+						s
+							.trim()
+							.toLowerCase()
+							.replace(/[^a-z0-9]+/g, "-"),
+				})
+				.use(markdownItTaskLists)
+				.render(plugin.description),
 			purchased,
 			installed,
 			update,
@@ -296,6 +313,47 @@ export default async function PluginInclude(
 			uninstall,
 			currentVersion,
 			minVersionCode,
+		});
+
+		// Handle anchor links
+		$page.body.querySelectorAll("a[href^='#']").forEach((link) => {
+			const originalHref = link.getAttribute("href");
+			link.setAttribute("data-href", originalHref);
+			link.style.cursor = "pointer";
+			// Remove default click behavior
+			link.removeAttribute("href");
+
+			// Add custom click handler
+			link.addEventListener(
+				"click",
+				(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+
+					const hash = link.getAttribute("data-href") || link.textContent;
+					const targetId = hash.startsWith("#") ? hash.slice(1) : hash;
+
+					// Look for either the anchor link or a heading with matching id
+					const targetElement =
+						$page.body.querySelector(`[name="${targetId}"]`) ||
+						$page.body.querySelector(`#${targetId}`);
+
+					if (targetElement) {
+						const headerOffset =
+							document.querySelector("header")?.offsetHeight || 0;
+						const elementPosition = targetElement.getBoundingClientRect().top;
+						const offsetPosition = elementPosition - headerOffset;
+
+						$page.body.scrollBy({
+							top: offsetPosition,
+							behavior: "smooth",
+						});
+					}
+
+					return false;
+				},
+				{ capture: true },
+			);
 		});
 
 		if ($settingsIcon) {

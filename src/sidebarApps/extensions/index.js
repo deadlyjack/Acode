@@ -5,6 +5,7 @@ import Sidebar from "components/sidebar";
 import select from "dialogs/select";
 import fsOperation from "fileSystem";
 import constants from "lib/constants";
+import InstallState from "lib/installState";
 import settings from "lib/settings";
 import plugin from "pages/plugin";
 import Url from "utils/Url";
@@ -360,7 +361,12 @@ async function loadAd(el) {
 async function uninstall(id) {
 	try {
 		const pluginDir = Url.join(PLUGIN_DIR, id);
-		await Promise.all([loadAd(this), fsOperation(pluginDir).delete()]);
+		const state = await InstallState.new(id);
+		await Promise.all([
+			loadAd(this),
+			fsOperation(pluginDir).delete(),
+			state.delete(state.storeUrl),
+		]);
 		acode.unmountPlugin(id);
 		if (!IS_FREE_VERSION && (await window.iad?.isLoaded())) {
 			window.iad.show();

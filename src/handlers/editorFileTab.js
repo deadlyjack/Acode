@@ -198,6 +198,21 @@ function releaseDrag(e) {
 			}
 			updateFileList($parent);
 		}
+	} else if (
+		$target.tagName === "INPUT" ||
+		$target.tagName === "TEXTAREA" ||
+		$target.classList.contains("ace_text-input") ||
+		$target.closest(".ace_editor")
+	) {
+		// If released on an input area or ace editor
+		const filePath = editorManager.activeFile.uri;
+		if (filePath) {
+			if ($target.closest(".ace_editor")) {
+				editorManager.editor.insert(filePath);
+			} else {
+				$target.value += filePath;
+			}
+		}
 	}
 
 	cancelAnimationFrame(animationFrame);

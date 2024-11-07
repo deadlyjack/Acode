@@ -307,8 +307,8 @@
 	"info-animation": "Отключите анимацию при лагах и зависаниях в приложении",
 	"info-quicktoolstriggermode": "Попробуйте сменить значение этой настройки если не работают кнопки быстрых инструментов",
 	"owned": "Свои",
-	"api_error": "Сервер API недоступен, повторите попытку через некоторое время",
-	"installed": "Установлённые",
+	"api_error": "Сервер API недоступен, повторите попытку позже",
+	"installed": "Установленные",
 	"all": "Все",
 	"medium": "Средний",
 	"refund": "Возврат",
@@ -383,5 +383,10 @@
 	"most_downloaded": "Популярные",
 	"newly_added": "Новые",
 	"top_rated": "С высокой оценкой",
-	"rename not supported": "Rename on termux dir isn't supported"
+	"rename not supported": "Rename on termux dir isn't supported",
+	"compress": "Compress",
+	"copy uri": "Copy Uri",
+	"delete entries": "Are you sure you want to delete {count} items?",
+	"deleting items": "Deleting {count} items...",
+	"import project zip": "Import Project(zip)"
 }

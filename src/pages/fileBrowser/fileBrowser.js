@@ -1,5 +1,6 @@
 import "./fileBrowser.scss";
 
+import Checkbox from "components/checkbox";
 import Contextmenu from "components/contextmenu";
 import Page from "components/page";
 import searchBar from "components/searchbar";
@@ -10,6 +11,7 @@ import prompt from "dialogs/prompt";
 import select from "dialogs/select";
 import fsOperation from "fileSystem";
 import externalFs from "fileSystem/externalFs";
+import JSZip from "jszip";
 import actionStack from "lib/actionStack";
 import checkFiles from "lib/checkFiles";
 import constants from "lib/constants";
@@ -61,6 +63,9 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 	const allStorages = [];
 	let storageList = JSON.parse(localStorage.storageList || "[]");
 
+	let isSelectionMode = false;
+	let selectedItems = new Set();
+
 	if (!info) {
 		if (mode !== "both") {
 			info = IS_FOLDER_MODE ? strings["open folder"] : strings["open file"];
@@ -74,14 +79,28 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 		const $menuToggler = (
 			<span className="icon more_vert" data-action="toggle-menu"></span>
 		);
+		const $selectionMenuToggler = (
+			<span
+				className="icon more_vert"
+				data-action="toggle-selection-menu"
+			></span>
+		);
 		const $addMenuToggler = (
 			<span className="icon add" data-action="toggle-add-menu"></span>
 		);
+		const $selectionModeToggler = (
+			<span
+				className="icon text_format"
+				data-action="toggle-selection-mode"
+			></span>
+		);
+
 		const $search = <span className="icon search" data-action="search"></span>;
 		const $lead = <span className="icon clearclose" data-action="close"></span>;
 		const $page = Page(strings["file browser"].capitalize(), {
 			lead: $lead,
 		});
+		let hideSearchBar = () => {};
 		const $content = helpers.parseHTML(
 			mustache.render(_template, {
 				type: mode,
@@ -105,6 +124,15 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			},
 			...menuOption,
 		});
+		const $selectionMenu = Contextmenu({
+			innerHTML: () => {
+				return `
+        <li action="compress">${strings.compress.capitalize(0)}</li>
+        <li action="delete">${strings.delete.capitalize(0)}</li>
+        `;
+			},
+			...((menuOption.toggler = $selectionMenuToggler) && menuOption),
+		});
 		const $addMenu = Contextmenu({
 			innerHTML: () => {
 				if (currentDir.url === "/") {
@@ -117,6 +145,8 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			},
 			...((menuOption.toggler = $addMenuToggler) && menuOption),
 		});
+
+		$selectionMenuToggler.style.display = "none";
 		const progress = {};
 		let cachedDir = {};
 		let currentDir = {
@@ -136,7 +166,13 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 		$content.addEventListener("click", handleClick);
 		$content.addEventListener("contextmenu", handleContextMenu, true);
 		$page.body = $content;
-		$page.header.append($search, $addMenuToggler, $menuToggler);
+		$page.header.append(
+			$search,
+			$selectionModeToggler,
+			$addMenuToggler,
+			$menuToggler,
+			$selectionMenuToggler,
+		);
 
 		if (IS_FOLDER_MODE) {
 			$openFolder = tag("button", {
@@ -170,6 +206,11 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			id: "filebrowser",
 			action: close,
 		});
+
+		$selectionModeToggler.onclick = function () {
+			isSelectionMode = !isSelectionMode;
+			toggleSelectionMode(isSelectionMode);
+		};
 
 		$fbMenu.onclick = function (e) {
 			$fbMenu.hide();
@@ -228,6 +269,68 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 					break;
 				}
 
+				case "import-project-zip": {
+					let zipFile = await new Promise((resolve, reject) => {
+						sdcard.openDocumentFile(
+							(res) => {
+								resolve(res.uri);
+							},
+							(err) => {
+								reject(err);
+							},
+							"application/zip",
+						);
+					});
+
+					if (!zipFile) break;
+
+					const loadingLoader = loader.create(
+						strings["loading"],
+						"Importing zip file...",
+						{ timeout: 10000 },
+					);
+
+					try {
+						const zipContent = await fsOperation(zipFile).readFile();
+						const zip = await JSZip.loadAsync(zipContent);
+						const targetDir = currentDir.url;
+						const targetFs = fsOperation(targetDir);
+
+						// Create folder with zip name
+						const zipName = Url.basename(zipFile).replace(/\.zip$/, "");
+						const extractDir = Url.join(targetDir, zipName);
+						await targetFs.createDirectory(zipName);
+
+						const files = Object.keys(zip.files);
+						const total = files.length;
+						let current = 0;
+
+						for (const filePath of files) {
+							const file = zip.files[filePath];
+							current++;
+
+							loadingLoader.setMessage(
+								`Extracting ${filePath} (${Math.round((current / total) * 100)}%)`,
+							);
+
+							if (file.dir) {
+								await fsOperation(extractDir).createDirectory(filePath);
+							} else {
+								const content = await file.async("arraybuffer");
+								await fsOperation(extractDir).createFile(filePath, content);
+							}
+						}
+
+						loadingLoader.destroy();
+						toast(strings.success);
+						reload();
+					} catch (err) {
+						loadingLoader.destroy();
+						helpers.error(err);
+					}
+					break;
+				}
+
 				case "add-path":
 					addStorage();
 					break;
@@ -244,12 +347,172 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			}
 		};
 
+		$selectionMenu.onclick = async (e) => {
+			$selectionMenu.hide();
+			const $target = e.target;
+			const action = $target.getAttribute("action");
+			if (!action) return;
+
+			switch (action) {
+				case "compress":
+					if (currentDir.url === "/") {
+						break;
+					}
+
+					const zip = new JSZip();
+					let loadingLoader = loader.create(
+						strings["loading"],
+						"Compressing files",
+						{
+							timeout: 3000,
+						},
+					);
+					try {
+						for (const url of selectedItems) {
+							const fs = fsOperation(url);
+							const stats = await fs.stat();
+							const isDir = stats.isDirectory;
+
+							if (isDir) {
+								const addDirToZip = async (dirUrl, zipFolder) => {
+									const entries = await fsOperation(dirUrl).lsDir();
+									for (const entry of entries) {
+										const percent = (
+											((entries.length - entries.indexOf(entry)) /
+												entries.length) *
+											100
+										).toFixed(0);
+										loadingLoader.setMessage(
+											`Compressing ${entry.name.length > 20 ? entry.name.substring(0, 20) + "..." : entry.name} (${percent}%)`,
+										);
+										if (entry.isDirectory) {
+											const newZipFolder = zipFolder.folder(entry.name);
+											await addDirToZip(entry.url, newZipFolder);
+										} else {
+											const content = await fsOperation(entry.url).readFile();
+											zipFolder.file(entry.name, content, { binary: true });
+										}
+									}
+								};
+								await addDirToZip(url, zip.folder(Url.basename(url)));
+							} else {
+								const content = await fs.readFile();
+								zip.file(Url.basename(url), content);
+							}
+						}
+
+						const zipContent = await zip.generateAsync({
+							type: "arraybuffer",
+						});
+						const zipName = "archive_" + Date.now() + ".zip";
+						const zipPath = Url.join(currentDir.url, zipName);
+						const shortPath =
+							currentDir.url.length > 40
+								? currentDir.url.substring(0, 37) + "..."
+								: currentDir.url;
+						loadingLoader.setMessage(`Saving ${zipName} to ${shortPath}`);
+						await fsOperation(currentDir.url).createFile(zipName, zipContent);
+						loadingLoader.destroy();
+						toast(strings.success);
+						isSelectionMode = !isSelectionMode;
+						toggleSelectionMode(isSelectionMode);
+						reload();
+					} catch (err) {
+						loadingLoader.destroy();
+						toast(strings.error);
+						console.error(err);
+					}
+					break;
+
+				case "delete": {
+					if (currentDir.url === "/") {
+						break;
+					}
+
+					// Show confirmation dialog
+					const confirmMessage =
+						selectedItems.size === 1
+							? strings["delete entry"].replace(
+									"{name}",
+									Array.from(selectedItems)[0].split("/").pop(),
+								)
+							: strings["delete entries"].replace(
+									"{count}",
+									selectedItems.size,
+								);
+
+					const confirmation = await confirm(strings.warning, confirmMessage);
+					if (!confirmation) break;
+
+					const loadingDialog = loader.create(
+						strings.loading,
+						strings["deleting items"].replace("{count}", selectedItems.size),
+						{ timeout: 3000 },
+					);
+
+					try {
+						for (const url of selectedItems) {
+							if ((await fsOperation(url).stat()).isDirectory) {
+								if (url.startsWith("content://com.termux.documents/tree/")) {
+									const fs = fsOperation(url);
+									const entries = await fs.lsDir();
+									if (entries.length === 0) {
+										await fs.delete();
+									} else {
+										const deleteRecursively = async (currentUrl) => {
+											const currentFs = fsOperation(currentUrl);
+											const currentEntries = await currentFs.lsDir();
+											for (const entry of currentEntries) {
+												if (entry.isDirectory) {
+													await deleteRecursively(entry.url);
+												} else {
+													await fsOperation(entry.url).delete();
+												}
+											}
+											await currentFs.delete();
+										};
+										await deleteRecursively(url);
+									}
+								} else {
+									await fsOperation(url).delete();
+								}
+								helpers.updateUriOfAllActiveFiles(url);
+								recents.removeFolder(url);
+							} else {
+								const fs = fsOperation(url);
+								await fs.delete();
+								const openedFile = editorManager.getFile(url, "uri");
+								if (openedFile) openedFile.uri = null;
+							}
+							recents.removeFile(url);
+							openFolder.removeItem(url);
+							delete cachedDir[url];
+						}
+						toast(strings.success);
+						reload();
+						isSelectionMode = false;
+						toggleSelectionMode(false);
+					} catch (err) {
+						loadingDialog.destroy();
+						helpers.error(err);
+					} finally {
+						loadingDialog.destroy();
+					}
+					break;
+				}
+
+				default:
+					break;
+			}
+		};
+
 		$search.onclick = function () {
 			const $list = $content.get("#list");
-			if ($list) searchBar($list);
+			if ($list) searchBar($list, (hide) => (hideSearchBar = hide));
 		};
 
 		$page.onhide = function () {
+			hideSearchBar();
 			helpers.hideAd();
 			actionStack.clearFromMark();
 			actionStack.remove("filebrowser");
@@ -273,6 +536,90 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			$page.hide();
 		}
 
+		function updateSelectionCount($count) {
+			if ($count) {
+				$count.textContent = `${selectedItems.size} items selected`;
+			}
+		}
+
+		function toggleSelectionMode(active) {
+			const $list = $content.get("#list");
+			if (active) {
+				$list.classList.add("selection-mode");
+				const $header = tag("div", {
+					className: "selection-header",
+				});
+
+				const selectAllCheckbox = Checkbox("", false);
+				const $count = tag("span", {
+					className: "text selection-count",
+					textContent: "0 items selected",
+				});
+
+				// Handle select all functionality
+				selectAllCheckbox.onclick = () => {
+					const checked = selectAllCheckbox.checked;
+					const items = $list.querySelectorAll(".tile:not(.selection-header)");
+					items.forEach((item) => {
+						const checkbox = item.querySelector(".input-checkbox");
+						if (checkbox) {
+							checkbox.checked = checked;
+							const url = item.querySelector("data-url").textContent;
+							if (checked) {
+								selectedItems.add(url);
+							} else {
+								selectedItems.delete(url);
+							}
+						}
+					});
+					updateSelectionCount($count);
+				};
+
+				$header.append(selectAllCheckbox, $count);
+				$list.insertBefore($header, $list.firstChild);
+
+				// Add checkboxes to list items
+				$list
+					.querySelectorAll(".tile:not(.selection-header)")
+					.forEach((item) => {
+						const checkbox = Checkbox("", false);
+						checkbox.onclick = () => {
+							const url = item.querySelector("data-url").textContent;
+							if (checkbox.checked) {
+								selectedItems.add(url);
+							} else {
+								selectedItems.delete(url);
+							}
+							updateSelectionCount($count);
+						};
+						item.prepend(checkbox);
+					});
+
+				$addMenuToggler.style.display = "none";
+				$menuToggler.style.display = "none";
+				$selectionMenuToggler.style.display = "";
+
+				// Disable floating button in selection mode
+				if ($openFolder) {
+					$openFolder.disabled = true;
+				}
+			} else {
+				$list.classList.remove("selection-mode");
+				$list.querySelector(".selection-header")?.remove();
+				$list.querySelectorAll(".input-checkbox").forEach((cb) => cb.remove());
+				selectedItems.clear();
+
+				$addMenuToggler.style.display = "";
+				$menuToggler.style.display = "";
+				$selectionMenuToggler.style.display = "none";
+
+				// Re-enable floating button when exiting selection mode
+				if ($openFolder) {
+					$openFolder.disabled = false;
+				}
+			}
+		}
+
 		/**
 		 * Called when any file folder is clicked
 		 * @param {MouseEvent} e
@@ -283,6 +630,25 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			 * @type {HTMLElement}
 			 */
 			const $el = e.target;
+
+			if (isSelectionMode) {
+				const checkbox = $el.closest(".tile")?.querySelector(".input-checkbox");
+				if (checkbox && !$el.closest(".selection-header")) {
+					checkbox.checked = !checkbox.checked;
+					const url = $el
+						.closest(".tile")
+						.querySelector("data-url").textContent;
+					if (checkbox.checked) {
+						selectedItems.add(url);
+					} else {
+						selectedItems.delete(url);
+					}
+					const $count = $content.querySelector(".selection-count");
+					updateSelectionCount($count);
+				}
+				return;
+			}
+
 			let action = $el.getAttribute("action") || $el.dataset.action;
 			if (!action) return;
 
@@ -402,6 +768,10 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 					options.push(["info", strings.info, "info"]);
 				}
 
+				if (currentDir.url !== "/" && url) {
+					options.push(["copyuri", strings["copy uri"], "copy"]);
+				}
+
 				const option = await select(strings["select"], options);
 				switch (option) {
 					case "delete": {
@@ -443,6 +813,11 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 
 					case "info":
 						acode.exec("file-info", url);
+						break;
+
+					case "copyuri":
+						navigator.clipboard.writeText(url);
+						alert(strings.success, strings["copied to clipboard"]);
 						break;
 				}
 			}
@@ -740,6 +1115,9 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 		 * @param {String} name
 		 */
 		async function navigate(url, name, assignBackButton = true) {
+			if (document.getElementById("search-bar")) {
+				hideSearchBar();
+			}
 			if (!url) {
 				throw new Error('navigate(url, name): "url" is required.');
 			}
@@ -1000,6 +1378,10 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 					list,
 				}),
 			);
+
+			if (document.getElementById("search-bar")) {
+				hideSearchBar();
+			}
 
 			const $oldList = $content.get("#list");
 			if ($oldList) {

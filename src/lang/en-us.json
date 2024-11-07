@@ -269,7 +269,7 @@
 	"server port": "Server port",
 	"preview settings": "Preview settings",
 	"preview settings note": "If preview port and server port are different, app will not start server and it will instead open https://<host>:<preview port> in browser or in-app browser. This is useful when you are running a server somewhere else.",
-	"backup/restore note": "It will only backup your settings, custom theme and key bindings. It will not backup your FTP/SFTP.",
+	"backup/restore note": "It will only backup your settings, custom theme, installed plugins and key bindings. It will not backup your FTP/SFTP or App state.",
 	"host": "Host",
 	"retry ftp/sftp when fail": "Retry ftp/sftp when fail",
 	"more": "More",
@@ -383,5 +383,10 @@
 	"most_downloaded": "Most Downloaded",
 	"newly_added": "Newly Added",
 	"top_rated": "Top Rated",
-	"rename not supported": "Rename on termux dir isn't supported"
+	"rename not supported": "Rename on termux dir isn't supported",
+	"compress": "Compress",
+	"copy uri": "Copy Uri",
+	"delete entries": "Are you sure you want to delete {count} items?",
+	"deleting items": "Deleting {count} items...",
+	"import project zip": "Import Project(zip)"
 }

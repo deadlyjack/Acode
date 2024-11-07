@@ -233,8 +233,7 @@ export default class Acode {
 
 	async format(selectIfNull = true) {
 		const file = editorManager.activeFile;
-		const { getModeForPath } = ace.require("ace/ext/modelist");
-		const { name } = getModeForPath(file.filename);
+		const name = (file.session.getMode().$id || "").split("/").pop();
 		const formatterId = appSettings.value.formatter[name];
 		const formatter = this.#formatter.find(({ id }) => id === formatterId);
 

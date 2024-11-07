@@ -1,3 +1,12 @@
+:root {
+  --color-note: #2f81f7;
+  --color-tip: #3fb950;
+  --color-warning: #d29922;
+  --color-severe: #db6d28;
+  --color-caution: #f85149;
+  --color-important: #a371f7;
+}
+
 .md {
   a {
     color: #0645ad;
@@ -27,22 +36,22 @@
 
   ::-moz-selection {
     background: rgba(255, 255, 0, 0.3);
-    color: #000
+    color: #000;
   }
 
   ::selection {
     background: rgba(255, 255, 0, 0.3);
-    color: #000
+    color: #000;
   }
 
   a::-moz-selection {
     background: rgba(255, 255, 0, 0.3);
-    color: #0645ad
+    color: #0645ad;
   }
 
   a::selection {
     background: rgba(255, 255, 0, 0.3);
-    color: #0645ad
+    color: #0645ad;
   }
 
   p {
@@ -53,51 +62,59 @@
     max-width: 100%;
   }
 
+  h1 {
+    margin: 0.67em 0;
+    font-weight: 600;
+    padding-bottom: 0.3em;
+    font-size: 2em;
+    border-bottom: 1px solid #bb800926;
+  }
+
+  h2 {
+    font-weight: 600;
+    padding-bottom: 0.3em;
+    font-size: 1.5em;
+    border-bottom: 1px solid #3d444db3;
+  }
+
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    font-weight: normal;
-    line-height: 1em;
-  }
-
-  h4,
-  h5,
-  h6 {
-    font-weight: bold;
-  }
-
-  h1 {
-    font-size: 2.5em;
-  }
-
-  h2 {
-    font-size: 2em;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    line-height: 1.25;
   }
 
   h3 {
-    font-size: 1.5em;
+    font-weight: 600;
+    font-size: 1.25em;
   }
 
   h4 {
-    font-size: 1.2em;
-  }
-
-  h5 {
+    font-weight: 600;
     font-size: 1em;
   }
 
+  h5 {
+    font-weight: 600;
+    font-size: 0.875em;
+  }
+
   h6 {
-    font-size: 0.9em;
+    font-weight: 600;
+    font-size: 0.85em;
+    color: #9198a1;
   }
 
   blockquote {
-    color: #666666;
     margin: 0;
-    padding-left: 3em;
-    border-left: 0.5em #EEE solid;
+    padding: 0 1em;
+    color: #9198a1;
+    border-left: 0.25em solid #3d444d;
   }
 
   hr {
@@ -112,12 +129,32 @@
 
   pre,
   code,
-  kbd,
   samp {
     color: rgb(107, 107, 107);
     font-family: monospace, monospace;
-    _font-family: 'courier new', monospace;
+    _font-family: "courier new", monospace;
     font-size: 0.98em;
+  }
+
+  kbd {
+    display: inline-block;
+    padding: 0.25rem;
+    font:
+      11px ui-monospace,
+      SFMono-Regular,
+      SF Mono,
+      Menlo,
+      Consolas,
+      Liberation Mono,
+      monospace;
+    line-height: 10px;
+    color: #f0f6fc;
+    vertical-align: middle;
+    background-color: #151b23;
+    border: solid 1px #3d444db3;
+    border-bottom-color: #3d444db3;
+    border-radius: 6px;
+    box-shadow: inset 0 -1px 0 #3d444db3;
   }
 
   pre {
@@ -175,7 +212,7 @@
   }
 
   li p:last-child {
-    margin: 0
+    margin: 0;
   }
 
   dd {
@@ -282,5 +319,87 @@
     h3 {
       page-break-after: avoid;
     }
+  }
+  .markdown-alert {
+    padding: 0.5rem 1rem;
+    margin-bottom: 16px;
+    color: inherit;
+    border-left: 0.25em solid #888;
+  }
+
+  .markdown-alert > :first-child {
+    margin-top: 0;
+  }
+
+  .markdown-alert > :last-child {
+    margin-bottom: 0;
+  }
+
+  .markdown-alert .markdown-alert-title {
+    display: flex;
+    font-weight: 500;
+    align-items: center;
+    line-height: 1;
+  }
+
+  .markdown-alert .markdown-alert-title .octicon {
+    margin-right: 0.5rem;
+    display: inline-block;
+    overflow: visible !important;
+    vertical-align: text-bottom;
+    fill: currentColor;
+  }
+
+  .markdown-alert.markdown-alert-note {
+    border-left-color: var(--color-note);
+  }
+
+  .markdown-alert.markdown-alert-note .markdown-alert-title {
+    color: var(--color-note);
+  }
+
+  .markdown-alert.markdown-alert-important {
+    border-left-color: var(--color-important);
+  }
+
+  .markdown-alert.markdown-alert-important .markdown-alert-title {
+    color: var(--color-important);
+  }
+
+  .markdown-alert.markdown-alert-warning {
+    border-left-color: var(--color-warning);
+  }
+
+  .markdown-alert.markdown-alert-warning .markdown-alert-title {
+    color: var(--color-warning);
+  }
+
+  .markdown-alert.markdown-alert-tip {
+    border-left-color: var(--color-tip);
+  }
+
+  .markdown-alert.markdown-alert-tip .markdown-alert-title {
+    color: var(--color-tip);
+  }
+
+  .markdown-alert.markdown-alert-caution {
+    border-left-color: var(--color-caution);
+  }
+
+  .markdown-alert.markdown-alert-caution .markdown-alert-title {
+    color: var(--color-caution);
+  }
+  .task-list-item {
+    list-style-type: none;
+    label {
+        font-weight: 400;
+    }
+    &+.task-list-item {
+        margin-top: 0.25rem;
+    }
+  }
+  ul:dir(rtl) .task-list-item-checkbox,
+  ol:dir(rtl) .task-list-item-checkbox {
+    margin: 0 -1.6em 0.25em 0.2em;
   }
 }
