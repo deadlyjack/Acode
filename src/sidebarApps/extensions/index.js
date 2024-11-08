@@ -369,7 +369,7 @@ async function uninstall(id) {
 		]);
 		acode.unmountPlugin(id);
 
-    // Show Ad If Its Free Version, interstitial Ad(iad) is loaded.
+    		// Show Ad If Its Free Version, interstitial Ad(iad) is loaded.
 		if (IS_FREE_VERSION && (await window.iad?.isLoaded())) {
 			window.iad.show();
 		}
