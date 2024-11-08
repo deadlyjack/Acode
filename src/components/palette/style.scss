@@ -1,0 +1,34 @@
+#palette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: 40px;
+  width: 90vw;
+  max-width: 600px;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  background-color: inherit;
+  box-shadow: 0 0 4px black;
+  z-index: 999;
+
+  &~#hints {
+    width: 90vw;
+    box-sizing: border-box;
+    z-index: 999;
+  }
+
+  &~.mask {
+    opacity: 0.4;
+    z-index: 998;
+    // pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    border: none;
+    color: var(--primary-text-color);
+  }
+}

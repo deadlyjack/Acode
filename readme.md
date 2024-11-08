@@ -1,35 +1,44 @@
-# Acode editor (Code editor for android)
+# Acode - Code Editor for Android
 
-<p style='text-align:center;'>
-     <img src='res/logo_1.png' width='250'>
+<p align="center">
+  <img src='res/logo_1.png' width='250'>
 </p>
 
-Acode is a lightweight but powerful code editor for Android phones. You can use this editor for editing HTML, CSS, JavaScript, text files etc.
+[![](https://img.shields.io/endpoint?label=Acode&style=flat-square&url=https%3A%2F%2Fmogyo.ro%2Fquart-apis%2Ftgmembercount%3Fchat_id%3Dfoxdebug_acode)](https://t.me/foxdebug_acode) [![](https://dcbadge.vercel.app/api/server/vVxVWYUAWD?style=flat)](https://discord.gg/vVxVWYUAWD)
 
-You can create a website, run the website in the browser and see errors or logs in the console.
-Also edit any kind of source file like python, CSS, HTML, Java, JavaScript, Dart, etc.
+## • Overview
 
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree)
+Welcome to Acode Editor - a powerful and versatile code editing tool designed specifically for Android devices. Whether you're working on HTML, CSS, JavaScript, or other programming languages, Acode empowers you to code on-the-go with confidence.
 
-## Project structure
+## • Features
+
+- Edit and create websites, and instantly preview them in a browser.
+- Seamlessly modify source files for various languages like Python, Java, JavaScript, and more.
+- Built-in javascript console
+- Enjoy multi-language editing support with easy management tools.
+- Enjoy a large collections of community plugins to enhance your coding experience.
+
+## • Installation
+
+You can get Acode Editor from popular platforms:
+
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="60">](https://play.google.com/store/apps/details?id=com.foxdebug.acodefree) [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="60"/>](https://www.f-droid.org/packages/com.foxdebug.acode/)
+
+## • Project Structure
 
 <pre>
 Acode/
 |
-|- src/   - contains all the raw code
+|- src/   - Core code and language files
 |
-|- www/   - contains public documents, built JavaScript and CSS files, language files, and HTML files
+|- www/   - Public documents, compiled files, and HTML templates
 |
-|- utils/ - contains the CLI tools for building the package, manipulating/adding strings to all languages etc.
+|- utils/ - CLI tools for building, string manipulation, and more
 </pre>
 
-## Multi-language support
+## • Multi-language Support
 
-To add new language, create a new file with language code for android (eg. en-us for english) in [`src/lang/`](https://github.com/deadlyjack/Acode/tree/main/src/lang) directory. After adding new laguage also add it to [`src/lib/lang.js`](https://github.com/deadlyjack/Acode/blob/main/src/lib/lang.js).
-
-Here are few utility tools to add, remove or search a string in all added languages.
+Enhance Acode's capabilities by adding new languages easily. Just create a file with the language code (e.g., en-us for English) in [`src/lang/`](https://github.com/deadlyjack/Acode/tree/main/src/lang) and include it in [`src/lib/lang.js`](https://github.com/deadlyjack/Acode/blob/main/src/lib/lang.js). Manage strings across languages effortlessly using utility commands:
 
 ```shell
 yarn lang add
@@ -38,22 +47,64 @@ yarn lang search
 yarn lang update
 ```
 
-## How to build
+## • Building the Application
 
-To build the APK you need Nodejs, NPM, and Apache Cordova installed on your device. Use Cordova CLI to build the application.
+To build the APK, ensure you have Node.js, NPM, and Apache Cordova installed on your device. Use Cordova CLI to build the application.
 
-Run this command to do the initial setup of the project. It's required just once.
+1. Initial setup (required only once):
 
 ```shell
 yarn setup
 ```
 
-Build the project
+2. Build the project:
 
 ```shell
 yarn build <platform (android)> <free|paid> <p|prod|d|dev>
 ```
 
-## Develop plugin for Acode
+## • Contributing
 
-Please see this [repository](https://github.com/deadlyjack/acode-plugin) for documentation.
+Acode Editor is an open-source project, and we welcome contributions from the community. To contribute, follow these steps:
+
+1. Fork the repository.
+2. Make your changes and commit them.(make branch for each feature or bug fix)
+3. Push your changes to your fork.
+4. Create a pull request from your branch to main branch of this repository with proper description and Wait for review.
+
+> [!Note]
+> Ensure your pull request includes:
+> - A clear description of the changes made or problem or feature.
+> - A reference to the issue being addressed (if applicable).
+> - A clear explanation of the solution or implementation.
+> - Screenshots or GIFs (if applicable).
+
+Please ensure that your code is clean, well-formatted, and follows the project's coding standards. Acode uses [Biomejs](https://biomejs.dev/) for formatting and linting and [typos](https://github.com/crate-ci/typos) for low false positives source code spell checking. You can use following commands to lints/format your code locally:
+```shell
+yarn lint # for linting
+yarn format # for formatting
+yarn check # it runs both lint and format
+```
+Also, ensure that your code is well-documented and includes comments where necessary.
+
+> [!Note]
+> You can use any package manager like npm or yarn or pnpm or bun.
+> You can use your editor specific Biomejs plugin for auto-formatting and linting based on Acode's configs.
+
+## • Developing a Plugin for Acode
+
+For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/deadlyjack/acode-plugin).
+
+For plugin development information, refer to: [Acode Plugin Documentation](https://acode.app/plugin-docs)
+
+> 💙 Happy coding!
+
+## Star History
+
+<a href="https://star-history.com/#deadlyjack/Acode&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=deadlyjack/Acode&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=deadlyjack/Acode&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=deadlyjack/Acode&type=Date" />
+ </picture>
+</a>

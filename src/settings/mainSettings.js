@@ -1,162 +1,184 @@
-import About from '../pages/about';
-import editorSettings from './editorSettings';
-import backupRestore from './backupRestore';
-import themeSetting from '../pages/themeSetting';
-import otherSettings from './appSettings';
-import defaultFormatter from './defaultFormatter';
-import rateBox from '../components/dialogboxes/rateBox';
-import Donate from '../pages/donate';
-import plugins from '../pages/plugins';
-import settingsPage from '../components/settingPage';
-import dialogs from '../components/dialogs';
-import previewSettings from './previewSettings';
-import removeAds from '../lib/removeAds';
-import appSettings from '../lib/settings';
-import helpers from '../utils/helpers';
+import settingsPage from "components/settingsPage";
+import confirm from "dialogs/confirm";
+import rateBox from "dialogs/rateBox";
+import actionStack from "lib/actionStack";
+import openFile from "lib/openFile";
+import removeAds from "lib/removeAds";
+import appSettings from "lib/settings";
+import settings from "lib/settings";
+import Donate from "pages/donate";
+import plugins from "pages/plugins";
+import themeSetting from "pages/themeSetting";
+import helpers from "utils/helpers";
+import About from "../pages/about";
+import otherSettings from "./appSettings";
+import backupRestore from "./backupRestore";
+import editorSettings from "./editorSettings";
+import filesSettings from "./filesSettings";
+import formatterSettings from "./formatterSettings";
+import previewSettings from "./previewSettings";
+import scrollSettings from "./scrollSettings";
+import searchSettings from "./searchSettings";
 
-export default function settingsMain() {
-  const title = strings.settings.capitalize();
-  let $list;
+export default function mainSettings() {
+	const title = strings.settings.capitalize();
+	const items = [
+		{
+			key: "about",
+			text: strings.about,
+			icon: "acode",
+			index: 0,
+		},
+		{
+			key: "donate",
+			text: strings.support,
+			icon: "favorite",
+			iconColor: "orangered",
+			sake: true,
+			index: 1,
+		},
+		{
+			key: "editor-settings",
+			text: strings["editor settings"],
+			icon: "text_format",
+			index: 3,
+		},
+		{
+			key: "app-settings",
+			text: strings["app settings"],
+			icon: "tune",
+			index: 2,
+		},
+		{
+			key: "formatter",
+			text: strings.formatter,
+			icon: "stars",
+		},
+		{
+			key: "theme",
+			text: strings.theme,
+			icon: "color_lenspalette",
+		},
+		{
+			key: "backup-restore",
+			text: strings.backup.capitalize() + "/" + strings.restore.capitalize(),
+			icon: "cached",
+		},
+		{
+			key: "rateapp",
+			text: strings["rate acode"],
+			icon: "googleplay",
+		},
+		{
+			key: "plugins",
+			text: strings["plugins"],
+			icon: "extension",
+		},
+		{
+			key: "reset",
+			text: strings["restore default settings"],
+			icon: "historyrestore",
+			index: 5,
+		},
+		{
+			key: "preview-settings",
+			text: strings["preview settings"],
+			icon: "play_arrow",
+			index: 4,
+		},
+		{
+			key: "editSettings",
+			text: `${strings["edit"]} settings.json`,
+			icon: "edit",
+		},
+	];
 
-  const items = [
-    {
-      key: 'about',
-      text: strings.about,
-      icon: 'acode',
-      index: 0,
-    },
-    {
-      key: 'donate',
-      text: strings.support,
-      icon: 'favorite',
-      iconColor: 'orangered',
-      sake: true,
-      index: 1,
-    },
-    {
-      key: 'editor-settings',
-      text: strings['editor settings'],
-      icon: 'text_format',
-      index: 3,
-    },
-    {
-      key: 'app-settings',
-      text: strings['app settings'],
-      icon: 'tune',
-      index: 2,
-    },
-    {
-      key: 'formatter',
-      text: strings.formatter,
-      icon: 'stars',
-    },
-    {
-      key: 'theme',
-      text: strings.theme,
-      icon: 'color_lenspalette',
-    },
-    {
-      key: 'backup-restore',
-      text: strings.backup.capitalize() + '/' + strings.restore.capitalize(),
-      icon: 'cached',
-    },
-    {
-      key: 'rateapp',
-      text: strings['rate acode'],
-      icon: 'googleplay'
-    },
-    {
-      key: 'plugins',
-      text: strings['plugins'],
-      icon: 'extension',
-    },
-    {
-      key: 'reset',
-      text: strings['restore default settings'],
-      icon: 'historyrestore',
-      index: 5,
-    },
-    {
-      key: 'preview',
-      text: strings['preview settings'],
-      icon: 'play_arrow',
-      index: 4,
-    }
-  ];
+	if (IS_FREE_VERSION) {
+		items.push({
+			key: "removeads",
+			text: strings["remove ads"],
+			icon: "cancel",
+		});
+	}
 
-  if (IS_FREE_VERSION) {
-    items.push({
-      key: 'removeads',
-      text: strings['remove ads'],
-      icon: 'cancel',
-    });
-  }
+	/**
+	 * Callback for settings page for handling click event
+	 * @this {HTMLElement}
+	 * @param {string} key
+	 */
+	async function callback(key) {
+		switch (key) {
+			case "app-settings":
+			case "backup-restore":
+			case "editor-settings":
+			case "preview-settings":
+				appSettings.uiSettings[key].show();
+				break;
 
-  removeAds.callback = () => {
-    $list.get('[data-key="removeads"]').remove();
-  }
+			case "theme":
+				themeSetting();
+				break;
 
-  async function callback(key) {
-    switch (key) {
-      case 'editor-settings':
-        editorSettings();
-        break;
+			case "about":
+				About();
+				break;
 
-      case 'theme':
-        themeSetting();
-        break;
+			case "donate":
+				Donate();
+				break;
 
-      case 'about':
-        About();
-        break;
+			case "rateapp":
+				rateBox();
+				break;
 
-      case 'app-settings':
-        otherSettings();
-        break;
+			case "plugins":
+				plugins();
+				break;
 
-      case 'backup-restore':
-        backupRestore();
-        break;
+			case "formatter":
+				formatterSettings();
+				break;
 
-      case 'donate':
-        Donate();
-        break;
+			case "editSettings": {
+				actionStack.pop();
+				openFile(settings.settingsFile);
+				break;
+			}
 
-      case 'rateapp':
-        rateBox();
-        break;
+			case "reset":
+				const confirmation = await confirm(
+					strings.warning,
+					strings["restore default settings"],
+				);
+				if (confirmation) {
+					await appSettings.reset();
+					location.reload();
+				}
+				break;
 
-      case 'plugins':
-        plugins();
-        break;
+			case "removeads":
+				try {
+					await removeAds();
+					this.remove();
+				} catch (error) {
+					helpers.error(error);
+				}
+				break;
 
-      case 'formatter':
-        defaultFormatter();
-        break;
+			default:
+				break;
+		}
+	}
 
-      case 'preview':
-        previewSettings();
-        break;
+	const page = settingsPage(title, items, callback);
+	page.show();
 
-      case 'reset':
-        const confirmation = await dialogs.confirm(strings.warning, strings['restore default settings']);
-        if (confirmation) {
-          await appSettings.reset();
-          location.reload();
-        }
-        break;
-
-      case 'removeads':
-        removeAds()
-          .then((error) => {
-            helpers.error(error);
-          });
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  ({ $list } = settingsPage(title, items, callback));
+	appSettings.uiSettings["main-settings"] = page;
+	appSettings.uiSettings["app-settings"] = otherSettings();
+	appSettings.uiSettings["file-settings"] = filesSettings();
+	appSettings.uiSettings["backup-restore"] = backupRestore();
+	appSettings.uiSettings["editor-settings"] = editorSettings();
+	appSettings.uiSettings["scroll-settings"] = scrollSettings();
+	appSettings.uiSettings["search-settings"] = searchSettings();
+	appSettings.uiSettings["preview-settings"] = previewSettings();
 }

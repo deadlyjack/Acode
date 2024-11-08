@@ -33,12 +33,11 @@
     <hook type="before_prepare" src="utils/resetProvider.js" />
     <hook type="after_prepare" src="utils/fixProvider.js" />
 
-    <resource-file src="file_provider.xml" target="res/xml/file_provider.xml" />
-    <source-file src="src/android/com/foxdebug/system/Base64Icons.java" target-dir="src/com/foxdebug/system"/>
-    <source-file src="src/android/com/foxdebug/system/BrowserDialog.java" target-dir="src/com/foxdebug/system"/>
-    <source-file src="src/android/com/foxdebug/system/System.java" target-dir="src/com/foxdebug/system"/>
+    <resource-file src="res/android/file_provider.xml" target="res/xml/file_provider.xml" />
+    <resource-file src="res/android/icon.ttf" target="assets/font/icon.ttf" />
+    <source-file src="android/com/foxdebug/system/Ui.java" target-dir="src/com/foxdebug/system"/>
+    <source-file src="android/com/foxdebug/system/System.java" target-dir="src/com/foxdebug/system"/>
 
-    <framework src="commons-io:commons-io:2.11.0" />
     <framework src="androidx.core:core:1.6.0" />
     <framework src="androidx.core:core-google-shortcuts:1.0.0" />
   </platform>

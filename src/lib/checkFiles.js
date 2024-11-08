@@ -1,91 +1,100 @@
-import dialogs from '../components/dialogs';
-import fsOperation from '../fileSystem';
-import EditorFile from './editorFile';
+import alert from "dialogs/alert";
+import confirm from "dialogs/confirm";
+import fsOperation from "fileSystem";
 
 let checkFileEnabled = true;
 
-Object.defineProperty(checkFiles, 'check', {
-  set(value) {
-    checkFileEnabled = value;
-  },
-  get() {
-    return checkFileEnabled;
-  }
+Object.defineProperty(checkFiles, "check", {
+	set(value) {
+		checkFileEnabled = value;
+	},
+	get() {
+		return checkFileEnabled;
+	},
 });
 
 export default async function checkFiles() {
-  if (checkFileEnabled === false) {
-    checkFileEnabled = true;
-    return;
-  }
-  const files = editorManager.files;
-  const { editor } = editorManager;
+	if (!editorManager) return;
+	if (checkFileEnabled === false) {
+		checkFileEnabled = true;
+		return;
+	}
+	const files = editorManager.files;
+	const { editor } = editorManager;
 
-  recursiveFileCheck([...files]);
+	recursiveFileCheck([...files]);
 
-  /**
-   * 
-   * @param {EditorFile[]} files 
-   */
-  async function recursiveFileCheck(files) {
-    const file = files.pop();
-    await checkFile(file);
-    if (files.length) {
-      recursiveFileCheck(files);
-    }
-    return;
-  }
+	/**
+	 * Checks if the file has been changed
+	 * @param {EditorFile[]} files List of files to check
+	 */
+	async function recursiveFileCheck(files) {
+		const file = files.pop();
+		await checkFile(file);
+		if (files.length) {
+			recursiveFileCheck(files);
+		}
+		return;
+	}
 
-  /**
-   * 
-   * @param {import('./editorFile').default} file
-   */
-  async function checkFile(file) {
-    if (file.isUnsaved || !file.loaded || file.loading) return;
+	/**
+	 * @typedef {import('./editorFile').default} EditorFile
+	 */
 
-    if (file.uri) {
-      const fs = fsOperation(file.uri);
+	/**
+	 * Checks a file for changes
+	 * @param {EditorFile} file File to check
+	 * @returns {Promise<void>}
+	 */
+	async function checkFile(file) {
+		if (file.isUnsaved || !file.loaded || file.loading) return;
 
-      if (!(await fs.exists()) && !file.readOnly) {
-        file.isUnsaved = true;
-        file.uri = null;
-        editorManager.onupdate('file-changed');
-        editorManager.emit('update', 'file-changed');
-        await new Promise((resolve) => {
-          dialogs.alert(
-            strings.info,
-            strings['file has been deleted'].replace('{file}', file.filename),
-            resolve,
-          );
-        });
-        return;
-      }
+		if (file.uri) {
+			const fs = fsOperation(file.uri);
+			const exists = await fs.exists();
 
-      const text = await fs.readFile(file.encoding ?? 'utf-8');
-      const loadedText = file.session.getValue();
+			if (!exists && !file.readOnly) {
+				file.isUnsaved = true;
+				file.uri = null;
+				editorManager.onupdate("file-changed");
+				editorManager.emit("update", "file-changed");
+				await new Promise((resolve) => {
+					alert(
+						strings.info,
+						strings["file has been deleted"].replace("{file}", file.filename),
+						resolve,
+					);
+				});
+				return;
+			}
 
-      if (text !== loadedText) {
-        try {
-          const confirmation = await dialogs.confirm(
-            strings.warning.toUpperCase(),
-            file.filename + strings['file changed'],
-          );
+			const text = await fs.readFile(file.encoding);
+			const loadedText = file.session.getValue();
 
-          if (!confirmation) return;
+			if (text !== loadedText) {
+				try {
+					const confirmation = await confirm(
+						strings.warning.toUpperCase(),
+						file.filename + strings["file changed"],
+					);
 
-          const cursorPos = editor.getCursorPosition();
-          editorManager.getFile(file.id, 'id')?.makeActive();
+					if (!confirmation) return;
 
-          file.markChanged = false;
-          file.session.setValue(text);
-          editor.gotoLine(cursorPos.row, cursorPos.column);
-          editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
-        } catch (error) { }
-      }
-    }
-  }
+					const cursorPos = editor.getCursorPosition();
+					editorManager.getFile(file.id, "id")?.makeActive();
 
-  if (!editorManager.activeFile) {
-    app.focus();
-  }
-};
+					file.markChanged = false;
+					file.session.setValue(text);
+					editor.gotoLine(cursorPos.row, cursorPos.column);
+					editor.renderer.scrollCursorIntoView(cursorPos, 0.5);
+				} catch (error) {
+					// ignore
+				}
+			}
+		}
+	}
+
+	if (!editorManager.activeFile) {
+		app.focus();
+	}
+}

@@ -1,0 +1,140 @@
+@import '../../styles/mixins.scss';
+
+.search-in-files {
+  width: calc(100% - 40px - 20px) !important;
+  margin: 0 auto;
+  overflow: visible !important;
+
+  [is='details'] {
+    width: 100%;
+
+    >[is='summary'] {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+
+      textarea,
+      input {
+        margin: 0 !important;
+        white-space: nowrap;
+        overflow-x: auto !important;
+      }
+
+      .marker::after {
+        width: 10px;
+        font-size: 1rem;
+        content: '\25B6';
+      }
+    }
+
+    >[is='summary']~* {
+      display: none;
+      margin: 0 0 5px auto !important;
+    }
+
+    &[open] {
+      >[is='summary'] {
+        .marker::after {
+          content: '\25BC';
+        }
+      }
+
+      >[is='summary']~* {
+        display: block;
+      }
+
+      >[is='summary']~div {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+
+        >* {
+          margin: 0 !important;
+        }
+      }
+    }
+  }
+
+  .ace_editor {
+    height: 100%;
+    width: calc(100% + 18px);
+    margin-left: -8px;
+    background-color: rgb(153, 153, 255);
+    background-color: var(--primary-color);
+    color: rgb(255, 255, 255);
+    color: var(--primary-text-color);
+
+    .ace_gutter,
+    .ace_gutter-cell {
+      background-color: inherit !important;
+      color: inherit !important;
+    }
+
+    .ace_fold {
+      display: none !important;
+    }
+
+    .ace_bracket {
+      display: none !important;
+    }
+
+    .ace_cursor {
+      display: none !important;
+    }
+
+    .ace_marker-layer {
+      display: none !important;
+    }
+
+    .ace_highlight {
+      border: solid 1px rgba(122, 122, 122, 0.2);
+      border: solid 1px var(--border-color);
+      border-radius: 2px;
+      background-color: rgb(255, 255, 255);
+      background-color: var(--secondary-color);
+      color: rgb(37, 37, 37);
+      color: var(--secondary-text-color);
+    }
+
+    .ace_file_name {
+      color: rgb(255, 215, 0);
+      color: var(--active-text-color);
+    }
+
+    .ace_gutter-cell:nth-child(odd),
+    .ace_line_group:nth-child(odd) {
+      background-color: rgba(0, 0, 0, 0.2) !important;
+    }
+  }
+
+  .extras {
+    display: block !important;
+    line-height: 0px !important;
+    margin-bottom: 10px !important;
+    text-align: right !important;
+  }
+
+  .options {
+    width: 100%;
+    margin-bottom: 10px;
+    text-align: right;
+  }
+
+  button {
+    display: inline-block;
+    background-color: transparent;
+    border: none;
+    color: rgb(37, 37, 37);
+    color: var(--secondary-text-color);
+  }
+
+  .error {
+    color: orangered;
+  }
+
+  .search-result {
+    position: relative;
+    padding-bottom: 5px;
+  }
+}

@@ -1,10 +1,11 @@
-import constants from './constants';
-import fsOperation from '../fileSystem';
-import helpers from '../utils/helpers';
-import Url from '../utils/Url';
-import lang from './lang';
-import ThemeBuilder from './themeBuilder';
-import themes from './themes';
+import fsOperation from "fileSystem";
+import ThemeBuilder from "theme/builder";
+import themes from "theme/list";
+import Url from "utils/Url";
+import helpers from "utils/helpers";
+import constants from "./constants";
+import lang from "./lang";
+
 /**
  * @typedef {object} fileBrowserSettings
  * @property {string} showHiddenFiles
@@ -19,292 +20,363 @@ import themes from './themes';
  */
 
 class Settings {
-  #customTheme = new ThemeBuilder('Custom').toJSON();
-  #defaultSettings;
-  #oldSettings;
-  #initialized = false;
-  #on = {
-    update: [],
-    reset: [],
-  };
-  #searchSettings = {
-    caseSensitive: false,
-    regExp: false,
-    wholeWord: false,
-  };
-  #fileBrowserSettings = {
-    showHiddenFiles: false,
-    sortByName: true,
-  };
+	#customTheme = new ThemeBuilder("Custom").toJSON();
+	#defaultSettings;
+	#oldSettings;
+	#initialized = false;
+	#on = {
+		update: [],
+		"update:after": [],
+		reset: [],
+	};
+	#searchSettings = {
+		caseSensitive: false,
+		regExp: false,
+		wholeWord: false,
+	};
+	#fileBrowserSettings = {
+		showHiddenFiles: false,
+		sortByName: true,
+	};
+	#excludeFolders = [
+		"**/node_modules/**",
+		"**/.git/**",
+		"**/.vscode/**",
+		"**/.idea/**",
+		"**/bower_components/**",
+		"**/dist/**",
+		"**/build/**",
+		"**/coverage/**",
+		"**/temp/**",
+		"**/tmp/**",
+		"**/logs/**",
+		"**/flow-typed/**",
+	];
+	#IS_TABLET = innerWidth > 768;
 
-  QUICKTOOLS_TRIGGER_MODE_TOUCH = 'touch';
-  QUICKTOOLS_TRIGGER_MODE_CLICK = 'click';
-  OPEN_FILE_LIST_POS_HEADER = 'header';
-  OPEN_FILE_LIST_POS_SIDEBAR = 'sidebar';
-  KEYBOARD_MODE_NO_SUGGESTIONS = 'NO_SUGGESTIONS';
-  KEYBOARD_MODE_NO_SUGGESTIONS_AGGRESSIVE = 'NO_SUGGESTIONS_AGGRESSIVE';
-  KEYBOARD_MODE_NORMAL = 'NORMAL';
-  CONSOLE_ERUDA = 'eruda';
-  CONSOLE_LEGACY = 'legacy';
-  PREVIEW_MODE_INAPP = 'inapp';
-  PREVIEW_MODE_BROWSER = 'browser';
+	QUICKTOOLS_ROWS = 2;
+	QUICKTOOLS_GROUP_CAPACITY = 8;
+	QUICKTOOLS_GROUPS = 2;
+	#QUICKTOOLS_SIZE =
+		this.QUICKTOOLS_GROUP_CAPACITY * // items per group
+		this.QUICKTOOLS_GROUPS * // number of groups
+		this.QUICKTOOLS_ROWS; // number of rows
 
-  constructor() {
-    this.#defaultSettings = {
-      animation: 'system',
-      appTheme: 'dark',
-      autosave: 0,
-      fileBrowser: this.#fileBrowserSettings,
-      formatter: {},
-      maxFileSize: 12,
-      serverPort: constants.SERVER_PORT,
-      previewPort: constants.PREVIEW_PORT,
-      showConsoleToggler: true,
-      previewMode: this.PREVIEW_MODE_INAPP,
-      disableCache: false,
-      host: 'localhost',
-      search: this.#searchSettings,
-      lang: 'en-us',
-      fontSize: '12px',
-      editorTheme: 'ace/theme/nord_dark',
-      textWrap: true,
-      softTab: true,
-      tabSize: 2,
-      retryRemoteFsAfterFail: true,
-      linenumbers: true,
-      formatOnSave: false,
-      autoCorrect: true,
-      openFileListPos: this.OPEN_FILE_LIST_POS_HEADER,
-      quickTools: 1,
-      quickToolsTriggerMode: this.QUICKTOOLS_TRIGGER_MODE_TOUCH,
-      editorFont: 'Roboto Mono',
-      vibrateOnTap: true,
-      fullscreen: false,
-      floatingButton: true,
-      liveAutoCompletion: true,
-      showPrintMargin: false,
-      printMargin: 80,
-      scrollbarSize: 20,
-      showSpaces: false,
-      confirmOnExit: true,
-      lineHeight: 2,
-      leftMargin: 50,
-      checkFiles: true,
-      desktopMode: false,
-      console: this.CONSOLE_LEGACY,
-      keyboardMode: this.KEYBOARD_MODE_NORMAL,
-      rememberFiles: true,
-      rememberFolders: true,
-      diagonalScrolling: false,
-      reverseScrolling: false,
-      teardropTimeout: 3000,
-      teardropSize: 30,
-      scrollSpeed: constants.SCROLL_SPEED_NORMAL,
-      customTheme: this.#customTheme,
-      relativeLineNumbers: false,
-      elasticTabstops: false,
-      rtlText: false,
-      hardWrap: false,
-      useTextareaForIME: false,
-      touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 10,
-    };
-    this.value = { ...this.#defaultSettings };
-  }
+	QUICKTOOLS_TRIGGER_MODE_TOUCH = "touch";
+	QUICKTOOLS_TRIGGER_MODE_CLICK = "click";
+	OPEN_FILE_LIST_POS_HEADER = "header";
+	OPEN_FILE_LIST_POS_SIDEBAR = "sidebar";
+	OPEN_FILE_LIST_POS_BOTTOM = "bottom";
+	KEYBOARD_MODE_NO_SUGGESTIONS = "NO_SUGGESTIONS";
+	KEYBOARD_MODE_NO_SUGGESTIONS_AGGRESSIVE = "NO_SUGGESTIONS_AGGRESSIVE";
+	KEYBOARD_MODE_NORMAL = "NORMAL";
+	CONSOLE_ERUDA = "eruda";
+	CONSOLE_LEGACY = "legacy";
+	PREVIEW_MODE_INAPP = "inapp";
+	PREVIEW_MODE_BROWSER = "browser";
 
-  async init() {
-    if (this.#initialized) return;
-    this.settingsFile = Url.join(DATA_STORAGE, 'settings.json');
+	/**@type {{[key: string]: import('components/settingsPage').SettingsPage}} */
+	uiSettings = {};
 
-    if (!IS_FREE_VERSION) {
-      this.#defaultSettings.appTheme = 'ocean';
-      this.#defaultSettings.editorTheme = 'ace/theme/dracula';
-    }
+	constructor() {
+		this.#defaultSettings = {
+			animation: "system",
+			appTheme: "dark",
+			autosave: 0,
+			fileBrowser: this.#fileBrowserSettings,
+			formatter: {},
+			maxFileSize: 12,
+			serverPort: constants.SERVER_PORT,
+			previewPort: constants.PREVIEW_PORT,
+			showConsoleToggler: true,
+			previewMode: this.PREVIEW_MODE_INAPP,
+			disableCache: false,
+			useCurrentFileForPreview: false,
+			host: "localhost",
+			search: this.#searchSettings,
+			lang: "en-us",
+			fontSize: "12px",
+			editorTheme: "ace/theme/nord_dark",
+			textWrap: true,
+			softTab: true,
+			tabSize: 2,
+			retryRemoteFsAfterFail: true,
+			linenumbers: true,
+			formatOnSave: false,
+			autoCorrect: true,
+			openFileListPos: this.OPEN_FILE_LIST_POS_HEADER,
+			quickTools: this.#IS_TABLET ? 0 : 1,
+			quickToolsTriggerMode: this.QUICKTOOLS_TRIGGER_MODE_TOUCH,
+			editorFont: "Roboto Mono",
+			vibrateOnTap: true,
+			fullscreen: false,
+			floatingButton: !this.#IS_TABLET,
+			liveAutoCompletion: true,
+			showPrintMargin: false,
+			printMargin: 80,
+			scrollbarSize: 20,
+			showSpaces: false,
+			confirmOnExit: true,
+			lineHeight: 2,
+			leftMargin: 50,
+			checkFiles: true,
+			desktopMode: false,
+			console: this.CONSOLE_LEGACY,
+			keyboardMode: this.KEYBOARD_MODE_NO_SUGGESTIONS_AGGRESSIVE,
+			rememberFiles: true,
+			rememberFolders: true,
+			diagonalScrolling: false,
+			reverseScrolling: false,
+			teardropTimeout: 3000,
+			teardropSize: 30,
+			scrollSpeed: constants.SCROLL_SPEED_NORMAL,
+			customTheme: this.#customTheme,
+			relativeLineNumbers: false,
+			elasticTabstops: false,
+			rtlText: false,
+			hardWrap: false,
+			useTextareaForIME: false,
+			touchMoveThreshold: Math.round((1 / devicePixelRatio) * 10) / 20,
+			quicktoolsItems: [...Array(this.#QUICKTOOLS_SIZE).keys()],
+			excludeFolders: this.#excludeFolders,
+			defaultFileEncoding: "UTF-8",
+			inlineAutoCompletion: true,
+			colorPreview: true,
+			maxRetryCount: 3,
+			showRetryToast: false,
+			showSideButtons: true,
+			showAnnotations: false,
+		};
+		this.value = structuredClone(this.#defaultSettings);
+	}
 
-    this.#initialized = true;
+	async init() {
+		if (this.#initialized) return;
+		this.settingsFile = Url.join(DATA_STORAGE, "settings.json");
 
-    const fs = fsOperation(this.settingsFile);
+		if (!IS_FREE_VERSION) {
+			this.#defaultSettings.appTheme = "ocean";
+			this.#defaultSettings.editorTheme = "ace/theme/dracula";
+		}
 
-    if (!(await fs.exists())) {
-      await this.#save();
-      this.value = structuredClone(this.#defaultSettings);
-      this.#oldSettings = structuredClone(this.#defaultSettings);
-      this.value.lang = navigator.language || 'en-us';
-      return;
-    }
+		this.#initialized = true;
 
-    const settings = helpers.parseJSON(await fs.readFile('utf-8'));
-    if (settings) {
-      // make sure that all the settings are present
-      Object.keys(this.#defaultSettings).forEach((setting) => {
-        const value = settings[setting];
-        if (value === undefined || typeof value !== typeof this.#defaultSettings[setting]) {
-          settings[setting] = this.#defaultSettings[setting];
-        }
-      });
+		const fs = fsOperation(this.settingsFile);
 
-      this.value = structuredClone(settings);
-      this.#oldSettings = structuredClone(settings);
-      try {
-        themes.update(ThemeBuilder.fromJSON(this.value.customTheme));
-      } catch (error) {
-        themes.update(new ThemeBuilder('Custom').toJSON());
-      }
+		if (!(await fs.exists())) {
+			await this.#save();
+			this.value = structuredClone(this.#defaultSettings);
+			this.#oldSettings = structuredClone(this.#defaultSettings);
+			this.value.lang = navigator.language || "en-us";
+			return;
+		}
 
-      return;
-    }
+		const settings = helpers.parseJSON(await fs.readFile("utf8"));
+		if (settings) {
+			// make sure that all the settings are present
+			Object.keys(this.#defaultSettings).forEach((setting) => {
+				const value = settings[setting];
+				if (
+					value === undefined ||
+					typeof value !== typeof this.#defaultSettings[setting]
+				) {
+					settings[setting] = this.#defaultSettings[setting];
+				}
+			});
 
-    await this.reset();
-  }
+			this.value = structuredClone(settings);
+			this.#oldSettings = structuredClone(settings);
+			try {
+				themes.update(ThemeBuilder.fromJSON(this.value.customTheme));
+			} catch (error) {
+				themes.update(new ThemeBuilder("Custom").toJSON());
+			}
 
-  async #save() {
-    const fs = fsOperation(this.settingsFile);
-    const settingsText = JSON.stringify(this.value, undefined, 4);
+			return;
+		}
 
-    if (!(await fs.exists())) {
-      const dirFs = fsOperation(DATA_STORAGE);
-      await dirFs.createFile('settings.json');
-    }
+		await this.reset();
+	}
 
-    await fs.writeFile(settingsText);
-    this.#oldSettings = { ...this.value };
-  }
+	async #save() {
+		const fs = fsOperation(this.settingsFile);
+		const settingsText = JSON.stringify(this.value, undefined, 4);
 
-  /**
-   *
-   * @param {Object} [settings] - if provided, the settings will be updated
-   * @param {Boolean} [showToast] - if false, the toast will not be shown
-   * default is true
-   * @param {Boolean} [saveFile] - if false, the settings will not be saved to the file,
-   * default is true
-   */
-  async update(settings, showToast = true, saveFile = true) {
-    if (typeof settings === 'boolean') {
-      showToast = settings;
-      settings = undefined;
-    }
+		if (!(await fs.exists())) {
+			const dirFs = fsOperation(DATA_STORAGE);
+			await dirFs.createFile("settings.json");
+		}
 
-    const onupdate = [...this.#on.update];
+		await fs.writeFile(settingsText);
+		this.#oldSettings = structuredClone(this.value);
+	}
 
-    if (settings) {
-      Object.keys(settings).forEach((key) => {
-        if (key in this.value) this.value[key] = settings[key];
-      });
-    }
+	/**
+	 *
+	 * @param {Object} [settings] - if provided, the settings will be updated
+	 * @param {Boolean} [showToast] - if false, the toast will not be shown
+	 * default is true
+	 * @param {Boolean} [saveFile] - if false, the settings will not be saved to the file,
+	 * default is true
+	 */
+	async update(settings, showToast = true, saveFile = true) {
+		if (typeof settings === "boolean") {
+			showToast = settings;
+			settings = undefined;
+		}
 
-    const changedSettings = this.#getChangedKeys();
-    changedSettings.forEach((setting) => {
-      this.#applySettings(setting);
-      const listeners = this.#on[`update:${setting}`];
-      if (Array.isArray(listeners)) {
-        onupdate.push(...listeners);
-      }
-      onupdate.forEach((listener) => listener(this.value[setting]));
-    });
+		const onupdate = [...this.#on.update];
+		const onupdateAfter = [...this.#on["update:after"]];
 
-    if (saveFile) await this.#save();
-    if (showToast) toast(strings['settings saved']);
-  }
+		if (settings) {
+			Object.keys(settings).forEach((key) => {
+				if (key in this.value) this.value[key] = settings[key];
+			});
+		}
 
-  async reset(setting) {
-    if (setting) {
-      if (setting in this.#defaultSettings) {
-        this.value[setting] = this.#defaultSettings[setting];
-        await this.update();
-      } else {
-        return false;
-      }
-    } else {
-      this.value = this.#defaultSettings;
-      await this.update(false);
-    }
+		const changedSettings = this.#getChangedKeys();
+		changedSettings.forEach((setting) => {
+			this.#applySettings(setting);
+			const listeners = this.#on[`update:${setting}`];
+			if (Array.isArray(listeners)) {
+				onupdate.push(...listeners);
+			}
+			onupdate.forEach((listener) => listener(this.value[setting]));
+		});
 
-    this.#on.reset.forEach((onreset) => onreset(this.value))
-  }
+		if (saveFile) await this.#save();
+		if (showToast) toast(strings["settings saved"]);
 
-  /**
-   *
-   * @param {'update' | 'reset'} event
-   * @param {function():void} callback
-   */
-  on(event, callback) {
-    if (!this.#on[event]) this.#on[event] = [];
-    this.#on[event].push(callback);
-  }
+		changedSettings.forEach((setting) => {
+			const listeners = this.#on[`update:${setting}:after`];
+			if (Array.isArray(listeners)) {
+				onupdateAfter.push(...listeners);
+			}
+			onupdateAfter.forEach((listener) => listener(this.value[setting]));
+		});
+	}
 
-  /**
-   *
-   * @param {'update' | 'reset'} event
-   * @param {function():void} callback
-   */
-  off(event, callback) {
-    if (!this.#on[event]) this.#on[event] = [];
-    this.#on[event].splice(this.#on[event].indexOf(callback), 1);
-  }
+	async reset(setting) {
+		if (setting) {
+			if (setting in this.#defaultSettings) {
+				this.value[setting] = this.#defaultSettings[setting];
+				await this.update();
+			} else {
+				return false;
+			}
+		} else {
+			this.value = this.#defaultSettings;
+			await this.update(false);
+		}
 
-  /**
-   *
-   * @param {String} key
-   * @returns
-   */
-  get(key) {
-    return this.value[key];
-  }
+		this.#on.reset.forEach((onreset) => onreset(this.value));
+	}
 
-  /**
-   * Returns changed settings
-   * @returns {Array<String>}
-   */
-  #getChangedKeys() {
-    if (!this.#oldSettings) return [];
-    const keys = [];
-    Object.keys(this.#oldSettings).forEach((key) => {
-      const value = this.#oldSettings[key];
-      if (typeof value === 'object') {
-        if (!helpers.areEqual(value, this.value[key])) keys.push(key);
-        return;
-      }
+	/**
+	 * Adds a listener for the given event
+	 * @param {'update:<setting>' | 'update:<setting>:after' | 'reset'} event
+	 * @param {function():void} callback
+	 */
+	on(event, callback) {
+		if (!this.#on[event]) this.#on[event] = [];
+		this.#on[event].push(callback);
+	}
 
-      if (value !== this.value[key]) keys.push(key);
-    });
-    return keys;
-  }
+	/**
+	 * Removes the given callback from the given event
+	 * @param {'update' | 'reset'} event
+	 * @param {function():void} callback
+	 */
+	off(event, callback) {
+		if (!this.#on[event]) this.#on[event] = [];
+		this.#on[event].splice(this.#on[event].indexOf(callback), 1);
+	}
 
-  #applySettings(setting) {
-    switch (setting) {
-      case 'animation':
-        this.applyAnimationSetting();
-        break;
+	/**
+	 * Gets a setting with the given key
+	 * @param {String} key
+	 * @returns
+	 */
+	get(key) {
+		return this.value[key];
+	}
 
-      case 'lang':
-        this.applyLangSetting();
-        break;
+	/**
+	 * Returns changed settings
+	 * @returns {Array<String>}
+	 */
+	#getChangedKeys() {
+		if (!this.#oldSettings) return [];
+		const keys = [];
+		Object.keys(this.#oldSettings).forEach((key) => {
+			const value = this.#oldSettings[key];
+			if (typeof value === "object") {
+				if (!areEqual(value, this.value[key])) keys.push(key);
+				return;
+			}
 
-      default:
-        break;
-    }
-  }
+			if (value !== this.value[key]) keys.push(key);
+		});
+		return keys;
+	}
 
-  async applyAnimationSetting() {
-    let value = this.value.animation;
-    if (value === 'system') {
-      const res = await new Promise((resolve, reject) => {
-        system.getGlobalSetting("animator_duration_scale", resolve, reject);
-      });
-      if (res) value = 'yes';
-      else value = 'no';
-    }
+	#applySettings(setting) {
+		switch (setting) {
+			case "animation":
+				this.applyAnimationSetting();
+				break;
 
-    if (value === 'yes') {
-      app.classList.remove('no-animation');
-    } else if (value === 'no') {
-      app.classList.add('no-animation');
-    }
-  }
+			case "lang":
+				this.applyLangSetting();
+				break;
 
-  async applyLangSetting() {
-    const value = this.value.lang;
-    lang.set(value);
-  }
+			default:
+				break;
+		}
+	}
+
+	async applyAnimationSetting() {
+		let value = this.value.animation;
+		if (value === "system") {
+			const res = await new Promise((resolve, reject) => {
+				system.getGlobalSetting("animator_duration_scale", resolve, reject);
+			});
+			if (res) value = "yes";
+			else value = "no";
+		}
+
+		if (value === "yes") {
+			app.classList.remove("no-animation");
+		} else if (value === "no") {
+			app.classList.add("no-animation");
+		}
+	}
+
+	async applyLangSetting() {
+		const value = this.value.lang;
+		lang.set(value);
+	}
+}
+
+/**
+ * Checks whether given objects are equal or not
+ * @param {Object} obj1
+ * @param {Object} obj2
+ * @returns
+ */
+function areEqual(obj1, obj2) {
+	if (obj1 === obj2) return true;
+	if (obj1 == null || obj2 == null) return false;
+	if (obj1.constructor !== obj2.constructor) return false;
+
+	for (let key in obj1) {
+		if (!obj2.hasOwnProperty(key)) return false;
+		if (obj1[key] === obj2[key]) continue;
+		if (typeof obj1[key] !== "object") return false;
+		if (!areEqual(obj1[key], obj2[key])) return false;
+	}
+
+	return true;
 }
 
 export default new Settings();

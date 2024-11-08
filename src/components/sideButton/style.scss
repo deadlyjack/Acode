@@ -1,0 +1,35 @@
+.side-button {
+  position: relative;
+  width: 15px;
+  padding: 2.5px 0;
+  border: none;
+  box-sizing: border-box;
+
+  .icon {
+    margin: 0 0 5px 0;
+  }
+
+  span {
+    writing-mode: vertical-rl;
+  }
+
+  &:active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($color: #000000, $alpha: 0.5);
+  }
+}
+
+.side-buttons {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}

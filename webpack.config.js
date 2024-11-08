@@ -12,7 +12,15 @@ module.exports = (env, options) => {
       use: ['raw-loader'],
     },
     {
-      test: /\.(sa|sc|c)ss$/,
+      test: /\.module.(sa|sc|c)ss$/,
+      use: [
+        'raw-loader',
+        'postcss-loader',
+        'sass-loader',
+      ],
+    },
+    {
+      test: /(?<!\.module)\.(sa|sc|c)ss$/,
       use: [
         {
           loader: MiniCssExtractPlugin.loader,
@@ -29,7 +37,7 @@ module.exports = (env, options) => {
         'postcss-loader',
         'sass-loader',
       ],
-    }
+    },
   ];
 
   // if (mode === 'production') {
@@ -54,6 +62,7 @@ module.exports = (env, options) => {
     entry: {
       main: './src/lib/main.js',
       console: './src/lib/console.js',
+      searchInFilesWorker: './src/sidebarApps/searchInFiles/worker.js',
     },
     output: {
       path: path.resolve(__dirname, 'www/js/build/'),
@@ -69,6 +78,7 @@ module.exports = (env, options) => {
         path: require.resolve('path-browserify'),
         crypto: false,
       },
+      modules: ["node_modules", "src"],
     },
     plugins: [
       new MiniCssExtractPlugin({
@@ -78,7 +88,7 @@ module.exports = (env, options) => {
   };
 
   return [main];
-}
+};
 
 function clearOutputDir() {
   const css = path.join(WWW, 'css/build');

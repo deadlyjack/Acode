@@ -1,228 +1,246 @@
-import './themeSetting.scss';
-import Page from '../../components/page';
-import searchBar from '../../components/searchbar';
-import CustomTheme from '../customTheme';
-import helpers from '../../utils/helpers';
-import removeAds from '../../lib/removeAds';
-import themes from '../../lib/themes';
-import appSettings from '../../lib/settings';
-import TabView from '../../components/tabView';
-import Ref from 'html-tag-js/ref';
-import ThemeBuilder from '../../lib/themeBuilder';
+import "./themeSetting.scss";
+import Page from "components/page";
+import searchBar from "components/searchbar";
+import TabView from "components/tabView";
+import Ref from "html-tag-js/ref";
+import actionStack from "lib/actionStack";
+import removeAds from "lib/removeAds";
+import appSettings from "lib/settings";
+import CustomTheme from "pages/customTheme";
+import ThemeBuilder from "theme/builder";
+import themes from "theme/list";
+import helpers from "utils/helpers";
 
 export default function () {
-  const $page = Page(strings.theme.capitalize());
-  const $search = <span attr-action='search' className='icon search'></span>;
-  const $themePreview = <div id='theme-preview'></div>;
-  const list = new Ref();
-  const editor = ace.edit($themePreview);
+	const $page = Page(strings.theme.capitalize());
+	const $search = <span attr-action="search" className="icon search"></span>;
+	const $themePreview = <div id="theme-preview"></div>;
+	const list = new Ref();
+	const editor = ace.edit($themePreview);
 
-  const session = ace.createEditSession('');
-  const currentSession = editorManager.activeFile.session;
+	const session = ace.createEditSession("");
+	const currentSession = editorManager.activeFile.session;
 
-  session.setMode(currentSession.getMode());
-  session.setValue(currentSession.getValue());
-  editor.setReadOnly(true);
-  editor.setSession(session);
-  editor.renderer.setMargin(0, 0, -16, 0);
+	session.setMode(currentSession.getMode());
+	session.setValue(currentSession.getValue());
+	editor.setReadOnly(true);
+	editor.setSession(session);
+	editor.renderer.setMargin(0, 0, -16, 0);
 
-  actionStack.push({
-    id: 'appTheme',
-    action: () => {
-      editor.destroy();
-      $page.hide();
-      $page.removeEventListener('click', clickHandler);
-    },
-  });
+	actionStack.push({
+		id: "appTheme",
+		action: () => {
+			editor.destroy();
+			$page.hide();
+			$page.removeEventListener("click", clickHandler);
+		},
+	});
 
-  $page.onhide = () => {
-    helpers.hideAd();
-    actionStack.remove('appTheme');
-  };
+	$page.onhide = () => {
+		helpers.hideAd();
+		actionStack.remove("appTheme");
+	};
 
-  $page.body = <TabView id='theme-setting'>
-    <div className='options'>
-      <span className='active' onclick={renderAppThemes} tabindex={0}>App</span>
-      <span onclick={renderEditorThemes} tabindex={0} >Editor</span>
-    </div>
-    <div ref={list} id='theme-list' className='list scroll'></div>
-  </TabView>;
-  $page.querySelector('header').append($search);
+	$page.body = (
+		<TabView id="theme-setting">
+			<div className="options">
+				<span className="active" onclick={renderAppThemes} tabindex={0}>
+					App
+				</span>
+				<span onclick={renderEditorThemes} tabindex={0}>
+					Editor
+				</span>
+			</div>
+			<div ref={list} id="theme-list" className="list scroll"></div>
+		</TabView>
+	);
+	$page.querySelector("header").append($search);
 
-  app.append($page);
-  renderAppThemes();
-  helpers.showAd();
+	app.append($page);
+	renderAppThemes();
+	helpers.showAd();
 
-  $page.addEventListener('click', clickHandler);
+	$page.addEventListener("click", clickHandler);
 
-  function renderAppThemes() {
-    $themePreview.remove();
-    const content = [];
+	function renderAppThemes() {
+		$themePreview.remove();
+		const content = [];
 
-    if (!DOES_SUPPORT_THEME) {
-      content.push(
-        <div className='list-item'>
-          <span className='icon warningreport_problem'></span>
-          <div className='container'>
-            <span className='text'>{strings['unsupported device']}</span>
-          </div>
-        </div>
-      )
-    }
+		if (!DOES_SUPPORT_THEME) {
+			content.push(
+				<div className="list-item">
+					<span className="icon warningreport_problem"></span>
+					<div className="container">
+						<span className="text">{strings["unsupported device"]}</span>
+					</div>
+				</div>,
+			);
+		}
 
-    const currentTheme = appSettings.value.appTheme;
-    let $currentItem;
-    themes.list().forEach((theme) => {
-      const isCurrentTheme = theme.name === currentTheme;
-      const isPremium = theme.version === 'paid' && IS_FREE_VERSION;
-      const $item = <Item
-        name={theme.name}
-        isPremium={isPremium}
-        isCurrent={isCurrentTheme}
-        color={theme.primaryColor}
-        onclick={() => setAppTheme(theme, isPremium)}
-      />;
-      content.push($item);
-      if (isCurrentTheme) $currentItem = $item;
-    });
+		const currentTheme = appSettings.value.appTheme;
+		let $currentItem;
+		themes.list().forEach((theme) => {
+			const isCurrentTheme = theme.id === currentTheme;
+			const isPremium = theme.version === "paid" && IS_FREE_VERSION;
+			const $item = (
+				<Item
+					name={theme.name}
+					isPremium={isPremium}
+					isCurrent={isCurrentTheme}
+					color={theme.primaryColor}
+					onclick={() => setAppTheme(theme, isPremium)}
+				/>
+			);
+			content.push($item);
+			if (isCurrentTheme) $currentItem = $item;
+		});
 
-    list.el.content = content;
-    $currentItem?.scrollIntoView();
-  }
+		list.el.content = content;
+		$currentItem?.scrollIntoView();
+	}
 
-  function renderEditorThemes() {
-    editor.setTheme(appSettings.value.editorTheme);
-    if (innerHeight * 0.3 >= 120) {
-      $page.body.append($themePreview);
-      editor.resize();
-    } else {
-      $themePreview.remove();
-    }
+	function renderEditorThemes() {
+		const currentTheme = appSettings.value.editorTheme;
+		const themePrefix = "ace/theme/";
+		const fullThemePath = currentTheme.startsWith(themePrefix)
+			? currentTheme
+			: themePrefix + currentTheme;
 
-    const themeList = ace.require('ace/ext/themelist');
-    const currentTheme = appSettings.value.editorTheme;
-    let $currentItem;
-    list.el.content = themeList.themes.map((theme) => {
-      const isCurrent = theme.theme === currentTheme;
-      const $item = <Item
-        name={theme.caption}
-        isCurrent={isCurrent}
-        isDark={theme.isDark}
-        onclick={() => setEditorTheme(theme)}
-      />
-      if (isCurrent) $currentItem = $item;
-      return $item;
-    });
-    $currentItem?.scrollIntoView();
-  }
+		editor.setTheme(fullThemePath);
+		if (innerHeight * 0.3 >= 120) {
+			$page.body.append($themePreview);
+			editor.resize();
+		} else {
+			$themePreview.remove();
+		}
 
-  /**
-   *
-   * @param {MouseEvent} e
-   */
-  function clickHandler(e) {
-    const $target = e.target;
-    if (!($target instanceof HTMLElement)) return;
-    const action = $target.getAttribute('action');
-    if (!action) return;
+		const themeList = ace.require("ace/ext/themelist");
+		let $currentItem;
+		list.el.content = themeList.themes.map((theme) => {
+			const isCurrent = theme.theme === fullThemePath;
+			const $item = (
+				<Item
+					name={theme.caption}
+					isCurrent={isCurrent}
+					isDark={theme.isDark}
+					onclick={() => setEditorTheme(theme)}
+				/>
+			);
+			if (isCurrent) $currentItem = $item;
+			return $item;
+		});
+		$currentItem?.scrollIntoView();
+	}
 
-    switch (action) {
-      case 'search':
-        searchBar(list.el);
-        break;
+	/**
+	 *
+	 * @param {MouseEvent} e
+	 */
+	function clickHandler(e) {
+		const $target = e.target;
+		if (!($target instanceof HTMLElement)) return;
+		const action = $target.getAttribute("action");
+		if (!action) return;
 
-      default:
-        break;
-    }
-  }
+		switch (action) {
+			case "search":
+				searchBar(list.el);
+				break;
 
-  /**
-   * Sets the selected theme
-   * @param {ThemeBuilder} theme 
-   */
-  async function setAppTheme(theme, buy) {
-    if (!DOES_SUPPORT_THEME) return;
+			default:
+				break;
+		}
+	}
 
-    if (buy) {
-      try {
-        await removeAds();
-        renderAppThemes();
-      } catch (e) {
-        return;
-      }
-    }
+	/**
+	 * Sets the selected theme
+	 * @param {ThemeBuilder} theme
+	 */
+	async function setAppTheme(theme, buy) {
+		if (!DOES_SUPPORT_THEME) return;
 
-    if (theme.name === 'custom') {
-      CustomTheme();
-      return;
-    }
+		if (buy) {
+			try {
+				await removeAds();
+				renderAppThemes();
+			} catch (e) {
+				return;
+			}
+		}
 
-    themes.apply(theme.name, true);
-    updateCheckedItem(theme.name);
-  }
+		if (theme.id === "custom") {
+			CustomTheme();
+			return;
+		}
 
-  /**
-   * Sets the selected editor theme
-   * @param {object} param0
-   * @param {string} param0.theme
-   */
-  function setEditorTheme({ caption, theme }) {
-    editorManager.editor.setTheme(theme); // main editor
-    editor.setTheme(theme); // preview
-    appSettings.update({
-      editorTheme: theme,
-    }, false);
-    updateCheckedItem(caption);
-  }
+		themes.apply(theme.id, true);
+		updateCheckedItem(theme.name);
+	}
 
-  /**
-   * Updates the checked item
-   * @param {string} theme 
-   */
-  function updateCheckedItem(theme) {
-    list.get('[checked="true"]')?.uncheck();
-    list.get(`[theme="${theme}"]`)?.check();
-  }
+	/**
+	 * Sets the selected editor theme
+	 * @param {object} param0
+	 * @param {string} param0.theme
+	 */
+	function setEditorTheme({ caption, theme }) {
+		editorManager.editor.setTheme(theme); // main editor
+		editor.setTheme(theme); // preview
+		appSettings.update(
+			{
+				editorTheme: theme,
+			},
+			false,
+		);
+		updateCheckedItem(caption);
+	}
 
-  function Item({ name, color, isDark, onclick, isCurrent, isPremium }) {
-    const check = <span ref={check} className='icon check'></span>;
-    const star = <span ref={star} className='icon stars'></span>;
-    let style = {};
-    let className = 'icon color';
+	/**
+	 * Updates the checked item
+	 * @param {string} theme
+	 */
+	function updateCheckedItem(theme) {
+		list.get('[checked="true"]')?.uncheck();
+		list.get(`[theme="${theme}"]`)?.check();
+	}
 
-    if (color) {
-      style = { color };
-    } else if (isDark) {
-      className += ' dark';
-    } else {
-      className += ' light';
-    }
+	function Item({ name, color, isDark, onclick, isCurrent, isPremium }) {
+		const check = <span ref={check} className="icon check"></span>;
+		const star = <span ref={star} className="icon stars"></span>;
+		let style = {};
+		let className = "icon color";
 
-    const $el = <div attr-checked={isCurrent} attr-theme={name} className='list-item' onclick={onclick}>
-      <span style={style} className={className}></span>
-      <div className='container'>
-        <span className='text'>{name}</span>
-      </div>
-      {
-        isCurrent
-          ? check
-          : <></>
-      }
-      {
-        isPremium
-          ? star
-          : <></>
-      }
-    </div>;
+		if (color) {
+			style = { color };
+		} else if (isDark) {
+			className += " dark";
+		} else {
+			className += " light";
+		}
 
-    $el.uncheck = () => {
-      check.remove();
-      $el.removeAttribute('checked');
-    };
-    $el.check = () => {
-      $el.append(check);
-      $el.setAttribute('checked', true);
-    };
-    return $el;
-  }
+		const $el = (
+			<div
+				attr-checked={isCurrent}
+				attr-theme={name}
+				className="list-item"
+				onclick={onclick}
+			>
+				<span style={style} className={className}></span>
+				<div className="container">
+					<span className="text">{name}</span>
+				</div>
+				{isCurrent ? check : <></>}
+				{isPremium ? star : <></>}
+			</div>
+		);
+
+		$el.uncheck = () => {
+			check.remove();
+			$el.removeAttribute("checked");
+		};
+		$el.check = () => {
+			$el.append(check);
+			$el.setAttribute("checked", true);
+		};
+		return $el;
+	}
 }

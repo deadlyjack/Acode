@@ -1,31 +1,31 @@
-import settingsPage from '../components/settingPage';
-import appSettings from '../lib/settings';
+import settingsPage from "../components/settingsPage";
+import appSettings from "../lib/settings";
 
 export default function searchSettings() {
-  const title = strings.search;
-  const values = appSettings.value.search;
-  const items = [
-    {
-      key: 'caseSensitive',
-      text: strings['case sensitive'],
-      checkbox: values.caseSensitive,
-    },
-    {
-      key: 'regExp',
-      text: strings['regular expression'],
-      checkbox: values.regExp,
-    },
-    {
-      key: 'wholeWord',
-      text: strings['whole word'],
-      checkbox: values.wholeWord,
-    },
-  ];
+	const title = strings.search;
+	const values = appSettings.value.search;
+	const items = [
+		{
+			key: "caseSensitive",
+			text: strings["case sensitive"],
+			checkbox: values.caseSensitive,
+		},
+		{
+			key: "regExp",
+			text: strings["regular expression"],
+			checkbox: values.regExp,
+		},
+		{
+			key: "wholeWord",
+			text: strings["whole word"],
+			checkbox: values.wholeWord,
+		},
+	];
 
-  function callback(key, value) {
-    values[key] = value;
-    appSettings.update();
-  }
+	return settingsPage(title, items, callback);
 
-  settingsPage(title, items, callback);
+	function callback(key, value) {
+		values[key] = value;
+		appSettings.update();
+	}
 }

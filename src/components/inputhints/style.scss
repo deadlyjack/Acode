@@ -1,0 +1,91 @@
+@import '../../styles/mixins.scss';
+
+#hints {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  border-radius: 0 0 4px 4px;
+  background-color: rgb(255, 255, 255);
+  background-color: var(--secondary-color);
+  color: rgb(37, 37, 37);
+  color: var(--secondary-text-color);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 4px var(--box-shadow-color);
+  border: solid 1px transparent;
+  border: solid 1px var(--popup-border-color);
+  height: fit-content;
+  min-height: 30px;
+  max-height: 70vh;
+  z-index: 999;
+  overflow-y: scroll;
+
+  &.bottom {
+    border-radius: 4px 4px 0 0;
+  }
+
+  &.all {
+    border-radius: 4px;
+  }
+
+  [data-action='hint'],
+  [action='hint'] {
+    font-size: 0.9rem;
+    min-height: 30px;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 5px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+
+    * {
+      pointer-events: none;
+    }
+
+    [data-str]::after {
+      content: attr(data-str);
+      font-size: 0.6rem;
+      opacity: 0.5;
+      margin-left: 10px;
+    }
+
+    small:not(:empty) {
+      margin-left: auto;
+      color: rgb(51, 153, 255);
+      color: var(--active-color);
+      padding: 2px;
+      border-radius: 2px;
+      font-size: 0.6rem;
+    }
+
+    &.active {
+      background-color: rgb(51, 153, 255);
+      background-color: var(--active-color);
+      color: rgb(27, 26, 26);
+      color: var(--primary-text-color);
+
+      small {
+        color: rgb(255, 215, 0);
+        color: var(--active-text-color);
+      }
+    }
+
+    &:hover {
+      background-color: rgb(107, 168, 229);
+      background-color: var(--primary-color);
+      color: rgb(27, 26, 26);
+      color: var(--secondary-text-color);
+    }
+  }
+
+  &.loading {
+    @include loader(18px);
+  }
+
+  &:empty {
+    display: none;
+  }
+}

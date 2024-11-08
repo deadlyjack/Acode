@@ -1,0 +1,19 @@
+#quicktools-settings {
+  display: flex;
+  flex-direction: column;
+
+  .row {
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+
+    .icon {
+      flex: 1;
+
+      &:active {
+        background-color: inherit !important;
+        color: var(--active-color);
+      }
+    }
+  }
+}

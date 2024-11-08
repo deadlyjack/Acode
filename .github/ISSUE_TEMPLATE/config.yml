@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask Questions
+    url: https://github.com/deadlyjack/Acode/discussions
+    about: Ask any questions regarding Acode and its ecosystem
+  - name: Telegram Group
+    url: https://t.me/foxdebug_acode
+    about: Friendly Acode Community for helps regarding Acode, development and more
+  - name: Discord Server
+    url: https://discord.gg/vVxVWYUAWD
+    about: Acode discord server 

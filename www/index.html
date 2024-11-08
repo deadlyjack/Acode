@@ -1,18 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <link rel="stylesheet" href="./res/icons/style.css" />
-    <link rel="stylesheet" href="./res/icon-file/style.css" />
-    <link rel="stylesheet" href="./res/octicons/style.css" />
+    <link rel="stylesheet" href="./res/file-icons/style.css" />
 
     <script>
       (function () {
-        var __testEl = document.createElement('div');
-        var __testChildEl = document.createElement('div');
+        var __testEl = document.createElement("div");
+        var __testChildEl = document.createElement("div");
         if (__testEl.append) {
           __testEl.append(__testChildEl);
           if (__testEl.children.length === 1) {
@@ -43,28 +43,49 @@
 
       // save all touch events added by ace editor so it can be use in src/ade/touchHandler.js
       var __oldAddEventListener = HTMLElement.prototype.addEventListener;
-      HTMLElement.prototype.addEventListener =
-        //
-        function (type, listener, useCapture) {
-          if (!this.touchListeners) {
-            this.touchListeners = {};
-          }
-          if (
-            this.classList.contains('editor-container') &&
-            startsWith(type, 'touch')
-          ) {
-            if (!this.touchListeners[type]) {
-              this.touchListeners[type] = [];
-            }
-            this.touchListeners[type].push({
-              listener: listener,
-              useCapture: useCapture,
-            });
-          }
+      HTMLElement.prototype.addEventListener = function (
+        type,
+        listener,
+        useCapture,
+        allowed
+      ) {
+        if (typeof useCapture === "boolean") {
+          allowed = useCapture;
+          useCapture = undefined;
+        }
+
+        if (type === "contextmenu" && !allowed) {
+          return;
+        }
+
+        if (allowed) {
           __oldAddEventListener.call(this, type, listener, useCapture);
-        };
+          return;
+        }
+
+        if (
+          this.classList.contains("editor-container") &&
+          startsWith(type, "touch")
+        ) {
+          if (!this.eventListeners) {
+            this.eventListeners = {};
+          }
+
+          if (!this.eventListeners[type]) {
+            this.eventListeners[type] = [];
+          }
+          this.eventListeners[type].push({
+            listener: listener,
+            useCapture: useCapture,
+          });
+
+          return;
+        }
+        __oldAddEventListener.call(this, type, listener, useCapture);
+      };
     </script>
 
+    <script src="cordova.js"></script>
     <script src="./js/emmet-core.js"></script>
     <script src="./js/ace/ace.js"></script>
     <script src="./js/ace/ext-beautify.js"></script>
@@ -80,20 +101,16 @@
     <script src="./js/ace/ext-error_marker.js"></script>
     <script src="./js/ace/ext-whitespace.js"></script>
     <script src="./js/ace/ext-static_highlight.js"></script>
-    <script src="./js/createKeyboardEvent.js"></script>
-    <script src="cordova.js"></script>
-    <script defer src="./js/build/main.build.js"></script>
-    <title>Acode</title>
 
     <script>
-      var color = localStorage.getItem('__primary_color');
-      var __bg_color = '#20202c';
+      var color = localStorage.getItem("__primary_color");
+      var __bg_color = "#20202c";
       if (color) {
         __bg_color = color;
       }
 
-      document.querySelector(':root').style.cssText =
-        '--bg-color: ' + __bg_color;
+      document.querySelector(":root").style.cssText =
+        "--bg-color: " + __bg_color;
     </script>
 
     <style>
@@ -107,7 +124,7 @@
 
       body.loading.splash::before {
         content: attr(data-version);
-        background-image: url('./res/logo/logo.svg');
+        background-image: url("./res/logo/logo.svg");
         background-position: center;
         background-repeat: no-repeat;
         background-size: 180px;
@@ -143,10 +160,14 @@
       }
     </style>
 
+    <script src="./js/build/main.build.js"></script>
+
+    <title>Acode</title>
       <!--styles-->
-<link rel="stylesheet" href="./css/build/14.css">
-<link rel="stylesheet" href="./css/build/330.css">
-<link rel="stylesheet" href="./css/build/477.css">
+<link rel="stylesheet" href="./css/build/32.css">
+<link rel="stylesheet" href="./css/build/383.css">
+<link rel="stylesheet" href="./css/build/53.css">
+<link rel="stylesheet" href="./css/build/609.css">
 <link rel="stylesheet" href="./css/build/about.css">
 <link rel="stylesheet" href="./css/build/customTheme.css">
 <link rel="stylesheet" href="./css/build/donate.css">

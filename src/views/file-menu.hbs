@@ -1,4 +1,4 @@
-<li action="file-info" {{^file_info}}class="disabled" {{/file_info}}>
+<li action="file-info" {{^file_on_disk}}class="disabled" {{/file_on_disk}}>
   <span class="text">{{file properties}}</span>
   <span class="icon info"></span>
 </li>
@@ -12,7 +12,7 @@
     <span class="value">{{file_mode}}</span>
   </div>
 </li>
-<li action="encoding">
+<li action="encoding" {{^file_on_disk}}class="disabled" {{/file_on_disk}}>
   <div class="text">
     <span>{{encoding}}</span>
     <span class="value">{{file_encoding}}</span>
@@ -39,7 +39,7 @@
   </div>
 </li>
 <hr>
-{{^new_file}}
+{{#file_on_disk}}
 <li action="share">
   <span class="text">{{share}}</span>
   <span class="icon share"></span>
@@ -52,7 +52,7 @@
   <span class="text">{{edit with}}</span>
   <span class="icon edit"></span>
 </li>
-{{/new_file}}
+{{/file_on_disk}}
 <hr>
 <li action="find">
   <span class="text">{{search}}</span>

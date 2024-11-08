@@ -29,9 +29,13 @@ body.no-animation {
   }
 
   &.phone {
-    transition: all 300ms ease;
+    transition: transform 300ms ease;
     transform: translate(-100%, 0);
     box-shadow: 2px 0 4px rgba(0, 0, 0, 0.07);
+
+    .resize-bar {
+      pointer-events: none;
+    }
   }
 
   &.tab {
@@ -40,7 +44,7 @@ body.no-animation {
 
   &.show {
     transform: translate(0, 0);
-    animation: show 300ms ease 1;
+    animation: show-sidebar 300ms ease 1;
   }
 
   .resize-bar {
@@ -80,11 +84,14 @@ body.no-animation {
     height: 100%;
 
     >.list {
+      width: 100%;
       max-width: 100%;
       max-height: 100%;
 
       &.hidden {
         max-height: 30px !important;
+        min-height: 30px !important;
+        overflow: hidden !important;
       }
 
       .tile {
@@ -94,7 +101,7 @@ body.no-animation {
 
         &.notice {
           &::before {
-            content: '•';
+            content: '\2022';
             color: rgb(212, 250, 150);
             display: flex;
             align-items: center;
@@ -113,6 +120,7 @@ body.no-animation {
 
       >ul {
         overflow: auto;
+        width: 100%;
         max-width: 100%;
         max-height: calc(100% - 30px);
         height: calc(100% - 30px);
@@ -134,10 +142,6 @@ body.no-animation {
             }
           }
         }
-
-        .list {
-          min-width: fit-content;
-        }
       }
     }
 
@@ -145,14 +149,55 @@ body.no-animation {
       user-select: none;
     }
   }
-}
 
-@keyframes show {
-  0% {
-    transform: translate(-100%, 0);
+  textarea {
+    padding: 5px !important;
+    box-sizing: border-box;
   }
 
-  100% {
-    transform: translate(0, 0);
+  textarea,
+  input {
+    color: rgb(255, 255, 255);
+    color: var(--primary-text-color);
+    border: solid 1px currentColor;
+    border-radius: 4px;
+    height: 30px;
+    width: 90%;
+    padding: 0 5px;
+    text-indent: 0;
+    margin-bottom: 10px;
+    background: transparent;
+
+    &:focus {
+      border-color: rgb(255, 215, 0) !important;
+      border-color: var(--accent-color) !important;
+    }
+  }
+
+  .box {
+    border: solid 1px rgb(255, 255, 255);
+    border: solid 1px var(--primary-text-color);
+
+    &::after {
+      background-color: rgb(255, 255, 255);
+      background-color: var(--primary-text-color);
+    }
+  }
+
+  .header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    .title {
+      display: flex;
+      width: 100%;
+      height: 30px;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
   }
 }

@@ -1,259 +1,97 @@
-ace.define("ace/ext/modelist", ["require", "exports", "module"], function (require, exports, module) {
-  "use strict";
+const modesByName = {};
+const modes = [];
 
-  let modes = [];
-  function getModeForPath(path) {
-    let mode = modesByName.text;
-    let fileName = path.split(/[\/\\]/).pop();
-    for (let i = 0; i < modes.length; i++) {
-      if (modes[i].supportsFile(fileName)) {
-        mode = modes[i];
-        break;
-      }
-    }
-    return mode;
-  }
+export function initModes() {
+	ace.define(
+		"ace/ext/modelist",
+		["require", "exports", "module"],
+		function (require, exports, module) {
+			module.exports = {
+				getModeForPath(path) {
+					let mode = modesByName.text;
+					let fileName = path.split(/[\/\\]/).pop();
+					for (const iMode of modes) {
+						if (iMode.supportsFile?.(fileName)) {
+							mode = iMode;
+							break;
+						}
+					}
+					return mode;
+				},
+				get modesByName() {
+					return modesByName;
+				},
+				get modes() {
+					return modes;
+				},
+			};
+		},
+	);
+}
 
-  let Mode = function (name, caption, extensions) {
-    this.name = name;
-    this.caption = caption;
-    this.mode = "ace/mode/" + name;
-    this.extensions = extensions;
-    let re;
-    if (/\^/.test(extensions)) {
-      re = extensions.replace(/\|(\^)?/g, function (a, b) {
-        return "$|" + (b ? "^" : "^.*\\.");
-      }) + "$";
-    } else {
-      re = "^.*\\.(" + extensions + ")$";
-    }
+/**
+ * Add language mode to ace editor
+ * @param {string} name name of the mode
+ * @param {string|Array<string>} extensions extensions of the mode
+ * @param {string} [caption] display name of the mode
+ */
+export function addMode(name, extensions, caption) {
+	const filename = name.toLowerCase();
+	const mode = new Mode(filename, caption, extensions);
+	modesByName[filename] = mode;
+	modes.push(mode);
+}
 
-    this.extRe = new RegExp(re, "gi");
-  };
+/**
+ * Remove language mode from ace editor
+ * @param {string} name
+ */
+export function removeMode(name) {
+	const filename = name.toLowerCase();
+	delete modesByName[filename];
+	const modeIndex = modes.findIndex((mode) => mode.name === filename);
+	if (modeIndex >= 0) {
+		modes.splice(modeIndex, 1);
+	}
+}
 
-  Mode.prototype.supportsFile = function (filename) {
-    return filename.match(this.extRe);
-  };
-  let supportedModes = {
-    ABAP: ["abap"],
-    ABC: ["abc"],
-    ActionScript: ["as"],
-    ADA: ["ada|adb"],
-    Alda: ["alda"],
-    Apache_Conf: ["^htaccess|^htgroups|^htpasswd|^conf|htaccess|htgroups|htpasswd"],
-    Apex: ["apex|cls|trigger|tgr"],
-    AQL: ["aql"],
-    AsciiDoc: ["asciidoc|adoc"],
-    ASL: ["dsl|asl|asl.json"],
-    Assembly_x86: ["asm|a"],
-    AutoHotKey: ["ahk"],
-    BatchFile: ["bat|cmd"],
-    BibTeX: ["bib"],
-    C_Cpp: ["cpp|c|cc|cxx|h|hh|hpp|ino"],
-    C9Search: ["c9search_results"],
-    Cirru: ["cirru|cr"],
-    Clojure: ["clj|cljs"],
-    Cobol: ["CBL|COB"],
-    coffee: ["coffee|cf|cson|^Cakefile"],
-    ColdFusion: ["cfm|cfc"],
-    Crystal: ["cr"],
-    CSharp: ["cs"],
-    Csound_Document: ["csd"],
-    Csound_Orchestra: ["orc"],
-    Csound_Score: ["sco"],
-    CSS: ["css"],
-    Curly: ["curly"],
-    D: ["d|di"],
-    Dart: ["dart"],
-    Diff: ["diff|patch"],
-    Dockerfile: ["^Dockerfile"],
-    Dot: ["dot"],
-    Drools: ["drl"],
-    Edifact: ["edi"],
-    Eiffel: ["e|ge"],
-    EJS: ["ejs"],
-    Elixir: ["ex|exs"],
-    Elm: ["elm"],
-    Erlang: ["erl|hrl"],
-    Forth: ["frt|fs|ldr|fth|4th"],
-    Fortran: ["f|f90"],
-    FSharp: ["fsi|fs|ml|mli|fsx|fsscript"],
-    FSL: ["fsl"],
-    FTL: ["ftl"],
-    Gcode: ["gcode"],
-    Gherkin: ["feature"],
-    Gitignore: ["^.gitignore"],
-    Glsl: ["glsl|frag|vert"],
-    Gobstones: ["gbs"],
-    golang: ["go"],
-    GraphQLSchema: ["gql"],
-    Groovy: ["groovy"],
-    HAML: ["haml"],
-    Handlebars: ["hbs|handlebars|tpl|mustache"],
-    Haskell: ["hs"],
-    Haskell_Cabal: ["cabal"],
-    haXe: ["hx"],
-    Hjson: ["hjson"],
-    HTML: ["html|htm|xhtml|vue|we|wpy"],
-    HTML_Elixir: ["eex|html.eex"],
-    HTML_Ruby: ["erb|rhtml|html.erb"],
-    INI: ["ini|conf|cfg|prefs"],
-    Io: ["io"],
-    Ion: ["ion"],
-    Jack: ["jack"],
-    Jade: ["jade|pug"],
-    Java: ["java"],
-    JavaScript: ["js|jsm|jsx|cjs|mjs"],
-    JEXL: ["jexl"],
-    JSON: ["json"],
-    JSON5: ["json5"],
-    JSONiq: ["jq"],
-    JSP: ["jsp"],
-    JSSM: ["jssm|jssm_state"],
-    JSX: ["jsx"],
-    Julia: ["jl"],
-    Kotlin: ["kt|kts"],
-    LaTeX: ["tex|latex|ltx|bib"],
-    Latte: ["latte"],
-    LESS: ["less"],
-    Liquid: ["liquid"],
-    Lisp: ["lisp"],
-    LiveScript: ["ls"],
-    Log: ["log"],
-    LogiQL: ["logic|lql"],
-    Logtalk: ["lgt"],
-    LSL: ["lsl"],
-    Lua: ["lua"],
-    LuaPage: ["lp"],
-    Lucene: ["lucene"],
-    Makefile: ["^Makefile|^GNUmakefile|^makefile|^OCamlMakefile|make"],
-    Markdown: ["md|markdown"],
-    Mask: ["mask"],
-    MATLAB: ["matlab"],
-    Maze: ["mz"],
-    MediaWiki: ["wiki|mediawiki"],
-    MEL: ["mel"],
-    MIPS: ["s|asm"],
-    MIXAL: ["mixal"],
-    MUSHCode: ["mc|mush"],
-    MySQL: ["mysql"],
-    Nginx: ["nginx|conf"],
-    Nim: ["nim"],
-    Nix: ["nix"],
-    NSIS: ["nsi|nsh"],
-    Nunjucks: ["nunjucks|nunjs|nj|njk"],
-    ObjectiveC: ["m|mm"],
-    OCaml: ["ml|mli"],
-    PartiQL: ["partiql|pql"],
-    Pascal: ["pas|p"],
-    Perl: ["pl|pm"],
-    pgSQL: ["pgsql"],
-    PHP: ["php|inc|phtml|shtml|php3|php4|php5|phps|phpt|aw|ctp|module"],
-    PHP_Laravel_blade: ["blade.php"],
-    Pig: ["pig"],
-    PLSQL: ["plsql"],
-    Powershell: ["ps1"],
-    Praat: ["praat|praatscript|psc|proc"],
-    Prisma: ["prisma"],
-    Prolog: ["plg|prolog"],
-    Properties: ["properties"],
-    Protobuf: ["proto"],
-    Puppet: ["epp|pp"],
-    Python: ["py"],
-    QML: ["qml"],
-    R: ["r"],
-    Raku: ["raku|rakumod|rakutest|p6|pl6|pm6"],
-    Razor: ["cshtml|asp"],
-    RDoc: ["Rd"],
-    Red: ["red|reds"],
-    RHTML: ["Rhtml"],
-    Robot: ["robot|resource"],
-    RST: ["rst"],
-    Ruby: ["rb|ru|gemspec|rake|^Guardfile|^Rakefile|^Gemfile"],
-    Rust: ["rs"],
-    SaC: ["sac"],
-    SASS: ["sass"],
-    SCAD: ["scad"],
-    Scala: ["scala|sbt"],
-    Scheme: ["scm|sm|rkt|oak|scheme"],
-    Scrypt: ["scrypt"],
-    SCSS: ["scss"],
-    SH: ["sh|bash|^.bashrc"],
-    SJS: ["sjs"],
-    Slim: ["slim|skim"],
-    Smali: ["smali"],
-    Smarty: ["smarty|tpl"],
-    Smithy: ["smithy"],
-    snippets: ["snippets"],
-    Soy_Template: ["soy"],
-    Space: ["space"],
-    SPARQL: ["rq"],
-    SQL: ["sql"],
-    SQLServer: ["sqlserver"],
-    Stylus: ["styl|stylus"],
-    SVG: ["svg"],
-    Swift: ["swift"],
-    Tcl: ["tcl"],
-    Terraform: ["tf", "tfvars", "terragrunt"],
-    Tex: ["tex"],
-    Text: ["txt"],
-    Textile: ["textile"],
-    Toml: ["toml"],
-    TSX: ["tsx"],
-    Turtle: ["ttl"],
-    Twig: ["twig|swig"],
-    Typescript: ["ts|typescript|str"],
-    Vala: ["vala"],
-    VBScript: ["vbs|vb"],
-    Velocity: ["vm"],
-    Verilog: ["v|vh|sv|svh"],
-    VHDL: ["vhd|vhdl"],
-    Visualforce: ["vfp|component|page"],
-    Wollok: ["wlk|wpgm|wtest"],
-    XML: ["xml|rdf|rss|wsdl|xslt|atom|mathml|mml|xul|xbl|xaml"],
-    XQuery: ["xq"],
-    YAML: ["yaml|yml"],
-    Zeek: ["zeek|bro"],
-    Django: ["html"]
-  };
+class Mode {
+	extensions;
+	displayName;
+	name;
+	mode;
+	extRe;
 
-  let nameOverrides = {
-    ObjectiveC: "Objective-C",
-    CSharp: "C#",
-    golang: "Go",
-    C_Cpp: "C and C++",
-    Csound_Document: "Csound Document",
-    Csound_Orchestra: "Csound",
-    Csound_Score: "Csound Score",
-    coffee: "CoffeeScript",
-    HTML_Ruby: "HTML (Ruby)",
-    HTML_Elixir: "HTML (Elixir)",
-    FTL: "FreeMarker",
-    PHP_Laravel_blade: "PHP (Blade Template)",
-    Perl6: "Perl 6",
-    AutoHotKey: "AutoHotkey / AutoIt"
-  };
+	/**
+	 * Create a new mode
+	 * @param {string} name
+	 * @param {string} caption
+	 * @param {string|Array<string>} extensions
+	 */
+	constructor(name, caption, extensions) {
+		if (Array.isArray(extensions)) {
+			extensions = extensions.join("|");
+		}
 
-  let modesByName = {};
-  for (let name in supportedModes) {
-    let data = supportedModes[name];
-    let displayName = (nameOverrides[name] || name).replace(/_/g, " ");
-    let filename = name.toLowerCase();
-    let mode = new Mode(filename, displayName, data[0]);
-    modesByName[filename] = mode;
-    modes.push(mode);
-  }
+		this.name = name;
+		this.mode = "ace/mode/" + name;
+		this.extensions = extensions;
+		this.caption = caption || this.name.replace(/_/g, " ");
+		let re;
 
-  module.exports = {
-    getModeForPath,
-    modes,
-    modesByName,
-  };
+		if (/\^/.test(extensions)) {
+			re =
+				extensions.replace(/\|(\^)?/g, function (a, b) {
+					return "$|" + (b ? "^" : "^.*\\.");
+				}) + "$";
+		} else {
+			re = "^.*\\.(" + extensions + ")$";
+		}
 
-}); (function () {
-  ace.require(["ace/ext/modelist"], function (m) {
-    if (typeof module == "object" && typeof exports == "object" && module) {
-      module.exports = m;
-    }
-  });
-})();
+		this.extRe = new RegExp(re, "i");
+	}
+
+	supportsFile(filename) {
+		return this.extRe.test(filename);
+	}
+}

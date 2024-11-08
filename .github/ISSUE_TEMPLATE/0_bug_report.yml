@@ -1,0 +1,44 @@
+name: Bug Report
+description: |
+  Use this template for bug reports.
+labels: []
+body:
+  - type: checkboxes
+    attributes:
+      label: Check for existing issues
+      description: Check the backlog of issues to reduce duplicates; if an issue already exists, place a 👍 on it.
+      options:
+        - label: Completed
+          required: true
+  - type: textarea
+    attributes:
+      label: Describe the bug / provide steps to reproduce it
+      description: A clear and concise description of what the bug is. If possible, then include a clip
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide your app version, Android version, webview version, etc (Search "Copy Device Info" in command palette to get all these info and share it)
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: If applicable, add mockups / screenshots regarding your vission
+      description: Drag issues into the text input below
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: If applicable, attach your Acode.log file to this issue.
+      description: |
+        Search for `Open Log File` in Acode command palette, it will open Acode.log file then share it
+        or Check this location for log file: `/storage/emulated/0/Android/com.foxdebug.acode{in case of free version there will be bit more}/files/Acode.log`
+      value: |
+        <details><summary>Acode.log</summary><pre>
+        <!-- Click below this line and paste or drag-and-drop your log-->
+
+        <!-- Click above this line and paste or drag-and-drop your log--></pre></details>
+    validations:
+      required: false

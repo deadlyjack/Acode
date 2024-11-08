@@ -18,7 +18,7 @@ module.exports = {
     cordova.exec(onSuccess, onFail, 'SDcard', 'format uri', [pathName]);
   },
   getPath: function (uri, filename, onSuccess, onFail) {
-    cordova.exec(onSuccess, onFail, 'SDcard', 'getpath', [uri, filename]);
+    cordova.exec(onSuccess, onFail, 'SDcard', 'get path', [uri, filename]);
   },
   getStorageAccessPermission: function (uuid, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'SDcard', 'storage permission', [uuid]);
@@ -44,16 +44,23 @@ module.exports = {
   read: function (filename, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'SDcard', 'read', [filename]);
   },
-  write: function (filename, content, isBinary, onSuccess, onFail) {
-    if (typeof isBinary === 'function') {
-      onSuccess = isBinary;
-      onFail = onSuccess;
-      isBinary = false;
-    }
-
-    cordova.exec(onSuccess, onFail, 'SDcard', 'write', [filename, content, isBinary]);
+  write: function (filename, content, onSuccess, onFail) {
+    var _isBuffer = content instanceof ArrayBuffer;
+    cordova.exec(onSuccess, onFail, 'SDcard', 'write', [filename, content, _isBuffer]);
   },
   stats: function (filename, onSuccess, onFail) {
     cordova.exec(onSuccess, onFail, 'SDcard', 'stats', [filename]);
+  },
+  watchFile: function (filename, listener, onFail) {
+    var id = parseInt(Date.now() + Math.random() * 1000000) + '';
+    cordova.exec(listener, onFail, 'SDcard', 'watch file', [filename, id]);
+    return {
+      unwatch: function () {
+        cordova.exec(null, null, 'SDcard', 'unwatch file', [id]);
+      }
+    };
+  },
+  listEncodings: function (onSuccess, onFail) {
+    cordova.exec(onSuccess, onFail, 'SDcard', 'list encodings', []);
   }
 };

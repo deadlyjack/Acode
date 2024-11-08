@@ -1,0 +1,44 @@
+#toast {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: rgba(9, 14, 29, 0.9);
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 50vh;
+  max-width: 80vw;
+  width: fit-content;
+  overflow: auto;
+  animation: slow-appear 500ms linear 1;
+  z-index: 9999;
+  border-radius: 4px;
+  pointer-events: none;
+
+  &.hide {
+    transition: all 1s linear;
+    opacity: 0;
+  }
+
+  &[clickable='true'] {
+    pointer-events: all;
+  }
+
+  .message {
+    padding: 10px;
+  }
+
+  .icon {
+    background-color: inherit;
+    color: inherit;
+    border: none;
+    min-height: 30px;
+    min-width: 30px;
+  }
+}

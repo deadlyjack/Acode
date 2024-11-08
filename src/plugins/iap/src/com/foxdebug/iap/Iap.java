@@ -23,6 +23,7 @@ import com.android.billingclient.api.SkuDetailsResponseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.lang.ref.WeakReference;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -35,14 +36,14 @@ import org.json.JSONObject;
 public class Iap extends CordovaPlugin {
 
   private BillingClient billingClient;
-  private Context context;
-  private Activity activity;
+  private WeakReference<Context> contextRef;
+  private WeakReference<Activity> activityRef;
   private CallbackContext purchaseUpdated;
 
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
-    context = cordova.getContext();
-    activity = cordova.getActivity();
+    contextRef = new WeakReference<>(cordova.getContext());
+    activityRef = new WeakReference<>(cordova.getActivity());
     billingClient = getBillingClient();
   }
 
@@ -91,7 +92,7 @@ public class Iap extends CordovaPlugin {
                 getPurchases(callbackContext);
                 break;
               case "acknowledgePurchase":
-                aknowledgePurchase(arg1, callbackContext);
+                acknowledgePurchase(arg1, callbackContext);
                 break;
             }
           }
@@ -103,7 +104,7 @@ public class Iap extends CordovaPlugin {
 
   private BillingClient getBillingClient() {
     return BillingClient
-      .newBuilder(this.context)
+      .newBuilder(this.contextRef.get())
       .enablePendingPurchases()
       .setListener(
         new PurchasesUpdatedListener() {
@@ -165,25 +166,29 @@ public class Iap extends CordovaPlugin {
   }
 
   private void startConnection(CallbackContext callbackContext) {
-    if (billingClient == null) {
-      billingClient = getBillingClient();
-    }
-    billingClient.startConnection(
-      new BillingClientStateListener() {
-        public void onBillingSetupFinished(BillingResult billingResult) {
-          int responseCode = billingResult.getResponseCode();
-          if (responseCode == BillingResponseCode.OK) {
-            callbackContext.success(responseCode);
-          } else {
-            callbackContext.error(responseCode);
+    try {
+      if (billingClient == null) {
+        billingClient = getBillingClient();
+      }
+      billingClient.startConnection(
+        new BillingClientStateListener() {
+          public void onBillingSetupFinished(BillingResult billingResult) {
+            int responseCode = billingResult.getResponseCode();
+            if (responseCode == BillingResponseCode.OK) {
+              callbackContext.success(responseCode);
+            } else {
+              callbackContext.error(responseCode);
+            }
+          }
+
+          public void onBillingServiceDisconnected() {
+            callbackContext.error("Billing service disconnected");
           }
         }
-
-        public void onBillingServiceDisconnected() {
-          callbackContext.error("Billing service disconnected");
-        }
-      }
-    );
+      );
+    } catch (SecurityException e) {
+      callbackContext.error(e.getMessage());
+    }
   }
 
   private void getProducts(
@@ -244,7 +249,7 @@ public class Iap extends CordovaPlugin {
     try {
       SkuDetails skuDetails = new SkuDetails(json);
       BillingResult result = billingClient.launchBillingFlow(
-        activity,
+        activityRef.get(),
         BillingFlowParams.newBuilder().setSkuDetails(skuDetails).build()
       );
       int responseCode = result.getResponseCode();
@@ -295,7 +300,7 @@ public class Iap extends CordovaPlugin {
     );
   }
 
-  private void aknowledgePurchase(
+  private void acknowledgePurchase(
     String purchaseToken,
     CallbackContext callbackContext
   ) {

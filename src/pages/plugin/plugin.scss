@@ -1,9 +1,26 @@
+@import '../../styles/mixins.scss';
+
 #plugin {
   overflow: auto;
+  max-width: 800px;
+  margin: auto;
 
   .header {
     display: flex;
     flex-direction: column;
+
+    .author {
+      display: flex;
+      padding: 10px 0;
+      gap: 2px;
+
+      .verified {
+        height: 12px;
+        width: 12px;
+        background-size: contain;
+        background-position: center;
+      }
+    }
 
     .tag {
       display: flex;
@@ -43,7 +60,6 @@
 
         &::after {
           content: attr(data-label);
-          text-transform: capitalize;
           font-size: smaller;
           margin-top: 5px;
           text-align: center;
@@ -117,6 +133,32 @@
     button {
       margin: 0 10px;
       border-radius: 4px;
+      max-width: 300px;
+
+      @media (max-width: 800px) {
+        &:only-child {
+          margin: 0 auto;
+        }
+      }
+
+      &[data-type='uninstall'] {
+        background-color: rgb(160, 51, 0) !important;
+        background-color: var(--danger-color) !important;
+        color: rgb(255, 255, 255) !important;
+        color: var(--danger-text-color) !important;
+      }
+    }
+
+    .error {
+      display: flex;
+      color: rgb(255, 185, 92);
+      color: var(--error-text-color);
+      align-items: center;
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
     }
   }
 
@@ -182,7 +224,8 @@
   background-color: rgb(255, 255, 255);
   background-color: var(--secondary-color);
   z-index: 999;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 20px var(--box-shadow-color);
   border-radius: 40px 40px 0 0;
   overflow: hidden;
   animation: slide-up 0.3s ease-in-out;
@@ -190,16 +233,6 @@
   &.hide {
     transition: all 0.3s ease-in-out !important;
     transform: translateY(100%) !important;
-  }
-
-  @keyframes slide-up {
-    0% {
-      transform: translateY(100%);
-    }
-
-    100% {
-      transform: translateY(0);
-    }
   }
 
   .reviews-header {
@@ -241,26 +274,7 @@
     overflow: auto;
 
     &.loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      &::after {
-        content: '';
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        border: 3px solid rgb(255, 255, 255);
-        border: 3px solid var(--primary-text-color);
-        border-top-color: transparent;
-        animation: spin 1s linear infinite;
-
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      }
+      @include loader(30px);
     }
 
     .review {
@@ -300,6 +314,7 @@
         display: flex;
         align-items: center;
         font-weight: 300;
+        overflow: auto;
       }
 
       .author-reply {

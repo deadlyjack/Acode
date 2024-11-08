@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<widget id="com.foxdebug.acode" android-versionCode="274" version="1.8.1"
+<widget id="com.foxdebug.acode" android-versionCode="953" version="1.10.5"
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -29,8 +29,6 @@
         <preference name="DisallowOverscroll" value="true" />
         <preference name="BackgroundColor" value="0xFF313131" />
         <preference name="AndroidPersistentFileLocation" value="Compatibility" />
-        <preference name="android-minSdkVersion" value="22" />
-        <preference name="android-targetSdkVersion" value="31" />
         <preference name="AndroidLaunchMode" value="singleTask" />
         <preference name="prerendered-icon" value="false" />
         <preference name="androidxEnabled" value="true" />
@@ -60,16 +58,24 @@
                 <data pathPattern=".*\.xml"/>
                 <data pathPattern=".*\.json"/>
             </intent-filter>
+            <!-- Allow app to open using url from browser -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="acode" />
+            </intent-filter>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
             <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
             <uses-permission android:name="android.permission.VIBRATE" />
+            <!-- <uses-permission android:name="com.termux.permission.RUN_COMMAND" /> -->
         </config-file>
 
         <hook type="before_prepare" src="hooks/modify-java-files.js" />
-        <hook type="before_prepare" src="hooks/post-process.js" />
-        <hook type="before_prepare" src="hooks/copy-resources.js" />
-        <hook type="before_prepare" src="hooks/move-files.js" />
+        <hook type="after_prepare" src="hooks/post-process.js" />
     </platform>
 </widget>

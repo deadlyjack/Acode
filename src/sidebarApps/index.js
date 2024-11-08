@@ -1,100 +1,111 @@
-const SIDRBAR_APPS_LAST_SECTION = 'sidebarAppslastSection';
-/**@type {HTMLElement} */
-let $sidebar = null;
-/**@type {HTMLElement} */
-let $apps = null;
-/**@type {string} */
-let currentSection = localStorage.getItem(SIDRBAR_APPS_LAST_SECTION);
+import SidebarApp from "./sidebarApp";
 
-/**@type {Map<string, HTMLElement>} */
-const contents = new Map();
+const SIDEBAR_APPS_LAST_SECTION = "sidebarAppsLastSection";
+
+/**@type {HTMLElement} */
+let $apps;
+/**@type {HTMLElement} */
+let $sidebar;
+/**@type {string} */
+let currentSection = localStorage.getItem(SIDEBAR_APPS_LAST_SECTION);
+/**@type {SidebarApp[]} */
+const apps = [];
 
 /**
- * @param {string} icon
- * @param {string} id
- * @param {HTMLElement} el
- * @param {string} title
+ * @param {string} icon icon of the app
+ * @param {string} id id of the app
+ * @param {HTMLElement} el element to show in sidebar
+ * @param {string} title title of the app
  * @param {(container:HTMLElement)=>void} initFunction
+ * @param {boolean} prepend weather to show this app at the top of the sidebar or not
+ * @param {(container:HTMLElement)=>void} onSelected
  * @returns {void}
  */
-function add(icon, id, title, initFunction, prepend) {
-  const container = <div className='container'></div>;
-  contents.set(id, container);
+function add(
+	icon,
+	id,
+	title,
+	initFunction,
+	prepend = false,
+	onSelected = () => {},
+) {
+	currentSection ??= id;
 
-  if (!currentSection) currentSection = id;
+	const active = currentSection === id;
+	const app = new SidebarApp(icon, id, title, initFunction, onSelected);
 
-  if (currentSection === id) {
-    $sidebar.replaceChild(container, getContainer());
-  }
-
-  if (prepend) {
-    $apps.prepend(
-      <Icon icon={icon} id={id} title={title} />,
-    );
-  } else {
-    $apps.append(
-      <Icon icon={icon} id={id} title={title} />,
-    );
-  }
-
-
-  if (initFunction) {
-    initFunction(container);
-  }
-}
-
-function init($el) {
-  $sidebar = $el;
-  $apps = $sidebar.get('.apps');
-}
-
-async function loadApps() {
-  add(...(await import('./files')).default);
-  add(...(await import('./extensions')).default);
+	app.active = active;
+	app.install(prepend);
+	apps.push(app);
 }
 
 /**
- * 
- * @param {object} param0 
- * @param {string} param0.icon
- * @param {string} param0.id
- * @param {string} param0.title
- * @returns {HTMLElement}
+ * Removes a sidebar app with the given ID.
+ * @param {string} id - The ID of the sidebar app to remove.
+ * @returns {void}
  */
-function Icon({ icon, id, title }) {
-  const onclick = function () {
-    localStorage.setItem(SIDRBAR_APPS_LAST_SECTION, id);
-    const currentContent = getContainer();
-    const content = contents.get(id);
-
-    contents.set(currentSection, currentContent);
-    currentSection = id;
-
-    $sidebar.replaceChild(content, currentContent);
-
-    $sidebar.get('.apps .active')
-      .classList.remove('active');
-
-    this.classList.add('active');
-  };
-  return <span
-    onclick={onclick}
-    title={title}
-    className={`icon ${icon} ${id === currentSection ? 'active' : ''}`}
-  ></span>;
+function remove(id) {
+	const app = apps.find((app) => app.id === id);
+	if (!app) return;
+	app.remove();
+	apps.splice(apps.indexOf(app), 1);
+	if (app.active) {
+		const firstApp = apps[0];
+		firstApp.active = true;
+	}
 }
 
+/**
+ * Initialize sidebar apps
+ * @param {HTMLElement} $el
+ */
+function init($el) {
+	$sidebar = $el;
+	$apps = $sidebar.get(".apps");
+	$apps.addEventListener("click", onclick);
+	SidebarApp.init($el, $apps);
+}
+
+/**
+ * Loads all sidebar apps.
+ */
+async function loadApps() {
+	add(...(await import("./files")).default);
+	add(...(await import("./searchInFiles")).default);
+	add(...(await import("./extensions")).default);
+}
+
+/**
+ * Gets the container of the app with the given ID.
+ * @param {string} id
+ * @returns
+ */
 function get(id) {
-  return contents.get(id);
+	const app = apps.find((app) => app.id === id);
+	return app.container;
 }
 
-function getContainer() {
-  return $sidebar.get('.container');
+/**
+ * Handles click on sidebar apps
+ * @param {MouseEvent} e
+ */
+function onclick(e) {
+	const target = e.target;
+	const { action, id } = target.dataset;
+
+	if (action !== "sidebar-app") return;
+
+	localStorage.setItem(SIDEBAR_APPS_LAST_SECTION, id);
+	const activeApp = apps.find((app) => app.active);
+	const app = apps.find((app) => app.id === id);
+	activeApp.active = false;
+	app.active = true;
 }
 
 export default {
-  init,
-  add,
-  get,
-  loadApps,
+	init,
+	add,
+	get,
+	remove,
+	loadApps,
 };

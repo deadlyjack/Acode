@@ -42,5 +42,5 @@ $script2&&
 echo \"${RED}$script3${NC}\";
 $script3;
 echo \"${RED}$script4${NC}\";
-$script4
+$script4;
 "

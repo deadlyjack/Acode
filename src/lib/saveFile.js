@@ -1,163 +1,197 @@
-import FileBrowser from '../pages/fileBrowser';
-import dialogs from '../components/dialogs';
-import helpers from '../utils/helpers';
-import constants from './constants';
-import recents from '../lib/recents';
-import fsOperation from '../fileSystem';
-import Url from '../utils/Url';
-import openFolder from './openFolder';
-import appSettings from './settings';
+import prompt from "dialogs/prompt";
+import select from "dialogs/select";
+import fsOperation from "fileSystem";
+import recents from "lib/recents";
+import FileBrowser from "pages/fileBrowser";
+import Url from "utils/Url";
+import helpers from "utils/helpers";
+import constants from "./constants";
+import EditorFile from "./editorFile";
+import openFolder from "./openFolder";
+import appSettings from "./settings";
 
 let saveTimeout;
 
+const SELECT_FOLDER = "select-folder";
+
 /**
- *
- * @param {File} file
+ * Saves a file to it's location, if file is new, it will ask for location
+ * @param {EditorFile} file
  * @param {boolean} [isSaveAs]
  */
 async function saveFile(file, isSaveAs = false) {
-  if (file.loading) return;
-  let fs;
-  let url;
-  let { filename } = file;
-  let isNewFile = false;
-  let createFile = false;
-  const data = file.session.getValue();
-  const $text = file.tab.querySelector('span.text');
-  if (!file.uri) {
-    isNewFile = true;
-  } else {
-    isSaveAs = isSaveAs ?? file.readOnly;
-  }
+	// If file is loading, return
+	if (file.loading) return;
 
-  formatFile();
+	/**
+	 * If set, new file needs to be created
+	 * @type {string}
+	 */
+	let newUrl;
+	/**
+	 * File operation object
+	 * @type {fsOperation}
+	 */
+	let fileOnDevice;
+	/**
+	 * File name, can be changed by user
+	 * @type {string}
+	 */
+	let { filename } = file;
+	/**
+	 * If file is new
+	 * @type {boolean}
+	 */
+	let isNewFile = false;
 
-  if (isSaveAs || isNewFile) {
-    const option = await recents.select(
-      [
-        ['select-folder', strings['select folder'], 'folder']
-      ],
-      'dir',
-      strings['select folder'],
-    );
+	/**
+	 * Encoding of file
+	 * @type {string}
+	 */
+	const { encoding } = file;
+	/**
+	 * File data
+	 * @type {string}
+	 */
+	const data = file.session.getValue();
+	/**
+	 * File tab bar text element, used to show saving status
+	 * @type {HTMLElement}
+	 */
+	const $text = file.tab.querySelector("span.text");
 
-    if (option === 'select-folder') {
-      url = await selectFolder();
-    } else {
-      url = option.val.url;
-    }
+	if (!file.uri) {
+		isNewFile = true;
+	} else {
+		isSaveAs = isSaveAs ?? file.readOnly;
+	}
 
-    if (isSaveAs) {
-      filename = await getfilename(url, file.filename);
-    } else {
-      filename = await check(url, file.filename);
-    }
-  }
+	if (isSaveAs || isNewFile) {
+		const option = await recents.select(
+			[[SELECT_FOLDER, strings["select folder"], "folder"]], // options
+			"dir", // type
+			strings["select folder"], // title
+		);
 
-  createFile = isSaveAs || url;
+		if (option === SELECT_FOLDER) {
+			newUrl = await selectFolder();
+		} else {
+			newUrl = option.val.url;
+		}
 
-  if (filename !== file.filename) {
-    file.filename = filename;
-    formatFile();
-  }
+		if (isSaveAs) {
+			filename = await getfilename(newUrl, file.filename);
+		} else {
+			filename = await check(newUrl, file.filename);
+		}
 
-  $text.textContent = strings.saving + '...';
-  file.isSaving = true;
+		// in case if user cancels the dialog
+		if (!filename) return;
+	}
 
-  try {
-    if (createFile) {
-      const fileUri = Url.join(url, file.filename);
-      fs = fsOperation(fileUri);
+	if (filename !== file.filename) {
+		file.filename = filename;
+	}
 
-      if (!await fs.exists()) {
-        const fileDir = fsOperation(url);
-        await fileDir.createFile(file.filename);
-      }
+	$text.textContent = strings.saving + "...";
+	file.isSaving = true;
 
-      const openedFile = editorManager.getFile(fileUri, 'uri');
-      if (openedFile) openedFile.uri = null;
-      file.uri = fileUri;
-      recents.addFile(fileUri);
+	try {
+		if (isSaveAs || newUrl) {
+			// if save as or new file
+			const fileUri = Url.join(newUrl, file.filename);
+			fileOnDevice = fsOperation(fileUri);
 
-      const folder = openFolder.find(url);
-      if (folder) folder.reload();
-    }
+			if (!(await fileOnDevice.exists())) {
+				await fsOperation(newUrl).createFile(file.filename);
+			}
 
-    if (!fs) fs = fsOperation(file.uri);
-    await fs.writeFile(data);
-    if (file.location) {
-      recents.addFolder(file.location);
-    }
+			const openedFile = editorManager.getFile(fileUri, "uri");
+			if (openedFile) openedFile.uri = null;
+			file.uri = fileUri;
+			recents.addFile(fileUri);
 
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-      file.isSaving = false;
-      file.isUnsaved = false;
-      // file.onsave();
-      if (url) recents.addFile(file.uri);
-      editorManager.onupdate('save-file');
-      editorManager.emit('update', 'save-file');
-      editorManager.emit('save-file', file);
-      resetText();
-    }, editorManager.TIMEOUT_VALUE + 100);
-  } catch (err) {
-    helpers.error(err);
-  }
-  resetText();
+			const folder = openFolder.find(newUrl);
+			if (folder) folder.reload();
+		}
 
-  function resetText() {
-    setTimeout(() => {
-      $text.textContent = file.filename;
-    }, editorManager.TIMEOUT_VALUE);
-  }
+		if (!fileOnDevice) {
+			fileOnDevice = fsOperation(file.uri);
+		}
 
-  async function selectFolder() {
-    const dir = await FileBrowser(
-      'folder',
-      strings[`save file${isSaveAs ? ' as' : ''}`],
-    );
-    return dir.url;
-  }
+		if (appSettings.value.formatOnSave) {
+			editorManager.activeFile.markChanged = false;
+			acode.exec("format", false);
+		}
 
-  async function getfilename(url, name) {
-    const filename = await dialogs.prompt(
-      strings['enter file name'],
-      name || '',
-      strings['new file'],
-      {
-        match: constants.FILE_NAME_REGEX,
-        required: true,
-      },
-    );
+		await fileOnDevice.writeFile(data, encoding);
 
-    return await check(url, filename);
-  }
+		if (file.location) {
+			recents.addFolder(file.location);
+		}
 
-  async function check(url, filename) {
-    const pathname = Url.join(url, filename);
+		clearTimeout(saveTimeout);
+		saveTimeout = setTimeout(() => {
+			file.isSaving = false;
+			file.isUnsaved = false;
+			if (newUrl) recents.addFile(file.uri);
+			editorManager.onupdate("save-file");
+			editorManager.emit("update", "save-file");
+			editorManager.emit("save-file", file);
+			resetText();
+		}, editorManager.TIMEOUT_VALUE + 100);
+	} catch (err) {
+		helpers.error(err);
+	}
+	resetText();
 
-    const fs = fsOperation(pathname);
-    if (await fs.exists()) {
-      const action = await dialogs.select(strings['file already exists'], [
-        ['overwrite', strings.overwrite],
-        ['newname', strings['enter file name']],
-      ]);
+	function resetText() {
+		setTimeout(() => {
+			$text.textContent = file.filename;
+		}, editorManager.TIMEOUT_VALUE);
+	}
 
-      if (action === 'newname') {
-        filename = await getfilename(url, filename);
-      }
-    }
+	async function selectFolder() {
+		const dir = await FileBrowser(
+			"folder",
+			strings[`save file${isSaveAs ? " as" : ""}`],
+		);
+		return dir.url;
+	}
 
-    return filename;
-  }
+	async function getfilename(url, name) {
+		let filename = await prompt(
+			strings["enter file name"],
+			name || "",
+			strings["new file"],
+			{
+				match: constants.FILE_NAME_REGEX,
+				required: true,
+			},
+		);
 
-  function formatFile() {
-    const { formatOnSave } = appSettings.value;
-    if (formatOnSave) {
-      editorManager.activeFile.markChanged = false;
-      acode.exec('format', false);
-    }
-  }
+		filename = helpers.fixFilename(filename);
+		if (!filename) return null;
+		return await check(url, filename);
+	}
+
+	async function check(url, filename) {
+		const pathname = Url.join(url, filename);
+
+		const fs = fsOperation(pathname);
+		if (!(await fs.exists())) return filename;
+
+		const action = await select(strings["file already exists"], [
+			["overwrite", strings.overwrite],
+			["newname", strings["enter file name"]],
+		]);
+
+		if (action === "newname") {
+			filename = await getfilename(url, filename);
+		}
+
+		return filename;
+	}
 }
 
 export default saveFile;
