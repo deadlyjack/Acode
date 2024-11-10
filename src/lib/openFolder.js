@@ -17,6 +17,7 @@ import * as FileList from "./fileList";
 import openFile from "./openFile";
 import recents from "./recents";
 import appSettings from "./settings";
+import toast from "components/toast";
 
 /**
  * @typedef {import('../components/collapsableList').Collapsible} Collapsible
@@ -45,7 +46,7 @@ import appSettings from "./settings";
 
 /**@type {Folder[]} */
 export const addedFolder = [];
-
+const ACODE_PLUGIN_MANIFEST_FILE = "plugin.json";
 /**
  * Open a folder in the sidebar
  * @param {string} _path
@@ -269,11 +270,24 @@ async function handleContextmenu(type, url, name, $target) {
 	const OPEN_FOLDER = ["open-folder", strings["open folder"], "folder"];
 	const INSERT_FILE = ["insert-file", strings["insert file"], "file_copy"];
 	const CLOSE_FOLDER = ["close", strings["close"], "folder-remove"];
+	const INSTALL_PLUGIN = [
+		"install-plugin",
+		strings["install as plugin"] || "Install as Plugin",
+		"extension",
+	];
 
 	let options;
 
 	if (helpers.isFile(type)) {
 		options = [COPY, CUT, RENAME, REMOVE];
+		if (
+			url.toLowerCase().endsWith(".zip") &&
+			(await fsOperation(
+				Url.dirname(url) + ACODE_PLUGIN_MANIFEST_FILE,
+			).exists())
+		) {
+			options.push(INSTALL_PLUGIN);
+		}
 	} else if (helpers.isDir(type)) {
 		options = [
 			COPY,
@@ -305,7 +319,7 @@ async function handleContextmenu(type, url, name, $target) {
 
 /**
  * @param {"dir"|"file"|"root"} type
- * @param {"copy"|"cut"|"delete"|"rename"|"paste"|"new file"|"new folder"|"cancel"|"open-folder"} action
+ * @param {"copy"|"cut"|"delete"|"rename"|"paste"|"new file"|"new folder"|"cancel"|"open-folder"|"install-plugin"} action
  * @param {string} url target url
  * @param {HTMLElement} $target target element
  * @param {string} name Name of file or folder
@@ -344,6 +358,25 @@ function execOperation(type, action, url, $target, name) {
 
 		case "close":
 			return remove();
+
+		case "install-plugin":
+			return installPlugin();
+	}
+
+	async function installPlugin() {
+		try {
+			const manifest = JSON.parse(
+				await fsOperation(
+					Url.dirname(url) + ACODE_PLUGIN_MANIFEST_FILE,
+				).readFile("utf8"),
+			);
+			const { default: installPlugin } = await import("lib/installPlugin");
+			await installPlugin(url, manifest.name);
+			toast(strings["success"], 3000);
+		} catch (error) {
+			helpers.error(error);
+			console.error(error);
+		}
 	}
 
 	async function deleteFile() {
