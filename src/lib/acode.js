@@ -36,6 +36,7 @@ import Color from "utils/color";
 import encodings from "utils/encodings";
 import helpers from "utils/helpers";
 import KeyboardEvent from "utils/keyboardEvent";
+import constants from "./constants";
 
 import { addMode, removeMode } from "ace/modelist";
 import { addIntentHandler, removeIntentHandler } from "handlers/intent";
@@ -155,6 +156,77 @@ export default class Acode {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Installs an Acode plugin from registry
+	 * @param {string} pluginId id of the plugin to install
+	 * @param {string} installerPluginName Name of plugin attempting to install
+	 * @returns {Promise<void>}
+	 */
+	installPlugin(pluginId, installerPluginName) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				const confirmation = await confirm(
+					strings["install"],
+					`Do you want to install plugin '${pluginId}'${installerPluginName ? ` requested by ${installerPluginName}` : ""}?`,
+				);
+
+				if (!confirmation) {
+					reject(new Error("User cancelled installation"));
+					return;
+				}
+
+				const isPluginExists = await fsOperation(
+					Url.join(PLUGIN_DIR, pluginId),
+				).exists();
+				if (isPluginExists) {
+					reject(new Error("PLugin already installed"));
+					return;
+				}
+
+				let purchaseToken = null;
+
+				const pluginUrl = Url.join(constants.API_BASE, `plugin/${pluginId}`);
+				const remotePlugin = await fsOperation(pluginUrl)
+					.readFile("json")
+					.catch(() => {
+						reject(new Error("Failed to fetch plugin details"));
+						return null;
+					});
+
+				if (remotePlugin) {
+					if (Number.parseFloat(remotePlugin.price) > 0) {
+						try {
+							const [product] = await helpers.promisify(iap.getProducts, [
+								remotePlugin.sku,
+							]);
+							if (product) {
+								async function getPurchase(sku) {
+									const purchases = await helpers.promisify(iap.getPurchases);
+									const purchase = purchases.find((p) =>
+										p.productIds.includes(sku),
+									);
+									return purchase;
+								}
+								const purchase = await getPurchase(product.productId);
+								purchaseToken = purchase?.purchaseToken;
+							}
+						} catch (error) {
+							helpers.error(error);
+							reject(new Error("Failed to validate purchase"));
+							return;
+						}
+					}
+				}
+
+				const { default: installPlugin } = await import("lib/installPlugin");
+				await installPlugin(pluginId, remotePlugin.name, purchaseToken);
+				resolve();
+			} catch (error) {
+				reject(error);
+			}
+		});
 	}
 
 	get exitAppMessage() {
