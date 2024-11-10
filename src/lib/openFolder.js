@@ -1,6 +1,7 @@
 import collapsableList from "components/collapsableList";
 import Sidebar from "components/sidebar";
 import tile from "components/tile";
+import toast from "components/toast";
 import alert from "dialogs/alert";
 import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
@@ -17,7 +18,6 @@ import * as FileList from "./fileList";
 import openFile from "./openFile";
 import recents from "./recents";
 import appSettings from "./settings";
-import toast from "components/toast";
 
 /**
  * @typedef {import('../components/collapsableList').Collapsible} Collapsible
