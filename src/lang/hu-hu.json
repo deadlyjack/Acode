@@ -387,6 +387,6 @@
 	"copy uri": "Uri másolása",
 	"delete entries": "Biztosan töröl {count} elemet?",
 	"deleting items": "{count} elem törlése…",
-	"import project zip": "Project(zip) importálása",
-	"changelog": "Change Log"
+	"import project zip": "Projekt importálása zip-ből",
+	"changelog": "Változásnapló"
 }
