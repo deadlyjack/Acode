@@ -73,6 +73,7 @@ async function loadApps() {
 	add(...(await import("./files")).default);
 	add(...(await import("./searchInFiles")).default);
 	add(...(await import("./extensions")).default);
+	add(...(await import("./notification")).default);
 }
 
 /**

@@ -389,5 +389,7 @@
 	"delete entries": "Bạn có chắc muốn xoá {count} mục?",
 	"deleting items": "Đang xoá {count} mục...",
 	"import project zip": "Nhập Dự Án(zip)",
-	"changelog": "Nhật Ký Thay Đổi"
+	"changelog": "Nhật Ký Thay Đổi",
+	"notifications": "Notifications",
+	"no_unread_notifications": "No unread notifications"
 }

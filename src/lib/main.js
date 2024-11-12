@@ -50,6 +50,7 @@ import { setKeyBindings } from "ace/commands";
 import { initModes } from "ace/modelist";
 import { keydownState } from "handlers/keyboard";
 import { initFileList } from "lib/fileList";
+import NotificationManager from "lib/notificationManager";
 import { addedFolder } from "lib/openFolder";
 import { getEncoding, initEncodings } from "utils/encodings";
 import constants from "./constants";
@@ -369,32 +370,26 @@ async function loadApp() {
 	});
 	//#endregion
 
-	window.log("info", "Started app and services...");
+	const notificationManager = new NotificationManager();
+	notificationManager.init();
+
+	window.log("info", "Started app and its services...");
 
 	new EditorFile();
 
 	checkPluginsUpdate()
 		.then((updates) => {
 			if (!updates.length) return;
-			const $icon = (
-				<span
-					onclick={() => {
+			acode.pushNotification(
+				"Plugin Updates",
+				`${updates.length} plugin${updates.length > 1 ? "s" : ""} ${updates.length > 1 ? "have" : "has"} new version${updates.length > 1 ? "s" : ""} available.`,
+				{
+					icon: "extension",
+					action: () => {
 						plugins(updates);
-						$icon.remove();
-					}}
-					attr-action=""
-					style={{ fontSize: "1.2rem" }}
-					className="icon notifications"
-				></span>
+					},
+				},
 			);
-
-			if ($editMenuToggler.isConnected) {
-				$header.insertBefore($icon, $editMenuToggler);
-			} else if ($runBtn.isConnected) {
-				$header.insertBefore($icon, $runBtn);
-			} else {
-				$header.insertBefore($icon, $menuToggler);
-			}
 		})
 		.catch(console.error);
 

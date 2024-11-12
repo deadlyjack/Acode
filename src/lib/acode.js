@@ -22,6 +22,7 @@ import commands from "lib/commands";
 import EditorFile from "lib/editorFile";
 import files from "lib/fileList";
 import fonts from "lib/fonts";
+import NotificationManager from "lib/notificationManager";
 import openFolder from "lib/openFolder";
 import projects from "lib/projects";
 import selectionMenu from "lib/selectionMenu";
@@ -415,5 +416,30 @@ export default class Acode {
 	async toInternalUrl(url) {
 		url = await helpers.toInternalUri(url);
 		return url;
+	}
+	/**
+	 * Push a notification
+	 * @param {string} title Title of the notification
+	 * @param {string} message Message body of the notification
+	 * @param {Object} options Notification options
+	 * @param {string} [options.icon] Icon for the notification, can be a URL or a base64 encoded image or icon class or svg string
+	 * @param {boolean} [options.autoClose=true] Whether notification should auto close
+	 * @param {Function} [options.action=null] Action callback when notification is clicked
+	 * @param {('info'|'warning'|'error'|'success')} [options.type='info'] Type of notification
+	 */
+	pushNotification(
+		title,
+		message,
+		{ icon, autoClose = true, action = null, type = "info" } = {},
+	) {
+		const nm = new NotificationManager();
+		nm.pushNotification({
+			title,
+			message,
+			icon,
+			autoClose,
+			action,
+			type,
+		});
 	}
 }
