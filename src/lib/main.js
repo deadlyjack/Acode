@@ -377,22 +377,6 @@ async function loadApp() {
 
 	new EditorFile();
 
-	checkPluginsUpdate()
-		.then((updates) => {
-			if (!updates.length) return;
-			acode.pushNotification(
-				"Plugin Updates",
-				`${updates.length} plugin${updates.length > 1 ? "s" : ""} ${updates.length > 1 ? "have" : "has"} new version${updates.length > 1 ? "s" : ""} available.`,
-				{
-					icon: "extension",
-					action: () => {
-						plugins(updates);
-					},
-				},
-			);
-		})
-		.catch(console.error);
-
 	//load plugins
 	try {
 		await loadPlugins();
@@ -423,6 +407,58 @@ async function loadApp() {
 	}
 
 	initFileList();
+
+	checkPluginsUpdate()
+		.then((updates) => {
+			if (!updates.length) return;
+			acode.pushNotification(
+				"Plugin Updates",
+				`${updates.length} plugin${updates.length > 1 ? "s" : ""} ${updates.length > 1 ? "have" : "has"} new version${updates.length > 1 ? "s" : ""} available.`,
+				{
+					icon: "extension",
+					action: () => {
+						plugins(updates);
+					},
+				},
+			);
+		})
+		.catch(console.error);
+
+	// Check for app updates
+	if (navigator.onLine) {
+		fetch("https://api.github.com/repos/deadlyjack/Acode/releases/latest")
+			.then((res) => res.json())
+			.then((release) => {
+				// assuming version is in format v1.2.3
+				const latestVersion = release.tag_name
+					.replace("v", "")
+					.split(".")
+					.map(Number);
+				const currentVersion = BuildInfo.version.split(".").map(Number);
+
+				const hasUpdate = latestVersion.some(
+					(num, i) => num > currentVersion[i],
+				);
+
+				if (hasUpdate) {
+					acode.pushNotification(
+						"Update Available",
+						`Acode ${release.tag_name} is now available! Click here to checkout.`,
+						{
+							icon: "update",
+							type: "warning",
+							action: () => {
+								system.openInBrowser(release.html_url);
+							},
+						},
+					);
+				}
+			})
+			.catch((err) => {
+				window.log("error", "Failed to check for updates");
+				window.log("error", err);
+			});
+	}
 
 	/**
 	 *
