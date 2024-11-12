@@ -389,6 +389,6 @@
 	"deleting items": "{count} elem törlése…",
 	"import project zip": "Projekt importálása zip-ből",
 	"changelog": "Változásnapló",
-	"notifications": "Notifications",
-	"no_unread_notifications": "No unread notifications"
+	"notifications": "Értesítések",
+	"no_unread_notifications": "Nincsenek olvasatlan értesítések"
 }
