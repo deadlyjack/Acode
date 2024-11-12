@@ -380,25 +380,16 @@ async function loadApp() {
 	checkPluginsUpdate()
 		.then((updates) => {
 			if (!updates.length) return;
-			const $icon = (
-				<span
-					onclick={() => {
+			acode.pushNotification(
+				"Plugin Updates",
+				`${updates.length} plugin${updates.length > 1 ? "s" : ""} ${updates.length > 1 ? "have" : "has"} new version${updates.length > 1 ? "s" : ""} available.`,
+				{
+					icon: "extension",
+					action: () => {
 						plugins(updates);
-						$icon.remove();
-					}}
-					attr-action=""
-					style={{ fontSize: "1.2rem" }}
-					className="icon notifications"
-				></span>
+					},
+				},
 			);
-
-			if ($editMenuToggler.isConnected) {
-				$header.insertBefore($icon, $editMenuToggler);
-			} else if ($runBtn.isConnected) {
-				$header.insertBefore($icon, $runBtn);
-			} else {
-				$header.insertBefore($icon, $menuToggler);
-			}
 		})
 		.catch(console.error);
 
