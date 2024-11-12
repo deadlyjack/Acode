@@ -50,6 +50,7 @@ import { setKeyBindings } from "ace/commands";
 import { initModes } from "ace/modelist";
 import { keydownState } from "handlers/keyboard";
 import { initFileList } from "lib/fileList";
+import NotificationManager from "lib/notificationManager";
 import { addedFolder } from "lib/openFolder";
 import { getEncoding, initEncodings } from "utils/encodings";
 import constants from "./constants";
@@ -369,7 +370,10 @@ async function loadApp() {
 	});
 	//#endregion
 
-	window.log("info", "Started app and services...");
+	const notificationManager = new NotificationManager();
+	notificationManager.init();
+
+	window.log("info", "Started app and its services...");
 
 	new EditorFile();
 
