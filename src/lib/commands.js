@@ -13,6 +13,7 @@ import changeEncoding from "palettes/changeEncoding";
 import changeMode from "palettes/changeMode";
 import commandPalette from "palettes/commandPalette";
 import findFile from "palettes/findFile";
+import browser from "plugins/browser";
 import help from "settings/helpSettings";
 import mainSettings from "settings/mainSettings";
 import Url from "utils/Url";
@@ -236,7 +237,9 @@ export default {
 	"resize-editor"() {
 		editorManager.editor.resize(true);
 	},
-
+	"open-inapp-browser"(url) {
+		browser.open(url);
+	},
 	run() {
 		editorManager.activeFile[
 			appSettings.value.useCurrentFileForPreview ? "runFile" : "run"
