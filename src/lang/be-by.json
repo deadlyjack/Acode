@@ -388,5 +388,8 @@
 	"copy uri": "Скапіяваць URl",
 	"delete entries": "Сапраўды хочаце выдаліць {count} элемент(аў)?",
 	"deleting items": "Выдаленне {count} элемента(аў)...",
-	"import project zip": "Імпартаваць праект(zip)"
+	"import project zip": "Імпартаваць праект(zip)",
+	"changelog": "Журнал змен",
+	"notifications": "Апавяшчэнні",
+	"no_unread_notifications": "Няма непрачытаных апавяшчэнняў"
 }
