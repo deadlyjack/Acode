@@ -229,6 +229,7 @@
 	"header": "Загаловак",
 	"sidebar": "Бакавая панэль",
 	"inapp": "Inapp",
+
 	"browser": "Браўзер",
 	"diagonal scrolling": "Дыяганальнае пракручванне",
 	"reverse scrolling": "Адваротнае пракручванне",
@@ -389,4 +390,6 @@
 	"delete entries": "Сапраўды хочаце выдаліць {count} элемент(аў)?",
 	"deleting items": "Выдаленне {count} элемента(аў)...",
 	"import project zip": "Імпартаваць праект(zip)"
+
+	
 }

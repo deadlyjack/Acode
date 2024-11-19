@@ -387,5 +387,8 @@
 	"copy uri": "URI kopieren",
 	"delete entries": "Sind sie sicher, das Sie {count} Einträge löschen wollen?",
 	"deleting items": "Löschen von {count} Einträgen...",
-	"import project zip": "Projekt(-Zip) importieren"
+	"import project zip": "Projekt(-Zip) importieren",
+	"changelog": "Änderungsbericht",
+	"notifications": "Notifications",
+	"no_unread_notifications": "No unread notifications"
 }

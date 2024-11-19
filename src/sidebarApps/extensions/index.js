@@ -368,7 +368,9 @@ async function uninstall(id) {
 			state.delete(state.storeUrl),
 		]);
 		acode.unmountPlugin(id);
-		if (!IS_FREE_VERSION && (await window.iad?.isLoaded())) {
+
+		// Show Ad If Its Free Version, interstitial Ad(iad) is loaded.
+		if (IS_FREE_VERSION && (await window.iad?.isLoaded())) {
 			window.iad.show();
 		}
 	} catch (err) {
