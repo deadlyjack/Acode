@@ -1,3 +1,0 @@
-files:
-  - source: /src/lang/en-us.json
-    translation: /%original_path%/%two_letters_code%-by.json
