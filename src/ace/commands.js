@@ -1,3 +1,4 @@
+import prompt from "dialogs/prompt";
 import fsOperation from "fileSystem";
 import actions from "handlers/quickTools";
 import keyBindings from "lib/keyBindings";
@@ -118,6 +119,19 @@ const commands = [
 			acode.exec("run");
 		},
 		readOnly: true,
+	},
+	{
+		name: "openInAppBrowser",
+		description: "Open In-App Browser",
+		async exec() {
+			const url = await prompt("Enter url", "", "url", {
+				placeholder: "http://",
+				match: /^https?:\/\/.+/,
+			});
+			if (url) {
+				acode.exec("open-inapp-browser", url);
+			}
+		},
 	},
 	{
 		name: "toggleFullscreen",

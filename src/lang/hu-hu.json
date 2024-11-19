@@ -387,5 +387,8 @@
 	"copy uri": "Uri másolása",
 	"delete entries": "Biztosan töröl {count} elemet?",
 	"deleting items": "{count} elem törlése…",
-	"import project zip": "Project(zip) importálása"
+	"import project zip": "Projekt importálása zip-ből",
+	"changelog": "Változáslista",
+	"notifications": "Értesítések",
+	"no_unread_notifications": "Nincsenek olvasatlan értesítések"
 }

@@ -384,9 +384,12 @@
 	"newly_added": "Mới được thêm vào",
 	"top_rated": "Đánh giá cao nhất",
 	"rename not supported": "Đổi tên trên thư mục Termux không được hỗ trợ",
-	"compress": "Compress",
-	"copy uri": "Copy Uri",
-	"delete entries": "Are you sure you want to delete {count} items?",
-	"deleting items": "Deleting {count} items...",
-	"import project zip": "Import Project(zip)"
+	"compress": "Nén lại",
+	"copy uri": "Sao chép Uri",
+	"delete entries": "Bạn có chắc muốn xoá {count} mục?",
+	"deleting items": "Đang xoá {count} mục...",
+	"import project zip": "Nhập Dự Án(zip)",
+	"changelog": "Nhật Ký Thay Đổi",
+	"notifications": "Notifications",
+	"no_unread_notifications": "No unread notifications"
 }
