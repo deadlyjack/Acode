@@ -25,6 +25,6 @@ export default async function checkPluginsUpdate() {
 		);
 	});
 
-	await Promise.all(promises);
+	await Promise.allSettled(promises);
 	return updates;
 }
