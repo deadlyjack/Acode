@@ -91,13 +91,17 @@ Also, ensure that your code is well-documented and includes comments where neces
 > You can use any package manager like npm or yarn or pnpm or bun.
 > You can use your editor specific Biomejs plugin for auto-formatting and linting based on Acode's configs.
 
+## • Contributors
+
+<a href="https://github.com/deadlyjack/Acode/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=deadlyjack/Acode" />
+</a>
+
 ## • Developing a Plugin for Acode
 
 For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/deadlyjack/acode-plugin).
 
 For plugin development information, refer to: [Acode Plugin Documentation](https://acode.app/plugin-docs)
-
-> 💙 Happy coding!
 
 ## Star History
 
