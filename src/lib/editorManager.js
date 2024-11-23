@@ -386,6 +386,7 @@ async function EditorManager($header, $body) {
 		editor.setOption("printMarginColumn", settings.printMargin);
 		editor.setOption("enableBasicAutocompletion", true);
 		editor.setOption("enableLiveAutocompletion", settings.liveAutoCompletion);
+		editor.setOption("copyWithEmptySelection", true);
 		// editor.setOption('enableInlineAutocompletion', settings.inlineAutoCompletion);
 
 		updateMargin(true);
