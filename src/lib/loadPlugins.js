@@ -10,8 +10,8 @@ export default async function loadPlugins() {
 		toast(strings["loading plugins"]);
 	}
 
-	// Load plugins sequentially to better handle errors
-	for (const pluginDir of plugins) {
+	// Load plugins concurrently
+	const loadPromises = plugins.map(async (pluginDir) => {
 		const pluginId = Url.basename(pluginDir.url);
 		try {
 			await loadPlugin(pluginId);
@@ -22,7 +22,8 @@ export default async function loadPlugins() {
 			toast(`Failed to load plugin: ${pluginId}`);
 			results.push(false);
 		}
-	}
+	});
 
+	await Promise.allSettled(loadPromises);
 	return results.filter(Boolean).length;
 }
