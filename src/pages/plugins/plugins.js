@@ -147,6 +147,8 @@ export default function PluginsInclude(updates) {
 
   if (updates) {
     $page.get(".options").style.display = "none";
+    $add.style.display = "none";
+    $filter.style.display = "none";
     $page.settitle(strings.update);
     getInstalledPlugins(updates).then(() => {
       render("installed");
