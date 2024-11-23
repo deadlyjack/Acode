@@ -14,7 +14,7 @@ export default class NotificationManager {
 		if (instance) {
 			return instance;
 		}
-		this.notifications = this.loadNotifications();
+		this.notifications = [];
 		instance = this;
 	}
 
@@ -62,23 +62,6 @@ export default class NotificationManager {
 		});
 	}
 
-	loadNotifications() {
-		try {
-			const notifications =
-				JSON.parse(localStorage.getItem("notifications")) || [];
-			return notifications.map((n) => ({
-				...n,
-				time: new Date(n.time),
-			}));
-		} catch {
-			return [];
-		}
-	}
-
-	saveNotifications() {
-		localStorage.setItem("notifications", JSON.stringify(this.notifications));
-	}
-
 	renderNotifications() {
 		const container = sidebarApps
 			.get("notification")
@@ -112,7 +95,6 @@ export default class NotificationManager {
 			if (index > -1) {
 				notificationElement.remove();
 				this.notifications.splice(index, 1);
-				this.saveNotifications();
 				this.renderNotifications();
 			}
 		}
@@ -141,9 +123,12 @@ export default class NotificationManager {
 			</div>
 						`;
 		if (notification.action) {
-			element.addEventListener("click", () =>
-				notification.action(notification),
-			);
+			element.addEventListener("click", (e) => {
+				if (e.target.closest(".action-button")) {
+					return;
+				}
+				notification.action(notification);
+			});
 		}
 		return element;
 	}
@@ -186,8 +171,6 @@ export default class NotificationManager {
 		if (this.notifications.length > this.MAX_NOTIFICATIONS) {
 			this.notifications.pop();
 		}
-
-		this.saveNotifications();
 
 		this.renderNotifications();
 
@@ -240,7 +223,6 @@ export default class NotificationManager {
 
 	clearAll() {
 		this.notifications = [];
-		this.saveNotifications();
 		this.renderNotifications();
 		if (this.timeUpdateInterval) {
 			clearInterval(this.timeUpdateInterval);
