@@ -50,8 +50,10 @@ import { setKeyBindings } from "ace/commands";
 import { initModes } from "ace/modelist";
 import { keydownState } from "handlers/keyboard";
 import { initFileList } from "lib/fileList";
+import NotificationManager from "lib/notificationManager";
 import { addedFolder } from "lib/openFolder";
 import { getEncoding, initEncodings } from "utils/encodings";
+import constants from "./constants";
 
 const previousVersionCode = Number.parseInt(localStorage.versionCode, 10);
 
@@ -106,6 +108,19 @@ async function onDeviceReady() {
 	window.KEYBINDING_FILE = Url.join(DATA_STORAGE, ".key-bindings.json");
 	window.IS_FREE_VERSION = isFreePackage;
 	window.log = logger.log.bind(logger);
+
+	// Capture synchronous errors
+	window.addEventListener("error", function (event) {
+		const errorMsg = `Error: ${event.message}, Source: ${event.filename}, Line: ${event.lineno}, Column: ${event.colno}, Stack: ${event.error?.stack || "N/A"}`;
+		window.log("error", errorMsg);
+	});
+	// Capture unhandled promise rejections
+	window.addEventListener("unhandledrejection", function (event) {
+		window.log(
+			"error",
+			`Unhandled rejection: ${event.reason ? event.reason.message : "Unknown reason"}\nStack: ${event.reason ? event.reason.stack : "No stack available"}`,
+		);
+	});
 
 	startAd();
 
@@ -185,22 +200,31 @@ async function onDeviceReady() {
 		oldResolveURL.call(this, Url.safe(url), ...args);
 	};
 
-	setTimeout(() => {
-		if (document.body.classList.contains("loading"))
+	setTimeout(async () => {
+		if (document.body.classList.contains("loading")) {
 			window.log("warn", "App is taking unexpectedly long time!");
-		document.body.setAttribute(
-			"data-small-msg",
-			"This is taking unexpectedly long time!",
-		);
+			document.body.setAttribute(
+				"data-small-msg",
+				"This is taking unexpectedly long time!",
+			);
+			// share the log file (but currently doesn't work)
+			// system.fileAction(
+			//   Url.join(DATA_STORAGE, constants.LOG_FILE_NAME),
+			//   constants.LOG_FILE_NAME,
+			//   "SEND",
+			//   "text/plain",
+			//   () => {
+			//     toast(strings["no app found to handle this file"]);
+			//   },
+			// );
+		}
 	}, 1000 * 10);
 
 	acode.setLoadingMessage("Loading settings...");
-	window.log("info", "Loading Settings...");
 	await settings.init();
 	themes.init();
 
 	acode.setLoadingMessage("Loading language...");
-	window.log("info", "Loading language...");
 	await lang.set(settings.value.lang);
 
 	try {
@@ -346,34 +370,12 @@ async function loadApp() {
 	});
 	//#endregion
 
-	window.log("info", "App started!");
+	const notificationManager = new NotificationManager();
+	notificationManager.init();
+
+	window.log("info", "Started app and its services...");
 
 	new EditorFile();
-
-	checkPluginsUpdate()
-		.then((updates) => {
-			if (!updates.length) return;
-			const $icon = (
-				<span
-					onclick={() => {
-						plugins(updates);
-						$icon.remove();
-					}}
-					attr-action=""
-					style={{ fontSize: "1.2rem" }}
-					className="icon notifications"
-				></span>
-			);
-
-			if ($editMenuToggler.isConnected) {
-				$header.insertBefore($icon, $editMenuToggler);
-			} else if ($runBtn.isConnected) {
-				$header.insertBefore($icon, $runBtn);
-			} else {
-				$header.insertBefore($icon, $menuToggler);
-			}
-		})
-		.catch(console.error);
 
 	//load plugins
 	try {
@@ -405,6 +407,58 @@ async function loadApp() {
 	}
 
 	initFileList();
+
+	checkPluginsUpdate()
+		.then((updates) => {
+			if (!updates.length) return;
+			acode.pushNotification(
+				"Plugin Updates",
+				`${updates.length} plugin${updates.length > 1 ? "s" : ""} ${updates.length > 1 ? "have" : "has"} new version${updates.length > 1 ? "s" : ""} available.`,
+				{
+					icon: "extension",
+					action: () => {
+						plugins(updates);
+					},
+				},
+			);
+		})
+		.catch(console.error);
+
+	// Check for app updates
+	if (navigator.onLine) {
+		fetch("https://api.github.com/repos/deadlyjack/Acode/releases/latest")
+			.then((res) => res.json())
+			.then((release) => {
+				// assuming version is in format v1.2.3
+				const latestVersion = release.tag_name
+					.replace("v", "")
+					.split(".")
+					.map(Number);
+				const currentVersion = BuildInfo.version.split(".").map(Number);
+
+				const hasUpdate = latestVersion.some(
+					(num, i) => num > currentVersion[i],
+				);
+
+				if (hasUpdate) {
+					acode.pushNotification(
+						"Update Available",
+						`Acode ${release.tag_name} is now available! Click here to checkout.`,
+						{
+							icon: "update",
+							type: "warning",
+							action: () => {
+								system.openInBrowser(release.html_url);
+							},
+						},
+					);
+				}
+			})
+			.catch((err) => {
+				window.log("error", "Failed to check for updates");
+				window.log("error", err);
+			});
+	}
 
 	/**
 	 *

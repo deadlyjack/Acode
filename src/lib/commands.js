@@ -7,11 +7,13 @@ import fsOperation from "fileSystem";
 import actions from "handlers/quickTools";
 import recents from "lib/recents";
 import FileBrowser from "pages/fileBrowser";
+import plugins from "pages/plugins";
 import Problems from "pages/problems/problems";
 import changeEncoding from "palettes/changeEncoding";
 import changeMode from "palettes/changeMode";
 import commandPalette from "palettes/commandPalette";
 import findFile from "palettes/findFile";
+import browser from "plugins/browser";
 import help from "settings/helpSettings";
 import mainSettings from "settings/mainSettings";
 import Url from "utils/Url";
@@ -176,6 +178,10 @@ export default {
 				Problems();
 				break;
 
+			case "plugins":
+				plugins();
+				break;
+
 			default:
 				return;
 		}
@@ -231,7 +237,9 @@ export default {
 	"resize-editor"() {
 		editorManager.editor.resize(true);
 	},
-
+	"open-inapp-browser"(url) {
+		browser.open(url);
+	},
 	run() {
 		editorManager.activeFile[
 			appSettings.value.useCurrentFileForPreview ? "runFile" : "run"
@@ -365,5 +373,74 @@ export default {
 	},
 	"open-log-file"() {
 		openFile(Url.join(DATA_STORAGE, constants.LOG_FILE_NAME));
+	},
+	"copy-device-info"() {
+		let webviewInfo = {};
+		let appInfo = {};
+		const getWebviewInfo = new Promise((resolve, reject) => {
+			system.getWebviewInfo(
+				(res) => {
+					webviewInfo = res;
+					resolve();
+				},
+				(error) => {
+					console.error("Error getting WebView info:", error);
+					reject(error);
+				},
+			);
+		});
+		const getAppInfo = new Promise((resolve, reject) => {
+			system.getAppInfo(
+				(res) => {
+					appInfo = res;
+					resolve();
+				},
+				(error) => {
+					console.error("Error getting app info:", error);
+					reject(error);
+				},
+			);
+		});
+
+		Promise.all([getWebviewInfo, getAppInfo])
+			.then(() => {
+				let info = `Device Information:
+WebView Info:
+		Package Name: ${webviewInfo?.packageName || "N/A"}
+		Version: ${webviewInfo?.versionName || "N/A"}
+
+App Info:
+		Name: ${appInfo?.label || "N/A"}
+		Package Name: ${appInfo?.packageName || "N/A"}
+		Version: ${appInfo?.versionName || "N/A"}
+		Version Code: ${appInfo?.versionCode || "N/A"}
+
+Device Info:
+		Android Version: ${device?.version || "N/A"}
+		Manufacturer: ${device?.manufacturer || "N/A"}
+		Model: ${device?.model || "N/A"}
+		Platform: ${device?.platform || "N/A"}
+		Cordova Version: ${device?.cordova || "N/A"}
+
+Screen Info:
+		Width: ${screen?.width || "N/A"}
+		Height: ${screen?.height || "N/A"}
+		Color Depth: ${screen?.colorDepth || "N/A"}
+
+Additional Info:
+		Language: ${navigator?.language || "N/A"}
+		User Agent: ${navigator?.userAgent || "N/A"}
+`;
+
+				// Copy the info to clipboard
+				if (cordova.plugins.clipboard) {
+					cordova.plugins.clipboard.copy(info);
+					toast(strings["copied to clipboard"]);
+				}
+			})
+			.catch((error) => {
+				console.error("Error getting device info:", error);
+				toast("Failed to get device info");
+			});
 	},
 };

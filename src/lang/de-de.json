@@ -379,7 +379,16 @@
 	"show side buttons": "Zeige Seitenknöpfe",
 	"bug_report": "Einen Fehlerbericht übermitteln",
 	"verified publisher": "Verifizierter Herausgeber",
-	"most_downloaded": "Most Downloaded",
-	"newly_added": "Newly Added",
-	"top_rated": "Top Rated"
+	"most_downloaded": "Meist Heruntergeladene",
+	"newly_added": "Neu Hinzugefügte",
+	"top_rated": "Am besten Bewertete",
+	"rename not supported": "Umbenennen des Termux-Verzeichnisses wird nicht unterstützt",
+	"compress": "Komprimieren",
+	"copy uri": "URI kopieren",
+	"delete entries": "Sind sie sicher, das Sie {count} Einträge löschen wollen?",
+	"deleting items": "Löschen von {count} Einträgen...",
+	"import project zip": "Projekt(-Zip) importieren",
+	"changelog": "Änderungsbericht",
+	"notifications": "Notifications",
+	"no_unread_notifications": "No unread notifications"
 }

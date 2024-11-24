@@ -381,5 +381,14 @@
 	"verified publisher": "Verified publisher",
 	"most_downloaded": "대부분의 다운로드",
 	"newly_added": "새로 추가되었습니다",
-	"top_rated": "최고 평점"
+	"top_rated": "최고 평점",
+	"rename not supported": "Rename on termux dir isn't supported",
+	"compress": "Compress",
+	"copy uri": "Copy Uri",
+	"delete entries": "Are you sure you want to delete {count} items?",
+	"deleting items": "Deleting {count} items...",
+	"import project zip": "Import Project(zip)",
+	"changelog": "Change Log",
+	"notifications": "Notifications",
+	"no_unread_notifications": "No unread notifications"
 }

@@ -1,7 +1,7 @@
 {
   "name": "com.foxdebug.acode",
   "displayName": "Acode",
-  "version": "1.10.4",
+  "version": "1.10.6",
   "description": "Acode is a code editor for android",
   "scripts": {
     "lang": "node ./utils/lang.js",
@@ -10,7 +10,6 @@
     "clean": "sh utils/scripts/clean.sh android android",
     "plugin": "sh utils/scripts/plugin.sh",
     "setup": "node ./utils/setup.js",
-    "spellcheck": "npx cspell",
     "lint": "biome lint --write",
     "format": "biome format --write",
     "check": "biome check --write"
@@ -70,7 +69,6 @@
     "cordova-plugin-server": "file:src/plugins/server",
     "cordova-plugin-sftp": "file:src/plugins/sftp",
     "cordova-plugin-system": "file:src/plugins/system",
-    "cspell": "^8.14.2",
     "css-loader": "^7.1.2",
     "mini-css-extract-plugin": "^2.9.0",
     "path-browserify": "^1.0.1",
@@ -98,6 +96,9 @@
     "js-base64": "^3.7.7",
     "jszip": "^3.10.1",
     "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.2.0",
+    "markdown-it-github-alerts": "^0.3.0",
+    "markdown-it-task-lists": "^2.1.1",
     "mime-types": "^2.1.35",
     "minimatch": "^9.0.4",
     "mustache": "^4.2.0",

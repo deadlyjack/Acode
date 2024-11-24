@@ -1,6 +1,8 @@
 import collapsableList from "components/collapsableList";
 import Sidebar from "components/sidebar";
 import tile from "components/tile";
+import toast from "components/toast";
+import alert from "dialogs/alert";
 import confirm from "dialogs/confirm";
 import prompt from "dialogs/prompt";
 import select from "dialogs/select";
@@ -44,7 +46,7 @@ import appSettings from "./settings";
 
 /**@type {Folder[]} */
 export const addedFolder = [];
-
+const ACODE_PLUGIN_MANIFEST_FILE = "plugin.json";
 /**
  * Open a folder in the sidebar
  * @param {string} _path
@@ -268,11 +270,24 @@ async function handleContextmenu(type, url, name, $target) {
 	const OPEN_FOLDER = ["open-folder", strings["open folder"], "folder"];
 	const INSERT_FILE = ["insert-file", strings["insert file"], "file_copy"];
 	const CLOSE_FOLDER = ["close", strings["close"], "folder-remove"];
+	const INSTALL_PLUGIN = [
+		"install-plugin",
+		strings["install as plugin"] || "Install as Plugin",
+		"extension",
+	];
 
 	let options;
 
 	if (helpers.isFile(type)) {
 		options = [COPY, CUT, RENAME, REMOVE];
+		if (
+			url.toLowerCase().endsWith(".zip") &&
+			(await fsOperation(
+				Url.dirname(url) + ACODE_PLUGIN_MANIFEST_FILE,
+			).exists())
+		) {
+			options.push(INSTALL_PLUGIN);
+		}
 	} else if (helpers.isDir(type)) {
 		options = [
 			COPY,
@@ -304,7 +319,7 @@ async function handleContextmenu(type, url, name, $target) {
 
 /**
  * @param {"dir"|"file"|"root"} type
- * @param {"copy"|"cut"|"delete"|"rename"|"paste"|"new file"|"new folder"|"cancel"|"open-folder"} action
+ * @param {"copy"|"cut"|"delete"|"rename"|"paste"|"new file"|"new folder"|"cancel"|"open-folder"|"install-plugin"} action
  * @param {string} url target url
  * @param {HTMLElement} $target target element
  * @param {string} name Name of file or folder
@@ -343,6 +358,25 @@ function execOperation(type, action, url, $target, name) {
 
 		case "close":
 			return remove();
+
+		case "install-plugin":
+			return installPlugin();
+	}
+
+	async function installPlugin() {
+		try {
+			const manifest = JSON.parse(
+				await fsOperation(
+					Url.dirname(url) + ACODE_PLUGIN_MANIFEST_FILE,
+				).readFile("utf8"),
+			);
+			const { default: installPlugin } = await import("lib/installPlugin");
+			await installPlugin(url, manifest.name);
+			toast(strings["success"], 3000);
+		} catch (error) {
+			helpers.error(error);
+			console.error(error);
+		}
 	}
 
 	async function deleteFile() {
@@ -350,15 +384,40 @@ function execOperation(type, action, url, $target, name) {
 		const confirmation = await confirm(strings.warning, msg);
 		if (!confirmation) return;
 		startLoading();
-		await fsOperation(url).delete();
+		if (!(await fsOperation(url).exists())) return;
+		// await fsOperation(url).delete();
 		recents.removeFile(url);
 		if (helpers.isFile(type)) {
+			await fsOperation(url).delete();
 			$target.remove();
 			const file = editorManager.getFile(url, "uri");
 			if (file) file.uri = null;
 			editorManager.onupdate("delete-file");
 			editorManager.emit("update", "delete-file");
 		} else {
+			if (url.startsWith("content://com.termux.documents/tree/")) {
+				const fs = fsOperation(url);
+				const entries = await fs.lsDir();
+				if (entries.length === 0) {
+					await fs.delete();
+				} else {
+					const deleteRecursively = async (currentUrl) => {
+						const currentFs = fsOperation(currentUrl);
+						const currentEntries = await currentFs.lsDir();
+						for (const entry of currentEntries) {
+							if (entry.isDirectory) {
+								await deleteRecursively(entry.url);
+							} else {
+								await fsOperation(entry.url).delete();
+							}
+						}
+						await currentFs.delete();
+					};
+					await deleteRecursively(url);
+				}
+			} else {
+				await fsOperation(url).delete();
+			}
 			recents.removeFolder(url);
 			helpers.updateUriOfAllActiveFiles(url, null);
 			$target.parentElement.remove();
@@ -371,6 +430,13 @@ function execOperation(type, action, url, $target, name) {
 	}
 
 	async function renameFile() {
+		if (
+			url.startsWith("content://com.termux.documents/tree/") &&
+			!helpers.isFile(type)
+		) {
+			alert(strings.warning, strings["rename not supported"]);
+			return;
+		}
 		let newName = await prompt(strings.rename, name, "text", {
 			match: constants.FILE_NAME_REGEX,
 			required: true,
@@ -381,7 +447,22 @@ function execOperation(type, action, url, $target, name) {
 
 		startLoading();
 		const fs = fsOperation(url);
-		const newUrl = await fs.renameTo(newName);
+		let newUrl;
+
+		if (
+			url.startsWith("content://com.termux.documents/tree/") &&
+			helpers.isFile(type)
+		) {
+			// Special handling for Termux content files
+			const newFilePath = Url.join(Url.dirname(url), newName);
+			const content = await fs.readFile();
+			await fsOperation(Url.dirname(url)).createFile(newName, content);
+			await fs.delete();
+			newUrl = newFilePath;
+		} else {
+			newUrl = await fs.renameTo(newName);
+		}
+
 		newName = Url.basename(newUrl);
 		$target.querySelector(":scope>.text").textContent = newName;
 		$target.dataset.url = newUrl;

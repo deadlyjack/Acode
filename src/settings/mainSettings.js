@@ -6,6 +6,7 @@ import openFile from "lib/openFile";
 import removeAds from "lib/removeAds";
 import appSettings from "lib/settings";
 import settings from "lib/settings";
+import Changelog from "pages/changelog/changelog";
 import Donate from "pages/donate";
 import plugins from "pages/plugins";
 import themeSetting from "pages/themeSetting";
@@ -91,6 +92,11 @@ export default function mainSettings() {
 			text: `${strings["edit"]} settings.json`,
 			icon: "edit",
 		},
+		{
+			key: "changeLog",
+			text: `${strings["changelog"]}`,
+			icon: "update",
+		},
 	];
 
 	if (IS_FREE_VERSION) {
@@ -163,6 +169,10 @@ export default function mainSettings() {
 				} catch (error) {
 					helpers.error(error);
 				}
+				break;
+
+			case "changeLog":
+				Changelog();
 				break;
 
 			default:

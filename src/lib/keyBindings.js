@@ -580,14 +580,14 @@ export default {
 	},
 	increaseFontSize: {
 		description: "Increase font size",
-		bindKey: "Ctrl-+",
+		key: "Ctrl-+|Ctrl-=",
 	},
 	decreaseFontSize: {
 		description: "Decrease font size",
-		bindKey: "Ctrl+-",
+		key: "Ctrl+-|Ctrl-_",
 	},
 	resetFontSize: {
 		description: "Reset font size",
-		bindKey: "Ctrl+0|Ctrl-Numpad0",
+		key: "Ctrl+0|Ctrl-Numpad0",
 	},
 };

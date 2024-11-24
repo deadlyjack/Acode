@@ -6,6 +6,7 @@ import JSZip from "jszip";
 import Url from "utils/Url";
 import helpers from "utils/helpers";
 import constants from "./constants";
+import InstallState from "./installState";
 import loadPlugin from "./loadPlugin";
 
 /**
@@ -87,34 +88,47 @@ export default async function installPlugin(
 				pluginDir = Url.join(PLUGIN_DIR, id);
 			}
 
+			const state = await InstallState.new(id);
+
 			if (!(await fsOperation(pluginDir).exists())) {
 				await fsOperation(PLUGIN_DIR).createDirectory(id);
 			}
 
 			const promises = Object.keys(zip.files).map(async (file) => {
-				let correctFile = file;
-				if (/\\/.test(correctFile)) {
-					correctFile = correctFile.replace(/\\/g, "/");
+				try {
+					let correctFile = file;
+					if (/\\/.test(correctFile)) {
+						correctFile = correctFile.replace(/\\/g, "/");
+					}
+
+					const fileUrl = Url.join(pluginDir, correctFile);
+
+					if (!state.exists(correctFile)) {
+						await createFileRecursive(pluginDir, correctFile);
+					}
+
+					// Skip directories
+					if (correctFile.endsWith("/")) return;
+
+					let data = await zip.files[file].async("ArrayBuffer");
+
+					if (file === "plugin.json") {
+						data = JSON.stringify(pluginJson);
+					}
+
+					if (!(await state.isUpdated(correctFile, data))) return;
+					await fsOperation(fileUrl).writeFile(data);
+					return;
+				} catch (error) {
+					console.error(`Error processing file ${file}:`, error);
 				}
-
-				const fileUrl = Url.join(pluginDir, correctFile);
-				if (!(await fsOperation(fileUrl).exists())) {
-					await createFileRecursive(pluginDir, correctFile);
-				}
-
-				if (correctFile.endsWith("/")) return;
-
-				let data = await zip.files[file].async("ArrayBuffer");
-
-				if (file === "plugin.json") {
-					data = JSON.stringify(pluginJson);
-				}
-
-				await fsOperation(fileUrl).writeFile(data);
 			});
 
-			await Promise.all(promises);
+			// Wait for all files to be processed
+			await Promise.allSettled(promises);
 			await loadPlugin(id, true);
+			await state.save();
+			deleteRedundantFiles(pluginDir, state);
 		}
 	} catch (err) {
 		try {
@@ -235,6 +249,38 @@ async function resolveDependency(id, setMessage) {
 				"json",
 			);
 			return plugin.version;
+		}
+	}
+}
+
+/**
+ *
+ * @param {string} dir
+ * @param {Array<string>} files
+ */
+async function listFileRecursive(dir, files) {
+	for (const child of await fsOperation(dir).lsDir()) {
+		const fileUrl = Url.join(dir, child.name);
+		if (child.isDirectory) {
+			await listFileRecursive(fileUrl, files);
+		} else {
+			files.push(fileUrl);
+		}
+	}
+}
+
+/**
+ *
+ * @param {Record<string, boolean>} files
+ */
+async function deleteRedundantFiles(pluginDir, state) {
+	/** @type string[] */
+	let files = [];
+	await listFileRecursive(pluginDir, files);
+
+	for (const file of files) {
+		if (!state.exists(file.replace(`${pluginDir}/`, ""))) {
+			fsOperation(file).delete();
 		}
 	}
 }

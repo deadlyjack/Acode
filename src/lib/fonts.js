@@ -150,26 +150,23 @@ async function setFont(name) {
 		);
 		let css = get(name);
 
-		// get all url font css
-		const urls = /url\((.*?)\)/g.exec(css)?.slice(1);
+		// Get all URL font references
+		const urls = [...css.matchAll(/url\((.*?)\)/g)].map((match) => match[1]);
 
-		await Promise.all(
-			urls?.map(async (url) => {
-				if (!/^https?/.test(url)) return;
-				if (/^https?:\/\/localhost/) return;
-				const fontFile = await downloadFont(name, url);
-				const internalUrl = await helpers.toInternalUri(fontFile);
-				css = css.replace(url, internalUrl);
-			}),
-		);
-
-		$style.textContent = `${css}
+		urls?.map(async (url) => {
+			if (!/^https?/.test(url)) return;
+			if (/^https?:\/\/localhost/.test(url)) return;
+			const fontFile = await downloadFont(name, url);
+			const internalUrl = await helpers.toInternalUri(fontFile);
+			css = css.replace(url, internalUrl);
+		}),
+			($style.textContent = `${css}
   .editor-container.ace_editor{
     font-family: "${name}", NotoMono, Monaco, MONOSPACE !important;
   }
   .ace_text{
     font-family: inherit !important;
-  }`;
+  }`);
 		document.head.append($style);
 	} catch (error) {
 		toast(`${name} font not found`, "error");
@@ -191,6 +188,7 @@ async function downloadFont(name, link) {
 	}
 
 	const font = await fsOperation(link).readFile();
+	console.log("fonts content : ", font);
 	await fsOperation(FONT_DIR).createFile(name, font);
 
 	return FONT_FILE;

@@ -244,12 +244,12 @@ class PageHandler {
 
 	onhide() {
 		this.$el.off("hide", this.onhide);
-		handlePagesForSmoothExprienceBack();
+		handlePagesForSmoothExperienceBack();
 	}
 
 	onshow() {
 		this.$el.off("show", this.onshow);
-		handlePagesForSmoothExprience();
+		handlePagesForSmoothExperience();
 	}
 
 	remove() {
@@ -260,13 +260,13 @@ class PageHandler {
 /**
  * Remove invisible pages from DOM and add them to the stack
  */
-function handlePagesForSmoothExprience() {
+function handlePagesForSmoothExperience() {
 	const $pages = [...tag.getAll("wc-page")];
 	for (let $page of $pages.slice(0, -1)) {
 		$page.handler.replaceEl();
 	}
 }
 
-function handlePagesForSmoothExprienceBack() {
+function handlePagesForSmoothExperienceBack() {
 	[...tag.getAll(".page-replacement")].pop()?.handler.restoreEl();
 }

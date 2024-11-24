@@ -1,5 +1,82 @@
 # Change Log
 
+## v1.10.6 (954)
+
+### New Features
+- **Install State for Plugins**: Added an install state to improve plugin updates (#1026) by @alMukaafih, further enhanced by @bajrangCoder.
+- **Selection Mode in File Browser**: Introduced a selection mode in the file browser by @bajrangCoder.
+- **Persistent Notification System**: Added a persistent notification system with toast notifications by @bajrangCoder.
+- **In-App Browser Command**: Added a command to open an in-app browser with a given URL by @angeloyana.
+- **Font Size Shortcut Keys**: Added new key shortcuts for changing font size by @bajrangCoder:
+    - Increase Font Size: `Ctrl - +` or `Ctrl - =`
+    - Decrease Font Size: `Ctrl + -` or `Ctrl - _`
+- **Command Palette Enhancements**:
+    - "Open Plugin Page" command for quick access to plugin pages, especially for keyboard users.
+    - "Copy Device Info" command to share device information for troubleshooting.
+- **GitHub Alert Support**: Added GitHub alert support in plugin descriptions by @bajrangCoder.
+- **File Tab Drop Behavior**: Dropping a file tab into any input or editor now inserts its path by @bajrangCoder.
+- **File Browser Context Menu**: Added a "Copy URI" option in the file browser context menu by @bajrangCoder.
+- **Project Import as ZIP**: Added the option to import projects as ZIP files by @bajrangCoder.
+- **Backup Plugins**: You can now back up plugins, whether they are paid or free by @bajrangCoder.
+- **Task List Markdown Support**: Added support for task lists (`- [x]`) in the plugin page markdown by @bajrangCoder.
+- **Install as Plugin for ZIP Files**: Added the "Install as Plugin" option in the sidebar files section for ZIP files containing a `plugin.json` in the root directory by @bajrangCoder.
+- **`acode.installPlugin` API**: Introduced an API for plugins to install other plugins with user consent by @bajrangCoder(available from versionCode: `954`).
+- **View Changelogs in Settings**: Added an option in the settings page to view changelogs directly inside the app by @bajrangCoder.
+- **App Update Checker**: Implemented an app update checker that runs on startup by @bajrangCoder.
+
+### Fixes
+- **Plugin Loading Failures**: Improved handling of plugin loading failures by @bajrangCoder:
+    - Prevents the app from crashing when plugins fail to load.
+    - Shows user feedback for each failed plugin while continuing to load others.
+- **Internal URL Navigation**: Replaced browser navigation with scroll behavior for internal links in plugin descriptions. Links to the same markdown now scroll instead of opening a browser by @bajrangCoder.
+- **Pro Version Ads Issue**: Fixed an issue where plugin context menu actions displayed ads even if the Pro version was purchased by @UnschooledGamer.
+- **Termux Private URI Operations**: Resolved issues with deleting folders/files and renaming files in Termux private URI file systems.
+- **Logger Enhancements**: Improved the logger to automatically detect failures and use `console.error` in Acode.
+- **Preview and Server Port Issue**: Fixed an issue where the browser did not open on the given port when the preview port and server port differed.
+- **Font Persistence**: Resolved an issue where fonts did not persist after restarting the app.
+- **Markdown Linking**: Fixed issues with linking to headings within the same page in markdown.
+- **Search Bar in File Browser**: Fixed a bug where the search bar in the file browser would get stuck and become unclosable.
+- **Theme Page Issues**: Addressed issues with theme plugins, including preview rendering and checkbox state changes.
+- **Formatter Mode Selection**: Fixed the formatter ignoring the selected mode for files by @alMukaafih.
+
+### Others
+- **Plugin Refactor**: Migrated the old plugin update icon to a new toast-like notification widget.
+
+### Translators
+- Updated translations for specific languages contributed by:
+    - **@Micha-he**: `de-de.json`
+    - **@LaunchLee**: `zh-cn.json` and `zh-hant.json`
+    - **@andrewczm**: `pl-pl.json`
+    - **@Nekitori17**: `vi-vn`
+    - **@s4ntiksu**: `ru-ru.json`
+    - **@summoner001**: `hu-hu.json`
+
+---
+
+## [1.10.5] (953)
+
+- New
+  - Plugin Filtering System in #1011
+  - feat: Add more action menu in sidebar plugin in #1017
+  - Implement Logger system in #1020
+  - Feat: Use Current File for preview (Toggle option) in #1006
+  - updated ace editor to v1.36.2 in #1025
+
+- Fixes
+  - Update de-de.json in #1039
+  - fixed sidebar plugin search list scrolling in #1002
+  - Improve zh-TW traditional Chinese translation in #1004
+  - fix: Fixed save all changes option in #1010
+  - chore(i18n): vi-vn in #1016
+  - removed auto paste of url on plugin page in #1023
+  - fixed weird spacing issue on header #925 in #1024
+  - Update zh-cn.json and zh-hant.json in #1031
+  - Refactor Iap.java: Use WeakReference for Context and Activity to prevent memory leaks in #1040
+  - Updated Polish translation in #1043
+  - ru-ru improved in #1041
+  - Update pl-pl.json in #1044 & #1045
+  - fix: termux related fs operations failure in #1046
+
 ## [1.10.4] (952)
 
 - New

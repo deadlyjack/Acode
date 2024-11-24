@@ -315,7 +315,7 @@
 	"product not available": "Sản phẩm không có sẵn",
 	"no-product-info": "Sản phẩm này hiện không có sẵn ở quốc gia của bạn, Hãy thử lại sau",
 	"close": "Đóng",
-	"explore": "Duyệt tệp",
+	"explore": "Khám phá",
 	"key bindings updated": "Đã cập nhật các phím tắt",
 	"search in files": "Tìm kiếm trong các tệp",
 	"exclude files": "Loại trừ các tập tin",
@@ -382,5 +382,14 @@
 	"verified publisher": "Nhà phát hành đã xác minh",
 	"most_downloaded": "Tải xuống nhiều nhất",
 	"newly_added": "Mới được thêm vào",
-	"top_rated": "Đánh giá cao nhất"
+	"top_rated": "Đánh giá cao nhất",
+	"rename not supported": "Đổi tên trên thư mục Termux không được hỗ trợ",
+	"compress": "Nén lại",
+	"copy uri": "Sao chép Uri",
+	"delete entries": "Bạn có chắc muốn xoá {count} mục?",
+	"deleting items": "Đang xoá {count} mục...",
+	"import project zip": "Nhập Dự Án(zip)",
+	"changelog": "Nhật Ký Thay Đổi",
+	"notifications": "Notifications",
+	"no_unread_notifications": "No unread notifications"
 }

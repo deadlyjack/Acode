@@ -1,0 +1,142 @@
+.container.notifications{
+    display: flex;
+    flex-direction: column;
+
+    .header{
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-text-color);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .clear-all {
+            font-size: 12px;
+            color: var(--secondary-text-color);
+            background: none;
+            padding: 5px;
+        }
+    }
+
+    .notifications-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .empty-state {
+            text-align: center;
+            color: var(--secondary-text-color);
+            padding: 20px;
+            font-size: 14px;
+        }
+        .notification-item {
+            padding: 10px 12px;
+            border-radius: 6px;
+            background: var(--popup-background-color);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            animation: slideIn 0.3s ease-out;
+            border: 1px solid var(--popup-border-color);
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: rgba($color: #000000, $alpha: 0.2);
+                border-color: var(--popup-border-color);
+            }
+            .notification-icon {
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                color: var(--primary-text-color);
+            }
+            .notification-content {
+                flex: 1;
+                min-width: 0;
+
+                .notification-title {
+                    font-size: 13px;
+                    font-weight: 500;
+                    margin-bottom: 4px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    word-wrap: break-word;
+                    color: var(--primary-text-color);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    .notification-time {
+                        font-size: 11px;
+                        color: var(--secondary-text-color);
+                    }
+                }
+                .notification-message {
+                    font-size: 12px;
+                    color: var(--secondary-text-color);
+                    line-height: 1.4;
+                }
+                .notification-actions {
+                    margin-top: 8px;
+                    display: flex;
+                    justify-content: flex-end;
+
+                    .action-button {
+                        font-size: 11px;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        background: transparent;
+                        color: var(--secondary-text-color);
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        border: 1px solid var(--border-color);
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+
+                        &:hover {
+                            background: rgba($color: var(--border-color), $alpha: 0.6);
+                            color: var(--primary-text-color);
+                            border-color: var(--border-color);
+                        }
+                        &:active {
+                            transform: translateY(1px);
+                        }
+                        &::before {
+                            content: '×';
+                            font-size: 14px;
+                            line-height: 1;
+                            opacity: 0.8;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

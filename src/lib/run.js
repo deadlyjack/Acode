@@ -3,6 +3,8 @@ import alert from "dialogs/alert";
 import box from "dialogs/box";
 import fsOperation from "fileSystem";
 import markdownIt from "markdown-it";
+import anchor from "markdown-it-anchor";
+import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
 import mimeType from "mime-types";
 import mustache from "mustache";
 import browser from "plugins/browser";
@@ -39,7 +41,8 @@ async function run(
 				return;
 			}
 
-			system.inAppBrowser(src, "", false, disableCache);
+			browser.open(src);
+			return;
 		}
 	}
 
@@ -265,9 +268,16 @@ async function run(
 
 				case ".md":
 					if (file) {
-						const html = markdownIt({ html: true }).render(
-							file.session.getValue(),
-						);
+						const html = markdownIt({ html: true })
+							.use(MarkdownItGitHubAlerts)
+							.use(anchor, {
+								slugify: (s) =>
+									s
+										.trim()
+										.toLowerCase()
+										.replace(/[^a-z0-9]+/g, "-"),
+							})
+							.render(file.session.getValue());
 						const doc = mustache.render($_markdown, {
 							html,
 							filename,
@@ -338,7 +348,7 @@ async function run(
 						? "eruda._shadowRoot.querySelector('.eruda-entry-btn').style.display = 'none';"
 						: ""
 				}
-        
+
         sessionStorage.setItem('__console_available', true);
         document.addEventListener('showconsole', function () {eruda.show()});
         document.addEventListener('hideconsole', function () {eruda.hide()});
