@@ -78,14 +78,19 @@ class SftpClient {
 					if (stat) options += "d";
 
 					sftp.exec(
-						`ls ${options} --full-time "${path}" | awk '{$2=\"\"; print $0}'`,
-						(res) => {
+						`ls ${options} --full-time -L "${path}" | awk '{$2=\"\"; print $0}'`,
+						async (res) => {
 							if (res.code <= 0) {
 								if (stat) {
-									resolve(this.#parseFile(res.result, Url.dirname(filename)));
+									const file = await this.#parseFile(
+										res.result,
+										Url.dirname(filename),
+									);
+									resolve(file);
 									return;
 								}
-								resolve(this.#parseDir(filename, res.result));
+								const dirList = await this.#parseDir(filename, res.result);
+								resolve(dirList);
 								return;
 							}
 							reject(this.#errorCodes(res.code));
@@ -490,18 +495,19 @@ class SftpClient {
 	 * @param {String} dirname
 	 * @param {String} res
 	 */
-	#parseDir(dirname, res) {
+	async #parseDir(dirname, res) {
 		if (!res) return [];
 
 		const list = res.split("\n");
 
 		if (/total/.test(list[0])) list.splice(0, 1);
 
-		const fileList = list.map((i) => this.#parseFile(i, dirname));
+		const filePromises = list.map((i) => this.#parseFile(i, dirname));
+		const fileList = await Promise.all(filePromises);
 		return fileList.filter((i) => !!i);
 	}
 
-	#parseFile(item, dirname) {
+	async #parseFile(item, dirname) {
 		if (!item) return null;
 		const PERMISSIONS = 0;
 		const SIZE = 2;
@@ -536,9 +542,67 @@ class SftpClient {
 		const canrw = permissions.substr(1, 2);
 		const type = DIR_TYPE(permissions[0]);
 
+		let isDirectory = type === "directory";
+		let isFile = type === "file";
+		let targetType = type;
+
 		if (type === "link") {
 			name.splice(name.indexOf("->"));
+			if (name.length === 0) return null;
+			const symlinkPath = Url.join(
+				dirname,
+				Url.basename(name[name.length - 1]),
+			);
+			let linkTarget = await new Promise((resolve, reject) => {
+				sftp.exec(
+					`readlink "${this.#safeName(symlinkPath)}"`,
+					(res) => {
+						if (res.code <= 0) {
+							resolve(res.result.trim());
+						} else {
+							reject(this.#errorCodes(res.code));
+						}
+					},
+					(err) => {
+						reject(err);
+					},
+				);
+			});
+			linkTarget = linkTarget.startsWith("/")
+				? linkTarget
+				: Url.join(dirname, linkTarget);
+
+			targetType = await new Promise((resolve, reject) => {
+				sftp.exec(
+					`ls -ld "${this.#safeName(linkTarget)}"`,
+					(res) => {
+						if (res.code <= 0) {
+							const output = res.result.trim();
+							switch (output[0]) {
+								case "d":
+									resolve("directory");
+									break;
+								default:
+									resolve("file");
+							}
+						} else {
+							resolve(["file", this.#errorCodes(res.code)]);
+						}
+					},
+					(err) => {
+						// If the exec fails, maybe the target is deleted, continue anyway
+						resolve(["file", this.#errorCodes(res.code)]);
+					},
+				);
+			});
+			if (Array.isArray(targetType)) {
+				const [type, err] = targetType;
+				targetType = type;
+			}
+			isDirectory = targetType === "directory";
+			isFile = targetType === "file";
 		}
+
 		name = Url.basename(name.join(" "));
 		if (["..", ".", "`"].includes(name)) return null;
 
@@ -550,13 +614,13 @@ class SftpClient {
 			url,
 			name,
 			size,
-			type,
+			type: targetType,
 			uri: url,
 			canRead: /r/.test(canrw),
 			canWrite: /w/.test(canrw),
-			isDirectory: type === "directory",
+			isDirectory,
 			isLink: type === "link",
-			isFile: type === "file",
+			isFile,
 			modifiedDate: date,
 		};
 	}
