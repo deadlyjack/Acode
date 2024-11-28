@@ -23,6 +23,8 @@
 - **`acode.installPlugin` API**: Introduced an API for plugins to install other plugins with user consent by @bajrangCoder(available from versionCode: `954`).
 - **View Changelogs in Settings**: Added an option in the settings page to view changelogs directly inside the app by @bajrangCoder.
 - **App Update Checker**: Implemented an app update checker that runs on startup by @bajrangCoder.
+- feat: copy/cut current line when selection is empty with same key shortcut by @angeloyana
+- feat: add symlinks support in SFTP by @bajrangCoder
 
 ### Fixes
 - **Plugin Loading Failures**: Improved handling of plugin loading failures by @bajrangCoder:
@@ -38,6 +40,8 @@
 - **Search Bar in File Browser**: Fixed a bug where the search bar in the file browser would get stuck and become unclosable.
 - **Theme Page Issues**: Addressed issues with theme plugins, including preview rendering and checkbox state changes.
 - **Formatter Mode Selection**: Fixed the formatter ignoring the selected mode for files by @alMukaafih.
+- fix: fetch plugin updates even if any fails by @UnschooledGamer
+- fix: plugin update page by removing unwanted option icon @bajrangCoder
 
 ### Others
 - **Plugin Refactor**: Migrated the old plugin update icon to a new toast-like notification widget.
@@ -50,6 +54,7 @@
     - **@Nekitori17**: `vi-vn`
     - **@s4ntiksu**: `ru-ru.json`
     - **@summoner001**: `hu-hu.json`
+    - **@antikruk**: `be-by.json`
 
 ---
 
