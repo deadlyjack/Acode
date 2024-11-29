@@ -203,7 +203,7 @@ function toggleSearch() {
 	const $searchInput = quickTools.$searchInput.el;
 	const $toggler = quickTools.$toggler;
 	const { editor } = editorManager;
-	const selectedText = editor.getCopyText();
+	const selectedText = editor.getSelectedText();
 
 	if (!$footer.contains($searchRow1)) {
 		const { className } = quickTools.$toggler;
