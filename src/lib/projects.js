@@ -20,7 +20,7 @@ const projects = {
     express() {
         acode.addIcon(
             "express-project-icon",
-            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADIUlEQVR4nO2YTYhNYRjHf9c1RilMimsMjexsKAtszE5KiGxm7XPB1pRQFoMFRY2arFhZkEmEEqGMRhSKBWZofDSaxndmwczoqf/VO+eec895771zZzTnV6dpzn2e//l6nud9nhdSUlJSUlJSJg9Tgc3AKeAR8B0YAb4AXUA7sAHIMkGpAfYCb3TjccdbYCeQidBrBn4CF4CGCt1jA3BRuqZfwCKg07nJJ8ABYCUwH5gG1AOrgIPAU8f2NrAg4sKnZfMKqCvzIeqkMyLdApYDA84FLazisK+wBXgtvx5gcYhdLfBQNpeLfL04MvIfkZ7pjqIR+CiDa8As/DD7606ozQmxaXReVAul0SL/AemNwpL1sfMQ2TKKww3pdETYrAeGgd9Ak6d+k/yGpVPADiecfL9EkNlAt/SiQvOIfrcIyCXUzTkRY/6hFaov5sK+bJWelewwsioM+QIRFwHZJPZrnepUagIGMZ1n0rXqFveGW2P0WpN8wTMyshJbSQ5J93A5MY9HTnXpgrZOVJLV0r1XRhVq9KlyH2SYNOmSUi9d6w7iwvBSyLpQ4yzMV5KE/R8ZV7pfykr3V8KV2hZSd6XOdwI9STuBfHsxFvhorwAGZX9Wfwd1vuIX88VXe3egGd1VysXG8kjKDKBfPv36/798kHMBv/OlPMh4kw+rH8Am4JtveOUTrKAdriJuojfrXLNvwufXEav744FbetsCv7X5lOC7Ml5H9Ykbkmp9hrGjMjxG9dlXbEgKaVPMPrYnelfl3ZA1CRrGsMbR/CJ5rofZTmVYopDtjigi8zxa+LBW3vyLDkJ9xYw8JsSXRUqn71Dl7XdTRneA6ZSGbRVdlU6nOtiShqRyhrG5yhMzuqU368NMZxflU8RGnMX6UIkbD8FhbKhYbi0F3utmeoGNCeaAjGb9XvmZ/7Ix2gpKtCWUx36477QuNnvv1+ydU7jkVO3s/AvH9gGwMETTXQ86KrA3kJFO1PrzD0ukPc5bjjusO9gGTInQa1O4HS8j/4KYzgnpBjuCAmoUXie1gWdV7SvwWcncrl2YCbsbn5KSkpKSMqn4C7OqTrF1asWzAAAAAElFTkSuQmCC"
+            "data:image/png;base64,...your express icon data here..."
         );
         return {
             async files() {
@@ -57,6 +57,36 @@ const projects = {
                 };
             },
             icon: "express-project-icon",
+        };
+    },
+
+    gofiber() {
+        acode.addIcon(
+            "gofiber-project-icon",
+            "data:image/png;base64,Cjxzdmcgdmlld0JveD0iMCAwIDgwMCAzMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0iIzMzMyI+PHBhdGggZD0ibTIzOS4yNSA2OS41OGgxMTcuODRsLTUuNzQgMzMuODloLTc2LjExbC01LjczIDM1LjRoNjguNjFsLTUuNzMgMzRoLTY4LjYxbC0xMS40NyA2OS4zN2gtNDEuNzJ6Ii8+PHBhdGggZD0ibTM1OSAxMTIuNzRoNDEuMjJsLTIxLjU0IDEyOS40N2gtNDEuMjJ6bTUtMzQuODljMS43LTEwLjg1IDEyLjQxLTE5LjY0IDI0LTE5LjY0czE5Ljg1IDguNzkgMTguNDEgMTkuNjQtMTIuMjIgMTkuNzItMjMuODUgMTkuNzItMjAuMTQtOC45NC0xOC41Ni0xOS43MnoiLz48cGF0aCBkPSJtNDIxLjYxIDY5LjU4aDQxLjIxbC0xMC43IDY1LjMzaC44OGM2Ljc0LTExLjg5IDIwLjE1LTIzLjg1IDQwLjYzLTIzLjg1IDI3LjA2IDAgNDggMjAuODIgNDAuMzcgNjYuNS03LjI1IDQ0LjA4LTM0LjIyIDY2LjUtNjIuODggNjYuNS0xOS41NSAwLTI5LjMzLTEwLjg3LTMyLjM2LTIyLjg0aC0xLjYxbC0zLjM3IDIxaC00MC43OHptNDAuNzEgMTQyLjQyYzE1LjE3IDAgMjYtMTMuNTcgMjkuMzMtMzQuNDdzLTIuNy0zNC4yMy0xOC0zNC4yM2MtMTUuMDkgMC0yNi4xMyAxMy4wNy0yOS41IDM0LjIzLTMuNDEgMjAuOTMgMy4wOCAzNC40NyAxOC4xNyAzNC40N3oiLz48cGF0aCBkPSJtNTM4Ljc5IDE3OGM2LjY1LTQwLjEyIDM2LjMyLTY2LjkyIDc1LjM1LTY2LjkyIDM2Ljc1IDAgNTguNjcgMjMuNTEgNTEuNTkgNjYuMDhsLTEuNjEgMTAuMjhoLTg2LjIybC0uMjYgMS41MmMtMi42MSAxNi40NCA1LjE0IDI2IDIxLjI0IDI2IDEwLjcxIDAgMjAtNC41NSAyNC43LTEzLjIzbDM3LjU5IDEuMDljLTkuMTggMjUuNDYtMzMuODggNDEuODktNjggNDEuODktNDAuNjUtLjA2LTYxLjM4LTI1LjM0LTU0LjM4LTY2Ljcxem05MC44Ni0xNC41YzIuMTEtMTMuMjMtNS44Mi0yMi42Ny0xOS4zLTIyLjY3LTEzLjMyIDAtMjUuMTIgOS44Ni0yOC4wNyAyMi42N3oiLz48cGF0aCBkPSJtNjg1LjggMTEyLjc0aDQwbC00IDIzLjZoMS4zNWM3LjY3LTE3LjExIDIwLjM5LTI1LjM0IDM0LjU1LTI1LjM0YTQ5IDQ5IDAgMCAxIDExLjMgMS40bC02LjA3IDM1LjkxYy0zLjc5LTEuNDMtMTAuNzktMi4xOS0xNS45My0yLjE5LTE0LjU4IDAtMjcuMjMgMTAuMzctMjkuOTIgMjUuNzlsLTExLjY0IDcwLjNoLTQxLjIxeiIvPjwvZz48cGF0aCBkPSJtMjEzLjc3IDExNS40MWgtMTM0LjUxbC0xMC43NiAxNS4yNyAxNDIuNzgtLjA4eiIgZmlsbD0iIzAwYWNkNyIvPjxwYXRoIGQ9Im0yMDkuMDIgMTQ3LjA2aC0xNzQuMDdsLTExLjA3IDE1LjIxIDE4Mi42NS0uMTN6IiBmaWxsPSIjMDBhY2Q3Ii8+PHBhdGggZD0ibTIwNC4yNyAxNzguN2gtNzQuMzdsLTEwIDE1LjI3IDgxLjg4LS4wNnoiIGZpbGw9IiMwMGFjZDciLz48L3N2Zz4K"
+        );
+        return {
+            async files() {
+                return {
+                    "go.mod":
+                        `module gofiber-app\n\n` +
+                        `go 1.20\n\n` +
+                        `require github.com/gofiber/fiber/v2 v2.37.0`,
+                    "main.go":
+                        `package main\n\n` +
+                        `import (\n` +
+                        `  "github.com/gofiber/fiber/v2"\n` +
+                        `)\n\n` +
+                        `func main() {\n` +
+                        `  app := fiber.New()\n\n` +
+                        `  app.Get("/", func(c *fiber.Ctx) error {\n` +
+                        `    return c.SendString("Hello, Go Fiber!")\n` +
+                        `  })\n\n` +
+                        `  app.Listen(":3000")\n` +
+                        `}\n`,
+                };
+            },
+            icon: "gofiber-project-icon",
         };
     },
 };
