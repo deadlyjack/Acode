@@ -391,5 +391,6 @@
 	"import project zip": "Nhập Dự Án(zip)",
 	"changelog": "Nhật Ký Thay Đổi",
 	"notifications": "Notifications",
-	"no_unread_notifications": "No unread notifications"
+	"no_unread_notifications": "No unread notifications",
+	"should_use_current_file_for_preview": "Should use Current File For preview instead of default (index.html)"
 }

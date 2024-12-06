@@ -390,5 +390,6 @@
 	"import project zip": "Projekt(-Zip) importieren",
 	"changelog": "Änderungsbericht",
 	"notifications": "Notifications",
-	"no_unread_notifications": "No unread notifications"
+	"no_unread_notifications": "No unread notifications",
+	"should_use_current_file_for_preview": "Should use Current File For preview instead of default (index.html)"
 }

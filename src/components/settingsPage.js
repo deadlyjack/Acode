@@ -194,7 +194,10 @@ function listItems($list, items, callback) {
 	const $items = [];
 
 	// sort settings by text before rendering
-	items.sort((acc, cur) => acc.text.localeCompare(cur.text));
+	items.sort((acc, cur) => {
+		if (!acc?.text || !cur?.text) return 0;
+		return acc.text.localeCompare(cur.text);
+	});
 	items.forEach((item) => {
 		const $setting = new Ref();
 		const $settingName = new Ref();
@@ -212,7 +215,7 @@ function listItems($list, items, callback) {
 				></span>
 				<div ref={$setting} className="container">
 					<div ref={$settingName} className="text">
-						{item.text.capitalize(0)}
+						{item.text?.capitalize?.(0) ?? item.text}
 					</div>
 				</div>
 			</div>
