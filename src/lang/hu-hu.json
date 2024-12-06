@@ -391,5 +391,5 @@
 	"changelog": "Változáslista",
 	"notifications": "Értesítések",
 	"no_unread_notifications": "Nincsenek olvasatlan értesítések",
-	"should_use_current_file_for_preview": "Should use Current File For preview instead of default (index.html)"
+	"should_use_current_file_for_preview": "A jelenlegi fájl használata az előnézethez az alapértelmezett (index.html) helyett"
 }
