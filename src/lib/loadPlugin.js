@@ -12,7 +12,11 @@ export default async function loadPlugin(pluginId, justInstalled = false) {
 		const $script = <script src={Url.join(baseUrl, "main.js")}></script>;
 
 		$script.onerror = (error) => {
-			reject(new Error(`Failed to load script for plugin ${pluginId}: ${error.message || error}`));
+			reject(
+				new Error(
+					`Failed to load script for plugin ${pluginId}: ${error.message || error}`,
+				),
+			);
 		};
 
 		$script.onload = async () => {
