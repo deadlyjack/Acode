@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import Ref from "html-tag-js/ref";
 import actionStack from "lib/actionStack";
 import restoreTheme from "lib/restoreTheme";
@@ -54,7 +55,7 @@ function create(titleText, message = "", options = {}) {
 				<div
 					ref={$message}
 					className="message"
-					innerHTML={message}
+					innerHTML={DOMPurify.sanitize(message)}
 					style={{ whiteSpace: "pre-wrap" }}
 				></div>
 			</span>
@@ -87,7 +88,7 @@ function create(titleText, message = "", options = {}) {
 			$titleSpan.textContent = title;
 		},
 		setMessage(message) {
-			$message.innerHTML = message;
+			$message.innerHTML = DOMPurify.sanitize(message);
 		},
 		hide,
 		show,

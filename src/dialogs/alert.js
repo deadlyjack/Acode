@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import actionStack from "lib/actionStack";
 import restoreTheme from "lib/restoreTheme";
 
@@ -26,7 +27,7 @@ function alert(titleText, message, onhide) {
 	});
 	const messageSpan = tag("span", {
 		className: "message scroll",
-		innerHTML: message,
+		innerHTML: DOMPurify.sanitize(message),
 	});
 	const okBtn = tag("button", {
 		textContent: strings.ok,

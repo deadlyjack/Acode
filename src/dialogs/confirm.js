@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import actionStack from "lib/actionStack";
 import restoreTheme from "lib/restoreTheme";
 
@@ -21,7 +22,7 @@ function confirm(titleText, message, isHTML) {
 		});
 		const messageSpan = tag("span", {
 			className: "message scroll",
-			innerHTML: isHTML ? message : undefined,
+			innerHTML: isHTML ? DOMPurify.sanitize(message) : undefined,
 			textContent: isHTML ? undefined : message,
 		});
 		const okBtn = tag("button", {
