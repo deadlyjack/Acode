@@ -38,7 +38,7 @@ Acode/
 
 ## • Multi-language Support
 
-Enhance Acode's capabilities by adding new languages easily. Just create a file with the language code (e.g., en-us for English) in [`src/lang/`](https://github.com/deadlyjack/Acode/tree/main/src/lang) and include it in [`src/lib/lang.js`](https://github.com/deadlyjack/Acode/blob/main/src/lib/lang.js). Manage strings across languages effortlessly using utility commands:
+Enhance Acode's capabilities by adding new languages easily. Just create a file with the language code (e.g., en-us for English) in [`src/lang/`](https://github.com/Acode-Foundation/Acode/tree/main/src/lang) and include it in [`src/lib/lang.js`](https://github.com/Acode-Foundation/Acode/blob/main/src/lib/lang.js). Manage strings across languages effortlessly using utility commands:
 
 ```shell
 yarn lang add
@@ -93,22 +93,22 @@ Also, ensure that your code is well-documented and includes comments where neces
 
 ## • Contributors
 
-<a href="https://github.com/deadlyjack/Acode/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=deadlyjack/Acode" />
+<a href="https://github.com/Acode-Foundation/Acode/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Acode-Foundation/Acode" />
 </a>
 
 ## • Developing a Plugin for Acode
 
-For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/deadlyjack/acode-plugin).
+For comprehensive documentation on creating plugins for Acode Editor, visit the [repository](https://github.com/Acode-Foundation/acode-plugin).
 
 For plugin development information, refer to: [Acode Plugin Documentation](https://acode.app/plugin-docs)
 
 ## Star History
 
-<a href="https://star-history.com/#deadlyjack/Acode&Date">
+<a href="https://star-history.com/#Acode-Foundation/Acode&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=deadlyjack/Acode&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=deadlyjack/Acode&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=deadlyjack/Acode&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Acode-Foundation/Acode&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Acode-Foundation/Acode&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Acode-Foundation/Acode&type=Date" />
  </picture>
 </a>
