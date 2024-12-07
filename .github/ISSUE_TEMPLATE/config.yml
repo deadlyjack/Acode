@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: Ask Questions
-    url: https://github.com/deadlyjack/Acode/discussions
+    url: https://github.com/Acode-Foundation/Acode/discussions
     about: Ask any questions regarding Acode and its ecosystem
   - name: Telegram Group
     url: https://t.me/foxdebug_acode
