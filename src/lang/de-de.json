@@ -389,7 +389,7 @@
 	"deleting items": "Löschen von {count} Einträgen...",
 	"import project zip": "Projekt(-Zip) importieren",
 	"changelog": "Änderungsbericht",
-	"notifications": "Notifications",
-	"no_unread_notifications": "No unread notifications",
-	"should_use_current_file_for_preview": "Should use Current File For preview instead of default (index.html)"
+	"notifications": "Benachrichtigungen",
+	"no_unread_notifications": "Keine ungelesenen Benachrichtigungen",
+	"should_use_current_file_for_preview": "Sollte die aktuelle Datei für die Vorschau verwenden, anstatt dem Standard (index.html)"
 }
