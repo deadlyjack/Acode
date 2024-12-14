@@ -115,6 +115,7 @@ async function searchPlugin() {
 			$searchResult.content = plugins.map(ListItem);
 			updateHeight($searchResult);
 		} catch (error) {
+			window.log("error", error);
 			$searchResult.content = <span className="error">{strings["error"]}</span>;
 		} finally {
 			$searchResult.classList.remove("loading");

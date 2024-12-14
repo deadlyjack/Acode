@@ -310,6 +310,14 @@ const commands = [
 		readOnly: true,
 	},
 	{
+		name: "openFileExplorer",
+		description: "File Explorer",
+		exec() {
+			acode.exec("open", "file_browser");
+		},
+		readOnly: true,
+	},
+	{
 		name: "copyDeviceInfo",
 		description: "Copy Device info",
 		exec() {

@@ -134,6 +134,7 @@
     font-family: monospace, monospace;
     _font-family: "courier new", monospace;
     font-size: 0.98em;
+    padding: 0.25rem;
   }
 
   kbd {
@@ -161,6 +162,30 @@
     white-space: pre;
     white-space: pre-wrap;
     word-wrap: break-word;
+    position: relative !important;
+  }
+
+  pre:hover .copy-button {
+    opacity: 1;
+  }
+
+  .copy-button {
+    position: absolute;
+    top: 8px;
+    right: 5px;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.8);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 12px;
+    color: inherit;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.9);
+    }
   }
 
   b,
@@ -284,7 +309,6 @@
       content: "";
     }
 
-    pre,
     blockquote {
       border: 1px solid #999;
       padding-right: 1em;
@@ -390,47 +414,45 @@
     color: var(--color-caution);
   }
   .task-list-item {
-        list-style-type: none;
+    list-style-type: none;
 
-        label {
-            font-weight: 400;
-        }
-
-        &.enabled label {
-            cursor: pointer;
-        }
-
-        &+.task-list-item {
-            margin-top: 0.25rem;
-        }
-
-        .handle {
-            display: none;
-        }
-
-        &-checkbox {
-            margin: 0 0.2em 0.25em -1.4em;
-            vertical-align: middle;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+    label {
+      font-weight: 400;
     }
 
-
-    ul:dir(rtl) .task-list-item-checkbox,
-    ol:dir(rtl) .task-list-item-checkbox {
-        margin: 0 -1.6em 0.25em 0.2em;
+    &.enabled label {
+      cursor: pointer;
     }
 
-    .contains-task-list {
-
-        &:hover .task-list-item-convert-container,
-        &:focus-within .task-list-item-convert-container {
-            display: block;
-            width: auto;
-            height: 24px;
-            overflow: visible;
-            clip: auto;
-        }
+    & + .task-list-item {
+      margin-top: 0.25rem;
     }
+
+    .handle {
+      display: none;
+    }
+
+    &-checkbox {
+      margin: 0 0.2em 0.25em -1.4em;
+      vertical-align: middle;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  }
+
+  ul:dir(rtl) .task-list-item-checkbox,
+  ol:dir(rtl) .task-list-item-checkbox {
+    margin: 0 -1.6em 0.25em 0.2em;
+  }
+
+  .contains-task-list {
+    &:hover .task-list-item-convert-container,
+    &:focus-within .task-list-item-convert-container {
+      display: block;
+      width: auto;
+      height: 24px;
+      overflow: visible;
+      clip: auto;
+    }
+  }
 }
