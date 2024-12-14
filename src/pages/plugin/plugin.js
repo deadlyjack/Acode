@@ -356,6 +356,33 @@ export default async function PluginInclude(
 			);
 		});
 
+		// add copy button to code blocks
+		const codeBlocks = $page.body.querySelectorAll("pre");
+		codeBlocks.forEach((pre) => {
+			pre.style.position = "relative";
+			const copyButton = document.createElement("button");
+			copyButton.className = "copy-button";
+			copyButton.textContent = "Copy";
+
+			copyButton.addEventListener("click", async () => {
+				const code = pre.querySelector("code")?.textContent || pre.textContent;
+				try {
+					cordova.plugins.clipboard.copy(code);
+					copyButton.textContent = "Copied!";
+					setTimeout(() => {
+						copyButton.textContent = "Copy";
+					}, 2000);
+				} catch (err) {
+					copyButton.textContent = "Failed to copy";
+					setTimeout(() => {
+						copyButton.textContent = "Copy";
+					}, 2000);
+				}
+			});
+
+			pre.appendChild(copyButton);
+		});
+
 		if ($settingsIcon) {
 			$settingsIcon.remove();
 			$settingsIcon = null;
