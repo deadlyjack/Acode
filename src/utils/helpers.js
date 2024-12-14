@@ -330,6 +330,7 @@ export default {
 			const { status } = await ajax.get(Url.join(constants.API_BASE, "status"));
 			return status === "ok";
 		} catch (error) {
+			window.log("error", error);
 			return false;
 		}
 	},

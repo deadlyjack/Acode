@@ -182,6 +182,10 @@ export default {
 				plugins();
 				break;
 
+			case "file_browser":
+				FileBrowser();
+				break;
+
 			default:
 				return;
 		}
