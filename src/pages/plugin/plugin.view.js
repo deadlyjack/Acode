@@ -317,7 +317,7 @@ function Review({
 					style={{ backgroundImage: `url(${dp})` }}
 					className="user-profile"
 				></span>
-				<span>{name}</span>
+				<span className="user-name">{name}</span>
 				<span ref={voteImage} className="vote"></span>
 			</div>
 			<p className="review-body">{comment}</p>
