@@ -9,7 +9,6 @@ extend-exclude = [
     ".vscode",
     "fastlane",
     "hooks",
-    "res",
     "*.gradle",
     "plugins",
     "platforms",
