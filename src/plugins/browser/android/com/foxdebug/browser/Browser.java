@@ -293,6 +293,7 @@ public class Browser extends LinearLayout {
             case "Set as Default":
               if (deviceEmulator != null) {
                 deviceEmulator.saveAsDefault();
+                updateDefaultItems(emulator);
                 Toast
                   .makeText(
                     context,
