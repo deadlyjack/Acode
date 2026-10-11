@@ -333,6 +333,12 @@ public class Emulator extends LinearLayout {
       .apply();
   }
 
+  private Runnable restoredListener;
+
+  public void setRestoredListener(Runnable listener) {
+    restoredListener = listener;
+  }
+
   private void restoreDefaultDevice() {
     if (!hasDefault(context)) return;
 
@@ -343,39 +349,60 @@ public class Emulator extends LinearLayout {
     SeekBar widthSeekBar = seekBars.get("width");
     SeekBar heightSeekBar = seekBars.get("height");
     SeekBar scaleSeekBar = seekBars.get("scale");
-
-    int width = Math.min(
-      prefs.getInt("default_width", widthSeekBar.getMax()),
-      widthSeekBar.getMax()
-    );
-    int height = Math.min(
-      prefs.getInt("default_height", heightSeekBar.getMax()),
-      heightSeekBar.getMax()
-    );
-
-    widthSeekBar.setProgress(width);
-    heightSeekBar.setProgress(height);
-    setMaxScale(width, height);
-    int scale = Math.min(
-      prefs.getInt("default_scale", 100),
-      scaleSeekBar.getMax()
-    );
-    scaleSeekBar.setProgress(scale);
-
     String name = prefs.getString("default_device", "Custom");
+
+    Device preset = null;
     for (Device device : deviceListView.devices) {
-      if (device.name.equals(name)) {
-        if (deviceListView.selectedDeviceView != null) {
-          deviceListView.selectedDeviceView.deselect();
-        }
-        deviceListView.select(device);
-        selectedDevice = device;
+      if (device.id != customDevice.id && device.name.equals(name)) {
+        preset = device;
         break;
       }
     }
 
-    if (listener != null) {
-      listener.onChange(width, height, scale / 100f);
+    if (preset != null && listener != null) {
+      // A preset is re-fitted to the current screen, so it keeps its shape if
+      // the screen size changed since it was saved (rotation, split-screen,
+      // foldables). Only the scale is restored from the saved value.
+      if (deviceListView.selectedDeviceView != null) {
+        deviceListView.selectedDeviceView.deselect();
+      }
+      deviceListView.select(preset);
+      selectDevice(preset);
+
+      int scale = Math.min(
+        prefs.getInt("default_scale", scaleSeekBar.getMax()),
+        scaleSeekBar.getMax()
+      );
+      scaleSeekBar.setProgress(scale);
+      listener.onChange(getWidthProgress(), getHeightProgress(), scale / 100f);
+    } else {
+      // Custom sizes are restored from the saved width/height.
+      int width = Math.min(
+        prefs.getInt("default_width", widthSeekBar.getMax()),
+        widthSeekBar.getMax()
+      );
+      int height = Math.min(
+        prefs.getInt("default_height", heightSeekBar.getMax()),
+        heightSeekBar.getMax()
+      );
+
+      widthSeekBar.setProgress(width);
+      heightSeekBar.setProgress(height);
+      setMaxScale(width, height);
+      int scale = Math.min(
+        prefs.getInt("default_scale", 100),
+        scaleSeekBar.getMax()
+      );
+      scaleSeekBar.setProgress(scale);
+      selectedDevice = customDevice;
+
+      if (listener != null) {
+        listener.onChange(width, height, scale / 100f);
+      }
+    }
+
+    if (restoredListener != null) {
+      restoredListener.run();
     }
   }
 
