@@ -373,11 +373,8 @@ public class Browser extends LinearLayout {
             menu.setChecked("Console", false);
             menu.setVisible("Console", false);
             addView(deviceEmulator);
-            fitWebViewTo(
-              deviceEmulator.getWidthProgress(),
-              deviceEmulator.getHeightProgress(),
-              deviceEmulator.getScaleProgress()
-            );
+            // The emulator sets up its sliders on a later layout pass and then
+            // applies the saved size itself, so the webview is not resized here.
           }
         }
       );
