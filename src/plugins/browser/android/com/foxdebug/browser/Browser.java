@@ -334,7 +334,10 @@ public class Browser extends LinearLayout {
 
   private void updateDefaultItems(boolean emulatorOn) {
     menu.setVisible("Set as Default", emulatorOn);
-    menu.setVisible("Clear Default", emulatorOn);
+    menu.setVisible(
+      "Clear Default",
+      emulatorOn && Emulator.hasDefault(context)
+    );
   }
 
   private void reloadAfterLayout() {
