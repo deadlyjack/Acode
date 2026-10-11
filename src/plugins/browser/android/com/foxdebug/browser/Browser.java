@@ -337,6 +337,24 @@ public class Browser extends LinearLayout {
     menu.setVisible("Clear Default", emulatorOn);
   }
 
+  private void reloadAfterLayout() {
+    // If no page was requested yet, the first load will already happen at
+    // the saved size, so there is nothing to reload.
+    if (url.isEmpty()) return;
+
+    webView
+      .getViewTreeObserver()
+      .addOnGlobalLayoutListener(
+        new ViewTreeObserver.OnGlobalLayoutListener() {
+          @Override
+          public void onGlobalLayout() {
+            webView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            webView.reload();
+          }
+        }
+      );
+  }
+
   private void restoreEmulator() {
     if (onlyConsole) return;
     if (!Emulator.hasDefault(context)) return;
