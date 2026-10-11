@@ -356,6 +356,14 @@ public class Browser extends LinearLayout {
 
             if (deviceEmulator == null) {
               createDeviceEmulatorLayout();
+              deviceEmulator.setRestoredListener(
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    reloadAfterLayout();
+                  }
+                }
+              );
             }
 
             emulator = true;
