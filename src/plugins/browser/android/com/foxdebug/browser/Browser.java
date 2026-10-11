@@ -305,6 +305,7 @@ public class Browser extends LinearLayout {
               break;
             case "Clear Default":
               Emulator.clearDefault(context);
+              updateDefaultItems(emulator);
               Toast
                 .makeText(context, "Default cleared", Toast.LENGTH_SHORT)
                 .show();
