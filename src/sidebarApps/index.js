@@ -181,7 +181,7 @@ function open(id) {
 function close() {
 	if (!$sidebar) return false;
 
-	Sidebar.hide();
+	Sidebar.hide(true);
 	return true;
 }
 
