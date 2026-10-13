@@ -4,12 +4,12 @@ import { createTransport } from "../transport";
 import {
 	checkServerInstallation,
 	ensureServerRunning,
-	getInstallCommand as getAlpineInstallCommand,
-	getUninstallCommand as getAlpineUninstallCommand,
+	getInstallCommand as getUbuntuInstallCommand,
+	getUninstallCommand as getUbuntuUninstallCommand,
 	installServer,
 	uninstallServer,
 } from "../serverLauncher";
-import { isBuiltinAlpineAccessible } from "../runtimeProviders";
+import { isBuiltinUbuntuAccessible } from "../runtimeProviders";
 import type {
 	LspRuntimeContext,
 	LspRuntimeProvider,
@@ -17,7 +17,7 @@ import type {
 	LspRuntimeUriResolutionContext,
 } from "../types";
 
-export const BUILTIN_ALPINE_RUNTIME_ID = "builtin-alpine";
+export const BUILTIN_UBUNTU_RUNTIME_ID = "builtin-ubuntu";
 
 function isUntitled(context: LspRuntimeContext): boolean {
 	return /^untitled:/i.test(
@@ -40,16 +40,16 @@ function cacheDocumentUri(context: LspRuntimeContext): string | null {
 }
 
 function canUseRealPath(context: LspRuntimeContext): boolean {
-	return isBuiltinAlpineAccessible({
+	return isBuiltinUbuntuAccessible({
 		...context,
 		rootUri: context.originalRootUri || context.rootUri,
 		uri: context.originalDocumentUri || context.uri,
 	});
 }
 
-export const builtinAlpineRuntimeProvider: LspRuntimeProvider = {
-	id: BUILTIN_ALPINE_RUNTIME_ID,
-	label: "Built-in Alpine",
+export const builtinUbuntuRuntimeProvider: LspRuntimeProvider = {
+	id: BUILTIN_UBUNTU_RUNTIME_ID,
+	label: "Built-in Ubuntu",
 	priority: -100,
 
 	canHandle(
@@ -78,7 +78,7 @@ export const builtinAlpineRuntimeProvider: LspRuntimeProvider = {
 		const documentUri = cacheDocumentUri(context);
 		if (!documentUri) {
 			throw new Error(
-				`Built-in Alpine cannot resolve a cache URI for ${context.originalDocumentUri}`,
+				`Built-in Ubuntu cannot resolve a cache URI for ${context.originalDocumentUri}`,
 			);
 		}
 		return {
@@ -133,11 +133,11 @@ export const builtinAlpineRuntimeProvider: LspRuntimeProvider = {
 	},
 
 	getInstallCommand(server, context, mode) {
-		return getAlpineInstallCommand(server, mode);
+		return getUbuntuInstallCommand(server, mode);
 	},
 
 	getUninstallCommand(server) {
-		return getAlpineUninstallCommand(server);
+		return getUbuntuUninstallCommand(server);
 	},
 
 	async start(server, context) {
@@ -149,10 +149,10 @@ export const builtinAlpineRuntimeProvider: LspRuntimeProvider = {
 		});
 		return {
 			kind: "transport",
-			providerId: BUILTIN_ALPINE_RUNTIME_ID,
+			providerId: BUILTIN_UBUNTU_RUNTIME_ID,
 			transport,
 		};
 	},
 };
 
-export default builtinAlpineRuntimeProvider;
+export default builtinUbuntuRuntimeProvider;

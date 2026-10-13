@@ -22,7 +22,7 @@ import java.util.Locale;
 import com.foxdebug.acode.R;
 import com.foxdebug.acode.rk.exec.terminal.*;
 
-public class AlpineDocumentProvider extends DocumentsProvider {
+public class UbuntuDocumentProvider extends DocumentsProvider {
     
     private static final String ALL_MIME_TYPES = "*/*";
 
@@ -306,7 +306,7 @@ public class AlpineDocumentProvider extends DocumentsProvider {
     }
 
     public static boolean isDocumentProviderEnabled(Context context) {
-        ComponentName componentName = new ComponentName(context, AlpineDocumentProvider.class);
+        ComponentName componentName = new ComponentName(context, UbuntuDocumentProvider.class);
         int state = context.getPackageManager().getComponentEnabledSetting(componentName);
         return state == PackageManager.COMPONENT_ENABLED_STATE_ENABLED ||
                state == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
@@ -316,7 +316,7 @@ public class AlpineDocumentProvider extends DocumentsProvider {
         if (isDocumentProviderEnabled(context) == enabled) {
             return;
         }
-        ComponentName componentName = new ComponentName(context, AlpineDocumentProvider.class);
+        ComponentName componentName = new ComponentName(context, UbuntuDocumentProvider.class);
         int newState = enabled ? 
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED : 
             PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
