@@ -226,7 +226,7 @@ class TouchSelectionMenuController {
 	};
 	#bindEvents() {
 		const root = this.#view.dom;
-		root.addEventListener("touchStart", this.#onPinchStart, true);
+		root.addEventListener("touchstart", this.#onPinchStart, true);
 		root.addEventListener("contextmenu", this.#onContextMenu, true);
 		document.addEventListener("pointerdown", this.#onGlobalPointerDown, true);
 		document.addEventListener("pointermove", this.#onGlobalPointerMove, true);
@@ -246,7 +246,6 @@ class TouchSelectionMenuController {
 			}
 			this.#showMenuDeferred();
 		});
-		root.removeEventListener("touchstart", this.#onPinchStart, true);
 		this.#tooltipObserver.observe(this.#view.dom, {
 			childList: true,
 			subtree: true,
@@ -256,6 +255,7 @@ class TouchSelectionMenuController {
 	destroy() {
 		const root = this.#view.dom;
 		root.removeEventListener("contextmenu", this.#onContextMenu, true);
+		root.removeEventListener("touchstart", this.#onPinchStart, true);
 		document.removeEventListener(
 			"pointerdown",
 			this.#onGlobalPointerDown,

@@ -112,7 +112,57 @@ describe("pinchZoom helpers", () => {
 });
 
 describe("pinchZoom gesture", () => {
-        it("applies the movement dropped by the throttle on the next frame", () => {
+    it("confirms a held pinch that ends without another touchmove", () => {
+        const view = createView();
+
+        fireTouch(view, "touchstart", [
+            { clientX: 0, clientY: 0 },
+            { clientX: 100, clientY: 0 },
+        ]);
+
+        now += 60;
+        fireTouch(view, "touchmove", [
+            { clientX: 0, clientY: 0 },
+            { clientX: 200, clientY: 0 },
+        ]);
+
+        // Held still past the confirmation delay: no further touchmove.
+        now += 121;
+
+        fireTouch(view, "touchend", [{ clientX: 0, clientY: 0 }]);
+
+        expect(settingsMock.value.fontSize).toBe("24px");
+        expect(settingsMock.update).toHaveBeenCalledTimes(1);
+        expect(settingsMock.update).toHaveBeenCalledWith(false);
+        expect(view.dom.style.fontSize).toBe("12px");
+
+        view.destroy();
+    });
+
+    it("still ignores a brief spread released inside the confirmation delay", () => {
+        const view = createView();
+
+        fireTouch(view, "touchstart", [
+            { clientX: 0, clientY: 0 },
+            { clientX: 100, clientY: 0 },
+        ]);
+
+        now += 60;
+        fireTouch(view, "touchmove", [
+            { clientX: 0, clientY: 0 },
+            { clientX: 200, clientY: 0 },
+        ]);
+
+        // Released only 50ms after the candidate movement was recorded.
+        now += 50;
+        fireTouch(view, "touchend", [{ clientX: 0, clientY: 0 }]);
+
+        expect(settingsMock.update).not.toHaveBeenCalled();
+        expect(settingsMock.value.fontSize).toBe("12px");
+
+        view.destroy();
+    });
+    it("applies the movement dropped by the throttle on the next frame", () => {
         const view = createView();
 
         fireTouch(view, "touchstart", [

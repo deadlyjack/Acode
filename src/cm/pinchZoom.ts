@@ -273,6 +273,21 @@ const pinchZoomExtension = ViewPlugin.define((view) => {
 		event.stopPropagation();
 
 		cancelScheduledPreview();
+		// A pinch can be held still after spreading (no further touchmove).
+		// Confirm the sustained candidate so the zoom is not silently lost.
+		if (!gesture.moved && gesture.candidateSince !== 0) {
+			const distanceChange =
+				gesture.pendingDistance - gesture.startDistance;
+			const initialDirection = Math.sign(
+				gesture.candidateDistance - gesture.startDistance,
+			);
+			if (
+				Date.now() - gesture.candidateSince >= PINCH_CONFIRMATION_MS &&
+				Math.sign(distanceChange) === initialDirection
+			) {
+				gesture.moved = true;
+			}
+		}
 
 		// Apply the latest movement even if the throttle skipped its preview.
 		if (gesture.moved) {
