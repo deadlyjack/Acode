@@ -1,203 +1,321 @@
 import { ViewPlugin } from "@codemirror/view";
 import settings from "lib/settings";
+import {
+  DEFAULT_EDITOR_FONT_SIZE,
+  clampEditorFontSize,
+} from "cm/editorFontSize";
 
 const ZOOM_THROTTLE_MS = 50;
-const MIN_FONT_SIZE = 6;
-const MAX_FONT_SIZE = 72;
-const DEFAULT_FONT_SIZE = 12;
+const MOVE_THRESHOLD_PX = 15;
+const PINCH_CONFIRMATION_MS = 120;
+
 
 interface PinchPoint {
 	clientX: number;
 	clientY: number;
 }
 
-export function clampEditorFontSize(px: number): number {
-	if (!Number.isFinite(px)) return DEFAULT_FONT_SIZE;
-	return Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, Math.round(px)));
+interface TrackedTouch extends PinchPoint {
+	identifier: number;
 }
 
-/**
- * Convert a pinch distance ratio into an absolute font size.
- * @param startPx font size in pixels when the gesture started
- * @param startDistance distance between the two touches at the start
- * @param distance current distance between the two touches
- */
+function distance(a: PinchPoint, b: PinchPoint): number {
+	return Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+}
+
 export function computePinchFontSize(
 	startPx: number,
 	startDistance: number,
-	distance: number,
+	currentDistance: number,
 ): number {
 	if (!Number.isFinite(startPx) || startPx <= 0) {
-		startPx = DEFAULT_FONT_SIZE;
+		startPx = DEFAULT_EDITOR_FONT_SIZE;
 	}
 
 	if (
 		!Number.isFinite(startDistance) ||
 		startDistance <= 0 ||
-		!Number.isFinite(distance) ||
-		distance <= 0
+		!Number.isFinite(currentDistance) ||
+		currentDistance <= 0
 	) {
 		return clampEditorFontSize(startPx);
 	}
 
-	return clampEditorFontSize((startPx * distance) / startDistance);
-}
-
-function touchDistance(a: PinchPoint, b: PinchPoint): number {
-	return Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
-}
-
-/**
- * Read the font size the editor is actually displaying, in pixels.
- *
- * The font theme only sets font-size on the editor root, and settings.json may
- * use any unit accepted by config.FONT_SIZE (px|rem|em|pt|mm|pc|in), so the computed 
- * style of the editor root is the only reliable base for the pinch
- * ratio. The saved setting is used as a fallback only when no computed style is
- * available (e.g. in tests).
- */
-function readFontSizePx(view: { dom: HTMLElement }): number {
-	const computed = Number.parseFloat(
-		getComputedStyle(view.dom).fontSize,
+	return clampEditorFontSize(
+		(startPx * currentDistance) / startDistance,
 	);
-	if (Number.isFinite(computed) && computed > 0) return computed;
+}
 
-	const match = String(settings?.value?.fontSize || `${DEFAULT_FONT_SIZE}px`)
-		.trim()
-		.match(/^(\d+(?:\.\d+)?)px$/i);
+function readFontSizePx(view: { dom: HTMLElement }): number {
+	const computed = Number.parseFloat(getComputedStyle(view.dom).fontSize);
+	return Number.isFinite(computed) && computed > 0
+		? computed
+		: DEFAULT_EDITOR_FONT_SIZE;
+}
 
-	if (match) {
-		const value = Number.parseFloat(match[1]);
-		if (Number.isFinite(value) && value > 0) return value;
+function getTrackedTouch(
+	touches: TouchList,
+	identifier: number,
+): TrackedTouch | undefined {
+	for (let i = 0; i < touches.length; i++) {
+		const touch = touches.item(i);
+		if (touch?.identifier === identifier) {
+			return {
+				identifier: touch.identifier,
+				clientX: touch.clientX,
+				clientY: touch.clientY,
+			};
+		}
+	}
+	return undefined;
+}
+
+function reportSettingsError(error: unknown): void {
+	console.error("Failed to save editor font size:", error);
+}
+
+const pinchZoomExtension = ViewPlugin.define((view) => {
+	const gesture = {
+		pinching: false,
+		moved: false,
+		firstId: -1,
+		secondId: -1,
+		startDistance: 0,
+		startPx: DEFAULT_EDITOR_FONT_SIZE,
+		lastPx: DEFAULT_EDITOR_FONT_SIZE,
+		pendingDistance: 0,
+		lastUpdate: 0,
+		originalInlineFontSize: "",
+		candidateSince: 0,
+		candidateDistance: 0,
+	};
+
+	let destroyed = false;
+	let scheduledFrame: number | null = null;
+
+	function requestLayoutMeasurement() {
+		view.requestMeasure();
 	}
 
-	return DEFAULT_FONT_SIZE;
-}
+	function applyPreview(px: number) {
+		px = clampEditorFontSize(px);
+		if (px === gesture.lastPx) return;
 
-export default function pinchZoom() {
-	return ViewPlugin.define((view) => {
-		const gesture = {
-			pinching: false,
-			moved: false,
-			startDistance: 0,
-			startPx: DEFAULT_FONT_SIZE,
-			lastPx: DEFAULT_FONT_SIZE,
-			pendingDistance: 0,
-			lastUpdate: 0,
-			originalInlineFontSize: "",
-		};
+		gesture.lastPx = px;
+		view.dom.style.fontSize = `${px}px`;
+		requestLayoutMeasurement();
+	}
 
-		function applyFontSize(px: number) {
-			px = clampEditorFontSize(px);
-			if (px === gesture.lastPx) return;
+	function applyPendingPreview() {
+		applyPreview(
+			computePinchFontSize(
+				gesture.startPx,
+				gesture.startDistance,
+				gesture.pendingDistance,
+			),
+		);
+	}
 
-			gesture.lastPx = px;
+	function cancelScheduledPreview() {
+		if (scheduledFrame != null) {
+			cancelAnimationFrame(scheduledFrame);
+			scheduledFrame = null;
+		}
+	}
 
-			// Preview directly on this editor. settings.update() only notifies
-			// update:fontSize listeners while the value differs from the last SAVED
-			// value, so writing settings mid-gesture can never undo a preview once
-			// the pinch returns to its starting size, and would leave the font
-			// theme stale as soon as the inline preview is removed.
-			view.dom.style.fontSize = `${px}px`;
+	function clearGesture() {
+		gesture.pinching = false;
+		gesture.firstId = -1;
+		gesture.secondId = -1;
+	}
+
+	function restorePreview() {
+		view.dom.style.fontSize = gesture.originalInlineFontSize;
+		requestLayoutMeasurement();
+	}
+	function persistFontSize() {
+		if (!gesture.moved || gesture.lastPx === gesture.startPx) {
+			restorePreview();
+			return;
 		}
 
-		function persistFontSize() {
-			if (gesture.lastPx !== gesture.startPx) {
-				// The value differs from the saved one, so this fires update:fontSize
-				// (rebuilding the font theme in every pane) and writes settings.json
-				// exactly once per gesture, before the inline preview is dropped below.
-				settings.value.fontSize = `${gesture.lastPx}px`;
-				settings.update(false);
-			}
+		settings.value.fontSize = `${gesture.lastPx}px`;
 
-			// Let the settings-driven font theme control the editor after the gesture.
-			view.dom.style.fontSize = gesture.originalInlineFontSize;
+		// Restore the inline preview immediately. The saved setting and
+		// font theme now control the editor's font size.
+		restorePreview();
+
+		// Handle the asynchronous save without delaying touch handling.
+		void Promise.resolve(settings.update(false)).catch(reportSettingsError);
+	}
+
+
+	function getCurrentTrackedTouches(event: TouchEvent) {
+		const first = getTrackedTouch(event.touches, gesture.firstId);
+		const second = getTrackedTouch(event.touches, gesture.secondId);
+
+		if (!first || !second) return undefined;
+		return { first, second };
+	}
+
+	function onTouchStart(event: TouchEvent) {
+		if (gesture.pinching || event.touches.length < 2) return;
+
+		const first = event.touches.item(0);
+		const second = event.touches.item(1);
+		if (!first || !second) return;
+
+		// This event is recognized as the start of a two-finger gesture.
+		event.preventDefault();
+		event.stopPropagation();
+
+		gesture.pinching = true;
+		gesture.moved = false;
+		gesture.candidateSince = 0;
+		gesture.candidateDistance = 0;
+		gesture.firstId = first.identifier;
+		gesture.secondId = second.identifier;
+		gesture.startDistance = distance(first, second);
+		gesture.pendingDistance = gesture.startDistance;
+		gesture.startPx = readFontSizePx(view);
+		gesture.lastPx = gesture.startPx;
+		gesture.lastUpdate = 0;
+		gesture.originalInlineFontSize = view.dom.style.fontSize;
+	}
+
+	function onTouchMove(event: TouchEvent) {
+		if (!gesture.pinching) return;
+		if (!event.cancelable) {
+			restorePreview();
+			clearGesture();
+			return;
 		}
+		const touches = getCurrentTrackedTouches(event);
 
-		function onTouchStart(event: TouchEvent) {
-			if (gesture.pinching || event.touches.length < 2) return;
-
+		// Do not silently switch to a third finger if an original finger leaves.
+		if (!touches) {
 			event.preventDefault();
-
-			gesture.pinching = true;
-			gesture.moved = false;
-			gesture.startDistance = touchDistance(
-				event.touches[0],
-				event.touches[1],
-			);
-			gesture.startPx = readFontSizePx(view);
-			gesture.lastPx = gesture.startPx;
-			gesture.pendingDistance = gesture.startDistance;
-			gesture.lastUpdate = 0;
-			gesture.originalInlineFontSize = view.dom.style.fontSize;
+			event.stopPropagation();
+			return;
 		}
 
-		function onTouchMove(event: TouchEvent) {
-			if (!gesture.pinching || event.touches.length < 2) return;
+		event.preventDefault();
+		event.stopPropagation();
 
-			event.preventDefault();
-
-			// The gesture received a real movement; remember the latest distance
-			// even when the preview itself is throttled.
-			gesture.moved = true;
-			gesture.pendingDistance = touchDistance(
-				event.touches[0],
-				event.touches[1],
-			);
-
+		const currentDistance = distance(touches.first, touches.second);
+		gesture.pendingDistance = currentDistance;
+		if (!gesture.moved) {
+			const distanceChange = currentDistance - gesture.startDistance;
+			const absDistanceChange = Math.abs(distanceChange);
 			const now = Date.now();
-			if (now - gesture.lastUpdate < ZOOM_THROTTLE_MS) return;
 
-			gesture.lastUpdate = now;
-
-			applyFontSize(
-				computePinchFontSize(
-					gesture.startPx,
-					gesture.startDistance,
-					gesture.pendingDistance,
-				),
-			);
-		}
-
-		function endPinch(event: TouchEvent) {
-			if (!gesture.pinching || event.touches.length >= 2) return;
-
-			// Only flush the latest movement when the gesture actually moved:
-			// a two-finger tap must not round or clamp the saved size
-			// (9.5px -> 10px, 99px -> 72px).
-			if (gesture.moved) {
-				applyFontSize(
-					computePinchFontSize(
-						gesture.startPx,
-						gesture.startDistance,
-						gesture.pendingDistance,
-					),
-				);
+			if (absDistanceChange < MOVE_THRESHOLD_PX) {
+				gesture.candidateSince = 0;
+				gesture.candidateDistance = 0;
+				return;
 			}
 
-			gesture.pinching = false;
-			persistFontSize();
+			if (gesture.candidateSince === 0) {
+				gesture.candidateSince = now;
+				gesture.candidateDistance = currentDistance;
+				return;
+			}
+
+			const initialDirection = Math.sign(
+				gesture.candidateDistance - gesture.startDistance,
+			);
+			const currentDirection = Math.sign(distanceChange);
+
+			if (initialDirection !== currentDirection) {
+				gesture.candidateSince = now;
+				gesture.candidateDistance = currentDistance;
+				return;
+			}
+
+			if (now - gesture.candidateSince < PINCH_CONFIRMATION_MS) {
+				return;
+			}
+
+			gesture.moved = true;
 		}
 
-		const { dom } = view;
+		const now = Date.now();
+		if (now - gesture.lastUpdate >= ZOOM_THROTTLE_MS) {
+			gesture.lastUpdate = now;
+			applyPendingPreview();
+			return;
+		}
 
-		dom.addEventListener("touchstart", onTouchStart, { passive: false });
-		dom.addEventListener("touchmove", onTouchMove, { passive: false });
-		dom.addEventListener("touchend", endPinch);
-		dom.addEventListener("touchcancel", endPinch);
+		// Inside the throttle window: coalesce into the next animation frame so
+		// the latest pending distance is applied and the preview never goes stale.
+		if (scheduledFrame == null) {
+			scheduledFrame = requestAnimationFrame(() => {
+				scheduledFrame = null;
+				if (destroyed || !gesture.pinching) return;
+				applyPendingPreview();
+			});
+		}
 
-		return {
-			destroy() {
-				// Never leave a half-finished preview behind.
-				if (gesture.pinching) {
-					view.dom.style.fontSize = gesture.originalInlineFontSize;
-					gesture.pinching = false;
-				}
-				dom.removeEventListener("touchstart", onTouchStart);
-				dom.removeEventListener("touchmove", onTouchMove);
-				dom.removeEventListener("touchend", endPinch);
-				dom.removeEventListener("touchcancel", endPinch);
-			},
-		};
+	}
+
+	function endPinch(event: TouchEvent) {
+		if (!gesture.pinching) return;
+
+		const originalTouchesRemain =
+			getTrackedTouch(event.touches, gesture.firstId) &&
+			getTrackedTouch(event.touches, gesture.secondId);
+
+		// If both original fingers remain, a third finger was added or removed.
+		// Keep the original gesture alive rather than restarting it.
+		if (originalTouchesRemain) return;
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		cancelScheduledPreview();
+
+		// Apply the latest movement even if the throttle skipped its preview.
+		if (gesture.moved) {
+			applyPendingPreview();
+		}
+
+		clearGesture();
+		persistFontSize();
+	}
+
+	const target = view.contentDOM;
+
+	target.addEventListener("touchstart", onTouchStart, {
+		passive: false,
+		capture: true,
 	});
-}
+	target.addEventListener("touchmove", onTouchMove, {
+		passive: false,
+		capture: true,
+	});
+	target.addEventListener("touchend", endPinch, {
+		capture: true,
+	});
+	target.addEventListener("touchcancel", endPinch, {
+		capture: true,
+	});
+
+	return {
+		destroy() {
+			destroyed = true;
+			cancelScheduledPreview();
+			if (gesture.pinching) {
+				clearGesture();
+				restorePreview();
+			}
+
+			target.removeEventListener("touchstart", onTouchStart, true);
+			target.removeEventListener("touchmove", onTouchMove, true);
+			target.removeEventListener("touchend", endPinch, true);
+			target.removeEventListener("touchcancel", endPinch, true);
+		},
+	};
+});
+
+// Reuse the same plugin definition for every editor.
+export default pinchZoomExtension;

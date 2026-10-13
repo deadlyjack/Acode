@@ -214,9 +214,19 @@ class TouchSelectionMenuController {
 		this.$menu.className = "cursor-menu";
 		this.#bindEvents();
 	}
-
+	#onPinchStart = (event) => {
+		// A two-finger gesture takes priority: cancel any captured tap/selection
+		// bookkeeping so nothing commits when a finger lifts mid-pinch (pinch zoom
+		// on the editor, see cm/pinchZoom).
+		if (event.touches.length < 2) return;
+		this.#pointerSelectionSession = null;
+		this.#readOnlyTapSession = null;
+		this.#pendingPointerSelectionClick = null;
+		this.#clearMenuShowTimer();
+	};
 	#bindEvents() {
 		const root = this.#view.dom;
+		root.addEventListener("touchStart", this.#onPinchStart, true);
 		root.addEventListener("contextmenu", this.#onContextMenu, true);
 		document.addEventListener("pointerdown", this.#onGlobalPointerDown, true);
 		document.addEventListener("pointermove", this.#onGlobalPointerMove, true);
@@ -236,6 +246,7 @@ class TouchSelectionMenuController {
 			}
 			this.#showMenuDeferred();
 		});
+		root.removeEventListener("touchstart", this.#onPinchStart, true);
 		this.#tooltipObserver.observe(this.#view.dom, {
 			childList: true,
 			subtree: true,
