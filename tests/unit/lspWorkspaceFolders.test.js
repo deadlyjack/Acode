@@ -1,11 +1,11 @@
 // @vitest-environment happy-dom
 
-import { describe, expect, it } from "vitest";
 import {
 	addJsTsLanguageAliases,
 	isTailwindCssServer,
 	resolveJsTsLanguageId,
 } from "cm/lsp/servers/shared";
+import { describe, expect, it } from "vitest";
 
 describe("Tailwind document language IDs", () => {
 	it("recognizes a custom server and supplies its standard aliases", () => {

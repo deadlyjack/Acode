@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { quotePosixShellArg } from "utils/shell";
+import { describe, expect, it } from "vitest";
 
 describe("quotePosixShellArg", () => {
 	it("quotes spaces and shell metacharacters as literal text", () => {

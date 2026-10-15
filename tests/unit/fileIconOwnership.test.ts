@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
-import { afterEach, expect, it, vi } from "vitest";
+
 import fileIcons from "lib/fileIcons";
+import { afterEach, expect, it, vi } from "vitest";
 
 afterEach(() => fileIcons.resetForTests());
 

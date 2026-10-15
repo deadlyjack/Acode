@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RewardedAd } from "../../src/plugins/admob/src/www/ads/rewarded";
+
 const mocks = vi.hoisted(() => ({
 	start: vi.fn(),
 	config: { HAS_PRO: false },
@@ -279,40 +280,38 @@ describe("rewarded wrapper disposal", () => {
 		expect(calls).toEqual([]);
 		await expect(ad.load()).rejects.toThrow("Ad is destroyed");
 	});
-	it.each(["SDK startup", "native creation"])(
-		"cancels during %s without issuing a late load or show",
-		async (phase) => {
-			let started;
-			if (phase === "SDK startup") {
-				admob.start.mockImplementation(
-					() =>
-						new Promise((resolve) => {
-							started = resolve;
-						}),
-				);
-			}
-			const ad = new RewardedAd({ id: "old", adUnitId: "test" });
-			const loading = ad.load();
-			const rejected = expect(loading).rejects.toThrow("Ad is destroyed");
-			await flush();
-			const disposed = ad.destroy();
-			expect(ad.destroy()).toBe(disposed);
-			const next = new RewardedAd({ id: "next", adUnitId: "test" });
-			if (started) started();
-			else calls.find(({ action }) => action === "adCreate").resolve();
-			await Promise.all([disposed, rejected]);
-			expect(calls.filter(({ action }) => action === "adLoad")).toEqual([]);
-			expect(
-				calls
-					.filter(({ action }) => action === "adDestroy")
-					.map(({ id }) => id),
-			).toEqual(["old"]);
-			expect(window.admobAds.old).toBeUndefined();
-			expect(window.admobAds.next).toBe(next);
-			await expect(ad.show()).rejects.toThrow("Ad is destroyed");
-			await next.destroy();
-		},
-	);
+	it.each([
+		"SDK startup",
+		"native creation",
+	])("cancels during %s without issuing a late load or show", async (phase) => {
+		let started;
+		if (phase === "SDK startup") {
+			admob.start.mockImplementation(
+				() =>
+					new Promise((resolve) => {
+						started = resolve;
+					}),
+			);
+		}
+		const ad = new RewardedAd({ id: "old", adUnitId: "test" });
+		const loading = ad.load();
+		const rejected = expect(loading).rejects.toThrow("Ad is destroyed");
+		await flush();
+		const disposed = ad.destroy();
+		expect(ad.destroy()).toBe(disposed);
+		const next = new RewardedAd({ id: "next", adUnitId: "test" });
+		if (started) started();
+		else calls.find(({ action }) => action === "adCreate").resolve();
+		await Promise.all([disposed, rejected]);
+		expect(calls.filter(({ action }) => action === "adLoad")).toEqual([]);
+		expect(
+			calls.filter(({ action }) => action === "adDestroy").map(({ id }) => id),
+		).toEqual(["old"]);
+		expect(window.admobAds.old).toBeUndefined();
+		expect(window.admobAds.next).toBe(next);
+		await expect(ad.show()).rejects.toThrow("Ad is destroyed");
+		await next.destroy();
+	});
 	it("destroys a pending native load and ignores its late completion", async () => {
 		const ad = new RewardedAd({ id: "loading", adUnitId: "test" });
 		const loading = ad.load();

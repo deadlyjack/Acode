@@ -1,13 +1,6 @@
-import type {
-	Location,
-	LocationLink,
-} from "vscode-languageserver-protocol";
+import type { Location, LocationLink } from "vscode-languageserver-protocol";
 
-export type LspLocationResult =
-	| Location
-	| Location[]
-	| LocationLink[]
-	| null;
+export type LspLocationResult = Location | Location[] | LocationLink[] | null;
 
 /** Normalize definition-style responses to the Location shape used by Acode. */
 export function normalizeLocations(result: LspLocationResult): Location[] {

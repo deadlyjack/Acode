@@ -1,11 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import "cm/supportedModes";
-import {
-	addMode,
-	getModeForPath,
-	getModes,
-	removeMode,
-} from "cm/modelist";
+import { addMode, getModeForPath, getModes, removeMode } from "cm/modelist";
 
 function getModeSpecificityScore(modeInstance) {
 	if (modeInstance.name.toLowerCase() === "text") {
@@ -122,9 +117,7 @@ function collectParityPaths() {
 				source.endsWith("$") &&
 				!/[|()[*+?]/.test(source.slice(1, -1).replace(/\\./g, ""))
 			) {
-				const name = source
-					.slice(1, -1)
-					.replace(/\\(.)/g, "$1");
+				const name = source.slice(1, -1).replace(/\\(.)/g, "$1");
 				if (name) paths.add(name);
 			}
 		}

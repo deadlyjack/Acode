@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it } from "vitest";
 import fileIcons, { BUILTIN_THEME_ID } from "lib/fileIcons";
+import { afterEach, describe, expect, it } from "vitest";
 
 afterEach(() => {
 	fileIcons.resetForTests();

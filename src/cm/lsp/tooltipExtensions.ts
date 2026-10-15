@@ -52,10 +52,7 @@ const SIGNATURE_TRIGGER_DELAY = 120;
 const SIGNATURE_RETRIGGER_DELAY = 250;
 const hoverLanguageLoads = new Map<string, Promise<Language | null>>();
 const pluginHoverLanguages = new WeakMap<Mode, Language>();
-const pluginHoverLanguageLoads = new WeakMap<
-	Mode,
-	Promise<Language | null>
->();
+const pluginHoverLanguageLoads = new WeakMap<Mode, Promise<Language | null>>();
 
 function clientHasCapability(
 	client: LSPClient,
@@ -250,7 +247,9 @@ function collectHoverLanguages(
 	return result;
 }
 
-async function loadHoverContentLanguages(contents: Hover["contents"]): Promise<void> {
+async function loadHoverContentLanguages(
+	contents: Hover["contents"],
+): Promise<void> {
 	const languageTags = collectHoverLanguages(contents);
 	await Promise.all(
 		Array.from(languageTags, (language) =>
@@ -368,8 +367,8 @@ function lspTooltipSource(
 	view: EditorView,
 	pos: number,
 ): Promise<Tooltip | null> {
-	const plugins = LSPPlugin.getAll(view, "hover").filter(
-		(plugin) => clientHasCapability(plugin.client, "hoverProvider"),
+	const plugins = LSPPlugin.getAll(view, "hover").filter((plugin) =>
+		clientHasCapability(plugin.client, "hoverProvider"),
 	);
 	if (!plugins.length) return Promise.resolve(null);
 
@@ -808,9 +807,8 @@ export const showSignatureHelp: Command = (view) => {
 	const field = view.state.field(signatureState);
 	if (!plugin || field === undefined) return false;
 
-	const lspPlugin = LSPPlugin.getAll(view, "signatureHelp").find(
-		(candidate) =>
-			clientHasCapability(candidate.client, "signatureHelpProvider"),
+	const lspPlugin = LSPPlugin.getAll(view, "signatureHelp").find((candidate) =>
+		clientHasCapability(candidate.client, "signatureHelpProvider"),
 	);
 	if (!lspPlugin) return false;
 

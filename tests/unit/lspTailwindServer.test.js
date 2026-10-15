@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { tailwindServers } from "cm/lsp/servers/tailwind";
+import { describe, expect, it } from "vitest";
 
 describe("built-in Tailwind CSS language server", () => {
 	it("is available but disabled by default", () => {

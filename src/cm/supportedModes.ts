@@ -138,7 +138,12 @@ function createLanguageLoader(name: string, lang: LanguageDescription) {
 }
 
 // 1) Always register a plain text fallback
-addMode("Text", "txt|text|log|plain|lock|pub|gitkeep|keep|mk|^makefile", "Plain Text", () => []);
+addMode(
+	"Text",
+	"txt|text|log|plain|lock|pub|gitkeep|keep|mk|^makefile",
+	"Plain Text",
+	() => [],
+);
 
 // 2) Register all languages provided by @codemirror/language-data
 //    We convert extensions like [".js", ".mjs"] into a modelist pattern: "js|mjs"
@@ -217,7 +222,13 @@ for (const lang of languages as readonly LanguageDescription[]) {
 			);
 		} else if (normalizedName === "json" || modeId === "json") {
 			langExtensions.push("prettierrc", "hintrc", "eslintrc", "babelrc");
-			filenames.push(".prettierrc", ".hintrc", ".eslintrc", ".babelrc", "bun.lock");
+			filenames.push(
+				".prettierrc",
+				".hintrc",
+				".eslintrc",
+				".babelrc",
+				"bun.lock",
+			);
 		} else if (normalizedName === "yaml" || modeId === "yaml") {
 			filenames.push("yarn.lock");
 		} else if (normalizedName === "toml" || modeId === "toml") {

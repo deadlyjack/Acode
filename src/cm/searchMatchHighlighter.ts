@@ -1,9 +1,9 @@
 import {
 	getSearchQuery,
-	searchPanelOpen,
 	type SearchQuery,
+	searchPanelOpen,
 } from "@codemirror/search";
-import { RangeSetBuilder, type EditorState } from "@codemirror/state";
+import { type EditorState, RangeSetBuilder } from "@codemirror/state";
 import type { DecorationSet, ViewUpdate } from "@codemirror/view";
 import { Decoration, EditorView, ViewPlugin } from "@codemirror/view";
 

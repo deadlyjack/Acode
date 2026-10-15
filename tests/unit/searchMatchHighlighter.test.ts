@@ -2,8 +2,8 @@
 
 import {
 	openSearchPanel,
-	search,
 	SearchQuery,
+	search,
 	setSearchQuery,
 } from "@codemirror/search";
 import { EditorSelection, EditorState } from "@codemirror/state";

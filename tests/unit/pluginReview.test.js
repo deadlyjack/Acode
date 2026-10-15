@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import { getIntlLocale, getLocaleDirection } from "lib/lang";
 import {
 	formatReviewDate,
@@ -11,6 +10,7 @@ import {
 	updateReviewStats,
 	validateReviewDraft,
 } from "pages/plugin/reviewUtils";
+import { describe, expect, it } from "vitest";
 
 describe("plugin review dates", () => {
 	it("formats database timestamps as website-style relative dates", () => {
@@ -104,12 +104,12 @@ describe("plugin review ordering", () => {
 
 describe("plugin review draft", () => {
 	it("normalizes whitespace and preserves valid votes", () => {
-		expect(normalizeReviewDraft({ comment: "  Very useful  ", vote: "1" })).toEqual(
-			{
-				comment: "Very useful",
-				vote: 1,
-			},
-		);
+		expect(
+			normalizeReviewDraft({ comment: "  Very useful  ", vote: "1" }),
+		).toEqual({
+			comment: "Very useful",
+			vote: 1,
+		});
 	});
 
 	it("supports an upvote without text and validates negative feedback", () => {

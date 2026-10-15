@@ -28,6 +28,7 @@ vi.mock("utils/helpers", () => ({
 			new Promise((resolve, reject) => fn(...args, resolve, reject)),
 	},
 }));
+
 import selectAppIcon from "lib/appIconSelection";
 
 function harness() {

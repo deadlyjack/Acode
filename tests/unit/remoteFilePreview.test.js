@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
 import { readRemoteFilePreview } from "utils/remoteFilePreview";
+import { describe, expect, it, vi } from "vitest";
 
 function createCache({ exists = false, text = "", error = null } = {}) {
 	return {
