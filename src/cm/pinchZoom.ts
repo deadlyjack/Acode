@@ -8,6 +8,7 @@ import {
 const ZOOM_THROTTLE_MS = 50;
 const MOVE_THRESHOLD_PX = 15;
 const PINCH_CONFIRMATION_MS = 120;
+const GESTURE_LISTENER_OPTIONS = { capture: true, passive: false } as const;
 
 
 interface PinchPoint {
@@ -123,6 +124,18 @@ const pinchZoomExtension = ViewPlugin.define((view) => {
 		}
 	}
 
+	function addGestureListeners() {
+		document.addEventListener("touchmove", onTouchMove, GESTURE_LISTENER_OPTIONS);
+		document.addEventListener("touchend", endPinch, GESTURE_LISTENER_OPTIONS);
+		document.addEventListener("touchcancel", endPinch, GESTURE_LISTENER_OPTIONS);
+	}
+
+	function removeGestureListeners() {
+		document.removeEventListener("touchmove", onTouchMove, true);
+		document.removeEventListener("touchend", endPinch, true);
+		document.removeEventListener("touchcancel", endPinch, true);
+	}
+
 	function clearGesture() {
 		gesture.pinching = false;
 		gesture.firstId = -1;
@@ -159,7 +172,23 @@ const pinchZoomExtension = ViewPlugin.define((view) => {
 	}
 
 	function onTouchStart(event: TouchEvent) {
-		if (gesture.pinching || event.touches.length < 2) return;
+		if (gesture.pinching) {
+			// Recovery path: if the original fingers' move/end events were
+			// lost (CodeMirror unmounted the line under a finger), the
+			// gesture is stuck. Abandon it so the next pinch can start.
+			const fingerStillDown =
+				getTrackedTouch(event.touches, gesture.firstId) ||
+				getTrackedTouch(event.touches, gesture.secondId);
+			if (fingerStillDown) return;
+			cancelScheduledPreview();
+			removeGestureListeners();
+			clearGesture();
+			restorePreview();
+		}
+
+		// Start only when exactly two fingers land together; a three-finger
+		// touch keeps Acode's normal behaviour (scrolling etc.).
+		if (event.touches.length !== 2) return;
 
 		const first = event.touches.item(0);
 		const second = event.touches.item(1);
@@ -181,11 +210,17 @@ const pinchZoomExtension = ViewPlugin.define((view) => {
 		gesture.lastPx = gesture.startPx;
 		gesture.lastUpdate = 0;
 		gesture.originalInlineFontSize = view.dom.style.fontSize;
+
+		// The rest of the gesture is observed on document: a finger's
+		// original target (.cm-line) can be unmounted by the preview
+		// re-measure, and events for a detached node never bubble back.
+		addGestureListeners();
 	}
 
 	function onTouchMove(event: TouchEvent) {
 		if (!gesture.pinching) return;
 		if (!event.cancelable) {
+			removeGestureListeners();
 			restorePreview();
 			clearGesture();
 			return;
@@ -268,7 +303,7 @@ const pinchZoomExtension = ViewPlugin.define((view) => {
 		// If both original fingers remain, a third finger was added or removed.
 		// Keep the original gesture alive rather than restarting it.
 		if (originalTouchesRemain) return;
-
+		removeGestureListeners();
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -304,21 +339,12 @@ const pinchZoomExtension = ViewPlugin.define((view) => {
 		passive: false,
 		capture: true,
 	});
-	target.addEventListener("touchmove", onTouchMove, {
-		passive: false,
-		capture: true,
-	});
-	target.addEventListener("touchend", endPinch, {
-		capture: true,
-	});
-	target.addEventListener("touchcancel", endPinch, {
-		capture: true,
-	});
 
 	return {
 		destroy() {
 			destroyed = true;
 			cancelScheduledPreview();
+			removeGestureListeners();
 			if (gesture.pinching) {
 				clearGesture();
 				restorePreview();
