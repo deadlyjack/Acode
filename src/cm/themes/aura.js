@@ -21,6 +21,7 @@ export const config = {
 	variable: "#edecee",
 	parameter: "#edecee",
 	function: "#ffca85",
+	property: "#edecee",
 	string: "#61ffca",
 	constant: "#61ffca",
 	type: "#82e2ff",
@@ -114,7 +115,7 @@ export const auraHighlightStyle = HighlightStyle.define([
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName], color: config.function },
+	{ tag: [t.propertyName], color: config.property },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,

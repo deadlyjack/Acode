@@ -20,6 +20,7 @@ export const config = {
 	variable: "#F8F8F2",
 	parameter: "#F8F8F2",
 	function: "#50FA7B",
+	property: "#F8F8F2",
 	string: "#F1FA8C",
 	constant: "#BD93F9",
 	type: "#8BE9FD",
@@ -111,7 +112,7 @@ export const draculaHighlightStyle = HighlightStyle.define([
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName], color: config.function },
+	{ tag: [t.propertyName], color: config.property },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,

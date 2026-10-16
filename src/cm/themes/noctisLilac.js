@@ -118,7 +118,6 @@ export const noctisLilacHighlightStyle = HighlightStyle.define([
 	{ tag: [t.number, t.bool, t.null, t.special(t.brace)], color: config.number },
 	{
 		tag: [
-			t.definition(t.propertyName),
 			t.function(t.variableName),
 			t.function(t.propertyName),
 			t.function(t.definition(t.propertyName)),

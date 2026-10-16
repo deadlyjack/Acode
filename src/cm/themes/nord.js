@@ -19,6 +19,7 @@ export const config = {
 	variable: "#d8dee9",
 	parameter: "#d8dee9",
 	function: "#8fbcbb",
+	property: "#d8dee9",
 	string: "#a3be8c",
 	constant: "#b48ead",
 	type: "#88c0d0",
@@ -96,7 +97,8 @@ export const nordHighlightStyle = HighlightStyle.define([
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName, t.attributeName], color: config.function },
+	{ tag: [t.attributeName], color: config.function },
+	{ tag: [t.propertyName], color: config.property },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,

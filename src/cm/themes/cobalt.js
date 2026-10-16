@@ -20,6 +20,7 @@ export const config = {
 	variable: "#ffffff",
 	parameter: "#ffffff",
 	function: "#ffc600",
+	property: "#ffffff",
 	string: "#3ad900",
 	constant: "#ff628c",
 	type: "#80ffbb",
@@ -93,7 +94,6 @@ export const cobaltHighlightStyle = HighlightStyle.define([
 	},
 	{
 		tag: [
-			t.propertyName,
 			t.function(t.variableName),
 			t.function(t.propertyName),
 			t.function(t.definition(t.propertyName)),
@@ -102,6 +102,7 @@ export const cobaltHighlightStyle = HighlightStyle.define([
 		],
 		color: config.function,
 	},
+	{ tag: [t.propertyName], color: config.property },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,

@@ -21,6 +21,7 @@ export const config = {
 	variable: "#268BD2",
 	parameter: "#268BD2",
 	function: "#268BD2",
+	property: "#839496",
 	string: "#2AA198",
 	constant: "#CB4B16",
 	type: "#859900",
@@ -113,7 +114,7 @@ export const solarizedDarkHighlightStyle = HighlightStyle.define([
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName], color: config.function },
+	{ tag: [t.propertyName], color: config.property },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,

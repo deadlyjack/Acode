@@ -246,4 +246,13 @@ describe("built-in theme function colours", () => {
 			expect(colorOf(state, tag)).toBe(expected);
 		}
 	});
+
+	it.each(
+		getThemes().map((theme) => [theme.id]),
+	)("%s colours properties differently from methods", (id) => {
+		const state = EditorState.create({ extensions: getThemeExtensions(id) });
+		const method = colorOf(state, t.function(t.propertyName));
+		expect(colorOf(state, t.propertyName)).not.toBe(method);
+		expect(colorOf(state, t.definition(t.propertyName))).not.toBe(method);
+	});
 });

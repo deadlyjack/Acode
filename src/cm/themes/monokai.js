@@ -20,6 +20,7 @@ export const config = {
 	variable: "#FD971F",
 	parameter: "#FD971F",
 	function: "#66D9EF",
+	property: "#f8f8f2",
 	string: "#E6DB74",
 	constant: "#AE81FF",
 	type: "#66D9EF",
@@ -118,7 +119,7 @@ export const monokaiHighlightStyle = HighlightStyle.define([
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName], color: config.function },
+	{ tag: [t.propertyName], color: config.property },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,

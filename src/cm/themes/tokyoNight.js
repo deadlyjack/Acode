@@ -21,6 +21,7 @@ export const config = {
 	variable: "#c0caf5",
 	parameter: "#cfc9c2",
 	function: "#7aa2f7",
+	property: "#73daca",
 	string: "#9ece6a",
 	constant: "#ff9e64",
 	type: "#2ac3de",
@@ -114,7 +115,7 @@ export const tokyoNightHighlightStyle = HighlightStyle.define([
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName], color: config.function },
+	{ tag: [t.propertyName], color: config.property },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,

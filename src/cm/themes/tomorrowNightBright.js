@@ -22,6 +22,7 @@ export const config = {
 	variable: "#D54E53",
 	parameter: "#E78C45",
 	function: "#7AA6DA",
+	property: "#DEDEDE",
 	string: "#B9CA4A",
 	constant: "#E78C45",
 	type: "#E7C547",
@@ -119,7 +120,7 @@ export const tomorrowNightBrightHighlightStyle = HighlightStyle.define([
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName], color: config.function },
+	{ tag: [t.propertyName], color: config.property },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,
