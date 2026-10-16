@@ -71,17 +71,12 @@ function createLanguageLoader(name: string, lang: LanguageDescription) {
 		case "typescript":
 		case "tsx":
 			return async () => {
-				const [{ javascript }, { withJSDoc }] = await Promise.all([
-					import("@codemirror/lang-javascript"),
-					import("./modes/jsdoc"),
-				]);
-				return withJSDoc(
-					javascript({
-						jsx: normalizedName !== "typescript",
-						typescript:
-							normalizedName === "typescript" || normalizedName === "tsx",
-					}),
-				);
+				const { javascriptSupport } = await import("./modes/javascript");
+				return javascriptSupport({
+					jsx: normalizedName !== "typescript",
+					typescript:
+						normalizedName === "typescript" || normalizedName === "tsx",
+				});
 			};
 
 		case "markdown":

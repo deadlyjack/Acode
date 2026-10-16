@@ -92,7 +92,14 @@ export const cobaltHighlightStyle = HighlightStyle.define([
 		color: config.variable,
 	},
 	{
-		tag: [t.propertyName, t.function(t.variableName), t.labelName],
+		tag: [
+			t.propertyName,
+			t.function(t.variableName),
+			t.function(t.propertyName),
+			t.function(t.definition(t.propertyName)),
+			t.function(t.definition(t.variableName)),
+			t.labelName,
+		],
 		color: config.function,
 	},
 	{

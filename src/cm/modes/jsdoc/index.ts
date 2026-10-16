@@ -1,9 +1,4 @@
-import {
-	foldNodeProp,
-	indentNodeProp,
-	LanguageSupport,
-	LRLanguage,
-} from "@codemirror/language";
+import { foldNodeProp, indentNodeProp } from "@codemirror/language";
 import {
 	type Input,
 	NodeSet,
@@ -20,7 +15,8 @@ import { styleTags, tags as t } from "@lezer/highlight";
 /**
  * A tiny JSDoc tokenizer mounted inside JS/TS `/** ... *\/` comments so
  * themes can style block tags, types, parameter names and inline links
- * separately from the comment text.
+ * separately from the comment text. Braces and other punctuation are left
+ * as comment text, like VS Code does.
  *
  * The mounted tree replaces the host `BlockComment` node, so its root keeps
  * that name (comment checks in completion and rainbow brackets still match)
@@ -33,33 +29,20 @@ enum Type {
 	BlockComment,
 	JSDocTag,
 	JSDocType,
-	JSDocTypeBrace,
-	JSDocTypePunctuation,
 	JSDocParam,
-	JSDocBracket,
 	JSDocLink,
 }
 
 const nodeSet = new NodeSet(
-	[
-		"BlockComment",
-		"JSDocTag",
-		"JSDocType",
-		"JSDocTypeBrace",
-		"JSDocTypePunctuation",
-		"JSDocParam",
-		"JSDocBracket",
-		"JSDocLink",
-	].map((name, id) => NodeType.define({ id, name })),
+	["BlockComment", "JSDocTag", "JSDocType", "JSDocParam", "JSDocLink"].map(
+		(name, id) => NodeType.define({ id, name }),
+	),
 ).extend(
 	styleTags({
 		BlockComment: t.docComment,
 		JSDocTag: t.keyword,
 		JSDocType: t.typeName,
-		JSDocTypeBrace: t.brace,
-		JSDocTypePunctuation: t.punctuation,
 		JSDocParam: t.variableName,
-		JSDocBracket: t.squareBracket,
 		JSDocLink: t.link,
 	}),
 	foldNodeProp.add({
@@ -85,6 +68,21 @@ function matchAt(re: RegExp, text: string, pos: number): string | null {
 
 function isSpace(ch: string | undefined): boolean {
 	return ch === " " || ch === "\t" || ch === "\r" || ch === "\n";
+}
+
+/**
+ * Index just past the string literal opening at `pos`, honouring backslash
+ * escapes, or -1 when it isn't closed on the same line before `limit`.
+ */
+function skipQuoted(text: string, pos: number, limit: number): number {
+	const quote = text[pos];
+	for (let i = pos + 1; i < limit; i++) {
+		const ch = text[i];
+		if (ch === "\\") i++;
+		else if (ch === quote) return i + 1;
+		else if (ch === "\n") return -1;
+	}
+	return -1;
 }
 
 function tokenize(text: string): number[] {
@@ -201,7 +199,6 @@ type Push = (type: Type, from: number, to: number) => void;
 
 /** `{@link Target|label}` and friends; `close` is the matching `}`. */
 function inlineTag(text: string, pos: number, close: number, push: Push) {
-	push(Type.JSDocTypeBrace, pos, pos + 1);
 	let i = pos + 1;
 	const tag = matchAt(TAG_NAME, text, i);
 	if (tag) {
@@ -213,7 +210,6 @@ function inlineTag(text: string, pos: number, close: number, push: Push) {
 			push(Type.JSDocLink, i, i + target.length);
 		}
 	}
-	push(Type.JSDocTypeBrace, close, close + 1);
 	return close + 1;
 }
 
@@ -226,9 +222,7 @@ const MAX_TYPE_LENGTH = 500;
  * of the comment as a type.
  */
 function typeExpression(text: string, pos: number, end: number, push: Push) {
-	const tokens: [Type, number, number][] = [
-		[Type.JSDocTypeBrace, pos, pos + 1],
-	];
+	const tokens: [Type, number, number][] = [];
 	const limit = Math.min(end, pos + MAX_TYPE_LENGTH);
 	let depth = 1;
 	let i = pos + 1;
@@ -243,7 +237,6 @@ function typeExpression(text: string, pos: number, end: number, push: Push) {
 		if (ch === "@") break;
 		if (ch === "{") depth++;
 		if (ch === "}" && --depth === 0) {
-			tokens.push([Type.JSDocTypeBrace, i, i + 1]);
 			for (const [type, from, to] of tokens) push(type, from, to);
 			return i + 1;
 		}
@@ -254,16 +247,12 @@ function typeExpression(text: string, pos: number, end: number, push: Push) {
 			continue;
 		}
 		if (ch === '"' || ch === "'") {
-			let close = i + 1;
-			while (close < limit && text[close] !== ch && text[close] !== "\n") {
-				close++;
-			}
-			if (text[close] !== ch) break;
-			tokens.push([Type.JSDocType, i, close + 1]);
-			i = close + 1;
+			const close = skipQuoted(text, i, limit);
+			if (close === -1) break;
+			tokens.push([Type.JSDocType, i, close]);
+			i = close;
 			continue;
 		}
-		tokens.push([Type.JSDocTypePunctuation, i, i + 1]);
 		i++;
 	}
 	return pos + 1;
@@ -271,7 +260,6 @@ function typeExpression(text: string, pos: number, end: number, push: Push) {
 
 /** `[name=default]` after `@param`. */
 function optionalParam(text: string, pos: number, end: number, push: Push) {
-	push(Type.JSDocBracket, pos, pos + 1);
 	let i = pos + 1;
 	const name = matchAt(IDENTIFIER, text, i);
 	if (name) {
@@ -279,13 +267,18 @@ function optionalParam(text: string, pos: number, end: number, push: Push) {
 		i += name.length;
 	}
 
+	// Find the closing `]`, ignoring brackets inside quoted defaults.
 	let depth = 1;
 	while (i < end && text[i] !== "\n") {
-		if (text[i] === "[") depth++;
-		if (text[i] === "]" && --depth === 0) {
-			push(Type.JSDocBracket, i, i + 1);
-			return i + 1;
+		const ch = text[i];
+		if (ch === '"' || ch === "'") {
+			const close = skipQuoted(text, i, end);
+			if (close === -1) return i;
+			i = close;
+			continue;
 		}
+		if (ch === "[") depth++;
+		if (ch === "]" && --depth === 0) return i + 1;
 		i++;
 	}
 	return i;
@@ -343,17 +336,10 @@ export const jsdocWrap: ParseWrapper = parseMixed((node, input) => {
 	if (node.name !== "BlockComment") return null;
 	// Every edit re-tokenizes the whole comment; leave huge ones plain.
 	if (node.to - node.from > MAX_COMMENT_LENGTH) return null;
+	// Like TypeScript, only `/**` not followed by `*` or `/` is JSDoc.
 	const head = input.read(node.from, Math.min(node.from + 4, node.to));
-	if (!head.startsWith("/**") || head === "/**/") return null;
+	if (!head.startsWith("/**") || head[3] === "*" || head[3] === "/") {
+		return null;
+	}
 	return { parser: jsdocParser };
 });
-
-/** Returns a copy of a JS/TS language support with JSDoc highlighting. */
-export function withJSDoc(support: LanguageSupport): LanguageSupport {
-	const language = support.language;
-	if (!(language instanceof LRLanguage)) return support;
-	return new LanguageSupport(
-		language.configure({ wrap: jsdocWrap }),
-		support.support,
-	);
-}

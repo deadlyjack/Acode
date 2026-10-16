@@ -225,6 +225,8 @@ function createCatppuccinTheme(config) {
 		{
 			tag: [
 				t.function(t.variableName),
+				t.function(t.definition(t.propertyName)),
+				t.function(t.definition(t.variableName)),
 				t.function(t.propertyName),
 				t.propertyName,
 				t.labelName,
