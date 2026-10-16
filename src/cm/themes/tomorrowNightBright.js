@@ -1,6 +1,7 @@
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorView } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
+import { memberProperty } from "../highlightTags";
 
 // Palette adapted from Tomorrow Night Bright (Chris Kempson)
 export const config = {
@@ -22,7 +23,7 @@ export const config = {
 	variable: "#D54E53",
 	parameter: "#E78C45",
 	function: "#7AA6DA",
-	property: "#DEDEDE",
+	memberProperty: "#DEDEDE",
 	string: "#B9CA4A",
 	constant: "#E78C45",
 	type: "#E7C547",
@@ -115,12 +116,16 @@ export const tomorrowNightBrightTheme = EditorView.theme(
 );
 
 export const tomorrowNightBrightHighlightStyle = HighlightStyle.define([
+	{
+		tag: [memberProperty, t.definition(memberProperty)],
+		color: config.memberProperty,
+	},
 	{ tag: t.keyword, color: config.keyword },
 	{
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName], color: config.property },
+	{ tag: [t.propertyName], color: config.function },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,

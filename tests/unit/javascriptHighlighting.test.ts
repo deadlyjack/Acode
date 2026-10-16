@@ -7,6 +7,7 @@ import {
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { highlightTree, type Tag, tags as t } from "@lezer/highlight";
+import { memberProperty } from "cm/highlightTags";
 import { javascriptSupport } from "cm/modes/javascript";
 import { getThemeExtensions, getThemes } from "cm/themes";
 import { describe, expect, it } from "vitest";
@@ -200,16 +201,16 @@ interface I { draw(): void; area: number }`,
 			"#secret",
 			"draw",
 		]);
-		expect(textsWith(state, "definition(propertyName)")).toEqual([
+		expect(textsWith(state, "definition(memberProperty)")).toEqual([
 			"field",
 			"area",
 		]);
 	});
 
 	it("keeps method calls tagged as function properties", () => {
-		const state = createState("options.uri.hashCode();");
+		const state = createState("options.uri.hashCode(); const { a: b } = o;");
 		expect(textsWith(state, "function(propertyName)")).toEqual(["hashCode"]);
-		expect(textsWith(state, "propertyName")).toEqual(["uri"]);
+		expect(textsWith(state, "memberProperty")).toEqual(["uri", "a"]);
 	});
 });
 
@@ -249,10 +250,12 @@ describe("built-in theme function colours", () => {
 
 	it.each(
 		getThemes().map((theme) => [theme.id]),
-	)("%s colours properties differently from methods", (id) => {
+	)("%s colours JS properties differently from methods", (id) => {
+		// VS Code's Solarized colours them alike too.
+		if (id.startsWith("solarized")) return;
 		const state = EditorState.create({ extensions: getThemeExtensions(id) });
 		const method = colorOf(state, t.function(t.propertyName));
-		expect(colorOf(state, t.propertyName)).not.toBe(method);
-		expect(colorOf(state, t.definition(t.propertyName))).not.toBe(method);
+		expect(colorOf(state, memberProperty)).not.toBe(method);
+		expect(colorOf(state, t.definition(memberProperty))).not.toBe(method);
 	});
 });

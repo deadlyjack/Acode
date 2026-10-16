@@ -1,6 +1,7 @@
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorView, lineNumbers } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
+import { memberProperty } from "../highlightTags";
 
 export const config = {
 	name: "dracula",
@@ -20,7 +21,7 @@ export const config = {
 	variable: "#F8F8F2",
 	parameter: "#F8F8F2",
 	function: "#50FA7B",
-	property: "#F8F8F2",
+	memberProperty: "#F8F8F2",
 	string: "#F1FA8C",
 	constant: "#BD93F9",
 	type: "#8BE9FD",
@@ -107,12 +108,16 @@ export const draculaTheme = EditorView.theme(
 );
 
 export const draculaHighlightStyle = HighlightStyle.define([
+	{
+		tag: [memberProperty, t.definition(memberProperty)],
+		color: config.memberProperty,
+	},
 	{ tag: t.keyword, color: config.keyword },
 	{
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName], color: config.property },
+	{ tag: [t.propertyName], color: config.function },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,

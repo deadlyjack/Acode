@@ -1,6 +1,7 @@
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorView } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
+import { memberProperty } from "../highlightTags";
 
 export const config = {
 	name: "ayuDark",
@@ -19,6 +20,7 @@ export const config = {
 	variable: "#b3b1ad",
 	parameter: "#f07178",
 	function: "#ffee99",
+	memberProperty: "#b3b1ad",
 	string: "#c2d94c",
 	constant: "#e6b450",
 	type: "#ff8f40",
@@ -91,6 +93,10 @@ export const ayuDarkTheme = EditorView.theme(
 );
 
 export const ayuDarkHighlightStyle = HighlightStyle.define([
+	{
+		tag: [memberProperty, t.definition(memberProperty)],
+		color: config.memberProperty,
+	},
 	{ tag: t.keyword, color: config.keyword },
 	{
 		tag: [t.name, t.deleted, t.character, t.macroName],

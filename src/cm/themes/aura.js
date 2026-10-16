@@ -1,6 +1,7 @@
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorView } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
+import { memberProperty } from "../highlightTags";
 
 // Aura theme configuration and extensions
 export const config = {
@@ -21,7 +22,7 @@ export const config = {
 	variable: "#edecee",
 	parameter: "#edecee",
 	function: "#ffca85",
-	property: "#edecee",
+	memberProperty: "#edecee",
 	string: "#61ffca",
 	constant: "#61ffca",
 	type: "#82e2ff",
@@ -110,12 +111,16 @@ export const auraTheme = EditorView.theme(
 );
 
 export const auraHighlightStyle = HighlightStyle.define([
+	{
+		tag: [memberProperty, t.definition(memberProperty)],
+		color: config.memberProperty,
+	},
 	{ tag: t.keyword, color: config.keyword },
 	{
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName], color: config.property },
+	{ tag: [t.propertyName], color: config.function },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,

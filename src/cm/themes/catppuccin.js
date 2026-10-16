@@ -1,6 +1,7 @@
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorView } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
+import { memberProperty } from "../highlightTags";
 
 const palettes = {
 	latte: {
@@ -122,7 +123,7 @@ function createConfig(name, caption, palette) {
 		variable: palette.text,
 		parameter: palette.text,
 		function: palette.blue,
-		property: palette.lavender,
+		memberProperty: palette.text,
 		string: palette.green,
 		constant: palette.peach,
 		type: palette.yellow,
@@ -218,6 +219,10 @@ function createCatppuccinTheme(config) {
 	);
 
 	const highlightStyle = HighlightStyle.define([
+		{
+			tag: [memberProperty, t.definition(memberProperty)],
+			color: config.memberProperty,
+		},
 		{ tag: t.keyword, color: config.keyword },
 		{
 			tag: [t.name, t.definition(t.name), t.deleted, t.character, t.macroName],
@@ -229,11 +234,11 @@ function createCatppuccinTheme(config) {
 				t.function(t.definition(t.propertyName)),
 				t.function(t.definition(t.variableName)),
 				t.function(t.propertyName),
+				t.propertyName,
 				t.labelName,
 			],
 			color: config.function,
 		},
-		{ tag: [t.propertyName], color: config.property },
 		{
 			tag: [t.color, t.constant(t.name), t.standard(t.name)],
 			color: config.constant,

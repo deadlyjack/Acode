@@ -1,6 +1,7 @@
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorView } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
+import { memberProperty } from "../highlightTags";
 
 export const config = {
 	name: "monokai",
@@ -20,7 +21,7 @@ export const config = {
 	variable: "#FD971F",
 	parameter: "#FD971F",
 	function: "#66D9EF",
-	property: "#f8f8f2",
+	memberProperty: "#f8f8f2",
 	string: "#E6DB74",
 	constant: "#AE81FF",
 	type: "#66D9EF",
@@ -114,12 +115,16 @@ export const monokaiTheme = EditorView.theme(
 );
 
 export const monokaiHighlightStyle = HighlightStyle.define([
+	{
+		tag: [memberProperty, t.definition(memberProperty)],
+		color: config.memberProperty,
+	},
 	{ tag: t.keyword, color: config.keyword },
 	{
 		tag: [t.name, t.deleted, t.character, t.macroName],
 		color: config.variable,
 	},
-	{ tag: [t.propertyName], color: config.property },
+	{ tag: [t.propertyName], color: config.function },
 	{
 		tag: [t.processingInstruction, t.string, t.inserted, t.special(t.string)],
 		color: config.string,
