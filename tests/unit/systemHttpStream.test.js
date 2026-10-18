@@ -1,5 +1,5 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import http from "node:http";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import system from "../../src/plugins/system/www/plugin.js";
 
@@ -430,7 +430,10 @@ describe("system.httpStream", () => {
 		bridge = createNativeBridge();
 		globalThis.cordova = { exec: (...args) => bridge.exec(...args) };
 		const url = server.url("/network-error");
-		const err = await system.httpStream(url).then(() => null, (e) => e);
+		const err = await system.httpStream(url).then(
+			() => null,
+			(e) => e,
+		);
 		expect(err).toBeInstanceOf(Error);
 	});
 
@@ -448,8 +451,7 @@ describe("system.httpStream", () => {
 		expect(
 			bridge.calls.some(
 				(c) =>
-					c.action === "http-stream-cancel" &&
-					typeof c.args[0] === "string",
+					c.action === "http-stream-cancel" && typeof c.args[0] === "string",
 			),
 		).toBe(true);
 
@@ -487,12 +489,15 @@ describe("system.httpStream", () => {
 
 		const err = await system
 			.httpStream(server.url("/simple"), { signal: controller.signal })
-			.then(() => null, (e) => e);
+			.then(
+				() => null,
+				(e) => e,
+			);
 		expect(err).toBeInstanceOf(Error);
 		expect(err.name).toBe("AbortError");
-		expect(
-			bridge.calls.some((c) => c.action === "http-stream-start"),
-		).toBe(false);
+		expect(bridge.calls.some((c) => c.action === "http-stream-start")).toBe(
+			false,
+		);
 	});
 
 	it("10. aborting the signal cancels an in-flight stream and errors the body", async () => {
@@ -509,15 +514,17 @@ describe("system.httpStream", () => {
 
 		controller.abort();
 
-		const err = await reader.read().then(() => null, (e) => e);
+		const err = await reader.read().then(
+			() => null,
+			(e) => e,
+		);
 		expect(err).toBeInstanceOf(Error);
 		expect(err.name).toBe("AbortError");
 
 		expect(
 			bridge.calls.some(
 				(c) =>
-					c.action === "http-stream-cancel" &&
-					typeof c.args[0] === "string",
+					c.action === "http-stream-cancel" && typeof c.args[0] === "string",
 			),
 		).toBe(true);
 		const entry = bridge.streams.values().next().value;
@@ -542,9 +549,7 @@ describe("system.httpStream", () => {
 		bridge = createNativeBridge();
 		globalThis.cordova = { exec: (...args) => bridge.exec(...args) };
 
-		const expected = Buffer.from([
-			0x00, 0x08, 0x1f, 0x7f, 0xff, 0x22, 0x00,
-		]);
+		const expected = Buffer.from([0x00, 0x08, 0x1f, 0x7f, 0xff, 0x22, 0x00]);
 		const response = await system.httpStream(server.url("/binary-ctrl"));
 		const bytes = Buffer.from(concat(await collect(response)));
 		expect(bytes.equals(expected)).toBe(true);

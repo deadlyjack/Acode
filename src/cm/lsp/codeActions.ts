@@ -12,9 +12,9 @@ import type {
 	Range as LspRange,
 	WorkspaceEdit,
 } from "vscode-languageserver-types";
-import type { Range } from "./types";
 import { addLspLogFor } from "./logs";
 import { safeLspPositionToOffset } from "./positionUtils";
+import type { Range } from "./types";
 import type AcodeWorkspace from "./workspace";
 
 type CodeActionResponse = (CodeAction | Command)[] | null;
@@ -135,7 +135,12 @@ async function executeCommand(
 		// -32601 = Method not implemented (expected for some LSP servers)
 		const lspError = error as { code?: number };
 		if (lspError?.code !== -32601) {
-			addLspLogFor(plugin, "warn", "Code action command execution failed", error);
+			addLspLogFor(
+				plugin,
+				"warn",
+				"Code action command execution failed",
+				error,
+			);
 			console.warn("[LSP:CodeAction] Command execution failed:", error);
 		}
 		return false;
@@ -190,10 +195,7 @@ async function applyChangesToFile(
 
 	displayedView.dispatch({
 		changes: changes.map((c) => ({
-			from: safeLspPositionToOffset(
-				displayedView.state.doc,
-				c.range.start,
-			),
+			from: safeLspPositionToOffset(displayedView.state.doc, c.range.start),
 			to: safeLspPositionToOffset(displayedView.state.doc, c.range.end),
 			insert: c.newText,
 		})),
@@ -347,13 +349,13 @@ export async function fetchCodeActions(
 	// Sort: preferred first, then quickfixes, then alphabetically. Stable
 	// sorting preserves server priority for otherwise identical actions.
 	items.sort((a, b) => {
-			if (a.isPreferred && !b.isPreferred) return -1;
-			if (!a.isPreferred && b.isPreferred) return 1;
-			if (a.kind?.startsWith("quickfix") && !b.kind?.startsWith("quickfix"))
-				return -1;
-			if (!a.kind?.startsWith("quickfix") && b.kind?.startsWith("quickfix"))
-				return 1;
-			return a.title.localeCompare(b.title);
+		if (a.isPreferred && !b.isPreferred) return -1;
+		if (!a.isPreferred && b.isPreferred) return 1;
+		if (a.kind?.startsWith("quickfix") && !b.kind?.startsWith("quickfix"))
+			return -1;
+		if (!a.kind?.startsWith("quickfix") && b.kind?.startsWith("quickfix"))
+			return 1;
+		return a.title.localeCompare(b.title);
 	});
 	return items;
 }

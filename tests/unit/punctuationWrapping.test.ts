@@ -27,13 +27,11 @@ function editor(doc: string) {
 
 function breaks(view: EditorView) {
 	const positions: number[] = [];
-	view.plugin(punctuationWrapping)?.decorations.between(
-		0,
-		view.state.doc.length,
-		(from) => {
+	view
+		.plugin(punctuationWrapping)
+		?.decorations.between(0, view.state.doc.length, (from) => {
 			positions.push(from);
-		},
-	);
+		});
 	return positions;
 }
 

@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 import fileIcons from "lib/fileIcons";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const sidebar = vi.hoisted(() => ({ on: vi.fn() }));
 vi.mock("components/sidebar", () => ({ default: sidebar }));

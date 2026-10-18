@@ -18,11 +18,11 @@ vi.mock("lib/settings", () => ({
 import "cm/supportedModes";
 import settings from "lib/settings";
 import {
-	HIGHLIGHT_CLASS,
 	applyHighlightStyles,
 	clearHighlightCache,
 	getHighlightStyleSheet,
 	getHighlightStyles,
+	HIGHLIGHT_CLASS,
 	highlightCodeBlock,
 	highlightLine,
 	initHighlighting,

@@ -29,9 +29,15 @@ it("validates orientation requests and waits for native lock/unlock acceptance",
 	exec.mockImplementation(() => {});
 	for (const mode of ["landscape", "portrait", null]) {
 		const settled = vi.fn();
-		const request = (mode ? orientation.lock(mode) : orientation.unlock()).then(settled);
+		const request = (mode ? orientation.lock(mode) : orientation.unlock()).then(
+			settled,
+		);
 		const [success, , service, action, args] = exec.mock.lastCall;
-		expect([service, action, args]).toEqual(["System", "set-fullscreen-orientation", [mode]]);
+		expect([service, action, args]).toEqual([
+			"System",
+			"set-fullscreen-orientation",
+			[mode],
+		]);
 		await Promise.resolve();
 		expect(settled).not.toHaveBeenCalled();
 		success();
@@ -47,7 +53,9 @@ describe("fullscreen Back ownership", () => {
 		for (const value of [undefined, false, "pause", {}]) {
 			await expect(api.setBackHandler(value)).rejects.toThrow(TypeError);
 		}
-		await expect(api.setBackHandler(() => {})).rejects.toThrow(/requires fullscreen/);
+		await expect(api.setBackHandler(() => {})).rejects.toThrow(
+			/requires fullscreen/,
+		);
 		expect(exec).not.toHaveBeenCalled();
 		await expect(api.setBackHandler(null)).resolves.toBeUndefined();
 		await expect(api.setBackHandler(null)).resolves.toBeUndefined();
@@ -111,21 +119,24 @@ describe("fullscreen Back ownership", () => {
 		expect(old).toHaveBeenCalledOnce();
 	});
 
-	it.each(["throw", "reject"])(
-		"exits the original session when a callback fails: %s",
-		async (kind) => {
-			change({});
-			await api.setBackHandler(() => {
-				if (kind === "throw") throw new Error("pause failed");
-				return Promise.reject(new Error("pause failed"));
-			});
-			back();
-			await flush();
-			expect(doc.exitFullscreen).toHaveBeenCalledOnce();
-		},
-	);
+	it.each([
+		"throw",
+		"reject",
+	])("exits the original session when a callback fails: %s", async (kind) => {
+		change({});
+		await api.setBackHandler(() => {
+			if (kind === "throw") throw new Error("pause failed");
+			return Promise.reject(new Error("pause failed"));
+		});
+		back();
+		await flush();
+		expect(doc.exitFullscreen).toHaveBeenCalledOnce();
+	});
 
-	it.each(["replace", "reenter"])("ignores an async callback failure after %s", async (kind) => {
+	it.each([
+		"replace",
+		"reenter",
+	])("ignores an async callback failure after %s", async (kind) => {
 		const owner = {};
 		change(owner);
 		let reject;
@@ -164,36 +175,40 @@ describe("fullscreen Back ownership", () => {
 		expect(doc.exitFullscreen).toHaveBeenCalledOnce();
 	});
 
-	it.each(["resolve", "reject"])(
-		"cleans up pending registration after exit and %s, before a new owner registers",
-		async (result) => {
-			change({});
-			const old = vi.fn(),
-				queued = vi.fn(),
-				next = vi.fn();
-			let complete;
-			exec.mockImplementationOnce((resolve, reject) => {
-				complete = result === "resolve" ? resolve : reject;
-			});
-			const pending = api.setBackHandler(old);
-			const failure = expect(pending).rejects.toThrow();
-			const obsolete = api.setBackHandler(queued);
-			const obsoleteFailure = expect(obsolete).rejects.toThrow(/session changed/);
-			await flush();
-			change(null);
-			change({});
-			const fresh = api.setBackHandler(next);
-			complete("old request");
-			await failure;
-			await obsoleteFailure;
-			await fresh;
-			expect(exec.mock.calls.map((call) => call[4][0])).toEqual([true, false, true]);
-			back();
-			expect(next).toHaveBeenCalledOnce();
-			expect(old).not.toHaveBeenCalled();
-			expect(queued).not.toHaveBeenCalled();
-		},
-	);
+	it.each([
+		"resolve",
+		"reject",
+	])("cleans up pending registration after exit and %s, before a new owner registers", async (result) => {
+		change({});
+		const old = vi.fn(),
+			queued = vi.fn(),
+			next = vi.fn();
+		let complete;
+		exec.mockImplementationOnce((resolve, reject) => {
+			complete = result === "resolve" ? resolve : reject;
+		});
+		const pending = api.setBackHandler(old);
+		const failure = expect(pending).rejects.toThrow();
+		const obsolete = api.setBackHandler(queued);
+		const obsoleteFailure = expect(obsolete).rejects.toThrow(/session changed/);
+		await flush();
+		change(null);
+		change({});
+		const fresh = api.setBackHandler(next);
+		complete("old request");
+		await failure;
+		await obsoleteFailure;
+		await fresh;
+		expect(exec.mock.calls.map((call) => call[4][0])).toEqual([
+			true,
+			false,
+			true,
+		]);
+		back();
+		expect(next).toHaveBeenCalledOnce();
+		expect(old).not.toHaveBeenCalled();
+		expect(queued).not.toHaveBeenCalled();
+	});
 
 	it("invalidates a queued release on exit so it cannot release the next session", async () => {
 		change({});
@@ -210,6 +225,10 @@ describe("fullscreen Back ownership", () => {
 		const next = api.setBackHandler(() => {});
 		complete();
 		await Promise.all([failure, release, next]);
-		expect(exec.mock.calls.map((call) => call[4][0])).toEqual([true, false, true]);
+		expect(exec.mock.calls.map((call) => call[4][0])).toEqual([
+			true,
+			false,
+			true,
+		]);
 	});
 });

@@ -152,7 +152,9 @@ test("hides a stale privacy-option entry and keeps ads single-started", async ()
 		},
 	});
 	const states = [];
-	const unsubscribe = harness.coordinator.subscribe((state) => states.push(state));
+	const unsubscribe = harness.coordinator.subscribe((state) =>
+		states.push(state),
+	);
 
 	await harness.coordinator.start();
 	harness.privacy.showOptions = async () => ({

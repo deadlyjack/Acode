@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, expect, it, vi } from "vitest";
 import { installIconTooltips } from "../../src/components/tooltip/longPress";
+
 let controller;
 afterEach(() => {
 	controller?.dispose();

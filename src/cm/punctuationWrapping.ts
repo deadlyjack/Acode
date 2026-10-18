@@ -10,7 +10,8 @@ import {
 
 // VS Code's default wordWrapBreak{After,Before}Characters:
 // https://github.com/microsoft/vscode/blob/main/src/vs/editor/common/config/editorOptions.ts
-const after = " \t})]?|/&.,;¢°′″‰℃、。｡､￠，．：；？！％・･ゝゞヽヾーァィゥェォッャュョヮヵヶぁぃぅぇぉっゃゅょゎゕゖㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿ々〻ｧｨｩｪｫｬｭｮｯｰ”〉》」』】〕）］｝｣";
+const after =
+	" \t})]?|/&.,;¢°′″‰℃、。｡､￠，．：；？！％・･ゝゞヽヾーァィゥェォッャュョヮヵヶぁぃぅぇぉっゃゅょゎゕゖㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿ々〻ｧｨｩｪｫｬｭｮｯｰ”〉》」』】〕）］｝｣";
 const before = "([{‘“〈《「『【〔（［｛｢£¥＄￡￥+＋";
 const escapeClass = (text: string) => text.replace(/[\\\]\[\-^]/g, "\\$&");
 
