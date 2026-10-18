@@ -5,6 +5,8 @@ export type LanguageExtensionProvider = () => Extension | Promise<Extension>;
 export interface AddModeOptions {
 	aliases?: string[];
 	filenameMatchers?: RegExp[];
+	/** Mode whose formatter (and Prettier parser) this mode reuses. */
+	formatAs?: string;
 }
 
 export interface ModesByName {
@@ -360,6 +362,7 @@ export class Mode {
 	aliases: string[];
 	extRe: RegExp | null;
 	filenameMatchers: RegExp[];
+	formatAs: string | null;
 	languageExtension: LanguageExtensionProvider | null;
 
 	constructor(
@@ -377,10 +380,19 @@ export class Mode {
 		this.mode = name; // CodeMirror uses different mode naming
 		this.extensions = extensions;
 		this.caption = caption || this.name.replace(/_/g, " ");
-		this.aliases = normalizeAliases(options.aliases, this.name);
-		this.filenameMatchers = Array.isArray(options.filenameMatchers)
-			? options.filenameMatchers.filter((matcher) => matcher instanceof RegExp)
+		// Plugins may pass anything here; ignore what isn't the expected shape
+		const { aliases, filenameMatchers, formatAs } =
+			options && typeof options === "object" ? options : {};
+		this.aliases = Array.isArray(aliases)
+			? normalizeAliases(aliases, this.name)
 			: [];
+		this.filenameMatchers = Array.isArray(filenameMatchers)
+			? filenameMatchers.filter((matcher) => matcher instanceof RegExp)
+			: [];
+		this.formatAs =
+			typeof formatAs === "string" && normalizeModeKey(formatAs)
+				? normalizeModeKey(formatAs)
+				: null;
 		this.languageExtension = languageExtension;
 		let re = "";
 
