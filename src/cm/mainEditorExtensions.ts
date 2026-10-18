@@ -1,7 +1,7 @@
 import type { Extension } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
-import searchMatchHighlighter from "./searchMatchHighlighter";
 import pinchZoom from "./pinchZoom";
+import searchMatchHighlighter from "./searchMatchHighlighter";
 
 interface MainEditorExtensionOptions {
 	emmetExtensions?: Extension[];

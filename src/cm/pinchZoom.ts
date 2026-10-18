@@ -1,15 +1,14 @@
 import { ViewPlugin } from "@codemirror/view";
-import settings from "lib/settings";
 import {
-  DEFAULT_EDITOR_FONT_SIZE,
-  clampEditorFontSize,
+	clampEditorFontSize,
+	DEFAULT_EDITOR_FONT_SIZE,
 } from "cm/editorFontSize";
+import settings from "lib/settings";
 
 const ZOOM_THROTTLE_MS = 50;
 const MOVE_THRESHOLD_PX = 15;
 const PINCH_CONFIRMATION_MS = 120;
 const GESTURE_LISTENER_OPTIONS = { capture: true, passive: false } as const;
-
 
 interface PinchPoint {
 	clientX: number;
@@ -42,9 +41,7 @@ export function computePinchFontSize(
 		return clampEditorFontSize(startPx);
 	}
 
-	return clampEditorFontSize(
-		(startPx * currentDistance) / startDistance,
-	);
+	return clampEditorFontSize((startPx * currentDistance) / startDistance);
 }
 
 function readFontSizePx(view: { dom: HTMLElement }): number {
@@ -125,9 +122,17 @@ const pinchZoomExtension = ViewPlugin.define((view) => {
 	}
 
 	function addGestureListeners() {
-		document.addEventListener("touchmove", onTouchMove, GESTURE_LISTENER_OPTIONS);
+		document.addEventListener(
+			"touchmove",
+			onTouchMove,
+			GESTURE_LISTENER_OPTIONS,
+		);
 		document.addEventListener("touchend", endPinch, GESTURE_LISTENER_OPTIONS);
-		document.addEventListener("touchcancel", endPinch, GESTURE_LISTENER_OPTIONS);
+		document.addEventListener(
+			"touchcancel",
+			endPinch,
+			GESTURE_LISTENER_OPTIONS,
+		);
 	}
 
 	function removeGestureListeners() {
@@ -161,7 +166,6 @@ const pinchZoomExtension = ViewPlugin.define((view) => {
 		// Handle the asynchronous save without delaying touch handling.
 		void Promise.resolve(settings.update(false)).catch(reportSettingsError);
 	}
-
 
 	function getCurrentTrackedTouches(event: TouchEvent) {
 		const first = getTrackedTouch(event.touches, gesture.firstId);
@@ -290,7 +294,6 @@ const pinchZoomExtension = ViewPlugin.define((view) => {
 				applyPendingPreview();
 			});
 		}
-
 	}
 
 	function endPinch(event: TouchEvent) {
@@ -311,8 +314,7 @@ const pinchZoomExtension = ViewPlugin.define((view) => {
 		// A pinch can be held still after spreading (no further touchmove).
 		// Confirm the sustained candidate so the zoom is not silently lost.
 		if (!gesture.moved && gesture.candidateSince !== 0) {
-			const distanceChange =
-				gesture.pendingDistance - gesture.startDistance;
+			const distanceChange = gesture.pendingDistance - gesture.startDistance;
 			const initialDirection = Math.sign(
 				gesture.candidateDistance - gesture.startDistance,
 			);
