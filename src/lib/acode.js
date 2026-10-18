@@ -22,6 +22,7 @@ import lspClientManager from "cm/lsp/clientManager";
 import { registerLspFormatter } from "cm/lsp/formatter";
 import {
 	addMode,
+	getFormatAsMode,
 	getModeForPath,
 	getModes,
 	getModesByName,
@@ -275,9 +276,10 @@ class Acode {
 		// Preferred CodeMirror language registration API for plugins
 		const editorLanguages = {
 			// name: string, extensions: string|Array<string>, caption?: string,
-			// loader?: () => Extension | Promise<Extension>
-			register: (name, extensions, caption, loader) =>
-				addMode(name, extensions, caption, loader),
+			// loader?: () => Extension | Promise<Extension>,
+			// options?: { aliases?, filenameMatchers?, formatAs? }
+			register: (name, extensions, caption, loader, options) =>
+				addMode(name, extensions, caption, loader, options),
 			unregister: (name) => removeMode(name),
 			add: (name, extensions, caption, loader) =>
 				addMode(name, extensions, caption, loader),
@@ -844,7 +846,9 @@ class Acode {
 		}
 		const modeName = resolvedMode || "text";
 		const formatterMap = appSettings.value.formatter || {};
-		const formatterId = formatterMap[modeName];
+		const formatAs = getFormatAsMode(modeName);
+		const formatterId =
+			formatterMap[modeName] ?? (formatAs && formatterMap[formatAs]);
 		const formatter = this.#formatter.find(({ id }) => id === formatterId);
 
 		if (!formatter) {
