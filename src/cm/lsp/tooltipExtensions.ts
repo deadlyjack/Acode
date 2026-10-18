@@ -27,6 +27,7 @@ import {
 	type ViewUpdate,
 } from "@codemirror/view";
 import { highlightCode } from "@lezer/highlight";
+import { navigateToReference } from "components/referencesPanel/utils";
 import type {
 	HoverParams,
 	ServerCapabilities,
@@ -348,6 +349,41 @@ function closeHoverIfNeeded(view: EditorView): void {
 	}
 }
 
+// Matches `#12`, `#L12`, `#L12,5`, `#12:5` style line/column fragments.
+const FILE_LINK_FRAGMENT = /^#L?(\d+)(?:[,:Cc](\d+))?/;
+
+/**
+ * Open `file://` links from LSP documentation in the editor instead of
+ * letting them bubble to the global handler, which would hand them to
+ * the system browser.
+ */
+function handleDocumentationLinks(dom: HTMLElement, view: EditorView): void {
+	dom.addEventListener("click", (event) => {
+		const link = (event.target as Element | null)?.closest?.("a[href]");
+		if (!link) return;
+		const href = link.getAttribute("href") || "";
+		if (!/^file:/i.test(href)) return;
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		const hashIndex = href.indexOf("#");
+		const uri = hashIndex === -1 ? href : href.slice(0, hashIndex);
+		const match =
+			hashIndex === -1 ? null : FILE_LINK_FRAGMENT.exec(href.slice(hashIndex));
+		const position = {
+			line: match ? Math.max(0, Number(match[1]) - 1) : 0,
+			character: match?.[2] ? Math.max(0, Number(match[2]) - 1) : 0,
+		};
+
+		closeHoverIfNeeded(view);
+		void navigateToReference({
+			uri,
+			range: { start: position, end: position },
+		});
+	});
+}
+
 function hoverRequest(plugin: LSPPlugin, pos: number) {
 	if (!clientHasCapability(plugin.client, "hoverProvider")) {
 		return Promise.resolve(null);
@@ -417,6 +453,7 @@ function lspTooltipSource(
 						results[index].result.contents,
 					);
 				}
+				handleDocumentationLinks(dom, view);
 				return { dom };
 			},
 			above: true,
@@ -618,6 +655,7 @@ function drawSignatureTooltip(
 			const docs = dom.appendChild(document.createElement("div"));
 			docs.className = "cm-lsp-signature-documentation cm-lsp-documentation";
 			docs.innerHTML = plugin.docToHTML(signature.documentation);
+			handleDocumentationLinks(docs, view);
 		}
 	}
 
