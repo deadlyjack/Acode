@@ -354,6 +354,15 @@ export function getMode(name: string): Mode | null {
 	return modesByName[normalizeModeKey(name)] || null;
 }
 
+/**
+ * Name of the mode that `name` formats as, with aliases resolved, or `null`.
+ */
+export function getFormatAsMode(name: string): string | null {
+	const formatAs = getMode(name)?.formatAs;
+	if (!formatAs) return null;
+	return getMode(formatAs)?.name ?? formatAs;
+}
+
 export class Mode {
 	extensions: string;
 	caption: string;

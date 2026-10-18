@@ -22,7 +22,7 @@ import lspClientManager from "cm/lsp/clientManager";
 import { registerLspFormatter } from "cm/lsp/formatter";
 import {
 	addMode,
-	getMode,
+	getFormatAsMode,
 	getModeForPath,
 	getModes,
 	getModesByName,
@@ -846,7 +846,7 @@ class Acode {
 		}
 		const modeName = resolvedMode || "text";
 		const formatterMap = appSettings.value.formatter || {};
-		const formatAs = getMode(modeName)?.formatAs;
+		const formatAs = getFormatAsMode(modeName);
 		const formatterId =
 			formatterMap[modeName] ?? (formatAs && formatterMap[formatAs]);
 		const formatter = this.#formatter.find(({ id }) => id === formatterId);

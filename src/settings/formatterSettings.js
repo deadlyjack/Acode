@@ -1,4 +1,4 @@
-import { getMode, getModes } from "cm/modelist";
+import { getFormatAsMode, getMode, getModes } from "cm/modelist";
 import settingsPage from "components/settingsPage";
 import appSettings from "lib/settings";
 
@@ -15,19 +15,27 @@ export default function formatterSettings(languageName) {
 			String(a.caption || a.name).localeCompare(String(b.caption || b.name)),
 		)
 		.map((mode) => {
-			const { name, caption, extensions, formatAs } = mode;
+			const { name, caption, extensions } = mode;
 			const formatterID = values.formatter[name] || null;
 			// Only pass real extensions (skip anchored filename patterns like ^Dockerfile)
 			const extList = String(extensions)
 				.split("|")
 				.filter((e) => e && !e.startsWith("^"));
 			// Also offer formatters of the mode this one formats as
-			const baseMode = getMode(formatAs);
+			const baseMode = getMode(getFormatAsMode(name) || "");
 			const baseExts = String(baseMode?.extensions || "")
 				.split("|")
 				.filter((e) => e && !e.startsWith("^"));
 			const options = acode.getFormatterFor([...extList, ...baseExts]);
 			const sampleExt = extList[0] || name;
+			// Unset falls back to the base mode's formatter, so say which one
+			const inheritedText = () => {
+				const inherited = formatters.find(
+					({ id }) => id === values.formatter[baseMode.name],
+				);
+				return inherited ? `${inherited.name} (${baseMode.caption})` : null;
+			};
+			if (baseMode) options[0] = [null, inheritedText() || strings.none];
 
 			return {
 				key: name,
@@ -39,14 +47,7 @@ export default function formatterSettings(languageName) {
 					if (formatter) {
 						return formatter.name;
 					}
-					// Unset: format() falls back to the base mode's formatter
-					const inherited =
-						baseMode &&
-						formatters.find(({ id }) => id === values.formatter[formatAs]);
-					if (inherited) {
-						return `${inherited.name} (${baseMode.caption})`;
-					}
-					return strings.none;
+					return (baseMode && inheritedText()) || strings.none;
 				},
 				select: options,
 				chevron: true,

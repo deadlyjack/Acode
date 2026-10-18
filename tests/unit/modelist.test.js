@@ -1,6 +1,12 @@
 import { afterEach, describe, expect, it } from "vitest";
 import "cm/supportedModes";
-import { addMode, getModeForPath, getModes, removeMode } from "cm/modelist";
+import {
+	addMode,
+	getFormatAsMode,
+	getModeForPath,
+	getModes,
+	removeMode,
+} from "cm/modelist";
 
 function getModeSpecificityScore(modeInstance) {
 	if (modeInstance.name.toLowerCase() === "text") {
@@ -243,6 +249,19 @@ describe("getModeForPath", () => {
 
 		expect(getModeForPath("a.acodejsonlike").formatAs).toBe("json");
 		expect(getModeForPath("a.acodeplain").formatAs).toBeNull();
+	});
+
+	it("resolves formatAs aliases to the base mode name", () => {
+		registerTestMode("acode-json5-like", "acodejson5like", {
+			formatAs: "json5",
+		});
+		registerTestMode("acode-unknown-base", "acodeunknownbase", {
+			formatAs: "acode-missing",
+		});
+
+		expect(getFormatAsMode("acode-json5-like")).toBe("json");
+		expect(getFormatAsMode("acode-unknown-base")).toBe("acode-missing");
+		expect(getFormatAsMode("json")).toBeNull();
 	});
 
 	it("ignores malformed mode options from plugins", () => {
