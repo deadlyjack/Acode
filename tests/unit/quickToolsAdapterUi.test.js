@@ -1,7 +1,11 @@
 // @vitest-environment happy-dom
+
+import {
+	clampEditorFontSize,
+	DEFAULT_EDITOR_FONT_SIZE,
+} from "cm/editorFontSize";
 import { afterEach, expect, it, vi } from "vitest";
 import { loadSourceModule } from "../helpers/loadSourceModule";
-import { clampEditorFontSize, DEFAULT_EDITOR_FONT_SIZE } from "cm/editorFontSize";
 
 function mockQuickTools() {
 	vi.doMock("components/quickTools", async () => {
