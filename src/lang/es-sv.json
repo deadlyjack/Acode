@@ -553,7 +553,7 @@
 	"lsp-feature-inlay-hints": "Incrustaciones",
 	"lsp-feature-inlay-hints-info": "Mostrar sugerencias de tipo en línea en el editor.",
 	"lsp-feature-signature": "Ayuda de parámetros",
-  "lsp-feature-signature-info": "Show function parameter hints while typing.",
+	"lsp-feature-signature-info": "Show function parameter hints while typing.",
 	"lsp-feature-state-toast": "{feature} {state}",
 	"lsp-initialization-options": "Opciones de inicialización",
 	"lsp-initialization-options-json": "Opciones de inicialización (JSON)",
