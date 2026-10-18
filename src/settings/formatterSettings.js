@@ -35,7 +35,6 @@ export default function formatterSettings(languageName) {
 				);
 				return inherited ? `${inherited.name} (${baseMode.caption})` : null;
 			};
-			if (baseMode) options[0] = [null, inheritedText() || strings.none];
 
 			return {
 				key: name,
@@ -49,7 +48,11 @@ export default function formatterSettings(languageName) {
 					}
 					return (baseMode && inheritedText()) || strings.none;
 				},
-				select: options,
+				// Read when the picker opens, so the inherited label stays current
+				get select() {
+					if (baseMode) options[0] = [null, inheritedText() || strings.none];
+					return options;
+				},
 				chevron: true,
 				category: languagesLabel,
 			};
