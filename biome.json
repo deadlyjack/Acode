@@ -42,6 +42,7 @@
 			"src/**/*.js",
 			"utils/**/*.js",
 			"src/lang/**/*.json",
+			"tests/unit/**/*.ts",
 			"!src/plugins/**/*.js",
 			"!www/**/*",
 			"!plugins/**/*",

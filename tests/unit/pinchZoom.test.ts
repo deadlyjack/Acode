@@ -47,7 +47,7 @@ function fireTouch(
 	const touches = points.map((point, index) => ({
 		...point,
 		identifier: point.identifier ?? index + 1,
-		target: view.contentDOM,
+		target,
 	}));
 
 	const event = new Event(type, {
@@ -65,7 +65,7 @@ function fireTouch(
 		});
 	}
 
-	view.contentDOM.dispatchEvent(event);
+	target.dispatchEvent(event);
 }
 let frameQueue: Array<() => void> = [];
 beforeEach(() => {
@@ -679,6 +679,119 @@ describe("pinchZoom gesture", () => {
 
 		expect(settingsMock.value.fontSize).toBe("24px");
 		expect(settingsMock.update).toHaveBeenCalledTimes(1);
+
+		view.destroy();
+	});
+	it("keeps pinching when move/end events reach document instead of the line", () => {
+		const view = createView();
+
+		fireTouch(view, "touchstart", [
+			{ clientX: 0, clientY: 0 },
+			{ clientX: 100, clientY: 0 },
+		]);
+
+		// The .cm-line under a finger was unmounted, so the remaining
+		// move/end events are only delivered to document.
+		now += 60;
+		fireTouch(
+			view,
+			"touchmove",
+			[
+				{ clientX: 0, clientY: 0 },
+				{ clientX: 200, clientY: 0 },
+			],
+			document,
+		);
+
+		now += 121;
+		fireTouch(
+			view,
+			"touchmove",
+			[
+				{ clientX: 0, clientY: 0 },
+				{ clientX: 200, clientY: 0 },
+			],
+			document,
+		);
+
+		expect(view.dom.style.fontSize).toBe("24px");
+
+		fireTouch(view, "touchend", [{ clientX: 0, clientY: 0 }], document);
+
+		expect(settingsMock.update).toHaveBeenCalledTimes(1);
+		expect(settingsMock.update).toHaveBeenCalledWith(false);
+		expect(settingsMock.value.fontSize).toBe("24px");
+		expect(view.dom.style.fontSize).toBe("12px");
+
+		view.destroy();
+	});
+
+	it("abandons a stuck pinch so the next two-finger gesture can start", () => {
+		const view = createView();
+
+		fireTouch(view, "touchstart", [
+			{ clientX: 0, clientY: 0, identifier: 1 },
+			{ clientX: 100, clientY: 0, identifier: 2 },
+		]);
+
+		now += 60;
+		fireTouch(
+			view,
+			"touchmove",
+			[
+				{ clientX: 0, clientY: 0, identifier: 1 },
+				{ clientX: 200, clientY: 0, identifier: 2 },
+			],
+			document,
+		);
+
+		now += 121;
+		fireTouch(
+			view,
+			"touchmove",
+			[
+				{ clientX: 0, clientY: 0, identifier: 1 },
+				{ clientX: 200, clientY: 0, identifier: 2 },
+			],
+			document,
+		);
+
+		expect(view.dom.style.fontSize).toBe("24px");
+
+		// The tracked fingers' events are lost entirely; a fresh finger lands.
+		// Neither tracked identifier is still down, so the stuck pinch must be
+		// abandoned and the preview restored.
+		fireTouch(view, "touchstart", [
+			{ clientX: 40, clientY: 40, identifier: 3 },
+		]);
+
+		expect(view.dom.style.fontSize).toBe("12px");
+		expect(settingsMock.update).not.toHaveBeenCalled();
+
+		// A new two-finger gesture must work again.
+		fireTouch(view, "touchstart", [
+			{ clientX: 40, clientY: 40, identifier: 3 },
+			{ clientX: 140, clientY: 40, identifier: 4 },
+		]);
+
+		now += 60;
+		fireTouch(view, "touchmove", [
+			{ clientX: 40, clientY: 40, identifier: 3 },
+			{ clientX: 340, clientY: 40, identifier: 4 },
+		]);
+
+		now += 121;
+		fireTouch(view, "touchmove", [
+			{ clientX: 40, clientY: 40, identifier: 3 },
+			{ clientX: 340, clientY: 40, identifier: 4 },
+		]);
+
+		expect(view.dom.style.fontSize).toBe("36px");
+
+		fireTouch(view, "touchend", [{ clientX: 40, clientY: 40, identifier: 3 }]);
+
+		expect(settingsMock.update).toHaveBeenCalledTimes(1);
+		expect(settingsMock.value.fontSize).toBe("36px");
 
 		view.destroy();
 	});
