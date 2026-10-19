@@ -595,86 +595,87 @@ it("continues resume checks past unavailable, failing, and read-only HTTP provid
 	expect(f.manager.files.every((file) => file.tab)).toBe(true);
 });
 
-it.each(["cached text", "", undefined])(
-	"keeps the loading view for cache %j until the session is ready",
-	(cached) => {
-		const source = managerSource;
-		const body = managerBody;
-		const names = [
-			"showLoadingEditor",
-			"applyFileToEditor",
-			"recreateActiveEditorState",
-			"getRawEditorState",
-			"isReusableEditorState",
-		];
-		const editor = new EditorView({ parent: document.body });
-		const file = {
-			type: "editor",
-			filename: "file.js",
-			loaded: false,
-			loading: false,
-			session: EditorState.create(),
-			__cmSessionReady: true,
-			__cmExtensionSignature: "test",
-		};
-		const loadingPreviews = new WeakMap();
-		if (cached !== undefined) loadingPreviews.set(file, cached);
-		const context = vm.createContext({
-			editor,
-			EditorState,
-			placeholder,
-			createEditorReadOnlyExtension,
-			blurEditorIfReadOnly,
-			loadingPreviews,
-			manager: { activeFile: file },
-			touchSelectionController: null,
-			themeCompartment: new Compartment(),
-			languageCompartment: new Compartment(),
-			lspCompartment: new Compartment(),
-			readOnlyCompartment: new Compartment(),
-			getConfiguredThemeExtension: () => [],
-			getBaseExtensionsFromOptions: () => [],
-			getEditorExtensionSignature: () => "test",
-			getFileLanguageSignature: () => "text",
-			applyCurrentEditorOptions: vi.fn(),
-			shouldApplyLanguage: () => false,
-			restoreFileScrollPosition: vi.fn(),
-			scheduleLspForFile: vi.fn(),
-		});
-		// Run the actual render functions with a real EditorView; omit the unrelated app shell.
-		vm.runInContext(
-			body
-				.filter(
-					(node) =>
-						node.type === "FunctionDeclaration" && names.includes(node.id.name),
-				)
-				.map((node) => source.slice(node.start, node.end))
-				.join("\n"),
-			context,
-		);
-		try {
-			const savedSession = file.session;
-			context.applyFileToEditor(file);
-			const preview = editor.state;
-			context.recreateActiveEditorState();
-			expect(editor.state).toBe(preview);
-			context.applyFileToEditor(file, { forceRecreate: true });
-			expect(editor.state.doc.toString()).toBe(cached ?? "");
-			expect(editor.state.readOnly).toBe(true);
-			expect(editor.contentDOM.getAttribute("contenteditable")).toBe("false");
-			expect(
-				editor.dom.querySelector(".cm-placeholder")?.textContent ?? null,
-			).toBe(cached === undefined ? "Loading file.js..." : null);
-			expect(file.session).toBe(savedSession);
-			file.session = EditorState.create({ doc: cached ?? "loaded text" });
-			file.loaded = true;
-			file.loading = false;
-			context.applyFileToEditor(file);
-			expect(editor.state).toBe(file.session);
-			expect(editor.state.readOnly).toBe(false);
-			expect(editor.dom.querySelector(".cm-placeholder")).toBeNull();
-		} finally {
-			editor.destroy();
-		}
-	},
-);
+it.each([
+	"cached text",
+	"",
+	undefined,
+])("keeps the loading view for cache %j until the session is ready", (cached) => {
+	const source = managerSource;
+	const body = managerBody;
+	const names = [
+		"showLoadingEditor",
+		"applyFileToEditor",
+		"recreateActiveEditorState",
+		"getRawEditorState",
+		"isReusableEditorState",
+	];
+	const editor = new EditorView({ parent: document.body });
+	const file = {
+		type: "editor",
+		filename: "file.js",
+		loaded: false,
+		loading: false,
+		session: EditorState.create(),
+		__cmSessionReady: true,
+		__cmExtensionSignature: "test",
+	};
+	const loadingPreviews = new WeakMap();
+	if (cached !== undefined) loadingPreviews.set(file, cached);
+	const context = vm.createContext({
+		editor,
+		EditorState,
+		placeholder,
+		createEditorReadOnlyExtension,
+		blurEditorIfReadOnly,
+		loadingPreviews,
+		manager: { activeFile: file },
+		touchSelectionController: null,
+		themeCompartment: new Compartment(),
+		languageCompartment: new Compartment(),
+		lspCompartment: new Compartment(),
+		readOnlyCompartment: new Compartment(),
+		getConfiguredThemeExtension: () => [],
+		getBaseExtensionsFromOptions: () => [],
+		getEditorExtensionSignature: () => "test",
+		getFileLanguageSignature: () => "text",
+		applyCurrentEditorOptions: vi.fn(),
+		shouldApplyLanguage: () => false,
+		restoreFileScrollPosition: vi.fn(),
+		scheduleLspForFile: vi.fn(),
+	});
+	// Run the actual render functions with a real EditorView; omit the unrelated app shell.
+	vm.runInContext(
+		body
+			.filter(
+				(node) =>
+					node.type === "FunctionDeclaration" && names.includes(node.id.name),
+			)
+			.map((node) => source.slice(node.start, node.end))
+			.join("\n"),
+		context,
+	);
+	try {
+		const savedSession = file.session;
+		context.applyFileToEditor(file);
+		const preview = editor.state;
+		context.recreateActiveEditorState();
+		expect(editor.state).toBe(preview);
+		context.applyFileToEditor(file, { forceRecreate: true });
+		expect(editor.state.doc.toString()).toBe(cached ?? "");
+		expect(editor.state.readOnly).toBe(true);
+		expect(editor.contentDOM.getAttribute("contenteditable")).toBe("false");
+		expect(
+			editor.dom.querySelector(".cm-placeholder")?.textContent ?? null,
+		).toBe(cached === undefined ? "Loading file.js..." : null);
+		expect(file.session).toBe(savedSession);
+		file.session = EditorState.create({ doc: cached ?? "loaded text" });
+		file.loaded = true;
+		file.loading = false;
+		context.applyFileToEditor(file);
+		expect(editor.state).toBe(file.session);
+		expect(editor.state.readOnly).toBe(false);
+		expect(editor.dom.querySelector(".cm-placeholder")).toBeNull();
+	} finally {
+		editor.destroy();
+	}
+});

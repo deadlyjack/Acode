@@ -1,7 +1,7 @@
-import { readFileSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { spawnSync } from "node:child_process";
 import { expect, it } from "vitest";
 
 const hasJava = spawnSync("javac", ["-version"]).status === 0;

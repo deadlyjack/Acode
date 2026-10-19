@@ -1,7 +1,8 @@
 // @vitest-environment happy-dom
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import tag from "html-tag-js";
+
 import FileTree from "components/fileTree";
+import tag from "html-tag-js";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 vi.mock("utils/helpers", () => ({
 	default: {

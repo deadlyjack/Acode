@@ -1,4 +1,4 @@
-import { getModes } from "cm/modelist";
+import { getFormatAsMode, getMode, getModes } from "cm/modelist";
 import settingsPage from "components/settingsPage";
 import appSettings from "lib/settings";
 
@@ -21,8 +21,20 @@ export default function formatterSettings(languageName) {
 			const extList = String(extensions)
 				.split("|")
 				.filter((e) => e && !e.startsWith("^"));
-			const options = acode.getFormatterFor(extList);
+			// Also offer formatters of the mode this one formats as
+			const baseMode = getMode(getFormatAsMode(name) || "");
+			const baseExts = String(baseMode?.extensions || "")
+				.split("|")
+				.filter((e) => e && !e.startsWith("^"));
+			const options = acode.getFormatterFor([...extList, ...baseExts]);
 			const sampleExt = extList[0] || name;
+			// Unset falls back to the base mode's formatter, so say which one
+			const inheritedText = () => {
+				const inherited = formatters.find(
+					({ id }) => id === values.formatter[baseMode.name],
+				);
+				return inherited ? `${inherited.name} (${baseMode.caption})` : null;
+			};
 
 			return {
 				key: name,
@@ -34,9 +46,13 @@ export default function formatterSettings(languageName) {
 					if (formatter) {
 						return formatter.name;
 					}
-					return strings.none;
+					return (baseMode && inheritedText()) || strings.none;
 				},
-				select: options,
+				// Read when the picker opens, so the inherited label stays current
+				get select() {
+					if (baseMode) options[0] = [null, inheritedText() || strings.none];
+					return options;
+				},
 				chevron: true,
 				category: languagesLabel,
 			};

@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
-import { describe, expect, it, vi } from "vitest";
 import VariableVirtualList from "components/virtualList/variable";
+import { describe, expect, it, vi } from "vitest";
 
 function createList() {
 	const container = document.createElement("div");

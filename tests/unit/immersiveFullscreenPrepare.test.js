@@ -20,13 +20,17 @@ const controllerSource = fs.readFileSync(
 const roots = [];
 
 afterEach(() => {
-	for (const root of roots.splice(0)) fs.rmSync(root, { recursive: true, force: true });
+	for (const root of roots.splice(0))
+		fs.rmSync(root, { recursive: true, force: true });
 });
 
 function fixture(source = cordovaSource) {
 	const root = fs.mkdtempSync(path.join(os.tmpdir(), "acode-fullscreen-"));
 	roots.push(root);
-	const native = path.join(root, "platforms/android/CordovaLib/src/org/apache/cordova");
+	const native = path.join(
+		root,
+		"platforms/android/CordovaLib/src/org/apache/cordova",
+	);
 	const tracked = path.join(root, "hooks/android/ImmersiveFullscreen.java");
 	const generated = path.join(native, "ImmersiveFullscreen.java");
 	const webview = path.join(native, "CordovaWebViewImpl.java");
@@ -50,11 +54,27 @@ describe("Android immersive fullscreen preparation", () => {
 		const patched = f.read();
 		expect(fs.readFileSync(f.generated, "utf8")).toBe(controllerSource);
 		for (const [method, before, after] of [
-			["showCustomView", "parent.bringToFront()", "immersiveFullscreen.enter(wrapperView)"],
-			["hideCustomView", "immersiveFullscreen.exit()", "mCustomViewCallback.onCustomViewHidden()"],
+			[
+				"showCustomView",
+				"parent.bringToFront()",
+				"immersiveFullscreen.enter(wrapperView)",
+			],
+			[
+				"hideCustomView",
+				"immersiveFullscreen.exit()",
+				"mCustomViewCallback.onCustomViewHidden()",
+			],
 			["handlePause", "immersiveFullscreen.pause()", "pluginManager.onPause"],
-			["handleResume", "immersiveFullscreen.resume()", "pluginManager.onResume"],
-			["onPageStarted", "immersiveFullscreen.unlockOrientation()", "pluginManager.onReset"],
+			[
+				"handleResume",
+				"immersiveFullscreen.resume()",
+				"pluginManager.onResume",
+			],
+			[
+				"onPageStarted",
+				"immersiveFullscreen.unlockOrientation()",
+				"pluginManager.onReset",
+			],
 			["handleDestroy", "hideCustomView()", "engine.destroy()"],
 		]) {
 			const start = patched.indexOf(`public void ${method}(`);
@@ -76,7 +96,9 @@ describe("Android immersive fullscreen preparation", () => {
 		fs.appendFileSync(f.tracked, "\n// updated native controller\n");
 		f.run();
 		expect(f.read()).toBe(first);
-		expect(fs.readFileSync(f.generated, "utf8")).toBe(fs.readFileSync(f.tracked, "utf8"));
+		expect(fs.readFileSync(f.generated, "utf8")).toBe(
+			fs.readFileSync(f.tracked, "utf8"),
+		);
 		expect(
 			first.replace(
 				/^[ \t]*\/\/ ACODE_FULLSCREEN_BEGIN ([a-z]+)\n[\s\S]*?^[ \t]*\/\/ ACODE_FULLSCREEN_END \1\n/gm,
@@ -110,7 +132,10 @@ describe("Android immersive fullscreen preparation", () => {
 			"pluginManager.onPause(keepRunning);",
 			"this.pluginManager.onResume(keepRunning);",
 			"pluginManager.onReset();",
-		].map((anchor) => [anchor, cordovaSource.replaceAll(anchor, "// changed upstream")]),
+		].map((anchor) => [
+			anchor,
+			cordovaSource.replaceAll(anchor, "// changed upstream"),
+		]),
 	])("rejects incompatible anchors before writing: %s", (_kind, source) => {
 		const f = fixture(source);
 		expect(f.run).toThrow(/Acode fullscreen: expected one Cordova/);
@@ -121,7 +146,9 @@ describe("Android immersive fullscreen preparation", () => {
 	it("rejects a damaged prior patch without overwriting either generated file", () => {
 		const f = fixture();
 		f.run();
-		const damaged = f.read().replace("// ACODE_FULLSCREEN_END enter", "// missing end marker");
+		const damaged = f
+			.read()
+			.replace("// ACODE_FULLSCREEN_END enter", "// missing end marker");
 		fs.writeFileSync(f.webview, damaged);
 		fs.writeFileSync(f.generated, "// existing controller");
 		expect(f.run).toThrow(/incomplete generated patch/);

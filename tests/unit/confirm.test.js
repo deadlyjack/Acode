@@ -2,6 +2,7 @@
 
 import tag from "html-tag-js";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 vi.mock("lib/settings", () => ({
 	default: { value: { confirmOnExit: false } },
 }));
@@ -9,8 +10,10 @@ vi.mock("lib/restoreTheme", () => ({ default: vi.fn() }));
 vi.mock("components/checkbox", () => ({
 	default: () => document.createElement("input"),
 }));
+
 import confirm from "dialogs/confirm";
 import actionStack from "lib/actionStack";
+
 beforeEach(() => {
 	vi.useFakeTimers();
 	vi.clearAllMocks();
@@ -78,33 +81,35 @@ it("preserves checkbox response and ignores subsequent dismissals", async () => 
 	expect(actionStack.length).toBe(0);
 });
 
-it.each(["back", "cancel", "ok", "abort"])(
-	"preserves the lower confirmation's Back handler after %s dismisses the top",
-	async (method) => {
-		const firstClosed = vi.fn();
-		confirm("First", "First confirmation").then(firstClosed);
-		const controller = new AbortController();
-		const second = confirm("Second", "Second confirmation", false, {
-			signal: controller.signal,
-		});
-		const top = document.querySelectorAll(".confirm")[1];
-		if (method === "back") await actionStack.pop();
-		if (method === "cancel") top.querySelector("button").click();
-		if (method === "ok") top.querySelectorAll("button")[1].click();
-		if (method === "abort") controller.abort();
-		await expect(second).resolves.toBe(method === "ok");
-		vi.runAllTimers();
-		expect(document.querySelectorAll(".confirm")).toHaveLength(1);
-		expect(actionStack.length).toBe(1);
-		expect(firstClosed).not.toHaveBeenCalled();
+it.each([
+	"back",
+	"cancel",
+	"ok",
+	"abort",
+])("preserves the lower confirmation's Back handler after %s dismisses the top", async (method) => {
+	const firstClosed = vi.fn();
+	confirm("First", "First confirmation").then(firstClosed);
+	const controller = new AbortController();
+	const second = confirm("Second", "Second confirmation", false, {
+		signal: controller.signal,
+	});
+	const top = document.querySelectorAll(".confirm")[1];
+	if (method === "back") await actionStack.pop();
+	if (method === "cancel") top.querySelector("button").click();
+	if (method === "ok") top.querySelectorAll("button")[1].click();
+	if (method === "abort") controller.abort();
+	await expect(second).resolves.toBe(method === "ok");
+	vi.runAllTimers();
+	expect(document.querySelectorAll(".confirm")).toHaveLength(1);
+	expect(actionStack.length).toBe(1);
+	expect(firstClosed).not.toHaveBeenCalled();
 
-		await actionStack.pop();
-		expect(firstClosed).toHaveBeenCalledExactlyOnceWith(false);
-		vi.runAllTimers();
-		expect(app.children.length).toBe(0);
-		expect(actionStack.length).toBe(0);
-	},
-);
+	await actionStack.pop();
+	expect(firstClosed).toHaveBeenCalledExactlyOnceWith(false);
+	vi.runAllTimers();
+	expect(app.children.length).toBe(0);
+	expect(actionStack.length).toBe(0);
+});
 
 it("preserves the top confirmation when the lower one is aborted", async () => {
 	const controller = new AbortController();

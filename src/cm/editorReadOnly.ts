@@ -2,9 +2,9 @@ import {
 	Compartment,
 	EditorSelection,
 	EditorState,
-	Transaction,
 	type Extension,
 	type SelectionRange,
+	Transaction,
 } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 

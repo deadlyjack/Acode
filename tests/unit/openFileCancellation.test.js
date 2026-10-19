@@ -86,7 +86,8 @@ describe("openFile cancellation", () => {
 		const exports = {};
 		new Function("require", "exports", "editorManager", outputText)(
 			(name) => {
-				if (!(name in dependencies)) throw new Error(`Unexpected import: ${name}`);
+				if (!(name in dependencies))
+					throw new Error(`Unexpected import: ${name}`);
 				return dependencies[name];
 			},
 			exports,
@@ -112,21 +113,18 @@ describe("openFile cancellation", () => {
 		"pptx",
 		"ppsx",
 		"potx",
-	])(
-		"requires a handler for external %s documents using the provider filename",
-		async (extension) => {
-			stat.mockResolvedValue({
-				name: `Document.${extension.toUpperCase()}`,
-				canWrite: false,
-			});
-			await expect(
-				openFile("content://provider/42", { external: true }),
-			).rejects.toMatchObject({ code: "DOCUMENT_HANDLER_UNAVAILABLE" });
-			expect(readFile).not.toHaveBeenCalled();
-			expect(createEditor).not.toHaveBeenCalled();
-			expect(loaderVisible).toBe(false);
-		},
-	);
+	])("requires a handler for external %s documents using the provider filename", async (extension) => {
+		stat.mockResolvedValue({
+			name: `Document.${extension.toUpperCase()}`,
+			canWrite: false,
+		});
+		await expect(
+			openFile("content://provider/42", { external: true }),
+		).rejects.toMatchObject({ code: "DOCUMENT_HANDLER_UNAVAILABLE" });
+		expect(readFile).not.toHaveBeenCalled();
+		expect(createEditor).not.toHaveBeenCalled();
+		expect(loaderVisible).toBe(false);
+	});
 
 	it("routes granted read-only documents and propagates handler failures instead of decoding bytes", async () => {
 		const handleFile = vi.fn(async () => {});
@@ -169,27 +167,24 @@ describe("openFile cancellation", () => {
 			"application/vnd.openxmlformats-officedocument.presentationml.template",
 		],
 		["archive.zip", "type", "text/plain"],
-	])(
-		"rejects external binary %s before reading or decoding",
-		async (name, field, mime) => {
-			stat.mockResolvedValue({
-				name,
-				[field]: mime,
-				canWrite: true,
-				url: "content://provider/42",
-			});
-			await expect(
-				openFile("content://provider/42", { external: true }),
-			).rejects.toMatchObject({
-				message: "Unsupported file",
-				filename: name,
-			});
-			expect(readFile).not.toHaveBeenCalled();
-			expect(decode).not.toHaveBeenCalled();
-			expect(createEditor).not.toHaveBeenCalled();
-			expect(loaderVisible).toBe(false);
-		},
-	);
+	])("rejects external binary %s before reading or decoding", async (name, field, mime) => {
+		stat.mockResolvedValue({
+			name,
+			[field]: mime,
+			canWrite: true,
+			url: "content://provider/42",
+		});
+		await expect(
+			openFile("content://provider/42", { external: true }),
+		).rejects.toMatchObject({
+			message: "Unsupported file",
+			filename: name,
+		});
+		expect(readFile).not.toHaveBeenCalled();
+		expect(decode).not.toHaveBeenCalled();
+		expect(createEditor).not.toHaveBeenCalled();
+		expect(loaderVisible).toBe(false);
+	});
 
 	it.each([
 		["README", "text/plain"],
@@ -197,15 +192,12 @@ describe("openFile cancellation", () => {
 		["plain.txt", "application/octet-stream"],
 		["plain.csv", "application/octet-stream"],
 		["plain.tsv", "application/octet-stream"],
-	])(
-		"retains the normal %s editor fallback for incoming files",
-		async (name, type) => {
-			stat.mockResolvedValue({ name, type, url: "content://provider/plain" });
-			await openFile("content://provider/plain", { external: true });
-			expect(createEditor).toHaveBeenCalledOnce();
-			expect(manager.activeFile.text).toBe("target text");
-		},
-	);
+	])("retains the normal %s editor fallback for incoming files", async (name, type) => {
+		stat.mockResolvedValue({ name, type, url: "content://provider/plain" });
+		await openFile("content://provider/plain", { external: true });
+		expect(createEditor).toHaveBeenCalledOnce();
+		expect(manager.activeFile.text).toBe("target text");
+	});
 
 	it("preserves handlers and internal opens for extensionless files with binary metadata", async () => {
 		stat.mockResolvedValue({
@@ -246,33 +238,35 @@ describe("openFile cancellation", () => {
 		expect(file.makeActive).not.toHaveBeenCalled();
 	});
 
-	it.each(["stat", "read", "detect", "decode"])(
-		"does not steal focus when cancelled during %s",
-		async (stage) => {
-			const waiting = deferred();
-			const operation = { stat, read: readFile, detect: detectEncoding, decode }[
-				stage
-			];
-			operation.mockReturnValueOnce(waiting.promise);
-			const opening = openFile("obsolete", {
-				render: true,
-				signal: controller.signal,
-			});
-			await vi.waitFor(() => expect(operation).toHaveBeenCalledOnce());
-			controller.abort();
+	it.each([
+		"stat",
+		"read",
+		"detect",
+		"decode",
+	])("does not steal focus when cancelled during %s", async (stage) => {
+		const waiting = deferred();
+		const operation = { stat, read: readFile, detect: detectEncoding, decode }[
+			stage
+		];
+		operation.mockReturnValueOnce(waiting.promise);
+		const opening = openFile("obsolete", {
+			render: true,
+			signal: controller.signal,
+		});
+		await vi.waitFor(() => expect(operation).toHaveBeenCalledOnce());
+		controller.abort();
 
-			// A newer open completes before the obsolete filesystem work does.
-			await openFile("latest", { render: true });
-			const latest = manager.activeFile;
-			waiting.resolve(
-				stage === "stat" ? { name: "obsolete.txt", length: 10 } : "text",
-			);
-			await opening;
-			expect(manager.activeFile).toBe(latest);
-			expect(createEditor).toHaveBeenCalledOnce();
-			expect(recents.addFile).toHaveBeenCalledExactlyOnceWith("latest");
-		},
-	);
+		// A newer open completes before the obsolete filesystem work does.
+		await openFile("latest", { render: true });
+		const latest = manager.activeFile;
+		waiting.resolve(
+			stage === "stat" ? { name: "obsolete.txt", length: 10 } : "text",
+		);
+		await opening;
+		expect(manager.activeFile).toBe(latest);
+		expect(createEditor).toHaveBeenCalledOnce();
+		expect(recents.addFile).toHaveBeenCalledExactlyOnceWith("latest");
+	});
 
 	it("guards a custom handler's delayed createEditor callback", async () => {
 		const waiting = deferred();
@@ -311,24 +305,23 @@ describe("openFile cancellation", () => {
 		expect(loaderVisible).toBe(false);
 	});
 
-	it.each([0, 1])(
-		"keeps the indicator until both concurrent opens finish (first to finish: %s)",
-		async (first) => {
-			const reads = [deferred(), deferred()];
-			readFile.mockReturnValueOnce(reads[0].promise);
-			readFile.mockReturnValueOnce(reads[1].promise);
-			const opens = [openFile("one"), openFile("two")];
-			await vi.waitFor(() => expect(readFile).toHaveBeenCalledTimes(2));
-			reads[first].resolve("bytes");
-			await opens[first];
-			expect(loaderVisible).toBe(true);
-			expect(titleLoader.removeTitleLoader).not.toHaveBeenCalled();
-			reads[1 - first].resolve("bytes");
-			await opens[1 - first];
-			expect(loaderVisible).toBe(false);
-			expect(titleLoader.removeTitleLoader).toHaveBeenCalledOnce();
-		},
-	);
+	it.each([
+		0, 1,
+	])("keeps the indicator until both concurrent opens finish (first to finish: %s)", async (first) => {
+		const reads = [deferred(), deferred()];
+		readFile.mockReturnValueOnce(reads[0].promise);
+		readFile.mockReturnValueOnce(reads[1].promise);
+		const opens = [openFile("one"), openFile("two")];
+		await vi.waitFor(() => expect(readFile).toHaveBeenCalledTimes(2));
+		reads[first].resolve("bytes");
+		await opens[first];
+		expect(loaderVisible).toBe(true);
+		expect(titleLoader.removeTitleLoader).not.toHaveBeenCalled();
+		reads[1 - first].resolve("bytes");
+		await opens[1 - first];
+		expect(loaderVisible).toBe(false);
+		expect(titleLoader.removeTitleLoader).toHaveBeenCalledOnce();
+	});
 
 	it("releases a cancelled open's loader without waiting for its read", async () => {
 		const reading = deferred();

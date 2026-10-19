@@ -1682,8 +1682,26 @@ public class System extends CordovaPlugin {
   }
 
   private void openInBrowser(String src, CallbackContext callback) {
-    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(src));
-    activity.startActivity(browserIntent);
+    if (src == null || src.isEmpty()) {
+      callback.error("No URL provided.");
+      return;
+    }
+
+    Uri uri = Uri.parse(src);
+    if ("file".equalsIgnoreCase(uri.getScheme())) {
+      // file:// URIs can't leave the app (FileUriExposedException).
+      callback.error("Cannot open file URI in browser: " + src);
+      return;
+    }
+
+    try {
+      Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
+      activity.startActivity(browserIntent);
+      callback.success();
+    } catch (Exception e) {
+      Log.e("System", "Failed to open URL: " + src, e);
+      callback.error(e.getMessage());
+    }
   }
 
   private void launchApp(

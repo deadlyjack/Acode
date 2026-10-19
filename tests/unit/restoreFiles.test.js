@@ -53,18 +53,23 @@ describe("restored file loading", () => {
 		expect(completed).toBe(true);
 	});
 
-	it.each(["ftp", "sftp", "http", "https", "gh", "plugin", "custom"])(
-		"does not block startup on an unresolved %s tab",
-		async (protocol) => {
-			await restoreFiles([
-				{
-					id: "remote",
-					filename: "remote.js",
-					uri: `${protocol}://example.com/remote.js`,
-				},
-			]);
+	it.each([
+		"ftp",
+		"sftp",
+		"http",
+		"https",
+		"gh",
+		"plugin",
+		"custom",
+	])("does not block startup on an unresolved %s tab", async (protocol) => {
+		await restoreFiles([
+			{
+				id: "remote",
+				filename: "remote.js",
+				uri: `${protocol}://example.com/remote.js`,
+			},
+		]);
 
-			expect(runtime.instances).toHaveLength(1);
-		},
-	);
+		expect(runtime.instances).toHaveLength(1);
+	});
 });

@@ -15,7 +15,6 @@ import {
 import { highlightSelectionMatches } from "@codemirror/search";
 import type { Extension } from "@codemirror/state";
 import { EditorState, Prec } from "@codemirror/state";
-import indentationFolding from "./indentationFolding";
 import {
 	crosshairCursor,
 	drawSelection,
@@ -27,6 +26,7 @@ import {
 	rectangularSelection,
 	tooltips,
 } from "@codemirror/view";
+import indentationFolding from "./indentationFolding";
 
 export interface BaseExtensionOptions {
 	autoIndent?: boolean;
@@ -51,10 +51,7 @@ export default function createBaseExtensions(
 		highlightActiveLine: enableHighlightActiveLine = true,
 		highlightSelectionMatches: enableHighlightSelectionMatches = true,
 	} = options;
-	const extensions: Extension[] = [
-		highlightSpecialChars(),
-		history(),
-	];
+	const extensions: Extension[] = [highlightSpecialChars(), history()];
 
 	if (enableHighlightActiveLine) extensions.push(highlightActiveLineGutter());
 	if (codeFolding) extensions.push(foldGutter(), indentationFolding);

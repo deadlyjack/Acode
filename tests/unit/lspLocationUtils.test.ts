@@ -30,9 +30,7 @@ describe("normalizeLocations", () => {
 
 	it("falls back to the LocationLink target range", () => {
 		expect(
-			normalizeLocations([
-				{ targetUri: "file:///project/a.ts", targetRange },
-			]),
+			normalizeLocations([{ targetUri: "file:///project/a.ts", targetRange }]),
 		).toEqual([{ uri: "file:///project/a.ts", range: targetRange }]);
 	});
 });
