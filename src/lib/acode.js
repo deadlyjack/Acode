@@ -61,7 +61,10 @@ import fullscreen from "lib/fullscreen";
 import {
 	BROKEN_PLUGINS,
 	LOADED_PLUGINS,
+	isInitialPluginLoadComplete,
+	isPluginLoading,
 	onPluginLoadCallback,
+	onPluginLoadFailedCallback,
 	onPluginsLoadCompleteCallback,
 } from "lib/loadPlugins";
 import notificationManager from "lib/notificationManager";
@@ -703,17 +706,28 @@ class Acode {
 	}
 
 	[onPluginLoadCallback](pluginId) {
-		this.#pluginWatchers.resolve(pluginId);
+		this.#pluginWatchers.resolve(pluginId, true);
 	}
 
-	[onPluginsLoadCompleteCallback]() {
+	[onPluginLoadFailedCallback](pluginId, error) {
+		this.#pluginWatchers.reject(
+			pluginId,
+			error || new Error(`Plugin '${pluginId}' failed to load.`),
+		);
+	}
+
+	[onPluginsLoadCompleteCallback](filter) {
 		this.#pluginWatchers.rejectAll(
 			(pluginId) => new Error(`Plugin '${pluginId}' failed to load.`),
+			filter,
 		);
 	}
 
 	waitForPlugin(pluginId) {
 		if (LOADED_PLUGINS.has(pluginId)) return Promise.resolve(true);
+		if (isInitialPluginLoadComplete() && !isPluginLoading(pluginId)) {
+			return Promise.reject(new Error(`Plugin '${pluginId}' failed to load.`));
+		}
 		return this.#pluginWatchers.waitFor(pluginId);
 	}
 

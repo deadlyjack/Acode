@@ -2,28 +2,42 @@ export default class PluginWaiters {
 	#waiters = new Map();
 
 	waitFor(pluginId) {
-		return new Promise((resolve, reject) => {
-			let waiters = this.#waiters.get(pluginId);
-			if (!waiters) {
-				waiters = new Set();
-				this.#waiters.set(pluginId, waiters);
-			}
-			waiters.add({ resolve, reject });
-		});
+		let deferred = this.#waiters.get(pluginId);
+		if (!deferred) {
+			let resolve;
+			let reject;
+			const promise = new Promise((res, rej) => {
+				resolve = res;
+				reject = rej;
+			});
+			deferred = { promise, resolve, reject };
+			this.#waiters.set(pluginId, deferred);
+		}
+		return deferred.promise;
 	}
 
-	resolve(pluginId) {
-		const waiters = this.#waiters.get(pluginId);
-		if (!waiters) return;
+	resolve(pluginId, value = true) {
+		const deferred = this.#waiters.get(pluginId);
+		if (!deferred) return;
 
 		this.#waiters.delete(pluginId);
-		for (const waiter of waiters) waiter.resolve();
+		deferred.resolve(value);
 	}
 
-	rejectAll(getError) {
-		for (const [pluginId, waiters] of this.#waiters) {
+	reject(pluginId, error) {
+		const deferred = this.#waiters.get(pluginId);
+		if (!deferred) return;
+
+		this.#waiters.delete(pluginId);
+		deferred.reject(error);
+	}
+
+	rejectAll(getError, filter) {
+		for (const [pluginId, deferred] of this.#waiters) {
+			if (filter && !filter(pluginId)) continue;
 			this.#waiters.delete(pluginId);
-			for (const waiter of waiters) waiter.reject(getError(pluginId));
+			const error = getError(pluginId);
+			deferred.reject(error);
 		}
 	}
 }
