@@ -205,14 +205,17 @@ export async function runFsTests(writeOutput) {
 		const fs = fsOperation(testDir);
 		const sourceName = `__fs_source_${Date.now()}__.txt`;
 		const destDirName = `__fs_destdir_${Date.now()}__`;
+		const moveDirName = `__fs_movedir_${Date.now()}__`;
 
 		const sourceUrl = Url.join(testDir, sourceName);
 		const destDirUrl = Url.join(testDir, destDirName);
+		const moveDirUrl = Url.join(testDir, moveDirName);
 
 		try {
-			// 1. Create source file and destination directory
+			// 1. Create source file and destination directories
 			await fs.createFile(sourceName, "file operation content");
 			await fs.createDirectory(destDirName);
+			await fs.createDirectory(moveDirName);
 
 			const sourceFs = fsOperation(sourceUrl);
 
@@ -231,7 +234,8 @@ export async function runFsTests(writeOutput) {
 			);
 
 			// 3. moveTo
-			const movedUrl = await copiedFs.moveTo(testDir); // Move it back to testDir
+			// Empty dir: testDir still holds the source file with the same name
+			const movedUrl = await copiedFs.moveTo(moveDirUrl);
 			const movedFs = fsOperation(movedUrl);
 			test.assertEqual(await movedFs.exists(), true, "Moved file should exist");
 			test.assertEqual(
@@ -269,12 +273,16 @@ export async function runFsTests(writeOutput) {
 			await sourceFs.delete();
 			await renamedFs.delete();
 			await fsOperation(destDirUrl).delete();
+			await fsOperation(moveDirUrl).delete();
 		} catch (error) {
 			try {
 				await fsOperation(sourceUrl).delete();
 			} catch (_) {}
 			try {
 				await fsOperation(destDirUrl).delete();
+			} catch (_) {}
+			try {
+				await fsOperation(moveDirUrl).delete();
 			} catch (_) {}
 			throw error;
 		}

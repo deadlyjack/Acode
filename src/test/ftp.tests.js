@@ -44,14 +44,16 @@ export async function runFtpTests(writeOutput) {
 				// 1. Create the file
 				const createdUrl = await fs.createFile(filename, "ftp test content");
 				test.assertEqual(
-					createdUrl,
-					fileUrl,
+					// Provider adds default port/query to the URL; compare paths only
+					Url.pathname(createdUrl),
+					Url.pathname(fileUrl),
 					"Created file URL should match expected path",
 				);
 
 				// 2. Check existence
 				const fileFs = fsOperation(createdUrl);
-				const exists = await fileFs.exists();
+				// Native FTP exists() resolves 1/0, not a boolean
+				const exists = Boolean(await fileFs.exists());
 				test.assertEqual(exists, true, "Created file should exist on FTP");
 
 				// 3. Read content
@@ -83,7 +85,7 @@ export async function runFtpTests(writeOutput) {
 
 				// 6. Delete file
 				await fileFs.delete();
-				const existsAfterDelete = await fileFs.exists();
+				const existsAfterDelete = Boolean(await fileFs.exists());
 				test.assertEqual(
 					existsAfterDelete,
 					false,
@@ -112,13 +114,14 @@ export async function runFtpTests(writeOutput) {
 			// 1. Create directory
 			const createdDirUrl = await fs.createDirectory(dirname);
 			test.assertEqual(
-				createdDirUrl,
-				dirUrl,
+				Url.pathname(createdDirUrl),
+				Url.pathname(dirUrl),
 				"Created directory URL should match",
 			);
 
 			const dirFs = fsOperation(createdDirUrl);
-			const exists = await dirFs.exists();
+			// Native FTP exists() resolves 1/0, not a boolean
+			const exists = Boolean(await dirFs.exists());
 			test.assertEqual(exists, true, "Created directory should exist");
 
 			// 2. Stat check
@@ -147,7 +150,7 @@ export async function runFtpTests(writeOutput) {
 			await childFs.delete();
 			await dirFs.delete();
 
-			const dirExistsAfterDelete = await dirFs.exists();
+			const dirExistsAfterDelete = Boolean(await dirFs.exists());
 			test.assertEqual(
 				dirExistsAfterDelete,
 				false,

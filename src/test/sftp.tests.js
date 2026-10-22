@@ -86,7 +86,8 @@ export async function runSftpTests(writeOutput) {
 
 				// 6. Delete file
 				await fileFs.delete();
-				const existsAfterDelete = await fileFs.exists();
+				// Fresh handle: delete() leaves a cached stat on fileFs
+				const existsAfterDelete = await fsOperation(createdUrl).exists();
 				test.assertEqual(
 					existsAfterDelete,
 					false,
@@ -152,7 +153,8 @@ export async function runSftpTests(writeOutput) {
 				await childFs.delete();
 				await dirFs.delete();
 
-				const dirExistsAfterDelete = await dirFs.exists();
+				// Fresh handle: delete() leaves a cached stat on dirFs
+				const dirExistsAfterDelete = await fsOperation(createdDirUrl).exists();
 				test.assertEqual(
 					dirExistsAfterDelete,
 					false,
