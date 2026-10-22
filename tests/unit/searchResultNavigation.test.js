@@ -1,6 +1,6 @@
+import navigateToResult from "sidebarApps/searchInFiles/navigateToResult";
 import { EditorState } from "@codemirror/state";
 import openFile from "lib/openFile";
-import navigateToResult from "sidebarApps/searchInFiles/navigateToResult";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("lib/openFile", () => ({ default: vi.fn() }));
@@ -61,21 +61,21 @@ describe("project search result navigation", () => {
 
 	afterEach(() => vi.unstubAllGlobals());
 
-	it.each([false, true])(
-		"reveals the exact match through the scroll-restore-safe API (existing tab: %s)",
-		async (existing) => {
-			if (existing) addFile("target");
-			expect(await navigateToResult("target", match)).toBe(true);
-			expect(openFile).toHaveBeenCalledWith("target", {
-				render: true,
-				signal: expect.any(AbortSignal),
-			});
-			expect(manager.revealRange).toHaveBeenCalledWith(8, 11, {
-				y: "center",
-				userEvent: "select.search",
-			});
-		},
-	);
+	it.each([
+		false,
+		true,
+	])("reveals the exact match through the scroll-restore-safe API (existing tab: %s)", async (existing) => {
+		if (existing) addFile("target");
+		expect(await navigateToResult("target", match)).toBe(true);
+		expect(openFile).toHaveBeenCalledWith("target", {
+			render: true,
+			signal: expect.any(AbortSignal),
+		});
+		expect(manager.revealRange).toHaveBeenCalledWith(8, 11, {
+			y: "center",
+			userEvent: "select.search",
+		});
+	});
 
 	it("waits for a restored tab's final document instead of its preview", async () => {
 		const file = addFile("target", "preview");
@@ -173,38 +173,39 @@ describe("project search result navigation", () => {
 		);
 	});
 
-	it.each(["switched", "closed", "failed"])(
-		"does not reveal into another document after the target is %s during loading",
-		async (action) => {
-			const file = addFile("target");
-			const loading = deferred();
-			file.load.mockImplementation(() => loading.promise);
-			const navigation = navigateToResult("target", match);
-			await vi.waitFor(() => expect(file.load).toHaveBeenCalled());
-			if (action === "switched") activate(addFile("other"));
-			if (action === "closed") files.delete("target");
-			if (action === "failed") file.loaded = false;
-			loading.resolve();
-			expect(await navigation).toBe(false);
-			expect(manager.revealRange).not.toHaveBeenCalled();
-		},
-	);
+	it.each([
+		"switched",
+		"closed",
+		"failed",
+	])("does not reveal into another document after the target is %s during loading", async (action) => {
+		const file = addFile("target");
+		const loading = deferred();
+		file.load.mockImplementation(() => loading.promise);
+		const navigation = navigateToResult("target", match);
+		await vi.waitFor(() => expect(file.load).toHaveBeenCalled());
+		if (action === "switched") activate(addFile("other"));
+		if (action === "closed") files.delete("target");
+		if (action === "failed") file.loaded = false;
+		loading.resolve();
+		expect(await navigation).toBe(false);
+		expect(manager.revealRange).not.toHaveBeenCalled();
+	});
 
-	it.each(["missing", "image"])(
-		"does not navigate the previous editor when opening a %s target",
-		async (type) => {
-			activate(addFile("previous"));
-			openFile.mockImplementationOnce(async () => {
-				if (type === "image") {
-					const file = addFile("target");
-					file.type = "image";
-					activate(file);
-				}
-			});
-			expect(await navigateToResult("target", match)).toBe(false);
-			expect(manager.revealRange).not.toHaveBeenCalled();
-		},
-	);
+	it.each([
+		"missing",
+		"image",
+	])("does not navigate the previous editor when opening a %s target", async (type) => {
+		activate(addFile("previous"));
+		openFile.mockImplementationOnce(async () => {
+			if (type === "image") {
+				const file = addFile("target");
+				file.type = "image";
+				activate(file);
+			}
+		});
+		expect(await navigateToResult("target", match)).toBe(false);
+		expect(manager.revealRange).not.toHaveBeenCalled();
+	});
 
 	it("handles multiline ranges and clamps stale coordinates", async () => {
 		addFile("target", "abc\ndef");
@@ -212,17 +213,27 @@ describe("project search result navigation", () => {
 			start: { row: 0, column: 1 },
 			end: { row: 1, column: 2 },
 		});
-		expect(manager.revealRange).toHaveBeenLastCalledWith(1, 6, expect.anything());
+		expect(manager.revealRange).toHaveBeenLastCalledWith(
+			1,
+			6,
+			expect.anything(),
+		);
 		await navigateToResult("target", {
 			start: { row: -1, column: -2 },
 			end: { row: 100, column: 100 },
 		});
-		expect(manager.revealRange).toHaveBeenLastCalledWith(0, 7, expect.anything());
+		expect(manager.revealRange).toHaveBeenLastCalledWith(
+			0,
+			7,
+			expect.anything(),
+		);
 	});
 
 	it("continues navigating after an open rejects", async () => {
 		openFile.mockRejectedValueOnce(new Error("Read failed"));
-		await expect(navigateToResult("broken", match)).rejects.toThrow("Read failed");
+		await expect(navigateToResult("broken", match)).rejects.toThrow(
+			"Read failed",
+		);
 		expect(await navigateToResult("target", match)).toBe(true);
 		expect(manager.activeFile.uri).toBe("target");
 	});

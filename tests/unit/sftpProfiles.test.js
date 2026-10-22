@@ -30,7 +30,9 @@ describe("SFTP secure profiles", () => {
 		const url = createSftpProfileUrl("profile-123", "/project/file.js");
 		expect(url).toBe("sftp://profile-123/project/file.js");
 		expect(getSftpProfileId(url)).toBe("profile-123");
-		expect(getSftpProfileId("sftp://user:secret@example.com/project")).toBeNull();
+		expect(
+			getSftpProfileId("sftp://user:secret@example.com/project"),
+		).toBeNull();
 		expect(
 			getSftpProfileId("sftp://user:secret@profile-server/project"),
 		).toBeNull();
@@ -149,8 +151,7 @@ describe("SFTP secure profiles", () => {
 		const saveProfile = vi.fn((...args) => args.at(-2)("profile-folder"));
 		globalThis.sftp = { saveProfile };
 		const root = "sftp://user:secret@example.com/project";
-		const expandedFolder =
-			"sftp://user:stale-secret@example.com/project/src";
+		const expandedFolder = "sftp://user:stale-secret@example.com/project/src";
 		localStorage.setItem(
 			"folders",
 			JSON.stringify([

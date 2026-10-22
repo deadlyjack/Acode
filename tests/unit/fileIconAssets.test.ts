@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import fileIcons from "lib/fileIcons";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const requests: FakeImage[] = [];
 class FakeImage {
@@ -122,9 +123,7 @@ describe("icon assets", () => {
 
 		const [file, folder] = document.body.querySelectorAll("span");
 		expect(file.className).toBe("pack-file icon");
-		expect(folder.className).toBe(
-			"pack-folder icon user-added-storage",
-		);
+		expect(folder.className).toBe("pack-folder icon user-added-storage");
 	});
 
 	it("uses distinct CSS classes for IDs that previously collided", () => {

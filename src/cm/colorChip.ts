@@ -96,8 +96,7 @@ export function isViewEditable(view: EditorView): boolean {
 export function hasLspColorProvider(view: EditorView): boolean {
 	return LSPPlugin.getAll(view, "documentColor").some(
 		(lsp) =>
-			lsp.client.connected &&
-			!!lsp.client.serverCapabilities?.colorProvider,
+			lsp.client.connected && !!lsp.client.serverCapabilities?.colorProvider,
 	);
 }
 

@@ -1,10 +1,10 @@
 // @vitest-environment happy-dom
 
-import {StateEffect} from "@codemirror/state";
-import {EditorView} from "@codemirror/view";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import { StateEffect } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const registry = vi.hoisted(() => ({servers: []}));
+const registry = vi.hoisted(() => ({ servers: [] }));
 
 // Keep the lifecycle test independent of app UI modules that use JSX in .js
 // files, which Vitest's native import analysis does not transform.
@@ -12,7 +12,8 @@ vi.mock("cm/lsp/serverRegistry", () => ({
 	default: {
 		getServersForLanguage: (languageId) =>
 			registry.servers.filter(
-				(server) => server.enabled !== false && server.languages.includes(languageId),
+				(server) =>
+					server.enabled !== false && server.languages.includes(languageId),
 			),
 	},
 }));
@@ -25,18 +26,18 @@ vi.mock("components/lspStatusBar", () => ({
 	},
 }));
 
-vi.mock("components/settingsPage", () => ({default: vi.fn()}));
+vi.mock("components/settingsPage", () => ({ default: vi.fn() }));
 vi.mock("components/checkbox", () => ({
 	default: vi.fn(),
 	updateSwitchHandle: vi.fn(),
 }));
 
 vi.mock("lib/notificationManager", () => ({
-	default: {add: vi.fn()},
+	default: { add: vi.fn() },
 }));
 
 vi.mock("lib/settings", () => ({
-	default: {value: {lsp: {}}},
+	default: { value: { lsp: {} } },
 }));
 
 vi.mock("cm/lsp/diagnostics", () => ({
@@ -57,7 +58,7 @@ vi.mock("cm/lsp/inlayHints", () => ({
 	inlayHintsExtension: () => [],
 }));
 
-vi.mock("cm/lsp/logs", () => ({addLspLog: vi.fn()}));
+vi.mock("cm/lsp/logs", () => ({ addLspLog: vi.fn() }));
 
 vi.mock("cm/lsp/tooltipExtensions", () => ({
 	hoverTooltips: () => [],
@@ -99,7 +100,7 @@ class TestWebSocket {
 		TestWebSocket.instances.push(this);
 		queueMicrotask(() => {
 			this.readyState = TestWebSocket.OPEN;
-			this.onopen?.({type: "open"});
+			this.onopen?.({ type: "open" });
 		});
 	}
 
@@ -115,7 +116,7 @@ class TestWebSocket {
 				data: JSON.stringify({
 					jsonrpc: "2.0",
 					id: message.id,
-					result: {capabilities: {}},
+					result: { capabilities: {} },
 				}),
 			});
 		});
@@ -124,7 +125,7 @@ class TestWebSocket {
 	close(code = 1000) {
 		this.closeCalls++;
 		this.readyState = TestWebSocket.CLOSED;
-		this.onclose?.({code, wasClean: code === 1000});
+		this.onclose?.({ code, wasClean: code === 1000 });
 	}
 }
 
@@ -140,7 +141,7 @@ class TestTransport {
 				JSON.stringify({
 					jsonrpc: "2.0",
 					id: message.id,
-					result: {capabilities: {}},
+					result: { capabilities: {} },
 				}),
 			);
 		});
@@ -168,7 +169,7 @@ beforeEach(() => {
 	originalWebSocket = globalThis.WebSocket;
 	globalThis.WebSocket = TestWebSocket;
 	TestWebSocket.instances = [];
-	registerRuntimeProvider(externalWebSocketRuntimeProvider, {replace: true});
+	registerRuntimeProvider(externalWebSocketRuntimeProvider, { replace: true });
 	registry.servers = [
 		{
 			id: SERVER_ID,
@@ -182,7 +183,7 @@ beforeEach(() => {
 			},
 		},
 	];
-	view = new EditorView({doc: "fn main() {}", parent: document.body});
+	view = new EditorView({ doc: "fn main() {}", parent: document.body });
 });
 
 afterEach(async () => {
@@ -211,13 +212,13 @@ describe("LSP client idle lifecycle", () => {
 			.find((message) => message.method === "initialize");
 		expect(initialize.params.capabilities.textDocument.codeAction).toEqual({
 			dataSupport: true,
-			resolveSupport: {properties: ["edit"]},
+			resolveSupport: { properties: ["edit"] },
 		});
 	});
 
 	it("reuses an external WebSocket client when a file attaches during the grace period", async () => {
-		const onClientIdle = vi.fn(({dispose}) => void dispose());
-		manager = new LspClientManager({onClientIdle});
+		const onClientIdle = vi.fn(({ dispose }) => void dispose());
+		manager = new LspClientManager({ onClientIdle });
 		const rootUri = "file:///workspace";
 
 		await manager.getExtensionsForFile({
@@ -245,8 +246,8 @@ describe("LSP client idle lifecycle", () => {
 	});
 
 	it("disposes an unused external WebSocket client after the grace period", async () => {
-		const onClientIdle = vi.fn(({dispose}) => void dispose());
-		manager = new LspClientManager({onClientIdle});
+		const onClientIdle = vi.fn(({ dispose }) => void dispose());
+		manager = new LspClientManager({ onClientIdle });
 		const rootUri = "file:///workspace-one";
 		const uri = `${rootUri}/only.rs`;
 
@@ -291,11 +292,11 @@ describe("LSP client idle lifecycle", () => {
 					};
 				},
 			},
-			{replace: true},
+			{ replace: true },
 		);
 		registry.servers[0].runtimes = [TRANSPORT_RUNTIME_ID];
-		const onClientIdle = vi.fn(({dispose}) => void dispose());
-		manager = new LspClientManager({onClientIdle});
+		const onClientIdle = vi.fn(({ dispose }) => void dispose());
+		manager = new LspClientManager({ onClientIdle });
 		const rootUri = "file:///workspace";
 		const uri = `${rootUri}/only.rs`;
 

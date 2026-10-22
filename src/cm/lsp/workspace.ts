@@ -3,10 +3,7 @@ import { LSPPlugin, Workspace } from "@codemirror/lsp-client";
 import type { Text, TransactionSpec } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
 import { getModeForPath } from "cm/modelist";
-import {
-	forgetPullDiagnostics,
-	schedulePullDiagnostics,
-} from "./diagnostics";
+import { forgetPullDiagnostics, schedulePullDiagnostics } from "./diagnostics";
 import { addLspLogFor, type LspLogLevel } from "./logs";
 import type { WorkspaceFileUpdate, WorkspaceOptions } from "./types";
 

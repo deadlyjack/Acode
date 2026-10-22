@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
 import {
 	executeConsoleCommand,
 	executeConsoleScript,
 	resolveConsoleExecutionContext,
 } from "lib/consoleRuntime";
+import { describe, expect, it } from "vitest";
 
 describe("console execution context", () => {
 	it("forces standalone menu consoles to use the worker", () => {

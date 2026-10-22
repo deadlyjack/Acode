@@ -22,6 +22,8 @@ describe("plugin context Cordova bridge", () => {
 		expect(requireModule).toHaveBeenCalledWith("cordova/exec");
 		expect(cordova.exec).toBeUndefined();
 		await expect(pluginContext.connect()).resolves.toBe(true);
-		await expect(pluginContext.default("example.plugin", "{}")).resolves.toBeTruthy();
+		await expect(
+			pluginContext.default("example.plugin", "{}"),
+		).resolves.toBeTruthy();
 	});
 });

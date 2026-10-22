@@ -133,16 +133,8 @@ const lspPublishedDiagnostics = StateField.define<
 			for (const [client, diagnostics] of value) {
 				const mapped: LspDiagnostic[] = [];
 				for (const diagnostic of diagnostics) {
-					const from = tr.changes.mapPos(
-						diagnostic.from,
-						1,
-						MapMode.TrackDel,
-					);
-					const to = tr.changes.mapPos(
-						diagnostic.to,
-						-1,
-						MapMode.TrackDel,
-					);
+					const from = tr.changes.mapPos(diagnostic.from, 1, MapMode.TrackDel);
+					const to = tr.changes.mapPos(diagnostic.to, -1, MapMode.TrackDel);
 					if (from != null && to != null) {
 						mapped.push({ ...diagnostic, from, to });
 					}
@@ -346,8 +338,7 @@ async function pullDiagnostics(
 		applyDiagnostics(client, uri, version, report.items);
 	} catch (error) {
 		if (state.generations.get(uri) === generation) {
-			const message =
-				error instanceof Error ? error.message : String(error);
+			const message = error instanceof Error ? error.message : String(error);
 			const failures = (state.failures.get(uri) ?? 0) + 1;
 			state.failures.set(uri, failures);
 			if (/timed out/i.test(message) && failures <= 2) {
@@ -390,10 +381,13 @@ export function schedulePullDiagnostics(
 	state.generations.set(uri, generation);
 	state.timers.set(
 		uri,
-		setTimeout(() => {
-			state.timers.delete(uri);
-			void pullDiagnostics(client, uri, generation);
-		}, Math.max(0, delay)),
+		setTimeout(
+			() => {
+				state.timers.delete(uri);
+				void pullDiagnostics(client, uri, generation);
+			},
+			Math.max(0, delay),
+		),
 	);
 }
 

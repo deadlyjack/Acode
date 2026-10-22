@@ -5,6 +5,7 @@ import {
 	hasQuickToolsOverlay,
 	watchQuickToolsOverlays,
 } from "../../src/lib/quickToolsOverlays";
+
 let dispose;
 afterEach(() => {
 	dispose?.();

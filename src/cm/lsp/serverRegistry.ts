@@ -2,6 +2,11 @@ import {
 	bindServerRegistry,
 	ensureBuiltinBundlesRegistered,
 } from "./serverCatalog";
+import {
+	addJsTsLanguageAliases,
+	isTailwindCssServer,
+	resolveJsTsLanguageId,
+} from "./servers/shared";
 import type {
 	AcodeClientConfig,
 	BridgeConfig,
@@ -15,11 +20,6 @@ import type {
 	TransportDescriptor,
 	WebSocketTransportOptions,
 } from "./types";
-import {
-	addJsTsLanguageAliases,
-	isTailwindCssServer,
-	resolveJsTsLanguageId,
-} from "./servers/shared";
 
 const registry = new Map<string, LspServerDefinition>();
 const listeners = new Set<RegistryEventListener>();
@@ -197,10 +197,7 @@ function sanitizeDefinition(
 		throw new Error(`LSP server ${id} is missing a transport descriptor`);
 	}
 
-	if (
-		!("languages" in definition) ||
-		!languages.length
-	) {
+	if (!("languages" in definition) || !languages.length) {
 		throw new Error(`LSP server ${id} must declare supported languages`);
 	}
 

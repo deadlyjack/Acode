@@ -62,7 +62,10 @@ it("queues cold-start and in-startup batches until both files and plugins are re
 	expect(f.open).not.toHaveBeenCalled();
 	f.ready();
 	await f.processPendingIntents();
-	expect(f.open.mock.calls.map(([uri]) => uri)).toEqual(["content://docs/1", "content://docs/2"]);
+	expect(f.open.mock.calls.map(([uri]) => uri)).toEqual([
+		"content://docs/1",
+		"content://docs/2",
+	]);
 	expect(f.open).toHaveBeenLastCalledWith("content://docs/2", {
 		mode: "single",
 		render: true,
@@ -81,7 +84,11 @@ it("serializes warm batches and deduplicates stream/ClipData URIs without losing
 				finish = resolve;
 			}),
 	);
-	const first = f.send(["content://docs/1", "content://docs/1", "file:///second.pdf"]);
+	const first = f.send([
+		"content://docs/1",
+		"content://docs/1",
+		"file:///second.pdf",
+	]);
 	const second = f.send(["content://docs/3"], "SEND");
 	expect(f.open).toHaveBeenCalledTimes(1);
 	finish();
@@ -147,33 +154,40 @@ it("continues after failures and offers Plugins once per batch, escaping provide
 	const items = f.select.mock.calls[0][1];
 	expect(items[0].text).toContain("&lt;img src=x&gt;.pdf");
 	expect(items[0].text).toContain("content://docs/2");
-	expect(items.map((item) => item.value)).toEqual([undefined, "plugins", "close"]);
+	expect(items.map((item) => item.value)).toEqual([
+		undefined,
+		"plugins",
+		"close",
+	]);
 	expect(f.exec).toHaveBeenCalledWith("open", "plugins");
 });
 
-it.each(["cancel", "reject"])(
-	"continues queued and later intents when the error dialog ends with %s",
-	async (outcome) => {
-		const f = setup();
-		f.ready();
-		vi.spyOn(console, "error").mockImplementation(() => {});
-		f.open.mockRejectedValueOnce({
-			code: "DOCUMENT_HANDLER_UNAVAILABLE",
-			filename: "missing.docx",
-		});
-		f.select.mockImplementationOnce((_title, _items, options) => {
-			if (outcome === "reject") return Promise.reject(Error("Dialog failed"));
-			options.onCancel();
-			return new Promise(() => {});
-		});
-		await Promise.all([f.send(["content://docs/missing"]), f.send(["content://docs/queued"])]);
-		await f.send(["content://docs/next"]);
-		expect(f.open.mock.calls.map(([uri]) => uri)).toEqual([
-			"content://docs/missing",
-			"content://docs/queued",
-			"content://docs/next",
-		]);
-		expect(f.reportError).toHaveBeenCalledTimes(outcome === "reject" ? 1 : 0);
-		expect(f.exec).not.toHaveBeenCalled();
-	},
-);
+it.each([
+	"cancel",
+	"reject",
+])("continues queued and later intents when the error dialog ends with %s", async (outcome) => {
+	const f = setup();
+	f.ready();
+	vi.spyOn(console, "error").mockImplementation(() => {});
+	f.open.mockRejectedValueOnce({
+		code: "DOCUMENT_HANDLER_UNAVAILABLE",
+		filename: "missing.docx",
+	});
+	f.select.mockImplementationOnce((_title, _items, options) => {
+		if (outcome === "reject") return Promise.reject(Error("Dialog failed"));
+		options.onCancel();
+		return new Promise(() => {});
+	});
+	await Promise.all([
+		f.send(["content://docs/missing"]),
+		f.send(["content://docs/queued"]),
+	]);
+	await f.send(["content://docs/next"]);
+	expect(f.open.mock.calls.map(([uri]) => uri)).toEqual([
+		"content://docs/missing",
+		"content://docs/queued",
+		"content://docs/next",
+	]);
+	expect(f.reportError).toHaveBeenCalledTimes(outcome === "reject" ? 1 : 0);
+	expect(f.exec).not.toHaveBeenCalled();
+});

@@ -104,10 +104,7 @@ async function performRename(view: EditorView): Promise<boolean> {
 						view.state.doc,
 						prepareResult.start,
 					);
-					const to = safeLspPositionToOffset(
-						view.state.doc,
-						prepareResult.end,
-					);
+					const to = safeLspPositionToOffset(view.state.doc, prepareResult.end);
 					initialValue = view.state.sliceDoc(from, to);
 				} else if ("range" in prepareResult && prepareResult.range) {
 					const from = safeLspPositionToOffset(
@@ -194,7 +191,11 @@ async function applyChangesToFile(
 
 	const displayedView = await workspace.displayFile(uri);
 	if (!displayedView?.state?.doc) {
-		addLspLogFor(workspace.client, "warn", `Rename could not open file: ${uri}`);
+		addLspLogFor(
+			workspace.client,
+			"warn",
+			`Rename could not open file: ${uri}`,
+		);
 		console.warn(`[LSP:Rename] Could not open file: ${uri}`);
 		return false;
 	}
@@ -272,7 +273,11 @@ async function doRename(
 	console.info(
 		`[LSP:Rename] Renamed to "${newName}" in ${filesChanged} file(s)`,
 	);
-	addLspLogFor(plugin, "info", `Renamed to "${newName}" in ${filesChanged} file(s)`);
+	addLspLogFor(
+		plugin,
+		"info",
+		`Renamed to "${newName}" in ${filesChanged} file(s)`,
+	);
 }
 
 export const renameSymbol: Command = (view) => {

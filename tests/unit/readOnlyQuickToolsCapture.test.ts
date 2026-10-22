@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
 import {
 	captureReadOnlyQuickToolsKey,
 	createReadOnlyQuickToolsCaptureSession,
 } from "handlers/readOnlyQuickToolsCapture";
+import { describe, expect, it } from "vitest";
 
 const modifiers = {
 	shiftKey: false,

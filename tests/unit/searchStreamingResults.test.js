@@ -1,8 +1,10 @@
 // @vitest-environment happy-dom
+
+import { createSearchResultView } from "sidebarApps/searchInFiles/cmResultView";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { expect, it, vi } from "vitest";
-import { createSearchResultView } from "sidebarApps/searchInFiles/cmResultView";
+
 vi.mock("lib/settings", () => ({ default: { value: {} } }));
 vi.mock("utils/helpers", () => ({
 	default: { getIconForFile: (name) => `icon-${name}` },

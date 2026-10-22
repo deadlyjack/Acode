@@ -4,7 +4,7 @@ import { showReferencesPanel } from "components/referencesPanel";
 import { navigateToReference } from "components/referencesPanel/utils";
 import toast from "components/toast";
 import type { ServerCapabilities } from "vscode-languageserver-protocol";
-import { normalizeLocations, type LspLocationResult } from "./locationUtils";
+import { type LspLocationResult, normalizeLocations } from "./locationUtils";
 import { addLspLogFor } from "./logs";
 import { fetchLineText, getWordAtCursor } from "./references";
 

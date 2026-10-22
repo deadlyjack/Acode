@@ -32,10 +32,7 @@ export function bindSelectionMenuButton(
 		if (!pointerStart) return false;
 		const xDistance = event.clientX - pointerStart.x;
 		const yDistance = event.clientY - pointerStart.y;
-		return (
-			xDistance ** 2 + yDistance ** 2 >
-			POINTER_MOVE_TOLERANCE ** 2
-		);
+		return xDistance ** 2 + yDistance ** 2 > POINTER_MOVE_TOLERANCE ** 2;
 	};
 
 	button.addEventListener("pointerdown", (event) => {
